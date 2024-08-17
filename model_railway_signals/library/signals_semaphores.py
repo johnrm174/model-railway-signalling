@@ -10,8 +10,11 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       signalsubtype - subtype of the semaphore signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
-#       callback - the function to call on signal switched, approached or passed events
-#               Note that the callback function returns (item_id, callback type)
+#       sig_switched_callback - the function to call on signal switched events (returns item_id)
+#       sub_switched_callback - the function to call on subsidary switched events (returns item_id)
+#       sig_released_callback - the function to call on signal released events (returns item_id)
+#       sig_passed_callback - the function to call on signal passed events (returns item_id)
+#       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
 #       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
@@ -63,7 +66,12 @@ from .signals import semaphore_subtype as semaphore_subtype
     
 def create_semaphore_signal(canvas, sig_id:int,
                             signalsubtype:semaphore_subtype,
-                            x:int, y:int, callback,
+                            x:int, y:int,
+                            sig_switched_callback,
+                            sub_switched_callback,
+                            sig_released_callback,
+                            sig_passed_callback,
+                            sig_updated_callback,
                             orientation:int=0,
                             sig_passed_button:bool=False,
                             sig_release_button:bool=False,
@@ -122,7 +130,11 @@ def create_semaphore_signal(canvas, sig_id:int,
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id,
                                                 signals.signal_type.semaphore,
-                                                x, y, orientation, callback,
+                                                x, y, orientation,
+                                                sig_switched_callback,
+                                                sig_passed_callback,
+                                                sig_updated_callback,
+                                                sub_switched_callback,
                                                 has_subsidary = has_subsidary,
                                                 sig_passed_button = sig_passed_button,
                                                 sig_automatic = fully_automatic,
@@ -279,8 +291,8 @@ def create_semaphore_signal(canvas, sig_id:int,
         signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=24, yoff=postoffset,
                         orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator)
         # Create the signal elements to support Approach Control
-        signals.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation,
-                                            canvas_tag=canvas_tag, approach_button=sig_release_button)
+        signals.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation, canvas_tag=canvas_tag,
+                                        approach_button=sig_release_button, sig_released_callback=sig_released_callback)
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
@@ -710,7 +722,7 @@ class timed_sequence():
                 if self.start_delay > 0:                 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
                     update_semaphore_signal(self.sig_id)
-                    signals.signals[str(self.sig_id)]["extcallback"] (self.sig_id,signals.signal_callback_type.sig_passed)
+                    signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
                 else:
                     update_semaphore_signal(self.sig_id)
             # We need to schedule the sequence completion (i.e. back to clear
@@ -722,7 +734,7 @@ class timed_sequence():
         if signals.signal_exists(self.sig_id):
             logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_semaphore_signal(self.sig_id)
-            signals.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals.signal_callback_type.sig_updated)
+            signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
 
 # -------------------------------------------------------------------------
 # Function to initiate a timed signal sequence - setting the signal initially to ON

@@ -36,6 +36,7 @@
 #    set_instrument_clear(*instrumentids)
 #    click_telegraph_key(*instrumentids)
 #    simulate_gpio_triggered(*gpioids)
+#    simulate_buttons_clicked(*buttonids)
 #
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
@@ -69,6 +70,10 @@
 #    assert_section_label(secid,label)
 #    assert_block_section_ahead_clear(instids*)
 #    assert_block_section_ahead_not_clear(instids*)
+#    assert_buttons_enabled(*buttonids)
+#    assert_buttons_disabled(*buttonids)
+#    assert_buttons_selected(*buttonids)
+#    assert_buttons_deselected(*buttonids)
 #
 # Supported Menubar control invocations:
 #    set_edit_mode()
@@ -89,6 +94,7 @@
 #    create_left_hand_point()
 #    create_right_hand_point()
 #    create_textbox()
+#    create_route()
 #
 # Supported Schematic keypress / right click menu invocations:
 #    toggle_mode()                    - 'Cntl-m'
@@ -145,17 +151,13 @@ import threading
 
 import sys
 sys.path.append("..")
-from model_railway_signals.editor import settings
 from model_railway_signals.editor import editor
 from model_railway_signals.editor import schematic
 from model_railway_signals.editor import objects
 from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
-from model_railway_signals.library import signals_colour_lights
-from model_railway_signals.library import signals_semaphores
-from model_railway_signals.library import signals_ground_position
-from model_railway_signals.library import signals_ground_disc
+from model_railway_signals.library import buttons
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sensors
@@ -470,6 +472,13 @@ def simulate_gpio_triggered(*gpioids):
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid,testing=True))
 
+def simulate_buttons_clicked(*buttonids):
+    for buttonid in buttonids:
+        if str(buttonid) not in buttons.buttons.keys():
+            raise_test_warning ("simulate_buttons_clicked - Button: "+str(buttonid)+" does not exist")
+        else:
+            run_function(lambda:buttons.button_event(buttonid))
+
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
@@ -770,6 +779,38 @@ def assert_block_section_ahead_not_clear(*instrumentids):
             raise_test_error ("assert_block_section_ahead_not_clear - Section: "+str(instid)+" - Test Fail")
         increment_tests_executed()
 
+def assert_buttons_enabled(*buttonids):
+    for buttonid in buttonids:
+        if str(buttonid) not in buttons.buttons.keys():
+            raise_test_warning ("assert_routes_enabled - Route: "+str(buttonid)+" does not exist")
+        elif not buttons.button_enabled(buttonid):
+            raise_test_error ("assert_routes_enabled - Route: "+str(buttonid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_buttons_disabled(*buttonids):
+    for buttonid in buttonids:
+        if str(buttonid) not in buttons.buttons.keys():
+            raise_test_warning ("assert_routes_disabled - Route: "+str(buttonid)+" does not exist")
+        elif buttons.button_enabled(buttonid):
+            raise_test_error ("assert_routes_disabled - Route: "+str(buttonid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_buttons_selected(*buttonids):
+    for buttonid in buttonids:
+        if str(buttonid) not in buttons.buttons.keys():
+            raise_test_warning ("assert_buttons_selected - Button: "+str(buttonid)+" does not exist")
+        elif not buttons.button_state(buttonid):
+            raise_test_error ("assert_buttons_selected - Button: "+str(buttonid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_buttons_deselected(*buttonids):
+    for buttonid in buttonids:
+        if str(buttonid) not in buttons.buttons.keys():
+            raise_test_warning ("assert_buttons_unselected - Button: "+str(buttonid)+" does not exist")
+        elif buttons.button_state(buttonid):
+            raise_test_error ("assert_buttons_unselected - Button: "+str(buttonid)+" - Test Fail")
+        increment_tests_executed()
+
 # ------------------------------------------------------------------------------
 # Dummy event class for generating mouse events (for the schematic tests)
 # ------------------------------------------------------------------------------
@@ -848,6 +889,11 @@ def create_right_hand_point():
 
 def create_textbox():
     run_function(lambda:schematic.create_object(objects.object_type.textbox))
+    object_id = list(objects.schematic_objects)[-1]
+    return(object_id)
+
+def create_route():
+    run_function(lambda:schematic.create_object(objects.object_type.route))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 

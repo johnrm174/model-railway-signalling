@@ -25,8 +25,9 @@
 #    configure_line.edit_line(root,object_id) - Open line edit window (on double click)
 #    configure_textbox.edit_textbox(root,object_id) - Open textbox edit window (on double click)
 #    configure_track_sensor.edit_track_sensor(root,object_id) - Open the edit window (on double click)
-#    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
-#
+#    configure_route.edit_route(root,object_id) - Open the edit window (on double click)
+#    run_layout.initialise(root_window, canvas) - Initialise the run_layout module with the root and canvas
+#    run_routes.initialise(root_window, canvas) - Initialise the run_routes module with the root and canvas 
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -41,6 +42,8 @@
 #    block_instruments.instrument_type - Used to access the block_instrument type
 #    points.point_type - Used to access the point type
 #    points.point_subtype - Used to access the point subtype
+#    lines.move_line_end1 - Used for schematic editing of a line
+#    lines.move_line_end2 - Used for schematic editing of a line
 #
 #------------------------------------------------------------------------------------
 
@@ -49,9 +52,11 @@ import tkinter as Tk
 from ..library import signals
 from ..library import block_instruments
 from ..library import points
+from ..library import lines
 
 from . import objects
 from . import run_layout
+from . import run_routes
 from . import configure_signal
 from . import configure_point
 from . import configure_section
@@ -59,6 +64,7 @@ from . import configure_instrument
 from . import configure_line
 from . import configure_textbox
 from . import configure_track_sensor
+from . import configure_route
 
 import importlib.resources
 import math
@@ -154,8 +160,7 @@ def select_object(object_id):
     schematic_state["selectedobjects"].append(object_id)
     # Highlight the item to show it has been selected
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-        canvas.itemconfigure(objects.schematic_objects[object_id]["end1"],state="normal")
-        canvas.itemconfigure(objects.schematic_objects[object_id]["end2"],state="normal")
+        canvas.itemconfigure(objects.schematic_objects[object_id]["selection"],state="normal")
     else:
         canvas.itemconfigure(objects.schematic_objects[object_id]["bbox"],state="normal")
     return()
@@ -170,8 +175,7 @@ def deselect_object(object_id):
     schematic_state["selectedobjects"].remove(object_id)
     # Remove the highlighting to show it has been de-selected
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-        canvas.itemconfigure(objects.schematic_objects[object_id]["end1"],state="hidden")
-        canvas.itemconfigure(objects.schematic_objects[object_id]["end2"],state="hidden")
+        canvas.itemconfigure(objects.schematic_objects[object_id]["selection"],state="hidden")
     else:
         canvas.itemconfigure(objects.schematic_objects[object_id]["bbox"],state="hidden")
     return()
@@ -239,6 +243,8 @@ def edit_selected_object():
         edit_popup = configure_instrument.edit_instrument(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.track_sensor:
         edit_popup = configure_track_sensor.edit_track_sensor(root,object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.route:
+        edit_popup = configure_route.edit_route(root,object_id)
     return()
 
 # The following function is for test purposes only - to close the windows opened above by the system tests
@@ -267,9 +273,9 @@ def snap_selected_objects_to_grid(event=None):
             posx = objects.schematic_objects[object_id]["endx"]
             posy = objects.schematic_objects[object_id]["endy"]
             xdiff2,ydiff2 = snap_to_grid(posx,posy, force_snap=True)
-            move_line_end_1(object_id,xdiff1,ydiff1)
+            lines.move_line_end_1(objects.schematic_objects[object_id]["itemid"],xdiff1,ydiff1)
             objects.move_objects([object_id],xdiff1=xdiff1,ydiff1=ydiff1)
-            move_line_end_2(object_id,xdiff2,ydiff2)
+            lines.move_line_end_2(objects.schematic_objects[object_id]["itemid"],xdiff2,ydiff2)
             objects.move_objects([object_id],xdiff2=xdiff2,ydiff2=ydiff2)
         else:
             canvas.move(objects.schematic_objects[object_id]["tags"],xdiff1,ydiff1)
@@ -317,44 +323,6 @@ def disable_arrow_keypress_events(event=None):
     canvas.unbind('<KeyPress-Right>')
     canvas.unbind('<KeyPress-Up>')
     canvas.unbind('<KeyPress-Down>')
-    return()
-
-#------------------------------------------------------------------------------------
-# Internal function to edit a line object on the canvas. The "editlineend1" and
-# "editlineend2" dictionary elements specify the line end that needs to be moved
-# Only a single Object will be selected when this function is called
-#------------------------------------------------------------------------------------
-        
-def update_end_stops(object_id):
-    # Update the line end stops using the common function provided by the objects sub-package
-    x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["line"])
-    dx,dy = objects.get_endstop_offsets(x1,y1,x2,y2)
-    canvas.coords(objects.schematic_objects[object_id]["stop1"],x1+dx,y1+dy,x1-dx,y1-dy)
-    canvas.coords(objects.schematic_objects[object_id]["stop2"],x2+dx,y2+dy,x2-dx,y2-dy)
-    return()
-
-def move_line_end_1(object_id, xdiff:int,ydiff:int):
-    # Move the tkinter selection circle for the 'start' of the line
-    canvas.move(objects.schematic_objects[object_id]["end1"],xdiff,ydiff)
-    # Update the line coordinates to reflect the changed 'start' position
-    end2x = objects.schematic_objects[object_id]["endx"]
-    end2y = objects.schematic_objects[object_id]["endy"]
-    x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end1"])
-    canvas.coords(objects.schematic_objects[object_id]["line"],(x1+x2)/2,(y1+y2)/2,end2x,end2y)
-    # Update the position of the line end stops to reflect the new line geometry
-    update_end_stops(object_id)
-    return()
-
-def move_line_end_2(object_id, xdiff:int,ydiff:int):
-    # Move the tkinter selection circle for the 'end' of the line
-    canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
-    # Update the line coordinates to reflect the changed 'end' position
-    end1x = objects.schematic_objects[object_id]["posx"]
-    end1y = objects.schematic_objects[object_id]["posy"]
-    x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end2"])
-    canvas.coords(objects.schematic_objects[object_id]["line"],end1x,end1y,(x1+x2)/2,(y1+y2)/2)
-    # Update the position of the line end stops to reflect the new line geometry
-    update_end_stops(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -611,8 +579,10 @@ def track_cursor(event):
         ydiff = canvas_y - schematic_state["lasty"]
         # Move the selected line end (only one object will be selected)
         object_id = schematic_state["selectedobjects"][0]       
-        if schematic_state["editlineend1"]: move_line_end_1(object_id,xdiff,ydiff)
-        else: move_line_end_2(object_id,xdiff,ydiff)
+        if schematic_state["editlineend1"]:
+            lines.move_line_end_1(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
+        else:
+            lines.move_line_end_2(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
         # Reset the "start" position for the next move
         schematic_state["lastx"] += xdiff
         schematic_state["lasty"] += ydiff
@@ -651,8 +621,10 @@ def left_button_release(event):
                                    schematic_state["lasty"]- schematic_state["starty"])
         # Move the selected line end (only one object will be selected)
         object_id = schematic_state["selectedobjects"][0]       
-        if schematic_state["editlineend1"]: move_line_end_1(object_id,xdiff,ydiff)
-        else: move_line_end_2(object_id,xdiff,ydiff)
+        if schematic_state["editlineend1"]:
+            lines.move_line_end_1(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
+        else:
+            lines.move_line_end_2(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
         # Calculate the total deltas for the move (from the startposition)
         finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
         finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
@@ -700,8 +672,10 @@ def cancel_move_in_progress(event=None):
         ydiff = schematic_state["starty"] - schematic_state["lasty"]
         # Move the selected line end (only one object will be selected)
         object_id = schematic_state["selectedobjects"][0]       
-        if schematic_state["editlineend1"]: move_line_end_1(object_id,xdiff,ydiff)
-        else: move_line_end_2(object_id,xdiff,ydiff)
+        if schematic_state["editlineend1"]:
+            lines.move_line_end_1(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
+        else:
+            lines.move_line_end_2(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
         # Clear the "Edit line mode" - but leave the line selected
         schematic_state["editlineend1"] = False
         schematic_state["editlineend2"] = False
@@ -949,7 +923,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["section", lambda:create_object(objects.object_type.section) ],
                    ["sensor", lambda:create_object(objects.object_type.track_sensor) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
-                                        block_instruments.instrument_type.single_line.value) ] ]
+                                        block_instruments.instrument_type.single_line.value) ],
+                   ["route", lambda:create_object(objects.object_type.route)] ]
     # Create the buttons we need (Note that the button images are added to a global
     # list so they remain in scope (otherwise the buttons won't work)
     resource_folder = 'model_railway_signals.editor.resources'
@@ -968,7 +943,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             button.pack(padx=2, pady=2, fill='x')
     # Initialise the Objects and run_layout modules with the canvas details
     objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
-    run_layout.initialise(canvas)
+    run_layout.initialise(root_window, canvas)
+    run_routes.initialise(root_window, canvas)
     return()
 
 # The following shutdown function is to overcome what seems to be a bug in TkInter where

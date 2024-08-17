@@ -10,14 +10,13 @@
 #    find_initial_canvas_position - common function to return the next 'free' position (x,y)
 #    new_item_id - Common function - common function to return the next 'free' item ID
 #
-#    line_exists (item_id:int) - Common function to see if a given item exists  ########################
-#
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
 #    line(item_id:int) - helper function to find the object Id by Item ID
 #    track_sensor(item_id:int) - helper function to find the object Id by Item ID
+#    route(item_id:int) - helper function to find the object Id by Item ID
 #
 # Objects intended to be accessed directly by other editor modules:
 #
@@ -33,6 +32,7 @@
 #    section_index - for iterating through all the section objects
 #    line_index - for iterating through all the line objects
 #    track_sensor_index - for iterating through all the sensor objects
+#    route_index - for iterating through all the route objects
 #
 #------------------------------------------------------------------------------------
 
@@ -50,6 +50,7 @@ class object_type():
     section:str = "section"
     instrument:str = "instrument"
     track_sensor:str = "tracksensor"
+    route:str = "route"
 
 #------------------------------------------------------------------------------------
 # All Objects we create (and their configuration) are stored in a global dictionary
@@ -69,6 +70,7 @@ instrument_index:dict={}
 section_index:dict={}
 line_index:dict={}
 track_sensor_index:dict={}
+route_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id
@@ -80,6 +82,7 @@ def instrument(ID:int): return (instrument_index[str(ID)])
 def section(ID:int): return (section_index[str(ID)])
 def line(ID:int): return (line_index[str(ID)])
 def track_sensor(ID:int): return (track_sensor_index[str(ID)])
+def route(ID:int): return (route_index[str(ID)])
 
 #------------------------------------------------------------------------------------
 # Simple functions to test if a particular item_id already exists (for an item_type)

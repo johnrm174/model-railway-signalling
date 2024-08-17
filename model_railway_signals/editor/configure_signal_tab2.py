@@ -63,6 +63,12 @@ class interlocking_route_group:
         self.p4 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
         self.p5 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
         self.p6 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p1.pack(side = Tk.LEFT)
+        self.p2.pack(side = Tk.LEFT)
+        self.p3.pack(side = Tk.LEFT)
+        self.p4.pack(side = Tk.LEFT)
+        self.p5.pack(side = Tk.LEFT)
+        self.p6.pack(side = Tk.LEFT)
         # Create the signal ahead and instrument ahead elements (always packed)
         self.label1 = Tk.Label(self.frame, text=" Sig:")
         self.label1.pack(side=Tk.LEFT)
@@ -237,85 +243,8 @@ class interlocking_route_frame:
         self.rh2.disable_block_ahead()
     
 #------------------------------------------------------------------------------------
-# Class for a conflicting signal UI Element (for interlocking)
-# uses multiple instances of the common signal_route_selection_element
-# Public class instance methods provided by this class are:
-#    "set_values" - Populates the list of interlocked signals and their routes 
-#          Note that we  also need the current item id for validation
-#    "get_values" - Returns the list of interlocked signals and their routes
-#    "enable_route" - Enables/loads all selections for the route
-#    "disable_route" - Disables/blanks all selections for the route
-#    "validate" - Validates all Entry boxes (Signals exist and not current ID) 
-#------------------------------------------------------------------------------------
-
-class conflicting_signals_element():
-    def __init__(self, parent_frame, parent_object, label:str):
-        # Theis is the functions used to validate that the entered signal ID exists
-        exists_function = signals.signal_exists
-        # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 
-        self.frame = Tk.LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
-        self.frame.pack(padx=2, pady=2, fill='x')
-        # create two frames - each frame will hold two conflicting signals
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack()
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack()
-        tool_tip = "Specify any signals/routes that would conflict with this signal route"
-        self.sig1 = common.signal_route_selections(self.subframe1, read_only=False,
-                            tool_tip = tool_tip,exists_function=exists_function)
-        self.sig1.frame.pack(side=Tk.LEFT, padx=5)
-        self.sig2 = common.signal_route_selections(self.subframe1, read_only=False,
-                            tool_tip = tool_tip, exists_function=exists_function)
-        self.sig2.frame.pack(side=Tk.LEFT, padx=5)
-        self.sig3 = common.signal_route_selections(self.subframe2, read_only=False,
-                            tool_tip = tool_tip, exists_function=exists_function)
-        self.sig3.frame.pack(side=Tk.LEFT, padx=5)
-        self.sig4 = common.signal_route_selections(self.subframe2, read_only=False,
-                            tool_tip = tool_tip, exists_function=exists_function)
-        self.sig4.frame.pack(side=Tk.LEFT, padx=5)
-
-    def validate(self):
-        # Validate everything - to highlight ALL validation errors in the UI
-        valid = True
-        if not self.sig1.validate(): valid = False
-        if not self.sig2.validate(): valid = False
-        if not self.sig3.validate(): valid = False
-        if not self.sig4.validate(): valid = False
-        return(valid)
-
-    def enable_route(self):
-        self.sig1.enable()
-        self.sig2.enable()
-        self.sig3.enable()
-        self.sig4.enable()
-        
-    def disable_route(self):
-        self.sig1.disable()
-        self.sig2.disable()
-        self.sig3.disable()
-        self.sig4.disable()
-
-    def set_values(self, sig_route:[[int,[bool,bool,bool,bool,bool]],], item_id):
-        # each sig_route comprises [sig1, sig2, sig3, sig4]
-        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # Where each route element is a boolean value (True or False)
-        self.sig1.set_values(sig_route[0], item_id)
-        self.sig2.set_values(sig_route[1], item_id)
-        self.sig3.set_values(sig_route[2], item_id)
-        self.sig4.set_values(sig_route[3], item_id)
-
-    def get_values(self):
-        # each sig_route comprises [sig1, sig2, sig3, sig4]
-        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # Where each route element is a boolean value (True or False)
-        return ( [self.sig1.get_values(),
-                  self.sig2.get_values(),
-                  self.sig3.get_values(),
-                  self.sig4.get_values()] )
-
-#------------------------------------------------------------------------------------
 # Class for a conflicting signal frame UI Element (for interlocking)
-# uses multiple instances of the common signal_route_selection_element
+# Uses the entry_box_grid class with signal_route_selection_elements
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the table of interlocked signal routes
 #          Note that we  also need the current item id for validation
@@ -327,12 +256,28 @@ class conflicting_signals_frame():
     def __init__(self, parent_frame, parent_object):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = Tk.LabelFrame(parent_frame, text="Conflicting signals not locked by the above point selections")
-        self.main = conflicting_signals_element(self.frame, parent_object, "MAIN Route")
-        self.lh1 = conflicting_signals_element(self.frame, parent_object, "LH1 Route")
-        self.lh2 = conflicting_signals_element(self.frame, parent_object, "LH2 Route")
-        self.rh1 = conflicting_signals_element(self.frame, parent_object, "RH1 Route")
-        self.rh2 = conflicting_signals_element(self.frame, parent_object, "RH2 Route")
-        
+        tool_tip = "Specify any signals/routes that would conflict with this signal route"
+        self.main_frame = Tk.LabelFrame(self.frame, text="MAIN Route - interlocking with conflicting signals")
+        self.main_frame.pack(padx=2, pady=2, fill='x')
+        self.main = common.entry_box_grid(self.main_frame, base_class=common.signal_route_selections,
+                                    tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.lh1_frame = Tk.LabelFrame(self.frame, text="LH1 Route - interlocking with conflicting signals")
+        self.lh1_frame.pack(padx=2, pady=2, fill='x')
+        self.lh1 = common.entry_box_grid(self.lh1_frame, base_class=common.signal_route_selections,
+                                    tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.lh2_frame = Tk.LabelFrame(self.frame, text="LH2 Route - interlocking with conflicting signals")
+        self.lh2_frame.pack(padx=2, pady=2, fill='x')
+        self.lh2 = common.entry_box_grid(self.lh2_frame, base_class=common.signal_route_selections,
+                                    tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.rh1_frame = Tk.LabelFrame(self.frame, text="RH1 Route - interlocking with conflicting signals")
+        self.rh1_frame.pack(padx=2, pady=2, fill='x')
+        self.rh1 = common.entry_box_grid(self.rh1_frame, base_class=common.signal_route_selections,
+                                    tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.rh2_frame = Tk.LabelFrame(self.frame, text="RH2 Route - interlocking with conflicting signals")
+        self.rh2_frame.pack(padx=2, pady=2, fill='x')
+        self.rh2 = common.entry_box_grid(self.rh2_frame, base_class=common.signal_route_selections,
+                                    tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
         valid = True
@@ -343,20 +288,28 @@ class conflicting_signals_frame():
         if not self.rh2.validate(): valid = False
         return(valid)
 
+    def create_list(self, sig_interlocking_route:[[int,[bool,bool,bool,bool,bool]],], item_id:int):
+        # To populate each signal_route_selections element via the entry_box_grid class, we need
+        # to compile a list of parameters for each element [[sig_interlocking_route, item_id], ]
+        class_set_values_list = []
+        for entry in sig_interlocking_route:
+            class_set_values_list.append([entry, item_id])
+        return(class_set_values_list)
+
     def set_values(self, sig_interlocking_routes:[[[int,[bool,bool,bool,bool,bool]],],], item_id:int):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
-        # each sig_route comprises a list of interlocked signals [sig1, sig2, sig3, sig4]
+        # each sig_route comprises a variable length list of interlocked signal entries
         # each interlocked signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # sig_id is the interlocked signal and the interlocked routes are True/False
-        self.main.set_values(sig_interlocking_routes[0], item_id)
-        self.lh1.set_values(sig_interlocking_routes[1], item_id)
-        self.lh2.set_values(sig_interlocking_routes[2], item_id)
-        self.rh1.set_values(sig_interlocking_routes[3], item_id)
-        self.rh2.set_values(sig_interlocking_routes[4], item_id)
+        self.main.set_values(self.create_list(sig_interlocking_routes[0], item_id))
+        self.lh1.set_values(self.create_list(sig_interlocking_routes[1], item_id))
+        self.lh2.set_values(self.create_list(sig_interlocking_routes[2], item_id))
+        self.rh1.set_values(self.create_list(sig_interlocking_routes[3], item_id))
+        self.rh2.set_values(self.create_list(sig_interlocking_routes[4], item_id))
 
     def get_values(self):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
-        # each sig_route comprises a list of interlocked signals [sig1, sig2, sig3, sig4]
+        # each sig_route comprises a variable length list of interlocked signal entries
         # each interlocked signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # sig_id is the interlocked signal and the interlocked routes are True/False
         return ( [self.main.get_values(),

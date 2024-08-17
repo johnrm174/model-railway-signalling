@@ -15,7 +15,7 @@
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
 #    update_references_to_section(old_id, new_id) - update section_id in the interlocking tables
-#    remove_references_to_instrument (inst_id) - remove instr references from the interlocking tables
+#    remove_references_to_instrument(inst_id) - remove instr references from the interlocking tables
 #    update_references_to_instrument(old_id, new_id) - update inst_id in the interlocking tables
 #
 # Makes the following external API calls to other editor modules:
@@ -24,9 +24,15 @@
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.signal - To get The Object_ID for a given Item_ID
 #    objects_points.reset_point_interlocking_tables() - recalculate interlocking tables 
+#    objects_routes.update_references_to_signal - called when the signal ID is changed
+#    objects_routes.remove_references_to_signal - called when the signal is deleted
 #
 # Accesses the following external editor objects directly:
-#    run_layout.schematic_callback - setting the object callbacks when created/recreated
+#    run_layout.signal_switched_callback - setting the object callbacks when created/recreated
+#    run_layout.subsidary_switched_callback - setting the object callbacks when created/recreated
+#    run_layout.signal_passed_callback - setting the object callbacks when created/recreated
+#    run_layout.signal_released_callback - setting the object callbacks when created/recreated
+#    run_layout.signal_updated_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.signal_index - The Index of Signal Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
@@ -70,6 +76,7 @@ from ...library import gpio_sensors
 
 from . import objects_common
 from . import objects_points
+from . import objects_routes
 from .. import run_layout
 
 #------------------------------------------------------------------------------------
@@ -146,32 +153,12 @@ default_signal_object["pointinterlock"] = [
 # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
 # Each entry is the ID of a (loacl) track section the signal is to be interlocked with
 default_signal_object["trackinterlock"] = [ [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0] ]
-# This is the default opposing signal interlocking table for a signal
-# The table comprises a list of route elements [main, lh1, lh2, rh1, rh2]
-# Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
+# From Release 4.5.0, the default opposing signal interlocking table for a signal
+# comprises a list of route elements [main, lh1, lh2, rh1, rh2]
+# Each route element comprises a variable length list of signals [sig1, etc, ]
 # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Where each route element is a boolean value (True or False)
-default_signal_object["siginterlock"] = [
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ] ]
+default_signal_object["siginterlock"] = [[],[],[],[],[]]
 # Set the default route selections for the signal
 default_signal_object["sigroutes"] = [True,False,False,False,False]
 default_signal_object["subroutes"] = [False,False,False,False,False]
@@ -239,15 +226,12 @@ def remove_references_to_signal(deleted_sig_id:int):
             list_of_conflicting_signals = list_of_interlocked_signal_routes[index1]
             # Create a new 'blank' list for copying the signals (that haven't been deleted) across
             # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by signal removals)
-            null_entry = [0, [False, False, False, False, False]]
-            new_list_of_conflicting_signals = [null_entry, null_entry, null_entry, null_entry]
-            index2 = 0
+            new_list_of_conflicting_signals = []
             # Iterate through each signal on the route in the interlocking table
             # to build up the new list of signals (that are to be retained)
             for conflicting_signal in list_of_conflicting_signals:
                 if conflicting_signal[0] != deleted_sig_id:
-                    new_list_of_conflicting_signals[index2] = conflicting_signal
-                    index2 = index2 + 1
+                    new_list_of_conflicting_signals.append(conflicting_signal)
             # replace the list of conflicting signals
             objects_common.schematic_objects[sig_object]["siginterlock"][index1] = new_list_of_conflicting_signals
         # Remove any "Trigger Timed signal" references to the signal
@@ -452,6 +436,8 @@ def update_signal(object_id, new_object_configuration):
         objects_common.signal_index[str(new_item_id)] = object_id
         # Update any "signal Ahead" references when signal ID is changed
         update_references_to_signal(old_item_id, new_item_id)
+        # Update any references to the signal in the route tables
+        objects_routes.update_references_to_signal(old_item_id, new_item_id)
     # Recalculate point interlocking tables in case they are affected
     objects_points.reset_point_interlocking_tables()
     return()
@@ -525,7 +511,11 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    callback = run_layout.schematic_callback,
+                    sig_switched_callback = run_layout.signal_switched_callback,
+                    sub_switched_callback = run_layout.subsidary_switched_callback,
+                    sig_released_callback = run_layout.signal_released_callback,
+                    sig_passed_callback = run_layout.signal_passed_callback,
+                    sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
@@ -555,7 +545,11 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    callback = run_layout.schematic_callback,
+                    sig_switched_callback = run_layout.signal_switched_callback,
+                    sub_switched_callback = run_layout.subsidary_switched_callback,
+                    sig_released_callback = run_layout.signal_released_callback,
+                    sig_passed_callback = run_layout.signal_passed_callback,
+                    sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
@@ -580,7 +574,11 @@ def redraw_signal_object(object_id):
                     signalsubtype = signals.semaphore_subtype.distant,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    callback = run_layout.schematic_callback,
+                    sig_switched_callback = run_layout.signal_switched_callback,
+                    sub_switched_callback = run_layout.subsidary_switched_callback,
+                    sig_released_callback = run_layout.signal_released_callback,
+                    sig_passed_callback = run_layout.signal_passed_callback,
+                    sig_updated_callback = run_layout.signal_updated_callback,
                     associated_home = objects_common.schematic_objects[object_id]["itemid"],
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][2][0],
@@ -599,7 +597,8 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    callback = run_layout.schematic_callback,
+                    sig_switched_callback = run_layout.signal_switched_callback,
+                    sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0])
     elif sig_type == signals.signal_type.ground_disc:
@@ -612,7 +611,8 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    callback = run_layout.schematic_callback,
+                    sig_switched_callback = run_layout.signal_switched_callback,
+                    sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
     # Create/update the canvas "tags" and selection rectangle for the signal
@@ -730,6 +730,8 @@ def delete_signal(object_id):
     delete_signal_object(object_id)
     # Remove any references to the signal from other signals
     remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
+    # Remove any references to the signal from the schematic route tables
+    objects_routes.remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

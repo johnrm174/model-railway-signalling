@@ -22,9 +22,12 @@
 #    objects_signals.remove_references_to_point - called when the point is deleted
 #    objects_sensors.update_references_to_point - called when the point ID is changed
 #    objects_sensors.remove_references_to_point - called when the point is deleted
+#    objects_routes.update_references_to_point - called when the point ID is changed
+#    objects_routes.remove_references_to_point - called when the point is deleted
 #
 # Accesses the following external editor objects directly:
-#    run_layout.schematic_callback - to set the callbacks when creating/recreating
+#    run_layout.point_switched_callback - to set the callbacks when creating/recreating
+#    run_layout.fpl_switched_callback - to set the callbacks when creating/recreating
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.point_index - The index of Point Objects (for iterating)
 #    objects_common.signal_index - The index of Signal Objects (for iterating)
@@ -55,6 +58,7 @@ from ...library import dcc_control
 from . import objects_common
 from . import objects_signals
 from . import objects_sensors
+from . import objects_routes
 from .. import run_layout
 
 #------------------------------------------------------------------------------------
@@ -172,9 +176,10 @@ def update_point(object_id, new_object_configuration):
         objects_common.point_index[str(new_item_id)] = object_id
         # Update any other point that "also switches" this point to use the new ID
         update_references_to_point(old_item_id,new_item_id)
-        # Update any affected signal / track sensor tables to reference the new point ID
+        # Update any affected signal / track sensor / route tables to reference the new point ID
         objects_signals.update_references_to_point(old_item_id, new_item_id)
         objects_sensors.update_references_to_point(old_item_id, new_item_id)
+        objects_routes.update_references_to_point(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -198,7 +203,8 @@ def redraw_point_object(object_id):
                 pointsubtype = point_subtype,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                callback = run_layout.schematic_callback,
+                point_callback = run_layout.point_switched_callback,
+                fpl_callback = run_layout.fpl_switched_callback,
                 colour = objects_common.schematic_objects[object_id]["colour"],
                 button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                 button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
@@ -286,9 +292,10 @@ def delete_point(object_id):
     delete_point_object(object_id)
     # Remove any references to the point from other points ('also switch' points).
     remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
-    # Remove any references to the point from the signal / track sensor tables
+    # Remove any references to the point from the signal / track sensor / route tables
     objects_signals.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
     objects_sensors.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
+    objects_routes.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

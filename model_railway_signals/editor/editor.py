@@ -20,7 +20,9 @@
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
-#    run_layout.schematic_callback() ###################################
+#    run_layout.run_layout.signal_updated_callback()
+#    run_routes.configure_automation(automation) - Configure run layout module for automation on/off
+#    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
@@ -67,7 +69,7 @@
 #    gpio_sensors.gpio_interface_enabled() - is the app running on a Raspberry Pi
 #    gpio_sensors.reset_gpio_mqtt_configuration() - Resets the publish/subscribe configuration
 #    gpio_sensors.set_gpio_sensors_to_publish_state(*ids) - Configure objects to publish state changes
-#    objects.subscribe_to_remote_gpio_sensors(*ids) #########################################
+#    objects.subscribe_to_remote_gpio_sensors(*ids) - subscribe to gpio events from other nodes
 #
 #    signals.reset_signals_mqtt_configuration() - Resets the publish/subscribe configuration
 #    signals.set_signals_to_publish_state(*ids) - Configure objects to publish state changes
@@ -87,12 +89,13 @@ import os
 import tkinter as Tk
 import logging
 import argparse
-import importlib.resources ######
+import importlib.resources
 
 from . import objects
 from . import settings
 from . import schematic
 from . import run_layout
+from . import run_routes
 from . import menubar_windows
 from . import utilities
 from ..library import file_interface
@@ -355,6 +358,8 @@ class main_menubar:
         self.auto_label = new_label
         settings.set_general(automation=True)
         run_layout.configure_automation(True)
+        run_routes.configure_automation(True)
+        run_layout.initialise_layout()
 
     def automation_disable(self):
         new_label = "Automation:Off"
@@ -362,6 +367,8 @@ class main_menubar:
         self.auto_label = new_label
         settings.set_general(automation=False)
         run_layout.configure_automation(False)
+        run_routes.configure_automation(False)
+        run_layout.initialise_layout()
 
     def edit_mode(self):
         if self.mode_label != "Mode:Edit":
@@ -372,6 +379,8 @@ class main_menubar:
             schematic.configure_edit_mode(True)
             library_common.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
+            run_routes.configure_edit_mode(True)
+            run_layout.initialise_layout()
         # Disable the automation menubar selection and set to "off" (automation is always disabled
         # in Run mode so we just need to update the indication (no need to update 'run_layout')
         new_label1 = "Automation:N/A"
@@ -388,6 +397,8 @@ class main_menubar:
             schematic.configure_edit_mode(False)
             library_common.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
+            run_routes.configure_edit_mode(False)
+            run_layout.initialise_layout()
         # Enable the the automation menubar selection and update to reflect the current setting
         # Note that automation is only enbled in Run mode so we just need to update the indication
         # no need to update 'run_layout'. Note the Automation flag is the fifth parameter returned
@@ -536,7 +547,7 @@ class main_menubar:
         gpio_sensors.set_gpio_sensors_to_publish_state(*settings.get_pub_sensors())
         gpio_sensors.subscribe_to_remote_gpio_sensors(*settings.get_sub_sensors())
         signals.set_signals_to_publish_state(*settings.get_pub_signals())
-        signals.subscribe_to_remote_signals(run_layout.schematic_callback, *settings.get_sub_signals())
+        signals.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_sub_signals())
         track_sections.set_sections_to_publish_state(*settings.get_pub_sections())
         track_sections.subscribe_to_remote_sections(*settings.get_sub_sections())
         block_instruments.set_instruments_to_publish_state(*settings.get_pub_instruments())

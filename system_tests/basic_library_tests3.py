@@ -19,8 +19,24 @@ from model_railway_signals.editor import schematic
 # Test basic Signal Library API
 #---------------------------------------------------------------------------------------------------------
 
-def signal_callback(signal_id, callback_type):
-    logging_string="Signal Callback from Signal "+str(signal_id)+"-"+str(callback_type)
+def sig_updated(signal_id):
+    logging_string="Signal Updated Callback from Signal "+str(signal_id)
+    logging.info(logging_string)
+    
+def sig_switched(signal_id):
+    logging_string="Signal Switched Callback from Signal "+str(signal_id)
+    logging.info(logging_string)
+    
+def sub_switched(signal_id):
+    logging_string="Subsidary Switched Callback from Signal "+str(signal_id)
+    logging.info(logging_string)
+    
+def sig_released(signal_id):
+    logging_string="Signal Released Callback from Signal "+str(signal_id)
+    logging.info(logging_string)
+    
+def sig_passed(signal_id):
+    logging_string="Signal Passed Callback from Signal "+str(signal_id)
     logging.info(logging_string)
     
 def run_library_api_tests():
@@ -30,57 +46,86 @@ def run_library_api_tests():
     # create_signal
     print("Library Tests - create_colour_light_signal - will generate 10 errors:")
     assert len(signals.signals) == 0
-    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100, signal_callback, has_subsidary=True)   # Success
-    create_colour_light_signal(canvas, "2", signals.signal_subtype.home, 100, 100, signal_callback)      # Error - not an int
-    create_colour_light_signal(canvas, 0, signals.signal_subtype.home, 100, 100, signal_callback)        # Error - out of range
-    create_colour_light_signal(canvas, 100, signals.signal_subtype.home, 100, 100, signal_callback)      # Error - out of range
-    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100, signal_callback)        # Error - already exists
-    create_colour_light_signal(canvas, 2, signals.signal_type.colour_light, 100, 100, signal_callback)   # Error - invalid subtype
-    create_colour_light_signal(canvas, 3, signals.signal_subtype.home, 100, 100, signal_callback,
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, has_subsidary=True)   # Success
+    create_colour_light_signal(canvas, "2", signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - not an int
+    create_colour_light_signal(canvas, 0, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - out of range
+    create_colour_light_signal(canvas, 100, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - out of range
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - already exists
+    create_colour_light_signal(canvas, 2, signals.signal_type.colour_light, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - invalid subtype
+    create_colour_light_signal(canvas, 3, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
                                             lhfeather45=True, theatre_route_indicator=True)              # Error - Feathers and theatre
-    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 100, 100, signal_callback, has_subsidary=True)   # Error - Dist & subsidary 
-    create_colour_light_signal(canvas, 5, signals.signal_subtype.distant, 100, 100, signal_callback, lhfeather45=True)   # Error - Dist & Feathers 
-    create_colour_light_signal(canvas, 6, signals.signal_subtype.distant, 100, 100, signal_callback, theatre_route_indicator=True)  # Error - Dist & Theatre
-    create_colour_light_signal(canvas, 7, signals.signal_subtype.distant, 100, 100, signal_callback, sig_release_button=True)  # Error - Dist & App control
+    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, has_subsidary=True)   # Error - Dist & subsidary 
+    create_colour_light_signal(canvas, 5, signals.signal_subtype.distant, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, lhfeather45=True)   # Error - Dist & Feathers 
+    create_colour_light_signal(canvas, 6, signals.signal_subtype.distant, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)  # Error - Dist & Theatre
+    create_colour_light_signal(canvas, 7, signals.signal_subtype.distant, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, sig_release_button=True)  # Error - Dist & App control
     assert len(signals.signals) == 1
     print("Library Tests - create_semaphore_signal - will generate 10 errors:")
-    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100, signal_callback, main_subsidary=True)  # Success
-    create_semaphore_signal(canvas, "3", signals.semaphore_subtype.home, 250, 100, signal_callback)      # Error - not an int
-    create_semaphore_signal(canvas, 0, signals.semaphore_subtype.home, 250, 100, signal_callback)        # Error - out of range
-    create_semaphore_signal(canvas, 200, signals.semaphore_subtype.home, 250, 100, signal_callback)      # Error - out of range
-    create_semaphore_signal(canvas, 1, signals.semaphore_subtype.home, 250, 100, signal_callback)        # Error - already exists
-    create_semaphore_signal(canvas, 3, signals.signal_type.colour_light, 250, 100, signal_callback)      # Error - invalid subtype
-    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.home, 250, 100, signal_callback, main_signal=False)  # Error - no main arm
-    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.home, 250, 100, signal_callback,
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_subsidary=True)  # Success
+    create_semaphore_signal(canvas, "3", signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - not an int
+    create_semaphore_signal(canvas, 0, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - out of range
+    create_semaphore_signal(canvas, 200, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - out of range
+    create_semaphore_signal(canvas, 1, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - already exists
+    create_semaphore_signal(canvas, 3, signals.signal_type.colour_light, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - invalid subtype
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_signal=False)  # Error - no main arm
+    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
                                             lh1_signal=True, theatre_route_indicator=True)               # Error - Route Arms and theatre
-    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100, signal_callback, lh1_subsidary=True)  # Error - Dist & Subsidary
-    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100, signal_callback, theatre_route_indicator=True)  # Error - Dist & Theatre
-    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100, signal_callback, sig_release_button=True)  # Error - Dist & App control
+    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, lh1_subsidary=True)  # Error - Dist & Subsidary
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)  # Error - Dist & Theatre
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, sig_release_button=True)  # Error - Dist & App control
     assert len(signals.signals) == 2
     print("Library Tests - create_semaphore_signal (validate associated home params) - will generate 6 errors:")
-    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=2)        # Success
-    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home="1")      # Error - associated ID not an int
-    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=1)        # Error - associated sig not a semaphore
-    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=3)        # Error - associated sig not a home
-    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=4)        # Error - associated sig does not exist
-    create_semaphore_signal(canvas, 8, signals.semaphore_subtype.home, 250, 100, signal_callback, associated_home=2)           # Error - sig type is a home
-    create_semaphore_signal(canvas, 9, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=2, sig_passed_button=True)  # Error - passed button
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)        # Success
+    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home="1")      # Error - associated ID not an int
+    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=1)        # Error - associated sig not a semaphore
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=3)        # Error - associated sig not a home
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=4)        # Error - associated sig does not exist
+    create_semaphore_signal(canvas, 8, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)           # Error - sig type is a home
+    create_semaphore_signal(canvas, 9, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2, sig_passed_button=True)  # Error - passed button
     assert len(signals.signals) == 3
     print("Library Tests - create_ground_disc_signal - will generate 5 errors:")
-    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 400, 100, signal_callback)        # Success
-    create_ground_disc_signal(canvas, "5", signals.ground_disc_subtype.standard, 400, 100, signal_callback)      # Error - not an int
-    create_ground_disc_signal(canvas, 0, signals.ground_disc_subtype.standard, 400, 100, signal_callback)        # Error - out of range
-    create_ground_disc_signal(canvas, 100, signals.ground_disc_subtype.standard, 400, 100, signal_callback)      # Error - out of range
-    create_ground_disc_signal(canvas, 1, signals.ground_disc_subtype.standard, 400, 100, signal_callback)        # Error - already exists
-    create_ground_disc_signal(canvas, 6, signals.signal_type.colour_light, 400, 100, signal_callback)            # Error - invalid subtype
+    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Success
+    create_ground_disc_signal(canvas, "5", signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - not an int
+    create_ground_disc_signal(canvas, 0, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - out of range
+    create_ground_disc_signal(canvas, 100, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - out of range
+    create_ground_disc_signal(canvas, 1, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - already exists
+    create_ground_disc_signal(canvas, 6, signals.signal_type.colour_light, 400, 100, sig_switched, sig_passed)            # Error - invalid subtype
     assert len(signals.signals) == 4
     print("Library Tests - create_ground_position_signal - will generate 5 errors:")
-    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 550, 100, signal_callback)        # Success
-    create_ground_position_signal(canvas, "6", signals.ground_pos_subtype.standard, 550, 100, signal_callback)      # Error - not an int
-    create_ground_position_signal(canvas, 0, signals.ground_pos_subtype.standard, 550, 100, signal_callback)        # Error - out of range
-    create_ground_position_signal(canvas, 100, signals.ground_pos_subtype.standard, 550, 100, signal_callback)      # Error - out of range
-    create_ground_position_signal(canvas, 1, signals.ground_pos_subtype.standard, 550, 100, signal_callback)        # Error - already exists
-    create_ground_position_signal(canvas, 7, signals.signal_type.colour_light, 550, 100, signal_callback)           # Error - invalid subtype
+    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Success
+    create_ground_position_signal(canvas, "6", signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - not an int
+    create_ground_position_signal(canvas, 0, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - out of range
+    create_ground_position_signal(canvas, 100, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - out of range
+    create_ground_position_signal(canvas, 1, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - already exists
+    create_ground_position_signal(canvas, 7, signals.signal_type.colour_light, 550, 100, sig_switched, sig_passed)           # Error - invalid subtype
     assert len(signals.signals) == 5
     print("Library Tests - signal_exists - will generate 1 error:")
     assert not signals.signal_exists(123.1)  # Error - not an int or str
@@ -91,10 +136,12 @@ def run_library_api_tests():
     assert signals.signal_exists(5)
     print("Library Tests - delete_signal - will generate 2 errors:")
     # Create some additional signals (to delete) for this test
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback)   # Success
-    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 250, signal_callback)    # Success
-    create_ground_position_signal(canvas, 12, signals.ground_pos_subtype.shunt_ahead, 400, 250, signal_callback)   # Success
-    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 550, 250, signal_callback)    # Success
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Success
+    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 250,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)    # Success
+    create_ground_position_signal(canvas, 12, signals.ground_pos_subtype.shunt_ahead, 400, 250, sig_switched, sig_passed)   # Success
+    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 550, 250, sig_switched, sig_passed)    # Success
     assert len(signals.signals) == 9
     signals.delete_signal("10")   # Error - not an int
     signals.delete_signal(14)     # Error - does not exist
@@ -124,11 +171,16 @@ def run_library_api_tests():
     assert not signals.signals["2"]["override"]
     print("Library Tests - set_signal_override_caution (distants only) - will generate 6 errors:")
     # Create some additional signals to facilitate this test
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback)
-    create_colour_light_signal(canvas, 11, signals.signal_subtype.three_aspect, 250, 250, signal_callback)
-    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 400, 250, signal_callback)
-    create_colour_light_signal(canvas, 13, signals.signal_subtype.distant, 550, 250, signal_callback)
-    create_semaphore_signal(canvas, 14, signals.semaphore_subtype.distant, 700, 250, signal_callback)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 11, signals.signal_subtype.three_aspect, 250, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 400, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 13, signals.signal_subtype.distant, 550, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 14, signals.semaphore_subtype.distant, 700, 250,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     assert not signals.signals["10"]["overcaution"]
     assert not signals.signals["11"]["overcaution"]
     assert not signals.signals["12"]["overcaution"]
@@ -175,14 +227,15 @@ def run_library_api_tests():
     signals.delete_signal(12)
     signals.delete_signal(13)
     signals.delete_signal(14)
-    print("Library Tests - lock_signal (also tests toggle_signal) - will generate 2 errors and 1 warning:")
+    print("Library Tests - lock_signal (also tests toggle_signal) - will generate 2 errors and 2 warnings:")
     # Create a fully automatic signal for this test (to fully excersise the code)
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250, signal_callback, fully_automatic=True)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, fully_automatic=True)
     assert not signals.signals["1"]["siglocked"]
     assert not signals.signals["10"]["siglocked"]
     signals.lock_signal(1)
     signals.lock_signal(1)
-    signals.lock_signal(10)
+    signals.lock_signal(10)   #  Warning as signal 10 is automatic so created OFF
     assert signals.signals["1"]["siglocked"]
     assert signals.signals["10"]["siglocked"]
     signals.lock_signal("2")  # Error - not an int
@@ -242,12 +295,18 @@ def run_library_api_tests():
     assert not signals.signals["2"]["sigclear"]
     print("Library Tests - set_approach_control - will generate 9 errors:")
     # Create some additional signals for these tests
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250, signal_callback)
-    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.distant, 225, 250, signal_callback)
-    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 350, 250, signal_callback)
-    create_colour_light_signal(canvas, 13, signals.signal_subtype.four_aspect, 475, 250, signal_callback)
-    create_colour_light_signal(canvas, 14, signals.signal_subtype.home, 600, 250, signal_callback)
-    create_semaphore_signal(canvas, 15, signals.semaphore_subtype.home, 725, 250, signal_callback)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.distant, 225, 250,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 350, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 13, signals.signal_subtype.four_aspect, 475, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 14, signals.signal_subtype.home, 600, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 15, signals.semaphore_subtype.home, 725, 250,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     assert not signals.signals["1"]["released"]
     assert not signals.signals["1"]["releaseonyel"]
     assert not signals.signals["1"]["releaseonred"]
@@ -331,9 +390,10 @@ def run_library_api_tests():
     assert not signals.subsidary_clear(3)     # Error - no subsidary
     assert not signals.subsidary_clear("1")   # Error - not an int
     assert not signals.subsidary_clear(6)     # Error - does not exist        
-    print("Library Tests - toggle_signal (validation failures) - will generate 2 errors and 1 warning:")
+    print("Library Tests - toggle_signal (validation failures) - will generate 2 errors and 2 warnings:")
     # Create a fully automatic signal (without control buttons)to excersise the code
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback, fully_automatic=True)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, fully_automatic=True)
     signals.toggle_signal("1")   # Error - not an int
     signals.toggle_signal(6)     # Error - does not exist
     assert not signals.signal_clear(1)
@@ -345,7 +405,7 @@ def run_library_api_tests():
     assert signals.signal_clear(1)
     signals.unlock_signal(1)
     signals.toggle_signal(1)
-    signals.toggle_signal(10)
+    signals.toggle_signal(10)   # Warning - signal is locked
     # Delete the fully automatic signal we created for this test
     signals.delete_signal(10)
     assert not signals.signal_clear(1)
@@ -385,7 +445,8 @@ def run_library_api_tests():
     signals.set_route(1, route=signals.route_type.NONE)   # Error - invalid route
     signals.set_route(6, route=signals.route_type.MAIN)   # Error - does not exist
     # Theatre Route indication
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250, signal_callback,theatre_route_indicator=True)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)
     assert signals.signals["10"]["hastheatre"]
     assert signals.signals["10"]["theatretext"] == ""
     assert not signals.signals["10"]["theatreenabled"]
@@ -408,7 +469,8 @@ def run_library_api_tests():
     signals.set_route(5, theatre_text="1")    # Error - unsupported type
     print("Library Tests - update_colour_light_signal (validation failures) - will generate 9 errors:")
     # Create an additional signal with a theatre route indicator for this test
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250, signal_callback,theatre_route_indicator=True)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)
     signals.update_colour_light_signal(1,sig_ahead_id=10)    # Success
     signals.update_colour_light_signal(1,sig_ahead_id="10")  # Success
     signals.update_colour_light_signal("1",sig_ahead_id=10)  # Fail - Sig ID not an int
@@ -444,7 +506,8 @@ def run_library_api_tests():
     signals.set_signals_to_publish_state(1)        # 1 warning - already set to publish
     assert len(signals.list_of_signals_to_publish) == 3
     # Create a Signal already set to publish state on creation
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250, signal_callback)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     # Excersise the publishing code for other signals
     signals.toggle_signal(1)
     signals.toggle_signal(2)
@@ -453,10 +516,10 @@ def run_library_api_tests():
     signals.delete_signal(10)
     print("Library Tests - subscribe_to_remote_signals - 5 Errors and 2 warnings will be generated")
     assert len(signals.signals) == 5
-    signals.subscribe_to_remote_signals(signal_callback,"box1-50","box1-51")   # Success
-    signals.subscribe_to_remote_signals(signal_callback,"box1-50","box1-51")   # 2 Warnings - already subscribed
-    signals.subscribe_to_remote_signals(signal_callback,"box1","51", 3)        # Fail - 3 errors
-    signals.subscribe_to_remote_signals(signal_callback,"box1-0","box1-100")   # Fail - 2 errors
+    signals.subscribe_to_remote_signals(sig_updated,"box1-50","box1-51")   # Success
+    signals.subscribe_to_remote_signals(sig_updated,"box1-50","box1-51")   # 2 Warnings - already subscribed
+    signals.subscribe_to_remote_signals(sig_updated,"box1","51", 3)        # Fail - 3 errors
+    signals.subscribe_to_remote_signals(sig_updated,"box1-0","box1-100")   # Fail - 2 errors
     assert len(signals.signals) == 7
     assert signals.signal_exists("box1-50")
     assert signals.signal_exists("box1-51")
@@ -486,13 +549,20 @@ def run_timed_signal_tests():
     print("Library Tests - Timed Signals")
     canvas = schematic.canvas
     # Set up the initial test conditions
-    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback)
-    create_colour_light_signal(canvas, 2, signals.signal_subtype.three_aspect, 225, 100, signal_callback)
-    create_colour_light_signal(canvas, 3, signals.signal_subtype.red_ylw, 350, 100, signal_callback)
-    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 475, 100, signal_callback)
-    create_colour_light_signal(canvas, 5, signals.signal_subtype.home, 600, 100, signal_callback)
-    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.home, 725, 100, signal_callback)
-    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100, signal_callback)
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 2, signals.signal_subtype.three_aspect, 225, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 3, signals.signal_subtype.red_ylw, 350, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 475, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 5, signals.signal_subtype.home, 600, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.home, 725, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -606,19 +676,19 @@ def run_signal_aspect_tests():
     canvas = schematic.canvas
     print("Library Tests - signal aspect tests - no errors")
     # Set up the initial test conditions
-    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback)
-    create_colour_light_signal(canvas, 2, signals.signal_subtype.three_aspect, 225, 100, signal_callback)
-    create_colour_light_signal(canvas, 3, signals.signal_subtype.red_ylw, 350, 100, signal_callback)
-    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 475, 100, signal_callback)
-    create_colour_light_signal(canvas, 5, signals.signal_subtype.home, 600, 100, signal_callback)
-    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.home, 725, 100, signal_callback)
-    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100, signal_callback)
-    create_ground_position_signal(canvas, 8, signals.ground_pos_subtype.standard, 100, 200, signal_callback)
-    create_ground_position_signal(canvas, 9, signals.ground_pos_subtype.shunt_ahead, 200, 200, signal_callback)
-    create_ground_position_signal(canvas, 10, signals.ground_pos_subtype.early_standard, 300, 200, signal_callback)
-    create_ground_position_signal(canvas, 11, signals.ground_pos_subtype.early_shunt_ahead, 400, 200, signal_callback)
-    create_ground_disc_signal(canvas, 12, signals.ground_disc_subtype.standard, 500, 200, signal_callback)
-    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 600, 200, signal_callback)
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 2, signals.signal_subtype.three_aspect, 225, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 3, signals.signal_subtype.red_ylw, 350, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 475, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_colour_light_signal(canvas, 5, signals.signal_subtype.home, 600, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.home, 725, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100, sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    create_ground_position_signal(canvas, 8, signals.ground_pos_subtype.standard, 100, 200, sig_switched, sig_passed)
+    create_ground_position_signal(canvas, 9, signals.ground_pos_subtype.shunt_ahead, 200, 200, sig_switched, sig_passed)
+    create_ground_position_signal(canvas, 10, signals.ground_pos_subtype.early_standard, 300, 200, sig_switched, sig_passed)
+    create_ground_position_signal(canvas, 11, signals.ground_pos_subtype.early_shunt_ahead, 400, 200, sig_switched, sig_passed)
+    create_ground_disc_signal(canvas, 12, signals.ground_disc_subtype.standard, 500, 200, sig_switched, sig_passed)
+    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 600, 200, sig_switched, sig_passed)
     # All signals ON
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
@@ -766,7 +836,8 @@ def run_signal_aspect_tests():
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     # Slotting for secondary distant semaphore signals
     assert signals.signal_state(6) == signals.signal_state_type.PROCEED
-    create_semaphore_signal(canvas, 16, signals.semaphore_subtype.distant, 725, 100, signal_callback, associated_home=6)
+    create_semaphore_signal(canvas, 16, signals.semaphore_subtype.distant, 725, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=6)
     # Signal 16 will be ON (CAUTION) and signal 6 will be OFF (PROCEED) going into these tests
     assert signals.signal_state(16) == signals.signal_state_type.CAUTION
     assert signals.signal_state(6) == signals.signal_state_type.CAUTION
@@ -787,7 +858,8 @@ def run_signal_aspect_tests():
     # Colour light signal aspects based on signal ahead
     # We're going to create a dummy signal and 'cheat' by setting the aspect
     # Note that all signals are OFF (PROCEED) going into this test
-    create_colour_light_signal(canvas, 20, signals.signal_subtype.four_aspect, 100, 300, signal_callback)
+    create_colour_light_signal(canvas, 20, signals.signal_subtype.four_aspect, 100, 300,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     # First aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.PROCEED
     signals.update_colour_light_signal(1,20)
@@ -902,15 +974,20 @@ def run_signal_route_tests():
     canvas = schematic.canvas
     print("Library Tests - signal route tests - no errors")
     # Set up the initial test conditions
-    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback,
-                            mainfeather=True, lhfeather45=True, lhfeather90=True, rhfeather45=True, rhfeather90=True)
-    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100, signal_callback, main_signal=True,
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                               mainfeather=True, lhfeather45=True, lhfeather90=True, rhfeather45=True, rhfeather90=True)
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_signal=True,
                             lh1_signal=True, lh2_signal=True,rh1_signal=True, rh2_signal=True, main_subsidary=True,
                             lh1_subsidary=True, lh2_subsidary=True, rh1_subsidary=True,  rh2_subsidary=True)
-    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100, signal_callback, main_signal=True,
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_signal=True,
                             lh1_signal=True, lh2_signal=True,rh1_signal=True, rh2_signal=True, associated_home=2)
-    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.home, 400, 100, signal_callback, main_subsidary=True,lh1_signal=True)
-    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.home, 400, 100, signal_callback, main_subsidary=True,rh1_signal=True)
+    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.home, 400, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_subsidary=True,lh1_signal=True)
+    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.home, 400, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_subsidary=True,rh1_signal=True)
     # Negative tests for unsupported semaphore routes (to exersise the logging code)
     signals.toggle_signal(4)
     signals.toggle_subsidary(4)
@@ -1032,13 +1109,16 @@ def run_signal_button_tests():
     canvas = schematic.canvas
     print("Library Tests - signal button tests - Will generate 4 Errors")
     # Set up the initial test conditions
-    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100, signal_callback,
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
                             has_subsidary=True, sig_passed_button=True, sig_release_button=True)
-    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 300, 100, signal_callback,
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 300, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
                             main_subsidary=True, sig_passed_button=True, sig_release_button=True)
-    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 300, 100, signal_callback, associated_home=2)
-    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 500, 100, signal_callback,sig_passed_button=True)
-    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 650, 100, signal_callback,sig_passed_button=True)
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 300, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)
+    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 500, 100, sig_switched, sig_passed, sig_passed_button=True)
+    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 650, 100, sig_switched,sig_passed, sig_passed_button=True)
     # Test the main control buttons
     assert not signals.signal_clear(1)
     assert not signals.signal_clear(2)
@@ -1111,10 +1191,12 @@ def run_approach_control_tests():
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     # Create some signals for this test
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 100, signal_callback,
-                                            sig_passed_button=True, sig_release_button=True)
-    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 100, signal_callback,
-                                            sig_passed_button=True, sig_release_button=True)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                               sig_passed_button=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            sig_passed_button=True, sig_release_button=True)
     print("Library Tests - Approach Control Tests - Release on Red - no errors")
     # Set up the initial test conditions (for Approach Control Release on Red)
     signals.toggle_signal(10)

@@ -29,6 +29,7 @@ from . import pi_sprog_interface
 from . import gpio_sensors
 from . import track_sensors
 from . import track_sections
+from . import buttons
 
 # -------------------------------------------------------------------------
 # Global variables used within the Library Modules
@@ -57,6 +58,7 @@ shutdown_initiated = False
 def configure_edit_mode(edit_mode:bool):
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
+    buttons.configure_edit_mode(edit_mode)
     return()
 
 #-------------------------------------------------------------------------

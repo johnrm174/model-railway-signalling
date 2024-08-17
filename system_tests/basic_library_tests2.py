@@ -8,6 +8,7 @@ import logging
 
 import system_test_harness
 from model_railway_signals.library import points
+from model_railway_signals.library import lines
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sections
@@ -18,8 +19,8 @@ from model_railway_signals.editor import schematic
 # Test Track Sensor Library objects
 #---------------------------------------------------------------------------------------------------------
 
-def track_sensor_callback(sensor_id, callback_type):
-    logging_string="Track Sensor Callback from Sensor "+str(sensor_id)+"-"+str(callback_type)
+def track_sensor_callback(sensor_id):
+    logging_string="Track Sensor Callback from Sensor "+str(sensor_id)
     logging.info(logging_string)
     
 def run_track_sensor_library_tests():
@@ -75,8 +76,8 @@ def run_track_sensor_library_tests():
 # Test Track Section Library objects
 #---------------------------------------------------------------------------------------------------------
 
-def track_section_callback(section_id, callback_type):
-    logging_string="Track Section Callback from Section "+str(section_id)+"-"+str(callback_type)
+def track_section_callback(section_id):
+    logging_string="Track Section Callback from Section "+str(section_id)
     logging.info(logging_string)
     
 def run_track_section_library_tests():
@@ -307,8 +308,12 @@ def run_track_section_library_tests():
 # Test Point Library objects
 #---------------------------------------------------------------------------------------------------------
 
-def point_callback(point_id, callback_type):
-    logging_string="Point Callback from Point "+str(point_id)+"-"+str(callback_type)
+def point_callback(point_id):
+    logging_string="Point Callback from Point "+str(point_id)
+    logging.info(logging_string)
+    
+def fpl_callback(point_id):
+    logging_string="FPL Callback from Point "+str(point_id)
     logging.info(logging_string)
     
 def run_point_library_tests():
@@ -318,26 +323,26 @@ def run_point_library_tests():
     # create_point
     assert len(points.points) == 0
     # Point ID and point_type combinations
-    print("Library Tests - create_point - will generate 8 errors:")
-    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback) #  Valid
-    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, also_switch=11)  # Valid
-    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl=True)  # Valid
-    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl=True)  # Valid
-    points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)   # Error (<1)
-    points.create_point(canvas, 100, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)  # Error (>99)
-    points.create_point(canvas, "15", points.point_type.RH, points.point_subtype.normal,100, 100, point_callback)  # Error (not int)
-    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)  # Error (duplicate)
-    points.create_point(canvas, 17, "random-type", points.point_subtype.normal, 100, 100, point_callback)  # Error - invalid type
-    points.create_point(canvas, 18, points.point_type.RH,"random-subtype", 100, 100, point_callback)  # Error - invalid subtype
-    points.create_point(canvas, 19, points.point_type.Y, points.point_subtype.trap, 100, 100, point_callback)  # Error - Not normal Subtype
+    print("Library Tests - create_point - will generate 10 errors:")
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red") #  Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, auto=True)  # Valid
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)  # Valid
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, auto=True)  # Valid
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
+    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, auto=True)  # Valid
+    points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
+    points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)   # Error (<1)
+    points.create_point(canvas, 100, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error (>99)
+    points.create_point(canvas, "15", points.point_type.RH, points.point_subtype.normal,100, 100, point_callback, fpl_callback)  # Error (not int)
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error (duplicate)
+    points.create_point(canvas, 17, "random-type", points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error - invalid type
+    points.create_point(canvas, 18, points.point_type.RH,"random-subtype", 100, 100, point_callback, fpl_callback)  # Error - invalid subtype
+    points.create_point(canvas, 19, points.point_type.Y, points.point_subtype.trap, 100, 100, point_callback, fpl_callback)  # Error - Not normal Subtype
     # Alsoswitch combinations
-    points.create_point(canvas, 18, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch="10") # Error (not an int)
-    points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch=19) # Error (switch itself)
+    points.create_point(canvas, 18, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch="10") # Error (not an int)
+    points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=19) # Error (switch itself)
     # Automatic and FPL combinations
-    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, auto=True, fpl=True) # Error
+    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, auto=True, fpl=True) # Error
     assert len(points.points) == 7
     # point_exists
     print("Library Tests - point_exists - will generate 1 error:")
@@ -422,24 +427,27 @@ def run_point_library_tests():
     # Note we leave the FPL off for the next tests to generate warnings
     points.fpl_button_event(14)   # Has FPL - toggle off FPL
     # Lock Point
-    print("Library Tests - lock_point - will generate 2 errors and 1 warning:")
-    assert points.points[str(10)]['locked']==False
-    assert points.points[str(14)]['locked']==False
+    print("Library Tests - lock_point / point_locked - will generate 2 errors and 1 warning:")
+    assert not points.point_locked(10)
+    assert not points.point_locked(14)
     points.lock_point("10") # Invalid
     points.lock_point(20)   # Does not exist
     points.lock_point(10)
     points.lock_point(14)
     points.lock_point(14)
-    assert points.points[str(10)]['locked']==True
-    assert points.points[str(14)]['locked']==True
-    print("Library Tests - unlock_point - will generate 2 errors:")
+    assert points.point_locked(10)
+    assert points.point_locked(14)
+    print("Library Tests - unlock_point / point_locked- will generate 2 errors:")
     points.unlock_point("10") # Invalid
     points.unlock_point(20)   # Does not exist
     points.unlock_point(10)
     points.unlock_point(14)
     points.unlock_point(14)
-    assert points.points[str(10)]['locked']==False
-    assert points.points[str(14)]['locked']==False
+    assert not points.point_locked(10)
+    assert not points.point_locked(14)
+    print("Library Tests - point_locked - negative tests - will generate 2 errors:")
+    assert not points.point_locked("10") # Invalid
+    assert not points.point_locked(20)   # Does not exist
     # Update autoswitch
     print("Library Tests - update_autoswitch - will generate 4 errors:")
     points.update_autoswitch("10", 13) # Error - not an int
@@ -468,7 +476,34 @@ def run_point_library_tests():
     points.toggle_point(12)
     assert points.point_switched(12)
     assert not points.point_switched(10)
-    # delete point    
+    print("Library Tests - set_point_colour - will generate 2 errors:")
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "black"
+    points.set_point_colour("10", "blue") # Point ID not an int
+    points.set_point_colour(20, "blue")   # Point ID does not exist
+    points.set_point_colour(10, "blue")
+    points.set_point_colour(14, "blue")
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "blue"
+    print("Library Tests - reset_point_colour - will generate 2 errors:")
+    points.reset_point_colour("10") # Point ID not an int
+    points.reset_point_colour(20)   # Point ID does not exist
+    points.reset_point_colour(10)
+    points.reset_point_colour(14)
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "black"
     print("Library Tests - delete_point - will generate 2 errors:")
     assert len(points.points) == 7
     points.delete_point("10")
@@ -490,13 +525,13 @@ def run_point_library_tests():
     assert not points.point_exists(12)
     assert len(points.points) == 0
     print("Library Tests - create autoswitched point - will generate 1 warning:")
-    points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch=11) # Valid
+    points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=11) # Valid
     points.toggle_point_state(10)
-    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, auto=True) # Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, auto=True) # Valid
     assert len(points.points) == 2
     assert points.point_switched(10)
     assert points.point_switched(11)
-    points.create_point(canvas, 12, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, also_switch=11) # Valid
+    points.create_point(canvas, 12, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11) # Valid
     assert points.point_switched(10)
     assert not points.point_switched(11)
     assert not points.point_switched(11)
@@ -517,8 +552,8 @@ def run_point_library_tests():
 # Test Block Instrument Library objects
 #---------------------------------------------------------------------------------------------------------
 
-def instrument_callback(instrument_id, callback_type):
-    logging_string="Instrument Callback from Instrument "+str(instrument_id)+" - "+str(callback_type)
+def instrument_callback(instrument_id):
+    logging_string="Instrument Callback from Instrument "+str(instrument_id)
     logging.info(logging_string)
     
 def run_instrument_library_tests():
@@ -816,6 +851,79 @@ def run_instrument_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test 'Line' Library objects
+#---------------------------------------------------------------------------------------------------------
+
+def run_line_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Line Objects")
+    canvas = schematic.canvas
+    print("Library Tests - create_line - will generate 4 errors:")
+    assert len(lines.lines) == 0    
+    lines.create_line(canvas, 10, 100, 100, 200, 100, arrow_type=[20,20,5], arrow_ends=0, colour="red")  # success
+    lines.create_line(canvas, 11, 100, 150, 200, 150, arrow_type=[20,20,5], arrow_ends=1)     # success
+    lines.create_line(canvas, 12, 100, 200, 200, 200, arrow_type=[20,20,5], arrow_ends=2)     # success
+    lines.create_line(canvas, 13, 100, 250, 200, 250, arrow_type=[20,20,5], arrow_ends=3)     # success
+    lines.create_line(canvas, 14, 100, 300, 200, 300, arrow_type=[1,1,1], arrow_ends=0)       # success
+    lines.create_line(canvas, 15, 100, 350, 200, 350, arrow_type=[1,1,1], arrow_ends=1)       # success
+    lines.create_line(canvas, 16, 100, 400, 200, 400, arrow_type=[1,1,1], arrow_ends=2)       # success
+    lines.create_line(canvas, 17, 100, 450, 200, 450, arrow_type=[1,1,1], arrow_ends=3)       # success
+    lines.create_line(canvas, 0, 100, 100, 200, 100)      # Fail (ID < 1)
+    lines.create_line(canvas, 100, 100, 100, 200, 100)    # Fail (ID > 99)
+    lines.create_line(canvas, 10, 100, 100, 200, 100)     # Fail (ID already exists)
+    assert len(lines.lines) == 8
+    print("Library Tests - line_exists - will generate 1 error:")
+    assert lines.line_exists(10)         # True (exists)
+    assert not lines.line_exists(20)     # False (exists)
+    assert not lines.line_exists("10")   # Error - not an int (exists)
+    print("Library Tests - move_line_end_1 - will generate 2 errors:")
+    # line coords before move are 100, 100, 200, 100
+    print ( canvas.coords(lines.lines[str(10)]["line"]))
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [100, 100, 200, 100]
+    lines.move_line_end_1(10, 300, 200)
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 200, 100]
+    lines.move_line_end_1("10",100,100)   # Error - not an int (exists)
+    lines.move_line_end_1(20,100,100)     # Error - does not exist
+    print("Library Tests - move_line_end_2 - will generate 2 errors:")
+    lines.move_line_end_2(10, 100, 100)
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 300, 200]
+    lines.move_line_end_2("10",100,100)   # Error - not an int (exists)
+    lines.move_line_end_2(20,100,100)     # Error - does not exist
+    print("Library Tests - set_line_colour - will generate 2 errors:")
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
+    lines.set_line_colour("10", "blue") # Line ID not an int
+    lines.set_line_colour(20, "blue")   # Line ID does not exist
+    lines.set_line_colour(10, "blue")
+    lines.set_line_colour(11, "blue")
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "blue"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "blue"
+    print("Library Tests - reset_line_colour - will generate 2 errors:")
+    lines.reset_line_colour("10") # Line ID not an int
+    lines.reset_line_colour(20)   # Line ID does not exist
+    lines.reset_line_colour(10)
+    lines.reset_line_colour(11)
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
+    print("Library Tests - delete_line - will generate 2 errors:")
+    assert len(lines.lines) == 8
+    lines.delete_line("10")   # Fail - not an int
+    lines.delete_line(20)     # Fail - does not exist
+    lines.delete_line(10)     # success
+    assert len(lines.lines) == 7
+    assert not lines.line_exists(10)
+    lines.delete_line(11)
+    lines.delete_line(12)
+    lines.delete_line(13)
+    lines.delete_line(14)
+    lines.delete_line(15)
+    lines.delete_line(16)
+    lines.delete_line(17)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
@@ -824,6 +932,7 @@ def run_all_basic_library_tests():
     run_track_section_library_tests()
     run_point_library_tests()
     run_instrument_library_tests()
+    run_line_library_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)

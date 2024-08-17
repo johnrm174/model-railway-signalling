@@ -24,6 +24,7 @@ def test_edit_object_windows(delay:float=0.0):
     create_right_hand_point()
     create_textbox()
     create_track_sensor()
+    create_route()
     # Test the configuration remains unchanged with Edit/Save
     really_do_test_all_object_edit_windows(test_all_controls=True)
     return()
@@ -37,20 +38,13 @@ def test_edit_object_windows(delay:float=0.0):
 def really_do_test_all_object_edit_windows(delay:float=0.0, test_all_controls:bool=False, report_object_tested:bool=False):
     print("Testing all object edit windows")
     object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point, objects.object_type.signal,
-                              objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor)
+        objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor, objects.object_type.route)
     for object_type in object_types:
         for object_id in objects.schematic_objects.keys():
             if objects.schematic_objects[object_id]["item"] == object_type:
                 configuration = copy.deepcopy(objects.schematic_objects[object_id])
                 if report_object_tested:
                     print("Testing object edit window for:",configuration["item"],configuration["itemid"])
-                # Get rid of the bits we dont need
-                if configuration["item"] == objects.object_type.line:
-                    del configuration["line"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["end1"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["end2"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["stop1"]  ## Tkinter drawing object - re-created on re-draw
-                    del configuration["stop2"]  ## Tkinter drawing object - re-created on re-draw
                 run_function(lambda:schematic.deselect_all_objects())
                 run_function(lambda:schematic.select_object(object_id))
                 run_function(lambda:schematic.edit_selected_object(), delay=1.0)

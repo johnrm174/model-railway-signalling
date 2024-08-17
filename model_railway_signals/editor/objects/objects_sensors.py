@@ -16,15 +16,17 @@
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the route tables
 #
 # Makes the following external API calls to other editor modules:
-#    run_layout.schematic_callback - the callback specified when creating the library objects
+#    run_layout.sensor_passed_callback - the callback specified when creating the library objects
 #    objects_common.set_bbox - to create/update the boundary box for the canvas drawing objects
 #    objects_common.new_item_id - to get the next 'free' type-specific Item ID (when creating objects)
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.track_sensor - to find the object_id from a given item_id
+#    objects_routes.remove_references_to_sensor - called when the Sensor ID is changed
+#    objects_routes.update_references_to_sensor - called when the Sensor is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
-#    objects_common.track_sensor_index - the type-specific index for this onject type
+#    objects_common.track_sensor_index - the type-specific index for this object type
 #    objects_common.default_object - The dictionary of object common configuration elements
 #    objects_common.object_type - The enumeration of supported object types
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -45,6 +47,7 @@ from ...library import gpio_sensors
 
 from .. import run_layout
 from . import objects_common
+from . import objects_routes
 
 #-------------------------------------------------------------------------------------------------------------
 # Default Object parameters (i.e. state at creation)
@@ -200,6 +203,8 @@ def update_track_sensor(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.track_sensor_index[str(old_item_id)]
         objects_common.track_sensor_index[str(new_item_id)] = object_id
+        # Update any affected route tables to reference the new sensor ID
+        objects_routes.update_references_to_sensor(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------------------------------------
@@ -212,7 +217,7 @@ def redraw_track_sensor_object(object_id):
     x = objects_common.schematic_objects[object_id]["posx"]
     y = objects_common.schematic_objects[object_id]["posy"]
     item_id = objects_common.schematic_objects[object_id]["itemid"]
-    callback = run_layout.schematic_callback
+    callback = run_layout.sensor_passed_callback
     canvas_tags = track_sensors.create_track_sensor(objects_common.canvas, item_id, x, y, callback=callback)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
@@ -255,8 +260,6 @@ def paste_track_sensor(object_to_paste, deltax:int, deltay:int):
     new_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.track_sensor_index[str(new_id)] = new_object_id
-    # Add the specific elements for this particular instance of the object
-    objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
@@ -276,7 +279,6 @@ def paste_track_sensor(object_to_paste, deltax:int, deltay:int):
 #------------------------------------------------------------------------------------------------------------------
 
 def delete_track_sensor_object(object_id):
-    global button_mappings
     # Delete the associated library objects
     item_id = objects_common.schematic_objects[object_id]["itemid"]
     track_sensors.delete_track_sensor(item_id)
@@ -292,6 +294,8 @@ def delete_track_sensor_object(object_id):
 def delete_track_sensor(object_id):
     # Delete the associated library objects
     delete_track_sensor_object(object_id)
+    # Remove any references to the sensor from the route tables
+    objects_routes.remove_references_to_sensor(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

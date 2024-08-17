@@ -1,4 +1,5 @@
 {
+    "buttons": {},
     "information": "Model Railway Signalling Configuration File",
     "instruments": {},
     "objects": {
@@ -9,25 +10,21 @@
                 0,
                 0
             ],
-            "bbox": 3437,
+            "bbox": 10096,
             "colour": "black",
-            "end1": 3433,
-            "end2": 3434,
             "endx": 300.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 8,
-            "line": 3432,
             "posx": 350.0,
             "posy": 275.0,
-            "stop1": 3435,
-            "stop2": 3436,
+            "selection": "line8selected",
             "tags": "line8"
         },
         "05083e4d-786d-421e-af32-90cf02b69524": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3443,
+            "bbox": 10102,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -52,25 +49,21 @@
                 0,
                 0
             ],
-            "bbox": 3449,
+            "bbox": 10108,
             "colour": "black",
-            "end1": 3445,
-            "end2": 3446,
             "endx": 575.0,
             "endy": 325.0,
             "item": "line",
             "itemid": 13,
-            "line": 3444,
             "posx": 25.0,
             "posy": 325.0,
-            "stop1": 3447,
-            "stop2": 3448,
+            "selection": "line13selected",
             "tags": "line13"
         },
         "096de21f-50bd-4997-b78c-259af84a518a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3455,
+            "bbox": 10114,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -100,7 +93,7 @@
                 false,
                 ""
             ],
-            "bbox": 3466,
+            "bbox": 10125,
             "dccaspects": [
                 [
                     [
@@ -852,206 +845,12 @@
                             false,
                             false
                         ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
                     ]
                 ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -1164,7 +963,7 @@
             ]
         },
         "0fe13115-2591-4c50-b1e8-944937058e27": {
-            "bbox": 3470,
+            "bbox": 10129,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -1177,7 +976,7 @@
         "164f0397-7c2a-428c-baaa-beaa2fa30004": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3476,
+            "bbox": 10135,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1202,23 +1001,19 @@
                 0,
                 0
             ],
-            "bbox": 3482,
+            "bbox": 10141,
             "colour": "black",
-            "end1": 3478,
-            "end2": 3479,
             "endx": 975.0,
             "endy": 375.0,
             "item": "line",
             "itemid": 15,
-            "line": 3477,
             "posx": 675.0,
             "posy": 375.0,
-            "stop1": 3480,
-            "stop2": 3481,
+            "selection": "line15selected",
             "tags": "line15"
         },
         "1f224d72-58aa-4d11-bc79-8fc6bb41d91b": {
-            "bbox": 3486,
+            "bbox": 10145,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -1231,7 +1026,7 @@
         "25438172-e456-40c5-b75e-1a1ba9ebddd0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 3492,
+            "bbox": 10151,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1283,7 +1078,7 @@
         "272f2895-1e55-4a45-adf5-19c1fa1a5a85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3498,
+            "bbox": 10157,
             "colour": "black",
             "dccaddress": 1000,
             "dccreversed": false,
@@ -1319,23 +1114,19 @@
                 0,
                 0
             ],
-            "bbox": 3504,
+            "bbox": 10163,
             "colour": "black",
-            "end1": 3500,
-            "end2": 3501,
             "endx": 650.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 19,
-            "line": 3499,
             "posx": 625.0,
             "posy": 275.0,
-            "stop1": 3502,
-            "stop2": 3503,
+            "selection": "line19selected",
             "tags": "line19"
         },
         "2ae22ec0-ab06-4a07-941d-9ebd0b62920e": {
-            "bbox": 3508,
+            "bbox": 10167,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -1348,7 +1139,7 @@
         "2da9f2b6-37f4-45bd-ac05-bd099c5415dc": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3513,
+            "bbox": 10172,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1373,19 +1164,15 @@
                 0,
                 0
             ],
-            "bbox": 3519,
+            "bbox": 10178,
             "colour": "black",
-            "end1": 3515,
-            "end2": 3516,
             "endx": 275.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 3,
-            "line": 3514,
             "posx": 250.0,
             "posy": 225.0,
-            "stop1": 3517,
-            "stop2": 3518,
+            "selection": "line3selected",
             "tags": "line3"
         },
         "2eaee2d3-d077-42ac-aa42-1d8f8ec44f1e": {
@@ -1400,7 +1187,7 @@
                 false,
                 ""
             ],
-            "bbox": 3536,
+            "bbox": 10195,
             "dccaspects": [
                 [
                     [
@@ -2142,216 +1929,11 @@
                 ]
             ],
             "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -2464,7 +2046,7 @@
             ]
         },
         "3488e32c-5c4e-4d54-bf0f-798f2e4319a6": {
-            "bbox": 3540,
+            "bbox": 10199,
             "item": "tracksensor",
             "itemid": 2,
             "passedsensor": "12",
@@ -2767,7 +2349,7 @@
             "tags": "sensor2"
         },
         "3d5a6124-111a-4765-b09e-84236b082aeb": {
-            "bbox": 3544,
+            "bbox": 10203,
             "item": "tracksensor",
             "itemid": 1,
             "passedsensor": "11",
@@ -3070,7 +2652,7 @@
             "tags": "sensor1"
         },
         "42f78e7b-e26c-4c11-9be5-4e86210ff479": {
-            "bbox": 3548,
+            "bbox": 10207,
             "item": "tracksensor",
             "itemid": 4,
             "passedsensor": "14",
@@ -3384,7 +2966,7 @@
                 false,
                 ""
             ],
-            "bbox": 3565,
+            "bbox": 10224,
             "dccaspects": [
                 [
                     [
@@ -4126,216 +3708,11 @@
                 ]
             ],
             "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -4450,7 +3827,7 @@
         "4677ea0e-2946-4798-8d9f-5a71fa913c84": {
             "alsoswitch": 7,
             "automatic": false,
-            "bbox": 3571,
+            "bbox": 10230,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4526,23 +3903,19 @@
                 0,
                 0
             ],
-            "bbox": 3577,
+            "bbox": 10236,
             "colour": "black",
-            "end1": 3573,
-            "end2": 3574,
             "endx": 350.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 7,
-            "line": 3572,
             "posx": 300.0,
             "posy": 175.0,
-            "stop1": 3575,
-            "stop2": 3576,
+            "selection": "line7selected",
             "tags": "line7"
         },
         "4a657a16-f262-4413-a41b-08b1e5bb9448": {
-            "bbox": 3581,
+            "bbox": 10240,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -4564,7 +3937,7 @@
                 false,
                 ""
             ],
-            "bbox": 3592,
+            "bbox": 10251,
             "dccaspects": [
                 [
                     [
@@ -5316,206 +4689,12 @@
                             true,
                             false
                         ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
                     ]
                 ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -5634,23 +4813,19 @@
                 0,
                 0
             ],
-            "bbox": 3598,
+            "bbox": 10257,
             "colour": "black",
-            "end1": 3594,
-            "end2": 3595,
             "endx": 275.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 10,
-            "line": 3593,
             "posx": 200.0,
             "posy": 75.0,
-            "stop1": 3596,
-            "stop2": 3597,
+            "selection": "line10selected",
             "tags": "line10"
         },
         "4ee8acda-44a1-45dd-8572-3ce33d9b6f8e": {
-            "bbox": 3602,
+            "bbox": 10261,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -5667,19 +4842,15 @@
                 1,
                 1
             ],
-            "bbox": 3608,
+            "bbox": 10267,
             "colour": "black",
-            "end1": 3604,
-            "end2": 3605,
             "endx": 825.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 11,
-            "line": 3603,
             "posx": 700.0,
             "posy": 275.0,
-            "stop1": 3606,
-            "stop2": 3607,
+            "selection": "line11selected",
             "tags": "line11"
         },
         "52d18274-eb4a-45e7-adfa-89bfbd3bf383": {
@@ -5694,7 +4865,7 @@
                 false,
                 ""
             ],
-            "bbox": 3625,
+            "bbox": 10284,
             "dccaspects": [
                 [
                     [
@@ -6436,216 +5607,11 @@
                 ]
             ],
             "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -6758,7 +5724,7 @@
             ]
         },
         "5c0bd890-f69f-4f6b-b604-2dee9c53ee9f": {
-            "bbox": 3629,
+            "bbox": 10288,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -6769,7 +5735,7 @@
             "tags": "section11"
         },
         "5c437fb2-93a1-47a7-8558-9d5ab4f79ca5": {
-            "bbox": 3633,
+            "bbox": 10292,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -6786,19 +5752,15 @@
                 1,
                 1
             ],
-            "bbox": 3639,
+            "bbox": 10298,
             "colour": "black",
-            "end1": 3635,
-            "end2": 3636,
             "endx": 200.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 9,
-            "line": 3634,
             "posx": 100.0,
             "posy": 75.0,
-            "stop1": 3637,
-            "stop2": 3638,
+            "selection": "line9selected",
             "tags": "line9"
         },
         "6a484560-236e-42d4-96ca-49fe1a74876d": {
@@ -6808,19 +5770,15 @@
                 0,
                 0
             ],
-            "bbox": 3645,
+            "bbox": 10304,
             "colour": "black",
-            "end1": 3641,
-            "end2": 3642,
             "endx": 575.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 12,
-            "line": 3640,
             "posx": 400.0,
             "posy": 275.0,
-            "stop1": 3643,
-            "stop2": 3644,
+            "selection": "line12selected",
             "tags": "line12"
         },
         "73c8d359-fadd-416c-a9d0-468c8f478c58": {
@@ -6830,19 +5788,15 @@
                 1,
                 1
             ],
-            "bbox": 3651,
+            "bbox": 10310,
             "colour": "black",
-            "end1": 3647,
-            "end2": 3648,
             "endx": 200.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 4,
-            "line": 3646,
             "posx": 100.0,
             "posy": 175.0,
-            "stop1": 3649,
-            "stop2": 3650,
+            "selection": "line4selected",
             "tags": "line4"
         },
         "79a7624e-caec-41d8-bef8-3ab48131c182": {
@@ -6852,23 +5806,19 @@
                 0,
                 0
             ],
-            "bbox": 3657,
+            "bbox": 10316,
             "colour": "black",
-            "end1": 3653,
-            "end2": 3654,
             "endx": 675.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 18,
-            "line": 3652,
             "posx": 650.0,
             "posy": 225.0,
-            "stop1": 3655,
-            "stop2": 3656,
+            "selection": "line18selected",
             "tags": "line18"
         },
         "81104548-f84d-4544-8225-dd143a85086b": {
-            "bbox": 3661,
+            "bbox": 10320,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -6879,7 +5829,7 @@
             "tags": "section13"
         },
         "8fb91b2a-f5db-46d8-be1e-6159187f8919": {
-            "bbox": 3665,
+            "bbox": 10324,
             "item": "tracksensor",
             "itemid": 3,
             "passedsensor": "13",
@@ -7182,7 +6132,7 @@
             "tags": "sensor3"
         },
         "9540b948-4815-4767-a6cb-dfe3388301ef": {
-            "bbox": 3669,
+            "bbox": 10328,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -7193,7 +6143,7 @@
             "tags": "section6"
         },
         "99d9b4ef-9e56-4fb4-8539-066142c94e2f": {
-            "bbox": 3673,
+            "bbox": 10332,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -7210,19 +6160,15 @@
                 0,
                 0
             ],
-            "bbox": 3679,
+            "bbox": 10338,
             "colour": "black",
-            "end1": 3675,
-            "end2": 3676,
             "endx": 650.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 17,
-            "line": 3674,
             "posx": 400.0,
             "posy": 225.0,
-            "stop1": 3677,
-            "stop2": 3678,
+            "selection": "line17selected",
             "tags": "line17"
         },
         "9b20c5b7-a05c-4d20-96c2-45d8880b05e5": {
@@ -7232,19 +6178,15 @@
                 0,
                 0
             ],
-            "bbox": 3685,
+            "bbox": 10344,
             "colour": "black",
-            "end1": 3681,
-            "end2": 3682,
             "endx": 225.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 6,
-            "line": 3680,
             "posx": 200.0,
             "posy": 125.0,
-            "stop1": 3683,
-            "stop2": 3684,
+            "selection": "line6selected",
             "tags": "line6"
         },
         "9b4c4410-1382-4213-af69-722398bc5bd4": {
@@ -7259,7 +6201,7 @@
                 false,
                 ""
             ],
-            "bbox": 3696,
+            "bbox": 10355,
             "dccaspects": [
                 [
                     [
@@ -8011,122 +6953,10 @@
                             false,
                             false
                         ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
                     ]
                 ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
+                [],
+                [],
                 [
                     [
                         1,
@@ -8137,80 +6967,9 @@
                             false,
                             false
                         ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
                     ]
                 ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                []
             ],
             "sigroutes": [
                 true,
@@ -8329,19 +7088,15 @@
                 20,
                 5
             ],
-            "bbox": 3702,
+            "bbox": 10361,
             "colour": "black",
-            "end1": 3698,
-            "end2": 3699,
             "endx": 625.0,
             "endy": 375.0,
             "item": "line",
             "itemid": 14,
-            "line": 3697,
             "posx": 25.0,
             "posy": 375.0,
-            "stop1": 3700,
-            "stop2": 3701,
+            "selection": "line14selected",
             "tags": "line14"
         },
         "a41c0abe-6a8f-4b99-a677-437ffd109f7b": {
@@ -8351,23 +7106,19 @@
                 1,
                 1
             ],
-            "bbox": 3708,
+            "bbox": 10367,
             "colour": "black",
-            "end1": 3704,
-            "end2": 3705,
             "endx": 250.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 1,
-            "line": 3703,
             "posx": 100.0,
             "posy": 275.0,
-            "stop1": 3706,
-            "stop2": 3707,
+            "selection": "line1selected",
             "tags": "line1"
         },
         "b0391ce1-ec72-4971-9b9b-6f629d6b7ef0": {
-            "bbox": 3712,
+            "bbox": 10371,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -8384,23 +7135,19 @@
                 1,
                 1
             ],
-            "bbox": 3718,
+            "bbox": 10377,
             "colour": "black",
-            "end1": 3714,
-            "end2": 3715,
             "endx": 250.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 2,
-            "line": 3713,
             "posx": 100.0,
             "posy": 225.0,
-            "stop1": 3716,
-            "stop2": 3717,
+            "selection": "line2selected",
             "tags": "line2"
         },
         "b6dcf075-cc98-4a5e-ae70-e19b4e18ed54": {
-            "bbox": 3722,
+            "bbox": 10381,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -8417,25 +7164,21 @@
                 1,
                 1
             ],
-            "bbox": 3728,
+            "bbox": 10387,
             "colour": "black",
-            "end1": 3724,
-            "end2": 3725,
             "endx": 200.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 5,
-            "line": 3723,
             "posx": 100.0,
             "posy": 125.0,
-            "stop1": 3726,
-            "stop2": 3727,
+            "selection": "line5selected",
             "tags": "line5"
         },
         "c34d8895-30b6-4d70-8cb7-bd06fb39ae82": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3734,
+            "bbox": 10393,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8454,7 +7197,7 @@
             "ybuttonoffset": 0
         },
         "c89b6e58-0a68-41f7-bfbb-666119b0f0ea": {
-            "bbox": 3738,
+            "bbox": 10397,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -8471,23 +7214,19 @@
                 20,
                 5
             ],
-            "bbox": 3744,
+            "bbox": 10403,
             "colour": "black",
-            "end1": 3740,
-            "end2": 3741,
             "endx": 975.0,
             "endy": 325.0,
             "item": "line",
             "itemid": 16,
-            "line": 3739,
             "posx": 675.0,
             "posy": 325.0,
-            "stop1": 3742,
-            "stop2": 3743,
+            "selection": "line16selected",
             "tags": "line16"
         },
         "d795ff87-0401-4125-8978-5e03ff90bae0": {
-            "bbox": 3748,
+            "bbox": 10407,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -8500,7 +7239,7 @@
         "e374c174-df8c-4cbf-b2ef-8ee59101f1a0": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3754,
+            "bbox": 10413,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8521,7 +7260,7 @@
         "e709491b-e065-46cf-a3ce-d893cab6cb8d": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3759,
+            "bbox": 10418,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8551,7 +7290,7 @@
                 false,
                 ""
             ],
-            "bbox": 3776,
+            "bbox": 10435,
             "dccaspects": [
                 [
                     [
@@ -9293,216 +8032,11 @@
                 ]
             ],
             "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -9626,7 +8160,7 @@
                 false,
                 ""
             ],
-            "bbox": 3793,
+            "bbox": 10452,
             "dccaspects": [
                 [
                     [
@@ -10368,216 +8902,11 @@
                 ]
             ],
             "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
+                [],
+                [],
+                [],
+                [],
+                []
             ],
             "sigroutes": [
                 true,
@@ -10813,7 +9142,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/sidings_example.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.4.0"
+            "version": "Version 4.5.0"
         },
         "gpio": {
             "portmappings": [
@@ -10977,7 +9306,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "NONE"
+            "theatretext": ""
         },
         "5": {
             "override": false,
@@ -10988,7 +9317,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "NONE"
+            "theatretext": ""
         },
         "6": {
             "override": false,
@@ -10999,7 +9328,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "NONE"
+            "theatretext": ""
         },
         "7": {
             "override": false,
@@ -11010,7 +9339,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "NONE"
+            "theatretext": ""
         },
         "8": {
             "override": false,
@@ -11021,7 +9350,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "NONE"
+            "theatretext": ""
         }
     }
 }

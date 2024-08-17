@@ -101,13 +101,6 @@
 #      route_type.LH2
 #      route_type.RH1
 #      route_type.RH2
-#
-#   signal_callback_type (tells the calling program what has triggered the callback):
-#      signal_callback_type.sig_switched     # The signal has been switched by the user
-#      signal_callback_type.sub_switched     # The subsidary signal has been switched by the user
-#      signal_callback_type.sig_passed       # The "signal passed" event has been triggered 
-#      signal_callback_type.sig_updated      # The displayed signal aspect has been changed/updated
-#      signal_callback_type.sig_released     # The "signal released" event has been triggered
 # 
 #   signal_exists(sig_id:int/str) - returns true if the Signal object 'exists' (either the Signal
 #                    exists on the local schematic or has been subscribed to via MQTT networking)
@@ -123,6 +116,10 @@
 #   lock_subsidary(sig_id:int) - use for point/signal interlocking
 #
 #   unlock_subsidary(sig_id:int) - use for point/signal interlocking
+#
+#   signal_locked(signal_id:int) - returns the current state of the interlocking
+#
+#   subsidary_locked(signal_id:int) - returns the current state of the interlocking
 #
 #   set_signal_override(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
 #
@@ -231,13 +228,6 @@ class route_type(enum.Enum):
     RH1 = 4          # immediate right
     RH2 = 5          # far right
 
-class signal_callback_type(enum.Enum):
-    sig_switched = 1   # The signal has been switched by the user
-    sub_switched = 2   # The subsidary signal has been switched by the user
-    sig_passed = 3     # A "signal passed" event has been triggered 
-    sig_updated = 4    # The signal aspect has been changed/updated
-    sig_released = 5   # A "signal released" event has been triggered
-
 # The superset of Possible states (displayed aspects) for a signal
 # CAUTION_APROACH_CONTROL represents approach control set with "Release On Yellow"
 class signal_state_type(enum.Enum):
@@ -299,7 +289,7 @@ def signal_button_event(sig_id:int):
     # Toggle the signal state (and the tkinter button object)
     toggle_signal(sig_id)
     # Make the external callback
-    signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_switched)
+    signals[str(sig_id)]['sigswitchedcallback'] (sig_id)
     return ()
 
 def subsidary_button_event(sig_id:int):
@@ -307,7 +297,7 @@ def subsidary_button_event(sig_id:int):
     # Toggle the subsidary state (and the tkinter button object)
     toggle_subsidary(sig_id)
     # Make the external callback
-    signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sub_switched)
+    signals[str(sig_id)]['subswitchedcallback'] (sig_id)
     return ()
 
 # -------------------------------------------------------------------------
@@ -331,7 +321,7 @@ def sig_passed_button_event(sig_id:int):
              signals[str(sig_id)]["sigtype"] == signal_type.semaphore ):
             signals[str(sig_id)]["released"] = False
         # Make the external callback
-        signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_passed)
+        signals[str(sig_id)]['sigpassedcallback'] (sig_id)
     return ()
 
 def approach_release_button_event(sig_id:int):
@@ -351,7 +341,7 @@ def approach_release_button_event(sig_id:int):
         signals[str(sig_id)]["released"] = True
         clear_approach_control(sig_id)
         # Make the external callback
-        signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_released)
+        signals[str(sig_id)]['sigreleasedcallback'] (sig_id)
     return ()
 
 # -------------------------------------------------------------------------
@@ -373,7 +363,10 @@ def create_common_signal_elements(canvas, sig_id:int,
                                   signal_type:signal_type,
                                   x:int, y:int,
                                   orientation:int,
-                                  ext_callback,
+                                  sig_switched_callback,
+                                  sig_passed_callback,
+                                  sig_updated_callback = None,
+                                  sub_switched_callback = None,
                                   has_subsidary:bool=False,
                                   sig_passed_button:bool=False,
                                   sig_automatic:bool=False,
@@ -435,23 +428,26 @@ def create_common_signal_elements(canvas, sig_id:int,
     if sig_automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
-    signals[str(sig_id)]["canvas"]       = canvas               # MANDATORY - canvas object
-    signals[str(sig_id)]["sigtype"]      = signal_type          # MANDATORY - Type of the signal
-    signals[str(sig_id)]["automatic"]    = sig_automatic        # MANDATORY - True = signal is fully automatic
-    signals[str(sig_id)]["extcallback"]  = ext_callback         # MANDATORY - The External Callback to use for the signal
-    signals[str(sig_id)]["routeset"]     = route_type.MAIN      # MANDATORY - Route setting for signal (MAIN at creation)
-    signals[str(sig_id)]["sigclear"]     = False                # MANDATORY - State of the main signal control (ON/OFF)
-    signals[str(sig_id)]["override"]     = False                # MANDATORY - Signal is "Overridden" to most restrictive aspect
-    signals[str(sig_id)]["overcaution"]  = False                # MANDATORY - Signal is "Overridden" to CAUTION
-    signals[str(sig_id)]["sigstate"]     = None                 # MANDATORY - Displayed 'aspect' of the signal (None on creation)
-    signals[str(sig_id)]["hassubsidary"] = has_subsidary        # MANDATORY - Whether the signal has a subsidary aspect or arms
-    signals[str(sig_id)]["subclear"]     = False                # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
-    signals[str(sig_id)]["siglocked"]    = False                # MANDATORY - State of signal interlocking 
-    signals[str(sig_id)]["sublocked"]    = False                # MANDATORY - State of subsidary interlocking
-    signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
-    signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
-    signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
-    signals[str(sig_id)]["tags"]         = main_canvas_tag      # MANDATORY - Canvas Tags for all drawing objects
+    signals[str(sig_id)]["canvas"]              = canvas                 # MANDATORY - canvas object
+    signals[str(sig_id)]["sigtype"]             = signal_type            # MANDATORY - Type of the signal
+    signals[str(sig_id)]["automatic"]           = sig_automatic          # MANDATORY - True = signal is fully automatic
+    signals[str(sig_id)]["sigswitchedcallback"] = sig_switched_callback  # MANDATORY - The External Callback to use for the signal
+    signals[str(sig_id)]["sigpassedcallback"]   = sig_passed_callback    # MANDATORY - The External Callback to use for the signal
+    signals[str(sig_id)]["sigupdatedcallback"]  = sig_updated_callback   # MANDATORY - The External Callback to use for the signal
+    signals[str(sig_id)]["subswitchedcallback"] = sub_switched_callback  # MANDATORY - The External Callback to use for the signal
+    signals[str(sig_id)]["routeset"]            = route_type.MAIN        # MANDATORY - Route setting for signal (MAIN at creation)
+    signals[str(sig_id)]["sigclear"]            = False                  # MANDATORY - State of the main signal control (ON/OFF)
+    signals[str(sig_id)]["override"]            = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["overcaution"]         = False                  # MANDATORY - Signal is "Overridden" to CAUTION
+    signals[str(sig_id)]["sigstate"]            = None                   # MANDATORY - Displayed 'aspect' of the signal (None on creation)
+    signals[str(sig_id)]["hassubsidary"]        = has_subsidary          # MANDATORY - Whether the signal has a subsidary aspect or arms
+    signals[str(sig_id)]["subclear"]            = False                  # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
+    signals[str(sig_id)]["siglocked"]           = False                  # MANDATORY - State of signal interlocking 
+    signals[str(sig_id)]["sublocked"]           = False                  # MANDATORY - State of subsidary interlocking
+    signals[str(sig_id)]["sigbutton"]           = sig_button             # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["subbutton"]           = sub_button             # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["passedbutton"]        = passed_button          # MANDATORY - Button drawing object (subsidary signal)
+    signals[str(sig_id)]["tags"]                = main_canvas_tag        # MANDATORY - Canvas Tags for all drawing objects
     return(canvas_tag)
 
 # -------------------------------------------------------------------------
@@ -460,7 +456,7 @@ def create_common_signal_elements(canvas, sig_id:int,
 # -------------------------------------------------------------------------
 
 def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag:str,
-                                     orientation:int, approach_button:bool):
+                            orientation:int, approach_button:bool, sig_released_callback):
     global signals
     # Create the approach release button - We only want a small button - hence a small font size
     approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
@@ -468,10 +464,11 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
     button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
-    signals[str(sig_id)]["released"] = False                          # SHARED - State between 'released' and 'passed' events
-    signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
-    signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
-    signals[str(sig_id)]["releasebutton"] = approach_release_button   # SHARED - Tkinter Button object
+    signals[str(sig_id)]["released"] = False                             # SHARED - State between 'released' and 'passed' events
+    signals[str(sig_id)]["releaseonred"] = False                         # SHARED - State of the "Approach Release for the signal
+    signals[str(sig_id)]["releaseonyel"] = False                         # SHARED - State of the "Approach Release for the signal
+    signals[str(sig_id)]["releasebutton"] = approach_release_button      # SHARED - Tkinter Button object
+    signals[str(sig_id)]["sigreleasedcallback"] = sig_released_callback  # SHARED - Callback to make on sig released events
     return()
 
 # -------------------------------------------------------------------------
@@ -896,6 +893,41 @@ def unlock_subsidary(sig_id:int):
     return()
 
 # -------------------------------------------------------------------------
+# Library API function to get the interlocking state of a signal
+# -------------------------------------------------------------------------
+
+def signal_locked(sig_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": signal_locked - Signal ID must be an int")
+        locked = False
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": signal_locked - Signal ID does not exist")
+        locked = False
+    else:
+        locked = signals[str(sig_id)]["siglocked"]
+    return(locked)
+
+# -------------------------------------------------------------------------
+# Library API function to get the interlocking state of a signal
+# -------------------------------------------------------------------------
+
+def subsidary_locked(sig_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": subsidary_locked - Signal ID must be an int")
+        locked = False
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": subsidary_locked - Signal ID does not exist")
+        locked = False
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": subsidary_locked - Signal does not have a subsidary")
+        locked = False
+    else:
+        locked = signals[str(sig_id)]["sublocked"]
+    return(locked)
+
+# -------------------------------------------------------------------------
 # Library API function to return the current SWITCHED state of the signal
 # (i.e. the ON/OFF state of the signal button) - Used to enable interlocking.
 # -------------------------------------------------------------------------
@@ -1090,7 +1122,7 @@ def handle_mqtt_signal_updated_event(message:dict):
         logging.info ("Signal "+signal_identifier+": Aspect has changed to : "+
                             str(signals[signal_identifier]["sigstate"]).rpartition('.')[-1])
         # Make the external callback (if one has been defined)
-        signals[signal_identifier]["extcallback"] (signal_identifier,signal_callback_type.sig_updated)
+        signals[signal_identifier]["sigupdatedcallback"] (signal_identifier)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -1180,7 +1212,7 @@ def subscribe_to_remote_signals(callback, *remote_identifiers:str):
             signals[remote_id]["sigtype"] = signal_type.remote_signal
             signals[remote_id]["sigstate"] = signal_state_type.DANGER
             signals[remote_id]["routeset"] = route_type.NONE
-            signals[remote_id]["extcallback"] = callback
+            signals[remote_id]["sigupdatedcallback"] = callback
             # Subscribe to updates from the remote signal (even if we have already subscribed)
             [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
             mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event", node_id,

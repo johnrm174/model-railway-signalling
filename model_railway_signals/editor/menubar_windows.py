@@ -53,6 +53,7 @@
 #    common.window_controls
 #    common.CreateToolTip
 #    common.scrollable_text_box
+#    common.entry_box_grid
 #
 # Uses the following library functions:
 #    gpio_sensors.get_list_of_available_gpio_ports() - to get a list of supported ports
@@ -653,81 +654,6 @@ class mqtt_configuration_tab():
         settings.set_mqtt(*current_settings)
 
 #------------------------------------------------------------------------------------
-# Base Class for a dynamic str_entry_box_grid.
-#------------------------------------------------------------------------------------
-
-class entry_box_grid():
-    def __init__(self, parent_frame, base_class, width:int, tool_tip:str, columns:int=5):
-        self.parent_frame = parent_frame
-        self.base_class = base_class
-        self.tool_tip = tool_tip
-        self.columns = columns
-        self.width = width
-        # Create a frame (with padding) in which to pack everything
-        self.frame = Tk.Frame(self.parent_frame)
-        self.frame.pack(side=Tk.LEFT,padx=2,pady=2)
-
-    def create_row(self, pack_after=None):
-        # Create the Frame for the row
-        self.list_of_subframes.append(Tk.Frame(self.frame))
-        self.list_of_subframes[-1].pack(after=pack_after, padx=2, fill='x')
-        # Create the entry_boxes for the row
-        for value in range (self.columns):
-            self.list_of_entry_boxes.append(self.base_class(self.list_of_subframes[-1],
-                                        width=self.width, tool_tip=self.tool_tip))
-            self.list_of_entry_boxes[-1].pack(side=Tk.LEFT)
-            # Only set the value if we haven't reached the end of the values_to_setlist
-            if len(self.list_of_entry_boxes) <= len(self.values_to_set):
-                self.list_of_entry_boxes[-1].set_value(self.values_to_set[len(self.list_of_entry_boxes)-1])
-        # Create the button for inserting rows
-        this_subframe = self.list_of_subframes[-1]
-        self.list_of_buttons.append(Tk.Button(self.list_of_subframes[-1], text="+", height= 1, width=1,
-                    padx=2, pady=0, font=('Courier',8,"normal"), command=lambda:self.create_row(this_subframe)))
-        self.list_of_buttons[-1].pack(side=Tk.LEFT, padx=5)
-        common.CreateToolTip(self.list_of_buttons[-1], "Insert new row (below)")
-        # Create the button for deleting rows (apart from the first row)
-        if len(self.list_of_subframes)>1:
-            self.list_of_buttons.append(Tk.Button(self.list_of_subframes[-1], text="-", height= 1, width=1,
-                    padx=2, pady=0, font=('Courier',8,"normal"), command=lambda:self.delete_row(this_subframe)))
-            self.list_of_buttons[-1].pack(side=Tk.LEFT)
-            common.CreateToolTip(self.list_of_buttons[-1], "Delete row")
-
-    def delete_row(self, this_subframe):
-        this_subframe.destroy()
-
-    def set_values(self, values_to_set:list):
-        # Destroy and re-create the parent frame - this should also destroy all child widgets
-        self.frame.destroy()
-        self.frame = Tk.Frame(self.parent_frame)
-        self.frame.pack(side=Tk.LEFT,padx=2,pady=2)
-        self.list_of_subframes = []
-        self.list_of_entry_boxes = []                
-        self.list_of_buttons = []                
-        # Ensure at least one row is created - even if the list of values_to_set is empty
-        self.values_to_set = values_to_set
-        while len(self.list_of_entry_boxes) < len(values_to_set) or self.list_of_subframes == []:
-            self.create_row()
-                        
-    def get_values(self):
-        # Validate all the entries to accept the current (as entered) values
-        self.validate()
-        return_values = []
-        for entry_box in self.list_of_entry_boxes:
-            if entry_box.winfo_exists():
-                # Ignore all default entries - we need to handle int and str entry boxes types
-                if ( (type(entry_box.get_value())==str and entry_box.get_value() != "" ) or
-                     (type(entry_box.get_value())==int and entry_box.get_value() != 0) ):
-                    return_values.append(entry_box.get_value())
-        return(return_values)
-    
-    def validate(self):
-        valid = True
-        for entry_box in self.list_of_entry_boxes:
-            if entry_box.winfo_exists():
-                if not entry_box.validate(): valid = False
-        return(valid)
-        
-#------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'Subscribe' Tab
 #------------------------------------------------------------------------------------    
 
@@ -736,23 +662,23 @@ class mqtt_subscribe_tab():
         # Create the Serial Port and baud rate UI elements 
         self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = entry_box_grid(self.frame1, base_class=common.entry_box, columns=4, width=8,
+        self.dcc = common.entry_box_grid(self.frame1, base_class=common.entry_box, columns=4, width=8,
             tool_tip="Specify the remote network nodes to take a DCC command feed from")
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = entry_box_grid(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.signals = common.entry_box_grid(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote signals to subscribe to (in the form 'node-ID')")
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = entry_box_grid(self.frame3, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.sections = common.entry_box_grid(self.frame3, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sections to subscribe to (in the form 'node-ID')")
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = entry_box_grid(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.instruments = common.entry_box_grid(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = entry_box_grid(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.sensors = common.entry_box_grid(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
 
     def validate(self):
@@ -775,19 +701,19 @@ class mqtt_publish_tab():
         self.dcc.pack(padx=2, pady=2)
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = entry_box_grid(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.signals = common.entry_box_grid(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the signals (on the local schematic) to publish via the MQTT network")
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sections = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sections (on the local schematic) to publish via the MQTT network")
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.instruments = common.entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sensors = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
 
     def validate(self):
@@ -959,6 +885,7 @@ class edit_mqtt_settings():
             self.update_function()
             # close the window (on OK)
             if close_window: self.close_window()
+            else: self.load_state()
         else:
             # Display the validation error message
             self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)

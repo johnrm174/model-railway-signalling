@@ -5,6 +5,7 @@
 # External API functions intended for use by other editor modules: 
 #    create_textbox() - Create a default line object on the schematic
 #    delete_textbox(object_id) - Hard Delete an object when deleted from the schematic
+#    update_textbox(object_id, new_object) - Update the configuration of the object
 #    paste_textbox(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_textbox_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_textbox_object(object_id) - Redraw the object on the canvas following an update

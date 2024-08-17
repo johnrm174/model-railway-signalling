@@ -9,14 +9,15 @@ from .signals import ground_pos_subtype
 from .signals import ground_disc_subtype
 from .signals import signal_state_type
 from .signals import route_type
-from .signals import signal_callback_type
 from .signals import signal_exists
 from .signals import delete_signal
 from .signals import set_route
 from .signals import lock_signal
 from .signals import unlock_signal
+from .signals import signal_locked
 from .signals import lock_subsidary
 from .signals import unlock_subsidary
+from .signals import subsidary_locked
 from .signals import set_signal_override
 from .signals import clear_signal_override
 from .signals import set_signal_override_caution
@@ -39,19 +40,20 @@ from .signals_ground_position import create_ground_position_signal
 from .signals_ground_disc import create_ground_disc_signal
 
 from .points import point_type
-from .points import point_callback_type
 from .points import create_point
 from .points import delete_point
 from .points import update_autoswitch
 from .points import point_exists
 from .points import lock_point
 from .points import unlock_point
+from .points import point_locked
 from .points import toggle_point
 from .points import toggle_fpl
 from .points import point_switched
 from .points import fpl_active
+from .points import set_point_colour
+from .points import reset_point_colour
 
-from .track_sections import section_callback_type
 from .track_sections import create_section
 from .track_sections import section_exists
 from .track_sections import delete_section
@@ -74,7 +76,6 @@ from .gpio_sensors import reset_gpio_mqtt_configuration
 from .gpio_sensors import set_gpio_sensors_to_publish_state
 from .gpio_sensors import subscribe_to_remote_gpio_sensors
 
-from .track_sensors import track_sensor_callback_type
 from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
 from .track_sensors import delete_track_sensor
@@ -102,7 +103,6 @@ from .mqtt_interface import mqtt_broker_connect
 from .mqtt_interface import mqtt_broker_disconnect
 
 from .block_instruments import instrument_type
-from .block_instruments import block_callback_type
 from .block_instruments import create_instrument
 from .block_instruments import instrument_exists
 from .block_instruments import update_linked_instrument
@@ -111,6 +111,16 @@ from .block_instruments import block_section_ahead_clear
 from .block_instruments import reset_instruments_mqtt_configuration
 from .block_instruments import set_instruments_to_publish_state
 from .block_instruments import subscribe_to_remote_instruments
+
+from .buttons import create_button
+from .buttons import button_exists
+from .buttons import delete_button
+from .buttons import toggle_button
+from .buttons import enable_button
+from .buttons import disable_button
+from .buttons import button_state
+from .buttons import button_enabled
+from .buttons import processing_complete
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -127,19 +137,20 @@ __all__ = [
         'configure_edit_mode',
       # Public point types/functions
         'point_type',
-        'point_callback_type',
         'create_point',
         'delete_point',
         'update_autoswitch',
         'point_exists',
         'lock_point',
         'unlock_point',
+        'point_locked',
         'point_switched',
         'fpl_active',
         'toggle_point',
         'toggle_fpl',
+        'set_point_colour',
+        'reset_point_colour',
       # public track sensor types/functions
-        'track_sensor_callback_type',
         'create_track_sensor',
         'delete_track_sensor',
         'track_sensor_exists',
@@ -151,14 +162,15 @@ __all__ = [
         'ground_disc_subtype',
         'signal_state_type',
         'route_type',
-        'signal_callback_type',
         'signal_exists',
         'delete_signal',
         'set_route',
         'lock_signal',
         'unlock_signal',
+        'signal_locked',
         'lock_subsidary',
         'unlock_subsidary',
+        'subsidary_locked',
         'set_signal_override',
         'clear_signal_override',
         'set_signal_override_caution',
@@ -179,9 +191,7 @@ __all__ = [
         'create_semaphore_signal',
         'create_ground_position_signal',
         'create_ground_disc_signal',
-
       # Public track section types/functions
-        'section_callback_type',
         'create_section',
         'section_exists',
         'delete_section',
@@ -226,7 +236,6 @@ __all__ = [
         'mqtt_broker_connect',
         'mqtt_broker_disconnect',
       # public block instrument types/functions
-        'block_callback_type',
         'instrument_type',
         'create_instrument',
         'instrument_exists',
@@ -236,6 +245,16 @@ __all__ = [
         'reset_instruments_mqtt_configuration',
         'subscribe_to_remote_instruments',
         'set_instruments_to_publish_state',
+      # public Button types/functions
+        'create_button',
+        'button_exists',
+        'delete_button',
+        'toggle_button',
+        'enable_button',
+        'disable_button',
+        'button_state',
+        'button_enabled',
+        'processing_complete',
       # Public file interface functions
         'save_schematic',
         'load_schematic',

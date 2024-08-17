@@ -4,16 +4,13 @@
 #
 # External API - classes and functions (used by the Schematic Editor):
 # 
-#   track_sensor_callback_type (tells the calling program what has triggered the callback):
-#      track_sensor_callback_type.sensor_triggered (the track sensor has been triggered)
-# 
 #   create_track_sensor - Creates a track sensior and returns a "tag" for all tkinter canvas drawing objects 
 #                         This allows the editor to move the track sensor object on the schematic as required
 #     Mandatory Parameters:
 #        Canvas - The Tkinter Drawing canvas on which the track sensor is to be displayed
 #        sensor_id:int - The unique ID for the track sensor
 #        x:int, y:int - Position of the point on the canvas (in pixels)
-#        callback - the function to call on track sensor triggered events
+#        callback - the function to call on track sensor triggered events (returns item_id)
 #
 #    track_sensor_exists(sensor_id:int) - returns true if the if a track sensor object 'exists'
 #
@@ -28,18 +25,10 @@
 #
 #---------------------------------------------------------------------------------------------------
 
-import enum
 import logging
 import tkinter as Tk
 
 from . import common
-
-#---------------------------------------------------------------------------------------------------
-# Public API classes (to be used by external functions)
-#---------------------------------------------------------------------------------------------------
-
-class track_sensor_callback_type(enum.Enum):
-    sensor_triggered = 61   # The sensor has been triggered (by the user or an GPIO sensor)
 
 #---------------------------------------------------------------------------------------------------
 # Track Sensors are maintained in a global dictionary (with a key of 'sensor_id')
@@ -107,7 +96,7 @@ def track_sensor_triggered (sensor_id:int, callback_type=None):
             common.root_window.after(1000,lambda:reset_sensor_button(sensor_id))
         # Make the external callback specified for the track sensor
         callback = track_sensors[str(sensor_id)]["callback"]
-        callback(sensor_id, track_sensor_callback_type.sensor_triggered)
+        callback(sensor_id)
     return ()
 
 def reset_sensor_button (sensor_id:int):

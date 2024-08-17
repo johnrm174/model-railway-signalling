@@ -10,8 +10,8 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       signalsubtype - subtype of the ground position signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
-#       callback - the function to call on signal switched or passed events
-#               Note that the callback function returns (item_id, callback type)
+#       sig_switched_callback - the function to call on signal switched events (returns item_id)
+#       sig_passed_callback - the function to call on signal passed events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
 #       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
@@ -39,7 +39,9 @@ from .signals import ground_pos_subtype as ground_pos_subtype
 
 def create_ground_position_signal(canvas, sig_id:int,
                                   signalsubtype:ground_pos_subtype,
-                                  x:int, y:int, callback = None,
+                                  x:int, y:int,
+                                  sig_switched_callback,
+                                  sig_passed_callback,
                                   orientation:int=0,
                                   sig_passed_button:bool=False):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
@@ -58,7 +60,9 @@ def create_ground_position_signal(canvas, sig_id:int,
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id,
                                                 signals.signal_type.ground_position,
-                                                x, y, orientation, callback,
+                                                x, y, orientation,
+                                                sig_switched_callback,
+                                                sig_passed_callback,
                                                 sig_passed_button = sig_passed_button)
         # Draw the signal base
         line_coords = common.rotate_line (x,y,0,0,0,-22,orientation)
