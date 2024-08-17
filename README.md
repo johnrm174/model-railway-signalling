@@ -34,6 +34,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 * Removed constraint on interlocking with conflicting signals - more than 4 signals can now be specified
 
+![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
+
 Bug reports and feedback is welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?
 * What aspects do you particularly like?
