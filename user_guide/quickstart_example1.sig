@@ -1,8 +1,324 @@
 {
-    "buttons": {},
+    "buttons": {
+        "1": {
+            "selected": false
+        },
+        "2": {
+            "selected": false
+        },
+        "3": {
+            "selected": false
+        },
+        "4": {
+            "selected": false
+        }
+    },
     "information": "Model Railway Signalling Configuration File",
     "instruments": {},
     "objects": {
+        "03f32844-9771-4717-91a8-ef160bada1df": {
+            "bbox": 126,
+            "item": "tracksensor",
+            "itemid": 3,
+            "passedsensor": "8",
+            "posx": 850.0,
+            "posy": 250.0,
+            "routeahead": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "routebehind": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "tags": "sensor3"
+        },
         "1e2616e2-21cc-4c34-8d93-b87e683e0284": {
             "arrowends": 1,
             "arrowtype": [
@@ -10,31 +326,334 @@
                 1,
                 1
             ],
-            "bbox": 13774,
+            "bbox": 132,
             "colour": "black",
-            "endx": 525.0,
+            "endx": 550.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 4,
-            "posx": 300.0,
+            "posx": 325.0,
             "posy": 200.0,
             "selection": "line4selected",
             "tags": "line4"
         },
+        "30bdbf8d-ab42-46a5-b86c-632d3bad5dd2": {
+            "bbox": 136,
+            "item": "tracksensor",
+            "itemid": 2,
+            "passedsensor": "7",
+            "posx": 850.0,
+            "posy": 200.0,
+            "routeahead": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "routebehind": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "tags": "sensor2"
+        },
         "338a06f5-049d-454e-9e8f-e032ab9ca9cb": {
-            "bbox": 13778,
+            "bbox": 140,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 4,
             "mirror": "",
-            "posx": 775.0,
+            "posx": 800.0,
             "posy": 250.0,
             "tags": "section4"
         },
         "3495a936-bc8d-4393-9abe-3520edcb0d9d": {
             "background": "#18bbd9",
-            "bbox": 13781,
+            "bbox": 143,
             "border": 1,
             "colour": "black",
             "font": "Courier",
@@ -43,14 +662,317 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 775.0,
+            "posx": 800.0,
             "posy": 175.0,
             "tags": "3495a936-bc8d-4393-9abe-3520edcb0d9d",
             "text": "     Platform 2     "
         },
+        "353b45c7-5cea-4783-81eb-7fe275398deb": {
+            "bbox": 147,
+            "item": "tracksensor",
+            "itemid": 1,
+            "passedsensor": "",
+            "posx": 175.0,
+            "posy": 250.0,
+            "routeahead": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "routebehind": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "tags": "sensor1"
+        },
         "40efa244-6879-4bbd-b880-9eeb70373504": {
             "background": "grey85",
-            "bbox": 13784,
+            "bbox": 150,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -59,14 +981,14 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 125.0,
+            "posx": 100.0,
             "posy": 250.0,
             "tags": "40efa244-6879-4bbd-b880-9eeb70373504",
             "text": "The rest of \nthe world"
         },
         "43fd9649-cff7-437a-b405-2811fc777a5f": {
             "background": "grey85",
-            "bbox": 13787,
+            "bbox": 153,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -75,14 +997,14 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 125.0,
+            "posx": 150.0,
             "posy": 181.0,
             "tags": "43fd9649-cff7-437a-b405-2811fc777a5f",
             "text": "Next Train"
         },
         "4576da32-1464-4dad-92d8-5e3e06ee59e3": {
             "background": "#18bbd9",
-            "bbox": 13790,
+            "bbox": 156,
             "border": 1,
             "colour": "black",
             "font": "Courier",
@@ -91,7 +1013,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 775.0,
+            "posx": 800.0,
             "posy": 275.0,
             "tags": "4576da32-1464-4dad-92d8-5e3e06ee59e3",
             "text": "     Platform 1     "
@@ -108,7 +1030,7 @@
                 false,
                 ""
             ],
-            "bbox": 13807,
+            "bbox": 173,
             "dccaspects": [
                 [
                     [
@@ -775,7 +1697,7 @@
                     0
                 ]
             ],
-            "posx": 250.0,
+            "posx": 300.0,
             "posy": 250.0,
             "sigarms": [
                 [
@@ -967,37 +1889,67 @@
             ]
         },
         "5e1d004d-aead-44c5-b51e-c48af4a29575": {
-            "arrowends": 1,
+            "arrowends": 0,
             "arrowtype": [
                 20,
                 20,
                 5
             ],
-            "bbox": 13813,
+            "bbox": 179,
             "colour": "black",
-            "endx": 525.0,
+            "endx": 550.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 1,
-            "posx": 175.0,
+            "posx": 150.0,
             "posy": 250.0,
             "selection": "line1selected",
             "tags": "line1"
         },
         "6788feaa-a049-4d62-978c-faa6f4dfd967": {
-            "bbox": 13817,
+            "bbox": 183,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 1,
             "mirror": "",
-            "posx": 125.0,
+            "posx": 150.0,
             "posy": 200.0,
             "tags": "section1"
         },
+        "6f705b1a-e264-4bb7-a979-4520901eec1b": {
+            "bbox": 187,
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 4,
+            "linestohighlight": [
+                2,
+                1
+            ],
+            "pointsonroute": {
+                "1": true
+            },
+            "pointstohighlight": [
+                1,
+                2
+            ],
+            "posx": 800.0,
+            "posy": 350.0,
+            "resetpoints": true,
+            "routecolour": "#1bb420",
+            "routedescription": "Platform 2 departure\nto the rest of the world",
+            "routename": "Depart Platform 2",
+            "signalsonroute": [
+                2
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "tags": "button4",
+            "tracksensor": 1
+        },
         "87f435df-8da5-4999-b3ef-e7ea67977c03": {
             "background": "grey85",
-            "bbox": 13820,
+            "bbox": 190,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1006,7 +1958,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 350.0,
+            "posx": 375.0,
             "posy": 175.0,
             "tags": "87f435df-8da5-4999-b3ef-e7ea67977c03",
             "text": "Siding"
@@ -1018,32 +1970,32 @@
                 1,
                 1
             ],
-            "bbox": 13826,
+            "bbox": 196,
             "colour": "black",
-            "endx": 875.0,
+            "endx": 900.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 3,
-            "posx": 575.0,
+            "posx": 600.0,
             "posy": 250.0,
             "selection": "line3selected",
             "tags": "line3"
         },
         "970e8948-a116-4023-847b-2e9269c0fa74": {
-            "bbox": 13830,
+            "bbox": 200,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 2,
             "mirror": "",
-            "posx": 375.0,
+            "posx": 400.0,
             "posy": 250.0,
             "tags": "section2"
         },
         "990769c5-58eb-435b-befb-21b9263321b4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 13835,
+            "bbox": 205,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1053,7 +2005,7 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
-            "posx": 550.0,
+            "posx": 575.0,
             "posy": 200.0,
             "reverse": false,
             "siginterlock": [],
@@ -1073,7 +2025,7 @@
                 false,
                 ""
             ],
-            "bbox": 13846,
+            "bbox": 216,
             "dccaspects": [
                 [
                     [
@@ -1740,7 +2692,7 @@
                     0
                 ]
             ],
-            "posx": 500.0,
+            "posx": 525.0,
             "posy": 200.0,
             "sigarms": [
                 [
@@ -1943,13 +2895,13 @@
             ]
         },
         "abc1ad1d-e1b2-4129-a1eb-e33844a0166d": {
-            "bbox": 13850,
+            "bbox": 220,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 5,
             "mirror": "",
-            "posx": 375.0,
+            "posx": 400.0,
             "posy": 200.0,
             "tags": "section5"
         },
@@ -1965,7 +2917,7 @@
                 false,
                 ""
             ],
-            "bbox": 13869,
+            "bbox": 239,
             "dccaspects": [
                 [
                     [
@@ -2632,7 +3584,7 @@
                     0
                 ]
             ],
-            "posx": 650.0,
+            "posx": 675.0,
             "posy": 200.0,
             "sigarms": [
                 [
@@ -2848,7 +3800,7 @@
         "b3241207-0377-4e6e-aeac-6cb08691c888": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 13876,
+            "bbox": 246,
             "colour": "black",
             "dccaddress": 1000,
             "dccreversed": false,
@@ -2858,7 +3810,7 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 550.0,
+            "posx": 575.0,
             "posy": 250.0,
             "reverse": false,
             "siginterlock": [
@@ -2917,6 +3869,36 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "c622073d-27c0-4f32-aecb-f95dfebb93a0": {
+            "bbox": 250,
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 2,
+            "linestohighlight": [
+                1,
+                2
+            ],
+            "pointsonroute": {
+                "1": true
+            },
+            "pointstohighlight": [
+                1,
+                2
+            ],
+            "posx": 275.0,
+            "posy": 350.0,
+            "resetpoints": true,
+            "routecolour": "#2916d9",
+            "routedescription": "From the rest of the World\ninto Platform 2",
+            "routename": "Into Platform 2",
+            "signalsonroute": [
+                1
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "tags": "button2",
+            "tracksensor": 2
+        },
         "d3a7822b-5865-4e92-bae1-250fe918ad8c": {
             "approachcontrol": [
                 0,
@@ -2929,7 +3911,7 @@
                 false,
                 ""
             ],
-            "bbox": 13893,
+            "bbox": 267,
             "dccaspects": [
                 [
                     [
@@ -3596,7 +4578,7 @@
                     0
                 ]
             ],
-            "posx": 450.0,
+            "posx": 475.0,
             "posy": 250.0,
             "sigarms": [
                 [
@@ -3809,6 +4791,64 @@
                 ]
             ]
         },
+        "da49f189-a72b-4e08-969a-d222c5609644": {
+            "bbox": 271,
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 3,
+            "linestohighlight": [
+                3,
+                1
+            ],
+            "pointsonroute": {
+                "1": false
+            },
+            "pointstohighlight": [
+                1
+            ],
+            "posx": 800.0,
+            "posy": 375.0,
+            "resetpoints": true,
+            "routecolour": "#1bb420",
+            "routedescription": "Platform 1 departure\nto rest of the world",
+            "routename": "Depart Platform 1",
+            "signalsonroute": [
+                3
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "tags": "button3",
+            "tracksensor": 1
+        },
+        "df3dcf3e-6882-4e86-84d9-f07049ac7129": {
+            "bbox": 275,
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 1,
+            "linestohighlight": [
+                1,
+                3
+            ],
+            "pointsonroute": {
+                "1": false
+            },
+            "pointstohighlight": [
+                1
+            ],
+            "posx": 275.0,
+            "posy": 375.0,
+            "resetpoints": true,
+            "routecolour": "#2916d9",
+            "routedescription": "From the rest of the world \ninto platform 1",
+            "routename": "Into Platform 1",
+            "signalsonroute": [
+                1
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "tags": "button1",
+            "tracksensor": 3
+        },
         "e25a9e32-bd47-4773-8146-24173d6d2f95": {
             "approachcontrol": [
                 0,
@@ -3821,7 +4861,7 @@
                 false,
                 ""
             ],
-            "bbox": 13910,
+            "bbox": 292,
             "dccaspects": [
                 [
                     [
@@ -4488,7 +5528,7 @@
                     0
                 ]
             ],
-            "posx": 650.0,
+            "posx": 675.0,
             "posy": 250.0,
             "sigarms": [
                 [
@@ -4697,25 +5737,25 @@
                 1,
                 1
             ],
-            "bbox": 13916,
+            "bbox": 298,
             "colour": "black",
-            "endx": 875.0,
+            "endx": 900.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 2,
-            "posx": 575.0,
+            "posx": 600.0,
             "posy": 200.0,
             "selection": "line2selected",
             "tags": "line2"
         },
         "fc5c18e4-b05c-4941-9c64-476d0ae651a2": {
-            "bbox": 13920,
+            "bbox": 302,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 3,
             "mirror": "",
-            "posx": 775.0,
+            "posx": 800.0,
             "posy": 200.0,
             "tags": "section3"
         }
@@ -4723,7 +5763,7 @@
     "points": {
         "1": {
             "fpllock": true,
-            "locked": false,
+            "locked": true,
             "switched": false
         },
         "2": {
@@ -4764,7 +5804,7 @@
         "general": {
             "automation": true,
             "editmode": true,
-            "filename": "/home/pi/Software/model-railway-signalling/user_guide/quickstart_example1.sig",
+            "filename": "/home/john/Desktop/quickstart_example1.sig",
             "info": "Document your layout here",
             "spadpopups": false,
             "version": "Version 4.5.0"
@@ -4790,6 +5830,18 @@
                 [
                     5,
                     13
+                ],
+                [
+                    6,
+                    20
+                ],
+                [
+                    7,
+                    21
+                ],
+                [
+                    8,
+                    22
                 ]
             ],
             "timeoutperiod": 1.0,
@@ -4848,7 +5900,7 @@
             "sigclear": false,
             "siglocked": true,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "3": {
@@ -4867,7 +5919,7 @@
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
-            "sigclear": false,
+            "sigclear": true,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
