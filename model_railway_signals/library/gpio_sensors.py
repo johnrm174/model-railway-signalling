@@ -60,9 +60,29 @@
 #        Dictionary comprises ["sourceidentifier"] - the identifier for the remote gpio sensor
 #
 #---------------------------------------------------------------------------------------------------
+# IMPLEMENTATION NOTES
+#
+# Previous versions of this module would 'close' all gpiozero objects when 'delete_all_local_gpio_sensors'
+# was called and then create/re-create them in sequence (when 'create_gpio_sensor' was called). This seemed
+# to work fine until I tested with a 'noisy' GPIO input. In this case, calls to 'close' the button object
+# would occasionally generate exceptions (somewhere in a thread in the gpiozero library) and even worse,
+# result in segmentation faults which caused the entire application to crash.
+#
+# I never managed to get to the root cause of these issues, but the changes I have made seem to resolved them
+# (not sure which 'one' worked, but the other changes have probably inproved the code anyway):
+#
+# 1) Only create the gpiozero button objects (assigned to a GPIO port) once. On 'delete_all_local_gpio_sensors',
+#    only the mappings to the sensor_ids are reset. On 'create_gpio_sensor', if a gpiozero button already exists
+#    for the specified gpio port then the button object is just updated with the new parameters (trigger period)
+# 2) Leave the references to the gpiozero button objects stable - On 'reset_gpio_mqtt_configuration' we only
+#    remove the elements we need from the master gpio_port_mappings - leaving everything else as is
+# 3) Simplify the processing of trigger events - we now use the gpiozero library to implement the trigger delay
+#    and immediately pass execution back to the main tkinter thread (using the root.after method)
+#    GPIO button is triggeres
+#
+#---------------------------------------------------------------------------------------------------
 
 import time
-import threading
 import logging
 from typing import Union
 
@@ -150,72 +170,38 @@ def gpio_sensor_exists(sensor_id:Union[int,str]):
     return(sensor_exists)
 
 #---------------------------------------------------------------------------------------------------
-# Thread to "lock" the GPIO sensor for the specified timeout period after it has been triggered
-# Any re-triggers during this period are ignored (they just extend the timeout period)
+# The 'gpio_triggered_callback' function is called whenever a "Button Held" event is detected for
+# an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
 #---------------------------------------------------------------------------------------------------
 
-def thread_to_timeout_sensor(gpio_port:int):
+def gpio_triggered_callback(*args):
+    common.root_window.after(0, lambda:gpio_sensor_triggered(*args))
+
+#---------------------------------------------------------------------------------------------------
+# Internal function executed in the main Tkinter thread whenever a "Button Held" event is detected
+# for the external GPIO port. A timeout is applied to ignore further triggers during the timeout period.
+# If the sensor is re-triggered within the timeout period then the timeout period is extended. This is
+# to handle optical sensors which might Fall and Rise as each carriage/waggon passes the sensor.
+#---------------------------------------------------------------------------------------------------
+
+def gpio_sensor_triggered(gpio_port:int):
     global gpio_port_mappings
-    # We put exception handling round the entire thread to handle the case of a gpio sensor mapping
-    # being deleted whilst the timeout period is still active - in this case we just exit gracefully
-    try:
-        # Wait for the timeout period to expire (if the sensor is released and triggered again within the
-        # timeout period then the timeout will just be extended). Note that the loop will immediately exit
-        # if the shutdown has been initiated (on application exit)
-        timeout_active = True
-        while timeout_active:
-            timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
-            timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
-            if time.time() > timeout_start + timeout_value or common.shutdown_initiated:
-                timeout_active = False
-            time.sleep(0.0001)
+    # Check the sensor still exists (hasn't been deleted)
+    if str(gpio_port) in gpio_port_mappings.keys():
+        timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
+        timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
         sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-        logging.debug("GPIO Sensor "+str(sensor_id)+": Event Timeout ********************************************")
-    except:
-        pass
-    return()
-
-#---------------------------------------------------------------------------------------------------
-# Internal function called whenever a "Button Press" event is detected for the external GPIO port.
-# A timeout is applied (via the thread above) to ignore further triggers during the timeout period.
-# If the sensor is re-triggered within the timeout period then the timeout period is extended. This
-# is to handle optical sensors which might Fall and Rise as each carriage/waggon passes the sensor.
-# Note that the 'gpio_sensor_triggered' function would normally only get called for 'real' GPIO events
-# where the gpiozero device would exist and would still be pressed at the end of the trigger period.
-# The function therefore has a specific "testing" flag to enable the code to be tested in isolation.
-#---------------------------------------------------------------------------------------------------
-                
-def gpio_sensor_triggered(gpio_port:int, testing:bool=False):
-    global gpio_port_mappings
-    # We put exception handling round the entire function to handle the case of a gpio sensor mapping
-    # being deleted immediately after it has just been triggered - in this case we just exit gracefully
-    try:
-        # Wait for the initial trigger period to complete
-        time.sleep(gpio_port_mappings[str(gpio_port)]["trigger_period"])
-        # Only process the event if the button is still active (effectively a de-bounce)
-        if testing or gpio_port_mappings[str(gpio_port)]["sensor_device"].is_pressed:
-            timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
-            timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
-            sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-            # Only process the event if we are not already in a timeout period
-            if time.time() > timeout_start + timeout_value:
-                logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
-                gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-                # Start a new timeout thread
-                timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_port,))
-                timeout_thread.setDaemon(True)
-                timeout_thread.start()
-                # Transmit the state via MQTT networking (will only be sent if configured to publish)
-                # Note we make the function call in the main Tkinter Thread to keep everything thread safe
-                common.execute_function_in_tkinter_thread(lambda:send_mqtt_gpio_sensor_triggered_event(sensor_id))
-                # Make the mapped signal or track sensor callback (if one is configured)
-                # Note we make the function call in the main Tkinter Thread to keep everything thread safe
-                common.execute_function_in_tkinter_thread(lambda:make_gpio_sensor_triggered_callback(sensor_id))
-            else:
-                logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
-                gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-    except:
-        pass
+        # Only process this as a new event if we are not in the timeout period
+        if time.time() > timeout_start + timeout_value:
+            logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
+            # Transmit the state via MQTT networking (will only be sent if configured to publish)
+            send_mqtt_gpio_sensor_triggered_event(sensor_id)
+            # Make the mapped signal or track sensor callback
+            make_gpio_sensor_triggered_callback(sensor_id)
+        else:
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
+        # Extend the timeout period (whether we have acted on it or not)
+        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -288,35 +274,42 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port must be int")
     elif gpio_channel not in get_list_of_available_gpio_ports():
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Invalid GPIO Port "+str(gpio_channel))
-    elif str(gpio_channel) in gpio_port_mappings.keys():
+    elif str(gpio_channel) in gpio_port_mappings.keys() and gpio_port_mappings[str(gpio_channel)]["sensor_id"] > 0:
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+str(gpio_channel)+" is already mapped")
     else:
         logging.debug("GPIO Sensor "+str(sensor_id)+": Mapping sensor to GPIO Port "+str(gpio_channel))
-        # Create the track sensor entry in the dictionary of gpio_port_mappings
-        gpio_port_mappings[str(gpio_channel)] = {}
+        # If the GPIO Port has not yet been mapped then create a new entry dictionary of gpio_port_mappings
+        # The sensor device itself (gpiozero Button Object) is creted later (if running on a RPi)
+        if str(gpio_channel) not in gpio_port_mappings.keys():
+            gpio_port_mappings[str(gpio_channel)] = {}
+            gpio_port_mappings[str(gpio_channel)]["sensor_device"] = None
+        # Create/update the rest of the GPIO Port Mapping entry in the dictionary of gpio_port_mappings
         gpio_port_mappings[str(gpio_channel)]["sensor_id"] = sensor_id
-        gpio_port_mappings[str(gpio_channel)]["trigger_period"] = trigger_period
         gpio_port_mappings[str(gpio_channel)]["timeout_value"] = sensor_timeout
-        gpio_port_mappings[str(gpio_channel)]["timeout_start"] = 0
-        gpio_port_mappings[str(gpio_channel)]["sensor_device"] = None
+        gpio_port_mappings[str(gpio_channel)]["timeout_start"] = 0.0
         gpio_port_mappings[str(gpio_channel)]["signal_approach"] = 0
         gpio_port_mappings[str(gpio_channel)]["signal_passed"] = 0
         gpio_port_mappings[str(gpio_channel)]["sensor_passed"] = 0
-        # We only create the gpiozero sensor device if we are running on a raspberry pi
+        # We only create /update the gpiozero button object if we are running on a raspberry pi
         if running_on_raspberry_pi:
-            try:
-                sensor_device = gpiozero.Button(gpio_channel)
-                sensor_device.when_pressed = lambda:gpio_sensor_triggered(gpio_channel)
-                gpio_port_mappings[str(gpio_channel)]["sensor_device"] = sensor_device
-            except:
-                logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+
-                               str(gpio_channel)+" cannot be mapped")
+            # We only create the gpiozero button object if it doesn't already exist
+            # Note that the default params we care about are pull_up=True, hold_repeat=False
+            # We use exception handling to catch any failures (i.e. gpio port being used by another app)
+            if gpio_port_mappings[str(gpio_channel)]["sensor_device"] is None:
+                try:
+                    gpio_port_mappings[str(gpio_channel)]["sensor_device"] = gpiozero.Button(pin=gpio_channel, bounce_time=0.001)
+                    gpio_port_mappings[str(gpio_channel)]["sensor_device"].when_held = lambda:gpio_triggered_callback(gpio_channel)
+                except:
+                    logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+
+                                   str(gpio_channel)+" cannot be mapped")
+            # Update/assign the gpiozero Button Object with the new value for the trigger period
+            gpio_port_mappings[str(gpio_channel)]["sensor_device"].hold_time = trigger_period
     return()
 
 #---------------------------------------------------------------------------------------------------
-# API function to delete all LOCAL GPIO sensor mappings. Called when the GPIO sensor mappings have been
+# API function to reset all LOCAL GPIO port mappings. Called when the GPIO sensor mappings have been
 # updated by the editor (on 'apply' of the GPIO sensor configuration). The editor will then go on to
-# re-create all LOCAL GPIO sensors (that have a GPIO mapping defined) with their updated mappings.
+# re-map (or create) all LOCAL GPIO port mappings with the new sensor ID as the sensors are created.
 #---------------------------------------------------------------------------------------------------
 
 def delete_all_local_gpio_sensors():
@@ -324,13 +317,11 @@ def delete_all_local_gpio_sensors():
     logging.debug("GPIO Interface: Deleting all local GPIO sensor mappings")
     # Remove all "local" GPIO sensors from the dictionary of gpio_port_mappings (where the
     # key in the gpio_port_mappings dict will be a a number' rather that a remote identifier).
-    # We don't iterate through the dictionary to remove items as it will change under us.
-    new_gpio_port_mappings = {}
+    # Note that we leave the GPIO port configuration (in the dict of GPIO port mappings)
+    # unchanged (i.e. don't delete it) - we just remove the mapping to the Sensor ID
     for gpio_port in gpio_port_mappings:
-        if not gpio_port.isdigit(): new_gpio_port_mappings[gpio_port] = gpio_port_mappings[gpio_port]
-        elif gpio_port_mappings[gpio_port]["sensor_device"] is not None:
-            gpio_port_mappings[gpio_port]["sensor_device"].close()
-    gpio_port_mappings = new_gpio_port_mappings
+        if gpio_port.isdigit():
+            gpio_port_mappings[gpio_port]["sensor_id"] = 0
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -410,10 +401,12 @@ def reset_gpio_mqtt_configuration():
     # Remove all "remote" GPIO sensors from the dictionary of gpio_port_mappings (where the
     # key in the gpio_port_mappings dict will be the remote identifier rather than a number).
     # We don't iterate through the dictionary to remove items as it will change under us.
-    new_gpio_port_mappings = {}
+    remote_gpio_sensor_keys = []
     for gpio_port in gpio_port_mappings:
-        if gpio_port.isdigit(): new_gpio_port_mappings[gpio_port] = gpio_port_mappings[gpio_port]
-    gpio_port_mappings = new_gpio_port_mappings
+        if not gpio_port.isdigit():
+            remote_gpio_sensor_keys.append(gpio_port)
+    for remote_gpio_sensor in remote_gpio_sensor_keys:
+        del gpio_port_mappings[remote_gpio_sensor]
     return()
 
 #---------------------------------------------------------------------------------------------------
