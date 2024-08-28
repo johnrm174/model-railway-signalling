@@ -89,7 +89,7 @@ default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
 default_settings["mqtt"]["pubsensors"] = []
 default_settings["gpio"] = {}
-default_settings["gpio"]["triggerdelay"] = 0.001
+default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
 default_settings["gpio"]["portmappings"] = []
 
