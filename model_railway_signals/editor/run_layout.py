@@ -955,14 +955,12 @@ def point_switched_callback(point_id:int, route_id:int=0):
         override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    canvas.focus_set()
     return()
 
 def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    canvas.focus_set()
     return()
 
 def signal_updated_callback(signal_id:Union[int,str]):
@@ -974,7 +972,6 @@ def signal_updated_callback(signal_id:Union[int,str]):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def signal_switched_callback(signal_id:int, route_id:int=0):
@@ -988,7 +985,6 @@ def signal_switched_callback(signal_id:int, route_id:int=0):
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def subsidary_switched_callback(signal_id:int, route_id:int=0):
@@ -997,7 +993,6 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def signal_passed_callback(signal_id:int):
@@ -1011,7 +1006,6 @@ def signal_passed_callback(signal_id:int):
             override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def signal_released_callback(signal_id:int):
@@ -1023,7 +1017,6 @@ def signal_released_callback(signal_id:int):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def sensor_passed_callback(sensor_id:int):
@@ -1037,7 +1030,6 @@ def sensor_passed_callback(sensor_id:int):
     process_all_signal_interlocking()
     run_routes.clear_down_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
         
 def section_updated_callback(section_id:int):
@@ -1048,14 +1040,12 @@ def section_updated_callback(section_id:int):
         override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def instrument_updated_callback(instrument_id:int):
     if enhanced_debugging: print("########## instrument_updated_callback "+str(instrument_id))
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 ##################################################################################################

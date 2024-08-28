@@ -481,8 +481,6 @@ def set_schematic_route_callback(route_id:int):
     schedule_task(delay, complete_route_setup, route_id)
     # Finally lock/unlock any other route buttons as required
     schedule_task(delay, enable_disable_schematic_routes)
-    # Focus back on the canvas so keypresses will work
-    canvas.focus_set()
     return()
             
 #------------------------------------------------------------------------------------
@@ -529,8 +527,6 @@ def clear_schematic_route_callback(route_id:int):
     schedule_task(delay, complete_route_cleardown, route_id)
     # Finally lock/unlock any other route buttons as required
     schedule_task(delay, enable_disable_schematic_routes)
-    # Focus back on the canvas so keypresses will work
-    canvas.focus_set()
     return()
 
 ##################################################################################################
