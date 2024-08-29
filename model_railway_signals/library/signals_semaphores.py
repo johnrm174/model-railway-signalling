@@ -721,10 +721,8 @@ class timed_sequence():
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
                 if self.start_delay > 0:                 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    update_semaphore_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
-                else:
-                    update_semaphore_signal(self.sig_id)
+                update_semaphore_signal(self.sig_id)
             # We need to schedule the sequence completion (i.e. back to clear
             common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
 

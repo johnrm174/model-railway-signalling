@@ -606,10 +606,8 @@ class timed_sequence():
                 if self.start_delay > 0: 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
                     # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
-                    update_colour_light_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
-                else:
-                    update_colour_light_signal(self.sig_id)
+                update_colour_light_signal(self.sig_id)
             # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
             if signals.signals[str(self.sig_id)]["subtype"] in (signal_subtype.three_aspect, signal_subtype.four_aspect):
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_yellow())
