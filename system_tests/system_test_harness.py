@@ -216,7 +216,7 @@ def start_application(callback_function):
         common.shutdown()
         
 def run_function(test_function, delay:float=thread_delay_time):
-    common.execute_function_in_tkinter_thread (test_function)
+    common.root_window.after(0, test_function)
     sleep(delay)
 
 # ------------------------------------------------------------------------------

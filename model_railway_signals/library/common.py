@@ -20,7 +20,6 @@
 # -------------------------------------------------------------------------
 
 import math
-import queue
 import logging
 import time
 
@@ -46,8 +45,6 @@ bgsunken = "white"    # Used by the Signals and Points modules
 
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
-# Event queue for passing "commands" back into the main tkinter thread
-event_queue = queue.Queue()
 # Global variable to signal (to other modules) that application is closing
 shutdown_initiated = False
 
@@ -79,8 +76,6 @@ def shutdown():
         # Turn off the DCC bus power and close the comms port
         pi_sprog_interface.request_dcc_power_off()
         pi_sprog_interface.sprog_disconnect()
-        # Return the GPIO ports to their original configuration
-        gpio_sensors.delete_all_local_gpio_sensors()
         # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
         # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
         # (although its unlikely the user would initiate a shut down until these have finished)
@@ -105,35 +100,9 @@ def shutdown():
 # objects should be done from within the main tkinter thread.
 #-------------------------------------------------------------------------
 
-def set_root_window (root):
+def set_root_window(root):
     global root_window
     root_window = root
-    # bind the tkinter event for handling events raised in external threads
-    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
-    return(root_window)
-
-#-------------------------------------------------------------------------
-# Functions to allow custom callback functions to be passed in (from an external
-# thread) and then handled in the main Tkinter thread (to keep everything threadsafe).
-# We use the tkinter event_generate method to generate a custom event in the main
-# tkinter event loop in conjunction with a (threadsafe) queue to pass the callback function
-# Use as follows: execute_function_in_tkinter_thread (lambda: my_function(arg1,arg2...))
-#-------------------------------------------------------------------------
-
-def handle_callback_in_tkinter_thread(*args):
-    while not event_queue.empty() and not shutdown_initiated:
-        callback = event_queue.get(False)
-        callback()
-    return()
-
-def execute_function_in_tkinter_thread(callback_function):
-    if not shutdown_initiated:
-        if root_window is not None: 
-            event_queue.put(callback_function)
-            root_window.event_generate("<<ExtCallback>>", when="tail")
-        else:
-            logging.error ("Execute_function_in_tkinter_thread - root undefined - executing in current thread")
-            callback_function()
     return()
 
 # -------------------------------------------------------------------------
