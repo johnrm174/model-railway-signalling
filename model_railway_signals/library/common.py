@@ -25,7 +25,6 @@ import time
 
 from . import mqtt_interface
 from . import pi_sprog_interface
-from . import gpio_sensors
 from . import track_sensors
 from . import track_sections
 from . import buttons
