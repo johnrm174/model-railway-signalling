@@ -365,12 +365,12 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             # Work out the offsets of the buttons and create them (in windows)
             if fpl:
                 point_coords = common.rotate_point(x, y, button_xoffset ,button1_yoffset, orientation)
-                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag, routes))
+                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag))
                 point_coords = common.rotate_point(x, y, button_xoffset, button2_yoffset, orientation)
-                canvas.create_window(point_coords, window=fpl_button, tags=(canvas_tag, routes))
+                canvas.create_window(point_coords, window=fpl_button, tags=(canvas_tag))
             elif not auto:
                 point_coords = common.rotate_point(x, y, button_xoffset, button1_yoffset, orientation)
-                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag, routes))
+                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag))
         # Side 1 of a Single Slip or Double Slip - Left Hand
         elif (pointsubtype == point_subtype.sslip1 or pointsubtype == point_subtype.dslip1) and pointtype==point_type.LH:
             # Create the line objects to represent the point
