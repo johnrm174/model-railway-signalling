@@ -24,6 +24,10 @@
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
+# Makes the following external API calls to library modules:
+#    lines.line_exists - Common function to see if a given item exists
+#    lines.delete_line(id) - delete library drawing object (part of soft delete)
+#    lines.create_line(id) -  To create the library object (create or redraw)
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -101,7 +105,7 @@ def create_line():
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_line_object)
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=objects_common.line_exists)
+    item_id = objects_common.new_item_id(exists_function=lines.line_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = x
@@ -123,7 +127,7 @@ def paste_line(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=objects_common.line_exists)
+    new_id = objects_common.new_item_id(exists_function=lines.line_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.line_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
