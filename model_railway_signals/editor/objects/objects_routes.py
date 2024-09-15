@@ -206,10 +206,18 @@ def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
 #------------------------------------------------------------------------------------
 
 def update_route(object_id, new_object_configuration):
+    # We need to track whether the Item ID has changed
+    old_item_id = objects_common.schematic_objects[object_id]["itemid"]
+    new_item_id = new_object_configuration["itemid"]
     # Delete the existing object, copy across the new config and redraw
     delete_route_object(object_id)
     objects_common.schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
     redraw_route_object(object_id)
+    # Check to see if the Type-specific ID has been changed
+    if old_item_id != new_item_id:
+        # Update the type-specific index
+        del objects_common.route_index[str(old_item_id)]
+        objects_common.route_index[str(new_item_id)] = object_id
     return()
 
 #------------------------------------------------------------------------------------
