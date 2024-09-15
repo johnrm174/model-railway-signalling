@@ -36,7 +36,7 @@ def run_gpio_sensor_library_tests():
     # create_gpio_sensor - Invalid Sensor ID
     gpio_sensors.create_gpio_sensor("18", 9, trigger_period=0.01, sensor_timeout=0.01)  # Fail - Sensor ID not an int
     gpio_sensors.create_gpio_sensor(0, 9, trigger_period=0.01, sensor_timeout=0.01)     # Fail - Sensor ID int not > 0
-    gpio_sensors.create_gpio_sensor(100, 9, trigger_period=0.01, sensor_timeout=0.01)   # Fail - Sensor ID int not < 100
+    gpio_sensors.create_gpio_sensor(1000, 9, trigger_period=0.01, sensor_timeout=0.01)  # Fail - Sensor ID int not < 1000
     gpio_sensors.create_gpio_sensor(10, 9, trigger_period=0.01, sensor_timeout=0.01)    # Fail - Sensor ID duplicate
     assert len(gpio_sensors.gpio_port_mappings) == 4
     # create_gpio_sensor - Invalid GPIO Port
@@ -91,9 +91,9 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.update_gpio_sensor_callback(12, signal_passed=-1)                                     # Fail - invalid item id
     gpio_sensors.update_gpio_sensor_callback(12, signal_approach=-1)                                   # Fail - invalid item id
     gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=-1)                                     # Fail - invalid item id
-    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=100)                                    # Fail - invalid item id
-    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=100)                                  # Fail - invalid item id
-    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=100)                                    # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1000)                                   # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=1000)                                 # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=1000)                                   # Fail - invalid item id
     gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
     gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1)                   # Fail - multiple specified
     gpio_sensors.update_gpio_sensor_callback(12, signal_approach=1, sensor_passed=1)                   # Fail - multiple specified
@@ -105,7 +105,7 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.set_gpio_sensors_to_publish_state(20, 21)         # success - int but does not yet exist
     gpio_sensors.set_gpio_sensors_to_publish_state(10, 11)         # sensors already set to publish - will generate warnings
     gpio_sensors.set_gpio_sensors_to_publish_state("12", "13")     # Fail - not an int
-    gpio_sensors.set_gpio_sensors_to_publish_state(0, 100)         # Fail - int out of range
+    gpio_sensors.set_gpio_sensors_to_publish_state(0, 1000)        # Fail - int out of range
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 4
     # gpio_sensor_triggered - This is an internal function so no need to test invalid inputs
     print ("GPIO Sensors - Sensor triggering tests - Triggering Sensors 10, 11, 12")
@@ -142,7 +142,7 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.subscribe_to_remote_gpio_sensors("box1")               # Fail - not valid remote ID
     gpio_sensors.subscribe_to_remote_gpio_sensors("20")                 # Fail - not valid remote ID
     gpio_sensors.subscribe_to_remote_gpio_sensors("box1-0")             # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-100")           # Fail - not valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-1000")          # Fail - not valid remote ID
     assert gpio_sensors.gpio_sensor_exists("box1-20")
     assert gpio_sensors.gpio_sensor_exists("box1-21")
     assert gpio_sensors.gpio_sensor_exists("box1-22")
@@ -516,7 +516,8 @@ def run_mqtt_interface_tests():
     assert mqtt_interface.split_remote_item_identifier("box111") is None
     assert mqtt_interface.split_remote_item_identifier("box1-abc") is None
     assert mqtt_interface.split_remote_item_identifier("box1-0") is None
-    assert mqtt_interface.split_remote_item_identifier("box1-999") is None
+    assert mqtt_interface.split_remote_item_identifier("box1-1000") is None
+    assert mqtt_interface.split_remote_item_identifier("box1-999") == ["box1", 999]
     assert mqtt_interface.split_remote_item_identifier("box1-99") == ["box1", 99]
     print("Library Tests - configure_mqtt_client - 5 Errors should be generated")
     mqtt_interface.configure_mqtt_client(100,"node1", False, False, False, shutdown_callback) # error
