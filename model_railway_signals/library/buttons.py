@@ -246,8 +246,8 @@ def create_button (canvas, button_id:int, x:int, y:int,
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "button"+str(button_id)
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) or button_id < 1 or button_id > 99:
-        logging.error("Button "+str(button_id)+": create_button - Button ID must be an int (1-99)")
+    if not isinstance(button_id, int) or button_id < 1 or button_id > 999:
+        logging.error("Button "+str(button_id)+": create_button - Button ID must be an int (1-999)")
     elif button_exists(button_id):
         logging.error("Button "+str(button_id)+": create_button - Button ID already exists")
     else:

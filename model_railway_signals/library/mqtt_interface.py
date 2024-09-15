@@ -216,7 +216,7 @@ def split_remote_item_identifier(item_identifier:str):
     if isinstance(item_identifier,str) and "-" in item_identifier:
         node_id = item_identifier.rpartition("-")[0]
         item_id = item_identifier.rpartition("-")[2]
-        if node_id != "" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 100:
+        if node_id != "" and item_id.isdigit() and int(item_id) >= 1 and int(item_id) <= 999:
             return_value = [node_id,int(item_id)]                          
     return (return_value)
 

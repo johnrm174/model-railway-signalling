@@ -37,7 +37,7 @@
 #       orientation:int - Orientation in degrees (0 or 180) - default = 0
 #       reverse:bool - If the switching logic is to be reversed - Default = False
 #       fpl:bool - If the point is to have a Facing point lock - Default = False (no FPL)
-#       also_switch:int - the Id of another point to switch with this point - Default = None
+#       also_switch:int - the Id of another point to switch with this point - Default = 0 (none)
 #       auto:bool - Point is fully automatic (i.e. no point control buttons) - Default = False.
 #
 #   delete_point(point_id:int) - To delete the specified point from the schematic
@@ -258,12 +258,12 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
     global points
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "point"+str(point_id)
-    if not isinstance(point_id, int) or point_id < 1 or point_id > 99:
-        logging.error("Point "+str(point_id)+": create_point - Point ID must be an int(1-99)")
+    if not isinstance(point_id, int) or point_id < 1 or point_id > 999:
+        logging.error("Point "+str(point_id)+": create_point - Point ID must be an int (1-999)")
     elif point_exists(point_id):
         logging.error("Point "+str(point_id)+": create_point - Point ID already exists")
-    elif not isinstance(also_switch, int):
-        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an int")
+    elif not isinstance(also_switch, int) or also_switch < 0 or also_switch > 999:
+        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an int (0-999)")
     elif also_switch == point_id:
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
     elif pointtype != point_type.LH and pointtype != point_type.RH and pointtype != point_type.Y:

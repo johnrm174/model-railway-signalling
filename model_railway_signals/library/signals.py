@@ -1175,8 +1175,8 @@ def set_signals_to_publish_state(*sig_ids:int):
     global list_of_signals_to_publish
     for sig_id in sig_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(sig_id,int) or sig_id < 1 or sig_id > 99:
-            logging.error("Signal "+str(sig_id)+": set_signals_to_publish_state - ID must be an int (1-99)")
+        if not isinstance(sig_id,int) or sig_id < 1 or sig_id > 999:
+            logging.error("Signal "+str(sig_id)+": set_signals_to_publish_state - ID must be an int (1-999)")
         elif sig_id in list_of_signals_to_publish:
             logging.warning("Signal "+str(sig_id)+": set_signals_to_publish_state -"
                                 +" Signal is already configured to publish state to MQTT broker")

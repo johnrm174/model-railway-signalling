@@ -493,8 +493,9 @@ def redraw_signal_object(object_id):
                     rh2_subsidary = objects_common.schematic_objects[object_id]["sigarms"][4][1][1],
                     THEATRE = objects_common.schematic_objects[object_id]["dcctheatre"] )
         # Create the new DCC Mapping for the associated distant Signal if there is one
+        # From Release 4.5.1 the Signal_ID for the Secondary Distant is Home Signal ID + 1000
         if has_associated_distant(object_id):
-            dcc_control.map_semaphore_signal (objects_common.schematic_objects[object_id]["itemid"]+100,
+            dcc_control.map_semaphore_signal (objects_common.schematic_objects[object_id]["itemid"]+1000,
                     main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][2][1],
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][2][1],
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][2][1],
@@ -565,12 +566,13 @@ def redraw_signal_object(object_id):
                     rh2_subsidary = objects_common.schematic_objects[object_id]["sigarms"][4][1][0],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"])
-        # Create the associated distant signal (signal_id = home_signal_id + 100)
+        # Create the associated distant signal
+        # From Release 4.5.1 the Signal_ID for the Secondary Distant is Home Signal ID + 1000
         if has_associated_distant(object_id):
             # Create the signal drawing object on the canvas
             signals_semaphores.create_semaphore_signal(
                     canvas = objects_common.canvas,
-                    sig_id = objects_common.schematic_objects[object_id]["itemid"]+100,
+                    sig_id = objects_common.schematic_objects[object_id]["itemid"]+1000,
                     signalsubtype = signals.semaphore_subtype.distant,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
@@ -716,8 +718,8 @@ def delete_signal_object(object_id):
     if approach_sensor != "": gpio_sensors.update_gpio_sensor_callback(approach_sensor)
     # Delete the associated distant signal (if there is one)
     if has_associated_distant(object_id):
-        signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
-        dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
+        signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+1000)
+        dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+1000)
     return()
 
 #------------------------------------------------------------------------------------
