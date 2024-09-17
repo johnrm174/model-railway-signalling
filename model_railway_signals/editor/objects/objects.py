@@ -109,7 +109,8 @@ from .. import settings
 def bring_track_sections_to_the_front():
     for object_id in objects_common.schematic_objects:
         if ( objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.section or
-             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.route ):
+             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.route or
+             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.textbox):
             objects_common.canvas.tag_raise(objects_common.schematic_objects[object_id]["tags"])
     return()
 
