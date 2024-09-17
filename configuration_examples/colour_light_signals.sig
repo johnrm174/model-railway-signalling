@@ -52216,10 +52216,10 @@
         "general": {
             "automation": true,
             "editmode": true,
-            "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/colour_light_signals.sig",
+            "filename": "/home/john/model-railway-signalling/configuration_examples/colour_light_signals.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.5.0"
+            "version": "Version 4.5.1"
         },
         "gpio": {
             "portmappings": [],

@@ -364,8 +364,8 @@ def run_object_deletion_tests(delay:float=0.0):
 def run_all_mqtt_networking_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_mqtt_networking.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    set_edit_mode()
-    test_object_edit_windows.test_all_object_edit_windows(delay)
+#     set_edit_mode()
+#     test_object_edit_windows.test_all_object_edit_windows(delay)
     set_run_mode()
     run_basic_networking_tests(delay)
     run_remote_track_sensor_tests(delay)

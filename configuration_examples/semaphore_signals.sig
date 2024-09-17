@@ -15,7 +15,7 @@
                 false,
                 ""
             ],
-            "bbox": 6661,
+            "bbox": 6119,
             "dccaspects": [
                 [
                     [
@@ -885,7 +885,7 @@
                 false,
                 ""
             ],
-            "bbox": 6691,
+            "bbox": 6149,
             "dccaspects": [
                 [
                     [
@@ -1755,7 +1755,7 @@
                 false,
                 ""
             ],
-            "bbox": 6719,
+            "bbox": 6177,
             "dccaspects": [
                 [
                     [
@@ -2625,7 +2625,7 @@
                 false,
                 ""
             ],
-            "bbox": 6747,
+            "bbox": 6205,
             "dccaspects": [
                 [
                     [
@@ -3495,7 +3495,7 @@
                 false,
                 ""
             ],
-            "bbox": 6797,
+            "bbox": 6255,
             "dccaspects": [
                 [
                     [
@@ -4365,7 +4365,7 @@
                 false,
                 ""
             ],
-            "bbox": 6827,
+            "bbox": 6285,
             "dccaspects": [
                 [
                     [
@@ -5235,7 +5235,7 @@
                 false,
                 ""
             ],
-            "bbox": 6855,
+            "bbox": 6313,
             "dccaspects": [
                 [
                     [
@@ -6105,7 +6105,7 @@
                 false,
                 ""
             ],
-            "bbox": 6884,
+            "bbox": 6342,
             "dccaspects": [
                 [
                     [
@@ -6975,7 +6975,7 @@
                 false,
                 ""
             ],
-            "bbox": 6913,
+            "bbox": 6371,
             "dccaspects": [
                 [
                     [
@@ -7845,7 +7845,7 @@
                 false,
                 ""
             ],
-            "bbox": 6939,
+            "bbox": 6397,
             "dccaspects": [
                 [
                     [
@@ -8715,7 +8715,7 @@
                 false,
                 ""
             ],
-            "bbox": 6970,
+            "bbox": 6428,
             "dccaspects": [
                 [
                     [
@@ -9585,7 +9585,7 @@
                 false,
                 ""
             ],
-            "bbox": 7004,
+            "bbox": 6462,
             "dccaspects": [
                 [
                     [
@@ -10455,7 +10455,7 @@
                 false,
                 ""
             ],
-            "bbox": 7057,
+            "bbox": 6515,
             "dccaspects": [
                 [
                     [
@@ -11325,7 +11325,7 @@
                 false,
                 ""
             ],
-            "bbox": 7088,
+            "bbox": 6546,
             "dccaspects": [
                 [
                     [
@@ -12195,7 +12195,7 @@
                 false,
                 ""
             ],
-            "bbox": 7117,
+            "bbox": 6575,
             "dccaspects": [
                 [
                     [
@@ -13065,7 +13065,7 @@
                 false,
                 ""
             ],
-            "bbox": 7148,
+            "bbox": 6606,
             "dccaspects": [
                 [
                     [
@@ -13935,7 +13935,7 @@
                 false,
                 ""
             ],
-            "bbox": 7198,
+            "bbox": 6656,
             "dccaspects": [
                 [
                     [
@@ -14805,7 +14805,7 @@
                 false,
                 ""
             ],
-            "bbox": 7233,
+            "bbox": 6691,
             "dccaspects": [
                 [
                     [
@@ -15675,7 +15675,7 @@
                 false,
                 ""
             ],
-            "bbox": 7289,
+            "bbox": 6747,
             "dccaspects": [
                 [
                     [
@@ -16545,7 +16545,7 @@
                 false,
                 ""
             ],
-            "bbox": 7320,
+            "bbox": 6778,
             "dccaspects": [
                 [
                     [
@@ -17415,7 +17415,7 @@
                 false,
                 ""
             ],
-            "bbox": 7350,
+            "bbox": 6808,
             "dccaspects": [
                 [
                     [
@@ -18285,7 +18285,7 @@
                 false,
                 ""
             ],
-            "bbox": 7378,
+            "bbox": 6836,
             "dccaspects": [
                 [
                     [
@@ -19155,7 +19155,7 @@
                 false,
                 ""
             ],
-            "bbox": 7408,
+            "bbox": 6866,
             "dccaspects": [
                 [
                     [
@@ -20025,7 +20025,7 @@
                 false,
                 ""
             ],
-            "bbox": 7460,
+            "bbox": 6918,
             "dccaspects": [
                 [
                     [
@@ -20895,7 +20895,7 @@
                 false,
                 ""
             ],
-            "bbox": 7486,
+            "bbox": 6944,
             "dccaspects": [
                 [
                     [
@@ -21765,7 +21765,7 @@
                 false,
                 ""
             ],
-            "bbox": 7515,
+            "bbox": 6973,
             "dccaspects": [
                 [
                     [
@@ -22635,7 +22635,7 @@
                 false,
                 ""
             ],
-            "bbox": 7549,
+            "bbox": 7007,
             "dccaspects": [
                 [
                     [
@@ -23505,7 +23505,7 @@
                 false,
                 ""
             ],
-            "bbox": 7600,
+            "bbox": 7058,
             "dccaspects": [
                 [
                     [
@@ -24375,7 +24375,7 @@
                 false,
                 ""
             ],
-            "bbox": 7631,
+            "bbox": 7089,
             "dccaspects": [
                 [
                     [
@@ -25245,7 +25245,7 @@
                 false,
                 ""
             ],
-            "bbox": 7661,
+            "bbox": 7119,
             "dccaspects": [
                 [
                     [
@@ -26115,7 +26115,7 @@
                 false,
                 ""
             ],
-            "bbox": 7690,
+            "bbox": 7148,
             "dccaspects": [
                 [
                     [
@@ -26985,7 +26985,7 @@
                 false,
                 ""
             ],
-            "bbox": 7719,
+            "bbox": 7177,
             "dccaspects": [
                 [
                     [
@@ -27855,7 +27855,7 @@
                 false,
                 ""
             ],
-            "bbox": 7748,
+            "bbox": 7206,
             "dccaspects": [
                 [
                     [
@@ -28725,7 +28725,7 @@
                 false,
                 ""
             ],
-            "bbox": 7778,
+            "bbox": 7236,
             "dccaspects": [
                 [
                     [
@@ -29595,7 +29595,7 @@
                 false,
                 ""
             ],
-            "bbox": 7807,
+            "bbox": 7265,
             "dccaspects": [
                 [
                     [
@@ -30465,7 +30465,7 @@
                 false,
                 ""
             ],
-            "bbox": 7860,
+            "bbox": 7318,
             "dccaspects": [
                 [
                     [
@@ -31335,7 +31335,7 @@
                 false,
                 ""
             ],
-            "bbox": 7887,
+            "bbox": 7345,
             "dccaspects": [
                 [
                     [
@@ -32205,7 +32205,7 @@
                 false,
                 ""
             ],
-            "bbox": 7914,
+            "bbox": 7372,
             "dccaspects": [
                 [
                     [
@@ -33075,7 +33075,7 @@
                 false,
                 ""
             ],
-            "bbox": 7949,
+            "bbox": 7407,
             "dccaspects": [
                 [
                     [
@@ -33945,7 +33945,7 @@
                 false,
                 ""
             ],
-            "bbox": 7977,
+            "bbox": 7435,
             "dccaspects": [
                 [
                     [
@@ -34815,7 +34815,7 @@
                 false,
                 ""
             ],
-            "bbox": 8029,
+            "bbox": 7487,
             "dccaspects": [
                 [
                     [
@@ -35685,7 +35685,7 @@
                 false,
                 ""
             ],
-            "bbox": 8079,
+            "bbox": 7537,
             "dccaspects": [
                 [
                     [
@@ -36555,7 +36555,7 @@
                 false,
                 ""
             ],
-            "bbox": 8128,
+            "bbox": 7586,
             "dccaspects": [
                 [
                     [
@@ -37425,7 +37425,7 @@
                 false,
                 ""
             ],
-            "bbox": 8184,
+            "bbox": 7642,
             "dccaspects": [
                 [
                     [
@@ -38295,7 +38295,7 @@
                 false,
                 ""
             ],
-            "bbox": 8219,
+            "bbox": 7677,
             "dccaspects": [
                 [
                     [
@@ -39165,7 +39165,7 @@
                 false,
                 ""
             ],
-            "bbox": 8269,
+            "bbox": 7727,
             "dccaspects": [
                 [
                     [
@@ -40035,7 +40035,7 @@
                 false,
                 ""
             ],
-            "bbox": 8296,
+            "bbox": 7754,
             "dccaspects": [
                 [
                     [
@@ -40905,7 +40905,7 @@
                 false,
                 ""
             ],
-            "bbox": 8330,
+            "bbox": 7788,
             "dccaspects": [
                 [
                     [
@@ -41775,7 +41775,7 @@
                 false,
                 ""
             ],
-            "bbox": 8361,
+            "bbox": 7819,
             "dccaspects": [
                 [
                     [
@@ -42645,7 +42645,7 @@
                 false,
                 ""
             ],
-            "bbox": 8414,
+            "bbox": 7872,
             "dccaspects": [
                 [
                     [
@@ -43515,7 +43515,7 @@
                 false,
                 ""
             ],
-            "bbox": 8467,
+            "bbox": 7925,
             "dccaspects": [
                 [
                     [
@@ -44385,7 +44385,7 @@
                 false,
                 ""
             ],
-            "bbox": 8475,
+            "bbox": 7933,
             "dccaspects": [
                 [
                     [
@@ -45255,7 +45255,7 @@
                 false,
                 ""
             ],
-            "bbox": 8503,
+            "bbox": 7961,
             "dccaspects": [
                 [
                     [
@@ -46125,7 +46125,7 @@
                 false,
                 ""
             ],
-            "bbox": 8553,
+            "bbox": 8011,
             "dccaspects": [
                 [
                     [
@@ -46995,7 +46995,7 @@
                 false,
                 ""
             ],
-            "bbox": 8601,
+            "bbox": 8059,
             "dccaspects": [
                 [
                     [
@@ -47865,7 +47865,7 @@
                 false,
                 ""
             ],
-            "bbox": 8631,
+            "bbox": 8089,
             "dccaspects": [
                 [
                     [
@@ -48735,7 +48735,7 @@
                 false,
                 ""
             ],
-            "bbox": 8683,
+            "bbox": 8141,
             "dccaspects": [
                 [
                     [
@@ -49605,7 +49605,7 @@
                 false,
                 ""
             ],
-            "bbox": 8714,
+            "bbox": 8172,
             "dccaspects": [
                 [
                     [
@@ -50475,7 +50475,7 @@
                 false,
                 ""
             ],
-            "bbox": 8742,
+            "bbox": 8200,
             "dccaspects": [
                 [
                     [
@@ -51345,7 +51345,7 @@
                 false,
                 ""
             ],
-            "bbox": 8795,
+            "bbox": 8253,
             "dccaspects": [
                 [
                     [
@@ -52215,7 +52215,7 @@
                 false,
                 ""
             ],
-            "bbox": 8847,
+            "bbox": 8305,
             "dccaspects": [
                 [
                     [
@@ -53085,7 +53085,7 @@
                 false,
                 ""
             ],
-            "bbox": 8900,
+            "bbox": 8358,
             "dccaspects": [
                 [
                     [
@@ -53955,7 +53955,7 @@
                 false,
                 ""
             ],
-            "bbox": 8908,
+            "bbox": 8366,
             "dccaspects": [
                 [
                     [
@@ -54825,7 +54825,7 @@
                 false,
                 ""
             ],
-            "bbox": 8965,
+            "bbox": 8423,
             "dccaspects": [
                 [
                     [
@@ -55695,7 +55695,7 @@
                 false,
                 ""
             ],
-            "bbox": 8991,
+            "bbox": 8449,
             "dccaspects": [
                 [
                     [
@@ -56565,7 +56565,7 @@
                 false,
                 ""
             ],
-            "bbox": 9041,
+            "bbox": 8499,
             "dccaspects": [
                 [
                     [
@@ -57435,7 +57435,7 @@
                 false,
                 ""
             ],
-            "bbox": 9098,
+            "bbox": 8556,
             "dccaspects": [
                 [
                     [
@@ -58305,7 +58305,7 @@
                 false,
                 ""
             ],
-            "bbox": 9129,
+            "bbox": 8587,
             "dccaspects": [
                 [
                     [
@@ -59175,7 +59175,7 @@
                 false,
                 ""
             ],
-            "bbox": 9160,
+            "bbox": 8618,
             "dccaspects": [
                 [
                     [
@@ -60045,7 +60045,7 @@
                 false,
                 ""
             ],
-            "bbox": 9209,
+            "bbox": 8667,
             "dccaspects": [
                 [
                     [
@@ -60915,7 +60915,7 @@
                 false,
                 ""
             ],
-            "bbox": 9260,
+            "bbox": 8718,
             "dccaspects": [
                 [
                     [
@@ -61785,7 +61785,7 @@
                 false,
                 ""
             ],
-            "bbox": 9290,
+            "bbox": 8748,
             "dccaspects": [
                 [
                     [
@@ -62655,7 +62655,7 @@
                 false,
                 ""
             ],
-            "bbox": 9318,
+            "bbox": 8776,
             "dccaspects": [
                 [
                     [
@@ -63525,7 +63525,7 @@
                 false,
                 ""
             ],
-            "bbox": 9349,
+            "bbox": 8807,
             "dccaspects": [
                 [
                     [
@@ -64395,7 +64395,7 @@
                 false,
                 ""
             ],
-            "bbox": 9401,
+            "bbox": 8859,
             "dccaspects": [
                 [
                     [
@@ -65265,7 +65265,7 @@
                 false,
                 ""
             ],
-            "bbox": 9409,
+            "bbox": 8867,
             "dccaspects": [
                 [
                     [
@@ -66135,7 +66135,7 @@
                 false,
                 ""
             ],
-            "bbox": 9461,
+            "bbox": 8919,
             "dccaspects": [
                 [
                     [
@@ -67005,7 +67005,7 @@
                 false,
                 ""
             ],
-            "bbox": 9489,
+            "bbox": 8947,
             "dccaspects": [
                 [
                     [
@@ -67875,7 +67875,7 @@
                 false,
                 ""
             ],
-            "bbox": 9538,
+            "bbox": 8996,
             "dccaspects": [
                 [
                     [
@@ -68745,7 +68745,7 @@
                 false,
                 ""
             ],
-            "bbox": 9587,
+            "bbox": 9045,
             "dccaspects": [
                 [
                     [
@@ -69615,7 +69615,7 @@
                 false,
                 ""
             ],
-            "bbox": 9638,
+            "bbox": 9096,
             "dccaspects": [
                 [
                     [
@@ -70485,7 +70485,7 @@
                 false,
                 ""
             ],
-            "bbox": 9672,
+            "bbox": 9130,
             "dccaspects": [
                 [
                     [
@@ -71355,7 +71355,7 @@
                 false,
                 ""
             ],
-            "bbox": 9700,
+            "bbox": 9158,
             "dccaspects": [
                 [
                     [
@@ -72225,7 +72225,7 @@
                 false,
                 ""
             ],
-            "bbox": 9730,
+            "bbox": 9188,
             "dccaspects": [
                 [
                     [
@@ -73095,7 +73095,7 @@
                 false,
                 ""
             ],
-            "bbox": 9757,
+            "bbox": 9215,
             "dccaspects": [
                 [
                     [
@@ -73965,7 +73965,7 @@
                 false,
                 ""
             ],
-            "bbox": 9787,
+            "bbox": 9245,
             "dccaspects": [
                 [
                     [
@@ -74835,7 +74835,7 @@
                 false,
                 ""
             ],
-            "bbox": 9818,
+            "bbox": 9276,
             "dccaspects": [
                 [
                     [
@@ -75705,7 +75705,7 @@
                 false,
                 ""
             ],
-            "bbox": 9869,
+            "bbox": 9327,
             "dccaspects": [
                 [
                     [
@@ -76575,7 +76575,7 @@
                 false,
                 ""
             ],
-            "bbox": 9900,
+            "bbox": 9358,
             "dccaspects": [
                 [
                     [
@@ -77445,7 +77445,7 @@
                 false,
                 ""
             ],
-            "bbox": 9930,
+            "bbox": 9388,
             "dccaspects": [
                 [
                     [
@@ -78315,7 +78315,7 @@
                 false,
                 ""
             ],
-            "bbox": 9956,
+            "bbox": 9414,
             "dccaspects": [
                 [
                     [
@@ -79185,7 +79185,7 @@
                 false,
                 ""
             ],
-            "bbox": 9964,
+            "bbox": 9422,
             "dccaspects": [
                 [
                     [
@@ -80055,7 +80055,7 @@
                 false,
                 ""
             ],
-            "bbox": 9999,
+            "bbox": 9457,
             "dccaspects": [
                 [
                     [
@@ -80925,7 +80925,7 @@
                 false,
                 ""
             ],
-            "bbox": 10029,
+            "bbox": 9487,
             "dccaspects": [
                 [
                     [
@@ -81796,10 +81796,10 @@
         "general": {
             "automation": true,
             "editmode": true,
-            "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/semaphore_signals.sig",
+            "filename": "/home/john/model-railway-signalling/configuration_examples/semaphore_signals.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.5.0"
+            "version": "Version 4.5.1"
         },
         "gpio": {
             "portmappings": [],
@@ -81862,7 +81862,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "101": {
+        "1001": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -81873,7 +81873,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "102": {
+        "1002": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -81884,7 +81884,326 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "107": {
+        "1007": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1012": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1014": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1019": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1022": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1023": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1025": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1026": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1028": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1030": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1032": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1034": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1038": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1039": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1043": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1044": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1046": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1047": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1048": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1049": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1057": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1058": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1059": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1061": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1062": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1063": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1079": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1080": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1081": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1082": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -81906,95 +82225,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "112": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "114": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "119": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
         "12": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "122": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "123": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "125": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "126": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "128": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -82016,128 +82247,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "130": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "132": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "134": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "138": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "139": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
         "14": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "143": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "144": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "146": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "147": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "148": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "149": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -82159,73 +82269,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "157": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "158": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "159": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
         "16": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "161": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "162": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "163": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -82247,51 +82291,7 @@
             "sublocked": false,
             "theatretext": "M"
         },
-        "179": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
         "18": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "180": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "181": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "182": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,

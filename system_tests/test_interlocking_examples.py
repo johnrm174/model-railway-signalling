@@ -23,7 +23,7 @@ def run_initial_state_tests(semaphore=False):
     # Differences are due to semaphore associated signals
     if semaphore:
         assert_signals_DANGER(16)
-        assert_signals_locked(116)
+        assert_signals_locked(1016)
         assert_signals_unlocked(16)
     else:
         assert_signals_CAUTION(16)
@@ -94,9 +94,9 @@ def run_signal_aspect_tests(semaphore=False):
         set_signals_off(17,16)
         assert_signals_PROCEED(17)
         assert_signals_CAUTION(16)
-        set_signals_off(8,1,3,4,116)
+        set_signals_off(8,1,3,4,1016)
         assert_signals_PROCEED(8,1,3,4,16)
-        set_signals_on(16,17,8,1,3,4,116)
+        set_signals_on(16,17,8,1,3,4,1016)
         # Main Route 2 - loop
         set_fpls_off(2,3)
         set_points_switched(2,3)
@@ -104,9 +104,9 @@ def run_signal_aspect_tests(semaphore=False):
         set_signals_off(17,16)
         assert_signals_PROCEED(17)
         assert_signals_CAUTION(16)
-        set_signals_off(8,1,2,4,116)
+        set_signals_off(8,1,2,4,1016)
         assert_signals_PROCEED(8,1,2,4,16)
-        set_signals_on(16,17,8,1,2,4,116)
+        set_signals_on(16,17,8,1,2,4,1016)
         set_fpls_off(2,3)
         set_points_normal(2,3)
         set_fpls_on(2,3)
@@ -527,7 +527,7 @@ def run_signal_interlocking_tests():
 
 def run_signal_interlock_ahead_tests(semaphore=False):
     print("Signal Interlock on signals ahead Tests")
-    if semaphore: sig_id = 116
+    if semaphore: sig_id = 1016
     else: sig_id = 16
     # Test the default state
     assert_signals_locked(9,18,sig_id)
