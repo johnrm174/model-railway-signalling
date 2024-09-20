@@ -25,7 +25,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 ## What's new for Release 4.5.1:
 
 BREAKING CHANGE - Single Slip and Double Slip points have been shortened to improve route highlighting but
-this does mean you will need to update your track lines on your schematic to take account of this change
+this does mean you will need to edit your schematic (extend track lines) to take account of this change.
+Also, Double Slip points have been changed to give a straight route through the point for their default state.
 
 * New feature to scroll canvas via mouse (drag and drop) in Run Mode - useful for larger layouts
 * Changed default GPIO sensor timeout to 20ms (the optimum value I have arrived at by testing)
