@@ -6,9 +6,6 @@
         "10": {
             "selected": false
         },
-        "11": {
-            "selected": false
-        },
         "12": {
             "selected": false
         },
@@ -46,7 +43,7 @@
             "selected": false
         },
         "23": {
-            "selected": true
+            "selected": false
         },
         "3": {
             "selected": false
@@ -74,7 +71,7 @@
     "instruments": {},
     "objects": {
         "012e8acd-9407-4338-971e-12d19f98ab9e": {
-            "bbox": 4137,
+            "bbox": 150,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 7,
@@ -84,7 +81,7 @@
                 8
             ],
             "pointsonroute": {
-                "31": false,
+                "31": true,
                 "34": false
             },
             "pointstohighlight": [
@@ -110,9 +107,9 @@
                 0,
                 0
             ],
-            "bbox": 4143,
+            "bbox": 156,
             "colour": "black",
-            "endx": 75.0,
+            "endx": 100.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 22,
@@ -128,7 +125,7 @@
                 0,
                 0
             ],
-            "bbox": 4149,
+            "bbox": 162,
             "colour": "black",
             "endx": 900.0,
             "endy": 125.0,
@@ -146,13 +143,13 @@
                 0,
                 0
             ],
-            "bbox": 4155,
+            "bbox": 168,
             "colour": "black",
-            "endx": 725.0,
+            "endx": 800.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 53,
-            "posx": 700.0,
+            "posx": 775.0,
             "posy": 325.0,
             "selection": "line53selected",
             "tags": "line53"
@@ -164,29 +161,38 @@
                 0,
                 0
             ],
-            "bbox": 4962,
+            "bbox": 174,
             "colour": "black",
             "endx": 50.0,
             "endy": 500.0,
             "item": "line",
             "itemid": 65,
-            "posx": 75.0,
+            "posx": 100.0,
             "posy": 500.0,
             "selection": "line65selected",
             "tags": "line65"
         },
         "08bd7aa3-6172-4418-b4fb-c5f8d13a3a63": {
-            "bbox": 4159,
+            "bbox": 178,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 13,
             "linestohighlight": [
-                11,
-                12
+                10,
+                12,
+                21
             ],
-            "pointsonroute": {},
-            "pointstohighlight": [],
-            "posx": 350.0,
+            "pointsonroute": {
+                "20": true,
+                "21": true,
+                "22": true
+            },
+            "pointstohighlight": [
+                20,
+                21,
+                22
+            ],
+            "posx": 300.0,
             "posy": 75.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
@@ -205,13 +211,13 @@
                 0,
                 0
             ],
-            "bbox": 4165,
+            "bbox": 184,
             "colour": "black",
-            "endx": 450.0,
+            "endx": 525.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 42,
-            "posx": 425.0,
+            "posx": 475.0,
             "posy": 300.0,
             "selection": "line42selected",
             "tags": "line42"
@@ -223,13 +229,13 @@
                 0,
                 0
             ],
-            "bbox": 4171,
+            "bbox": 190,
             "colour": "black",
-            "endx": 750.0,
+            "endx": 825.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 52,
-            "posx": 725.0,
+            "posx": 775.0,
             "posy": 300.0,
             "selection": "line52selected",
             "tags": "line52"
@@ -241,7 +247,7 @@
                 0,
                 0
             ],
-            "bbox": 4177,
+            "bbox": 196,
             "colour": "black",
             "endx": 1250.0,
             "endy": 125.0,
@@ -259,13 +265,13 @@
                 0,
                 0
             ],
-            "bbox": 4183,
+            "bbox": 202,
             "colour": "black",
-            "endx": 250.0,
+            "endx": 225.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 20,
-            "posx": 225.0,
+            "posx": 200.0,
             "posy": 75.0,
             "selection": "line20selected",
             "tags": "line20"
@@ -277,19 +283,19 @@
                 0,
                 0
             ],
-            "bbox": 4189,
+            "bbox": 208,
             "colour": "black",
             "endx": 200.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 26,
-            "posx": 175.0,
+            "posx": 150.0,
             "posy": 300.0,
             "selection": "line26selected",
             "tags": "line26"
         },
         "0fea6334-0b93-4fcd-bcbc-c580a6c2cc8e": {
-            "bbox": 4193,
+            "bbox": 212,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 4,
@@ -300,7 +306,7 @@
             ],
             "pointsonroute": {
                 "25": true,
-                "35": true
+                "35": false
             },
             "pointstohighlight": [
                 25,
@@ -327,7 +333,7 @@
                 0,
                 0
             ],
-            "bbox": 4199,
+            "bbox": 218,
             "colour": "black",
             "endx": 1250.0,
             "endy": 75.0,
@@ -345,9 +351,9 @@
                 0,
                 0
             ],
-            "bbox": 4956,
+            "bbox": 224,
             "colour": "black",
-            "endx": 175.0,
+            "endx": 150.0,
             "endy": 500.0,
             "item": "line",
             "itemid": 64,
@@ -359,7 +365,7 @@
         "131f1c29-65f4-4af6-8420-271462af5623": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4206,
+            "bbox": 231,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -369,8 +375,8 @@
             "itemsubtype": 7,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 1200.0,
-            "posy": 425.0,
+            "posx": 1125.0,
+            "posy": 525.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point29",
@@ -378,7 +384,7 @@
             "ybuttonoffset": 0
         },
         "13c86fba-96d2-4c67-94bd-f91a8a5dcd96": {
-            "bbox": 4210,
+            "bbox": 235,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 8,
@@ -388,7 +394,7 @@
                 9
             ],
             "pointsonroute": {
-                "31": true,
+                "31": false,
                 "34": true
             },
             "pointstohighlight": [
@@ -414,13 +420,13 @@
                 0,
                 0
             ],
-            "bbox": 4216,
+            "bbox": 241,
             "colour": "black",
-            "endx": 750.0,
+            "endx": 825.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 51,
-            "posx": 725.0,
+            "posx": 800.0,
             "posy": 350.0,
             "selection": "line51selected",
             "tags": "line51"
@@ -428,7 +434,7 @@
         "16f6d440-2829-401f-916d-24f2a8fd74d8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4224,
+            "bbox": 249,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -438,7 +444,7 @@
             "itemsubtype": 4,
             "itemtype": 2,
             "orientation": 180,
-            "posx": 275.0,
+            "posx": 300.0,
             "posy": 300.0,
             "reverse": false,
             "siginterlock": [],
@@ -447,7 +453,7 @@
             "ybuttonoffset": 0
         },
         "18878158-2b7c-4982-9e44-834de20f824b": {
-            "bbox": 4886,
+            "bbox": 253,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 21,
@@ -461,8 +467,8 @@
             ],
             "pointsonroute": {
                 "10": true,
-                "2": false,
-                "5": true,
+                "2": true,
+                "5": false,
                 "7": false
             },
             "pointstohighlight": [
@@ -486,7 +492,7 @@
         "18e60c3e-4c95-4c3d-98a8-54c5c016a005": {
             "alsoswitch": 32,
             "automatic": false,
-            "bbox": 4231,
+            "bbox": 260,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -506,7 +512,7 @@
         },
         "1b80533d-389d-4d7a-92b3-0dc7d58abc45": {
             "background": "grey85",
-            "bbox": 4234,
+            "bbox": 263,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -527,7 +533,7 @@
                 0,
                 0
             ],
-            "bbox": 4914,
+            "bbox": 269,
             "colour": "black",
             "endx": 175.0,
             "endy": 450.0,
@@ -541,7 +547,7 @@
         "1f215078-299d-4950-903b-9a76228e19a8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4241,
+            "bbox": 276,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -551,8 +557,8 @@
             "itemsubtype": 2,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 1250.0,
-            "posy": 250.0,
+            "posx": 1175.0,
+            "posy": 350.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point42",
@@ -566,13 +572,13 @@
                 0,
                 0
             ],
-            "bbox": 4247,
+            "bbox": 282,
             "colour": "black",
-            "endx": 450.0,
+            "endx": 500.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 46,
-            "posx": 475.0,
+            "posx": 525.0,
             "posy": 275.0,
             "selection": "line46selected",
             "tags": "line46"
@@ -580,7 +586,7 @@
         "21bd347b-1210-4a91-802f-8be0c711650a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4254,
+            "bbox": 289,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -590,8 +596,8 @@
             "itemsubtype": 2,
             "itemtype": 1,
             "orientation": 180,
-            "posx": 1275.0,
-            "posy": 300.0,
+            "posx": 1200.0,
+            "posy": 400.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point45",
@@ -601,7 +607,7 @@
         "235c4b99-057e-4029-aea5-b01b599fcccb": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4262,
+            "bbox": 297,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -611,7 +617,7 @@
             "itemsubtype": 4,
             "itemtype": 1,
             "orientation": 180,
-            "posx": 650.0,
+            "posx": 725.0,
             "posy": 300.0,
             "reverse": false,
             "siginterlock": [],
@@ -621,7 +627,7 @@
         },
         "247cf23e-6255-425e-8fc9-4117033c362a": {
             "background": "grey85",
-            "bbox": 4265,
+            "bbox": 300,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -630,14 +636,14 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 1275.0,
-            "posy": 200.0,
+            "posx": 1200.0,
+            "posy": 300.0,
             "tags": "247cf23e-6255-425e-8fc9-4117033c362a",
             "text": "'Trap' Points (LH and RH)"
         },
         "273d3962-26c9-4909-b389-7131962b5a57": {
             "background": "grey85",
-            "bbox": 4268,
+            "bbox": 303,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -658,7 +664,7 @@
                 0,
                 0
             ],
-            "bbox": 4274,
+            "bbox": 309,
             "colour": "black",
             "endx": 700.0,
             "endy": 125.0,
@@ -676,7 +682,7 @@
                 0,
                 0
             ],
-            "bbox": 4280,
+            "bbox": 315,
             "colour": "black",
             "endx": 1100.0,
             "endy": 125.0,
@@ -689,7 +695,7 @@
         },
         "29137e31-f6b7-4819-87da-ba4508d19a77": {
             "background": "grey85",
-            "bbox": 4283,
+            "bbox": 318,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -698,7 +704,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 550.0,
+            "posx": 650.0,
             "posy": 225.0,
             "tags": "29137e31-f6b7-4819-87da-ba4508d19a77",
             "text": "Right Hand Single Slip points"
@@ -706,7 +712,7 @@
         "292247f0-8cc8-4dd2-b45b-0ef0c26e3e33": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4288,
+            "bbox": 323,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -718,7 +724,7 @@
             "orientation": 180,
             "posx": 850.0,
             "posy": 125.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point36",
             "xbuttonoffset": 0,
@@ -727,7 +733,7 @@
         "2b8bde9c-7637-4299-a205-31ad6a46e75d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4298,
+            "bbox": 333,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -739,7 +745,7 @@
             "orientation": 0,
             "posx": 100.0,
             "posy": 500.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point5",
             "xbuttonoffset": 0,
@@ -752,7 +758,7 @@
                 0,
                 0
             ],
-            "bbox": 4902,
+            "bbox": 339,
             "colour": "black",
             "endx": 75.0,
             "endy": 550.0,
@@ -764,7 +770,7 @@
             "tags": "line55"
         },
         "2e3d2b1b-b596-4be4-a7fc-d5ef8aaf2cde": {
-            "bbox": 4302,
+            "bbox": 343,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 17,
@@ -779,8 +785,8 @@
                 52
             ],
             "pointsonroute": {
-                "11": false,
-                "12": false,
+                "11": true,
+                "12": true,
                 "13": false,
                 "14": false,
                 "15": false,
@@ -798,8 +804,8 @@
                 15,
                 16
             ],
-            "posx": 850.0,
-            "posy": 250.0,
+            "posx": 950.0,
+            "posy": 275.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Route description (Run Mode tooltip)",
@@ -817,20 +823,20 @@
                 0,
                 0
             ],
-            "bbox": 4308,
+            "bbox": 349,
             "colour": "black",
-            "endx": 1225.0,
-            "endy": 300.0,
+            "endx": 1150.0,
+            "endy": 400.0,
             "item": "line",
             "itemid": 31,
-            "posx": 1200.0,
-            "posy": 300.0,
+            "posx": 1125.0,
+            "posy": 400.0,
             "selection": "line31selected",
             "tags": "line31"
         },
         "32df5739-31c0-4811-a751-b3995f862dc5": {
             "background": "grey85",
-            "bbox": 4311,
+            "bbox": 352,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -839,7 +845,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 75.0,
+            "posx": 100.0,
             "posy": 375.0,
             "tags": "32df5739-31c0-4811-a751-b3995f862dc5",
             "text": "(Normal)"
@@ -851,13 +857,13 @@
                 0,
                 0
             ],
-            "bbox": 4317,
+            "bbox": 358,
             "colour": "black",
-            "endx": 250.0,
+            "endx": 225.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 21,
-            "posx": 225.0,
+            "posx": 200.0,
             "posy": 125.0,
             "selection": "line21selected",
             "tags": "line21"
@@ -865,7 +871,7 @@
         "35b02f65-7a77-4fea-9c09-a8385b0595e4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4322,
+            "bbox": 363,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -890,36 +896,16 @@
                 0,
                 0
             ],
-            "bbox": 4328,
+            "bbox": 369,
             "colour": "black",
-            "endx": 1400.0,
-            "endy": 425.0,
+            "endx": 1325.0,
+            "endy": 525.0,
             "item": "line",
             "itemid": 29,
-            "posx": 1375.0,
-            "posy": 425.0,
+            "posx": 1300.0,
+            "posy": 525.0,
             "selection": "line29selected",
             "tags": "line29"
-        },
-        "372076d1-50cd-405a-8ec4-7904e44dd50c": {
-            "bbox": 4332,
-            "buttonwidth": 15,
-            "item": "route",
-            "itemid": 11,
-            "linestohighlight": [],
-            "pointsonroute": {},
-            "pointstohighlight": [],
-            "posx": 350.0,
-            "posy": 175.0,
-            "resetpoints": false,
-            "routecolour": "#0000ff",
-            "routedescription": "Route description (Run Mode tooltip)",
-            "routename": "Route Name",
-            "signalsonroute": [],
-            "subsidariesonroute": [],
-            "switchdelay": 0,
-            "tags": "button11",
-            "tracksensor": 0
         },
         "38d68df7-5b33-4a6b-8c90-640658b52e9c": {
             "arrowends": 0,
@@ -928,9 +914,9 @@
                 0,
                 0
             ],
-            "bbox": 4944,
+            "bbox": 375,
             "colour": "black",
-            "endx": 525.0,
+            "endx": 500.0,
             "endy": 500.0,
             "item": "line",
             "itemid": 62,
@@ -946,14 +932,14 @@
                 0,
                 0
             ],
-            "bbox": 4338,
+            "bbox": 381,
             "colour": "black",
-            "endx": 1275.0,
-            "endy": 300.0,
+            "endx": 1200.0,
+            "endy": 400.0,
             "item": "line",
             "itemid": 33,
-            "posx": 1250.0,
-            "posy": 300.0,
+            "posx": 1175.0,
+            "posy": 400.0,
             "selection": "line33selected",
             "tags": "line33"
         },
@@ -964,13 +950,13 @@
                 0,
                 0
             ],
-            "bbox": 4344,
+            "bbox": 387,
             "colour": "black",
-            "endx": 450.0,
+            "endx": 500.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 43,
-            "posx": 425.0,
+            "posx": 475.0,
             "posy": 250.0,
             "selection": "line43selected",
             "tags": "line43"
@@ -982,13 +968,13 @@
                 0,
                 0
             ],
-            "bbox": 4350,
+            "bbox": 393,
             "colour": "black",
-            "endx": 650.0,
+            "endx": 725.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 50,
-            "posx": 625.0,
+            "posx": 700.0,
             "posy": 250.0,
             "selection": "line50selected",
             "tags": "line50"
@@ -996,7 +982,7 @@
         "41bd2ee1-f703-4536-8d60-8bfa38374130": {
             "alsoswitch": 26,
             "automatic": false,
-            "bbox": 4357,
+            "bbox": 400,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1021,7 +1007,7 @@
                 0,
                 0
             ],
-            "bbox": 4363,
+            "bbox": 406,
             "colour": "black",
             "endx": 200.0,
             "endy": 250.0,
@@ -1035,11 +1021,11 @@
         "49fca724-fda3-44fa-b8e5-800443a78304": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4370,
+            "bbox": 414,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
-            "hasfpl": false,
+            "hasfpl": true,
             "item": "point",
             "itemid": 13,
             "itemsubtype": 4,
@@ -1055,7 +1041,7 @@
         },
         "533ace8f-9229-475c-afc8-eb59c7ac9eb0": {
             "background": "grey85",
-            "bbox": 4373,
+            "bbox": 417,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1064,7 +1050,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 175.0,
+            "posx": 150.0,
             "posy": 25.0,
             "tags": "533ace8f-9229-475c-afc8-eb59c7ac9eb0",
             "text": "Normal Points (LH and RH)"
@@ -1072,7 +1058,7 @@
         "535aef80-e3b7-4492-af6e-7831d8a5d1f9": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4383,
+            "bbox": 427,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1097,7 +1083,7 @@
                 0,
                 0
             ],
-            "bbox": 4950,
+            "bbox": 433,
             "colour": "black",
             "endx": 525.0,
             "endy": 550.0,
@@ -1110,7 +1096,7 @@
         },
         "550bf579-44d3-4835-8ccf-3c0d4da10845": {
             "background": "grey85",
-            "bbox": 4386,
+            "bbox": 436,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1127,7 +1113,7 @@
         "58bee3f2-f694-4f91-a93c-2d7ced3e6842": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4393,
+            "bbox": 443,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1137,8 +1123,8 @@
             "itemsubtype": 2,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 1300.0,
-            "posy": 250.0,
+            "posx": 1225.0,
+            "posy": 350.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point43",
@@ -1146,7 +1132,7 @@
             "ybuttonoffset": 0
         },
         "59867085-8526-4cc9-ae06-77aa3e18e96c": {
-            "bbox": 4397,
+            "bbox": 447,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 3,
@@ -1184,31 +1170,41 @@
                 0,
                 0
             ],
-            "bbox": 4403,
+            "bbox": 453,
             "colour": "black",
-            "endx": 250.0,
+            "endx": 300.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 36,
-            "posx": 225.0,
+            "posx": 250.0,
             "posy": 300.0,
             "selection": "line36selected",
             "tags": "line36"
         },
         "5d2fcb58-4cc5-4ae3-9e2e-934713504a80": {
-            "bbox": 4407,
+            "bbox": 457,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 12,
-            "linestohighlight": [],
-            "pointsonroute": {},
-            "pointstohighlight": [],
-            "posx": 350.0,
+            "linestohighlight": [
+                11,
+                13,
+                21
+            ],
+            "pointsonroute": {
+                "19": true,
+                "22": false
+            },
+            "pointstohighlight": [
+                19,
+                22
+            ],
+            "posx": 300.0,
             "posy": 100.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Route description (Run Mode tooltip)",
-            "routename": "Route Name",
+            "routename": "Route 3",
             "signalsonroute": [],
             "subsidariesonroute": [],
             "switchdelay": 0,
@@ -1216,21 +1212,24 @@
             "tracksensor": 0
         },
         "5f1c6afa-1c7b-4fdb-9a95-b536e5c267b4": {
-            "bbox": 4411,
+            "bbox": 461,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 14,
             "linestohighlight": [
                 10,
-                12
-            ],
-            "pointsonroute": {
-                "20": false
-            },
-            "pointstohighlight": [
+                12,
                 20
             ],
-            "posx": 350.0,
+            "pointsonroute": {
+                "20": true,
+                "21": false
+            },
+            "pointstohighlight": [
+                20,
+                21
+            ],
+            "posx": 300.0,
             "posy": 50.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
@@ -1245,7 +1244,7 @@
         "5f52c741-4bf4-4517-a384-8864c71a82dc": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4418,
+            "bbox": 468,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1257,7 +1256,7 @@
             "orientation": 0,
             "posx": 1200.0,
             "posy": 100.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point31",
             "xbuttonoffset": 0,
@@ -1265,7 +1264,7 @@
         },
         "614b0d05-91fd-4146-981f-e11e9cd47d1b": {
             "background": "grey85",
-            "bbox": 4421,
+            "bbox": 471,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1274,7 +1273,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 500.0,
+            "posx": 550.0,
             "posy": 350.0,
             "tags": "614b0d05-91fd-4146-981f-e11e9cd47d1b",
             "text": "(Normal)"
@@ -1282,7 +1281,7 @@
         "62651d8c-eedf-452b-828a-83ea894559ad": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4428,
+            "bbox": 478,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1292,8 +1291,8 @@
             "itemsubtype": 2,
             "itemtype": 2,
             "orientation": 180,
-            "posx": 1225.0,
-            "posy": 300.0,
+            "posx": 1150.0,
+            "posy": 400.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point44",
@@ -1303,7 +1302,7 @@
         "63610068-f6e1-48d1-afbd-de1e97a2c3d8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4438,
+            "bbox": 488,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1328,14 +1327,14 @@
                 0,
                 0
             ],
-            "bbox": 4444,
+            "bbox": 494,
             "colour": "black",
-            "endx": 1325.0,
-            "endy": 425.0,
+            "endx": 1250.0,
+            "endy": 525.0,
             "item": "line",
             "itemid": 1,
-            "posx": 1300.0,
-            "posy": 425.0,
+            "posx": 1225.0,
+            "posy": 525.0,
             "selection": "line1selected",
             "tags": "line1"
         },
@@ -1346,13 +1345,13 @@
                 0,
                 0
             ],
-            "bbox": 4450,
+            "bbox": 500,
             "colour": "black",
             "endx": 150.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 13,
-            "posx": 125.0,
+            "posx": 100.0,
             "posy": 125.0,
             "selection": "line13selected",
             "tags": "line13"
@@ -1360,7 +1359,7 @@
         "67811741-acf1-4677-b3cd-b2554e7a1419": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4460,
+            "bbox": 510,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1385,7 +1384,7 @@
                 0,
                 0
             ],
-            "bbox": 4466,
+            "bbox": 516,
             "colour": "black",
             "endx": 175.0,
             "endy": 250.0,
@@ -1399,7 +1398,7 @@
         "6cade9d1-7352-4c04-a373-b88315a99a08": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4476,
+            "bbox": 526,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1420,7 +1419,7 @@
         "6f16ec1f-d3a8-4cdf-9964-5e6d9ac67e8c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4483,
+            "bbox": 533,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1430,9 +1429,9 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
-            "posx": 100.0,
+            "posx": 75.0,
             "posy": 75.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point20",
             "xbuttonoffset": 0,
@@ -1441,7 +1440,7 @@
         "6f17c5e9-5121-4a3b-8daf-ca175d7763df": {
             "alsoswitch": 36,
             "automatic": false,
-            "bbox": 4490,
+            "bbox": 540,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1453,7 +1452,7 @@
             "orientation": 0,
             "posx": 850.0,
             "posy": 75.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point35",
             "xbuttonoffset": -15,
@@ -1466,14 +1465,14 @@
                 0,
                 0
             ],
-            "bbox": 4496,
+            "bbox": 546,
             "colour": "black",
-            "endx": 1275.0,
-            "endy": 250.0,
+            "endx": 1200.0,
+            "endy": 350.0,
             "item": "line",
             "itemid": 32,
-            "posx": 1250.0,
-            "posy": 250.0,
+            "posx": 1175.0,
+            "posy": 350.0,
             "selection": "line32selected",
             "tags": "line32"
         },
@@ -1484,20 +1483,20 @@
                 0,
                 0
             ],
-            "bbox": 4502,
+            "bbox": 552,
             "colour": "black",
-            "endx": 575.0,
+            "endx": 625.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 47,
-            "posx": 550.0,
+            "posx": 575.0,
             "posy": 300.0,
             "selection": "line47selected",
             "tags": "line47"
         },
         "71bab62a-8ea2-42bd-ae29-f0f5c6a99627": {
             "background": "grey85",
-            "bbox": 4505,
+            "bbox": 555,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1514,7 +1513,7 @@
         "75fd19ff-237d-4415-9fa0-fcb1c96f936b": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4515,
+            "bbox": 565,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1539,7 +1538,7 @@
                 0,
                 0
             ],
-            "bbox": 4521,
+            "bbox": 571,
             "colour": "black",
             "endx": 1175.0,
             "endy": 100.0,
@@ -1557,34 +1556,16 @@
                 0,
                 0
             ],
-            "bbox": 4527,
+            "bbox": 577,
             "colour": "black",
-            "endx": 350.0,
+            "endx": 375.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 40,
-            "posx": 325.0,
+            "posx": 350.0,
             "posy": 275.0,
             "selection": "line40selected",
             "tags": "line40"
-        },
-        "7ff0c07a-e97e-4389-9eaa-99bdb429bb6a": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 4533,
-            "colour": "black",
-            "endx": 175.0,
-            "endy": 75.0,
-            "item": "line",
-            "itemid": 19,
-            "posx": 150.0,
-            "posy": 75.0,
-            "selection": "line19selected",
-            "tags": "line19"
         },
         "81169360-6826-4e9b-919f-d45d4f6df6b7": {
             "arrowends": 0,
@@ -1593,19 +1574,19 @@
                 0,
                 0
             ],
-            "bbox": 4539,
+            "bbox": 583,
             "colour": "black",
-            "endx": 375.0,
+            "endx": 400.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 38,
-            "posx": 350.0,
+            "posx": 375.0,
             "posy": 250.0,
             "selection": "line38selected",
             "tags": "line38"
         },
         "813448e4-f519-44ee-9bb3-d805867459a0": {
-            "bbox": 4543,
+            "bbox": 587,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 2,
@@ -1617,7 +1598,7 @@
             "pointsonroute": {
                 "27": true,
                 "33": false,
-                "35": false
+                "35": true
             },
             "pointstohighlight": [
                 27,
@@ -1639,7 +1620,7 @@
         },
         "864b3e09-1ea8-4b12-90ee-48379e0b2788": {
             "background": "grey85",
-            "bbox": 4546,
+            "bbox": 590,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1648,15 +1629,15 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 1275.0,
-            "posy": 475.0,
+            "posx": 1200.0,
+            "posy": 575.0,
             "tags": "864b3e09-1ea8-4b12-90ee-48379e0b2788",
             "text": "(With Button Position X offsets)"
         },
         "86672a6f-f09b-4d1d-bef5-ac6624fd5c0a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4553,
+            "bbox": 597,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1666,9 +1647,9 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 100.0,
+            "posx": 75.0,
             "posy": 125.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point19",
             "xbuttonoffset": 0,
@@ -1681,13 +1662,13 @@
                 0,
                 0
             ],
-            "bbox": 4559,
+            "bbox": 603,
             "colour": "black",
-            "endx": 250.0,
+            "endx": 275.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 37,
-            "posx": 225.0,
+            "posx": 250.0,
             "posy": 350.0,
             "selection": "line37selected",
             "tags": "line37"
@@ -1699,7 +1680,7 @@
                 0,
                 0
             ],
-            "bbox": 4908,
+            "bbox": 609,
             "colour": "black",
             "endx": 200.0,
             "endy": 450.0,
@@ -1711,7 +1692,7 @@
             "tags": "line56"
         },
         "885ae7a8-0963-4d2d-a0be-49442e59aafc": {
-            "bbox": 4563,
+            "bbox": 613,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 9,
@@ -1721,7 +1702,7 @@
                 8
             ],
             "pointsonroute": {
-                "31": false,
+                "31": true,
                 "34": true
             },
             "pointstohighlight": [
@@ -1747,13 +1728,13 @@
                 0,
                 0
             ],
-            "bbox": 4569,
+            "bbox": 619,
             "colour": "black",
-            "endx": 625.0,
+            "endx": 700.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 49,
-            "posx": 600.0,
+            "posx": 675.0,
             "posy": 250.0,
             "selection": "line49selected",
             "tags": "line49"
@@ -1765,13 +1746,13 @@
                 0,
                 0
             ],
-            "bbox": 4575,
+            "bbox": 625,
             "colour": "black",
-            "endx": 75.0,
+            "endx": 50.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 11,
-            "posx": 50.0,
+            "posx": 25.0,
             "posy": 125.0,
             "selection": "line11selected",
             "tags": "line11"
@@ -1783,21 +1764,21 @@
                 0,
                 0
             ],
-            "bbox": 4581,
+            "bbox": 631,
             "colour": "black",
-            "endx": 1325.0,
-            "endy": 300.0,
+            "endx": 1250.0,
+            "endy": 400.0,
             "item": "line",
             "itemid": 30,
-            "posx": 1300.0,
-            "posy": 300.0,
+            "posx": 1225.0,
+            "posy": 400.0,
             "selection": "line30selected",
             "tags": "line30"
         },
         "8f1bd03a-ce27-48ed-b500-fa59b0a4d69d": {
             "alsoswitch": 28,
             "automatic": false,
-            "bbox": 4588,
+            "bbox": 638,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1822,7 +1803,7 @@
                 0,
                 0
             ],
-            "bbox": 4594,
+            "bbox": 644,
             "colour": "black",
             "endx": 825.0,
             "endy": 75.0,
@@ -1834,7 +1815,7 @@
             "tags": "line15"
         },
         "94071e83-94c1-4ea4-887c-e5379fba006f": {
-            "bbox": 4598,
+            "bbox": 648,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 1,
@@ -1847,7 +1828,7 @@
                 "25": false,
                 "27": false,
                 "33": false,
-                "35": false
+                "35": true
             },
             "pointstohighlight": [
                 27,
@@ -1870,7 +1851,7 @@
         "9974d0bb-2f63-40d6-a8bc-4863b4b0ccdc": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4606,
+            "bbox": 656,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1880,9 +1861,9 @@
             "itemsubtype": 4,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 525.0,
+            "posx": 575.0,
             "posy": 300.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point12",
             "xbuttonoffset": 0,
@@ -1891,7 +1872,7 @@
         "9b856101-0edb-42db-a000-c556bb804dc0": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4615,
+            "bbox": 665,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1912,7 +1893,7 @@
         "9fd94ff2-5098-4cb6-9665-f019caa4a34d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4624,
+            "bbox": 674,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1922,7 +1903,7 @@
             "itemsubtype": 3,
             "itemtype": 1,
             "orientation": 180,
-            "posx": 700.0,
+            "posx": 775.0,
             "posy": 300.0,
             "reverse": false,
             "siginterlock": [],
@@ -1933,7 +1914,7 @@
         "a125c411-cd2a-45bc-8817-b3cc5add29f9": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4633,
+            "bbox": 683,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1943,9 +1924,9 @@
             "itemsubtype": 3,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 475.0,
+            "posx": 525.0,
             "posy": 300.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point11",
             "xbuttonoffset": 0,
@@ -1953,7 +1934,7 @@
         },
         "a1669f45-8007-4d80-a489-4a8a74b01b6e": {
             "background": "grey85",
-            "bbox": 4636,
+            "bbox": 686,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1968,7 +1949,7 @@
             "text": "Left Hand Single Slip points"
         },
         "a1fc37d8-6fe2-4cf8-8e01-e5afe52c857d": {
-            "bbox": 4882,
+            "bbox": 690,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 20,
@@ -1980,8 +1961,8 @@
             ],
             "pointsonroute": {
                 "10": false,
-                "2": false,
-                "5": false,
+                "2": true,
+                "5": true,
                 "7": false
             },
             "pointstohighlight": [
@@ -2005,7 +1986,7 @@
         "a289091f-866d-40be-a580-743c9799124d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4643,
+            "bbox": 697,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2015,8 +1996,8 @@
             "itemsubtype": 7,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 1225.0,
-            "posy": 425.0,
+            "posx": 1150.0,
+            "posy": 525.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point30",
@@ -2025,7 +2006,7 @@
         },
         "a3051485-e8d8-47c0-ab4d-e555913fe104": {
             "background": "grey85",
-            "bbox": 4646,
+            "bbox": 700,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2034,7 +2015,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 675.0,
+            "posx": 750.0,
             "posy": 350.0,
             "tags": "a3051485-e8d8-47c0-ab4d-e555913fe104",
             "text": "(Rotated)"
@@ -2046,19 +2027,19 @@
                 0,
                 0
             ],
-            "bbox": 4652,
+            "bbox": 706,
             "colour": "black",
-            "endx": 1325.0,
-            "endy": 250.0,
+            "endx": 1250.0,
+            "endy": 350.0,
             "item": "line",
             "itemid": 35,
-            "posx": 1300.0,
-            "posy": 250.0,
+            "posx": 1225.0,
+            "posy": 350.0,
             "selection": "line35selected",
             "tags": "line35"
         },
         "ac34e474-3ca8-449f-b037-9348d2b32ea2": {
-            "bbox": 4656,
+            "bbox": 710,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 19,
@@ -2077,8 +2058,8 @@
                 52
             ],
             "pointsonroute": {
-                "11": true,
-                "12": true,
+                "11": false,
+                "12": false,
                 "13": true,
                 "14": true,
                 "15": true,
@@ -2096,8 +2077,8 @@
                 15,
                 16
             ],
-            "posx": 850.0,
-            "posy": 300.0,
+            "posx": 950.0,
+            "posy": 325.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Route description (Run Mode tooltip)",
@@ -2109,47 +2090,41 @@
             "tracksensor": 0
         },
         "af5f77e2-11d7-4a63-b5d4-f089af00db2f": {
-            "bbox": 4660,
+            "bbox": 714,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 16,
-            "linestohighlight": [],
-            "pointsonroute": {},
-            "pointstohighlight": [],
-            "posx": 350.0,
+            "linestohighlight": [
+                11,
+                12,
+                20
+            ],
+            "pointsonroute": {
+                "19": false,
+                "20": false,
+                "21": false
+            },
+            "pointstohighlight": [
+                19,
+                20,
+                21
+            ],
+            "posx": 300.0,
             "posy": 125.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Route description (Run Mode tooltip)",
-            "routename": "Route Name",
+            "routename": "Route 4",
             "signalsonroute": [],
             "subsidariesonroute": [],
             "switchdelay": 0,
             "tags": "button16",
             "tracksensor": 0
         },
-        "b04bc5d5-ae38-44e1-9f1e-d53cd807750b": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 4666,
-            "colour": "black",
-            "endx": 175.0,
-            "endy": 125.0,
-            "item": "line",
-            "itemid": 18,
-            "posx": 150.0,
-            "posy": 125.0,
-            "selection": "line18selected",
-            "tags": "line18"
-        },
         "b23e8471-c6a4-469c-8181-712d884a1d47": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4674,
+            "bbox": 722,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2168,7 +2143,7 @@
             "ybuttonoffset": 0
         },
         "b263fa34-c17b-411c-9356-5f42a7ff6af0": {
-            "bbox": 4975,
+            "bbox": 726,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 23,
@@ -2182,8 +2157,8 @@
             ],
             "pointsonroute": {
                 "10": false,
-                "2": true,
-                "5": false,
+                "2": false,
+                "5": true,
                 "7": true
             },
             "pointstohighlight": [
@@ -2207,7 +2182,7 @@
         "b2f6dadf-506c-410f-8641-2028db0b41bb": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4681,
+            "bbox": 733,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2217,7 +2192,7 @@
             "itemsubtype": 1,
             "itemtype": 1,
             "orientation": 180,
-            "posx": 200.0,
+            "posx": 175.0,
             "posy": 125.0,
             "reverse": false,
             "siginterlock": [],
@@ -2228,7 +2203,7 @@
         "b49bb4b9-eeed-4e02-a98b-3cf310a9177b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4686,
+            "bbox": 738,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2249,7 +2224,7 @@
         "b4e40068-28a1-4058-86b1-4ed2c35c7a47": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4691,
+            "bbox": 743,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2269,7 +2244,7 @@
         },
         "b4f56c10-201d-4e9b-894b-627d0d553070": {
             "background": "grey85",
-            "bbox": 4694,
+            "bbox": 746,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2284,19 +2259,33 @@
             "text": "Scissors Crossovers\n(using 'SX' Points)"
         },
         "b7974a1e-49e9-4722-83ef-63b4683b0f9d": {
-            "bbox": 4698,
+            "bbox": 750,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 15,
-            "linestohighlight": [],
-            "pointsonroute": {},
-            "pointstohighlight": [],
-            "posx": 350.0,
+            "linestohighlight": [
+                11,
+                12,
+                21
+            ],
+            "pointsonroute": {
+                "19": false,
+                "20": false,
+                "21": true,
+                "22": true
+            },
+            "pointstohighlight": [
+                19,
+                20,
+                21,
+                22
+            ],
+            "posx": 300.0,
             "posy": 150.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Route description (Run Mode tooltip)",
-            "routename": "Route Name",
+            "routename": "Route 5",
             "signalsonroute": [],
             "subsidariesonroute": [],
             "switchdelay": 0,
@@ -2310,13 +2299,13 @@
                 0,
                 0
             ],
-            "bbox": 4938,
+            "bbox": 756,
             "colour": "black",
             "endx": 400.0,
             "endy": 500.0,
             "item": "line",
             "itemid": 61,
-            "posx": 425.0,
+            "posx": 450.0,
             "posy": 500.0,
             "selection": "line61selected",
             "tags": "line61"
@@ -2324,7 +2313,7 @@
         "b9f1c77f-0226-4b52-81fd-fd3d2c5e5c78": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4705,
+            "bbox": 763,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2334,8 +2323,8 @@
             "itemsubtype": 7,
             "itemtype": 1,
             "orientation": 180,
-            "posx": 1325.0,
-            "posy": 425.0,
+            "posx": 1250.0,
+            "posy": 525.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point37",
@@ -2345,7 +2334,7 @@
         "bcf3e20c-4a84-41b7-9834-ad235f4410ea": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4712,
+            "bbox": 770,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2355,8 +2344,8 @@
             "itemsubtype": 7,
             "itemtype": 2,
             "orientation": 180,
-            "posx": 1350.0,
-            "posy": 425.0,
+            "posx": 1275.0,
+            "posy": 525.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point38",
@@ -2370,13 +2359,13 @@
                 0,
                 0
             ],
-            "bbox": 4718,
+            "bbox": 776,
             "colour": "black",
-            "endx": 75.0,
+            "endx": 50.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 10,
-            "posx": 50.0,
+            "posx": 25.0,
             "posy": 75.0,
             "selection": "line10selected",
             "tags": "line10"
@@ -2388,7 +2377,7 @@
                 0,
                 0
             ],
-            "bbox": 4724,
+            "bbox": 782,
             "colour": "black",
             "endx": 900.0,
             "endy": 75.0,
@@ -2406,7 +2395,7 @@
                 0,
                 0
             ],
-            "bbox": 4920,
+            "bbox": 788,
             "colour": "black",
             "endx": 400.0,
             "endy": 450.0,
@@ -2424,20 +2413,20 @@
                 0,
                 0
             ],
-            "bbox": 4730,
+            "bbox": 794,
             "colour": "black",
             "endx": 150.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 12,
-            "posx": 125.0,
+            "posx": 100.0,
             "posy": 75.0,
             "selection": "line12selected",
             "tags": "line12"
         },
         "cc28c313-5047-4d05-8340-8e7586b666c6": {
             "background": "grey85",
-            "bbox": 4733,
+            "bbox": 797,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2452,7 +2441,7 @@
             "text": "(Normal)"
         },
         "cd265dde-6c1d-4fe6-b428-179f2906c3e4": {
-            "bbox": 4737,
+            "bbox": 801,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 5,
@@ -2464,7 +2453,7 @@
             "pointsonroute": {
                 "25": true,
                 "33": false,
-                "35": false
+                "35": true
             },
             "pointstohighlight": [
                 25,
@@ -2491,7 +2480,7 @@
                 0,
                 0
             ],
-            "bbox": 4743,
+            "bbox": 807,
             "colour": "black",
             "endx": 1100.0,
             "endy": 75.0,
@@ -2504,7 +2493,7 @@
         },
         "d3e48098-3f76-476b-a6b7-4021f7bd5637": {
             "background": "grey85",
-            "bbox": 4746,
+            "bbox": 810,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2525,7 +2514,7 @@
                 0,
                 0
             ],
-            "bbox": 4926,
+            "bbox": 816,
             "colour": "black",
             "endx": 425.0,
             "endy": 450.0,
@@ -2543,7 +2532,7 @@
                 0,
                 0
             ],
-            "bbox": 4752,
+            "bbox": 822,
             "colour": "black",
             "endx": 700.0,
             "endy": 75.0,
@@ -2557,7 +2546,7 @@
         "dae197b5-8a12-414d-b12f-5164d0a6a21d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4759,
+            "bbox": 829,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2567,7 +2556,7 @@
             "itemsubtype": 1,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 200.0,
+            "posx": 175.0,
             "posy": 75.0,
             "reverse": false,
             "siginterlock": [],
@@ -2582,21 +2571,21 @@
                 0,
                 0
             ],
-            "bbox": 4765,
+            "bbox": 835,
             "colour": "black",
-            "endx": 1250.0,
-            "endy": 425.0,
+            "endx": 1175.0,
+            "endy": 525.0,
             "item": "line",
             "itemid": 25,
-            "posx": 1225.0,
-            "posy": 425.0,
+            "posx": 1150.0,
+            "posy": 525.0,
             "selection": "line25selected",
             "tags": "line25"
         },
         "e0148185-4fe9-4742-a5f8-0a98346691b6": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4774,
+            "bbox": 844,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2606,7 +2595,7 @@
             "itemsubtype": 3,
             "itemtype": 2,
             "orientation": 180,
-            "posx": 325.0,
+            "posx": 350.0,
             "posy": 300.0,
             "reverse": false,
             "siginterlock": [],
@@ -2616,7 +2605,7 @@
         },
         "e06f4afb-ebc7-4351-ba08-a417f1002da1": {
             "background": "grey85",
-            "bbox": 4777,
+            "bbox": 847,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2637,19 +2626,19 @@
                 0,
                 0
             ],
-            "bbox": 4783,
+            "bbox": 853,
             "colour": "black",
-            "endx": 525.0,
+            "endx": 575.0,
             "endy": 325.0,
             "item": "line",
             "itemid": 45,
-            "posx": 550.0,
+            "posx": 600.0,
             "posy": 350.0,
             "selection": "line45selected",
             "tags": "line45"
         },
         "e1fc346f-efb4-41c2-977f-609ebd4f90a1": {
-            "bbox": 4787,
+            "bbox": 857,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 10,
@@ -2659,7 +2648,7 @@
                 9
             ],
             "pointsonroute": {
-                "31": true,
+                "31": false,
                 "34": false
             },
             "pointstohighlight": [
@@ -2679,7 +2668,7 @@
             "tracksensor": 0
         },
         "e3620645-ce1d-43f9-a00c-d325986c48e2": {
-            "bbox": 4890,
+            "bbox": 861,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 22,
@@ -2695,8 +2684,8 @@
             ],
             "pointsonroute": {
                 "10": true,
-                "2": true,
-                "5": true,
+                "2": false,
+                "5": false,
                 "7": true
             },
             "pointstohighlight": [
@@ -2718,7 +2707,7 @@
             "tracksensor": 0
         },
         "e49bd002-0b47-4cd1-a6d8-77dcb30ecdb9": {
-            "bbox": 4791,
+            "bbox": 865,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 6,
@@ -2731,7 +2720,7 @@
                 "25": false,
                 "27": false,
                 "33": false,
-                "35": false
+                "35": true
             },
             "pointstohighlight": [
                 25,
@@ -2754,7 +2743,7 @@
         "e5435df4-5e78-4286-b779-f25844c24e52": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4801,
+            "bbox": 875,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2779,7 +2768,7 @@
                 0,
                 0
             ],
-            "bbox": 4896,
+            "bbox": 881,
             "colour": "black",
             "endx": 100.0,
             "endy": 525.0,
@@ -2797,14 +2786,14 @@
                 0,
                 0
             ],
-            "bbox": 4807,
+            "bbox": 887,
             "colour": "black",
-            "endx": 1150.0,
-            "endy": 425.0,
+            "endx": 1075.0,
+            "endy": 525.0,
             "item": "line",
             "itemid": 17,
-            "posx": 1175.0,
-            "posy": 425.0,
+            "posx": 1100.0,
+            "posy": 525.0,
             "selection": "line17selected",
             "tags": "line17"
         },
@@ -2815,20 +2804,20 @@
                 0,
                 0
             ],
-            "bbox": 4813,
+            "bbox": 893,
             "colour": "black",
-            "endx": 625.0,
+            "endx": 725.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 48,
-            "posx": 600.0,
+            "posx": 675.0,
             "posy": 300.0,
             "selection": "line48selected",
             "tags": "line48"
         },
         "e74d0328-d99f-4f04-bf57-8d356f6bed91": {
             "background": "grey85",
-            "bbox": 4816,
+            "bbox": 896,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2837,8 +2826,8 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 1275.0,
-            "posy": 375.0,
+            "posx": 1200.0,
+            "posy": 475.0,
             "tags": "e74d0328-d99f-4f04-bf57-8d356f6bed91",
             "text": "Three Way Points \n(using 'SX' points)"
         },
@@ -2849,7 +2838,7 @@
                 0,
                 0
             ],
-            "bbox": 4932,
+            "bbox": 902,
             "colour": "black",
             "endx": 525.0,
             "endy": 550.0,
@@ -2862,7 +2851,7 @@
         },
         "ea6b992c-2762-49ae-99c1-c7647ab675af": {
             "background": "grey85",
-            "bbox": 4819,
+            "bbox": 905,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2883,19 +2872,19 @@
                 0,
                 0
             ],
-            "bbox": 4825,
+            "bbox": 911,
             "colour": "black",
-            "endx": 275.0,
+            "endx": 300.0,
             "endy": 325.0,
             "item": "line",
             "itemid": 41,
-            "posx": 250.0,
+            "posx": 275.0,
             "posy": 350.0,
             "selection": "line41selected",
             "tags": "line41"
         },
         "ed453b53-bdf4-4520-a145-4cd615ed6c3d": {
-            "bbox": 4829,
+            "bbox": 915,
             "buttonwidth": 15,
             "item": "route",
             "itemid": 18,
@@ -2918,8 +2907,8 @@
                 51
             ],
             "pointsonroute": {
-                "11": false,
-                "12": false,
+                "11": true,
+                "12": true,
                 "13": false,
                 "14": false,
                 "15": false,
@@ -2937,8 +2926,8 @@
                 15,
                 16
             ],
-            "posx": 850.0,
-            "posy": 275.0,
+            "posx": 950.0,
+            "posy": 300.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Route description (Run Mode tooltip)",
@@ -2956,9 +2945,9 @@
                 0,
                 0
             ],
-            "bbox": 4835,
+            "bbox": 921,
             "colour": "black",
-            "endx": 375.0,
+            "endx": 400.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 39,
@@ -2974,13 +2963,13 @@
                 0,
                 0
             ],
-            "bbox": 4841,
+            "bbox": 927,
             "colour": "black",
-            "endx": 575.0,
+            "endx": 625.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 44,
-            "posx": 550.0,
+            "posx": 600.0,
             "posy": 350.0,
             "selection": "line44selected",
             "tags": "line44"
@@ -2992,7 +2981,7 @@
                 0,
                 0
             ],
-            "bbox": 4847,
+            "bbox": 933,
             "colour": "black",
             "endx": 825.0,
             "endy": 125.0,
@@ -3005,7 +2994,7 @@
         },
         "f8186a69-c498-4d68-82f2-02346f09c972": {
             "background": "grey85",
-            "bbox": 4850,
+            "bbox": 936,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3014,7 +3003,7 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 300.0,
+            "posx": 325.0,
             "posy": 350.0,
             "tags": "f8186a69-c498-4d68-82f2-02346f09c972",
             "text": "(Rotated)"
@@ -3026,14 +3015,14 @@
                 0,
                 0
             ],
-            "bbox": 4856,
+            "bbox": 942,
             "colour": "black",
-            "endx": 1225.0,
-            "endy": 250.0,
+            "endx": 1150.0,
+            "endy": 350.0,
             "item": "line",
             "itemid": 34,
-            "posx": 1200.0,
-            "posy": 250.0,
+            "posx": 1125.0,
+            "posy": 350.0,
             "selection": "line34selected",
             "tags": "line34"
         },
@@ -3044,7 +3033,7 @@
                 0,
                 0
             ],
-            "bbox": 4862,
+            "bbox": 948,
             "colour": "black",
             "endx": 100.0,
             "endy": 325.0,
@@ -3062,7 +3051,7 @@
                 0,
                 0
             ],
-            "bbox": 4868,
+            "bbox": 954,
             "colour": "black",
             "endx": 75.0,
             "endy": 350.0,
@@ -3076,7 +3065,7 @@
         "fe787384-3810-4c9d-864d-8d258e6ee74e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4878,
+            "bbox": 964,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -3088,7 +3077,7 @@
             "orientation": 0,
             "posx": 150.0,
             "posy": 500.0,
-            "reverse": false,
+            "reverse": true,
             "siginterlock": [],
             "tags": "point2",
             "xbuttonoffset": 0,
@@ -3097,14 +3086,14 @@
     },
     "points": {
         "1": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
         "10": {
             "fpllock": true,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "11": {
             "fpllock": true,
@@ -3117,7 +3106,7 @@
             "switched": false
         },
         "13": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
@@ -3144,7 +3133,7 @@
         "2": {
             "fpllock": true,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "20": {
             "fpllock": true,
@@ -3267,7 +3256,7 @@
             "switched": false
         },
         "6": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
@@ -3277,12 +3266,12 @@
             "switched": true
         },
         "8": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
         "9": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         }
