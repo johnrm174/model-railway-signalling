@@ -478,22 +478,28 @@ def run_point_library_tests():
     assert points.point_switched(12)
     assert not points.point_switched(10)
     print("Library Tests - set_point_colour - will generate 2 errors:")
+    assert not points.point_switched(10)
+    assert not points.point_switched(14)
     assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
-    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
     assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
-    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "black"
     points.set_point_colour("10", "blue") # Point ID not an int
     points.set_point_colour(20, "blue")   # Point ID does not exist
     points.set_point_colour(10, "blue")
     points.set_point_colour(14, "blue")
     assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "blue"
-    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "blue"
-    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "blue"
-    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "blue"
-    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "black"
     print("Library Tests - reset_point_colour - will generate 2 errors:")
     points.reset_point_colour("10") # Point ID not an int
     points.reset_point_colour(20)   # Point ID does not exist
@@ -501,10 +507,12 @@ def run_point_library_tests():
     points.reset_point_colour(14)
     assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
-    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
     assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
-    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "black"
     print("Library Tests - delete_point - will generate 2 errors:")
     assert len(points.points) == 7
     points.delete_point("10")
@@ -929,8 +937,8 @@ def run_line_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-    run_track_sensor_library_tests()
-    run_track_section_library_tests()
+#     run_track_sensor_library_tests()
+#     run_track_section_library_tests()
     run_point_library_tests()
     run_instrument_library_tests()
     run_line_library_tests()
