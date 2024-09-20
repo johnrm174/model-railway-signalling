@@ -24,11 +24,16 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release 4.5.1:
 
+BREAKING CHANGE - Single Slip and Double Slip points have been shortened to improve route highlighting but
+this does mean you will need to update your track lines on your schematic to take account of this change
+
 * New feature to scroll canvas via mouse (drag and drop) in Run Mode - useful for larger layouts
 * Changed default GPIO sensor timeout to 20ms (the optimum value I have arrived at by testing)
-* Open up the range of Item IDs that can be assigned (signals, points, lines etc) - Now 1-999
+* Improvement - Item IDs (signals, points, lines etc) can now be in the range 1-999
 * Improvement - Route selection buttons are now always displayed on top of route lines
 * Improvement - Text Boxes are now always displayed on top of route lines
+* Improvement - Improved representation of Trap Points and single slip points
+* Improvement - Route highlighting through points improved (for most point types)
 * Bugfix to GPIO sensors - to prevent the occasional spurious segmentation errors on settings apply
 * Bugfix to timed signals (triggered by another signal) - to prevent spurious SPAD warnings
 * Bugfix to handle update of Route ID (if changed by user in the route configuration dialog)
