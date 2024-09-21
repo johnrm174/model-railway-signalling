@@ -94,10 +94,10 @@ def create_semaphore_signal(canvas, sig_id:int,
     has_subsidary = main_subsidary or lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary
     has_route_arms = (lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary or
                          lh1_signal or lh2_signal or rh1_signal or rh2_signal )
-    # Common validation (common to all signal types) - note we allow sig_ids up to 199 for Semaphore signals
-    # as the Editor assignes a sig_id + 100 for secondary distant signals (associated with a home)
-    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 199:
-        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-199)")
+    # Common validation (common to all signal types) - note we allow sig_ids up to 1999 for Semaphore signals
+    # as the Editor assignes a sig_id + 1000 for secondary distant signals (associated with a home)
+    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 1999:
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-1999)")
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
@@ -721,10 +721,8 @@ class timed_sequence():
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
                 if self.start_delay > 0:                 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    update_semaphore_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
-                else:
-                    update_semaphore_signal(self.sig_id)
+                update_semaphore_signal(self.sig_id)
             # We need to schedule the sequence completion (i.e. back to clear
             common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
 

@@ -52,7 +52,7 @@ def run_library_api_tests():
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - not an int
     create_colour_light_signal(canvas, 0, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - out of range
-    create_colour_light_signal(canvas, 100, signals.signal_subtype.home, 100, 100,
+    create_colour_light_signal(canvas, 1000, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - out of range
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - already exists
@@ -77,7 +77,7 @@ def run_library_api_tests():
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - not an int
     create_semaphore_signal(canvas, 0, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - out of range
-    create_semaphore_signal(canvas, 200, signals.semaphore_subtype.home, 250, 100,
+    create_semaphore_signal(canvas, 2000, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - out of range
     create_semaphore_signal(canvas, 1, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - already exists
@@ -115,7 +115,7 @@ def run_library_api_tests():
     create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Success
     create_ground_disc_signal(canvas, "5", signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - not an int
     create_ground_disc_signal(canvas, 0, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - out of range
-    create_ground_disc_signal(canvas, 100, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - out of range
+    create_ground_disc_signal(canvas, 1000, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - out of range
     create_ground_disc_signal(canvas, 1, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - already exists
     create_ground_disc_signal(canvas, 6, signals.signal_type.colour_light, 400, 100, sig_switched, sig_passed)            # Error - invalid subtype
     assert len(signals.signals) == 4
@@ -123,7 +123,7 @@ def run_library_api_tests():
     create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Success
     create_ground_position_signal(canvas, "6", signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - not an int
     create_ground_position_signal(canvas, 0, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - out of range
-    create_ground_position_signal(canvas, 100, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - out of range
+    create_ground_position_signal(canvas, 1000, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - out of range
     create_ground_position_signal(canvas, 1, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - already exists
     create_ground_position_signal(canvas, 7, signals.signal_type.colour_light, 550, 100, sig_switched, sig_passed)           # Error - invalid subtype
     assert len(signals.signals) == 5
@@ -502,7 +502,7 @@ def run_library_api_tests():
     assert len(signals.list_of_signals_to_publish) == 0
     signals.set_signals_to_publish_state(1,2,10)   # success
     signals.set_signals_to_publish_state("3","4")  # 2 errors - not an int
-    signals.set_signals_to_publish_state(0,100)    # 2 errors - out of range
+    signals.set_signals_to_publish_state(0,1000)    # 2 errors - out of range
     signals.set_signals_to_publish_state(1)        # 1 warning - already set to publish
     assert len(signals.list_of_signals_to_publish) == 3
     # Create a Signal already set to publish state on creation
@@ -519,7 +519,7 @@ def run_library_api_tests():
     signals.subscribe_to_remote_signals(sig_updated,"box1-50","box1-51")   # Success
     signals.subscribe_to_remote_signals(sig_updated,"box1-50","box1-51")   # 2 Warnings - already subscribed
     signals.subscribe_to_remote_signals(sig_updated,"box1","51", 3)        # Fail - 3 errors
-    signals.subscribe_to_remote_signals(sig_updated,"box1-0","box1-100")   # Fail - 2 errors
+    signals.subscribe_to_remote_signals(sig_updated,"box1-0","box1-1000")   # Fail - 2 errors
     assert len(signals.signals) == 7
     assert signals.signal_exists("box1-50")
     assert signals.signal_exists("box1-51")

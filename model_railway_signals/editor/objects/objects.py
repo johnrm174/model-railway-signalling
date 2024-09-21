@@ -102,13 +102,15 @@ from .. import settings
 #######################################################################################################
 
 #------------------------------------------------------------------------------------
-# Internal function to bring all track sections to the front of the canvas
-# This insures they are not obscured by any lines drawn on the canvas
+# Internal function to bring all track sections and route buttons to the front
+# his insures they are not obscured by any lines drawn on the canvas
 #------------------------------------------------------------------------------------
 
 def bring_track_sections_to_the_front():
     for object_id in objects_common.schematic_objects:
-        if objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.section:
+        if ( objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.section or
+             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.route or
+             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.textbox):
             objects_common.canvas.tag_raise(objects_common.schematic_objects[object_id]["tags"])
     return()
 

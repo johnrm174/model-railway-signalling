@@ -22,17 +22,24 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.5.0:
+## What's new for Release 4.6.0:
 
-* Schematic Route Buttons Feature:
-    * 'One click' select/deselect of routes, changing all points and signals as required
-    * Point and signal changes can be instantaneous or sequenced with a user-specified time delay
-    * Once successfully set up, routes can be highlighted on the schematic in user-defined colours
-    * Automatic clear-down of highlighting if routes are invalidated (e.g. point or signal changes)
-    * Track-sensors can be used to automatically de-select routes when the trains have cleared the routes
-    * Interlocking is preserved - If a route isn't possible the button will be disabled (with a tooltip)
+BREAKING CHANGE - Single Slip and Double Slip points have been shortened to improve route highlighting but
+this does mean you will need to edit your schematic (extend track lines) to take account of this change.
+Also, Double Slip points have been changed to give a straight route through the point for their default state.
 
-* Removed constraint on interlocking with conflicting signals - more than 4 signals can now be specified
+* New feature to scroll canvas via mouse (drag and drop) in Run Mode - useful for larger layouts
+* Changed default GPIO sensor timeout to 20ms (the optimum value I have arrived at by testing)
+* Improvement - Item IDs (signals, points, lines etc) can now be in the range 1-999
+* Improvement - Route selection buttons are now always displayed on top of route lines
+* Improvement - Text Boxes are now always displayed on top of route lines
+* Improvement - Improved representation of Trap Points and single slip points
+* Improvement - Improved Route highlighting through points (for most point types)
+* Improvement - Improved readability for theatre route indications and track occupancy
+* Bugfix to GPIO sensors - to prevent the occasional spurious segmentation errors on settings apply
+* Bugfix to timed signals (triggered by another signal) - to prevent spurious SPAD warnings
+* Bugfix to handle update of Route ID (if changed by user in the route configuration dialog)
+* Bugfix to schematic route highlighting for 'Y' points (route now correctly highlighted)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
@@ -49,7 +56,11 @@ email: enquiries@model-railway-signalling.co.uk
 
 For a first time installation use:
 <pre>
-$ python3 -m pip install model-railway-signals 
+$ pip install model-railway-signals <== This should work for most python installations
+or
+$ python -m pip install model-railway-signals <== If the command line version of pip is not installed/enabled
+or
+$ python -m pip install model-railway-signals <== If you have multiple major versions of python installed
 </pre>
 When installing the application on later versions of python you may get the following error:
 <pre>
@@ -70,44 +81,73 @@ error: externally-managed-environment
     virtual environment for you. Make sure you have pipx installed.
 
     See /usr/share/doc/python3.11/README.venv for more information.
-
-note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
-hint: See PEP 668 for the detailed specification.
 </pre>
-To overcome this, remove the 'EXTERNALLY-MANAGED' file from the default python installation and then re-attempt the install:
+To overcome this, remove the 'EXTERNALLY-MANAGED' file from the default python installation and then re-attempt the install (as above).
+Note that this is the file location for the Raspberry Pi python 3.11 installation. Other platforms may use a different location for this file:
 <pre>
 $ sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
-$ python3 -m pip install model-railway-signals
 </pre>
 To upgrade to the latest version use:
 <pre>
-$ python3 -m pip install --upgrade model-railway-signals 
+$ pip install --upgrade model-railway-signals            <== This should work for most python installations
+or
+$ python -m pip install --upgrade model-railway-signals  <== If the command line version of pip is not installed/enabled
+or
+$ python -m pip install --upgrade model-railway-signals  <== If you have multiple major versions of python installed
+</pre>
+To remove the application:
+<pre>
+$ pip uninstall model-railway-signals <== This should work for most python installations
+or
+$ python -m pip uninstall model-railway-signals          <== If the command line version of pip is not installed/enabled
+or
+$ python -m pip uninstall model-railway-signals          <== If you have multiple major versions of python installed
+</pre>
+To install a specific version of the application the application:
+<pre>
+$ pip install model-railway-signals==4.5.0               <== This should work for most python installations
+or
+$ python -m pip install model-railway-signals==4.5.0     <== If the command line version of pip is not installed/enabled
+or
+$ python -m pip install model-railway-signals==4.5.0     <== If you have multiple major versions of python installed
+</pre>
+The application has minimum external dependencies (over and above the 'standard' python installation),
+'pyserial' and 'paho-mqtt', both of which should automatically get installed with the application.
+If for some reason this doesn't happen (I've been made aware of one instance on a Windows platform) then
+these packages can be installed seperately (prior to installing the model-railway-signals package):
+<pre>
+$ pip install paho-mqtt
+$ pip install pyserial
 </pre>
 If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
-then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
-on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first).
-If 'simpleaudio' is not installed then the software will still function correctly (just without sound).
+then you will also need to install the 'simpleaudio' package. If 'simpleaudio' is not installed then 
+the application will still function correctly (just without sound).
 <pre>
-$ python3 -m pip install simpleaudio
+$ pip install simpleaudio
 </pre>
-Note that if you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
+If you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
 <pre>
 $ sudo apt-get install libasound2-dev
 </pre>
+Note that for Windows, the 'simpleaudio' it has a dependency  on Microsoft Visual C++ 14.0 or greater 
+(so you will need to ensure Visual Studio 2015 is installed first).
+
 
 ## Running the application
 
 The python package should be run as a module (note underscores):
 <pre>
-$ python3 -m model_railway_signals
+$ python -m model_railway_signals  <== This should work for most python installations
+or
+$ python3 -m model_railway_signals <== If you have multiple major versions of python installed
 </pre>
 If required, a layout schematic can be loaded at startup:
 <pre>
-$ python3 -m model_railway_signals -f layout_file.sig
+$ python -m model_railway_signals -f layout_file.sig
 </pre>
 If required, the logging level can be specified at startup (ERROR, WARNING, INFO or DEBUG)
 <pre>
-$ python3 -m model_railway_signals -f layout_file.sig -l DEBUG
+$ python -m model_railway_signals -f layout_file.sig -l DEBUG
 </pre>
 
 Application documentation, can be found in the 'user_guide' folder: 

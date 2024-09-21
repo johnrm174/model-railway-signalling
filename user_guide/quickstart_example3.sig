@@ -5,7 +5,7 @@
     "objects": {
         "027167c4-575e-4384-9e79-d97b56ae3e01": {
             "background": "grey85",
-            "bbox": 14245,
+            "bbox": 11702,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -26,7 +26,7 @@
                 20,
                 5
             ],
-            "bbox": 14251,
+            "bbox": 11708,
             "colour": "black",
             "endx": 1275.0,
             "endy": 225.0,
@@ -40,7 +40,7 @@
         "07d52e15-c961-4ee9-8227-5c7e7ade9d7c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 14258,
+            "bbox": 11715,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -81,7 +81,7 @@
                 false,
                 ""
             ],
-            "bbox": 14275,
+            "bbox": 11732,
             "dccaspects": [
                 [
                     [
@@ -941,7 +941,7 @@
         },
         "1cd0d6ee-bf33-4e85-ad10-162a5114e499": {
             "background": "grey85",
-            "bbox": 14278,
+            "bbox": 11735,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -956,7 +956,7 @@
             "text": "TT-DS10"
         },
         "1d324970-3029-401b-8c66-8425a680ff42": {
-            "bbox": 14282,
+            "bbox": 11739,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -978,7 +978,7 @@
                 false,
                 ""
             ],
-            "bbox": 14299,
+            "bbox": 11756,
             "dccaspects": [
                 [
                     [
@@ -1843,7 +1843,7 @@
                 0,
                 0
             ],
-            "bbox": 14305,
+            "bbox": 11762,
             "colour": "black",
             "endx": 900.0,
             "endy": 100.0,
@@ -1866,7 +1866,7 @@
                 false,
                 ""
             ],
-            "bbox": 14322,
+            "bbox": 11779,
             "dccaspects": [
                 [
                     [
@@ -2736,7 +2736,7 @@
                 false,
                 ""
             ],
-            "bbox": 14339,
+            "bbox": 11796,
             "dccaspects": [
                 [
                     [
@@ -3607,7 +3607,7 @@
         },
         "33bf5593-6030-4282-a957-c96d2a12548f": {
             "background": "grey85",
-            "bbox": 14342,
+            "bbox": 11799,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3628,7 +3628,7 @@
                 20,
                 5
             ],
-            "bbox": 14348,
+            "bbox": 11805,
             "colour": "black",
             "endx": 800.0,
             "endy": 275.0,
@@ -3651,7 +3651,7 @@
                 false,
                 ""
             ],
-            "bbox": 14365,
+            "bbox": 11822,
             "dccaspects": [
                 [
                     [
@@ -4521,7 +4521,7 @@
                 false,
                 ""
             ],
-            "bbox": 14382,
+            "bbox": 11839,
             "dccaspects": [
                 [
                     [
@@ -5380,7 +5380,7 @@
             ]
         },
         "55eab425-03d7-40a2-8b77-2c7d23b8e933": {
-            "bbox": 14386,
+            "bbox": 11843,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -5402,7 +5402,7 @@
                 false,
                 ""
             ],
-            "bbox": 14403,
+            "bbox": 11860,
             "dccaspects": [
                 [
                     [
@@ -6272,7 +6272,7 @@
                 false,
                 ""
             ],
-            "bbox": 14420,
+            "bbox": 11877,
             "dccaspects": [
                 [
                     [
@@ -7142,7 +7142,7 @@
                 false,
                 ""
             ],
-            "bbox": 14437,
+            "bbox": 11894,
             "dccaspects": [
                 [
                     [
@@ -8001,7 +8001,7 @@
             ]
         },
         "628c161f-b9f5-46fd-837c-4f36eecd60ab": {
-            "bbox": 14441,
+            "bbox": 11898,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8012,7 +8012,7 @@
             "tags": "section11"
         },
         "65c6b251-6622-4fd2-958f-b28a6778dc76": {
-            "bbox": 14445,
+            "bbox": 11902,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8024,7 +8024,7 @@
         },
         "6966a516-b636-4321-ae7b-3a733356e215": {
             "background": "grey85",
-            "bbox": 14448,
+            "bbox": 11905,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -8040,7 +8040,7 @@
         },
         "6b03065c-be75-450c-8af5-af5dc644b14f": {
             "background": "grey85",
-            "bbox": 14451,
+            "bbox": 11908,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -8057,7 +8057,7 @@
         "719f6d7b-e39c-4d3a-8b22-f232dff5443e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 14457,
+            "bbox": 11914,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8098,7 +8098,7 @@
         },
         "7c1562c4-2d75-46cf-b559-bef25efa2c9e": {
             "background": "grey85",
-            "bbox": 14460,
+            "bbox": 11917,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -8113,7 +8113,7 @@
             "text": "TT-DS10"
         },
         "7d95452f-2bb7-48b8-8418-6d83598356d4": {
-            "bbox": 14464,
+            "bbox": 11921,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8130,7 +8130,7 @@
                 20,
                 5
             ],
-            "bbox": 14470,
+            "bbox": 11927,
             "colour": "black",
             "endx": 1275.0,
             "endy": 100.0,
@@ -8142,7 +8142,7 @@
             "tags": "line8"
         },
         "a6541a21-387c-4ebc-93dd-3b86a950f45d": {
-            "bbox": 14474,
+            "bbox": 11931,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8154,7 +8154,7 @@
         },
         "a6d29d1d-43c7-4b82-bca6-0fd6d90d6c89": {
             "background": "grey85",
-            "bbox": 14477,
+            "bbox": 11934,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -8169,7 +8169,7 @@
             "text": "TT-DS10"
         },
         "a6e61479-8736-4f06-b351-c8e99ff870f5": {
-            "bbox": 14481,
+            "bbox": 11938,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8181,7 +8181,7 @@
         },
         "a96bd506-67b8-4312-a415-169eae42e657": {
             "background": "grey85",
-            "bbox": 14484,
+            "bbox": 11941,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -8202,7 +8202,7 @@
                 0,
                 0
             ],
-            "bbox": 14490,
+            "bbox": 11947,
             "colour": "black",
             "endx": 1275.0,
             "endy": 275.0,
@@ -8225,7 +8225,7 @@
                 false,
                 ""
             ],
-            "bbox": 14507,
+            "bbox": 11964,
             "dccaspects": [
                 [
                     [
@@ -9084,7 +9084,7 @@
             ]
         },
         "b1288a67-ed1d-427f-98d5-f7963edaf7f4": {
-            "bbox": 14511,
+            "bbox": 11968,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9101,7 +9101,7 @@
                 0,
                 0
             ],
-            "bbox": 14517,
+            "bbox": 11974,
             "colour": "black",
             "endx": 925.0,
             "endy": 150.0,
@@ -9113,7 +9113,7 @@
             "tags": "line6"
         },
         "b62548e4-2291-454e-9f01-4c3163fb178a": {
-            "bbox": 14521,
+            "bbox": 11978,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9124,7 +9124,7 @@
             "tags": "section3"
         },
         "bc423a55-8a1d-42b1-82ee-24b38662af63": {
-            "bbox": 14525,
+            "bbox": 11982,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9141,7 +9141,7 @@
                 0,
                 0
             ],
-            "bbox": 14531,
+            "bbox": 11988,
             "colour": "black",
             "endx": 1275.0,
             "endy": 150.0,
@@ -9154,7 +9154,7 @@
         },
         "d6a52ed1-1079-413c-ba46-7d8bb9b44dfd": {
             "background": "grey85",
-            "bbox": 14534,
+            "bbox": 11991,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -9170,7 +9170,7 @@
         },
         "db5992bd-ce35-492b-9453-b8a860f4a69b": {
             "background": "grey85",
-            "bbox": 14537,
+            "bbox": 11994,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -9186,7 +9186,7 @@
         },
         "e5810a77-a225-4247-acd8-0df551fe4184": {
             "background": "grey85",
-            "bbox": 14540,
+            "bbox": 11997,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -9212,7 +9212,7 @@
                 false,
                 ""
             ],
-            "bbox": 14557,
+            "bbox": 12014,
             "dccaspects": [
                 [
                     [
@@ -10082,7 +10082,7 @@
                 true,
                 "14"
             ],
-            "bbox": 14575,
+            "bbox": 12032,
             "dccaspects": [
                 [
                     [
@@ -10952,7 +10952,7 @@
             ]
         },
         "eca7185e-bfed-4cfb-8430-a3153bc29573": {
-            "bbox": 14579,
+            "bbox": 12036,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -10964,7 +10964,7 @@
         },
         "edf730b4-253d-4ac9-a473-0a3ba0e72183": {
             "background": "grey85",
-            "bbox": 14582,
+            "bbox": 12039,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -10990,7 +10990,7 @@
                 false,
                 ""
             ],
-            "bbox": 14599,
+            "bbox": 12056,
             "dccaspects": [
                 [
                     [
@@ -11849,7 +11849,7 @@
             ]
         },
         "f85047ff-ffac-4342-835a-98803dee39b6": {
-            "bbox": 14603,
+            "bbox": 12060,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11866,7 +11866,7 @@
                 0,
                 0
             ],
-            "bbox": 14609,
+            "bbox": 12066,
             "colour": "black",
             "endx": 775.0,
             "endy": 225.0,
@@ -11878,7 +11878,7 @@
             "tags": "line1"
         },
         "fdcafbec-2869-438c-ba72-2a8d5d849f58": {
-            "bbox": 14613,
+            "bbox": 12070,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11890,7 +11890,7 @@
         },
         "ff002fef-4577-4b37-8b4c-c09a758ae29f": {
             "background": "grey85",
-            "bbox": 14616,
+            "bbox": 12073,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -11981,10 +11981,10 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/pi/Software/model-railway-signalling/user_guide/quickstart_example3.sig",
+            "filename": "/home/john/model-railway-signalling/user_guide/quickstart_example3.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.5.0"
+            "version": "Version 4.6.0"
         },
         "gpio": {
             "portmappings": [

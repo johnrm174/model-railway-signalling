@@ -216,7 +216,7 @@ class point_dcc_entry_box(common.dcc_entry_box):
             dcc_mapping = dcc_control.dcc_address_mapping(dcc_address)
             if dcc_mapping is not None and (dcc_mapping[0] != "Point" or dcc_mapping[1] != self.current_item_id):
                 # We need to correct the mapped signal ID for secondary distants
-                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 99: dcc_mapping[1] = dcc_mapping[1] - 100
+                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
                 self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
                 valid = False
         self.set_validation_status(valid)

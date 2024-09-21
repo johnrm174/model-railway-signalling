@@ -110,8 +110,8 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
     global track_sensors
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "sensor"+str(sensor_id)
-    if not isinstance(sensor_id, int) or sensor_id < 1 or sensor_id > 99:
-        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an int (1-99)")
+    if not isinstance(sensor_id, int) or sensor_id < 1 or sensor_id > 999:
+        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an int (1-999)")
     elif track_sensor_exists(sensor_id):
         logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID already exists")
     else:

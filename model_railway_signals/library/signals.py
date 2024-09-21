@@ -484,9 +484,9 @@ def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
     # The text object is created anyway - but 'hidden' if not required for this particular signal
     text_coordinates = common.rotate_point(x,y,xoff,yoff,orientation)
     if has_theatre:
-        rectangle_coords = common.rotate_line(x,y,xoff-6,yoff+6,xoff+6,yoff-6,orientation)
+        rectangle_coords = common.rotate_line(x,y,xoff-6,yoff+6,xoff+8,yoff-6,orientation)
         canvas.create_rectangle(rectangle_coords,fill="black",tags=canvas_tag)
-        theatre_text = canvas.create_text(text_coordinates,fill="white",font=('Courier',common.fontsize,"normal"),
+        theatre_text = canvas.create_text(text_coordinates,fill="white",font=('Courier',9,"bold"),
                                           angle=orientation-90,state='normal',tags=canvas_tag)
     else:
         theatre_text = canvas.create_text(text_coordinates,state='hidden',tags=canvas_tag)
@@ -1175,8 +1175,8 @@ def set_signals_to_publish_state(*sig_ids:int):
     global list_of_signals_to_publish
     for sig_id in sig_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(sig_id,int) or sig_id < 1 or sig_id > 99:
-            logging.error("Signal "+str(sig_id)+": set_signals_to_publish_state - ID must be an int (1-99)")
+        if not isinstance(sig_id,int) or sig_id < 1 or sig_id > 999:
+            logging.error("Signal "+str(sig_id)+": set_signals_to_publish_state - ID must be an int (1-999)")
         elif sig_id in list_of_signals_to_publish:
             logging.warning("Signal "+str(sig_id)+": set_signals_to_publish_state -"
                                 +" Signal is already configured to publish state to MQTT broker")

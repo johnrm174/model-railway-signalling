@@ -42,13 +42,13 @@ class signal_dcc_entry_box(common.dcc_entry_box):
         valid = super().validate(update_validation_status=False)
         if valid and self.entry.get() != "":
             # Ensure the address is not mapped to another signal or point. Note that to cater for Semaphore
-            # Signals with secondary distant arms we also need to check for Signal IDs + 100
+            # Signals with secondary distant arms we also need to check for Signal IDs + 1000
             dcc_address = int(self.entry.get())
             dcc_mapping = dcc_control.dcc_address_mapping(dcc_address)
             if dcc_mapping is not None and (dcc_mapping[0] != "Signal" or
-                    (dcc_mapping[1] != self.current_item_id and dcc_mapping[1] != self.current_item_id + 100)):
+                    (dcc_mapping[1] != self.current_item_id and dcc_mapping[1] != self.current_item_id + 1000)):
                 # We need to correct the mapped signal ID for secondary distants
-                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 99: dcc_mapping[1] = dcc_mapping[1] - 100
+                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
                 self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
                 valid = False
         self.set_validation_status(valid)

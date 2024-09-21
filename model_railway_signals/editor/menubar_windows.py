@@ -105,6 +105,7 @@ Schematic editor functions (Run Mode):
 2) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
 3) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
 4) Arrow keys will scroll the canvas area (if the canvas is bigger than the window)
+5) The mouse (left click) can also be used to scroll (drag and drop) the canvas area
 
 Menubar Options
 
@@ -112,16 +113,18 @@ Menubar Options
 2) Mode => Edit/Run/Reset - Select Edit or Run Mode (also Reset layout to default state)
 3) Automation => Enable/Disable - Toggle signal automation functions (in Run Mode)
 4) SPROG => Connect/Disconnect - Toggle the connection to the SPROG DCC Command Station
-5) DCC Power => Enable/Disable - Toggle the DCC bus supply (SPROG must be connected)
+5) DCC Power => ON/OFF - Toggle the DCC bus supply (SPROG must be connected)
 6) MQTT => Connect/disconnect - Toggle connection to an external MQTT broker
 7) Utilities => DCC Programmming - One touch and CV programming of signals/points
-8) Settings => Canvas - Change the layout display size and grid configuration
-9) Settings => MQTT - Configure the MQTT broker and signalling networking
-10) Settings => SPROG - Configure the serial port and SPROG behavior
-11) Settings => Logging - Set the log level for running the layout
-12) Settings => Sensors - Define the Ri-Pi GPIO port to track sensor mappings
-13) Help => About - Application version and licence information
-13) Help => Info - Add user notes to document your layout configuration
+8) Utilities => DCC Mapping - To view the assigned DCC addresses for your layout
+9) Settings => Canvas - Change the layout display size and grid configuration
+10) Settings => General - Enable/disable Signal Passed at Danger (SPAD) warnings
+11) Settings => MQTT - Configure the MQTT broker and signalling networking
+12) Settings => SPROG - Configure the serial port and SPROG behavior
+13) Settings => Logging - Set the log level for running the layout
+14) Settings => GPIO - Define the Ri-Pi GPIO port to track sensor mappings
+15) Help => About - Application version and licence information
+16) Help => Info - Add user notes to document your layout configuration
 
 """
 

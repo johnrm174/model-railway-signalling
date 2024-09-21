@@ -360,7 +360,7 @@ def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:in
 def process_signal_aspect_update(int_or_str_signal_id:Union[int,str]):
     # First update on the signal ahead (only if it is a LOCAL colour light signal)
     # Other local signal types will always display the appropriate aspect
-    if is_local_id(int_or_str_signal_id) and int(int_or_str_signal_id) < 100:
+    if is_local_id(int_or_str_signal_id) and int(int_or_str_signal_id) < 1000:
         signal_object = objects.schematic_objects[objects.signal(int_or_str_signal_id)]
         if signal_object["itemtype"] == signals.signal_type.colour_light.value:
             str_signal_ahead_id = find_signal_ahead(int(int_or_str_signal_id))
@@ -391,7 +391,7 @@ def set_signal_route(int_signal_id:int):
         # For Semaphore Signals with secondary distant arms we also need
         # to set the route for the associated semaphore distant signal
         if has_distant_arms(int_signal_id):
-            int_associated_distant_sig_id = int_signal_id + 100
+            int_associated_distant_sig_id = int_signal_id + 1000
             signals.set_route(int_associated_distant_sig_id, route=signal_route)
     return()
 
@@ -654,8 +654,8 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
 def process_all_signal_interlocking():
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
-        # Note that the ID of any associated distant signal is sig_id+100
-        int_associated_distant_id = int_signal_id + 100
+        # Note that the ID of any associated distant signal is sig_id+1000
+        int_associated_distant_id = int_signal_id + 1000
         distant_arms_can_be_unlocked = has_distant_arms(int_signal_id)
         signal_can_be_unlocked = False
         subsidary_can_be_unlocked = False
@@ -699,7 +699,7 @@ def process_all_signal_interlocking():
             if signal_object["interlockahead"] and home_signal_ahead_at_danger(int_signal_id):
                 if has_distant_arms(int_signal_id):
                     # Must be a home semaphore signal with secondary distant arms
-                    if not signals.signal_clear(signal_object["itemid"]+100):
+                    if not signals.signal_clear(signal_object["itemid"]+1000):
                         distant_arms_can_be_unlocked = False
                 else:
                     # Must be a distant signal (colour light or semaphore)
@@ -771,14 +771,14 @@ def override_signals_based_on_track_sections_ahead():
         if objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]:
             signals.set_signal_override(int_signal_id)
             if has_distant_arms(int_signal_id):
-                signals.set_signal_override(int_signal_id + 100)
+                signals.set_signal_override(int_signal_id + 1000)
 
     # Sub-function to Clear a signal override
     def clear_signal_override(int_signal_id:int):
         if objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]:
             signals.clear_signal_override(int_signal_id)
             if has_distant_arms(int_signal_id):
-                signals.clear_signal_override(int_signal_id + 100)
+                signals.clear_signal_override(int_signal_id + 1000)
 
     # Start of main function
     for str_signal_id in objects.signal_index:
@@ -824,12 +824,12 @@ def override_distant_signals_based_on_signals_ahead():
             #    but you might still want to show the signal (and its state) on your own block schematic
             if distant_signal_ahead_at_caution(int_signal_id) or home_signal_ahead_at_danger(int_signal_id):
                 if has_distant_arms(int_signal_id):
-                    signals.set_signal_override_caution(int_signal_id+100)
+                    signals.set_signal_override_caution(int_signal_id+1000)
                 else:
                     signals.set_signal_override_caution(int_signal_id)
             else:
                 if has_distant_arms(int_signal_id):
-                    signals.clear_signal_override_caution(int_signal_id+100)
+                    signals.clear_signal_override_caution(int_signal_id+1000)
                 else:
                     signals.clear_signal_override_caution(int_signal_id)
             # Update the signal aspect and propogate any aspect updates back along the route
@@ -867,7 +867,7 @@ def clear_all_distant_overrides():
         signal_object = objects.schematic_objects[objects.signal(int(str_signal_id))]
         if signal_object["overrideahead"]:
             if has_distant_arms(int(str_signal_id)):
-                signals.clear_signal_override_caution(int(str_signal_id)+100)
+                signals.clear_signal_override_caution(int(str_signal_id)+1000)
             else:
                 signals.clear_signal_override_caution(int(str_signal_id))
     return()
@@ -955,14 +955,12 @@ def point_switched_callback(point_id:int, route_id:int=0):
         override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    canvas.focus_set()
     return()
 
 def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    canvas.focus_set()
     return()
 
 def signal_updated_callback(signal_id:Union[int,str]):
@@ -974,7 +972,6 @@ def signal_updated_callback(signal_id:Union[int,str]):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def signal_switched_callback(signal_id:int, route_id:int=0):
@@ -988,7 +985,6 @@ def signal_switched_callback(signal_id:int, route_id:int=0):
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def subsidary_switched_callback(signal_id:int, route_id:int=0):
@@ -997,7 +993,6 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def signal_passed_callback(signal_id:int):
@@ -1011,7 +1006,6 @@ def signal_passed_callback(signal_id:int):
             override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def signal_released_callback(signal_id:int):
@@ -1023,7 +1017,6 @@ def signal_released_callback(signal_id:int):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def sensor_passed_callback(sensor_id:int):
@@ -1037,7 +1030,6 @@ def sensor_passed_callback(sensor_id:int):
     process_all_signal_interlocking()
     run_routes.clear_down_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
         
 def section_updated_callback(section_id:int):
@@ -1048,14 +1040,12 @@ def section_updated_callback(section_id:int):
         override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 def instrument_updated_callback(instrument_id:int):
     if enhanced_debugging: print("########## instrument_updated_callback "+str(instrument_id))
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
-    canvas.focus_set()
     return()
 
 ##################################################################################################

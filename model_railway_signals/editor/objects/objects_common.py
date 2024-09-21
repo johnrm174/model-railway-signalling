@@ -85,12 +85,6 @@ def track_sensor(ID:int): return (track_sensor_index[str(ID)])
 def route(ID:int): return (route_index[str(ID)])
 
 #------------------------------------------------------------------------------------
-# Simple functions to test if a particular item_id already exists (for an item_type)
-#------------------------------------------------------------------------------------
-
-def line_exists(ID:int): return (str(ID) in line_index.keys())  ##########################
-
-#------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
 # These elements are common to all schematic layout objects and are primarily
 # used to support the schematic editor functions (move, select, etc)

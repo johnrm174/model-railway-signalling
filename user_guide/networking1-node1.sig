@@ -19,7 +19,7 @@
                 20,
                 5
             ],
-            "bbox": 13544,
+            "bbox": 10727,
             "colour": "black",
             "endx": 600.0,
             "endy": 125.0,
@@ -37,7 +37,7 @@
                 20,
                 5
             ],
-            "bbox": 13550,
+            "bbox": 10733,
             "colour": "black",
             "endx": 125.0,
             "endy": 125.0,
@@ -60,7 +60,7 @@
                 false,
                 ""
             ],
-            "bbox": 13576,
+            "bbox": 10759,
             "dccaspects": [
                 [
                     [
@@ -930,7 +930,7 @@
             ]
         },
         "5119d487-7752-469d-addb-5aa3be1bedb6": {
-            "bbox": 13580,
+            "bbox": 10763,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -952,7 +952,7 @@
                 false,
                 ""
             ],
-            "bbox": 13606,
+            "bbox": 10789,
             "dccaspects": [
                 [
                     [
@@ -1833,7 +1833,7 @@
         },
         "6408cbee-f763-41ad-8fca-3130f53d2519": {
             "background": "grey85",
-            "bbox": 13609,
+            "bbox": 10792,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1859,7 +1859,7 @@
                 false,
                 ""
             ],
-            "bbox": 13626,
+            "bbox": 10809,
             "dccaspects": [
                 [
                     [
@@ -2724,7 +2724,7 @@
                 20,
                 5
             ],
-            "bbox": 13632,
+            "bbox": 10815,
             "colour": "black",
             "endx": 475.0,
             "endy": 300.0,
@@ -2736,7 +2736,7 @@
             "tags": "line3"
         },
         "70194f30-ef69-484a-b947-66951acf8a72": {
-            "bbox": 13636,
+            "bbox": 10819,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2758,7 +2758,7 @@
                 false,
                 ""
             ],
-            "bbox": 13653,
+            "bbox": 10836,
             "dccaspects": [
                 [
                     [
@@ -3617,7 +3617,7 @@
             ]
         },
         "73be5b7a-289a-4a48-959b-0f06dc39c0e9": {
-            "bbox": 13657,
+            "bbox": 10840,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -3629,7 +3629,7 @@
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
-            "bbox": 13660,
+            "bbox": 10843,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3645,7 +3645,7 @@
         },
         "9a8b2db4-dadb-4a28-bf0f-5ce1baaa363f": {
             "background": "grey85",
-            "bbox": 13663,
+            "bbox": 10846,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3660,7 +3660,7 @@
             "text": "To\nNode2"
         },
         "a271c006-6796-436a-b85f-c805554d8237": {
-            "bbox": 13678,
+            "bbox": 10861,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -3673,7 +3673,7 @@
         },
         "aad6451e-e1e2-4a4d-8f93-064d331acafd": {
             "background": "grey85",
-            "bbox": 13681,
+            "bbox": 10864,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3699,7 +3699,7 @@
                 false,
                 ""
             ],
-            "bbox": 13707,
+            "bbox": 10890,
             "dccaspects": [
                 [
                     [
@@ -4598,10 +4598,10 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/pi/Software/model-railway-signalling/user_guide/networking1-node1.sig",
+            "filename": "/home/john/model-railway-signalling/user_guide/networking1-node1.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.5.0"
+            "version": "Version 4.6.0"
         },
         "gpio": {
             "portmappings": [

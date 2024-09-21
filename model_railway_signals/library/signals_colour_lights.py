@@ -83,8 +83,8 @@ def create_colour_light_signal (canvas, sig_id:int,
     # Get some info about the signal to help validation of the parameters we have been given
     signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
     # Common validation (common to all signal types)
-    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 99:
-        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-99)")
+    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 999:
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-999)")
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
@@ -606,10 +606,8 @@ class timed_sequence():
                 if self.start_delay > 0: 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
                     # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
-                    update_colour_light_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
-                else:
-                    update_colour_light_signal(self.sig_id)
+                update_colour_light_signal(self.sig_id)
             # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
             if signals.signals[str(self.sig_id)]["subtype"] in (signal_subtype.three_aspect, signal_subtype.four_aspect):
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_yellow())

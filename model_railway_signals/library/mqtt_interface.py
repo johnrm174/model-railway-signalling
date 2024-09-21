@@ -129,7 +129,7 @@ heartbeats = {}
 
 def get_node_status():
     return (heartbeats)
-
+    
 #-----------------------------------------------------------------------------------------------
 # Common function used by the main thread to wait for responses in other threads. When the 
 # specified function returns True within the timeout period, the function exits and returns
@@ -187,7 +187,7 @@ def thread_to_send_heartbeat_messages():
     node_config["heartbeat_thread_terminated"] = False
     while not node_config["terminate_heartbeat_thread"]:
         # The PAHO MQTT client may not be thread safe so publish the message from the main Tkinter thread
-        common.execute_function_in_tkinter_thread(publish_heartbeat_message)
+        common.root_window.after(0, publish_heartbeat_message)
         # Wait before we send out the next heartbeat
         last_heartbeat_time = time.time()
         while (time.time() < last_heartbeat_time + node_config["heartbeat_frequency"]
@@ -216,7 +216,7 @@ def split_remote_item_identifier(item_identifier:str):
     if isinstance(item_identifier,str) and "-" in item_identifier:
         node_id = item_identifier.rpartition("-")[0]
         item_id = item_identifier.rpartition("-")[2]
-        if node_id != "" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 100:
+        if node_id != "" and item_id.isdigit() and int(item_id) >= 1 and int(item_id) <= 999:
             return_value = [node_id,int(item_id)]                          
     return (return_value)
 
@@ -315,17 +315,15 @@ def process_message(msg):
             logging.warning("MQTT-Client: unhandled message topic: "+str(msg.topic))
     return()
 
-#--------------------------------------------------------------------------------------------------------
-# Internal function to handle messages received from the MQTT Broker. Note that we "pass" the
-# execution for processing the function back into the main Tkinter thread (assuming we know the
-# root window (if not, then as a fallback we raise a callback in the current mqtt event thread)
-#--------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------
+# Internal function to handle messages received from the MQTT Broker. Note that we "pass"
+# the execution for processing the function back into the main Tkinter thread
+#-----------------------------------------------------------------------------------------------
 
 def on_message(mqtt_client,obj,msg):
-    global node_config
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
-    if msg.payload: common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
+    if msg.payload: common.root_window.after(0, lambda:process_message(msg)) 
     return()
 
 #-----------------------------------------------------------------------------------------------

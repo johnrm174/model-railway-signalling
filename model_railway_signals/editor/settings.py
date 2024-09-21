@@ -50,7 +50,7 @@ default_settings = {}
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
 default_settings["general"]["editmode"] = True
-default_settings["general"]["version"] = "Version 4.5.0"
+default_settings["general"]["version"] = "Version 4.6.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
@@ -89,7 +89,7 @@ default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
 default_settings["mqtt"]["pubsensors"] = []
 default_settings["gpio"] = {}
-default_settings["gpio"]["triggerdelay"] = 0.001
+default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
 default_settings["gpio"]["portmappings"] = []
 

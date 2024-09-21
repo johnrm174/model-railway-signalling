@@ -80,6 +80,7 @@ schematic_state["startx"] = 0
 schematic_state["starty"] = 0
 schematic_state["lastx"] = 0
 schematic_state["lasty"] = 0
+schematic_state["movewindow"] = False
 schematic_state["moveobjects"] = False
 schematic_state["editlineend1"] = False
 schematic_state["editlineend2"] = False
@@ -110,6 +111,8 @@ edit_popup = None
 button_frame = None
 # The list of button images (which needs to be kept in scope)
 button_images = []
+# The global flag to track whether we are in edit mode or not
+edit_mode_active = True
 
 #------------------------------------------------------------------------------------
 # Internal Function to return the absolute canvas coordinates for an event
@@ -488,33 +491,38 @@ def left_button_click(event):
     schematic_state["starty"] = canvas_y
     schematic_state["lastx"] = canvas_x 
     schematic_state["lasty"] = canvas_y
-    # See if the cursor is over the "end" of an already selected line 
-    highlighted_object = find_highlighted_line_end(canvas_x,canvas_y)
-    if highlighted_object:
-        # Clear selections and select the highlighted line. Note that the edit line
-        # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
-        deselect_all_objects()
-        select_object(highlighted_object)
-    else:
-        # See if the cursor is over any other canvas object
-        highlighted_object = find_highlighted_object(canvas_x,canvas_y)
+    if edit_mode_active:
+        # See if the cursor is over the "end" of an already selected line
+        highlighted_object = find_highlighted_line_end(canvas_x,canvas_y)
         if highlighted_object:
-            schematic_state["moveobjects"] = True
-            if highlighted_object not in schematic_state["selectedobjects"]:
-                # Clear any current selections and select the highlighted object
-                deselect_all_objects()
-                select_object(highlighted_object)
-        else:
-            # Cursor is not over any object - Could be the start of a new area selection or
-            # just clearing the current selection - In either case we deselect all objects
+            # Clear selections and select the highlighted line. Note that the edit line
+            # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
             deselect_all_objects()
-            schematic_state["selectarea"] = True
-            # Make the 'selectareabox' visible. This will create the box on first use
-            # or after a 'delete_all_objects (when the box is set to 'None')
-            if schematic_state["selectareabox"] is None:
-                schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
-            canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
-            canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
+            select_object(highlighted_object)
+        else:
+            # See if the cursor is over any other canvas object
+            highlighted_object = find_highlighted_object(canvas_x,canvas_y)
+            if highlighted_object:
+                schematic_state["moveobjects"] = True
+                if highlighted_object not in schematic_state["selectedobjects"]:
+                    # Clear any current selections and select the highlighted object
+                    deselect_all_objects()
+                    select_object(highlighted_object)
+            else:
+                # Cursor is not over any object - Could be the start of a new area selection or
+                # just clearing the current selection - In either case we deselect all objects
+                deselect_all_objects()
+                schematic_state["selectarea"] = True
+                # Make the 'selectareabox' visible. This will create the box on first use
+                # or after a 'delete_all_objects (when the box is set to 'None')
+                if schematic_state["selectareabox"] is None:
+                    schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
+                canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
+                canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
+    else:
+        # This could be a 'drag and drop' scroll of the canvas within the window
+        canvas.scan_mark(event.x, event.y)
+        schematic_state["movewindow"] = True
     # Unbind the canvas keypresses until left button release to prevent mode changes,
     # rotate/delete of objects (i.e. prevent undesirable editor behavior)
     disable_all_keypress_events_during_move()
@@ -572,8 +580,8 @@ def track_cursor(event):
         # Move all the objects that are selected
         move_selected_objects(xdiff,ydiff)
         # Set the 'last' position for the next move event
-        schematic_state["lastx"] += xdiff
-        schematic_state["lasty"] += ydiff
+        schematic_state["lastx"] = canvas_x
+        schematic_state["lasty"] = canvas_y
     elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
         xdiff = canvas_x - schematic_state["lastx"]
         ydiff = canvas_y - schematic_state["lasty"]
@@ -584,13 +592,16 @@ def track_cursor(event):
         else:
             lines.move_line_end_2(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
         # Reset the "start" position for the next move
-        schematic_state["lastx"] += xdiff
-        schematic_state["lasty"] += ydiff
+        schematic_state["lastx"] = canvas_x
+        schematic_state["lasty"] = canvas_y
     elif schematic_state["selectarea"]:
         # Dynamically resize the selection area
         x1 = schematic_state["startx"]
         y1 = schematic_state["starty"]
         canvas.coords(schematic_state["selectareabox"],x1,y1,canvas_x,canvas_y)
+    elif schematic_state["movewindow"]:
+        # Scroll the canvas within the main window
+        canvas.scan_dragto(event.x, event.y)
     return()
 
 #------------------------------------------------------------------------------------
@@ -647,6 +658,9 @@ def left_button_release(event):
         # Clear the Select Area Mode and Hide the area selection rectangle
         canvas.itemconfigure(schematic_state["selectareabox"],state="hidden")
         schematic_state["selectarea"] = False
+    elif schematic_state["movewindow"]:
+        # Clear the scroll canvas mode
+        schematic_state["movewindow"] = False
     # Re-bind the canvas keypresses on completion of area selection or Move Objects
     enable_all_keypress_events_after_completion_of_move()
     return()
@@ -795,6 +809,9 @@ def disable_edit_keypress_events():
 
 def configure_edit_mode(edit_mode:bool):
     global canvas_grid_state
+    global edit_mode_active
+    # Save the edit mode state in a global variable (for use by the mouse button functions)
+    edit_mode_active = edit_mode
     if edit_mode:
         # Display the Edit Mode Grid
         canvas_grid_state = "normal"
@@ -830,13 +847,11 @@ def configure_edit_mode(edit_mode:bool):
         deselect_all_objects()
         # Forget the subframe containing the "add object" buttons to hide it
         button_frame.forget()
-        # Unbind the Canvas mouse and button events in Run Mode
-        canvas.unbind("<Motion>")
-        canvas.unbind('<Button-1>')
+        # Unbind the the button 2 and button 3 events in Run Mode - the motion event and
+        # single button 1 events remain bound to enable scroll of the canvas in Run mode
         canvas.unbind('<Button-2>')
         canvas.unbind('<Button-3>')
         canvas.unbind('<Shift-Button-1>')
-        canvas.unbind('<ButtonRelease-1>')
         canvas.unbind('<Double-Button-1>')
         # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
         disable_edit_keypress_events()
@@ -858,6 +873,9 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     global canvas_width, canvas_height, canvas_grid, canvas_grid_state, canvas_snap_to_grid
     global button_frame, canvas_frame, button_images
     global canvas_event_callback
+    global edit_mode_active
+    # Store the global variables we need within the schematic module
+    edit_mode_active = edit_mode
     root = root_window
     canvas_event_callback = event_callback
     # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
