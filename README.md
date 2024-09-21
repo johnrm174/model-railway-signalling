@@ -34,7 +34,8 @@ Also, Double Slip points have been changed to give a straight route through the 
 * Improvement - Route selection buttons are now always displayed on top of route lines
 * Improvement - Text Boxes are now always displayed on top of route lines
 * Improvement - Improved representation of Trap Points and single slip points
-* Improvement - Route highlighting through points improved (for most point types)
+* Improvement - Improved Route highlighting through points (for most point types)
+* Improvement - Improved readability for theatre route indications and track occupancy
 * Bugfix to GPIO sensors - to prevent the occasional spurious segmentation errors on settings apply
 * Bugfix to timed signals (triggered by another signal) - to prevent spurious SPAD warnings
 * Bugfix to handle update of Route ID (if changed by user in the route configuration dialog)
