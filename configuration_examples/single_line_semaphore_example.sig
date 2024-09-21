@@ -24,7 +24,7 @@
                 false,
                 ""
             ],
-            "bbox": 10013,
+            "bbox": 10364,
             "dccaspects": [
                 [
                     [
@@ -915,7 +915,7 @@
                 false,
                 ""
             ],
-            "bbox": 10039,
+            "bbox": 10390,
             "dccaspects": [
                 [
                     [
@@ -1795,7 +1795,7 @@
             ]
         },
         "0b251a10-3b3a-44be-89e2-f6954d641b29": {
-            "bbox": 10043,
+            "bbox": 10394,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1817,7 +1817,7 @@
                 false,
                 ""
             ],
-            "bbox": 10071,
+            "bbox": 10422,
             "dccaspects": [
                 [
                     [
@@ -2709,7 +2709,7 @@
                 false,
                 ""
             ],
-            "bbox": 10097,
+            "bbox": 10448,
             "dccaspects": [
                 [
                     [
@@ -3600,7 +3600,7 @@
                 false,
                 ""
             ],
-            "bbox": 10125,
+            "bbox": 10476,
             "dccaspects": [
                 [
                     [
@@ -4492,7 +4492,7 @@
                 false,
                 ""
             ],
-            "bbox": 10153,
+            "bbox": 10504,
             "dccaspects": [
                 [
                     [
@@ -5384,7 +5384,7 @@
                 false,
                 ""
             ],
-            "bbox": 10179,
+            "bbox": 10530,
             "dccaspects": [
                 [
                     [
@@ -6270,7 +6270,7 @@
                 0,
                 0
             ],
-            "bbox": 10185,
+            "bbox": 10536,
             "colour": "black",
             "endx": 1400,
             "endy": 100,
@@ -6282,7 +6282,7 @@
             "tags": "line1"
         },
         "8b2daea0-c49c-4dc2-880e-73ec00bb4a7d": {
-            "bbox": 10189,
+            "bbox": 10540,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -6293,7 +6293,7 @@
             "tags": "section3"
         },
         "8cd209c0-9f73-42bd-ac04-e555e25372e5": {
-            "bbox": 10204,
+            "bbox": 10555,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -6311,7 +6311,7 @@
                 0,
                 0
             ],
-            "bbox": 10210,
+            "bbox": 10561,
             "colour": "black",
             "endx": 200,
             "endy": 150,
@@ -6334,7 +6334,7 @@
                 false,
                 ""
             ],
-            "bbox": 10238,
+            "bbox": 10589,
             "dccaspects": [
                 [
                     [
@@ -7215,7 +7215,7 @@
             ]
         },
         "9f0084b0-536d-4ba4-8429-d507dfe749f3": {
-            "bbox": 10253,
+            "bbox": 10604,
             "bellsound": "bell-ring-04.wav",
             "item": "instrument",
             "itemid": 2,
@@ -7227,7 +7227,7 @@
             "tags": "instrument2"
         },
         "a00e5871-328c-4d71-a1df-a464efe5cce4": {
-            "bbox": 10257,
+            "bbox": 10608,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7240,7 +7240,7 @@
         "a26a7440-68cc-4d3a-8186-dda77da27e7a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 10264,
+            "bbox": 10615,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7300,7 +7300,7 @@
             "ybuttonoffset": 0
         },
         "a6aaaf9c-ad0e-40dc-adda-60b9daabc3a9": {
-            "bbox": 10268,
+            "bbox": 10619,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7317,7 +7317,7 @@
                 0,
                 0
             ],
-            "bbox": 10274,
+            "bbox": 10625,
             "colour": "black",
             "endx": 1200,
             "endy": 100,
@@ -7329,7 +7329,7 @@
             "tags": "line3"
         },
         "b9d8ab0e-cd28-4590-ba49-36393b716aee": {
-            "bbox": 10278,
+            "bbox": 10629,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7346,7 +7346,7 @@
                 0,
                 0
             ],
-            "bbox": 10284,
+            "bbox": 10635,
             "colour": "black",
             "endx": 200,
             "endy": 100,
@@ -7364,7 +7364,7 @@
                 0,
                 0
             ],
-            "bbox": 10290,
+            "bbox": 10641,
             "colour": "black",
             "endx": 225,
             "endy": 125,
@@ -7382,7 +7382,7 @@
                 0,
                 0
             ],
-            "bbox": 10296,
+            "bbox": 10647,
             "colour": "black",
             "endx": 1400,
             "endy": 150,
@@ -7394,7 +7394,7 @@
             "tags": "line6"
         },
         "cd47274b-172c-4b41-b8be-6c3d73d17084": {
-            "bbox": 10300,
+            "bbox": 10651,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7407,7 +7407,7 @@
         "d79d5363-5db2-49c7-bb7a-197d8f798b69": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 10307,
+            "bbox": 10658,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7467,7 +7467,7 @@
             "ybuttonoffset": 0
         },
         "e1580065-8556-4f74-924e-9a88db52729d": {
-            "bbox": 10311,
+            "bbox": 10662,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7484,7 +7484,7 @@
                 0,
                 0
             ],
-            "bbox": 10317,
+            "bbox": 10668,
             "colour": "black",
             "endx": 1150,
             "endy": 150,
@@ -7551,7 +7551,7 @@
             "filename": "/home/john/model-railway-signalling/configuration_examples/single_line_semaphore_example.sig",
             "info": "This layout is an example of a single line between two 'block sections', with the points and signals in\nin each block section interlocked - e.g. signal 1 is interlocked with point 2 and opposing signals 3 & 4.\nThe distant signals are also interlocked with the home signals ahead - e.g. signal 4 can only be cleared\nif signal 3 has already been cleared - note it can be returned to 'on' at any time.\n\nBlock instruments are used to coordinate train movements between the two block sections and allow \ncommunication via bell codes (right click on the 'Telegraph' button to bring up a list of common bell \ncodes). In this example, the 'starter' signals for each block section have been interlocked with their \nrespective instruments (and the instruments linked together) - so signals 1/2 can only be cleared when\ninstrument 2 (on the right hand side) has been set to 'line clear' and signals 5/6 can only be cleared \nwhen instrument 1 (on the left hand side) has been set to 'line clear'.\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' on the layout).\n\nTrack sections have bene included on the schematic to provide a mimic display of track occupancy (when\na train passes a signal (signal is 'off') it gets passed from the section behind to the section ahead).\nThe desired behavior is again configured via the 'automation' tab of each signal. For example, signal 3\ncontrols two 'routes' so when passed, section 3 will be cleared and either section 1 or 2 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change from 'off' to 'on' when passed (section ahead is occupied) \nand then revert to'off' as soon as the section ahead is cleared.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. \n\nSignalman 1 - Right click the top left track section and enter a train designation code of your choice \n(this sets the track section to 'occupied'). Unlock, switch and re-lock point 2. On the LH instrument,\nuse the telegraph key to call attention and ask if the line is clear (just for a bit of fun). \n\nSignalman 2 - Set the RH instrument to 'clear' (this will finally unlock signal 1), set signal 7 to \n'off' and then set signal 8 to 'off' to set the route through the block section \n\nSignalman 1 - Set Signal 1 to 'off' and move the train through the schematic, clicking the 'signal \npassed' button at the base of each signal along the route in turn (don't forget to telegraph 'train \nentering section' so signalman 2 knows they need to set their instrument to 'occupied'). \n\nSignalman 2 - When the train has cleared the home signal, telegraph 'train arrived' and revert the \nRH instrument back to 'line blocked, in readiness for the next movement.\n\nThe use of block instruments in this example may seem like overkill (this is only a single application\nwith a single user after all) but with MQTT networking you can create and configure any number of linked\napplication instances. Only the application instance acting as the DCC command station needs to be run\nup on the R-Pi (other instances can be run up on Windows, iOS, linux or any other platform / operating\nsystem combiination that supports python). This provides the potential for splitting large layouts into \ndifferent signalling areas each with a signalman responsible for their area\nDocument your layout here\n\n",
             "spadpopups": false,
-            "version": "Version 4.5.1"
+            "version": "Version 4.6.0"
         },
         "gpio": {
             "portmappings": [],

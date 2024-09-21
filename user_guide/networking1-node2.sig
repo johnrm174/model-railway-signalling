@@ -24,7 +24,7 @@
                 false,
                 ""
             ],
-            "bbox": 10609,
+            "bbox": 10960,
             "dccaspects": [
                 [
                     [
@@ -889,7 +889,7 @@
                 20,
                 5
             ],
-            "bbox": 10615,
+            "bbox": 10966,
             "colour": "black",
             "endx": 625.0,
             "endy": 300.0,
@@ -902,7 +902,7 @@
         },
         "3992df93-f016-42e7-a710-f0bddf9b1627": {
             "background": "grey85",
-            "bbox": 10618,
+            "bbox": 10969,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -923,7 +923,7 @@
                 20,
                 5
             ],
-            "bbox": 10624,
+            "bbox": 10975,
             "colour": "black",
             "endx": 625.0,
             "endy": 125.0,
@@ -935,7 +935,7 @@
             "tags": "line1"
         },
         "6085fa37-fea7-42cd-a7a9-f15aeb1ec731": {
-            "bbox": 10639,
+            "bbox": 10990,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -947,7 +947,7 @@
             "tags": "instrument2"
         },
         "6e4f0867-155b-4ed8-ae84-38e1cc667131": {
-            "bbox": 10643,
+            "bbox": 10994,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -959,7 +959,7 @@
         },
         "70238cfa-4556-4ed9-9a92-46ac169573de": {
             "background": "grey85",
-            "bbox": 10646,
+            "bbox": 10997,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -980,7 +980,7 @@
                 20,
                 5
             ],
-            "bbox": 10652,
+            "bbox": 11003,
             "colour": "black",
             "endx": 225.0,
             "endy": 125.0,
@@ -1003,7 +1003,7 @@
                 false,
                 ""
             ],
-            "bbox": 10678,
+            "bbox": 11029,
             "dccaspects": [
                 [
                     [
@@ -1874,7 +1874,7 @@
         },
         "9ac66673-362c-4529-a451-6dba32782869": {
             "background": "grey85",
-            "bbox": 10681,
+            "bbox": 11032,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1900,7 +1900,7 @@
                 false,
                 ""
             ],
-            "bbox": 10698,
+            "bbox": 11049,
             "dccaspects": [
                 [
                     [
@@ -2759,7 +2759,7 @@
             ]
         },
         "e26bc73f-b67e-4fed-ae67-8971af1d7b92": {
-            "bbox": 10702,
+            "bbox": 11053,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2771,7 +2771,7 @@
         },
         "e497d420-ad7a-4cb5-877c-6dbd0d849296": {
             "background": "grey85",
-            "bbox": 10705,
+            "bbox": 11056,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2797,7 +2797,7 @@
                 false,
                 ""
             ],
-            "bbox": 10731,
+            "bbox": 11082,
             "dccaspects": [
                 [
                     [
@@ -3678,7 +3678,7 @@
                 false,
                 ""
             ],
-            "bbox": 10757,
+            "bbox": 11108,
             "dccaspects": [
                 [
                     [
@@ -4586,7 +4586,7 @@
             "filename": "/home/john/model-railway-signalling/user_guide/networking1-node2.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.5.1"
+            "version": "Version 4.6.0"
         },
         "gpio": {
             "portmappings": [],
