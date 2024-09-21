@@ -92,11 +92,10 @@ def open_entry_box(section_id):
     if entry_box_window is not None:
         text_entry_box.destroy()
         canvas.delete(entry_box_window)
-    # Set the font size and length for the text entry box
-    font_size = common.fontsize
+    # Set the length for the text entry box
     label_length = sections[str(section_id)]["labellength"]
     # Create the entry box and bind the RETURN, ESCAPE and FOCUSOUT events to it
-    text_entry_box = Tk.Entry(canvas,width=label_length,font=('Courier',font_size,"normal"))
+    text_entry_box = Tk.Entry(canvas,width=label_length,font=('Courier',9,"bold"))
     text_entry_box.bind('<Return>', lambda event:accept_entered_value(section_id))
     text_entry_box.bind('<Escape>', lambda event:close_entry_box(section_id))
     text_entry_box.bind('<FocusOut>', lambda event:accept_entered_value(section_id))
@@ -335,7 +334,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         # Create the button object, callbacks and window to hold it. Note the Mouse button events are
         # only bound to the button if the Section is editable - otherwise the button will be disabled
         section_button = Tk.Button(canvas, text=default_label, state="normal", relief="raised",
-                                   width=label_width, font=('Courier',common.fontsize,"normal"),
+                                   width=label_width, font=('Courier',9,"bold"),
                                    bg="grey", fg="grey40", padx=common.xpadding, pady=common.ypadding,
                                    activebackground="grey", activeforeground="grey40")
         if editable:
@@ -347,8 +346,8 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
         # Note that the canvas Text object width is defined in pixels so we have to use the fointsize
         # The Placeholder label is always the Track Section ID so it can be identified on the edit canvas
-        placeholder1 = canvas.create_text(x, y, text=default_label, width=label_width*common.fontsize,                  
-                                    font=('Courier',common.fontsize,"normal"), fill="white", tags=canvas_tag)
+        placeholder1 = canvas.create_text(x, y, text=default_label, width=label_width*9,                  
+                                    font=('Courier',9,"bold"), fill="white", tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
                     tags=canvas_tag, fill="black")
