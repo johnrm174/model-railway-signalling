@@ -486,7 +486,7 @@ def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
     if has_theatre:
         rectangle_coords = common.rotate_line(x,y,xoff-6,yoff+6,xoff+8,yoff-6,orientation)
         canvas.create_rectangle(rectangle_coords,fill="black",tags=canvas_tag)
-        theatre_text = canvas.create_text(text_coordinates,fill="white",font=('Courier',common.fontsize+1,"bold"),
+        theatre_text = canvas.create_text(text_coordinates,fill="white",font=('Courier',9,"bold"),
                                           angle=orientation-90,state='normal',tags=canvas_tag)
     else:
         theatre_text = canvas.create_text(text_coordinates,state='hidden',tags=canvas_tag)
