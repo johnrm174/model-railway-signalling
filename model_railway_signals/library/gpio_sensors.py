@@ -297,7 +297,7 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
             # We use exception handling to catch any failures (i.e. gpio port being used by another app)
             if gpio_port_mappings[str(gpio_channel)]["sensor_device"] is None:
                 try:
-                    gpio_port_mappings[str(gpio_channel)]["sensor_device"] = gpiozero.Button(pin=gpio_channel, bounce_time=0.001)
+                    gpio_port_mappings[str(gpio_channel)]["sensor_device"] = gpiozero.Button(pin=gpio_channel, pull_up=True)
                     gpio_port_mappings[str(gpio_channel)]["sensor_device"].when_held = lambda:gpio_triggered_callback(gpio_channel)
                 except:
                     logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+
