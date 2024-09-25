@@ -59,7 +59,6 @@ import logging
 import tkinter as Tk
 from typing import Union
 
-from . import common
 from . import mqtt_interface
 from . import file_interface
     
@@ -329,13 +328,15 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         logging.error("Section "+str(section_id)+": create_section - (Remote) Mirrored Section ID is invalid format")        
     else:
         logging.debug("Section "+str(section_id)+": Creating Track Occupancy Section")
+        # Specify the fontsize locally
+        fontsize = 9
         # We need the default label width to set the width of the Track section button
         label_width = len(default_label)
         # Create the button object, callbacks and window to hold it. Note the Mouse button events are
         # only bound to the button if the Section is editable - otherwise the button will be disabled
         section_button = Tk.Button(canvas, text=default_label, state="normal", relief="raised",
-                                   width=label_width, font=('Courier',9,"bold"),
-                                   bg="grey", fg="grey40", padx=common.xpadding, pady=common.ypadding,
+                                   width=label_width, font=('Courier',fontsize,"bold"),
+                                   bg="grey", fg="grey40", padx=0, pady=0,
                                    activebackground="grey", activeforeground="grey40")
         if editable:
             section_button.bind('<Button-1>', lambda event:section_button_event(section_id))
@@ -346,10 +347,10 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
         # Note that the canvas Text object width is defined in pixels so we have to use the fointsize
         # The Placeholder label is always the Track Section ID so it can be identified on the edit canvas
-        placeholder1 = canvas.create_text(x, y, text=default_label, width=label_width*9,                  
-                                    font=('Courier',9,"bold"), fill="white", tags=canvas_tag)
+        placeholder1 = canvas.create_text(x, y, text=default_label, width=label_width*fontsize,                  
+                                    font=('Courier',fontsize,"bold"), fill="white", tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
-        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
+        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-2, bbox[2]+4, bbox[3]+0,
                     tags=canvas_tag, fill="black")
         canvas.tag_raise(placeholder1,placeholder2)
         canvas.itemconfigure(placeholder1, text=format(section_id,'02d'))
