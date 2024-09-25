@@ -293,7 +293,7 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         # 'route2' is the tag for route lines through the point when the point is in its switched configuration
         # Single slips can form a crossover so we also use 'route3' for the 'crossing' route ('route1' is the 'straight' route
         blade1_tag, blade2_tag = canvas_tag+"blade1", canvas_tag+"blade2"
-        route1_tag, route2_tag, route3_tag = canvas_tag+"route1", canvas_tag+"route2", canvas_tag+"route3"
+        route1_tag, route2_tag = canvas_tag+"route1", canvas_tag+"route2"
         # How the tags actually get applied to the point drawing objects will depend on whether the point is reversed or not
         if reverse: blade1, blade2, route1, route2 = blade2_tag, blade1_tag, route2_tag, route1_tag
         else: blade1, blade2, route1, route2 = blade1_tag, blade2_tag, route1_tag, route2_tag
