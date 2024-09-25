@@ -3290,7 +3290,7 @@
             "filename": "/home/john/model-railway-signalling/configuration_examples/complex_trackwork.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.6.0"
+            "version": "Version 4.6.1"
         },
         "gpio": {
             "portmappings": [],
