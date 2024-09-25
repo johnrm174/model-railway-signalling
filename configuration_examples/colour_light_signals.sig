@@ -52219,7 +52219,7 @@
             "filename": "/home/john/model-railway-signalling/configuration_examples/colour_light_signals.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.6.0"
+            "version": "Version 4.6.1"
         },
         "gpio": {
             "portmappings": [],

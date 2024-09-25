@@ -41,7 +41,6 @@
 import logging
 import tkinter as Tk
 
-from . import common
 from ..editor.common import CreateToolTip
 
 from . import file_interface
@@ -252,10 +251,12 @@ def create_button (canvas, button_id:int, x:int, y:int,
         logging.error("Button "+str(button_id)+": create_button - Button ID already exists")
     else:
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
+        # Specify the fontsize locally
+        fontsize = 9
         # Create the button object, callbacks and window to hold it.
         button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, disabledforeground="grey40",
-                           font=('Courier',common.fontsize,"normal"), bg="SeaGreen3", activebackground="SeaGreen2",
-                           padx=common.xpadding, pady=common.ypadding, command=lambda:button_event(button_id))
+                           font=('Courier',fontsize,"normal"), bg="SeaGreen3", activebackground="SeaGreen2",
+                           padx=2, pady=2, command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag)
         # Create and store a tool-tip for the button
         tooltip_object = CreateToolTip(button, text=tooltip)
@@ -264,10 +265,10 @@ def create_button (canvas, button_id:int, x:int, y:int,
         # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
         # Note that the 'width' parameter is the maximum width in pixels before the text starts to wrap. To set the
         # minimum width we need to specify an initial 'text' value that contains the required number of characters.
-        placeholder1 = canvas.create_text(x, y, text=label.zfill(width), width=width*common.fontsize,                  
-                                  font=('Courier',common.fontsize,"normal"), fill="black", tags=canvas_tag)
+        placeholder1 = canvas.create_text(x, y, text=label.zfill(width), width=width*fontsize,                  
+                                  font=('Courier',fontsize,"normal"), fill="black", tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
-        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
+        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-4, bbox[2]+4, bbox[3]+2,
                                                tags=canvas_tag, fill="SeaGreen3")
         canvas.tag_raise(placeholder1, placeholder2)
         # Now we have created the textbox at the right width, update it to display the 'proper' label

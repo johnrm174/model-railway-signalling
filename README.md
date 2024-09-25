@@ -22,24 +22,11 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.6.0:
+## What's new for Release 4.6.1:
 
-BREAKING CHANGE - Single Slip and Double Slip points have been shortened to improve route highlighting but
-this does mean you will need to edit your schematic (extend track lines) to take account of this change.
-Also, Double Slip points have been changed to give a straight route through the point for their default state.
-
-* New feature to scroll canvas via mouse (drag and drop) in Run Mode - useful for larger layouts
-* Changed default GPIO sensor timeout to 20ms (the optimum value I have arrived at by testing)
-* Improvement - Item IDs (signals, points, lines etc) can now be in the range 1-999
-* Improvement - Route selection buttons are now always displayed on top of route lines
-* Improvement - Text Boxes are now always displayed on top of route lines
-* Improvement - Improved representation of Trap Points and single slip points
-* Improvement - Improved Route highlighting through points (for most point types)
-* Improvement - Improved readability for theatre route indications and track occupancy
-* Bugfix to GPIO sensors - to prevent the occasional spurious segmentation errors on settings apply
-* Bugfix to timed signals (triggered by another signal) - to prevent spurious SPAD warnings
-* Bugfix to handle update of Route ID (if changed by user in the route configuration dialog)
-* Bugfix to schematic route highlighting for 'Y' points (route now correctly highlighted)
+* HOTFIX - Removed GPIO sensor de-bounce as this was causing sensor triggering issues
+* Improvement - Reduced scroll rate when scrolling canvas via mouse (drag and drop) in Run Mode
+* Improvement - Increased fontsize and padding for Route Buttons (easier to select via touchscreen)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

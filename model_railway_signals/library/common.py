@@ -36,9 +36,9 @@ from . import buttons
 # Global variables for how the signals/points/sections buttons appear
 # on the screen. This is to allow the appearance to be optimised for
 # particular window sizes/screen resolutions.
-fontsize = 8  # Used by the Signals, Points and sections modules
-xpadding = 2  # Used by the Signals, Points and sections modules
-ypadding = -1  # Used by the Signals, Points and sections modules
+fontsize = 8  # Used by the Signals and Points modules
+xpadding = 2  # Used by the Signals and Points modules
+ypadding = -1  # Used by the Signals and Points modules
 bgraised = "grey85"   # Used by the Signals and Points modules
 bgsunken = "white"    # Used by the Signals and Points modules
 

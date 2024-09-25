@@ -601,7 +601,7 @@ def track_cursor(event):
         canvas.coords(schematic_state["selectareabox"],x1,y1,canvas_x,canvas_y)
     elif schematic_state["movewindow"]:
         # Scroll the canvas within the main window
-        canvas.scan_dragto(event.x, event.y)
+        canvas.scan_dragto(event.x, event.y, gain=1)
     return()
 
 #------------------------------------------------------------------------------------

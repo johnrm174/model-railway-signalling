@@ -432,6 +432,7 @@ def trigger_timed_signal_sequence(int_signal_id:int):
 def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_level:int=0):
     if recursion_level < 20:
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
+        initial_signal_aspect = signals.signal_state(int_signal_id)
         if (signal_object["itemtype"] == signals.signal_type.colour_light.value or
                  signal_object["itemtype"] == signals.signal_type.semaphore.value):
             signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
@@ -449,12 +450,14 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
                     signals.clear_approach_control(int_signal_id)
             else:
                 signals.clear_approach_control(int_signal_id)
-        # Update the signal aspect and work back along the route to see if any other signals need
-        # approach control to be set/cleared depending on the updated aspect of this signal
-        process_signal_aspect_update(int_signal_id)    
-        int_signal_behind_id = find_signal_behind(int_signal_id)
-        if int_signal_behind_id is not None:
-            update_signal_approach_control(int_signal_behind_id, False, recursion_level+1)
+            # Update the signal aspect and change the displayed aspect of any signals behind (if required)
+            process_signal_aspect_update(int_signal_id)    
+            # If the displayed aspect has changed then we also need to work back along the route to update
+            # the approach control status of any signals behind (for the semaphore approach control use case)
+            if signals.signal_state(int_signal_id) != initial_signal_aspect:
+                int_signal_behind_id = find_signal_behind(int_signal_id)
+                if int_signal_behind_id is not None:
+                    update_signal_approach_control(int_signal_behind_id, False, recursion_level+1)
     else:
         logging.error("RUN LAYOUT - Update Approach Control on signals ahead - Maximum recursion level reached")
     return()
