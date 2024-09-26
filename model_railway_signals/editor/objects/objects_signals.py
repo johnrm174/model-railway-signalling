@@ -527,7 +527,6 @@ def redraw_signal_object(object_id):
                     rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][3],
                     rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
-                    refresh_immediately = False,
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"])
         # set the initial theatre route indication (for MAIN) for the signal if appropriate
         if objects_common.schematic_objects[object_id]["theatreroute"]:

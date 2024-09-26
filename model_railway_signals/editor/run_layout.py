@@ -351,10 +351,11 @@ def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:in
     return()
 
 #------------------------------------------------------------------------------------
-# Functions to update a signal aspect based on the signal ahead and then to work back
-# along the set route to update any other signals that need changing. Note that the
-# signal ID could be LOCAL or REMOTE. We only update on the signal ahead for LOCAL
-# signals but always update the signals behind for LOCAL or REMOTE signals.
+# Internal function to update a colour light signal aspect based on the displayed aspect
+# of the signal ahead and then to work back along the set route to update any other colour
+# light signals signals need changing. Note that the signal ID could be LOCAL or REMOTE.
+# We only update on the signal ahead for LOCAL signals (as we have no idea of the signal
+# ahead on the other schematic) but update the signals behind for LOCAL or REMOTE signals.
 #------------------------------------------------------------------------------------
 
 def process_signal_aspect_update(int_or_str_signal_id:Union[int,str]):
@@ -450,7 +451,8 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
                     signals.clear_approach_control(int_signal_id)
             else:
                 signals.clear_approach_control(int_signal_id)
-            # Update the signal aspect and change the displayed aspect of any signals behind (if required)
+            # Update the signal aspect (for colour light signals) and work back along the route to change the displayed
+            # aspect of any colour light signals behind (if the displayed aspect of the current signal has changed)
             process_signal_aspect_update(int_signal_id)    
             # If the displayed aspect has changed then we also need to work back along the route to update
             # the approach control status of any signals behind (for the semaphore approach control use case)
