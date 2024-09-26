@@ -25,7 +25,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 ## What's new for Release 4.7.0:
 
 * New Feature - Ability to hide track sections in RUN Mode (to meet a specific use case for my layout)
-* TBD
+* New Feature - Ability to change point/signal button sizes via the editor (aids selection via a touchscreen)
 * TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
