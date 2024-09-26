@@ -584,6 +584,7 @@ class main_menubar:
     def general_settings_update(self):
         # The spad popups enabled flag is the 6th parameter returned
         run_layout.configure_spad_popups(settings.get_general()[5])
+        library_common.configure_button_size(settings.get_general()[6])
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions

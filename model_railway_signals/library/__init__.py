@@ -129,12 +129,14 @@ from .file_interface import save_schematic
 from .common import set_root_window
 from .common import shutdown
 from .common import configure_edit_mode
+from .common import configure_button_size
 
 __all__ = [
       # Public common functions
         'set_root_window',
         'shutdown',
         'configure_edit_mode',
+        'configure_button_size',
       # Public point types/functions
         'point_type',
         'create_point',

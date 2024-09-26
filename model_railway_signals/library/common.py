@@ -11,6 +11,8 @@
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
+#   configure_button_size(button_size:int) - Specify the Font size for layout control buttons)
+#
 # External API - classes and functions (used by the other library modules):
 #
 #   execute_function_in_tkinter_thread(callback_function) - Will 'pass' the function
@@ -55,6 +57,15 @@ def configure_edit_mode(edit_mode:bool):
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     buttons.configure_edit_mode(edit_mode)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to configure the font size for layout control buttons (points/signals)
+#------------------------------------------------------------------------------------
+
+def configure_button_size(button_size:int):
+    global fontsize
+    fontsize = button_size
     return()
 
 #-------------------------------------------------------------------------

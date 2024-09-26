@@ -54,6 +54,7 @@ default_settings["general"]["version"] = "Version 4.6.1"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
+default_settings["general"]["buttonsize"] = 8
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
@@ -162,15 +163,17 @@ def get_general(param=None):
     info = settings["general"]["info"]
     automation = settings["general"]["automation"]
     spad = settings["general"]["spadpopups"]
-    return(filename, editmode, version, info, automation, spad)
+    buttonsize = settings["general"]["buttonsize"]
+    return(filename, editmode, version, info, automation, spad, buttonsize)
 
-def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None, automation:bool=None, spad:bool=None):
+def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None, automation:bool=None, spad:bool=None, buttonsize:int=None):
     if filename is not None: settings["general"]["filename"] = filename
     if editmode is not None: settings["general"]["editmode"] = editmode
     if version is not None: settings["general"]["version"] = version
     if info is not None: settings["general"]["info"] = info
     if automation is not None: settings["general"]["automation"] = automation
     if spad is not None: settings["general"]["spadpopups"] = spad
+    if buttonsize is not None: settings["general"]["buttonsize"] = buttonsize
     return()
 
 #------------------------------------------------------------------------------------
