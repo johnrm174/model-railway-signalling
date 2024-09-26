@@ -13,6 +13,7 @@
 #     Optional parameters:
 #       default_label:str - The default label to display when occupied - default = 'OCCUPIED'
 #       editable:bool - If the section can be manually toggled and/or edited - default = True
+#       hidden:bool - Whether the Track section should be 'hidden' in Run Mode - default = False
 #       mirror_id:str - The ID of another local/remote Section to mirror - default = None
 #
 #   section_exists(section_id:int/str) - returns true if the Track Section object 'exists' (either the
@@ -159,7 +160,8 @@ def configure_edit_mode(edit_mode:bool):
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='normal')
                 track_section["canvas"].itemconfig(track_section["placeholder2"], state='normal')
             else:
-                track_section["canvas"].itemconfig(track_section["buttonwindow"], state='normal')
+                if not track_section["hidden"]:
+                    track_section["canvas"].itemconfig(track_section["buttonwindow"], state='normal')
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='hidden')
                 track_section["canvas"].itemconfig(track_section["placeholder2"], state='hidden')
     return()
@@ -309,7 +311,7 @@ def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
 #---------------------------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int, section_callback,
-                    default_label:str="OCCUPIED", editable:bool=True, mirror_id:str=""):
+                    default_label:str="OCCUPIED", editable:bool=True, hidden=False, mirror_id:str=""):
     global sections
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "section"+str(section_id)
@@ -355,9 +357,11 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         canvas.tag_raise(placeholder1,placeholder2)
         canvas.itemconfigure(placeholder1, text=format(section_id,'02d'))
         # Display either the button or button 'placeholder' depending on the mode
+        # Note thet the button is hidden in Run Mode if the track section is'hidden'
         if editing_enabled:
             canvas.itemconfig(button_window, state='hidden')
         else:
+            if hidden: canvas.itemconfig(button_window, state='hidden')
             canvas.itemconfig(placeholder1, state='hidden')
             canvas.itemconfig(placeholder2, state='hidden')
         # Compile a dictionary of everything we need to track
@@ -365,6 +369,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         sections[str(section_id)]["canvas"] = canvas                  # Tkinter canvas object
         sections[str(section_id)]["extcallback"] = section_callback   # External callback to make
         sections[str(section_id)]["mirror"] = mirror_id               # Other Local or Remote section to mirror
+        sections[str(section_id)]["hidden"] = hidden                  # Display/hide the Track Sensor in Run Mode
         sections[str(section_id)]["labellength"] = label_width        # The fixed width for the train designator
         sections[str(section_id)]["occupied"] = False                 # Current state (occupied/clear)
         sections[str(section_id)]["labeltext"] = default_label        # Current state (train designator)

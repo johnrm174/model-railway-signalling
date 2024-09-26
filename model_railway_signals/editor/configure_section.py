@@ -241,9 +241,12 @@ class section_configuration_tab():
         # Create a labelframe for the General settings
         self.subframe1 = Tk.LabelFrame(self.frame1, text="General Settings")
         self.subframe1.pack(padx=2, pady=2, fill='x')
-        self.readonly = common.check_box(self.subframe1, label="Read only",
+        self.readonly = common.check_box(self.subframe1, width=12, label="Read only",
                      tool_tip= "Select to make the Track Section non-editable")
         self.readonly.pack(padx=2, pady=2)
+        self.hidden = common.check_box(self.subframe1, width=12, label="Hidden",
+                     tool_tip= "Select to hide the Track Section in Run Mode")
+        self.hidden.pack(padx=2, pady=2)
         # Create a Label Frame to hold the "Mirror" section. Note that this needs a
         # reference to the parent object to access the current value of Section ID
         self.mirror = mirrored_section(parent_tab)
@@ -344,6 +347,7 @@ class edit_section():
             # Set the Initial UI state from the current object settings
             self.config.sectionid.set_value(item_id)
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
+            self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
             self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
@@ -372,6 +376,7 @@ class edit_section():
             # Update the section coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.config.sectionid.get_value()
             new_object_configuration["editable"] = not self.config.readonly.get_value()
+            new_object_configuration["hidden"] = self.config.hidden.get_value()
             new_object_configuration["mirror"] = self.config.mirror.get_value()
             new_object_configuration["defaultlabel"] = self.config.label.get_value()
             # Save the updated configuration (and re-draw the object)

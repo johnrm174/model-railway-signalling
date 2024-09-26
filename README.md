@@ -22,11 +22,11 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.6.1:
+## What's new for Release 4.7.0:
 
-* HOTFIX - Removed GPIO sensor de-bounce as this was causing sensor triggering issues
-* Improvement - Reduced scroll rate when scrolling canvas via mouse (drag and drop) in Run Mode
-* Improvement - Increased fontsize and padding for Route Buttons (easier to select via touchscreen)
+* New Feature - Ability to hide track sections in RUN Mode (to meet a specific use case for my layout)
+* TBD
+* TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
