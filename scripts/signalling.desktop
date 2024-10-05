@@ -1,10 +1,14 @@
 # Example desktop entry for running up the autostart script (signalling.sh)
-# File should be saved as: /home/pi/.config/autostart/signalling.desktop
-# This will then autostart the application on Pi startup (user login)
-# Useful for remote nodes being used to publish networked track sensors
+# This file should be saved as: /home/<user>/.config/autostart/signalling.desktop
+# This will then autostart the application once the Pi has started up (user login)
+# Primarily intended for running up the application on remote track sensor nodes
 #
 [Desktop Entry]
 Type=Application
 Name=Signalling
 Terminal=false
-Exec=sh /home/pi/.config/autostart/signalling.sh
+#
+# Remember to change 'signalbox' to your user name to set the correct path
+#
+Exec=lxterminal -e "sh /home/signalbox/.config/autostart/signalling.sh"
+
