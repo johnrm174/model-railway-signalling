@@ -960,7 +960,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')
     # Initialise the Objects and run_layout modules with the canvas details
-    objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
+    objects.initialise(root_window, canvas, canvas_width, canvas_height, canvas_grid)
     run_layout.initialise(root_window, canvas)
     run_routes.initialise(root_window, canvas)
     return()

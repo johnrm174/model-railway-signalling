@@ -15,6 +15,10 @@
 #       width:int - The width of the  button in characters (default 10)
 #       label:int - The label for the button (default is empty string)
 #       tooltip:str - the default tooltip to be displayed (default is empty string)
+#       button_colour:str - the colour to use for the button when 'normal' (default='SeaGreen3')
+#       active_colour:str - the colour to use for the button when 'active' (default='SeaGreen2')
+#       selected_colour:str - the colour to use for the button when 'selected' (default='SeaGreen1')
+#       text_colour:str - the colour to use for the button text (default='black')
 #
 #   processing_complete(button_id:int) - 'activate' the button after completing the associated processing
 #
@@ -196,9 +200,9 @@ def update_button_appearance(button_id:int):
         buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["enabledtooltiptext"]
     # Activate or deactivate the button
     if buttons[str(button_id)]["selected"]:
-        buttons[str(button_id)]["button"].config(relief="sunken",bg="SeaGreen1")
+        buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
     else:
-        buttons[str(button_id)]["button"].config(relief="raised",bg="SeaGreen3")
+        buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["buttoncolour"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -238,9 +242,9 @@ def button_enabled(button_id:int):
 # Public API function to create a Button object (drawing objects plus internal state)
 #---------------------------------------------------------------------------------------------
 
-def create_button (canvas, button_id:int, x:int, y:int,
-                   selected_callback, deselected_callback,
-                    width:int=10, label:str="", tooltip=""):
+def create_button (canvas, button_id:int, x:int, y:int, selected_callback, deselected_callback, width:int=10,
+                   label:str="", tooltip="", button_colour:str="SeaGreen3",  active_colour:str="SeaGreen2",
+                   selected_colour:str="SeaGreen1", text_colour:str="black"):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "button"+str(button_id)
@@ -255,8 +259,8 @@ def create_button (canvas, button_id:int, x:int, y:int,
         fontsize = 9
         # Create the button object, callbacks and window to hold it.
         button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, disabledforeground="grey40",
-                           font=('Courier',fontsize,"normal"), bg="SeaGreen3", activebackground="SeaGreen2",
-                           padx=2, pady=2, command=lambda:button_event(button_id))
+                        font=('Courier',fontsize,"normal"), bg=button_colour, activebackground=active_colour, padx=2, pady=2,
+                        activeforeground=text_colour, fg=text_colour,  command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag)
         # Create and store a tool-tip for the button
         tooltip_object = CreateToolTip(button, text=tooltip)
@@ -266,10 +270,10 @@ def create_button (canvas, button_id:int, x:int, y:int,
         # Note that the 'width' parameter is the maximum width in pixels before the text starts to wrap. To set the
         # minimum width we need to specify an initial 'text' value that contains the required number of characters.
         placeholder1 = canvas.create_text(x, y, text=label.zfill(width), width=width*fontsize,                  
-                                  font=('Courier',fontsize,"normal"), fill="black", tags=canvas_tag)
+                                  font=('Courier',fontsize,"normal"), fill=text_colour, tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-4, bbox[2]+4, bbox[3]+2,
-                                               tags=canvas_tag, fill="SeaGreen3")
+                                               tags=canvas_tag, fill=button_colour)
         canvas.tag_raise(placeholder1, placeholder2)
         # Now we have created the textbox at the right width, update it to display the 'proper' label
         canvas.itemconfig(placeholder1, text=label)
@@ -294,6 +298,8 @@ def create_button (canvas, button_id:int, x:int, y:int,
         buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
         buttons[str(button_id)]["enabled"] = False                            # Flag to indicate if the button is enabled/disabled
         buttons[str(button_id)]["processing"] = False                         # True between button press and processing complete events
+        buttons[str(button_id)]["buttoncolour"] = button_colour               # button colour in its normal/unselected state
+        buttons[str(button_id)]["selectedcolour"] = selected_colour           # button colour in its selected state
         buttons[str(button_id)]["tags"] = canvas_tag                          # Canvas Tag for ALL drawing objects
         # Get the initial state for the button (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("buttons",button_id)

@@ -32,6 +32,7 @@
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
+#    objects_common.root - Reference to the Tkinter root object
 #
 ## Makes the following external API calls to library modules:
 #    buttons.create_button(id) - Create the library object
@@ -62,9 +63,11 @@ default_route_object["pointsonroute"] = {}
 default_route_object["linestohighlight"] = []
 default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
+default_route_object["buttoncolour"] = "SeaGreen3"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
 default_route_object["tracksensor"] = 0
+default_route_object["setupsensor"] = 0
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from the Route's points table.
@@ -221,11 +224,47 @@ def update_route(object_id, new_object_configuration):
     return()
 
 #------------------------------------------------------------------------------------
+# Internal Function to calculate an appropriate colour for the 'active' and 'selected' button
+# state based on the selected colour for the button - Full acknowledgement to stack overflow
+#------------------------------------------------------------------------------------
+
+def get_offset_colour(colour:str, brightness_offset:int):
+    # First we ensure the colour is in Hex format
+    rgb = objects_common.root.winfo_rgb(colour)
+    r,g,b = [x>>8 for x in rgb]
+    hex_colour = '#{:02x}{:02x}{:02x}'.format(r,g,b)
+    # Now we can work out the 'offset colour' from this
+    rgb_hex = [hex_colour[x:x+2] for x in [1, 3, 5]]
+    new_rgb_int = [int(hex_value, 16) + brightness_offset for hex_value in rgb_hex]
+    new_rgb_int = [min([255, max([0, i])]) for i in new_rgb_int]
+    # hex() produces "0x88", we want just "88"
+    active_colour = "#" + "".join([hex(i)[2:] for i in new_rgb_int])
+    return(active_colour)
+
+#------------------------------------------------------------------------------------
+# Internal Function to set the text colour to black or white depending on the overall
+# intensities of the background RGB elements - Full acknowledgement to stack overflow
+#------------------------------------------------------------------------------------
+
+def get_text_colour(colour:str):
+    rgb = objects_common.root.winfo_rgb(colour)
+    r,g,b = [x>>8 for x in rgb]
+    if (r*0.299 + g*0.587 + b*0.114) > 186: text_colour = "#000000"
+    else: text_colour = "#FFFFFF"
+    return(text_colour)
+
+#------------------------------------------------------------------------------------
 # Function to re-draw a Route object on the schematic. Called when the object
 # is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
         
 def redraw_route_object(object_id):
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be - using the brightest of the three
+    text_colour= get_text_colour(selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -235,7 +274,9 @@ def redraw_route_object(object_id):
                 deselected_callback = run_routes.clear_schematic_route_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
-                tooltip = objects_common.schematic_objects[object_id]["routedescription"] )
+                tooltip = objects_common.schematic_objects[object_id]["routedescription"],
+                button_colour = button_colour, active_colour = active_colour,
+                selected_colour = selected_colour, text_colour = text_colour)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)

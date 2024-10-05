@@ -20,6 +20,7 @@
 #
 # Objects intended to be accessed directly by other editor modules:
 #
+#    root - global reference to the Tkinter root object
 #    canvas - global reference to the Tkinter drawing object
 #    object_type - Enumeration type for the supported objects
 #    schematic_objects - for accessing/editing the configuration of an object
@@ -107,13 +108,15 @@ default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 #------------------------------------------------------------------------------------
 
 canvas = None
+root = None
 canvas_width = 0
 canvas_height = 0
 canvas_grid = 0
 
-def initialise (canvas_object, width:int, height:int, grid:int):
-    global canvas
+def initialise (root_object, canvas_object, width:int, height:int, grid:int):
+    global canvas, root
     canvas = canvas_object
+    root = root_object
     update_canvas(canvas_width, canvas_height, grid)
     return()
 
