@@ -243,10 +243,10 @@ class section_configuration_tab():
         self.subframe1.pack(padx=2, pady=2, fill='x')
         self.readonly = common.check_box(self.subframe1, width=12, label="Read only",
                      tool_tip= "Select to make the Track Section non-editable")
-        self.readonly.pack(padx=2, pady=2)
+        self.readonly.pack(padx=2)
         self.hidden = common.check_box(self.subframe1, width=12, label="Hidden",
                      tool_tip= "Select to hide the Track Section in Run Mode")
-        self.hidden.pack(padx=2, pady=2)
+        self.hidden.pack(padx=2)
         # Create a Label Frame to hold the "Mirror" section. Note that this needs a
         # reference to the parent object to access the current value of Section ID
         self.mirror = mirrored_section(parent_tab)
