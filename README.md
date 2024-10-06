@@ -24,9 +24,10 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release 4.7.0:
 
-* New Feature - Ability to hide track sections in RUN Mode (to meet a specific use case for my layout)
-* New Feature - Ability to change point/signal button sizes via the editor (aids selection via a touchscreen)
-* TBD
+* Track sections can optionally be hidden in RUN Mode (to meet a specific use case for my layout)
+* Point/signal button sizes can be changed via general settings (aids selection via a touchscreen)
+* The colour of the Schematic Route buttons can now be set by the user (for differentiating routes)
+* Setup of Schematic Routes can now be triggered from Track Sensors (useful for converging routes)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

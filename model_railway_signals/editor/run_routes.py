@@ -10,7 +10,7 @@
 #    check_routes_valid_after_point_change(point_id) - Clears down route highlighting if compromised
 #    check_routes_valid_after_signal_change(signal_id) - Clears down route highlighting if compromised
 #    check_routes_valid_after_subsidary_change(subsidary_id) - Clears down route highlighting if compromised
-#    clear_down_routes_after_sensor_passed(sensor_id) - automatically clear down routes on sensor passed events
+#    trigger_routes_after_sensor_passed(sensor_id) - automatically set up routes on sensor passed events
 #    enable_disable_schematic_routes() - enable/disable route buttons based on route viability
 #    initialise_all_schematic_routes() - highlight/unhighlight routes demending on mode and route selections
 #
@@ -54,6 +54,8 @@
 #    track_sections.section_occupied(inst_id) - Test if a track section is occupied
 #
 #------------------------------------------------------------------------------------
+
+import logging
 
 from . import run_layout
 
@@ -106,13 +108,13 @@ def configure_automation(automation:bool):
     return()
 
 #------------------------------------------------------------------------------------
-# This is a sub-function to test if any of thee signals along the route would be locked
-# by an opposing signal once the route has been set up. The function is called twice from
-# the enable_disable_schematic_routes function - once for the main signals on the route
-# and a second time for the subsidariy signals (attached to a main signal) on the route.
+# This is a sub-function to test if any of the signals along the route would be locked
+# by an opposing signal once the route has been set up. The function is called twice
+# from the parent functions function - once for the main signals on the route and a
+# second time for the subsidariy signals (attached to a main signal) on the route.
 #------------------------------------------------------------------------------------
 
-def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool, subsidaries:bool=False):
+def check_conflicting_signals(route_object:dict, route_tooltip:str, route_viable:bool, subsidaries:bool=False):
     # Set up the function to check Signals or subsidaries
     if subsidaries:
         signals_on_route_dict_key = "subsidariesonroute"
@@ -183,6 +185,60 @@ def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool
     return(route_tooltip, route_viable)
 
 #------------------------------------------------------------------------------------
+# This is a sub-function to test if any of the points along the route are locked in
+# the wrong position by a signal (preventing the route from being set up)
+#------------------------------------------------------------------------------------
+
+def check_conflicting_points(route_object:dict, route_tooltip:str, route_viable:bool):
+    # See if any points that need to be set for the route are locked by a signal at OFF
+    # Note that automatic signals are ignored (manual points should have been specified))
+    for str_point_id in route_object["pointsonroute"].keys():
+        automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
+        required_point_state = route_object["pointsonroute"][str_point_id]
+        int_point_id = int(str_point_id)
+        if not automatic_point and points.point_switched(int_point_id) != required_point_state and points.point_locked(int_point_id):
+            # We've found a manual point that needs switching for the route but is currently locked
+            # We then iterate through the signal interlocking table for the point to test each
+            # interlocked signal (and signal route) to find the signal(s) that are locking the point
+            # The Point interlocking Table comprises a variable length list of interlocked signals
+            # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+            # Each route element in the list of routes is a boolean value (True or False)
+            point_object = objects.schematic_objects[objects.point(int_point_id)]
+            for interlocked_signal in point_object["siginterlock"]:
+                interlocked_sig_id = interlocked_signal[0]
+                interlocked_routes = interlocked_signal[1]
+                for index, interlocked_route in enumerate(interlocked_routes):
+                    route_to_test = signals.route_type(index+1)
+                    if interlocked_route:
+                        if signals.signal_clear(interlocked_sig_id, route_to_test):
+                            message = "\nPoint "+str_point_id+" is locked by Signal "+str(interlocked_sig_id)
+                            route_tooltip = route_tooltip + message
+                            route_viable = False
+                        if run_layout.has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
+                            message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
+                            route_tooltip = route_tooltip + message
+                            route_viable = False
+    return(route_tooltip, route_viable)
+
+#------------------------------------------------------------------------------------
+# This is a sub-function to test if a given route is viable (i.e. the current state
+# of the points and signals on the layout do not prevent the route being set up)
+#------------------------------------------------------------------------------------
+
+def check_route_viable(str_route_id:str):
+    route_object = objects.schematic_objects[objects.route(str_route_id)]
+    route_tooltip, route_viable = "", True
+    # See if any points that need to be set for the route are locked by a signal at OFF
+    # Note that automatic signals are ignored (manual points should have been specified))
+    route_tooltip, route_viable = check_conflicting_points(route_object, route_tooltip, route_viable)
+    # See if any signals along the route WOULD be locked by an opposing signal once the route is set
+    # This function also tests to see any of the signals WOULD be locked by the Block Instrument Ahead
+    # and if any of the signals WOULD be locked by an occupied track section on the route ahead
+    route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable)
+    route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable, subsidaries=True)
+    return(route_tooltip, route_viable)
+
+#------------------------------------------------------------------------------------
 # This function is called after any layout state change that might affect the viability
 # of a schematic route, enabling or disabling the route buttons accordingly
 #------------------------------------------------------------------------------------
@@ -190,45 +246,13 @@ def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool
 def enable_disable_schematic_routes():
     # Iterate through all the schematic routes
     for str_route_id in objects.route_index.keys():
-        route_viable = True
-        route_tooltip = "Route cannot be set because:"
-        route_object = objects.schematic_objects[objects.route(str_route_id)]
-        # See if any points that need to be set for the route are locked by a signal at OFF
-        # Note that automatic signals are ignored (manual points should have been specified))
-        for str_point_id in route_object["pointsonroute"].keys():
-            automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
-            required_point_state = route_object["pointsonroute"][str_point_id]
-            int_point_id = int(str_point_id)
-            if not automatic_point and points.point_switched(int_point_id) != required_point_state and points.point_locked(int_point_id):
-                # We've found a manual point that needs switching for the route but is currently locked
-                # We then iterate through the signal interlocking table for the point to test each
-                # interlocked signal (and signal route) to find the signal(s) that are locking the point
-                # The Point interlocking Table comprises a variable length list of interlocked signals
-                # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-                # Each route element in the list of routes is a boolean value (True or False)
-                point_object = objects.schematic_objects[objects.point(int_point_id)]
-                for interlocked_signal in point_object["siginterlock"]:
-                    interlocked_sig_id = interlocked_signal[0]
-                    interlocked_routes = interlocked_signal[1]
-                    for index, interlocked_route in enumerate(interlocked_routes):
-                        route_to_test = signals.route_type(index+1)
-                        if interlocked_route:
-                            if signals.signal_clear(interlocked_sig_id, route_to_test):
-                                message = "\nPoint "+str_point_id+" is locked by Signal "+str(interlocked_sig_id)
-                                route_tooltip = route_tooltip + message
-                                route_viable = False
-                            if run_layout.has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
-                                message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
-                                route_tooltip = route_tooltip + message
-                                route_viable = False
-        # See if any signals along the route WOULD be locked by an opposing signal once the route is set
-        # This function also tests to see any of the signals WOULD be locked by the Block Instrument Ahead
-        # and if any of the signals WOULD be locked by an occupied track section on the route ahead
-        route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable)
-        route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable, subsidaries=True)
+        route_tooltip, route_viable = check_route_viable(str_route_id)
         # Enable/disable the route button as required
-        if route_viable: buttons.enable_button(int(str_route_id))
-        else: buttons.disable_button(int(str_route_id), route_tooltip)
+        if route_viable:
+            buttons.enable_button(int(str_route_id))
+        else:
+            route_tooltip = "Route "+str_route_id+" cannot be set because:"+route_tooltip
+            buttons.disable_button(int(str_route_id), route_tooltip)
     return()
 
 #------------------------------------------------------------------------------------
@@ -309,17 +333,29 @@ def check_routes_valid_after_point_change(point_id:int, route_id:int):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to automatically reset a schematic route after a track sensor passed event
+# Function to automatically set/reset a schematic route after a track sensor passed event
 #------------------------------------------------------------------------------------
 
-def clear_down_routes_after_sensor_passed(sensor_id:int):
+def trigger_routes_after_sensor_passed(sensor_id:int):
     for str_route_id in objects.route_index:
         route_object = objects.schematic_objects[objects.route(str_route_id)]
+        # Process the clear down of any routes (button is always enabled if active)
         if buttons.button_state(int(str_route_id)) and route_object["tracksensor"] == sensor_id:
-            # Reset the button to show the route has been cleared down
+            # Reset the button (and then lock it) to show the route has been deselected
             buttons.toggle_button(int(str_route_id))
-            # Schedule all the events to clear down the route
+            # Schedule all the events to clear down the route (finally unlocking the button)
             clear_schematic_route_callback(int(str_route_id))
+        # Process the set up of any routes (button may be enabled or disabled)
+        if not buttons.button_state(int(str_route_id)) and route_object["setupsensor"] == sensor_id:
+            # Only trigger the route setup if the route can be set up (i.e. route is viable)
+            route_tooltip, route_viable = check_route_viable(str_route_id)
+            if route_viable:
+                # Set the button (and then lock it) to show the route has been selected
+                buttons.toggle_button(int(str_route_id))
+                # Schedule all the events to set up the route (finally unlocking the button)
+                set_schematic_route_callback(int(str_route_id))
+            else:
+                logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+str_route_id+" set-up because:"+route_tooltip)
     return()
 
 #-------------------------------------------------------------------------------------------------
@@ -406,6 +442,7 @@ def complete_route_setup(route_id:int):
             if buttons.button_state(route_id): buttons.toggle_button(route_id)
         # Unlock the route button now the processing is complete
         buttons.processing_complete(route_id)
+        logging.info("RUN ROUTES - Set-up of Route "+str(route_id)+" is now complete **************************************")
     return()
 
 def complete_route_cleardown(route_id:int):
@@ -417,6 +454,7 @@ def complete_route_cleardown(route_id:int):
         lines.reset_line_colour(line_id)
     # Unlock the route button now the processing is complete 
     buttons.processing_complete(route_id)
+    logging.info("RUN ROUTES - Clear-down of Route "+str(route_id)+" is now complete **********************************")
     return()
 
 #------------------------------------------------------------------------------------
@@ -432,6 +470,7 @@ def complete_route_cleardown(route_id:int):
 #------------------------------------------------------------------------------------
 
 def set_schematic_route_callback(route_id:int):
+    logging.info("RUN ROUTES - Initiating set-up of Route "+str(route_id)+" *******************************************")
     # Retrieve the object configuration for the Route
     route_object = objects.schematic_objects[objects.route(route_id)]
     delay = route_object["switchdelay"]
@@ -492,6 +531,7 @@ def set_schematic_route_callback(route_id:int):
 #------------------------------------------------------------------------------------
 
 def clear_schematic_route_callback(route_id:int):
+    logging.info("RUN ROUTES - Initiating clear-down of Route "+str(route_id)+" ***************************************")
     # Retrieve the object configuration for the Route
     route_object = objects.schematic_objects[objects.route(route_id)]
     delay = route_object["switchdelay"]

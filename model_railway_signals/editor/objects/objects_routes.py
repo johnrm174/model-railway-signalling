@@ -182,26 +182,32 @@ def update_references_to_line(old_line_id:int, new_line_id:int):
 
 #------------------------------------------------------------------------------------
 # Function to remove references to a Sensor ID from the Route's configuration.
-# This is the 'tracksensor' element in the Route description dictionary.
+# These are the 'tracksensor' and 'setupsensor' elements in the Route dictionary.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_sensor(sensor_id:int):
     for route_id in objects_common.route_index:
-        current_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
-        if current_sensor_id == sensor_id:
+        current_cleardown_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
+        if current_cleardown_sensor_id == sensor_id:
             objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = 0
+        current_setup_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"]
+        if current_setup_sensor_id == sensor_id:
+            objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = 0
     return()
 
 #------------------------------------------------------------------------------------
 # Function to update references to a Sensor ID in the Route's configuration
-# This is the 'tracksensor' element in the Route description dictionary.
+# These are the 'tracksensor' and 'setupsensor' elements in the Route dictionary.
 #------------------------------------------------------------------------------------
 
 def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
     for route_id in objects_common.route_index:
-        current_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
-        if current_sensor_id == old_sensor_id:
+        current_cleardown_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
+        if current_cleardown_sensor_id == old_sensor_id:
             objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = new_sensor_id
+        current_setup_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"]
+        if current_setup_sensor_id == old_sensor_id:
+            objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = new_sensor_id
     return()
 
 #------------------------------------------------------------------------------------

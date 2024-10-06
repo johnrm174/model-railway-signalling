@@ -23,7 +23,13 @@
 #    objects.point(point_id) - To get the object_id for a given point_id
 #    objects.section(section_id) - To get the object_id for a given section_id
 #    objects.track_sensor(sensor_id) - To get the object_id for a given sensor_id
-#    
+#    run_routes.enable_disable_schematic_routes()
+#    run_routes.initialise_all_schematic_routes()
+#    run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
+#    run_routes.check_routes_valid_after_point_change(point_id, route_id)
+#    run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
+#    run_routes.trigger_routes_after_sensor_passed(sensor_id)
+#
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
 #    objects.object_type - used to establish the type of the schematic objects
@@ -1033,7 +1039,7 @@ def sensor_passed_callback(sensor_id:int):
             update_approach_control_status_for_all_signals()    
             override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
-    run_routes.clear_down_routes_after_sensor_passed(sensor_id)
+    run_routes.trigger_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
     return()
         
