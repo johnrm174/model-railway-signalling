@@ -56,6 +56,7 @@ from . import objects_routes
 default_track_sensor_object = copy.deepcopy(objects_common.default_object)
 default_track_sensor_object["item"] = objects_common.object_type.track_sensor
 default_track_sensor_object["passedsensor"] = ""
+default_track_sensor_object["hidden"] = False
 # The "routeahead" element comprises a list of routes: [main, lh1, lh2, rh1, rh2]
 # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
 # Each point element in the point list comprises [point_id, point_state]
@@ -217,8 +218,9 @@ def redraw_track_sensor_object(object_id):
     x = objects_common.schematic_objects[object_id]["posx"]
     y = objects_common.schematic_objects[object_id]["posy"]
     item_id = objects_common.schematic_objects[object_id]["itemid"]
+    hidden = objects_common.schematic_objects[object_id]["hidden"]
     callback = run_layout.sensor_passed_callback
-    canvas_tags = track_sensors.create_track_sensor(objects_common.canvas, item_id, x, y, callback=callback)
+    canvas_tags = track_sensors.create_track_sensor(objects_common.canvas, item_id, x, y, callback=callback, hidden=hidden)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
