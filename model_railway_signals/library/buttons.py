@@ -28,6 +28,7 @@
 #
 #   button_state(button_id:int) - get the current state of a button (returns True for Active)
 #
+#   ########### THIS FUNCTION NOT USED ANYWHERE - COINSIDER REMOVING ##################
 #   button_enabled(button_id:int) - get the current state of a button (returns True for Enabled)
 #
 #   toggle_button(button_id:int) - toggle the state of the button
@@ -102,17 +103,16 @@ def button_exists(button_id:int):
 #---------------------------------------------------------------------------------------------
 
 def button_event(button_id:int):
-    logging.info ("Button "+str(button_id)+": Button Toggled *********************************************************")
     buttons[str(button_id)]["processing"] = True
     update_button_appearance(button_id)
     if buttons[str(button_id)]["selected"]:
-        logging.info("Button "+str(button_id)+": has been de-selected")
+        logging.info("Button "+str(button_id)+": Button has been de-selected ***********************************************")
         buttons[str(button_id)]["selected"] = False
         buttons[str(button_id)]["processing"] = True
         update_button_appearance(button_id)
         buttons[str(button_id)]["deselectedcallback"] (button_id)
     else:
-        logging.info("Button "+str(button_id)+": has been selected")
+        logging.info("Button "+str(button_id)+": Button has been selected **************************************************")
         buttons[str(button_id)]["selected"] = True
         buttons[str(button_id)]["processing"] = True
         update_button_appearance(button_id)
@@ -223,6 +223,7 @@ def button_state(button_id:int):
 
 #---------------------------------------------------------------------------------------------
 # API function to get the current state of a Button (enabled or disabled)
+############ THIS FUNCTION NOT USED ANYWHERE - COINSIDER REMOVING ##################
 #---------------------------------------------------------------------------------------------
 
 def button_enabled(button_id:int):
