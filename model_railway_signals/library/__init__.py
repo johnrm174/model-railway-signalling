@@ -80,6 +80,10 @@ from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
 from .track_sensors import delete_track_sensor
 
+from .text_boxes import create_text_box
+from .text_boxes import text_box_exists
+from .text_boxes import delete_text_box
+
 from .pi_sprog_interface import sprog_connect
 from .pi_sprog_interface import sprog_disconnect
 from .pi_sprog_interface import service_mode_read_cv
@@ -119,7 +123,7 @@ from .buttons import toggle_button
 from .buttons import enable_button
 from .buttons import disable_button
 from .buttons import button_state
-from .buttons import button_enabled
+from .buttons import button_enabled #######UNUSED FUNCTION############
 from .buttons import processing_complete
 
 from .file_interface import load_schematic
@@ -156,6 +160,10 @@ __all__ = [
         'create_track_sensor',
         'delete_track_sensor',
         'track_sensor_exists',
+      # public text box types/functions
+        'create_text_box',
+        'delete_text_box',
+        'text_box_exists',
       # Public signal types/functions
         'signal_type',
         'signal_subtype',
