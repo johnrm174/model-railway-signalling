@@ -24,7 +24,10 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release 4.7.0:
 
-* Track Sections and Track Sensors can optionally be hidden in RUN Mode (supports additional use-cases)
+* Track Sections, Track Sensors and Text Boxes can be hidden in RUN Mode if required - this enables the
+schematic to be annonated with design notes in Edit Mode (which are then hidden in Run Mode). Also
+provides flexibility for implementing other niche automation use cases on your layout.
+* Ability to set the background colour of Text Boxes to 'Transparent (i.e. no fill colour)
 * Point/signal button sizes can be changed via general settings (aids selection via touchscreen monitors)
 * The colour of the Schematic Route buttons can now be set by the user (for differentiating route groups)
 * Setup of Schematic Routes can now be triggered from Track Sensors (useful for converging routes)

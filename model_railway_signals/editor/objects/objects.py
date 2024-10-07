@@ -506,6 +506,7 @@ def set_all(new_objects):
     ### Code block to Handle breaking changes - see later in the code for details ####
     ##################################################################################
     list_of_track_sensors_to_create =[]
+    one_up_text_box_id = 1
     ##################################################################################
     ################ End of code block to handle breaking changes ####################
     ##################################################################################
@@ -546,6 +547,18 @@ def set_all(new_objects):
                 if element not in default_object.keys():
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
+                #################################################################################################
+                ## Handle breaking change of text boxes being library objects from Release 4.7 onwards ##########
+                ## and hence requiring a unique item ID (even if this is 'under the hood') ######################
+                #################################################################################################
+                elif (new_object_type == objects_common.object_type.textbox and
+                      element == "itemid" and new_objects[object_id][element] == 0):
+                    objects_common.schematic_objects[object_id][element] = one_up_text_box_id
+                    one_up_text_box_id = one_up_text_box_id + 1
+                #################################################################################################
+                ## End of Handle breaking change for Text Box IDs ###############################################
+                #################################################################################################
+
                 #################################################################################################
                 ## Handle breaking change of tracks sections now a list of 3 sections from release 4.0.0 #########
                 ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
