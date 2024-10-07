@@ -156,14 +156,18 @@ def configure_edit_mode(edit_mode:bool):
         if section_id.isdigit():
             track_section = sections[section_id]
             if editing_enabled:
+                # In Edit Mode - Hide the button window and display all placeholder objects in their normal
+                # configuration (placeholder1 is the text object and placeholder2 is the rectangle object)
                 track_section["canvas"].itemconfig(track_section["buttonwindow"], state='hidden')
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='normal')
-                track_section["canvas"].itemconfig(track_section["placeholder2"], state='normal')
+                track_section["canvas"].itemconfig(track_section["placeholder2"], fill='black')
             else:
+                # In Run Mode - If the object is configured as 'hidden' then we hide the text object but set
+                # the rectangle object to transparent - effectively hiding it whilst maintaining its 'presence'
                 if not track_section["hidden"]:
                     track_section["canvas"].itemconfig(track_section["buttonwindow"], state='normal')
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='hidden')
-                track_section["canvas"].itemconfig(track_section["placeholder2"], state='hidden')
+                track_section["canvas"].itemconfig(track_section["placeholder2"], fill='')
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -333,44 +337,51 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         # Specify the fontsize locally
         fontsize = 9
         # We need the default label width to set the width of the Track section button
-        label_width = len(default_label)
-        # Create the button object, callbacks and window to hold it. Note the Mouse button events are
-        # only bound to the button if the Section is editable - otherwise the button will be disabled
+        label_length = len(default_label)
+        # Create the Section Button and its canvas window (for Run Mode operation). Note the Window
+        # is initially 'hidden', assuming edit mode - but changed later if we are in Run Mode
         section_button = Tk.Button(canvas, text=default_label, state="normal", relief="raised",
-                                   width=label_width, font=('Courier',fontsize,"bold"),
-                                   bg="grey", fg="grey40", padx=0, pady=0,
-                                   activebackground="grey", activeforeground="grey40")
+                            width=label_length, font=('Courier',fontsize,"bold"), bg="grey", fg="grey40",
+                            padx=3, pady=0, activebackground="grey", activeforeground="grey40")
+        # Bind the mouse button events to the Track Section - only if the Section is editable
+        # If not editable we also make the button disabled to prevent responses to clicking
         if editable:
             section_button.bind('<Button-1>', lambda event:section_button_event(section_id))
             section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
         else:
             section_button.config(state="disabled")
-        button_window = canvas.create_window(x, y, window=section_button, tags=canvas_tag)
-        # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
-        # Note that the canvas Text object width is defined in pixels so we have to use the fointsize
-        # The Placeholder label is always the Track Section ID so it can be identified on the edit canvas
-        placeholder1 = canvas.create_text(x, y, text=default_label, width=label_width*fontsize,                  
-                                    font=('Courier',fontsize,"bold"), fill="white", tags=canvas_tag)
+        button_window = canvas.create_window(x, y, window=section_button, tags=canvas_tag, state='hidden')
+        # Create the 'placeholders' for the button to display in Edit Mode (so it an be selected/moved)
+        # Note that we have to create the text object with the default section text in order to set the
+        # correct width (specifying a 'width' parameter in pixels doesn't seen to work for some reason)
+        placeholder1 = canvas.create_text(x, y, text=default_label, fill="white",
+                                    font=('Courier',fontsize,"bold"), tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-2, bbox[2]+4, bbox[3]+0,
-                    tags=canvas_tag, fill="black")
+                                    tags=canvas_tag, fill="black", width=0)
+        # Raise the text item to be in front of the rectangle item
         canvas.tag_raise(placeholder1,placeholder2)
+        # Now everything has been creted at the correct width, we can set the text for the placeholder
+        # which is always the Track Section ID so it can easily be identified on the edit canvas
         canvas.itemconfigure(placeholder1, text=format(section_id,'02d'))
-        # Display either the button or button 'placeholder' depending on the mode
-        # Note thet the button is hidden in Run Mode if the track section is'hidden'
-        if editing_enabled:
-            canvas.itemconfig(button_window, state='hidden')
-        else:
+        # Hide the placeholder objects if we are in Run Mode. Note we can't just make the rectangle
+        # 'hidden' as the canvas.bbox function (used by the editor to get the selection area) would
+        # just return zero values when subsequently queried (after the return from this function) and
+        # so the object would be unselectable when the user toggles back to edit mode. We therefore
+        # make the rectangle transparent (fill="") to effectively make it hidden. Note we also hide
+        # the button window if the Track Section itself needs to be 'hidden' in Run Mode.
+        if not editing_enabled:
             if hidden: canvas.itemconfig(button_window, state='hidden')
+            else: canvas.itemconfig(button_window, state='normal')
             canvas.itemconfig(placeholder1, state='hidden')
-            canvas.itemconfig(placeholder2, state='hidden')
+            canvas.itemconfig(placeholder2, fill='')
         # Compile a dictionary of everything we need to track
         sections[str(section_id)] = {}
         sections[str(section_id)]["canvas"] = canvas                  # Tkinter canvas object
         sections[str(section_id)]["extcallback"] = section_callback   # External callback to make
         sections[str(section_id)]["mirror"] = mirror_id               # Other Local or Remote section to mirror
         sections[str(section_id)]["hidden"] = hidden                  # Display/hide the Track Sensor in Run Mode
-        sections[str(section_id)]["labellength"] = label_width        # The fixed width for the train designator
+        sections[str(section_id)]["labellength"] = label_length        # The fixed width for the train designator
         sections[str(section_id)]["occupied"] = False                 # Current state (occupied/clear)
         sections[str(section_id)]["labeltext"] = default_label        # Current state (train designator)
         sections[str(section_id)]["statevalid"] = True                # State always valid for Local sections
