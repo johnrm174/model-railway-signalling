@@ -9,8 +9,9 @@
 #     Mandatory Parameters:
 #        Canvas - The Tkinter Drawing canvas on which the track sensor is to be displayed
 #        sensor_id:int - The unique ID for the track sensor
-#        x:int, y:int - Position of the point on the canvas (in pixels)
+#        x:int, y:int - Position of the track sensor on the canvas (in pixels)
 #        callback - the function to call on track sensor triggered events (returns item_id)
+#     Optional Parameters:
 #        hidden:bool - Whether the Track Sensor should be 'hidden' in Run Mode - default = False
 #
 #    track_sensor_exists(sensor_id:int) - returns true if the if a track sensor object 'exists'
