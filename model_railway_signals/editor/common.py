@@ -1106,7 +1106,8 @@ class selection_buttons():
         self.B7.configure(state="disabled")
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for Colour selection
+# Compound UI Element for Colour selection. Also has an option to select "transparent"
+# if the 'transparent_option' is set to True (useful for 'fill' colours
 # Note the responsibility of the instantiating func/class to 'pack' the Frame of
 # the UI element - i.e. '<class_instance>.frame.pack()'
 #
@@ -1117,37 +1118,53 @@ class selection_buttons():
 #------------------------------------------------------------------------------------
 
 class colour_selection():
-    def __init__(self, parent_frame, label:str):
+    def __init__(self, parent_frame, label:str, transparent_option:bool=False):
         # Flag to test if a colour chooser window is open or not
         self.colour_chooser_open = False
-        # Variable to hold the currently selected colour:
-        self.colour ='black'
-        # Create a frame to hold the tkinter widgets
-        # The parent class is responsible for packing the frame
+        # Variable to hold the currently selected colour (the default background colour)
+        self.colour = 'Grey85'
+        # Create a Labelframe to hold all the tkinter widgets
         self.frame = Tk.LabelFrame(parent_frame,text=label)
-        # Create a sub frame for the UI elements to centre them
-        self.subframe = Tk.Frame(self.frame)
-        self.subframe.pack()
-        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour, borderwidth=1, relief="solid")
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.label2, "Currently selected colour")
-        self.B1 = Tk.Button(self.subframe, text="Change", command=self.update)
+        # Create a sub frame for the selected colour and the colour chooser button
+        self.subframe1 = Tk.Frame(self.frame)
+        self.subframe1.pack()
+        self.label1 = Tk.Label(self.subframe1, width=3, bg=self.colour, borderwidth=1, relief="solid")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.label1, "Currently selected colour")
+        self.B1 = Tk.Button(self.subframe1, text="Change", command=self.colour_updated)
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
+        # Create the checkbox for "transparent (only pack it if specified at creation time)
+        self.transparent = check_box(self.frame,label="Transparent ",callback=self.transparent_updated,
+                     tool_tip= "Select to make transparent (no fill)")
+        if transparent_option: self.transparent.pack()
         
-    def update(self):
+    def colour_updated(self):
         self.colour_chooser_open = True
         colour_code = colorchooser.askcolor(self.colour, parent=self.frame, title ="Select Colour")
         self.colour = colour_code[1]
-        self.label2.config(bg=self.colour)
+        self.label1.config(bg=self.colour)
         self.colour_chooser_open = False
-        
+
+    def transparent_updated(self):
+        if self.transparent.get_value():
+            self.label1.config(text="X", bg='Grey85')
+        else:
+            self.label1.config(text="", bg=self.colour)
+
     def get_value(self):
-        return(self.colour)
+        if self.transparent.get_value(): colour = ""
+        else: colour = self.colour
+        return(colour)
         
     def set_value(self,colour:str):
-        self.colour = colour
-        self.label2.config(bg=self.colour)
+        if colour == "":
+            self.transparent.set_value(True)
+            self.colour = 'Grey85'
+        else:
+            self.transparent.set_value(False)
+            self.colour = colour
+        self.transparent_updated()
         
     def is_open(self):
         return(self.colour_chooser_open)
