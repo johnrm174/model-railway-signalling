@@ -12,6 +12,7 @@ from model_railway_signals.library import lines
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sections
+from model_railway_signals.library import buttons
 
 from model_railway_signals.editor import schematic
 
@@ -933,6 +934,132 @@ def run_line_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test 'Button' Library objects
+#---------------------------------------------------------------------------------------------------------
+
+def selected_callback(button_id):
+    logging_string="Button Selected Callback from Button "+str(button_id)
+    logging.info(logging_string)
+    
+def deselected_callback(button_id):
+    logging_string="Button Deselected Callback from Button "+str(button_id)
+    logging.info(logging_string)
+
+def run_button_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Button Objects")
+    # Ensure we start off in Run Mode
+    buttons.configure_edit_mode(edit_mode=False)
+    canvas = schematic.canvas
+    print("Library Tests - create_button - will generate 4 errors:")
+    assert len(buttons.buttons) == 0
+    buttons.create_button(canvas,0,100,100,selected_callback,deselected_callback)      # Error - ID out of range
+    buttons.create_button(canvas,1000,100,100,selected_callback,deselected_callback)   # Error - ID out of range
+    buttons.create_button(canvas,"1",100,100,selected_callback,deselected_callback)    # Error - ID not an int
+    buttons.create_button(canvas,1,100,100,selected_callback,deselected_callback)      # Success
+    buttons.create_button(canvas,2,200,100,selected_callback,deselected_callback)      # Success
+    buttons.create_button(canvas,1,200,100,selected_callback,deselected_callback)      # Error - ID already Exists
+    assert len(buttons.buttons) == 2
+    print("Library Tests - button_exists - will generate 1 error:")
+    assert not buttons.button_exists("1")     # Error - not an int
+    assert buttons.button_exists(1)           # Success (exists)
+    assert buttons.button_exists(2)           # Success (exists)
+    assert not buttons.button_exists(3)       # Success (does not exist)
+    print("Library Tests - button_state - will generate 2 errors:")
+    assert not buttons.button_state("1")      # Error - not an int
+    assert not buttons.button_state(1)        # Success (exists)
+    assert not buttons.button_state(2)        # Success (exists)
+    assert not buttons.button_state(3)        # Error - does not exist
+    print("Library Tests - enable_button, disable_button and button_enabled- will generate 4 errors:")
+    assert buttons.button_enabled(1)
+    assert buttons.button_enabled(2)
+    buttons.disable_button("1")               # Error - not an int
+    buttons.disable_button(3)                 # Error - does not exist
+    buttons.disable_button(1)                 # Success
+    assert not buttons.button_enabled(1)
+    assert buttons.button_enabled(2)
+    buttons.disable_button(2)                 # Success
+    assert not buttons.button_enabled(1)
+    assert not buttons.button_enabled(2)
+    buttons.enable_button("1")                # Error - not an int
+    buttons.enable_button(3)                  # Error - does not exist
+    buttons.enable_button(1)                  # Success
+    assert buttons.button_enabled(1)
+    assert not buttons.button_enabled(2)
+    buttons.enable_button(2)                  # Success
+    assert buttons.button_enabled(1)
+    assert buttons.button_enabled(2)    
+    print("Library Tests - button events, button_state and button_enabled - will generate 4 errors:")
+    assert not buttons.button_state(1)
+    assert not buttons.button_state(2)
+    buttons.button_event(1)
+    assert buttons.button_state(1)
+    assert not buttons.button_enabled(1)
+    assert not buttons.button_state(2)
+    assert buttons.button_enabled(2)    
+    buttons.button_event(2)
+    assert buttons.button_state(1)
+    assert not buttons.button_enabled(1)
+    assert buttons.button_state(2)
+    assert not buttons.button_enabled(2)    
+    print("Library Tests - processing_complete and button_enabled - will generate 2 errors:")
+    buttons.processing_complete("1")       # Error - not an int
+    buttons.processing_complete(3)         # Error - does not exist
+    buttons.processing_complete(1)         # Success
+    assert buttons.button_state(1)
+    assert buttons.button_enabled(1)
+    assert buttons.button_state(2)
+    assert not buttons.button_enabled(2)
+    buttons.processing_complete(2)         # Success
+    assert buttons.button_state(1)
+    assert buttons.button_enabled(1)
+    assert buttons.button_state(2)
+    assert buttons.button_enabled(2)
+    print("Library Tests - toggle_button and button_state, button_enabled - will generate 2 errors")
+    buttons.toggle_button("1")            # Error - not an int
+    buttons.toggle_button(3)              # Error - does not exist
+    buttons.toggle_button(1)
+    assert not buttons.button_state(1)
+    assert not buttons.button_enabled(1)
+    assert buttons.button_state(2)
+    assert buttons.button_enabled(2)    
+    buttons.toggle_button(2)
+    assert not buttons.button_state(1)
+    assert not buttons.button_enabled(1)
+    assert not buttons.button_state(2)
+    assert not buttons.button_enabled(2)        
+    buttons.processing_complete(1)
+    buttons.processing_complete(2)
+    assert not buttons.button_state(1)
+    assert buttons.button_enabled(1)
+    assert not buttons.button_state(2)
+    assert buttons.button_enabled(2)
+    print("Library Tests - configure_edit_mode - Creation in Edit Mode - No errors:")
+    buttons.configure_edit_mode(edit_mode=True)
+    buttons.create_button(canvas,3,300,100,selected_callback,deselected_callback)      # Success
+    assert len(buttons.buttons) == 3
+    assert buttons.button_exists(3)
+    print("Library Tests - configure_edit_mode - Toggling between Run and Edit Mode - No errors:")
+    buttons.configure_edit_mode(edit_mode=False)
+    buttons.configure_edit_mode(edit_mode=True)
+    buttons.configure_edit_mode(edit_mode=False)
+    print("Library Tests - delete_button - will generate 2 errors:")
+    buttons.delete_button("1")         # Error - not an int
+    buttons.delete_button(4)           # Error - does not exist
+    assert len(buttons.buttons) == 3
+    buttons.delete_button(1)
+    buttons.delete_button(2)
+    assert not buttons.button_exists(1)
+    assert not buttons.button_exists(2)
+    assert buttons.button_exists(3)
+    assert len(buttons.buttons) == 1
+    buttons.delete_button(3)
+    assert len(buttons.buttons) == 0
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
@@ -942,6 +1069,7 @@ def run_all_basic_library_tests():
     run_point_library_tests()
     run_instrument_library_tests()
     run_line_library_tests()
+    run_button_library_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
