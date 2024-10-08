@@ -27,10 +27,7 @@
 #   delete_button(button_id:int) - Delete the library object from the schematic
 #
 #   button_state(button_id:int) - get the current state of a button (returns True for Active)
-#
-#   ########### THIS FUNCTION NOT USED ANYWHERE - COINSIDER REMOVING ##################
-#   button_enabled(button_id:int) - get the current state of a button (returns True for Enabled)
-#
+##
 #   toggle_button(button_id:int) - toggle the state of the button
 #
 #   enable_button(button_id:int) - enable the button (and revert to the standard tooltip)
@@ -40,7 +37,12 @@
 # External API - classes and functions (used by the other library modules):
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
-# 
+#
+#   #############################################################################################
+#   ######## THIS FUNCTION IS NOT AN API FUNCTION - ONLY USED FOR THE SYSTEM TESTS ##############
+#   button_enabled(button_id:int) - get the current state of a button (returns True for Enabled)
+#   #############################################################################################
+
 #---------------------------------------------------------------------------------------------
 
 import logging
@@ -221,23 +223,17 @@ def button_state(button_id:int):
         button_state = buttons[str(button_id)]["selected"]
     return(button_state)
 
-#---------------------------------------------------------------------------------------------
-# API function to get the current state of a Button (enabled or disabled)
-############ THIS FUNCTION NOT USED ANYWHERE - COINSIDER REMOVING ##################
-#---------------------------------------------------------------------------------------------
+##############################################################################################
+# Function to get the current state of a Button (enabled or disabled) ########################
+# THIS FUNCTION IS NOT AN API FUNCTION - ONLY USED BY THE SYSTEM TESTS #######################
+##############################################################################################
 
 def button_enabled(button_id:int):
-    # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) :
-        logging.error("Button "+str(button_id)+": button_locked - Button ID must be an int")
-        button_enabled = False
-    elif not button_exists(button_id):
-        logging.error("Button "+str(button_id)+": button_locked - Button ID does not exist")
-        button_enabled = False
-    else:
-        # Button is always enabled if selected (so it can always be de-selected)
-        button_enabled = buttons[str(button_id)]["enabled"] or buttons[str(button_id)]["selected"]
+    # Button is always enabled if selected (so it can always be de-selected)
+    button_enabled = buttons[str(button_id)]["enabled"] or buttons[str(button_id)]["selected"]
     return(button_enabled)
+
+##############################################################################################
 
 #---------------------------------------------------------------------------------------------
 # Public API function to create a Button object (drawing objects plus internal state)

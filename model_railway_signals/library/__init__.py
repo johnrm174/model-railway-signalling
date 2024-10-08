@@ -123,7 +123,6 @@ from .buttons import toggle_button
 from .buttons import enable_button
 from .buttons import disable_button
 from .buttons import button_state
-from .buttons import button_enabled #######UNUSED FUNCTION############
 from .buttons import processing_complete
 
 from .file_interface import load_schematic
