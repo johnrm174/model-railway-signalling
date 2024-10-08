@@ -31,6 +31,7 @@ provides flexibility for implementing other niche automation use cases on your l
 * Point/signal button sizes can be changed via general settings (aids selection via touchscreen monitors)
 * The colour of the Schematic Route buttons can now be set by the user (for differentiating route groups)
 * Setup of Schematic Routes can now be triggered from Track Sensors (useful for converging routes)
+* Bugfix to schematic editor - to prevent right mouse clicks whilst object moves ae in progress
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

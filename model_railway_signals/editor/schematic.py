@@ -761,6 +761,9 @@ def enable_all_keypress_events_after_completion_of_move():
     enable_arrow_keypress_events()
     canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
     canvas.bind('<Control-Key-r>', reset_window_size)
+    # Re-bind the other mouse buttons to re-enable right clicks
+    canvas.bind('<Button-2>', right_button_click)
+    canvas.bind('<Button-3>', right_button_click)
     return()
 
 def disable_all_keypress_events_during_move():
@@ -768,7 +771,10 @@ def disable_all_keypress_events_during_move():
     disable_arrow_keypress_events()
     canvas.bind('<Escape>',cancel_move_in_progress)
     canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
-    canvas.unbind('<Control-Key-r>')                             # Toggle Mode (Edit/Run)
+    canvas.unbind('<Control-Key-r>')                             # Revert Canvas Size
+    # Unbind the other mouse buttons to prevent inadvertant clicks
+    canvas.unbind('<Button-2>')
+    canvas.unbind('<Button-3>')
     return()
 
 #------------------------------------------------------------------------------------
