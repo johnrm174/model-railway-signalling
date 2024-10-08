@@ -12,9 +12,58 @@ from model_railway_signals.library import lines
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sections
+from model_railway_signals.library import text_boxes
 from model_railway_signals.library import buttons
 
 from model_railway_signals.editor import schematic
+
+#---------------------------------------------------------------------------------------------------------
+# Test Text Box Library objects
+#---------------------------------------------------------------------------------------------------------
+    
+def run_text_box_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Text Box Objects")
+    canvas = schematic.canvas
+    # create_track_sensor
+    print("Library Tests - create_text_box - will generate 4 errors:")
+    assert len(track_sensors.track_sensors) == 0    
+    text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # success
+    text_boxes.create_text_box(canvas, "2", 200, 100, text="Textbox 1")    # Fail - not an int
+    text_boxes.create_text_box(canvas, 0, 200, 100, text="Textbox 1")      # Fail - out of range
+    text_boxes.create_text_box(canvas, 1000, 200, 100, text="Textbox 1")   # Fail - out of range
+    text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # Fail - duplicate
+    assert len(text_boxes.text_boxes) == 1
+    # track_sensor_exists
+    print("Library Tests - text_box_exists - will generate 1 error:")
+    assert text_boxes.text_box_exists(1)         # True (exists)
+    assert not text_boxes.text_box_exists("1")      # False - with error message (not int)
+    assert not text_boxes.text_box_exists(0)        # False - no error message
+    assert not text_boxes.text_box_exists(100)      # False - no error message
+    # delete_track_sensor - reset_sensor_button function should not generate any exceptions
+    print("Library Tests - delete_text_box - will generate 2 errors:")
+    text_boxes.delete_text_box("1")        # Fail - not an int
+    text_boxes.delete_text_box(100)        # Fail - does not exist
+    text_boxes.delete_text_box(1)          # success
+    assert len(text_boxes.text_boxes) == 0
+    assert not text_boxes.text_box_exists(1)       
+    # configure_edit_mode - this is an internal library function
+    print("Library Tests - configure_edit_mode - No Errors or Warnings")
+    text_boxes.configure_edit_mode(edit_mode=False)
+    text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")
+    text_boxes.create_text_box(canvas, 2, 200, 100, text="Textbox 1", hidden=True)
+    text_boxes.configure_edit_mode(edit_mode=True)
+    text_boxes.create_text_box(canvas, 3, 300, 100, text="Textbox 1")
+    text_boxes.create_text_box(canvas, 4, 400, 100, text="Textbox 1", hidden=True)
+    text_boxes.configure_edit_mode(edit_mode=False)
+    # Clean up
+    text_boxes.delete_text_box(1) 
+    text_boxes.delete_text_box(2)
+    text_boxes.delete_text_box(3) 
+    text_boxes.delete_text_box(4)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
 
 #---------------------------------------------------------------------------------------------------------
 # Test Track Sensor Library objects
@@ -63,8 +112,10 @@ def run_track_sensor_library_tests():
     print("Library Tests - configure_edit_mode")
     track_sensors.configure_edit_mode(edit_mode=False)
     track_sensors.create_track_sensor(canvas, sensor_id=10, x=100, y=100, callback=track_sensor_callback)    # success
+    track_sensors.create_track_sensor(canvas, sensor_id=11, x=100, y=100, callback=track_sensor_callback, hidden=True)    # success
     track_sensors.configure_edit_mode(edit_mode=True)
     track_sensors.create_track_sensor(canvas, sensor_id=20, x=200, y=100, callback=track_sensor_callback)    # success
+    track_sensors.create_track_sensor(canvas, sensor_id=21, x=200, y=100, callback=track_sensor_callback, hidden=True)    # success
     track_sensors.configure_edit_mode(edit_mode=False)
     # Clean up
     track_sensors.delete_track_sensor(10)     # success
@@ -91,9 +142,9 @@ def run_track_section_library_tests():
     track_sections.configure_edit_mode(False)
     track_sections.create_section(canvas,1,100,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="box1-50")    # Success
     track_sections.create_section(canvas,2,200,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="box1-51")    # Success
-    track_sections.create_section(canvas,3,300,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="4")          # Success
+    track_sections.create_section(canvas,3,300,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="4", hidden=True) # Success
     track_sections.configure_edit_mode(True)
-    track_sections.create_section(canvas,4,400,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="3")          # Success
+    track_sections.create_section(canvas,4,400,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="3", hidden=True)  # Success
     track_sections.create_section(canvas,5,500,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
     track_sections.create_section(canvas,6,600,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
     track_sections.create_section(canvas,0,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID out of range
@@ -481,6 +532,8 @@ def run_point_library_tests():
     print("Library Tests - set_point_colour - will generate 2 errors:")
     assert not points.point_switched(10)
     assert not points.point_switched(14)
+    points.toggle_point(14)
+    assert points.point_switched(14)
     assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "red"
@@ -497,10 +550,10 @@ def run_point_library_tests():
     assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "blue"
     assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
-    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "blue"
-    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
-    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "blue"
-    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "blue"
     print("Library Tests - reset_point_colour - will generate 2 errors:")
     points.reset_point_colour("10") # Point ID not an int
     points.reset_point_colour(20)   # Point ID does not exist
@@ -871,13 +924,13 @@ def run_line_library_tests():
     print("Library Tests - create_line - will generate 4 errors:")
     assert len(lines.lines) == 0    
     lines.create_line(canvas, 10, 100, 100, 200, 100, arrow_type=[20,20,5], arrow_ends=0, colour="red")  # success
-    lines.create_line(canvas, 11, 100, 150, 200, 150, arrow_type=[20,20,5], arrow_ends=1)     # success
-    lines.create_line(canvas, 12, 100, 200, 200, 200, arrow_type=[20,20,5], arrow_ends=2)     # success
-    lines.create_line(canvas, 13, 100, 250, 200, 250, arrow_type=[20,20,5], arrow_ends=3)     # success
-    lines.create_line(canvas, 14, 100, 300, 200, 300, arrow_type=[1,1,1], arrow_ends=0)       # success
-    lines.create_line(canvas, 15, 100, 350, 200, 350, arrow_type=[1,1,1], arrow_ends=1)       # success
-    lines.create_line(canvas, 16, 100, 400, 200, 400, arrow_type=[1,1,1], arrow_ends=2)       # success
-    lines.create_line(canvas, 17, 100, 450, 200, 450, arrow_type=[1,1,1], arrow_ends=3)       # success
+    lines.create_line(canvas, 11, 100, 150, 200, 150, arrow_type=[20,20,5], arrow_ends=1)                 # success
+    lines.create_line(canvas, 12, 100, 200, 200, 200, arrow_type=[20,20,5], arrow_ends=2)                 # success
+    lines.create_line(canvas, 13, 100, 250, 200, 250, arrow_type=[20,20,5], arrow_ends=3)                 # success
+    lines.create_line(canvas, 14, 100, 300, 200, 300, arrow_type=[1,1,1], arrow_ends=0)                   # success
+    lines.create_line(canvas, 15, 100, 350, 200, 350, arrow_type=[1,1,1], arrow_ends=1)                   # success
+    lines.create_line(canvas, 16, 100, 400, 200, 400, arrow_type=[1,1,1], arrow_ends=2)                   # success
+    lines.create_line(canvas, 17, 100, 450, 200, 450, arrow_type=[1,1,1], arrow_ends=3, selected=True)    # success
     lines.create_line(canvas, "18", 100, 100, 200, 100)   # Fail (ID not an int)
     lines.create_line(canvas, 0, 100, 100, 200, 100)      # Fail (ID < 1)
     lines.create_line(canvas, 1000, 100, 100, 200, 100)   # Fail (ID > 999)
@@ -891,6 +944,10 @@ def run_line_library_tests():
     # line coords before move are 100, 100, 200, 100
     assert canvas.coords(lines.lines[str(10)]["line"]) == [100, 100, 200, 100]
     lines.move_line_end_1(10, 300, 200)
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 200, 100]
+    lines.move_line_end_1(10, -200, 200)
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [200, 500, 200, 100]
+    lines.move_line_end_1(10, 200, -200)
     assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 200, 100]
     lines.move_line_end_1("10",100,100)   # Error - not an int (exists)
     lines.move_line_end_1(20,100,100)     # Error - does not exist
@@ -1096,6 +1153,7 @@ def run_button_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
+    run_text_box_library_tests()
     run_track_sensor_library_tests()
     run_track_section_library_tests()
     run_point_library_tests()

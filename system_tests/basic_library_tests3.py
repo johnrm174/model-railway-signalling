@@ -49,20 +49,20 @@ def run_library_api_tests():
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, has_subsidary=True)   # Success
     create_colour_light_signal(canvas, "2", signals.signal_subtype.home, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - not an int
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)  # Error - not an int
     create_colour_light_signal(canvas, 0, signals.signal_subtype.home, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - out of range
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - out of range
     create_colour_light_signal(canvas, 1000, signals.signal_subtype.home, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - out of range
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - out of range
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - already exists
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - already exists
     create_colour_light_signal(canvas, 2, signals.signal_type.colour_light, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - invalid subtype
     create_colour_light_signal(canvas, 3, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
-                                            lhfeather45=True, theatre_route_indicator=True)              # Error - Feathers and theatre
+                                            lhfeather45=True, theatre_route_indicator=True)         # Error - Feathers and theatre
     create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, has_subsidary=True)   # Error - Dist & subsidary 
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated, has_subsidary=True) # Error - Dist & subsidary 
     create_colour_light_signal(canvas, 5, signals.signal_subtype.distant, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, lhfeather45=True)   # Error - Dist & Feathers 
     create_colour_light_signal(canvas, 6, signals.signal_subtype.distant, 100, 100,
@@ -231,25 +231,24 @@ def run_library_api_tests():
     # Create a fully automatic signal for this test (to fully excersise the code)
     create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, fully_automatic=True)
-    assert not signals.signals["1"]["siglocked"]
-    assert not signals.signals["10"]["siglocked"]
+    assert not signals.signal_locked(1)
+    assert not signals.signal_locked(10)
     signals.lock_signal(1)
     signals.lock_signal(1)
     signals.lock_signal(10)   #  Warning as signal 10 is automatic so created OFF
-    assert signals.signals["1"]["siglocked"]
-    assert signals.signals["10"]["siglocked"]
+    assert signals.signal_locked(1)
+    assert signals.signal_locked(10)
     signals.lock_signal("2")  # Error - not an int
     signals.lock_signal(6)    # Error - does not exist
     # Test locking of a signal that is off (also tests toggle_signal)
-    assert not signals.signals["2"]["siglocked"]
-    assert not signals.signals["2"]["sigclear"]
+    assert not signals.signal_locked(2)
+    assert not signals.signal_clear(2)
     signals.toggle_signal(2)  # Toggle to OFF
-    assert signals.signals["2"]["sigclear"]
+    assert signals.signal_clear(2)
     signals.lock_signal(2)    # Warning - signal is OFF - locking anyway
-    assert signals.signals["2"]["siglocked"]
     print("Library Tests - unlock_signal (also tests toggle_signal) - will generate 2 errors:")
-    assert signals.signals["1"]["siglocked"]
-    assert signals.signals["2"]["siglocked"]
+    assert signals.signal_locked(1)
+    assert signals.signal_locked(2)
     signals.unlock_signal(1)
     signals.unlock_signal(1)
     signals.unlock_signal(10)
@@ -257,33 +256,33 @@ def run_library_api_tests():
     signals.unlock_signal("2")  # Error - not an int
     signals.unlock_signal(6)    # Error - does not exist
     signals.toggle_signal(2)    # Toggle to ON (revert to normal)
-    assert not signals.signals["1"]["siglocked"]
-    assert not signals.signals["10"]["siglocked"]
-    assert not signals.signals["2"]["siglocked"]
-    assert not signals.signals["2"]["sigclear"]
+    assert not signals.signal_locked(1)
+    assert not signals.signal_locked(2)
+    assert not signals.signal_locked(10)
+    assert not signals.signal_clear(2)
     # Delete the automatic signal we specifically created for this test
     signals.delete_signal(10)
     print("Library Tests - lock_subsidary (also tests toggle_subsidary) - will generate 3 errors and 1 warning:")
-    assert not signals.signals["1"]["sublocked"]
+    assert not signals.subsidary_locked(1)
     signals.lock_subsidary(1)
     signals.lock_subsidary(1)
-    assert signals.signals["1"]["sublocked"]
+    assert signals.subsidary_locked(1)
     signals.lock_subsidary("2")  # Error - not an int
     signals.lock_subsidary(6)    # Error - does not exist
     # Test locking of a signal that does not have a subsidary
-    assert not signals.signals["3"]["sublocked"]
+    assert not signals.subsidary_locked(3)
     signals.lock_subsidary(3)  # Error - signal does not have a subsidary
-    assert not signals.signals["3"]["sublocked"]
+    assert not signals.subsidary_locked(3)
     # Test locking of a subsidary that is OFF
     signals.unlock_subsidary(1)  # Unlock subsidary first (to reset for the test)
-    assert not signals.signals["1"]["sublocked"]
-    assert not signals.signals["1"]["subclear"]
+    assert not signals.subsidary_locked(1)
+    assert not signals.subsidary_clear(1)
     signals.toggle_subsidary(1)  # Toggle subsidary to OFF
-    assert signals.signals["1"]["subclear"]
+    assert signals.subsidary_clear(1)
     signals.lock_subsidary(1)       # Warning - subsidary is OFF - locking anyway
     assert signals.signals["1"]["sublocked"]
     print("Library Tests - unlock_subsidary (also tests toggle_subsidary) - will generate 3 errors:")
-    assert signals.signals["1"]["sublocked"]
+    assert signals.subsidary_locked(1)
     signals.unlock_subsidary(1)
     signals.unlock_subsidary(1)
     signals.unlock_subsidary("2")  # Error - not an int
@@ -291,8 +290,8 @@ def run_library_api_tests():
     # Test unlocking of a signal that does not have a subsidary
     signals.unlock_subsidary(3)  # Error - signal does not have a subsidary
     signals.toggle_subsidary(1)  # Toggle subsidary to ON (revert to normal)
-    assert not signals.signals["1"]["sublocked"]
-    assert not signals.signals["2"]["sigclear"]
+    assert not signals.subsidary_locked(1)
+    assert not signals.signal_clear(2)
     print("Library Tests - set_approach_control - will generate 9 errors:")
     # Create some additional signals for these tests
     create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250,
