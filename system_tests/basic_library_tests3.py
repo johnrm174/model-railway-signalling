@@ -425,6 +425,10 @@ def run_library_api_tests():
     signals.toggle_subsidary(2)    
     assert not signals.subsidary_clear(1)
     print("Library Tests - signal_state (validation failures) - will generate 2 errors:")
+    # Colour light signals do not update their aspects on creation (state defaults to 'None'
+    # they rely on the 'update_colour_light_signal' function being called
+    assert signals.signal_state("1") == None                               # Valid - ID str
+    signals.update_colour_light_signal(1)                                  # Valid - ID must be an int
     assert signals.signal_state("1") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.signal_state("2") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.signal_state("3") == signals.signal_state_type.CAUTION  # Valid - ID str
@@ -444,9 +448,10 @@ def run_library_api_tests():
     signals.set_route("1", route=signals.route_type.MAIN) # Error - not an int
     signals.set_route(1, route=signals.route_type.NONE)   # Error - invalid route
     signals.set_route(6, route=signals.route_type.MAIN)   # Error - does not exist
-    # Theatre Route indication
+    # Theatre Route indication (note we need to update the signal aspect after creation
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)
+    signals.update_colour_light_signal(10)
     assert signals.signals["10"]["hastheatre"]
     assert signals.signals["10"]["theatretext"] == ""
     assert not signals.signals["10"]["theatreenabled"]
@@ -454,10 +459,12 @@ def run_library_api_tests():
     assert signals.signals["10"]["theatretext"] == "1"
     assert not signals.signals["10"]["theatreenabled"]
     signals.toggle_signal(10)
+    signals.update_colour_light_signal(10)
     assert signals.signals["10"]["theatreenabled"]
     signals.set_route(10, theatre_text="2")
     assert signals.signals["10"]["theatretext"] == "2"
     signals.toggle_signal(10)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["theatreenabled"]
     signals.delete_signal(10)
     signals.set_route(1, theatre_text="1")    # Error - does not have a theatre
@@ -563,6 +570,17 @@ def run_timed_signal_tests():
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    # Note that colour light signals need to be updated to display the correct aspect
+    assert signals.signal_state(1) == None
+    assert signals.signal_state(2) == None
+    assert signals.signal_state(3) == None
+    assert signals.signal_state(4) == None
+    assert signals.signal_state(5) == None
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -577,6 +595,11 @@ def run_timed_signal_tests():
     signals.toggle_signal(5)
     signals.toggle_signal(6)
     signals.toggle_signal(7)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -689,7 +712,17 @@ def run_signal_aspect_tests():
     create_ground_position_signal(canvas, 11, signals.ground_pos_subtype.early_shunt_ahead, 400, 200, sig_switched, sig_passed)
     create_ground_disc_signal(canvas, 12, signals.ground_disc_subtype.standard, 500, 200, sig_switched, sig_passed)
     create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 600, 200, sig_switched, sig_passed)
-    # All signals ON
+    # All signals ON (note that colour light signals need to be updated to display the correct aspect
+    assert signals.signal_state(1) == None
+    assert signals.signal_state(2) == None
+    assert signals.signal_state(3) == None
+    assert signals.signal_state(4) == None
+    assert signals.signal_state(5) == None
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -717,6 +750,11 @@ def run_signal_aspect_tests():
     signals.toggle_signal(11)
     signals.toggle_signal(12)
     signals.toggle_signal(13)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -744,6 +782,11 @@ def run_signal_aspect_tests():
     signals.set_signal_override(11)
     signals.set_signal_override(12)
     signals.set_signal_override(13)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -770,6 +813,11 @@ def run_signal_aspect_tests():
     signals.clear_signal_override(11)
     signals.clear_signal_override(12)
     signals.clear_signal_override(13)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -789,6 +837,10 @@ def run_signal_aspect_tests():
     signals.set_signal_override_caution(3)
     signals.set_signal_override_caution(4)
     signals.set_signal_override_caution(7)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
     assert signals.signal_state(1) == signals.signal_state_type.CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.CAUTION
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -799,6 +851,10 @@ def run_signal_aspect_tests():
     signals.clear_signal_override_caution(3)
     signals.clear_signal_override_caution(4)
     signals.clear_signal_override_caution(7)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -810,6 +866,10 @@ def run_signal_aspect_tests():
     signals.set_approach_control(3,release_on_yellow=False)
     signals.set_approach_control(5,release_on_yellow=False)
     signals.set_approach_control(6,release_on_yellow=False)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -820,6 +880,10 @@ def run_signal_aspect_tests():
     signals.clear_approach_control(3)
     signals.clear_approach_control(5)
     signals.clear_approach_control(6)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -828,10 +892,14 @@ def run_signal_aspect_tests():
     # Signals subject to 'Release on Yellow' approach control
     signals.set_approach_control(1,release_on_yellow=True)
     signals.set_approach_control(2,release_on_yellow=True)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
     assert signals.signal_state(1) == signals.signal_state_type.CAUTION_APP_CNTL
     assert signals.signal_state(2) == signals.signal_state_type.CAUTION_APP_CNTL
     signals.clear_approach_control(1)
     signals.clear_approach_control(2)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     # Slotting for secondary distant semaphore signals
@@ -1201,10 +1269,12 @@ def run_approach_control_tests():
     # Set up the initial test conditions (for Approach Control Release on Red)
     signals.toggle_signal(10)
     signals.toggle_signal(11)
+    signals.update_colour_light_signal(10)
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     assert signals.signal_state(11) == signals.signal_state_type.PROCEED
     signals.set_approach_control(10, release_on_yellow=False, force_set=False)
     signals.set_approach_control(11, release_on_yellow=False, force_set=False)
+    signals.update_colour_light_signal(10)
     assert signals.signals["10"]["releaseonred"]
     assert signals.signals["11"]["releaseonred"]
     assert not signals.signals["10"]["released"]
@@ -1214,6 +1284,7 @@ def run_approach_control_tests():
     # Test the signals are released on signal approach events
     signals.approach_release_button_event(10)
     signals.approach_release_button_event(11)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["releaseonred"]
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signals["10"]["released"]
@@ -1223,6 +1294,7 @@ def run_approach_control_tests():
     # Test that approach control cannot normally be reset between approach and passed events
     signals.set_approach_control(10, release_on_yellow=False, force_set=False)
     signals.set_approach_control(11, release_on_yellow=False, force_set=False)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["releaseonred"]
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signals["10"]["released"]
@@ -1232,10 +1304,12 @@ def run_approach_control_tests():
     # Test that approach control can be normally reset after a signal passed event
     signals.sig_passed_button_event(10)
     signals.sig_passed_button_event(11)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["released"]
     assert not signals.signals["11"]["released"]
     signals.set_approach_control(10, release_on_yellow=False, force_set=False)
     signals.set_approach_control(11, release_on_yellow=False, force_set=False)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["released"]
     assert not signals.signals["11"]["released"]    
     assert signals.signals["10"]["releaseonred"]
@@ -1245,6 +1319,7 @@ def run_approach_control_tests():
     # Test that approach control can be 'force set' between approach and release events
     signals.approach_release_button_event(10)
     signals.approach_release_button_event(11)
+    signals.update_colour_light_signal(10)
     assert signals.signals["10"]["released"]
     assert signals.signals["11"]["released"]    
     assert not signals.signals["10"]["releaseonred"]
@@ -1253,17 +1328,20 @@ def run_approach_control_tests():
     assert signals.signal_state(11) == signals.signal_state_type.PROCEED
     signals.set_approach_control(10, release_on_yellow=False, force_set=True)
     signals.set_approach_control(11, release_on_yellow=False, force_set=True)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["released"]
     assert not signals.signals["11"]["released"]    
     assert signals.signals["10"]["releaseonred"]
     assert signals.signals["11"]["releaseonred"]
     assert signals.signal_state(10) == signals.signal_state_type.DANGER
     assert signals.signal_state(11) == signals.signal_state_type.DANGER
+    signals.update_colour_light_signal(10)
     # Put everything back to normal for the next test
     signals.approach_release_button_event(10)
     signals.approach_release_button_event(11)
     signals.sig_passed_button_event(10)
     signals.sig_passed_button_event(11)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["releaseonred"]
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
@@ -1273,32 +1351,39 @@ def run_approach_control_tests():
     # Set up the initial test conditions (for Approach Control Release on Yellow)
     # We can only test this for colour light signals (not supported by semaphores)
     signals.set_approach_control(10, release_on_yellow=True, force_set=False)
+    signals.update_colour_light_signal(10)
     assert signals.signals["10"]["releaseonyel"]
     assert not signals.signals["10"]["released"]
     assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
     # Test the signal is released on signal approach events
     signals.approach_release_button_event(10)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["releaseonyel"]
     assert signals.signals["10"]["released"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     # Test that approach control cannot normally be reset between approach and passed events
     signals.set_approach_control(10, release_on_yellow=True, force_set=False)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["releaseonyel"]
     assert signals.signals["10"]["released"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     # Test that approach control can be normally reset after a signal passed event
     signals.sig_passed_button_event(10)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["released"]
     signals.set_approach_control(10, release_on_yellow=True, force_set=False)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["released"]
     assert signals.signals["10"]["releaseonyel"]
     assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
     # Test that approach control can be 'force set' between approach and release events
     signals.approach_release_button_event(10)
+    signals.update_colour_light_signal(10)
     assert signals.signals["10"]["released"]
     assert not signals.signals["10"]["releaseonyel"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     signals.set_approach_control(10, release_on_yellow=True, force_set=True)
+    signals.update_colour_light_signal(10)
     assert not signals.signals["10"]["released"]
     assert signals.signals["10"]["releaseonyel"]
     assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
