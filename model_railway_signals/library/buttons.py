@@ -13,8 +13,8 @@
 #       deselected_callback - The function to call when the Button is deselected (returns item_id)
 #     Optional parameters:
 #       width:int - The width of the  button in characters (default 10)
-#       label:int - The label for the button (default is empty string)
-#       tooltip:str - the default tooltip to be displayed (default is empty string)
+#       label:int - The label for the button (default is 'Button')
+#       tooltip:str - the default tooltip to be displayed (default is 'Tooltip')
 #       button_colour:str - the colour to use for the button when 'normal' (default='SeaGreen3')
 #       active_colour:str - the colour to use for the button when 'active' (default='SeaGreen2')
 #       selected_colour:str - the colour to use for the button when 'selected' (default='SeaGreen1')
@@ -133,14 +133,15 @@ def toggle_button(button_id:int):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID must be an int")
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID does not exist")
-    elif buttons[str(button_id)]["selected"]:
-        logging.info("Button "+str(button_id)+": has been toggled to OFF")
-        buttons[str(button_id)]["selected"] = False
     else:
-        logging.info("Button "+str(button_id)+": has been toggled to ON")
-        buttons[str(button_id)]["selected"] = True
-    buttons[str(button_id)]["processing"] = True
-    update_button_appearance(button_id)
+        if buttons[str(button_id)]["selected"]:
+            logging.info("Button "+str(button_id)+": has been toggled to OFF")
+            buttons[str(button_id)]["selected"] = False
+        else:
+            logging.info("Button "+str(button_id)+": has been toggled to ON")
+            buttons[str(button_id)]["selected"] = True
+        buttons[str(button_id)]["processing"] = True
+        update_button_appearance(button_id)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -174,7 +175,7 @@ def enable_button(button_id:int):
         update_button_appearance(button_id)
     return()
 
-def disable_button(button_id:int, tooltip:str):
+def disable_button(button_id:int, tooltip:str="Button Disabled"):
     if not isinstance(button_id, int) :
         logging.error("Button "+str(button_id)+": disable_button - Button ID must be an int")
     elif not button_exists(button_id):
@@ -190,7 +191,8 @@ def disable_button(button_id:int, tooltip:str):
 #---------------------------------------------------------------------------------------------
 
 def update_button_appearance(button_id:int):
-    # Enable or disable the button (with the appropriate tooltip)
+    # Enable or disable the button (with the appropriate tooltip - The Button is always enabled if
+    # selected (so it can always be de-selected) unless the editor is processing the button click
     if not buttons[str(button_id)]["enabled"] and not buttons[str(button_id)]["selected"]:
         buttons[str(button_id)]["button"].config(state="disabled")
         buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["disabledtooltiptext"]
@@ -229,8 +231,10 @@ def button_state(button_id:int):
 ##############################################################################################
 
 def button_enabled(button_id:int):
-    # Button is always enabled if selected (so it can always be de-selected)
-    button_enabled = buttons[str(button_id)]["enabled"] or buttons[str(button_id)]["selected"]
+    # Button is always enabled if selected (so it can always be de-selected) unless the editor
+    # is still processing the actions resulting from the button click
+    button_enabled = ( (buttons[str(button_id)]["enabled"] or buttons[str(button_id)]["selected"])
+                        and not buttons[str(button_id)]["processing"])
     return(button_enabled)
 
 ##############################################################################################
@@ -239,9 +243,9 @@ def button_enabled(button_id:int):
 # Public API function to create a Button object (drawing objects plus internal state)
 #---------------------------------------------------------------------------------------------
 
-def create_button (canvas, button_id:int, x:int, y:int, selected_callback, deselected_callback, width:int=10,
-                   label:str="", tooltip="", button_colour:str="SeaGreen3",  active_colour:str="SeaGreen2",
-                   selected_colour:str="SeaGreen1", text_colour:str="black"):
+def create_button (canvas, button_id:int, x:int, y:int, selected_callback, deselected_callback,
+                   width:int=10, label:str="Button", tooltip="Tooltip", button_colour:str="SeaGreen3",
+                   active_colour:str="SeaGreen2", selected_colour:str="SeaGreen1", text_colour:str="black"):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "button"+str(button_id)
@@ -293,7 +297,7 @@ def create_button (canvas, button_id:int, x:int, y:int, selected_callback, desel
         buttons[str(button_id)]["enabledtooltiptext"] = tooltip               # The default tooltip text to display
         buttons[str(button_id)]["disabledtooltiptext"] = tooltip              # The tooltip text to display when disabled
         buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
-        buttons[str(button_id)]["enabled"] = False                            # Flag to indicate if the button is enabled/disabled
+        buttons[str(button_id)]["enabled"] = True                             # Flag to indicate if the button is enabled/disabled
         buttons[str(button_id)]["processing"] = False                         # True between button press and processing complete events
         buttons[str(button_id)]["buttoncolour"] = button_colour               # button colour in its normal/unselected state
         buttons[str(button_id)]["selectedcolour"] = selected_colour           # button colour in its selected state
