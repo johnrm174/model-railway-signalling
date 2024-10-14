@@ -8,8 +8,8 @@
 # Permissions should be set to make the script executable: chmod 755 signalling.sh
 # Note we give ourselves a delay before application startup and shutdown to intervene if required
 ##
-echo "Starting signalling application in 10 seconds - Hit <CNTL-C> to abort"
-sleep 10
+echo "Starting signalling application in 5 seconds - Hit <CNTL-C> to abort"
+sleep 5
 filename=signalling.log
 current_time=$(date "+%Y%m%d-%H%M%S")
 logfilename=$current_time-$filename
@@ -24,7 +24,7 @@ python3 -m model_railway_signals -f /home/signalbox/sensor_node.sig >> /home/sig
 #
 # Comment out the following lines if you don't want to shut down the Raspberry Pi on application exit
 #
-echo "Shutting down Raspberry Pi in 10 seconds - Hit <CNTL-C> to abort"
-sleep 10
+echo "Shutting down Raspberry Pi in 5 seconds - Hit <CNTL-C> to abort"
+sleep 5
 echo "Shutting down Raspberry Pi now"
 shutdown -h now
