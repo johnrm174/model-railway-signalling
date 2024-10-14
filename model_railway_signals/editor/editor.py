@@ -230,9 +230,6 @@ class main_menubar:
         self.logging_update()
         # Initialise the editor configuration at startup (using the default settings)
         self.initialise_editor()
-        # If a filename has been specified as a command line argument then load it. The loaded
-        # settings will overwrite the default settings and initialise_editor will be called again
-        if args.filename is not None: self.load_schematic(args.filename)
         # The following code is to help with advanced debugging (start the app with the -d flag)
         if args.debug_mode:
             self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -242,7 +239,15 @@ class main_menubar:
             self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
             tracemalloc.start()
         self.monitor_memory_usage = False
-        
+        # If a filename has been specified as a command line argument then load it. The loaded
+        # settings will overwrite the default settings and initialise_editor will be called again
+        # Note we schedule this to run immediately after the main loop starts so Tkinter is
+        # 'ready' to handle any events that may be passed in from other threads when we configure
+        # the application with the newly loaded settings (GPIO or MQTT events)
+        if args.filename is not None:
+            self.root.after(0, self.load_schematic, args.filename)
+            print(args.filename)
+
     # --------------------------------------------------------------------------------------
     # Advanced debugging functions (memory allocation monitoring/reporting)
     # Full acknowledgements to stack overflow for the reporting functions used here

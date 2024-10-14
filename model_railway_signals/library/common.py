@@ -159,9 +159,19 @@ def handle_callback_in_tkinter_thread(*args):
 def execute_function_in_tkinter_thread(callback_function):
     if root_window is not None:
         event_queue.put(callback_function)
-        root_window.event_generate("<<ExtCallback>>", when="tail")
+        # When loading a layout file on startup, there were a number of possible edge cases that could cause
+        # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
+        # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
+        # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
+        # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
+        # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
+        try:
+            root_window.event_generate("<<ExtCallback>>", when="tail")
+        except Exception as exception:
+            logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
+            logging.error(str(exception))
     else:
-        logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
+        logging.error("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
     return()
 
 ##################################################################################################
