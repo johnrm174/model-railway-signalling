@@ -135,6 +135,7 @@ def load_schematic(requested_filename:str=None):
         if filename_to_load == () or filename_to_load == "": 
             filename_to_load = None
     elif not os.path.isfile(requested_filename):
+        logging.error("Load File - Layout file '"+requested_filename+"' does not exist")
         filename_to_load = None
     else:
         filename_to_load = requested_filename
