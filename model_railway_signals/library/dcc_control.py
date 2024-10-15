@@ -440,7 +440,6 @@ def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
 
 def update_dcc_point(point_id:int, state:bool):    
     if point_mapped(point_id):
-        logging.debug ("Point "+str(point_id)+": Looking up DCC commands to switch point")
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
         if dcc_mapping["address"] > 0:
@@ -464,7 +463,6 @@ def update_dcc_signal_aspects(sig_id:int, sig_state:signals.signal_state_type):
         if dcc_mapping["mapping_type"] != mapping_type.COLOUR_LIGHT:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
         else:
-            logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change main signal aspect")
             for entry in dcc_mapping[str(sig_state)]:
                 if entry[0] > 0:
                     # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
@@ -490,7 +488,6 @@ def update_dcc_signal_element(sig_id:int, state:bool, element:str="main_subsidar
         if element != "main_subsidary" and dcc_mapping["mapping_type"] != mapping_type.SEMAPHORE:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Semaphore signal")
         else:
-            logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change \'"+element+"\' ")
             if dcc_mapping[element] > 0:
                 # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
                 # Note that the commands will only be sent if the pi-sprog interface is configured
@@ -527,7 +524,6 @@ def update_dcc_signal_route(sig_id:int, route:signals.route_type,
             if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
                  (not dcc_mapping["auto_route_inhibit"] and signal_change) or
                  (not sig_at_danger and not signal_change) ):
-                logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change route display")
                 for entry in dcc_mapping[str(route)]:
                     if entry[0] > 0:
                         # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
@@ -562,7 +558,6 @@ def update_dcc_signal_theatre(sig_id:int, character_to_display:str,
         if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
              (not dcc_mapping["auto_route_inhibit"] and signal_change) or
              (not sig_at_danger and not signal_change) ):
-            logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change Theatre display")
             # Send the DCC commands to change the state if required
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
