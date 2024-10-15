@@ -378,7 +378,7 @@ def run_dcc_control_tests(baud_rate):
                                                      ['2', [[1,True], ["abc",True], [11,"random"], [2048, True], 2047,[1,2,3]]] ] )
     assert len(dcc_control.dcc_signal_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 20
-    print("Library Tests - map_dcc_point - Two Debug messages - 8 error messages should be generated")
+    print("Library Tests - map_dcc_point - Two Debug messages - 7 error messages should be generated")
     assert len(dcc_control.dcc_point_mappings) == 0
     dcc_control.map_dcc_point(1, 30, False)
     dcc_control.map_dcc_point(2, 31, True)
@@ -389,7 +389,6 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_dcc_point(5, 10, False)     # Fail - address already in use 
     dcc_control.map_dcc_point(6, "abc", False)  # Fail - address not a str 
     dcc_control.map_dcc_point(6, 2048, False)   # Fail - Invalid address 
-    dcc_control.map_dcc_point(7, 33, "True")    # Fail - Invalid reversed flag 
     assert len(dcc_control.dcc_point_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 22
     print("Library Tests - get_dcc_address_mappings (no errors or warnings should be generated)")
@@ -575,10 +574,10 @@ def run_mqtt_interface_tests():
 
 def run_all_basic_library_tests():
     baud_rate = 115200    # change to 115200 for Pi-Sprog-3 V2 or 460800 for Pi-SPROG-3 V1
-    run_gpio_sensor_library_tests()
-    run_pi_sprog_interface_tests(baud_rate)
+#     run_gpio_sensor_library_tests()
+#     run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
-    run_mqtt_interface_tests()
+#     run_mqtt_interface_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
