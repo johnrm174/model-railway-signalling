@@ -34,10 +34,13 @@
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #    objects_common.root - Reference to the Tkinter root object
 #
-## Makes the following external API calls to library modules:
+# Makes the following external API calls to library modules:
 #    buttons.create_button(id) - Create the library object
 #    buttons.delete_button(id) - Delete the library object
 #    buttons.button_exists - to find out if the specified Item ID already exists
+#
+# Accesses the following external library objects directly:
+#    button.button_type - for setting the enum value when creating the object
 #
 #------------------------------------------------------------------------------------
 
@@ -274,6 +277,7 @@ def redraw_route_object(object_id):
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
+                buttontype = buttons.button_type.switched,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
                 selected_callback = run_routes.set_schematic_route_callback,

@@ -45,9 +45,10 @@
 #    points.reset_point_colour(line_id) - Used for shematic route setting
 #    buttons.enable_button(button_id) - to enable the schematic route selection
 #    buttons.disable_button(button_id) - to disable the schematic route selection
-#    buttons.toggle_button(button_id) - to get the current state of the button
+#    buttons.toggle_button(button_id) - to toggle the current state of the button
 #    buttons.button_state(button_id) - to get the current state of the button
-#    buttons.processing_complete(button_id) - to enable the button after route setting has completed
+#    buttons.lock_button(button_id) - lock the button whilst route setup/cleardown is in progress
+#    buttons.unlock_button(button_id) - unlock the button after route setup/cleardown has completed
 #    lines.set_line_colour(line_id) - Used for shematic route setting
 #    lines.reset_line_colour(line_id) - Used for shematic route setting
 #    block_instruments.block_section_ahead_clear(inst_id) - Test if an instrument is clear
@@ -247,8 +248,9 @@ def enable_disable_schematic_routes():
     # Iterate through all the schematic routes
     for str_route_id in objects.route_index.keys():
         route_tooltip, route_viable = check_route_viable(str_route_id)
-        # Enable/disable the route button as required
-        if route_viable:
+        # Enable/disable the route button as required. Note that selected route buttons
+        # always remain enabled (unless locked) so they can be deselected as required
+        if route_viable or buttons.button_state(int(str_route_id)):
             buttons.enable_button(int(str_route_id))
         else:
             route_tooltip = "Route "+str_route_id+" cannot be set because:"+route_tooltip
@@ -411,6 +413,22 @@ def set_point_state(route_id:int, point_id:int, state:bool):
             run_layout.point_switched_callback(point_id, route_id)
     return()
 
+def set_route_highlighting(route_id:int, colour:str):
+    # Set the point and line colours to highlight the route
+    for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
+        points.set_point_colour(point_id, colour)
+    for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
+        lines.set_line_colour(line_id, colour)
+    return()
+
+def reset_route_highlighting(route_id:int):
+    # Reset the point and line colours to un-highlight the route
+    for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
+        points.reset_point_colour(point_id)
+    for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
+        lines.reset_line_colour(line_id)
+    return()
+
 def complete_route_setup(route_id:int):
     if run_mode:
         # Confirm the route has been set up correctly - just in case there have been any other events
@@ -433,27 +451,30 @@ def complete_route_setup(route_id:int):
         # If successful we update the point and line colours to highlight the route
         # If unsuccessful we de-select the button (to show the route was not set up)
         if route_set_up_and_locked:
-            colour=objects.schematic_objects[objects.route(route_id)]["routecolour"]
-            for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
-                points.set_point_colour(point_id, colour)
-            for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
-                lines.set_line_colour(line_id, colour)
+            set_route_highlighting(route_id, objects.schematic_objects[objects.route(route_id)]["routecolour"])
         else:
             if buttons.button_state(route_id): buttons.toggle_button(route_id)
-        # Unlock the route button now the processing is complete
-        buttons.processing_complete(route_id)
+        # Unlock the route button now processing is complete (so it can be enabled)
+        buttons.unlock_button(route_id)
+        # Re-enable the button if the route remains viable (as something might have changed in the interim).
+        # We always enable the button if it is selected (so it can always be de-selected)
+        tooltip, route_viable = check_route_viable(route_id)
+        if route_viable or buttons.button_state(route_id): buttons.enable_button(route_id)
+        else: buttons.disable_button(route_id, tooltip)
         logging.info("RUN ROUTES - Set-up of Route "+str(route_id)+" is now complete **************************************")
     return()
 
 def complete_route_cleardown(route_id:int):
-    # Reset the point and line colours to un-highlight the route
+    # Ensure the route is unhighlighted
+    reset_route_highlighting(route_id)
+    # Unlock the route button now processing is complete (so it can be enabled)
     # Note that this function will get executed in both EDIT and RUN Modes
-    for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
-        points.reset_point_colour(point_id)
-    for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
-        lines.reset_line_colour(line_id)
-    # Unlock the route button now the processing is complete 
-    buttons.processing_complete(route_id)
+    buttons.unlock_button(route_id)
+    # Re-enable the button if the route remains viable (as something might have changed in the interim).
+    # We always enable the button if it is selected (so it can always be de-selected)
+    tooltip, route_viable = check_route_viable(route_id)
+    if route_viable or buttons.button_state(route_id): buttons.enable_button(route_id)
+    else: buttons.disable_button(route_id, tooltip)
     logging.info("RUN ROUTES - Clear-down of Route "+str(route_id)+" is now complete **********************************")
     return()
 
@@ -471,6 +492,9 @@ def complete_route_cleardown(route_id:int):
 
 def set_schematic_route_callback(route_id:int):
     logging.info("RUN ROUTES - Initiating set-up of Route "+str(route_id)+" *******************************************")
+    # Lock and disable the route button (to prevent further clicks before we have finished setting up the route)
+    buttons.lock_button(route_id)
+    buttons.disable_button(route_id, tooltip="Route clear down in progress")
     # Retrieve the object configuration for the Route
     route_object = objects.schematic_objects[objects.route(route_id)]
     delay = route_object["switchdelay"]
@@ -532,9 +556,14 @@ def set_schematic_route_callback(route_id:int):
 
 def clear_schematic_route_callback(route_id:int):
     logging.info("RUN ROUTES - Initiating clear-down of Route "+str(route_id)+" ***************************************")
+    # Lock and disable the route button (to prevent further clicks before we have finished clearing down the route)
+    buttons.lock_button(route_id)
+    buttons.disable_button(route_id, tooltip="Route clear down in progress")
     # Retrieve the object configuration for the Route
     route_object = objects.schematic_objects[objects.route(route_id)]
     delay = route_object["switchdelay"]
+    # Unhighlight the route to show it has been de-selected
+    reset_route_highlighting(route_id)
     # Schedule tasks to set all the signals along the route to ON. The "signalsonroute" and
     # "subsidariesonroute" elements of the route object comprise a list of signal_ids. We
     # don't need to check their state beforehand as any user initiated change (to ON) would
