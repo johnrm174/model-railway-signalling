@@ -611,8 +611,8 @@ def run_schematic_routes_example_tests(delay:float=0.0):
 def run_all_schematic_routes_tests(delay:float=0.0):
     # Run the standalone tests for Schematic routes
     print("Route configuration update tests (change/delete of item IDs)")
-#     initialise_test_harness()
-#     run_change_of_item_id_tests(delay)
+    initialise_test_harness()
+    run_change_of_item_id_tests(delay)
     # Run the Tests for "test_schematic_routes.sig" - Note this layout File should  
     # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
@@ -621,25 +621,25 @@ def run_all_schematic_routes_tests(delay:float=0.0):
     print("Schematic Route Tests - Run Mode, Automation Off")
     set_automation_off()
     run_schematic_routes_tests(delay)
-#     print("Schematic Route Tests - Run Mode, Automation On")
-#     set_automation_on()
-#     run_schematic_routes_tests(delay)
-#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-#     set_edit_mode()
-#     test_object_edit_windows.test_all_object_edit_windows(delay)
-#     # Run the Tests for the example layout
-#     initialise_test_harness(filename="../configuration_examples/schematic_routes_example.sig")
-#     reset_layout()
-#     print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
-#     set_run_mode()
-#     set_automation_off()
-#     run_schematic_routes_example_tests(delay)
-#     print("Schematic Route Example Layout Tests - Run Mode, Automation On")
-#     set_automation_on()
-#     run_schematic_routes_example_tests(delay)
-#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-#     set_edit_mode()
-#     test_object_edit_windows.test_all_object_edit_windows(delay)
+    print("Schematic Route Tests - Run Mode, Automation On")
+    set_automation_on()
+    run_schematic_routes_tests(delay)
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_object_edit_windows.test_all_object_edit_windows(delay)
+    # Run the Tests for the example layout
+    initialise_test_harness(filename="../configuration_examples/schematic_routes_example.sig")
+    reset_layout()
+    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
+    set_run_mode()
+    set_automation_off()
+    run_schematic_routes_example_tests(delay)
+    print("Schematic Route Example Layout Tests - Run Mode, Automation On")
+    set_automation_on()
+    run_schematic_routes_example_tests(delay)
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_object_edit_windows.test_all_object_edit_windows(delay)
     report_results()
     
 if __name__ == "__main__":

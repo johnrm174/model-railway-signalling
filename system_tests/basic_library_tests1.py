@@ -574,10 +574,10 @@ def run_mqtt_interface_tests():
 
 def run_all_basic_library_tests():
     baud_rate = 115200    # change to 115200 for Pi-Sprog-3 V2 or 460800 for Pi-SPROG-3 V1
-#     run_gpio_sensor_library_tests()
-#     run_pi_sprog_interface_tests(baud_rate)
+    run_gpio_sensor_library_tests()
+    run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
-#     run_mqtt_interface_tests()
+    run_mqtt_interface_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)

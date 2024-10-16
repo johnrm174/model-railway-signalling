@@ -1154,12 +1154,12 @@ def run_button_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-#     run_text_box_library_tests()
-#     run_track_sensor_library_tests()
-#     run_track_section_library_tests()
-#     run_point_library_tests()
-#     run_instrument_library_tests()
-#     run_line_library_tests()
+    run_text_box_library_tests()
+    run_track_sensor_library_tests()
+    run_track_section_library_tests()
+    run_point_library_tests()
+    run_instrument_library_tests()
+    run_line_library_tests()
     run_button_library_tests()
 
 if __name__ == "__main__":
