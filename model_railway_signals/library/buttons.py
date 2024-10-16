@@ -20,6 +20,7 @@
 #       width:int - The width of the  button in characters (default 10)
 #       label:int - The label for the button (default is 'Button')
 #       tooltip:str - the default tooltip to be displayed (default is 'Tooltip')
+#       hidden:bool - Whether the Button should be 'hidden' in Run Mode (default=False)
 #       button_colour:str - the colour to use for the button when 'normal' (default='SeaGreen3')
 #       active_colour:str - the colour to use for the button when 'active' (default='SeaGreen2')
 #       selected_colour:str - the colour to use for the button when 'selected' (default='SeaGreen1')
@@ -85,13 +86,18 @@ def configure_edit_mode(edit_mode:bool):
     for button_id in buttons:
         button = buttons[button_id]
         if editing_enabled:
+            # In Edit Mode - Hide the button window and display all placeholder objects in their normal
+            # configuration (placeholder1 is the text object and placeholder2 is the rectangle object)
             button["canvas"].itemconfig(button["buttonwindow"], state='hidden')
             button["canvas"].itemconfig(button["placeholder1"], state='normal')
-            button["canvas"].itemconfig(button["placeholder2"], state='normal')
+            button["canvas"].itemconfig(button["placeholder2"], fill=button["deselectedcolour"], width=1)
         else:
-            button["canvas"].itemconfig(button["buttonwindow"], state='normal')
+            # In Run Mode - If the object is configured as 'hidden' then we hide the text object but set
+            # the rectangle object to transparent - effectively hiding it whilst maintaining its 'presence'
+            if not button["hidden"]:
+                button["canvas"].itemconfig(button["buttonwindow"], state='normal')
             button["canvas"].itemconfig(button["placeholder1"], state='hidden')
-            button["canvas"].itemconfig(button["placeholder2"], state='hidden')
+            button["canvas"].itemconfig(button["placeholder2"], fill='', width=0)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -226,7 +232,7 @@ def button_state(button_id:int):
 #---------------------------------------------------------------------------------------------
 
 def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, selected_callback, deselected_callback,
-                   width:int=10, label:str="Button", tooltip="Tooltip", button_colour:str="SeaGreen3",
+                   width:int=10, label:str="Button", tooltip="Tooltip", hidden:bool=False, button_colour:str="SeaGreen3",
                    active_colour:str="SeaGreen2", selected_colour:str="SeaGreen1", text_colour:str="black"):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
@@ -242,15 +248,16 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
         # Specify the fontsize locally
         fontsize = 9
-        # Create the button object, callbacks and window to hold it.
-        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, disabledforeground="grey40",
+        # Create the Button and its canvas window (for Run Mode operation). Note the Window is created
+        # as 'hidden' - assuming we are in edit mode - but changed later if we are in Run Mode
+        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, foreground="grey40",
                         font=('Courier',fontsize,"normal"), bg=button_colour, activebackground=active_colour, padx=2, pady=2,
                         activeforeground=text_colour, fg=text_colour,  command=lambda:button_event(button_id))
-        button_window = canvas.create_window(x, y, window=button, tags=canvas_tag)
+        button_window = canvas.create_window(x, y, window=button, tags=canvas_tag, state="hidden")
         # Create and store a tool-tip for the button
         tooltip_object = CreateToolTip(button, text=tooltip)
         tooltip_object.waittime = 200     # miliseconds
-        tooltip_object.wraplength = 400   #pixels
+        tooltip_object.wraplength = 400   # pixels
         # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
         # Note that the 'width' parameter is the maximum width in pixels before the text starts to wrap. To set the
         # minimum width we need to specify an initial 'text' value that contains the required number of characters.
@@ -258,16 +265,21 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
                             font=('Courier',fontsize,"normal"), fill=text_colour, tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-4, bbox[2]+4, bbox[3]+2,
-                                               tags=canvas_tag, fill=button_colour)
+                                            tags=canvas_tag, fill=button_colour, width=1)
         canvas.tag_raise(placeholder1, placeholder2)
         # Now we have created the textbox at the right width, update it to display the 'proper' label
         canvas.itemconfig(placeholder1, text=label)
-        # Display either the button or button 'placeholder' depending on the mode
-        if editing_enabled:
-            canvas.itemconfig(button_window, state='hidden')
-        else:
+        # Hide the placeholder objects if we are in Run Mode. Note we can't just make the rectangle
+        # 'hidden' as the canvas.bbox function (used by the editor to get the selection area) would
+        # just return zero values when subsequently queried (after the return from this function) and
+        # so the object would be unselectable when the user toggles back to edit mode. We therefore
+        # make the rectangle transparent (fill="") to effectively make it hidden. Note we also hide
+        # the button window if the Button itself needs to be 'hidden' in Run Mode.
+        if not editing_enabled:
+            if hidden: canvas.itemconfig(button_window, state='hidden')
+            else: canvas.itemconfig(button_window, state='normal')
             canvas.itemconfig(placeholder1, state='hidden')
-            canvas.itemconfig(placeholder2, state='hidden')
+            canvas.itemconfig(placeholder2, fill='', width=0)
         # Compile a dictionary of everything we need to track
         buttons[str(button_id)] = {}
         buttons[str(button_id)]["canvas"] = canvas                            # Tkinter canvas object
@@ -275,6 +287,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["deselectedcallback"] = deselected_callback   # External callback to make
         buttons[str(button_id)]["selected"] = False                           # Current state (selected or de-selected)
         buttons[str(button_id)]["locked"] = False                             # The master lock for the button
+        buttons[str(button_id)]["hidden"] = hidden                            # True if the button should be hidden in run mode
         buttons[str(button_id)]["buttontype"] = buttontype                    # Type of the button (route, switch or button)
         buttons[str(button_id)]["button"] = button                            # Tkinter button object (for run mode)
         buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
