@@ -783,7 +783,7 @@ def assert_buttons_enabled(*buttonids):
     for buttonid in buttonids:
         if str(buttonid) not in buttons.buttons.keys():
             raise_test_warning ("assert_routes_enabled - Route: "+str(buttonid)+" does not exist")
-        elif not buttons.button_enabled(buttonid):
+        elif buttons.buttons[str(buttonid)]["button"]["state"] == "disabled":
             raise_test_error ("assert_routes_enabled - Route: "+str(buttonid)+" - Test Fail")
         increment_tests_executed()
 
@@ -791,7 +791,7 @@ def assert_buttons_disabled(*buttonids):
     for buttonid in buttonids:
         if str(buttonid) not in buttons.buttons.keys():
             raise_test_warning ("assert_routes_disabled - Route: "+str(buttonid)+" does not exist")
-        elif buttons.button_enabled(buttonid):
+        elif buttons.buttons[str(buttonid)]["button"]["state"] == "normal":
             raise_test_error ("assert_routes_disabled - Route: "+str(buttonid)+" - Test Fail")
         increment_tests_executed()
 
