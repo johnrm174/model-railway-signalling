@@ -13,14 +13,14 @@ sleep 5
 filename=signalling.log
 current_time=$(date "+%Y%m%d-%H%M%S")
 logfilename=$current_time-$filename
-echo $logfilename >> /home/signalbox/"Signalling Logs"/$logfilename 2>&1
+echo $logfilename >> /home/signalbox/Signalling/Logs/$logfilename 2>&1
 #
 # Modify the filename after the -f flag to load a different layout file on startup
 # eg: python3 -m model_railway_signals -f /home/signalbox/my_layout.sig
 # You can also specify a different logging level if required (DEBUG, INFO, WARNING or ERROR)
 # eg: python3 -m model_railway_signals -f /home/signalbox/my_layout.sig -l DEBUG
 #
-python3 -m model_railway_signals -f /home/signalbox/sensor_node.sig >> /home/signalbox/"Signalling Logs"/$logfilename 2>&1
+python3 -m model_railway_signals -f /home/signalbox/Signalling/Files/sensor_node.sig >> /home/signalbox/Signalling/Logs/$logfilename 2>&1
 #
 # Comment out the following lines if you don't want to shut down the Raspberry Pi on application exit
 #
