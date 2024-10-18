@@ -48,34 +48,20 @@ email: enquiries@model-railway-signalling.co.uk
 
 For a first time installation use:
 <pre>
-$ pip install model-railway-signals <== This should work for most python installations
+$ pip install model-railway-signals             <== This should work for most python installations
 or
-$ python -m pip install model-railway-signals <== If the command line version of pip is not installed/enabled
+$ python -m pip install model-railway-signals   <== If the command line version of pip is not installed/enabled
 or
-$ python -m pip install model-railway-signals <== If you have multiple major versions of python installed
+$ python3 -m pip install model-railway-signals  <== If you have multiple major versions of python installed
 </pre>
 When installing the application on later versions of python you may get the following error:
 <pre>
 error: externally-managed-environment
-
-× This environment is externally managed
-╰─> To install Python packages system-wide, try apt install
-    python3-xyz, where xyz is the package you are trying to
-    install.
-
-    If you wish to install a non-Debian-packaged Python package,
-    create a virtual environment using python3 -m venv path/to/venv.
-    Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
-    sure you have python3-full installed.
-
-    If you wish to install a non-Debian packaged Python application,
-    it may be easiest to use pipx install xyz, which will manage a
-    virtual environment for you. Make sure you have pipx installed.
-
-    See /usr/share/doc/python3.11/README.venv for more information.
 </pre>
-To overcome this, remove the 'EXTERNALLY-MANAGED' file from the default python installation and then re-attempt the install (as above).
-Note that this is the file location for the Raspberry Pi python 3.11 installation. Other platforms may use a different location for this file:
+To overcome this, add the '--break-system-packages' argument to the command - e.g.
+<pre>
+$ pip install --break-system-packages model-railway-signals 
+</pre>
 <pre>
 $ sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
 </pre>
@@ -85,15 +71,15 @@ $ pip install --upgrade model-railway-signals            <== This should work fo
 or
 $ python -m pip install --upgrade model-railway-signals  <== If the command line version of pip is not installed/enabled
 or
-$ python -m pip install --upgrade model-railway-signals  <== If you have multiple major versions of python installed
+$ python3 -m pip install --upgrade model-railway-signals <== If you have multiple major versions of python installed
 </pre>
 To remove the application:
 <pre>
-$ pip uninstall model-railway-signals <== This should work for most python installations
+$ pip uninstall model-railway-signals                    <== This should work for most python installations
 or
 $ python -m pip uninstall model-railway-signals          <== If the command line version of pip is not installed/enabled
 or
-$ python -m pip uninstall model-railway-signals          <== If you have multiple major versions of python installed
+$ python3 -m pip uninstall model-railway-signals         <== If you have multiple major versions of python installed
 </pre>
 To install a specific version of the application the application:
 <pre>
@@ -101,7 +87,7 @@ $ pip install model-railway-signals==4.5.0               <== This should work fo
 or
 $ python -m pip install model-railway-signals==4.5.0     <== If the command line version of pip is not installed/enabled
 or
-$ python -m pip install model-railway-signals==4.5.0     <== If you have multiple major versions of python installed
+$ python3 -m pip install model-railway-signals==4.5.0    <== If you have multiple major versions of python installed
 </pre>
 The application has minimum external dependencies (over and above the 'standard' python installation),
 'pyserial' and 'paho-mqtt', both of which should automatically get installed with the application.
