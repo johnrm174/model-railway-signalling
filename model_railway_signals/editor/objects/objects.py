@@ -101,14 +101,6 @@ from . import objects_switches
 
 from .. import run_layout
 
-#######################################################################################################
-### Handle change of sensors being a configuration item in their own right from release 3.6.0 #########
-#######################################################################################################
-from .. import settings 
-#######################################################################################################
-################################## End of code to handle breaking changes #############################
-#######################################################################################################
-
 #------------------------------------------------------------------------------------
 # Internal function to bring all track sections, route buttons and switches to the
 # front. This ensures they are not obscured by any lines drawn on the canvas
