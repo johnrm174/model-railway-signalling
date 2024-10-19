@@ -15,16 +15,15 @@
 #    buttons.button_exists(button_id) - To see if a specified (route) button ID exists
 #
 # Inherits the following common editor base classes (from common):
-# #    common.int_item_id_entry_box
-# #    common.object_id_selection
-# #    common.colour_selection
-# #    common.entry_box
-# #    common.integer_entry_box
-# #    common.point_interlocking_entry
-# #    common.entry_box_grid
-# #    common.scrollable_text_frame
-# #    common.window_controls
-# #    common.check_box
+#    common.object_id_selection
+#    common.integer_entry_box
+#    common.colour_selection
+#    common.check_box
+#    common.selection_buttons
+#    common.entry_box
+#    common.scrollable_text_frame
+#    common.row_of_validated_dcc_commands
+#    common.window_controls
 #
 #------------------------------------------------------------------------------------
 
@@ -149,7 +148,10 @@ class edit_switch():
             self.load_state()
 
     def switch_type_updated(self):
-        pass
+        if self.switchtype.get_value() == buttons.button_type.momentary.value:
+            self.offcommands.disable()
+        else:
+            self.offcommands.enable()
 
 #------------------------------------------------------------------------------------
 # Functions for load, save and close window
@@ -168,11 +170,14 @@ class edit_switch():
             self.buttonid.set_value(item_id)
             self.buttonname.set_value(objects.schematic_objects[self.object_id]["switchname"])
             self.description.set_value(objects.schematic_objects[self.object_id]["switchdescription"])
+            self.switchtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.buttonhidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.oncommands.set_values(objects.schematic_objects[self.object_id]["dcconcommands"], item_id=item_id)
             self.offcommands.set_values(objects.schematic_objects[self.object_id]["dccoffcommands"], item_id=item_id)
+            # Enable/disable the 'off' UI elements depending on switch type
+            self.switch_type_updated()
             # Hide the validation error message
             self.validation_error.pack_forget()        
         return()
@@ -192,6 +197,7 @@ class edit_switch():
             new_object_configuration["itemid"] = self.buttonid.get_value()
             new_object_configuration["switchname"] = self.buttonname.get_value()
             new_object_configuration["switchdescription"] = self.description.get_value()
+            new_object_configuration["itemtype"] = self.switchtype.get_value()
             new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
             new_object_configuration["hidden"] = self.buttonhidden.get_value()
