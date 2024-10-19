@@ -121,8 +121,8 @@ class edit_route():
             self.frame2 = Tk.LabelFrame(self.main_frame, text="Points to set")
             self.frame2.pack(padx=2, pady=2, fill='x')
             self.points = common.entry_box_grid(self.frame2, base_class=common.point_interlocking_entry, columns=7,
-                exists_function = points.point_exists, tool_tip="Specify the points that need to be set and locked "+
-                                                    "for the route and their required configuration (normal/switched)")
+                                            tool_tip="Specify the points that need to be set and locked "+
+                                            "for the route and their required configuration (normal/switched)")
             self.frame3 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
             self.frame3.pack(padx=2, pady=2, fill='x')
             self.signals = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=12,
