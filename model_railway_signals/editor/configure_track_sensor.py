@@ -16,7 +16,6 @@
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
 #    track_sensors.track_sensor_exists(id) - To see if the track sensor exists
 #    track_sections.section_exists(id) - To see if the track section exists (local or remote)
-#    points.point_exists(id) - To see if the point exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.str_int_item_id_entry_box
