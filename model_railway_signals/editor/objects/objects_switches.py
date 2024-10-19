@@ -39,6 +39,7 @@ import uuid
 import copy
 
 from ...library import buttons
+from ...library import dcc_control
 from . import objects_common
 
 #------------------------------------------------------------------------------------
@@ -53,10 +54,10 @@ default_switch_object["switchdescription"] = "Switch description (Run Mode toolt
 default_switch_object["buttonwidth"] = 10
 default_switch_object["buttoncolour"] = "SkyBlue2"
 default_switch_object["hidden"] = False
-# Each DCC command sequence comprises a list of DCC commands [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+# Each DCC command sequence comprises a variable list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
-default_switch_object["dcconcommands"] = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
-default_switch_object["dccoffcommands"] = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
+default_switch_object["dcconcommands"] = []
+default_switch_object["dccoffcommands"] = []
 
 #------------------------------------------------------------------------------------
 # Function to to update a Switch object following a configuration change
@@ -91,7 +92,10 @@ def local_null_callback(button_id):
 #------------------------------------------------------------------------------------
         
 def redraw_switch_object(object_id):
-    ############### VREATE DCC MAPPING ############################
+    # Create the DCC mapping for the switch
+    dcc_control.map_dcc_switch(objects_common.schematic_objects[object_id]["itemid"],
+                               objects_common.schematic_objects[object_id]["dcconcommands"],
+                               objects_common.schematic_objects[object_id]["dccoffcommands"])
     # Turn the button type value back into the required enumeration type
     button_type = buttons.button_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Work out what the active and selected colours for the button should be
@@ -177,6 +181,7 @@ def delete_switch_object(object_id):
     # Delete the associated library objects
     item_id = objects_common.schematic_objects[object_id]["itemid"]
     buttons.delete_button(item_id)
+    dcc_control.delete_switch_mapping(objects_common.schematic_objects[object_id]["itemid"])
     return()
 
 #------------------------------------------------------------------------------------

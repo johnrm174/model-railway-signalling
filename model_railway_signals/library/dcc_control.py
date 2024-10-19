@@ -479,11 +479,11 @@ def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
 
 #----------------------------------------------------------------------------------------------------
 # Function to "map" a DCC Switch object to a series of DCC addresses/command sequences
-# Note we allow DCC addresses of zero to be specified (i.e. no mapping for that element)
+# The variable length command lists contain valid DCC commands with no 'blanks' (address=zero)
 #----------------------------------------------------------------------------------------------------
 
 def map_dcc_switch(switch_id:int, on_commands:[[int,bool],], off_commands:[[int,bool],]):
-    global dcc_signal_mappings
+    global dcc_switch_mappings
     global dcc_address_mappings
     # Do some basic validation on the parameters we have been given
     if not isinstance(switch_id,int) or switch_id < 1:
@@ -499,7 +499,7 @@ def map_dcc_switch(switch_id:int, on_commands:[[int,bool],], off_commands:[[int,
             new_dcc_mapping = {
                 "oncommands" : on_commands,
                 "offcommands": off_commands }
-            dcc_signal_mappings[str(switch_id)] = new_dcc_mapping
+            dcc_switch_mappings[str(switch_id)] = new_dcc_mapping
             # Update the DCC mappings dictionary with all addresses used by the switch
             add_dcc_commands_to_dcc_address_mappings("Switch", switch_id, list_of_commands)
     return()
@@ -522,20 +522,20 @@ def update_dcc_point(point_id:int, state:bool):
 
 #----------------------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to set the state of a DCC accessory.
+# The variable length command lists contain valid DCC commands with no 'blanks' (address=zero)
 #----------------------------------------------------------------------------------------------------
 
 def update_dcc_switch(switch_id:int, state:bool):
     if switch_mapped(switch_id):
-        if state: commands = dcc_signal_mappings[str(switch_id)]["oncommands"]
-        else: commands = dcc_signal_mappings[str(switch_id)]["offcommands"]
+        if state: commands = dcc_switch_mappings[str(switch_id)]["oncommands"]
+        else: commands = dcc_switch_mappings[str(switch_id)]["offcommands"]
         for entry in commands:
-            if entry[0] > 0:
-                # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
-                # Note that the commands will only be sent if the pi-sprog interface is configured
-                pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
-                # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-                # Commands will only be published if networking is configured and publishing is enabled
-                publish_accessory_short_event(entry[0],entry[1])
+            # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
+            # Note that the commands will only be sent if the pi-sprog interface is configured
+            pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
+            # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+            # Commands will only be published if networking is configured and publishing is enabled
+            publish_accessory_short_event(entry[0],entry[1])
     return()
 
 #----------------------------------------------------------------------------------------------------
