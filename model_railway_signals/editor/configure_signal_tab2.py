@@ -5,7 +5,6 @@
 #
 # Makes the following external API calls to library modules:
 #    signals.signal_exists(id) - To see if the instrument exists (local or remote)
-#    points.point_exists(id) - To see if the point exists (local)
 #    block_instruments.instrument_exists(id) - To see if the instrument exists (local or remote)
 #    track_sections.section_exists(id) - To see if the track section exists
 #
@@ -22,7 +21,6 @@ import tkinter as Tk
 
 from . import common
 
-from ..library import points
 from ..library import signals
 from ..library import block_instruments
 from ..library import track_sections
@@ -48,7 +46,6 @@ class interlocking_route_group:
         # These are the 'item exists' functions for validation
         signal_exists_function = signals.signal_exists
         instrument_exists_function = block_instruments.instrument_exists
-        point_exists_function = points.point_exists
         # Create a frame for this UI element (always packed into the parent frame)
         self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
@@ -57,12 +54,12 @@ class interlocking_route_group:
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify any points that need to be set and locked before the signal can be cleared for the route"
-        self.p1 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
-        self.p2 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
-        self.p3 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
-        self.p4 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
-        self.p5 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
-        self.p6 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p1 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p2 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p3 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p4 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p5 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p6 = common.point_interlocking_entry(self.frame, tool_tip)
         self.p1.pack(side = Tk.LEFT)
         self.p2.pack(side = Tk.LEFT)
         self.p3.pack(side = Tk.LEFT)
