@@ -33,7 +33,6 @@ import tkinter as Tk
 from . import common
 from . import objects
 
-from ..library import points
 from ..library import gpio_sensors
 from ..library import track_sensors
 from ..library import track_sections
@@ -124,12 +123,12 @@ class track_sensor_route_group():
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify the points that need to be configured for the route"
-        self.p1 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p2 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p3 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p4 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p5 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p6 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p1 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p2 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p3 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p4 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p5 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p6 = common.point_interlocking_entry(self.frame, tool_tip)
         self.p1.pack(side = Tk.LEFT)
         self.p2.pack(side = Tk.LEFT)
         self.p3.pack(side = Tk.LEFT)
