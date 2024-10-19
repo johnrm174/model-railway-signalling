@@ -29,7 +29,8 @@
 #    buttons.create_button(id) - Create the library object
 #    buttons.delete_button(id) - Delete the library object
 #    buttons.button_exists - to find out if the specified Item ID already exists
-#
+#    dcc_control.map_dcc_switch - Create a DCC mapping for the Accessory Switch
+#    dcc_control.delete_switch_mapping - Delete the DCC mapping for the switch
 # Accesses the following external library objects directly:
 #    button.button_type - for setting the enum value when creating the object
 #
