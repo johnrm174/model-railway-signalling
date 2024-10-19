@@ -126,12 +126,12 @@ class edit_textbox():
             self.frame2.pack(padx=2, pady=2, fill='x')
             # Create the text colour and text background colour selection elements
             self.colour = common.colour_selection(self.frame2, label="Text colour")
-            self.colour.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
-            self.background = common.colour_selection(self.frame2, label="Background colour")
+            self.colour.frame.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
+            self.background = common.colour_selection(self.frame2, label="Background colour", transparent_option=True)
             self.background.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
             # Create a Frame for the Text Justification
             self.frame3 = Tk.Frame(self.main_frame)
-            self.frame3.pack(padx=2, pady=2, fill='x')
+            self.frame3.pack(fill='x')
             # Use radio buttons for the text justification selection
             self.justify = common.selection_buttons(self.frame3, label="Text Justification",
                     tool_tip= "select text justification", b1="Left", b2="Centre", b3="Right",
@@ -139,7 +139,13 @@ class edit_textbox():
             self.justify.frame.pack(padx=2, pady=2, fill='x')
             # Create a Frame for the Text Style Entry widgey
             self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
-            self.textstyle.frame.pack(padx=2, pady=2, fill='x')        
+            self.textstyle.frame.pack(padx=2, pady=2, fill='x')
+            # Create a Frame for the other general settings
+            self.subframe1 = Tk.LabelFrame(self.window, text="General Settings")
+            self.subframe1.pack(padx=2, pady=2, fill='x')
+            self.hidden = common.check_box(self.subframe1, label="Hidden",
+                     tool_tip= "Select to hide the Text Box in Run Mode")
+            self.hidden.pack(padx=2, pady=2)
             # load the initial UI state
             self.load_state()
         
@@ -162,6 +168,7 @@ class edit_textbox():
             self.text.set_value(objects.schematic_objects[self.object_id]["text"])
             self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
             self.background.set_value(objects.schematic_objects[self.object_id]["background"])
+            self.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             justify = objects.schematic_objects[self.object_id]["justify"]
             font = objects.schematic_objects[self.object_id]["font"]
             font_size = objects.schematic_objects[self.object_id]["fontsize"]
@@ -188,6 +195,7 @@ class edit_textbox():
             new_object_configuration["text"] = self.text.get_value()
             new_object_configuration["colour"] = self.colour.get_value()
             new_object_configuration["background"] = self.background.get_value()
+            new_object_configuration["hidden"] = self.hidden.get_value()
             new_object_configuration["justify"] = self.justify.get_value()
             font, font_size, font_style, border = self.textstyle.get_values()
             new_object_configuration["font"] = font

@@ -38,9 +38,10 @@
     },
     "objects": {
         "0924c57d-1f88-4c4f-9a85-88c502e9aedd": {
-            "bbox": 14467,
+            "bbox": 14776,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 5,
             "mirror": "",
@@ -55,7 +56,7 @@
                 0,
                 0
             ],
-            "bbox": 14473,
+            "bbox": 14782,
             "colour": "black",
             "endx": 400.0,
             "endy": 400.0,
@@ -68,24 +69,26 @@
         },
         "1231bb63-e727-4e5a-bad9-14c09f9b0f11": {
             "background": "grey85",
-            "bbox": 14476,
+            "bbox": 14785,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 1,
             "justify": 2,
             "posx": 675.0,
             "posy": 175.0,
-            "tags": "1231bb63-e727-4e5a-bad9-14c09f9b0f11",
+            "tags": "textbox1",
             "text": "R3"
         },
         "12db2eb4-7d45-452e-ae19-47b8532b48ef": {
-            "bbox": 14480,
+            "bbox": 14789,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 1,
             "mirror": "",
@@ -100,7 +103,7 @@
                 0,
                 0
             ],
-            "bbox": 14486,
+            "bbox": 14795,
             "colour": "black",
             "endx": 275.0,
             "endy": 175.0,
@@ -113,18 +116,19 @@
         },
         "1a8672c8-8635-4e64-af85-50b58a598119": {
             "background": "grey85",
-            "bbox": 14489,
+            "bbox": 14798,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 2,
             "justify": 2,
             "posx": 675.0,
             "posy": 125.0,
-            "tags": "1a8672c8-8635-4e64-af85-50b58a598119",
+            "tags": "textbox2",
             "text": "R2"
         },
         "1acc91ea-c516-40c0-80ce-d9db3895abac": {
@@ -139,7 +143,7 @@
                 false,
                 ""
             ],
-            "bbox": 14508,
+            "bbox": 14817,
             "dccaspects": [
                 [
                     [
@@ -1020,7 +1024,7 @@
                 false,
                 ""
             ],
-            "bbox": 14527,
+            "bbox": 14836,
             "dccaspects": [
                 [
                     [
@@ -1890,7 +1894,8 @@
             ]
         },
         "280d74dc-dffb-402d-a51d-1e80f29a3a10": {
-            "bbox": 14531,
+            "bbox": 14840,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 10,
             "item": "route",
             "itemid": 7,
@@ -1910,6 +1915,7 @@
             "routecolour": "#00ff00",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Branch",
+            "setupsensor": 0,
             "signalsonroute": [
                 5
             ],
@@ -1925,7 +1931,7 @@
                 0,
                 0
             ],
-            "bbox": 14537,
+            "bbox": 14846,
             "colour": "black",
             "endx": 650.0,
             "endy": 125.0,
@@ -1937,7 +1943,7 @@
             "tags": "line4"
         },
         "372e382f-2dad-44b3-b825-e174d4cdb259": {
-            "bbox": 14552,
+            "bbox": 14861,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1960,7 +1966,7 @@
                 false,
                 ""
             ],
-            "bbox": 14571,
+            "bbox": 14880,
             "dccaspects": [
                 [
                     [
@@ -2836,7 +2842,7 @@
                 0,
                 0
             ],
-            "bbox": 14577,
+            "bbox": 14886,
             "colour": "black",
             "endx": 650.0,
             "endy": 175.0,
@@ -2854,7 +2860,7 @@
                 0,
                 0
             ],
-            "bbox": 14583,
+            "bbox": 14892,
             "colour": "black",
             "endx": 650.0,
             "endy": 75.0,
@@ -2867,22 +2873,24 @@
         },
         "420c4fa6-0479-4e63-85b6-32c16cfcce4a": {
             "background": "grey85",
-            "bbox": 14586,
+            "bbox": 14895,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 3,
             "justify": 2,
             "posx": 725.0,
             "posy": 375.0,
-            "tags": "420c4fa6-0479-4e63-85b6-32c16cfcce4a",
+            "tags": "textbox3",
             "text": "This Layout File should be saved in RUN Mode\nwith Automation ON and 'Route 3 Main' active"
         },
         "43dc9897-b2c9-419c-98c7-0fce8c3179af": {
-            "bbox": 14590,
+            "bbox": 14899,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
             "itemid": 2,
@@ -2903,6 +2911,7 @@
             "routecolour": "#00ff00",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 1 Shunt",
+            "setupsensor": 0,
             "signalsonroute": [],
             "subsidariesonroute": [
                 1
@@ -2912,9 +2921,10 @@
             "tracksensor": 0
         },
         "462b2667-f649-4486-b7a2-2679d7599a22": {
-            "bbox": 14594,
+            "bbox": 14903,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 7,
             "mirror": "",
@@ -2925,7 +2935,7 @@
         "466fdbb1-49a5-4389-ba22-b56e86e3a59b": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 14600,
+            "bbox": 14909,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2981,7 +2991,7 @@
                 0,
                 0
             ],
-            "bbox": 14606,
+            "bbox": 14915,
             "colour": "black",
             "endx": 300.0,
             "endy": 400.0,
@@ -3004,7 +3014,7 @@
                 false,
                 ""
             ],
-            "bbox": 14623,
+            "bbox": 14932,
             "dccaspects": [
                 [
                     [
@@ -3869,7 +3879,7 @@
                 0,
                 0
             ],
-            "bbox": 14629,
+            "bbox": 14938,
             "colour": "black",
             "endx": 400.0,
             "endy": 375.0,
@@ -3881,7 +3891,8 @@
             "tags": "line7"
         },
         "6925181f-7e58-4997-b225-794c2d3324cd": {
-            "bbox": 14633,
+            "bbox": 14942,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 10,
             "item": "route",
             "itemid": 8,
@@ -3901,6 +3912,7 @@
             "routecolour": "#00ff00",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Main",
+            "setupsensor": 0,
             "signalsonroute": [
                 5
             ],
@@ -3911,22 +3923,24 @@
         },
         "6fa5a660-bbf1-40d3-9466-a5e1c32a07ac": {
             "background": "grey85",
-            "bbox": 14636,
+            "bbox": 14945,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 4,
             "justify": 2,
             "posx": 675.0,
             "posy": 75.0,
-            "tags": "6fa5a660-bbf1-40d3-9466-a5e1c32a07ac",
+            "tags": "textbox4",
             "text": "R1"
         },
         "704ba590-fd9e-4cb0-9175-32af75278e82": {
-            "bbox": 14640,
+            "bbox": 14949,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
             "itemid": 3,
@@ -3948,6 +3962,7 @@
             "routecolour": "#ff0000",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 2 Main",
+            "setupsensor": 0,
             "signalsonroute": [
                 1
             ],
@@ -3963,7 +3978,7 @@
                 0,
                 0
             ],
-            "bbox": 14646,
+            "bbox": 14955,
             "colour": "black",
             "endx": 175.0,
             "endy": 125.0,
@@ -3986,7 +4001,7 @@
                 false,
                 ""
             ],
-            "bbox": 14665,
+            "bbox": 14974,
             "dccaspects": [
                 [
                     [
@@ -4856,7 +4871,7 @@
             ]
         },
         "87f3f4a6-5fce-4ec3-ad51-7dfddf217e1b": {
-            "bbox": 14680,
+            "bbox": 14989,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -4870,7 +4885,7 @@
         "88495a44-2ae1-478e-a569-1fcc3e5752d5": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 14686,
+            "bbox": 14995,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4889,7 +4904,8 @@
             "ybuttonoffset": 0
         },
         "918adc91-218c-457c-a775-1ee41f83cc68": {
-            "bbox": 14690,
+            "bbox": 14999,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
             "itemid": 6,
@@ -4912,6 +4928,7 @@
             "routecolour": "#00ff00",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 3 Shunt",
+            "setupsensor": 0,
             "signalsonroute": [],
             "subsidariesonroute": [
                 1
@@ -4932,7 +4949,7 @@
                 false,
                 ""
             ],
-            "bbox": 14709,
+            "bbox": 15018,
             "dccaspects": [
                 [
                     [
@@ -5802,9 +5819,10 @@
             ]
         },
         "9547b313-2571-4ea6-a026-7d9434e05137": {
-            "bbox": 14713,
+            "bbox": 15022,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 8,
             "mirror": "",
@@ -5813,7 +5831,8 @@
             "tags": "section8"
         },
         "971da1aa-52b9-42dd-b2ca-40db4c8a513b": {
-            "bbox": 14717,
+            "bbox": 15026,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
             "itemid": 4,
@@ -5835,6 +5854,7 @@
             "routecolour": "#00ff00",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 2 Shunt",
+            "setupsensor": 0,
             "signalsonroute": [],
             "subsidariesonroute": [
                 1
@@ -5850,7 +5870,7 @@
                 0,
                 0
             ],
-            "bbox": 14723,
+            "bbox": 15032,
             "colour": "black",
             "endx": 225.0,
             "endy": 75.0,
@@ -5873,7 +5893,7 @@
                 false,
                 ""
             ],
-            "bbox": 14742,
+            "bbox": 15051,
             "dccaspects": [
                 [
                     [
@@ -6743,9 +6763,10 @@
             ]
         },
         "ad6c5d81-9864-4204-afc9-5c47ca23937e": {
-            "bbox": 14746,
+            "bbox": 15055,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 3,
             "mirror": "",
@@ -6765,7 +6786,7 @@
                 false,
                 ""
             ],
-            "bbox": 14765,
+            "bbox": 15074,
             "dccaspects": [
                 [
                     [
@@ -7689,7 +7710,7 @@
         "c066da43-4a4e-4839-8e88-d65e842f1195": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 14771,
+            "bbox": 15080,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7750,24 +7771,26 @@
         },
         "c25738d9-8763-45a3-b4d4-0d22959570f8": {
             "background": "grey85",
-            "bbox": 14774,
+            "bbox": 15083,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 5,
             "justify": 2,
             "posx": 825.0,
             "posy": 25.0,
-            "tags": "c25738d9-8763-45a3-b4d4-0d22959570f8",
+            "tags": "textbox5",
             "text": "Instruments controlling Route 1"
         },
         "c2d0102b-7032-4fa3-92b5-a9698485399f": {
-            "bbox": 14778,
+            "bbox": 15087,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 4,
             "mirror": "",
@@ -7776,9 +7799,10 @@
             "tags": "section4"
         },
         "c6ee6d5e-87fd-4685-bf52-559af959aa45": {
-            "bbox": 14782,
+            "bbox": 15091,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 9,
             "mirror": "",
@@ -7787,9 +7811,10 @@
             "tags": "section9"
         },
         "e2f14aba-d776-4f1e-91f0-ea653bb150fa": {
-            "bbox": 14786,
+            "bbox": 15095,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 2,
             "mirror": "",
@@ -7798,9 +7823,10 @@
             "tags": "section2"
         },
         "eecbdb5e-04c4-4fc8-97f7-b0b7ebfce322": {
-            "bbox": 14790,
+            "bbox": 15099,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 6,
             "mirror": "",
@@ -7809,7 +7835,8 @@
             "tags": "section6"
         },
         "f9d2ee11-4010-46e4-948e-0a4e1c062b33": {
-            "bbox": 14794,
+            "bbox": 15103,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
             "itemid": 1,
@@ -7830,6 +7857,7 @@
             "routecolour": "#ff0000",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 1 Main",
+            "setupsensor": 0,
             "signalsonroute": [
                 1
             ],
@@ -7839,7 +7867,8 @@
             "tracksensor": 0
         },
         "fdb9c32e-4cee-4264-b5d3-5d30da73ee8b": {
-            "bbox": 14798,
+            "bbox": 15107,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
             "itemid": 5,
@@ -7862,6 +7891,7 @@
             "routecolour": "#ff0000",
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 3 Main",
+            "setupsensor": 0,
             "signalsonroute": [
                 1
             ],
@@ -7935,11 +7965,12 @@
         },
         "general": {
             "automation": true,
+            "buttonsize": 8,
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/system_tests/test_schematic_routes.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.6.1"
+            "version": "Version 4.7.0"
         },
         "gpio": {
             "portmappings": [],

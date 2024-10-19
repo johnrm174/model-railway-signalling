@@ -80,6 +80,10 @@ from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
 from .track_sensors import delete_track_sensor
 
+from .text_boxes import create_text_box
+from .text_boxes import text_box_exists
+from .text_boxes import delete_text_box
+
 from .pi_sprog_interface import sprog_connect
 from .pi_sprog_interface import sprog_disconnect
 from .pi_sprog_interface import service_mode_read_cv
@@ -117,10 +121,10 @@ from .buttons import button_exists
 from .buttons import delete_button
 from .buttons import toggle_button
 from .buttons import enable_button
+from .buttons import lock_button
+from .buttons import unlock_button
 from .buttons import disable_button
 from .buttons import button_state
-from .buttons import button_enabled
-from .buttons import processing_complete
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -129,12 +133,14 @@ from .file_interface import save_schematic
 from .common import set_root_window
 from .common import shutdown
 from .common import configure_edit_mode
+from .common import configure_button_size
 
 __all__ = [
       # Public common functions
         'set_root_window',
         'shutdown',
         'configure_edit_mode',
+        'configure_button_size',
       # Public point types/functions
         'point_type',
         'create_point',
@@ -154,6 +160,10 @@ __all__ = [
         'create_track_sensor',
         'delete_track_sensor',
         'track_sensor_exists',
+      # public text box types/functions
+        'create_text_box',
+        'delete_text_box',
+        'text_box_exists',
       # Public signal types/functions
         'signal_type',
         'signal_subtype',
@@ -252,9 +262,9 @@ __all__ = [
         'toggle_button',
         'enable_button',
         'disable_button',
+        'lock_button',
+        'unlock_button',
         'button_state',
-        'button_enabled',
-        'processing_complete',
       # Public file interface functions
         'save_schematic',
         'load_schematic',

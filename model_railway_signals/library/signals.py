@@ -553,11 +553,12 @@ def enable_disable_theatre_route_indication(sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_signal_aspect(sig_id:int):
-    # Call the signal type-specific functions to update the signal (note that we only update
-    # Colour light signals if they are configured to update immediately after a state change)
-    if signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
-        if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
+    # Call the signal type-specific functions to update semaphore, ground position and
+    # ground disc signals. Note that we don't update colour light signals as the aspect
+    # they need to display may depend on the signal ahead - in this case, the calling
+    # programme needs to call 'signals_colour_lights.update_colour_light_signal' with
+    # the ID of the signal to update and the ID of the signal on the route ahead
+    if signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
         signals_ground_position.update_ground_position_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         signals_semaphores.update_semaphore_signal(sig_id)

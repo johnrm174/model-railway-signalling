@@ -16,7 +16,6 @@
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
 #    track_sensors.track_sensor_exists(id) - To see if the track sensor exists
 #    track_sections.section_exists(id) - To see if the track section exists (local or remote)
-#    points.point_exists(id) - To see if the point exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.str_int_item_id_entry_box
@@ -33,7 +32,6 @@ import tkinter as Tk
 from . import common
 from . import objects
 
-from ..library import points
 from ..library import gpio_sensors
 from ..library import track_sensors
 from ..library import track_sections
@@ -69,7 +67,7 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
         # Create a subframe to centre the UI elements
         self.subframe=Tk.Frame(self.frame)
         self.subframe.pack()
-        self.label = Tk.Label(self.subframe, text="  Track Sensor 'passed' sensor:")
+        self.label = Tk.Label(self.subframe, text="  Sensor 'passed' sensor:")
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
         # The 'exists' function will return true if the GPIO sensor exists
         exists_function = gpio_sensors.gpio_sensor_exists
@@ -124,12 +122,12 @@ class track_sensor_route_group():
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify the points that need to be configured for the route"
-        self.p1 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p2 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p3 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p4 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p5 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
-        self.p6 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p1 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p2 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p3 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p4 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p5 = common.point_interlocking_entry(self.frame, tool_tip)
+        self.p6 = common.point_interlocking_entry(self.frame, tool_tip)
         self.p1.pack(side = Tk.LEFT)
         self.p2.pack(side = Tk.LEFT)
         self.p3.pack(side = Tk.LEFT)
@@ -256,7 +254,13 @@ class edit_track_sensor():
             self.sensorid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the UI Element for the GPIO Sensor selection.
             self.gpiosensor = gpio_sensor_selection(self.frame)
-            self.gpiosensor.frame.pack(padx=2, pady=2, fill='x')
+            self.gpiosensor.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            # Create the UI Element for the general settings
+            self.subframe1 = Tk.LabelFrame(self.frame, text="General Settings")
+            self.subframe1.pack(padx=2, pady=2, fill='x')
+            self.hidden = common.check_box(self.subframe1, label="Hidden",
+                     tool_tip= "Select to hide the Track Sensor in Run Mode")
+            self.hidden.pack(padx=2, pady=2)
             # Create the UI Elements for the track sensor route elements
             self.behind = track_sensor_route_frame(self.window,label="Routes / Track Sections 'behind' Track Sensor")
             self.behind.frame.pack(padx=2, pady=2, fill='x')
@@ -288,6 +292,7 @@ class edit_track_sensor():
             self.gpiosensor.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.ahead.set_routes(objects.schematic_objects[self.object_id]["routeahead"])
             self.behind.set_routes(objects.schematic_objects[self.object_id]["routebehind"])
+            self.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
@@ -308,6 +313,7 @@ class edit_track_sensor():
             new_object_configuration["passedsensor"] = self.gpiosensor.get_value()
             new_object_configuration["routeahead"] = self.ahead.get_routes()
             new_object_configuration["routebehind"] = self.behind.get_routes()
+            new_object_configuration["hidden"] = self.hidden.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

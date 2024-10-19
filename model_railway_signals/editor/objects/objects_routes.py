@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------------------
-# This module contains all the functions for managing 'Route' objects
+# This module contains all the functions for managing 'Route' objects. Note that
+# "Route" objects use the same underlying button library functions as "Switch" Objects
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules: 
@@ -25,18 +26,24 @@
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
+#    objects_common.get_offset_colour - Get a colour with a specified brightness offset to a specified colour
+#    objects_common.get_text_colour - Get text colour (black/white) for max contrast with the background colour
 #    
 # Accesses the following external editor objects directly:
-#    objects_common.objects_common.schematic_objects - the master dictionary of Schematic Objects
-#    objects_common.objects_common.route_index - the type-specific index for this object type
+#    objects_common.schematic_objects - the master dictionary of Schematic Objects
+#    objects_common.route_index - the type-specific index for this object type
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
+#    objects_common.root - Reference to the Tkinter root object
 #
-## Makes the following external API calls to library modules:
+# Makes the following external API calls to library modules:
 #    buttons.create_button(id) - Create the library object
 #    buttons.delete_button(id) - Delete the library object
 #    buttons.button_exists - to find out if the specified Item ID already exists
+#
+# Accesses the following external library objects directly:
+#    button.button_type - for setting the enum value when creating the object
 #
 #------------------------------------------------------------------------------------
 
@@ -62,9 +69,11 @@ default_route_object["pointsonroute"] = {}
 default_route_object["linestohighlight"] = []
 default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
+default_route_object["buttoncolour"] = "SeaGreen3"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
 default_route_object["tracksensor"] = 0
+default_route_object["setupsensor"] = 0
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from the Route's points table.
@@ -179,26 +188,32 @@ def update_references_to_line(old_line_id:int, new_line_id:int):
 
 #------------------------------------------------------------------------------------
 # Function to remove references to a Sensor ID from the Route's configuration.
-# This is the 'tracksensor' element in the Route description dictionary.
+# These are the 'tracksensor' and 'setupsensor' elements in the Route dictionary.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_sensor(sensor_id:int):
     for route_id in objects_common.route_index:
-        current_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
-        if current_sensor_id == sensor_id:
+        current_cleardown_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
+        if current_cleardown_sensor_id == sensor_id:
             objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = 0
+        current_setup_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"]
+        if current_setup_sensor_id == sensor_id:
+            objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = 0
     return()
 
 #------------------------------------------------------------------------------------
 # Function to update references to a Sensor ID in the Route's configuration
-# This is the 'tracksensor' element in the Route description dictionary.
+# These are the 'tracksensor' and 'setupsensor' elements in the Route dictionary.
 #------------------------------------------------------------------------------------
 
 def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
     for route_id in objects_common.route_index:
-        current_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
-        if current_sensor_id == old_sensor_id:
+        current_cleardown_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
+        if current_cleardown_sensor_id == old_sensor_id:
             objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = new_sensor_id
+        current_setup_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"]
+        if current_setup_sensor_id == old_sensor_id:
+            objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = new_sensor_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -226,16 +241,25 @@ def update_route(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
         
 def redraw_route_object(object_id):
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be - using the brightest of the three
+    text_colour = objects_common.get_text_colour(selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
+                buttontype = buttons.button_type.switched,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
                 selected_callback = run_routes.set_schematic_route_callback,
                 deselected_callback = run_routes.clear_schematic_route_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
-                tooltip = objects_common.schematic_objects[object_id]["routedescription"] )
+                tooltip = objects_common.schematic_objects[object_id]["routedescription"],
+                button_colour = button_colour, active_colour = active_colour,
+                selected_colour = selected_colour, text_colour = text_colour)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)

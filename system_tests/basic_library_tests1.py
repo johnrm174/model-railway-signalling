@@ -289,6 +289,14 @@ def run_pi_sprog_interface_tests(baud_rate):
     assert pi_sprog_interface.service_mode_read_cv(1) is None
     assert not pi_sprog_interface.service_mode_write_cv(1,255)
     assert not pi_sprog_interface.request_dcc_power_off()
+    print("Library Tests - Edge case testing - send CBUS command - 6 Errors will be generated")
+    pi_sprog_interface.send_cbus_command (mj_pri=-1, min_pri=2, op_code=8)     # Invalid mj_pri
+    pi_sprog_interface.send_cbus_command (mj_pri=3, min_pri=3, op_code=8)      # Invalid mj_pri
+    pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=-1, op_code=8)     # Invalid min_pri
+    pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=4, op_code=8)      # Invalid min_pri
+    pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=-1)     # Invalid op_code
+    pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=256)    # Invalid op_code
+    pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=8)      # Valid but port is closed
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -370,7 +378,7 @@ def run_dcc_control_tests(baud_rate):
                                                      ['2', [[1,True], ["abc",True], [11,"random"], [2048, True], 2047,[1,2,3]]] ] )
     assert len(dcc_control.dcc_signal_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 20
-    print("Library Tests - map_dcc_point - Two Debug messages - 8 error messages should be generated")
+    print("Library Tests - map_dcc_point - Two Debug messages - 7 error messages should be generated")
     assert len(dcc_control.dcc_point_mappings) == 0
     dcc_control.map_dcc_point(1, 30, False)
     dcc_control.map_dcc_point(2, 31, True)
@@ -381,7 +389,6 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_dcc_point(5, 10, False)     # Fail - address already in use 
     dcc_control.map_dcc_point(6, "abc", False)  # Fail - address not a str 
     dcc_control.map_dcc_point(6, 2048, False)   # Fail - Invalid address 
-    dcc_control.map_dcc_point(7, 33, "True")    # Fail - Invalid reversed flag 
     assert len(dcc_control.dcc_point_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 22
     print("Library Tests - get_dcc_address_mappings (no errors or warnings should be generated)")
@@ -457,6 +464,8 @@ def run_dcc_control_tests(baud_rate):
     print("Library Tests - set_node_to_publish_dcc_commands - 1 Error will be generated ")
     dcc_control.set_node_to_publish_dcc_commands("True") # Error
     dcc_control.set_node_to_publish_dcc_commands(True) 
+    dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
+    dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
     print("Library Tests - subscribe_to_dcc_command_feed - 1 Error will be generated")
     dcc_control.subscribe_to_dcc_command_feed(100) # Error
     dcc_control.subscribe_to_dcc_command_feed("Box1")

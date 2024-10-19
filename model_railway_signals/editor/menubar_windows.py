@@ -4,7 +4,8 @@
 # Classes (pop up windows) called from the main editor module menubar selections
 #    display_help(root)
 #    display_about(root)
-#    edit_layout_info()
+#    edit_layout_info(root)
+#    edit_general_settings(root, general_settings_update_callback)
 #    edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
 #    edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
 #    edit_logging_settings(root, logging_update_callback)
@@ -16,8 +17,8 @@
 #    settings.set_canvas() - Save the new canvas settings (as specified)
 #    settings.get_logging() - Get the current log level (for editing)
 #    settings.set_logging(level) - Save the new log level (as specified)
-#    settings.get_general() - Get the current settings (layout info, version for info/editing)
-#    settings.set_general() - Save the new settings (only layout info can be edited/saved)
+#    settings.get_general() - Get the current settings (for editing)
+#    settings.set_general() - Save the new settings (as specified)
 #    settings.get_sprog() - Get the current SPROG settings (for editing)
 #    settings.set_sprog() - Save the new SPROG settings (as specified)
 #    settings.get_mqtt() - Get the current MQTT settings (for editing)
@@ -1083,26 +1084,52 @@ class edit_general_settings():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             edit_general_settings_window = self.window
+            # Create a labelframe for the run Layout Settings
+            self.labelframe1 = Tk.LabelFrame(self.window, text = "Run Layout settings")
+            self.labelframe1.pack(padx=2, pady=2, fill=Tk.BOTH)
             # Create the "SPAD Popups" selection element
-            self.spad = common.check_box(self.window, label="Enable Signal Passed at Danger popup warnings",
+            self.spad = common.check_box(self.labelframe1, label="Enable popup SPAD warnings",
                     tool_tip="Select to Enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.spad.pack(padx=2, pady=2)
+            # Create a labelframe for the run Layout Settings
+            self.labelframe2 = Tk.LabelFrame(self.window, text = "Appearance Settings")
+            self.labelframe2.pack(padx=2, pady=2, fill=Tk.BOTH)
+            # Create the "Button Fontsize" selection element
+            self.subframe = Tk.Frame(self.labelframe2)
+            self.subframe.pack(padx=2, pady=2)
+            self.label1 = Tk.Label(self.subframe, text="Control button fontsize")
+            self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.fontsize = common.integer_entry_box(self.subframe, min_value=8, max_value=12, width=3, allow_empty=False,
+                        tool_tip="Specify the font-size to use for the point and signal control buttons on the schematic "+
+                                "(8-12). Note that the new fontsize will only be applied on layout save/load or layout reset")
+            self.fontsize.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
             self.load_state()
 
     def load_state(self):
+        self.validation_error.pack_forget()
         # Spad Popups flag is the 6th parameter returned from get_general
+        # fontsize is the 7th parameter returned from get_general
         self.spad.set_value(settings.get_general()[5])
+        self.fontsize.set_value(settings.get_general()[6])
 
     def save_state(self, close_window:bool):
-        settings.set_general(spad=self.spad.get_value())
-        # Make the callback to apply the updated settings
-        self.update_function()
-        # close the window (on OK )
-        if close_window: self.close_window()
+        if self.fontsize.validate():
+            self.validation_error.pack_forget()
+            settings.set_general(spad=self.spad.get_value())
+            settings.set_general(buttonsize=self.fontsize.get_value())
+            # Make the callback to apply the updated settings
+            self.update_function()
+            # close the window (on OK )
+            if close_window: self.close_window()
+        else:
+            # Display the validation error message
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
 
     def close_window(self):
         global edit_general_settings_window

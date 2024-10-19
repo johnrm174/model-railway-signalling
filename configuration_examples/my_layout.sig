@@ -71,7 +71,8 @@
     "instruments": {},
     "objects": {
         "010e5fa1-fd7a-4068-a751-d214c9950ae4": {
-            "bbox": 4940,
+            "bbox": 4944,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 3,
@@ -96,6 +97,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Platform 1 departure to Down Main",
             "routename": "Platform 1 to Down",
+            "setupsensor": 0,
             "signalsonroute": [
                 8
             ],
@@ -105,9 +107,10 @@
             "tracksensor": 0
         },
         "0148c4d4-8a20-45c2-9a32-a1eb5e532d9f": {
-            "bbox": 4944,
+            "bbox": 4948,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 7,
             "mirror": "",
@@ -122,7 +125,7 @@
                 0,
                 0
             ],
-            "bbox": 4950,
+            "bbox": 4954,
             "colour": "black",
             "endx": 900.0,
             "endy": 425.0,
@@ -135,18 +138,19 @@
         },
         "02aaa6bf-c249-45ed-965f-047262cad8a5": {
             "background": "grey85",
-            "bbox": 4953,
+            "bbox": 4957,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 1,
             "justify": 2,
             "posx": 76.0,
             "posy": 275.0,
-            "tags": "02aaa6bf-c249-45ed-965f-047262cad8a5",
+            "tags": "textbox1",
             "text": "BRANCH"
         },
         "031f9ebb-3dbb-4496-bd2e-da1f19292ffc": {
@@ -156,7 +160,7 @@
                 20,
                 5
             ],
-            "bbox": 4959,
+            "bbox": 4963,
             "colour": "black",
             "endx": 161.0,
             "endy": 275.0,
@@ -170,7 +174,7 @@
         "058012a1-4cb8-40e0-9c67-55c0139c064a": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 4966,
+            "bbox": 4970,
             "colour": "black",
             "dccaddress": 105,
             "dccreversed": true,
@@ -242,7 +246,7 @@
         "05daf194-7943-4c0b-8540-b574716ce9ca": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 4973,
+            "bbox": 4977,
             "colour": "black",
             "dccaddress": 106,
             "dccreversed": true,
@@ -308,7 +312,7 @@
                 0,
                 0
             ],
-            "bbox": 4979,
+            "bbox": 4983,
             "colour": "black",
             "endx": 1700.0,
             "endy": 325.0,
@@ -331,7 +335,7 @@
                 false,
                 ""
             ],
-            "bbox": 4996,
+            "bbox": 5000,
             "dccaspects": [
                 [
                     [
@@ -1252,7 +1256,8 @@
             ]
         },
         "0950163c-9b77-46c1-84c9-5ad56088c55a": {
-            "bbox": 5000,
+            "bbox": 5004,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 1,
@@ -1277,6 +1282,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into Platform 1",
             "routename": "Down to Platform 1",
+            "setupsensor": 0,
             "signalsonroute": [
                 5
             ],
@@ -1287,24 +1293,26 @@
         },
         "0981c3fb-63d1-4cc4-bcdb-c89612f58ed6": {
             "background": "grey85",
-            "bbox": 5003,
+            "bbox": 5007,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 2,
             "justify": 2,
             "posx": 548.0,
             "posy": 181.0,
-            "tags": "0981c3fb-63d1-4cc4-bcdb-c89612f58ed6",
+            "tags": "textbox2",
             "text": "TMD"
         },
         "0bcc8fee-02a4-485d-a1f4-b8b935e35504": {
-            "bbox": 5007,
+            "bbox": 5011,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 15,
             "mirror": "",
@@ -1324,7 +1332,7 @@
                 false,
                 ""
             ],
-            "bbox": 5018,
+            "bbox": 5022,
             "dccaspects": [
                 [
                     [
@@ -2214,7 +2222,8 @@
             ]
         },
         "1625ee65-272d-41ec-a9ec-2832f28fbbe7": {
-            "bbox": 5022,
+            "bbox": 5026,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 17,
@@ -2246,6 +2255,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Goods loop departure to Down Main",
             "routename": "Goods to Down",
+            "setupsensor": 0,
             "signalsonroute": [
                 1
             ],
@@ -2257,7 +2267,7 @@
         "1ab8c048-bc7a-4a3b-a14c-b02afcafcaa4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5027,
+            "bbox": 5031,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2287,7 +2297,7 @@
                 false,
                 ""
             ],
-            "bbox": 5044,
+            "bbox": 5048,
             "dccaspects": [
                 [
                     [
@@ -3198,7 +3208,8 @@
             ]
         },
         "1f8a59e9-5c19-4a50-a9ec-c9fac51c71c1": {
-            "bbox": 5048,
+            "bbox": 5052,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 12,
@@ -3222,6 +3233,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Platform 2 departure to branch",
             "routename": "Platform 3 to Branch",
+            "setupsensor": 0,
             "signalsonroute": [
                 3,
                 22
@@ -3243,7 +3255,7 @@
                 false,
                 ""
             ],
-            "bbox": 5067,
+            "bbox": 5071,
             "dccaspects": [
                 [
                     [
@@ -4192,7 +4204,7 @@
                 1,
                 1
             ],
-            "bbox": 5073,
+            "bbox": 5077,
             "colour": "black",
             "endx": 1325.0,
             "endy": 200.0,
@@ -4204,9 +4216,10 @@
             "tags": "line17"
         },
         "22a63804-92ab-4d6a-89fb-c5b3eed7e475": {
-            "bbox": 5077,
+            "bbox": 5081,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 8,
             "mirror": "",
@@ -4217,7 +4230,7 @@
         "25bde8e4-dc58-4917-b214-70b236a0e316": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 5083,
+            "bbox": 5087,
             "colour": "black",
             "dccaddress": 104,
             "dccreversed": false,
@@ -4289,7 +4302,7 @@
         "2660e87b-743d-4bf5-b5c9-33eb079c533c": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5088,
+            "bbox": 5092,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4308,9 +4321,10 @@
             "ybuttonoffset": 0
         },
         "280ffb82-b4eb-49d3-96d3-9de9160072b7": {
-            "bbox": 5092,
+            "bbox": 5096,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 6,
             "mirror": "",
@@ -4325,7 +4339,7 @@
                 1,
                 1
             ],
-            "bbox": 5098,
+            "bbox": 5102,
             "colour": "black",
             "endx": 650.0,
             "endy": 200.0,
@@ -4343,7 +4357,7 @@
                 20,
                 5
             ],
-            "bbox": 5104,
+            "bbox": 5108,
             "colour": "black",
             "endx": 125.0,
             "endy": 375.0,
@@ -4355,7 +4369,8 @@
             "tags": "line31"
         },
         "2bead2aa-671c-4699-9f91-4f2ec453fe9f": {
-            "bbox": 5108,
+            "bbox": 5112,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 6,
@@ -4383,6 +4398,7 @@
             "routecolour": "#c800ff",
             "routedescription": "Goods loop departure to Up Main",
             "routename": "Goods to Up",
+            "setupsensor": 0,
             "signalsonroute": [
                 2
             ],
@@ -4393,38 +4409,41 @@
         },
         "2ea41ff5-d1c7-4c38-bb25-53eeadc25735": {
             "background": "grey85",
-            "bbox": 5111,
+            "bbox": 5115,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 3,
             "justify": 2,
             "posx": 1726.0,
             "posy": 375.0,
-            "tags": "2ea41ff5-d1c7-4c38-bb25-53eeadc25735",
+            "tags": "textbox3",
             "text": "DOWN\nMAIN"
         },
         "2fcbbfe6-7a94-4913-b572-8ddad96c76a3": {
             "background": "grey85",
-            "bbox": 5114,
+            "bbox": 5118,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 4,
             "justify": 2,
             "posx": 1272.0,
             "posy": 130.0,
-            "tags": "2fcbbfe6-7a94-4913-b572-8ddad96c76a3",
+            "tags": "textbox4",
             "text": "Goods Yard"
         },
         "333315c4-06d2-4914-bfcb-48af3597e851": {
-            "bbox": 5118,
+            "bbox": 5122,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 7,
@@ -4453,6 +4472,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into goods loop",
             "routename": "Down to Goods",
+            "setupsensor": 0,
             "signalsonroute": [
                 5
             ],
@@ -4463,18 +4483,19 @@
         },
         "359d1564-4a52-49ef-81e0-a72df0f02220": {
             "background": "grey85",
-            "bbox": 5121,
+            "bbox": 5125,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 5,
             "justify": 2,
             "posx": 550.0,
             "posy": 130.0,
-            "tags": "359d1564-4a52-49ef-81e0-a72df0f02220",
+            "tags": "textbox5",
             "text": "Headshunt"
         },
         "36d05755-f972-442a-9139-8739e35dadea": {
@@ -4484,7 +4505,7 @@
                 0,
                 0
             ],
-            "bbox": 5127,
+            "bbox": 5131,
             "colour": "black",
             "endx": 575.0,
             "endy": 325.0,
@@ -4496,9 +4517,10 @@
             "tags": "line10"
         },
         "37716476-045e-4efc-a8d0-dc30b5f9ccbb": {
-            "bbox": 5131,
+            "bbox": 5135,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 5,
             "mirror": "",
@@ -4509,7 +4531,7 @@
         "37fbb878-e6fd-4629-96f8-5912ec2ab8d3": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 5138,
+            "bbox": 5142,
             "colour": "black",
             "dccaddress": 108,
             "dccreversed": false,
@@ -4550,7 +4572,7 @@
                 false,
                 ""
             ],
-            "bbox": 5157,
+            "bbox": 5161,
             "dccaspects": [
                 [
                     [
@@ -5457,7 +5479,7 @@
                 20,
                 5
             ],
-            "bbox": 5163,
+            "bbox": 5167,
             "colour": "black",
             "endx": 500.0,
             "endy": 375.0,
@@ -5475,7 +5497,7 @@
                 0,
                 0
             ],
-            "bbox": 5169,
+            "bbox": 5173,
             "colour": "black",
             "endx": 1125.0,
             "endy": 425.0,
@@ -5487,7 +5509,8 @@
             "tags": "line13"
         },
         "3b5c8ec9-898a-4724-8b45-fb33b6158df6": {
-            "bbox": 5173,
+            "bbox": 5177,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 20,
@@ -5518,6 +5541,7 @@
             "routecolour": "#c800ff",
             "routedescription": "Up Main arrival into goods loop",
             "routename": "Up to Goods",
+            "setupsensor": 0,
             "signalsonroute": [
                 6
             ],
@@ -5527,9 +5551,10 @@
             "tracksensor": 0
         },
         "3b9c9266-3dfe-4349-84a3-c7b9b9185cae": {
-            "bbox": 5177,
+            "bbox": 5181,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 17,
             "mirror": "",
@@ -5538,7 +5563,8 @@
             "tags": "section17"
         },
         "3ed6eb67-18ea-4f66-b2f0-e12664a6d90f": {
-            "bbox": 5181,
+            "bbox": 5185,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 19,
@@ -5562,6 +5588,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Branch Arrival into Platform 3",
             "routename": "Branch to Platform 3",
+            "setupsensor": 0,
             "signalsonroute": [
                 11,
                 10
@@ -5578,7 +5605,7 @@
                 20,
                 5
             ],
-            "bbox": 5187,
+            "bbox": 5191,
             "colour": "black",
             "endx": 1650.0,
             "endy": 375.0,
@@ -5596,7 +5623,7 @@
                 0,
                 0
             ],
-            "bbox": 5193,
+            "bbox": 5197,
             "colour": "black",
             "endx": 575.0,
             "endy": 275.0,
@@ -5619,7 +5646,7 @@
                 false,
                 ""
             ],
-            "bbox": 5212,
+            "bbox": 5216,
             "dccaspects": [
                 [
                     [
@@ -6526,7 +6553,7 @@
                 0,
                 0
             ],
-            "bbox": 5218,
+            "bbox": 5222,
             "colour": "black",
             "endx": 1075.0,
             "endy": 200.0,
@@ -6540,7 +6567,7 @@
         "47a9ea55-623c-48d0-af0d-6a4be22cc19f": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 5225,
+            "bbox": 5229,
             "colour": "black",
             "dccaddress": 102,
             "dccreversed": false,
@@ -6616,7 +6643,7 @@
                 0,
                 0
             ],
-            "bbox": 5231,
+            "bbox": 5235,
             "colour": "black",
             "endx": 1125.0,
             "endy": 375.0,
@@ -6634,7 +6661,7 @@
                 0,
                 0
             ],
-            "bbox": 5237,
+            "bbox": 5241,
             "colour": "black",
             "endx": 650.0,
             "endy": 375.0,
@@ -6646,7 +6673,8 @@
             "tags": "line14"
         },
         "55da5108-9de2-4e68-ab11-d0dd6e32a222": {
-            "bbox": 5241,
+            "bbox": 5245,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 5,
@@ -6674,6 +6702,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into Platform 3",
             "routename": "Down to Platform 3",
+            "setupsensor": 0,
             "signalsonroute": [
                 5
             ],
@@ -6689,7 +6718,7 @@
                 0,
                 0
             ],
-            "bbox": 5247,
+            "bbox": 5251,
             "colour": "black",
             "endx": 1150.0,
             "endy": 275.0,
@@ -6702,22 +6731,24 @@
         },
         "58ab1e60-0f14-4c1a-b97c-63a46790c987": {
             "background": "#d9d9b1",
-            "bbox": 5250,
+            "bbox": 5254,
             "border": 2,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 6,
             "justify": 2,
             "posx": 900.0,
             "posy": 461.0,
-            "tags": "58ab1e60-0f14-4c1a-b97c-63a46790c987",
+            "tags": "textbox6",
             "text": "   Platform 1   \n         "
         },
         "5b638f9c-8e40-4fa7-ae68-ff0b9c8d16bf": {
-            "bbox": 5254,
+            "bbox": 5258,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 21,
@@ -6745,6 +6776,7 @@
             "routecolour": "#c800ff",
             "routedescription": "Up Main arrival into platform 3",
             "routename": "Up to Platform 3",
+            "setupsensor": 0,
             "signalsonroute": [
                 6
             ],
@@ -6756,7 +6788,7 @@
         "5e8f3ed5-e412-4861-a3d8-499d7f467e80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5260,
+            "bbox": 5264,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -6786,7 +6818,7 @@
                 false,
                 ""
             ],
-            "bbox": 5271,
+            "bbox": 5275,
             "dccaspects": [
                 [
                     [
@@ -7689,7 +7721,7 @@
         "5fd84d01-3fc8-4592-923c-968e38f13c80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5276,
+            "bbox": 5280,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7719,7 +7751,7 @@
                 false,
                 ""
             ],
-            "bbox": 5293,
+            "bbox": 5297,
             "dccaspects": [
                 [
                     [
@@ -8584,7 +8616,7 @@
                 1,
                 1
             ],
-            "bbox": 5299,
+            "bbox": 5303,
             "colour": "black",
             "endx": 700.0,
             "endy": 150.0,
@@ -8596,9 +8628,10 @@
             "tags": "line23"
         },
         "6175fcca-1121-4c31-b8f5-f6318d2b570e": {
-            "bbox": 5303,
+            "bbox": 5307,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 12,
             "mirror": "21",
@@ -8607,7 +8640,8 @@
             "tags": "section12"
         },
         "67046282-f9b4-4d33-9c90-0a23531fc6b2": {
-            "bbox": 5307,
+            "bbox": 5311,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 11,
@@ -8632,6 +8666,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Branch arrival into Goods loop",
             "routename": "Branch to Goods",
+            "setupsensor": 0,
             "signalsonroute": [
                 14,
                 13
@@ -8648,7 +8683,7 @@
                 0,
                 0
             ],
-            "bbox": 5313,
+            "bbox": 5317,
             "colour": "black",
             "endx": 900.0,
             "endy": 200.0,
@@ -8666,7 +8701,7 @@
                 0,
                 0
             ],
-            "bbox": 5319,
+            "bbox": 5323,
             "colour": "black",
             "endx": 1700.0,
             "endy": 375.0,
@@ -8684,7 +8719,7 @@
                 0,
                 0
             ],
-            "bbox": 5325,
+            "bbox": 5329,
             "colour": "black",
             "endx": 1150.0,
             "endy": 400.0,
@@ -8707,7 +8742,7 @@
                 false,
                 ""
             ],
-            "bbox": 5344,
+            "bbox": 5348,
             "dccaspects": [
                 [
                     [
@@ -9654,7 +9689,7 @@
                 20,
                 5
             ],
-            "bbox": 5350,
+            "bbox": 5354,
             "colour": "black",
             "endx": 150.0,
             "endy": 325.0,
@@ -9666,9 +9701,10 @@
             "tags": "line30"
         },
         "7189da3b-f611-493b-b453-4c18190325b3": {
-            "bbox": 5354,
+            "bbox": 5358,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 4,
             "mirror": "",
@@ -9677,9 +9713,10 @@
             "tags": "section4"
         },
         "72d9a7ab-03e3-4862-9edc-e4b1b0669d8a": {
-            "bbox": 5358,
+            "bbox": 5362,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 19,
             "mirror": "1",
@@ -9688,9 +9725,10 @@
             "tags": "section19"
         },
         "75c0f7e2-4c9c-4b9e-91f3-0046cea86d2d": {
-            "bbox": 5362,
+            "bbox": 5366,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 1,
             "mirror": "19",
@@ -9705,7 +9743,7 @@
                 0,
                 0
             ],
-            "bbox": 5368,
+            "bbox": 5372,
             "colour": "black",
             "endx": 500.0,
             "endy": 325.0,
@@ -9719,7 +9757,7 @@
         "771fd5da-2c58-423c-9b29-d181501dca9b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5373,
+            "bbox": 5377,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -9744,7 +9782,7 @@
                 20,
                 5
             ],
-            "bbox": 5379,
+            "bbox": 5383,
             "colour": "black",
             "endx": 1675.0,
             "endy": 325.0,
@@ -9756,9 +9794,10 @@
             "tags": "line5"
         },
         "78c8911f-a18a-41bf-961d-3a43893854d4": {
-            "bbox": 5383,
+            "bbox": 5387,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 11,
             "mirror": "",
@@ -9768,24 +9807,25 @@
         },
         "7aa34fb1-3039-4be1-b71a-9d85fa38f112": {
             "background": "grey85",
-            "bbox": 5386,
+            "bbox": 5390,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 18,
             "fontstyle": "bold underline ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 7,
             "justify": 2,
             "posx": 900.0,
             "posy": 50.0,
-            "tags": "7aa34fb1-3039-4be1-b71a-9d85fa38f112",
+            "tags": "textbox7",
             "text": "My Layout"
         },
         "7f925596-94a5-43a6-b260-ce4bd63caaad": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5391,
+            "bbox": 5395,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -9810,7 +9850,7 @@
                 0,
                 0
             ],
-            "bbox": 5397,
+            "bbox": 5401,
             "colour": "black",
             "endx": 900.0,
             "endy": 325.0,
@@ -9823,34 +9863,36 @@
         },
         "846b5450-3bb8-443d-9552-644e650b10dd": {
             "background": "#d9d9b1",
-            "bbox": 5400,
+            "bbox": 5404,
             "border": 2,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 8,
             "justify": 2,
             "posx": 899.0,
             "posy": 288.0,
-            "tags": "846b5450-3bb8-443d-9552-644e650b10dd",
+            "tags": "textbox8",
             "text": "   Platform 3   \n   Platform 2   "
         },
         "84a2cb6e-79ed-42c2-ae61-55e5c92be7db": {
             "background": "grey85",
-            "bbox": 5403,
+            "bbox": 5407,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 9,
             "justify": 2,
             "posx": 1724.0,
             "posy": 275.0,
-            "tags": "84a2cb6e-79ed-42c2-ae61-55e5c92be7db",
+            "tags": "textbox9",
             "text": "BRANCH"
         },
         "84b2145a-5eb7-4b8c-881d-b1c18e146b65": {
@@ -9865,7 +9907,7 @@
                 false,
                 ""
             ],
-            "bbox": 5414,
+            "bbox": 5418,
             "dccaspects": [
                 [
                     [
@@ -10766,9 +10808,10 @@
             ]
         },
         "857bc7b3-6dd9-4fe8-a800-04b0845c77f2": {
-            "bbox": 5418,
+            "bbox": 5422,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 16,
             "mirror": "",
@@ -10788,7 +10831,7 @@
                 false,
                 ""
             ],
-            "bbox": 5435,
+            "bbox": 5439,
             "dccaspects": [
                 [
                     [
@@ -11664,7 +11707,7 @@
                 0,
                 0
             ],
-            "bbox": 5441,
+            "bbox": 5445,
             "colour": "black",
             "endx": 1700.0,
             "endy": 275.0,
@@ -11682,7 +11725,7 @@
                 20,
                 5
             ],
-            "bbox": 5447,
+            "bbox": 5451,
             "colour": "black",
             "endx": 111.0,
             "endy": 275.0,
@@ -11700,7 +11743,7 @@
                 20,
                 5
             ],
-            "bbox": 5453,
+            "bbox": 5457,
             "colour": "black",
             "endx": 1687.0,
             "endy": 275.0,
@@ -11713,22 +11756,24 @@
         },
         "93d61cb6-a272-45a4-be73-7fcd8ae70932": {
             "background": "grey85",
-            "bbox": 5456,
+            "bbox": 5460,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 10,
             "justify": 2,
             "posx": 76.0,
             "posy": 375.0,
-            "tags": "93d61cb6-a272-45a4-be73-7fcd8ae70932",
+            "tags": "textbox10",
             "text": "DOWN\nMAIN"
         },
         "99bd153e-9f0c-4134-9611-853fa6740f25": {
-            "bbox": 5460,
+            "bbox": 5464,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 2,
@@ -11752,6 +11797,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into Down Avoiding loop",
             "routename": "Down to Avoiding",
+            "setupsensor": 0,
             "signalsonroute": [
                 5
             ],
@@ -11761,7 +11807,8 @@
             "tracksensor": 0
         },
         "9aec57b5-85f1-4118-b3e2-4c145e6ffaa8": {
-            "bbox": 5464,
+            "bbox": 5468,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 18,
@@ -11788,6 +11835,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Branch arrival into goods loop",
             "routename": "Branch to Goods",
+            "setupsensor": 0,
             "signalsonroute": [
                 11,
                 10
@@ -11800,7 +11848,7 @@
         "9dcab729-9273-4ede-9329-f6adc2ff05fb": {
             "alsoswitch": 17,
             "automatic": false,
-            "bbox": 5471,
+            "bbox": 5475,
             "colour": "black",
             "dccaddress": 103,
             "dccreversed": true,
@@ -11840,7 +11888,8 @@
             "ybuttonoffset": 0
         },
         "9f2c0ce4-5515-4591-944c-b719fe662513": {
-            "bbox": 5475,
+            "bbox": 5479,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 15,
@@ -11864,6 +11913,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Platform 3 departure to branch",
             "routename": "Platform 3 to Branch",
+            "setupsensor": 0,
             "signalsonroute": [
                 7,
                 21
@@ -11880,7 +11930,7 @@
                 1,
                 1
             ],
-            "bbox": 5481,
+            "bbox": 5485,
             "colour": "black",
             "endx": 650.0,
             "endy": 425.0,
@@ -11893,24 +11943,25 @@
         },
         "a824704b-6fde-49ba-ba05-933b6f7fe189": {
             "background": "grey85",
-            "bbox": 5484,
+            "bbox": 5488,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 11,
             "justify": 2,
             "posx": 75.0,
             "posy": 327.0,
-            "tags": "a824704b-6fde-49ba-ba05-933b6f7fe189",
+            "tags": "textbox11",
             "text": "UP\nMAIN"
         },
         "b0f29657-f391-457d-85b7-6a5ec41b0d13": {
             "alsoswitch": 12,
             "automatic": false,
-            "bbox": 5491,
+            "bbox": 5495,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -11980,7 +12031,8 @@
             "ybuttonoffset": 0
         },
         "b118ca35-20db-4e0e-881a-e22db97c1b66": {
-            "bbox": 5495,
+            "bbox": 5499,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 14,
@@ -12007,6 +12059,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Goods Loop departure to branch",
             "routename": "Goods to Branch",
+            "setupsensor": 0,
             "signalsonroute": [
                 1,
                 21
@@ -12028,7 +12081,7 @@
                 false,
                 ""
             ],
-            "bbox": 5512,
+            "bbox": 5516,
             "dccaspects": [
                 [
                     [
@@ -12898,9 +12951,10 @@
             ]
         },
         "b17fb551-2bfe-4d2a-9429-d2d94005c0c5": {
-            "bbox": 5516,
+            "bbox": 5520,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 20,
             "mirror": "",
@@ -12911,7 +12965,7 @@
         "b34426dc-7315-4c73-b36a-b2c97b9c94c7": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5523,
+            "bbox": 5527,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12941,7 +12995,7 @@
                 false,
                 ""
             ],
-            "bbox": 5540,
+            "bbox": 5544,
             "dccaspects": [
                 [
                     [
@@ -13811,7 +13865,7 @@
                 false,
                 ""
             ],
-            "bbox": 5557,
+            "bbox": 5561,
             "dccaspects": [
                 [
                     [
@@ -14670,7 +14724,8 @@
             ]
         },
         "b7d81f2a-7d03-42f7-9125-a3559433f934": {
-            "bbox": 5561,
+            "bbox": 5565,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 22,
@@ -14694,6 +14749,7 @@
             "routecolour": "#c800ff",
             "routedescription": "Up Main arrival into Platform 2",
             "routename": "Up to Platform 2",
+            "setupsensor": 0,
             "signalsonroute": [
                 6
             ],
@@ -14703,7 +14759,8 @@
             "tracksensor": 0
         },
         "b7f5f250-60f7-4678-95b8-0c8e50417a04": {
-            "bbox": 5565,
+            "bbox": 5569,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 13,
@@ -14728,6 +14785,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Branch line arrival into Platform 2",
             "routename": "Branch to Platform 3",
+            "setupsensor": 0,
             "signalsonroute": [
                 14,
                 13
@@ -14738,7 +14796,8 @@
             "tracksensor": 0
         },
         "b9e52658-031c-49c8-a7c1-c18c6bf6d8e1": {
-            "bbox": 5569,
+            "bbox": 5573,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 4,
@@ -14762,6 +14821,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Avoiding Loop departure to Down Main",
             "routename": "Avoiding to Down",
+            "setupsensor": 0,
             "signalsonroute": [
                 9
             ],
@@ -14771,7 +14831,8 @@
             "tracksensor": 0
         },
         "bc306663-e528-4e0e-b65b-a32754ee91d5": {
-            "bbox": 5573,
+            "bbox": 5577,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 10,
@@ -14796,6 +14857,7 @@
             "routecolour": "#0000ff",
             "routedescription": "Goods Loop departure to branch",
             "routename": "Goods to Branch",
+            "setupsensor": 0,
             "signalsonroute": [
                 2,
                 22
@@ -14806,9 +14868,10 @@
             "tracksensor": 0
         },
         "bc6fbf64-cd5a-418a-98b7-2e0beeb7c64e": {
-            "bbox": 5577,
+            "bbox": 5581,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 18,
             "mirror": "",
@@ -14828,7 +14891,7 @@
                 false,
                 ""
             ],
-            "bbox": 5594,
+            "bbox": 5598,
             "dccaspects": [
                 [
                     [
@@ -15687,9 +15750,10 @@
             ]
         },
         "bf63c705-72aa-4cc3-8d20-bbb1c69bb297": {
-            "bbox": 5598,
+            "bbox": 5602,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 14,
             "mirror": "",
@@ -15704,7 +15768,7 @@
                 0,
                 0
             ],
-            "bbox": 5604,
+            "bbox": 5608,
             "colour": "black",
             "endx": 900.0,
             "endy": 250.0,
@@ -15718,7 +15782,7 @@
         "c867d2f6-3d89-490c-a3f9-b8cdd535ae99": {
             "alsoswitch": 18,
             "automatic": false,
-            "bbox": 5610,
+            "bbox": 5614,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15758,9 +15822,10 @@
             "ybuttonoffset": 0
         },
         "c9d70646-364e-454c-95de-978d995c6c8e": {
-            "bbox": 5614,
+            "bbox": 5618,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 3,
             "mirror": "",
@@ -15780,7 +15845,7 @@
                 false,
                 ""
             ],
-            "bbox": 5631,
+            "bbox": 5635,
             "dccaspects": [
                 [
                     [
@@ -16676,7 +16741,7 @@
                 0,
                 0
             ],
-            "bbox": 5637,
+            "bbox": 5641,
             "colour": "black",
             "endx": 1175.0,
             "endy": 325.0,
@@ -16694,7 +16759,7 @@
                 20,
                 5
             ],
-            "bbox": 5643,
+            "bbox": 5647,
             "colour": "black",
             "endx": 1637.0,
             "endy": 275.0,
@@ -16707,18 +16772,19 @@
         },
         "cc0ad700-89e3-486c-8ad0-e9a05ea0556d": {
             "background": "grey85",
-            "bbox": 5646,
+            "bbox": 5650,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 12,
             "justify": 2,
             "posx": 1275.0,
             "posy": 180.0,
-            "tags": "cc0ad700-89e3-486c-8ad0-e9a05ea0556d",
+            "tags": "textbox12",
             "text": "Headshunt"
         },
         "cd5c7c03-c9da-44fd-9909-24219cd7c59b": {
@@ -16728,7 +16794,7 @@
                 0,
                 0
             ],
-            "bbox": 5652,
+            "bbox": 5656,
             "colour": "black",
             "endx": 650.0,
             "endy": 250.0,
@@ -16740,9 +16806,10 @@
             "tags": "line8"
         },
         "ceebbc85-e329-4185-a57f-e9230865a45c": {
-            "bbox": 5656,
+            "bbox": 5660,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 13,
             "mirror": "",
@@ -16753,7 +16820,7 @@
         "d433fb55-7016-4bc9-ac60-9cf142605fa8": {
             "alsoswitch": 13,
             "automatic": false,
-            "bbox": 5663,
+            "bbox": 5667,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -16813,9 +16880,10 @@
             "ybuttonoffset": 0
         },
         "d4a3a8dc-b0f1-4ada-b934-36b9646a17b7": {
-            "bbox": 5667,
+            "bbox": 5671,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 10,
             "mirror": "",
@@ -16825,24 +16893,25 @@
         },
         "ddb09cbe-5c7d-4810-b27b-0b64e588e56b": {
             "background": "grey85",
-            "bbox": 5670,
+            "bbox": 5674,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 13,
             "justify": 2,
             "posx": 1725.0,
             "posy": 327.0,
-            "tags": "ddb09cbe-5c7d-4810-b27b-0b64e588e56b",
+            "tags": "textbox13",
             "text": "UP\nMAIN"
         },
         "dec5f273-15d3-4ba7-a029-16028a9936e9": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5675,
+            "bbox": 5679,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16867,7 +16936,7 @@
                 0,
                 0
             ],
-            "bbox": 5681,
+            "bbox": 5685,
             "colour": "black",
             "endx": 1125.0,
             "endy": 150.0,
@@ -16879,9 +16948,10 @@
             "tags": "line21"
         },
         "e234b7a0-f5c6-48bb-a9d3-cfeb92adf401": {
-            "bbox": 5685,
+            "bbox": 5689,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 21,
             "mirror": "12",
@@ -16890,7 +16960,8 @@
             "tags": "section21"
         },
         "e2c437bb-ec9b-46d1-bf27-0a9b5467f77d": {
-            "bbox": 5689,
+            "bbox": 5693,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 16,
@@ -16918,6 +16989,7 @@
             "routecolour": "#ff6100",
             "routedescription": "Platform 3 departure to Down Main",
             "routename": "Platform 3 to Down",
+            "setupsensor": 0,
             "signalsonroute": [
                 7
             ],
@@ -16933,7 +17005,7 @@
                 1,
                 1
             ],
-            "bbox": 5695,
+            "bbox": 5699,
             "colour": "black",
             "endx": 1325.0,
             "endy": 150.0,
@@ -16947,7 +17019,7 @@
         "e5eea518-6f34-47d9-8a17-ca314e06a52d": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5700,
+            "bbox": 5704,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16977,7 +17049,7 @@
                 false,
                 ""
             ],
-            "bbox": 5719,
+            "bbox": 5723,
             "dccaspects": [
                 [
                     [
@@ -17909,7 +17981,7 @@
                 false,
                 ""
             ],
-            "bbox": 5736,
+            "bbox": 5740,
             "dccaspects": [
                 [
                     [
@@ -18770,7 +18842,7 @@
         "eaed2508-4646-46cc-83fa-b9ef8ee2848b": {
             "alsoswitch": 7,
             "automatic": false,
-            "bbox": 5743,
+            "bbox": 5747,
             "colour": "black",
             "dccaddress": 107,
             "dccreversed": false,
@@ -18846,7 +18918,7 @@
                 0,
                 0
             ],
-            "bbox": 5749,
+            "bbox": 5753,
             "colour": "black",
             "endx": 900.0,
             "endy": 375.0,
@@ -18864,7 +18936,7 @@
                 0,
                 0
             ],
-            "bbox": 5755,
+            "bbox": 5759,
             "colour": "black",
             "endx": 1075.0,
             "endy": 250.0,
@@ -18876,7 +18948,8 @@
             "tags": "line3"
         },
         "f4875d39-1482-47d9-a37d-3b58035e94ad": {
-            "bbox": 5759,
+            "bbox": 5763,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 8,
@@ -18903,6 +18976,7 @@
             "routecolour": "#c800ff",
             "routedescription": "Platform 3 departure to Up Main",
             "routename": "Platform 3 to Up",
+            "setupsensor": 0,
             "signalsonroute": [
                 3
             ],
@@ -18923,7 +18997,7 @@
                 false,
                 ""
             ],
-            "bbox": 5776,
+            "bbox": 5780,
             "dccaspects": [
                 [
                     [
@@ -19813,7 +19887,8 @@
             ]
         },
         "f85bced4-b684-4738-a166-c8b978efeb6d": {
-            "bbox": 5780,
+            "bbox": 5784,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 9,
@@ -19836,6 +19911,7 @@
             "routecolour": "#c800ff",
             "routedescription": "Platform 2 departure to Up Main",
             "routename": "Platform 2 to Up",
+            "setupsensor": 0,
             "signalsonroute": [
                 4
             ],
@@ -19856,7 +19932,7 @@
                 false,
                 ""
             ],
-            "bbox": 5799,
+            "bbox": 5803,
             "dccaspects": [
                 [
                     [
@@ -20784,7 +20860,7 @@
                 0,
                 0
             ],
-            "bbox": 5805,
+            "bbox": 5809,
             "colour": "black",
             "endx": 1200.0,
             "endy": 375.0,
@@ -20980,11 +21056,12 @@
         },
         "general": {
             "automation": true,
+            "buttonsize": 8,
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/configuration_examples/my_layout.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.6.1"
+            "version": "Version 4.7.0"
         },
         "gpio": {
             "portmappings": [

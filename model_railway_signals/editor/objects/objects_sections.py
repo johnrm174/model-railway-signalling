@@ -55,6 +55,7 @@ default_section_object = copy.deepcopy(objects_common.default_object)
 default_section_object["item"] = objects_common.object_type.section
 default_section_object["defaultlabel"] = "XXXXX"
 default_section_object["editable"] = True
+default_section_object["hidden"] = False
 default_section_object["mirror"] = ""
 
 #------------------------------------------------------------------------------------
@@ -130,6 +131,7 @@ def redraw_section_object(object_id):
                 section_callback = run_layout.section_updated_callback,
                 default_label = objects_common.schematic_objects[object_id]["defaultlabel"],
                 editable = objects_common.schematic_objects[object_id]["editable"],
+                hidden = objects_common.schematic_objects[object_id]["hidden"],
                 mirror_id = objects_common.schematic_objects[object_id]["mirror"])
     # Create/update the canvas "tags" and selection rectangle for the Track Section
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags

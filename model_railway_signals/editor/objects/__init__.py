@@ -13,6 +13,7 @@
 #    track_sensor(item_id:int) - helper function to find the object Id by Item ID
 #    line(item_id:int) - helper function to find the object Id by Item ID
 #    route(item_id:int) - helper function to find the object Id by Item ID
+#    switch(item_id:int) - helper function to find the object Id by Item ID
 #
 #    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
@@ -42,6 +43,7 @@
 #    line_index - for iterating through all the line objects
 #    track_sensor_index - for iterating through all the track_sensor objects
 #    route_index - for iterating through all the route objects
+#    switch_index - for iterating through all the switch objects
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -72,6 +74,7 @@ from .objects_common import instrument
 from .objects_common import line
 from .objects_common import track_sensor
 from .objects_common import route
+from .objects_common import switch
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -82,6 +85,7 @@ from .objects_common import instrument_index
 from .objects_common import line_index
 from .objects_common import track_sensor_index
 from .objects_common import route_index
+from .objects_common import switch_index
 
 from .objects_gpio import create_gpio_sensors
 from .objects_gpio import configure_remote_gpio_sensor_event_mappings
@@ -116,6 +120,7 @@ __all__ = [
     'line',
     'track_sensor',
     'route',
+    'switch',
     # Main schematic object dict and the type-specific indexes
     'schematic_objects',
     'signal_index',
@@ -125,6 +130,7 @@ __all__ = [
     'line_index',
     'track_sensor_index',
     'route_index',
+    'switch_index',
     # GPIO Event configuration functions
     'create_gpio_sensors',
     'configure_remote_gpio_sensor_event_mappings',

@@ -230,9 +230,6 @@ class main_menubar:
         self.logging_update()
         # Initialise the editor configuration at startup (using the default settings)
         self.initialise_editor()
-        # If a filename has been specified as a command line argument then load it. The loaded
-        # settings will overwrite the default settings and initialise_editor will be called again
-        if args.filename is not None: self.load_schematic(args.filename)
         # The following code is to help with advanced debugging (start the app with the -d flag)
         if args.debug_mode:
             self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -242,7 +239,15 @@ class main_menubar:
             self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
             tracemalloc.start()
         self.monitor_memory_usage = False
-        
+        # If a filename has been specified as a command line argument then load it. The loaded
+        # settings will overwrite the default settings and initialise_editor will be called again
+        # Note we schedule this to run immediately after the main loop starts so Tkinter is
+        # 'ready' to handle any events that may be passed in from other threads when we configure
+        # the application with the newly loaded settings (GPIO or MQTT events)
+        if args.filename is not None:
+            self.root.after(0, self.load_schematic, args.filename)
+            print(args.filename)
+
     # --------------------------------------------------------------------------------------
     # Advanced debugging functions (memory allocation monitoring/reporting)
     # Full acknowledgements to stack overflow for the reporting functions used here
@@ -584,6 +589,7 @@ class main_menubar:
     def general_settings_update(self):
         # The spad popups enabled flag is the 6th parameter returned
         run_layout.configure_spad_popups(settings.get_general()[5])
+        library_common.configure_button_size(settings.get_general()[6])
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
@@ -665,7 +671,7 @@ class main_menubar:
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
-                elif self.tuple_version(sig_file_version) < self.tuple_version("3.5.0"):
+                elif self.tuple_version(sig_file_version) < self.tuple_version("4.0.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
                     logging.error("Load File - File was saved by application "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)

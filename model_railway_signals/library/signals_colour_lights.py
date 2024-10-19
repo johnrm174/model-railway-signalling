@@ -26,11 +26,6 @@
 #       rhfeather45:bool - Creates a RH route feather at 45 degrees - Default = False
 #       rhfeather90:bool - Creates a RH route feather at 90 degrees - Default = False
 #       theatre_route_indicator:bool -  Creates a Theatre route indicator - Default = False
-#       refresh_immediately:bool - When set to False the signal aspects will NOT be automatically
-#                 updated when the signal is changed and the calling programme will need to call 
-#                 the seperate 'update_signal' function. Primarily intended for use with 3/4 
-#                 aspect signals, where the displayed aspect will depend on the displayed aspect 
-#                 of the signal ahead if the signal is clear - Default = True 
 #       fully_automatic:bool - Creates a signal without a manual controls - Default = False
 #
 # Classes and functions used by the other library modules:
@@ -76,7 +71,6 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
                                 theatre_route_indicator:bool=False,
-                                refresh_immediately:bool=True,
                                 fully_automatic:bool=False):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
@@ -199,7 +193,6 @@ def create_colour_light_signal (canvas, sig_id:int,
         # All SHARED attributes are signals_common to more than one signal Types
         signals.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
         signals.signals[str(sig_id)]["subtype"] = signalsubtype                  # Type-specific - subtype of the signal
-        signals.signals[str(sig_id)]["refresh"] = refresh_immediately             # Type-specific - controls when aspects are updated
         signals.signals[str(sig_id)]["hasfeathers"] = signal_has_feathers         # Type-specific - If there is a Feather Route display
         signals.signals[str(sig_id)]["featherenabled"] = None                     # Type-specific - State of the Feather Route display
         signals.signals[str(sig_id)]["grn"] = grn                                 # Type-specific - drawing object
@@ -231,9 +224,6 @@ def create_colour_light_signal (canvas, sig_id:int,
         if loaded_state["override"]: signals.set_signal_override(sig_id)
         # If no state was loaded we still need to toggle fully automatic signals to OFF
         if loaded_state["sigclear"] or fully_automatic: signals.toggle_signal(sig_id)
-        # Update the signal to show the initial aspect (and send out DCC commands)
-        # We only refresh the signal if it is set to refresh immediately
-        if signals.signals[str(sig_id)]["refresh"]: update_colour_light_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals.lock_signal(sig_id)
         if has_subsidary:
@@ -515,9 +505,6 @@ def update_feather_route_indication(sig_id:int,route_to_set):
                 # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
                 dcc_control.update_dcc_signal_route(sig_id, signals.signals[str(sig_id)]["routeset"],
                                                         signal_change = False, sig_at_danger = True)
-            # Refresh the signal aspect (a catch-all to ensure the signal displays the correct aspect
-            # in case the signal is in the middle of a timed sequence for the old route or the new route
-            if signals.signals[str(sig_id)]["refresh"]: update_colour_light_signal(sig_id)
         # Update the feathers on the display
         refresh_feathers(sig_id)
     return()

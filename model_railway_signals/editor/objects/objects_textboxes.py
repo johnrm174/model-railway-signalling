@@ -21,12 +21,18 @@
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
+# Makes the following external API calls to library modules:
+#    text_boxes.create_text_box(id) - Create the library object
+#    text_boxes.delete_text_box(id) - Delete the library object
+#    text_boxes.text_box_exists - to find out if the specified Item ID already exists
+#
 #------------------------------------------------------------------------------------
 
 import uuid
 import copy
 import tkinter as Tk
 
+from ...library import text_boxes
 from . import objects_common
 
 #------------------------------------------------------------------------------------
@@ -43,6 +49,7 @@ default_textbox_object["font"] = "Courier"
 default_textbox_object["fontsize"] = 10  
 default_textbox_object["fontstyle"] = ""  
 default_textbox_object["border"] = 0  
+default_textbox_object["hidden"] = False
 
 #------------------------------------------------------------------------------------
 # Function to to update a text box object following a configuration change
@@ -61,33 +68,36 @@ def update_textbox(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
         
 def redraw_textbox_object(object_id):
-    x1 = objects_common.schematic_objects[object_id]["posx"]
-    y1 = objects_common.schematic_objects[object_id]["posy"]
-    colour = objects_common.schematic_objects[object_id]["colour"]
-    background  = objects_common.schematic_objects[object_id]["background"]
-    font = (objects_common.schematic_objects[object_id]["font"],
-            objects_common.schematic_objects[object_id]["fontsize"],
-            objects_common.schematic_objects[object_id]["fontstyle"])
-    text = objects_common.schematic_objects[object_id]["text"]
-    width = objects_common.schematic_objects[object_id]["border"]
-    # Create the textbox, justifying the text as required
-    if objects_common.schematic_objects[object_id]["justify"] == 1: justify=Tk.LEFT
-    elif objects_common.schematic_objects[object_id]["justify"] == 2: justify=Tk.CENTER
-    elif objects_common.schematic_objects[object_id]["justify"] == 3: justify=Tk.RIGHT
-    text_box = objects_common.canvas.create_text(x1,y1,fill=colour,text=text,tags=str(object_id),justify=justify,font=font)
-    # find the boundary box and create the rectangle for the background
-    bbox = objects_common.canvas.bbox(text_box)
-    rectangle = objects_common.canvas.create_rectangle(bbox[0]-3, bbox[1]-3, bbox[2]+3, bbox[3]+2,
-                             width=width, tags=str(object_id), fill=background, outline=colour)
-    # Raise the text item to be in front of the rectangle item
-    objects_common.canvas.tag_raise(text_box, rectangle)
-    # Create/update the canvas "tags" and selection rectangle for the textbox
-    objects_common.schematic_objects[object_id]["tags"] = str(object_id)
-    objects_common.set_bbox(object_id, str(object_id))
+    # Create the Tkinter Font tuple
+    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
+                          objects_common.schematic_objects[object_id]["fontsize"],
+                          objects_common.schematic_objects[object_id]["fontstyle"])
+    # Assign the tkinter justification parameter
+    if objects_common.schematic_objects[object_id]["justify"] == 1: tkinter_justification=Tk.LEFT
+    elif objects_common.schematic_objects[object_id]["justify"] == 2: tkinter_justification=Tk.CENTER
+    elif objects_common.schematic_objects[object_id]["justify"] == 3: tkinter_justification=Tk.RIGHT
+    else: tkinter_justification=Tk.CENTER
+    # Create the text box on the canvas
+    canvas_tags = text_boxes.create_text_box(objects_common.canvas,
+                    textbox_id = objects_common.schematic_objects[object_id]["itemid"],
+                    x = objects_common.schematic_objects[object_id]["posx"],
+                    y = objects_common.schematic_objects[object_id]["posy"],
+                    text = objects_common.schematic_objects[object_id]["text"],
+                    colour = objects_common.schematic_objects[object_id]["colour"],
+                    background = objects_common.schematic_objects[object_id]["background"],
+                    justify = tkinter_justification,
+                    borderwidth = objects_common.schematic_objects[object_id]["border"],
+                    font = tkinter_font_tuple,
+                    hidden = objects_common.schematic_objects[object_id]["hidden"])
+    # Create/update the selection rectangle for the textbox
+    objects_common.schematic_objects[object_id]["tags"] = canvas_tags
+    objects_common.set_bbox(object_id, canvas_tags)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Create a new default Text Box (and draw it on the canvas)
+# Note that, unlike other objects, there is no requirement to iterate through
+# text boxes at run time so we don't need to maintain a type-specific index
 #------------------------------------------------------------------------------------
         
 def create_textbox():
@@ -99,6 +109,8 @@ def create_textbox():
     # Find the initial canvas position
     x, y = objects_common.find_initial_canvas_position()
     # Add the specific elements for this particular instance of the object
+    item_id = objects_common.new_item_id(exists_function=text_boxes.text_box_exists)
+    objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = x
     objects_common.schematic_objects[object_id]["posy"] = y
     # Draw the text box on the canvas
@@ -107,12 +119,16 @@ def create_textbox():
 
 #------------------------------------------------------------------------------------
 # Function to paste a copy of an existing text box - returns the new Object ID
+# For textboxes we copy all elements across apart from the position and the Item ID
 #------------------------------------------------------------------------------------
 
 def paste_textbox(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
+    # Assign a new type-specific ID for the object
+    new_id = objects_common.new_item_id(exists_function=text_boxes.text_box_exists)
+    objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
@@ -129,8 +145,9 @@ def paste_textbox(object_to_paste, deltax:int, deltay:int):
 #------------------------------------------------------------------------------------
 
 def delete_textbox_object(object_id):
-    # Delete the tkinter drawing objects associated with the object
-    objects_common.canvas.delete(objects_common.schematic_objects[object_id]["tags"])
+    # Delete the associated library objects
+    item_id = objects_common.schematic_objects[object_id]["itemid"]
+    text_boxes.delete_text_box(item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -142,7 +159,7 @@ def delete_textbox(object_id):
     # Soft delete the associated library objects from the canvas
     delete_textbox_object(object_id)
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
-    # the object from the dictionary of schematic objects
+    # the object from the dictionary of schematic objects (note no index for text boxes)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])
     del objects_common.schematic_objects[object_id]
     return()

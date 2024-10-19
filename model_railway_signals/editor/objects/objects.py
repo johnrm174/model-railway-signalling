@@ -75,6 +75,13 @@
 #    objects_routes.delete_route_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_routes.redraw_route_object(object_id) - Redraw the object on the canvas following an update
 #    objects_routes.default_route_object - The dictionary of default values for the object
+#    objects_switches.create_switch() - Create a default object on the schematic
+#    objects_switches.delete_switch(object_id) - Hard Delete an object when deleted from the schematic
+#    objects_switches.update_switch(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_switches.paste_switch(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    objects_switches.delete_switch_object(object_id) - soft delete the drawing object (prior to recreating)
+#    objects_switches.redraw_switch_object(object_id) - Redraw the object on the canvas following an update
+#    objects_switches.default_switch_object - The dictionary of default values for the object
 
 #------------------------------------------------------------------------------------
 
@@ -90,26 +97,20 @@ from . import objects_textboxes
 from . import objects_sensors
 from . import objects_points
 from . import objects_routes
+from . import objects_switches
 
 from .. import run_layout
 
-#######################################################################################################
-### Handle change of sensors being a configuration item in their own right from release 3.6.0 #########
-#######################################################################################################
-from .. import settings 
-#######################################################################################################
-################################## End of code to handle breaking changes #############################
-#######################################################################################################
-
 #------------------------------------------------------------------------------------
-# Internal function to bring all track sections and route buttons to the front
-# his insures they are not obscured by any lines drawn on the canvas
+# Internal function to bring all track sections, route buttons and switches to the
+# front. This ensures they are not obscured by any lines drawn on the canvas
 #------------------------------------------------------------------------------------
 
 def bring_track_sections_to_the_front():
     for object_id in objects_common.schematic_objects:
         if ( objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.section or
              objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.route or
+             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.switch or
              objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.textbox):
             objects_common.canvas.tag_raise(objects_common.schematic_objects[object_id]["tags"])
     return()
@@ -140,6 +141,8 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
             objects_sensors.redraw_track_sensor_object(object_id)
         elif this_object_type == objects_common.object_type.route:
             objects_routes.redraw_route_object(object_id)
+        elif this_object_type == objects_common.object_type.switch:
+            objects_switches.redraw_switch_object(object_id)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     return()
@@ -169,6 +172,8 @@ def reset_all_schematic_indexes():
             objects_common.track_sensor_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.route:
             objects_common.route_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.switch:
+            objects_common.switch_index[str(this_object_item_id)] = object_id
         # Note that textboxes don't have an index as we don't track their IDs
     return()
 
@@ -263,6 +268,8 @@ def reset_objects():
             objects_sensors.delete_track_sensor_object(object_id)
         elif type_of_object == objects_common.object_type.route:
             objects_routes.delete_route_object(object_id)
+        elif type_of_object == objects_common.object_type.switch:
+            objects_switches.delete_switch_object(object_id)
     # Redraw all point, section, instrument and signal objects in their default state
     # We don't need to create a new bbox as soft_delete keeps the tkinter object
     redraw_all_objects(create_new_bbox=False, reset_state=True)
@@ -295,6 +302,8 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
         object_id = objects_sensors.create_track_sensor()
     elif new_object_type == objects_common.object_type.route:
         object_id = objects_routes.create_route()
+    elif new_object_type == objects_common.object_type.switch:
+        object_id = objects_switches.create_switch()
     else:
         object_id = None
     # save the current state (for undo/redo)
@@ -325,6 +334,8 @@ def update_object(object_id, new_object):
         objects_sensors.update_track_sensor(object_id, new_object)
     elif type_of_object == objects_common.object_type.route:
         objects_routes.update_route(object_id, new_object)
+    elif type_of_object == objects_common.object_type.switch:
+        objects_switches.update_switch(object_id, new_object)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # save the current state (for undo/redo)
@@ -357,6 +368,8 @@ def delete_object(object_id):
         objects_sensors.delete_track_sensor(object_id)
     elif type_of_object == objects_common.object_type.route:
         objects_routes.delete_route(object_id)
+    elif type_of_object == objects_common.object_type.switch:
+        objects_switches.delete_switch(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -485,6 +498,8 @@ def paste_objects():
             new_object_id = objects_sensors.paste_track_sensor(object_to_paste, deltax, deltay)
         elif type_of_object == objects_common.object_type.route:
             new_object_id = objects_routes.paste_route(object_to_paste, deltax, deltay)
+        elif type_of_object == objects_common.object_type.switch:
+            new_object_id = objects_switches.paste_switch(object_to_paste, deltax, deltay)
         # Add the new object to the list of clipboard objects
         # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
@@ -505,7 +520,7 @@ def set_all(new_objects):
     ##################################################################################
     ### Code block to Handle breaking changes - see later in the code for details ####
     ##################################################################################
-    list_of_track_sensors_to_create =[]
+    one_up_text_box_id = 1
     ##################################################################################
     ################ End of code block to handle breaking changes ####################
     ##################################################################################
@@ -535,6 +550,8 @@ def set_all(new_objects):
             default_object = objects_sensors.default_track_sensor_object
         elif new_object_type == objects_common.object_type.route:
             default_object = objects_routes.default_route_object
+        elif new_object_type == objects_common.object_type.switch:
+            default_object = objects_switches.default_switch_object
         else:
             default_object = {}
             logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
@@ -546,6 +563,18 @@ def set_all(new_objects):
                 if element not in default_object.keys():
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
+                #################################################################################################
+                ## Handle breaking change of text boxes being library objects from Release 4.7 onwards ##########
+                ## and hence requiring a unique item ID (even if this is 'under the hood') ######################
+                #################################################################################################
+                elif (new_object_type == objects_common.object_type.textbox and
+                      element == "itemid" and new_objects[object_id][element] == 0):
+                    objects_common.schematic_objects[object_id][element] = one_up_text_box_id
+                    one_up_text_box_id = one_up_text_box_id + 1
+                #################################################################################################
+                ## End of Handle breaking change for Text Box IDs ###############################################
+                #################################################################################################
+
                 #################################################################################################
                 ## Handle breaking change of tracks sections now a list of 3 sections from release 4.0.0 #########
                 ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
@@ -586,66 +615,8 @@ def set_all(new_objects):
                 ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################
 
-                #################################################################################################
-                ### Handle change of GPIO sensor IDs being strings from Release 3.6.0 onwards ###################
-                ### This is something we can resolve without affecting the user so we resolve ###################
-                ### it silently without an Log message or load warning message ##################################
-                #################################################################################################
-                elif new_object_type == objects_common.object_type.signal and element == "passedsensor":
-                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
-                    if new_objects[object_id][element][1] == 0:
-                        objects_common.schematic_objects[object_id][element][1] = ""
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    elif isinstance(new_objects[object_id][element][1],int):
-                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
-                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    else:
-                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                elif new_object_type == objects_common.object_type.signal and element == "approachsensor":
-                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
-                    if new_objects[object_id][element][1] == 0:
-                        objects_common.schematic_objects[object_id][element][1] = ""
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    elif isinstance(new_objects[object_id][element][1],int):
-                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
-                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    else:
-                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                #################################################################################################
-                ## End of Handle breaking change for GPIO sensor IDs ############################################
-                #################################################################################################
-
-                #################################################################################################
-                ## Handle bugfix for Signal point interlocking tables (i.e. list wrongly included 7 points ######
-                ## on point deletion whereas the list should only ever include 6 points #########################
-                #################################################################################################
-                elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
-                    for index, route in enumerate (new_objects[object_id][element]):
-                        objects_common.schematic_objects[object_id][element][index][0] = route[0][0:6]
-                        objects_common.schematic_objects[object_id][element][index][1] = route[1]
-                        objects_common.schematic_objects[object_id][element][index][2] = route[2]
-                #################################################################################################
-                ## End of Handle bugfix for Signal point interlocking tables ####################################
-                #################################################################################################
-
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-
-            #################################################################################################
-            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards ########################
-            #################################################################################################
-            if len(list_of_track_sensors_to_create) > 0:
-                logging.debug("LOAD LAYOUT - Populating track sensor mappings to handle version 3.6.0 breaking change")
-                settings.set_gpio(mappings = list_of_track_sensors_to_create)       
-            #################################################################################################
-            ## End of Handle breaking change for sensor IDs #################################################
-            #################################################################################################
 
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)

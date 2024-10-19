@@ -77,7 +77,7 @@
 # 2) Leave the references to the gpiozero button objects stable - On 'reset_gpio_mqtt_configuration' we only
 #    remove the elements we need from the master gpio_port_mappings - leaving everything else as is
 # 3) Simplify the processing of trigger events - we now use the gpiozero library to implement the trigger delay
-#    and immediately pass execution back to the main tkinter thread (using the root.after method)
+#    and pass execution back to the main tkinter thread (using common.execute_function_in_tkinter_thread)
 #    GPIO button is triggeres
 #
 #---------------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ def gpio_sensor_exists(sensor_id:Union[int,str]):
 #---------------------------------------------------------------------------------------------------
 
 def gpio_triggered_callback(*args):
-    common.root_window.after(0, lambda:gpio_sensor_triggered(*args))
+    common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(*args))
 
 #---------------------------------------------------------------------------------------------------
 # Internal function executed in the main Tkinter thread whenever a "Button Held" event is detected

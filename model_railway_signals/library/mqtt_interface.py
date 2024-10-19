@@ -186,8 +186,9 @@ def thread_to_send_heartbeat_messages():
     if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Heartbeat thread started")
     node_config["heartbeat_thread_terminated"] = False
     while not node_config["terminate_heartbeat_thread"]:
-        # The PAHO MQTT client may not be thread safe so publish the message from the main Tkinter thread
-        common.root_window.after(0, publish_heartbeat_message)
+        # The PAHO MQTT client may not be thread safe so publish the message from the main Tkinter
+        # thread as this thread is the thread that 'created' our MQTT client instance
+        common.execute_function_in_tkinter_thread(lambda:publish_heartbeat_message())
         # Wait before we send out the next heartbeat
         last_heartbeat_time = time.time()
         while (time.time() < last_heartbeat_time + node_config["heartbeat_frequency"]
@@ -323,7 +324,7 @@ def process_message(msg):
 def on_message(mqtt_client,obj,msg):
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
-    if msg.payload: common.root_window.after(0, lambda:process_message(msg)) 
+    if msg.payload: common.execute_function_in_tkinter_thread(lambda:process_message(msg))
     return()
 
 #-----------------------------------------------------------------------------------------------

@@ -11,7 +11,13 @@
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
+#   configure_button_size(button_size:int) - Specify the Font size for layout control buttons)
+#
 # External API - classes and functions (used by the other library modules):
+#
+#   rotate_point(ox,oy,px,py,angle) - Rotate a point (px,py) around the origin (ox,oy)
+#
+#   rotate_line(ox,oy,px1,py1,px2,py2,angle) - Rotate a line (px1,py1,px3,py2) around the origin (ox,oy)
 #
 #   execute_function_in_tkinter_thread(callback_function) - Will 'pass' the function
 #         into the main tkinter thread via a queue (and tkinter event) and then execute
@@ -22,11 +28,13 @@
 import math
 import logging
 import time
+import queue
 
 from . import mqtt_interface
 from . import pi_sprog_interface
 from . import track_sensors
 from . import track_sections
+from . import text_boxes
 from . import buttons
 
 # -------------------------------------------------------------------------
@@ -41,20 +49,27 @@ xpadding = 2  # Used by the Signals and Points modules
 ypadding = -1  # Used by the Signals and Points modules
 bgraised = "grey85"   # Used by the Signals and Points modules
 bgsunken = "white"    # Used by the Signals and Points modules
-
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
 # Global variable to signal (to other modules) that application is closing
 shutdown_initiated = False
+# Event queue for passing "commands" back into the main tkinter thread
+event_queue = queue.Queue()
 
-#------------------------------------------------------------------------------------
-# The behavior/appearance of the some library objects may change in Edit Mode
-#------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+# Function to set the tkinter "root" window reference as this is used to
+# schedule callback events in the main tkinter event loop using the 'after'
+# method and also for feeding custom callback functions into the main tkinter
+# thread. We do this as all the information out there on the internet concludes
+# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
+# objects should be done from within the main tkinter thread.
+#-------------------------------------------------------------------------
 
-def configure_edit_mode(edit_mode:bool):
-    track_sensors.configure_edit_mode(edit_mode)
-    track_sections.configure_edit_mode(edit_mode)
-    buttons.configure_edit_mode(edit_mode)
+def set_root_window(root):
+    global root_window
+    root_window = root
+    # bind the tkinter event for handling events raised in external threads
+    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
     return()
 
 #-------------------------------------------------------------------------
@@ -90,18 +105,24 @@ def shutdown():
             logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
     return()
 
-#-------------------------------------------------------------------------
-# Function to set the tkinter "root" window reference as this is used to
-# schedule callback events in the main tkinter event loop using the 'after' 
-# method and also for feeding custom callback functions into the main tkinter
-# thread. We do this as all the information out there on the internet concludes
-# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
-# objects should be done from within the main tkinter thread.
-#-------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+# The behavior/appearance of the some library objects may change in Edit Mode
+#------------------------------------------------------------------------------------
 
-def set_root_window(root):
-    global root_window
-    root_window = root
+def configure_edit_mode(edit_mode:bool):
+    track_sensors.configure_edit_mode(edit_mode)
+    track_sections.configure_edit_mode(edit_mode)
+    text_boxes.configure_edit_mode(edit_mode)
+    buttons.configure_edit_mode(edit_mode)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to configure the font size for layout control buttons (points/signals)
+#------------------------------------------------------------------------------------
+
+def configure_button_size(button_size:int):
+    global fontsize
+    fontsize = button_size
     return()
 
 # -------------------------------------------------------------------------
@@ -119,6 +140,39 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
     start_point = rotate_point(ox,oy,px1,py1,angle)
     end_point = rotate_point(ox,oy,px2,py2,angle)
     return (start_point, end_point)
+
+#-------------------------------------------------------------------------
+# Functions to allow custom callback functions to be passed in (from an external thread)
+# and then handled in the main Tkinter thread (to keep everything threadsafe). We use
+# the tkinter event_generate method to generate a custom event in the main event loop
+# in conjunction with a (threadsafe) queue to pass the callback function. We don't use
+# the tkinter root.after method as we don't believe that this is threadsafe.
+# Use as follows: execute_function_in_tkinter_thread (lambda: my_function(arg1,arg2...))
+#-------------------------------------------------------------------------
+
+def handle_callback_in_tkinter_thread(*args):
+    while not event_queue.empty():
+        callback = event_queue.get(False)
+        callback()
+    return()
+
+def execute_function_in_tkinter_thread(callback_function):
+    if root_window is not None:
+        event_queue.put(callback_function)
+        # When loading a layout file on startup, there were a number of possible edge cases that could cause
+        # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
+        # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
+        # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
+        # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
+        # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
+        try:
+            root_window.event_generate("<<ExtCallback>>", when="tail")
+        except Exception as exception:
+            logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
+            logging.error(str(exception))
+    else:
+        logging.error("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
+    return()
 
 ##################################################################################################
 
