@@ -17,7 +17,8 @@
     "instruments": {},
     "objects": {
         "03f32844-9771-4717-91a8-ef160bada1df": {
-            "bbox": 11712,
+            "bbox": 12021,
+            "hidden": false,
             "item": "tracksensor",
             "itemid": 3,
             "passedsensor": "8",
@@ -326,7 +327,7 @@
                 1,
                 1
             ],
-            "bbox": 11718,
+            "bbox": 12027,
             "colour": "black",
             "endx": 550.0,
             "endy": 200.0,
@@ -338,7 +339,8 @@
             "tags": "line4"
         },
         "30bdbf8d-ab42-46a5-b86c-632d3bad5dd2": {
-            "bbox": 11722,
+            "bbox": 12031,
+            "hidden": false,
             "item": "tracksensor",
             "itemid": 2,
             "passedsensor": "7",
@@ -641,9 +643,10 @@
             "tags": "sensor2"
         },
         "338a06f5-049d-454e-9e8f-e032ab9ca9cb": {
-            "bbox": 11726,
+            "bbox": 12035,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 4,
             "mirror": "",
@@ -653,22 +656,24 @@
         },
         "3495a936-bc8d-4393-9abe-3520edcb0d9d": {
             "background": "#18bbd9",
-            "bbox": 11729,
+            "bbox": 12038,
             "border": 1,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 1,
             "justify": 2,
             "posx": 800.0,
             "posy": 175.0,
-            "tags": "3495a936-bc8d-4393-9abe-3520edcb0d9d",
+            "tags": "textbox1",
             "text": "     Platform 2     "
         },
         "353b45c7-5cea-4783-81eb-7fe275398deb": {
-            "bbox": 11733,
+            "bbox": 12042,
+            "hidden": false,
             "item": "tracksensor",
             "itemid": 1,
             "passedsensor": "",
@@ -972,50 +977,53 @@
         },
         "40efa244-6879-4bbd-b880-9eeb70373504": {
             "background": "grey85",
-            "bbox": 11736,
+            "bbox": 12045,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 2,
             "justify": 2,
             "posx": 100.0,
             "posy": 250.0,
-            "tags": "40efa244-6879-4bbd-b880-9eeb70373504",
+            "tags": "textbox2",
             "text": "The rest of \nthe world"
         },
         "43fd9649-cff7-437a-b405-2811fc777a5f": {
             "background": "grey85",
-            "bbox": 11739,
+            "bbox": 12048,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 3,
             "justify": 2,
             "posx": 150.0,
             "posy": 181.0,
-            "tags": "43fd9649-cff7-437a-b405-2811fc777a5f",
+            "tags": "textbox3",
             "text": "Next Train"
         },
         "4576da32-1464-4dad-92d8-5e3e06ee59e3": {
             "background": "#18bbd9",
-            "bbox": 11742,
+            "bbox": 12051,
             "border": 1,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 4,
             "justify": 2,
             "posx": 800.0,
             "posy": 275.0,
-            "tags": "4576da32-1464-4dad-92d8-5e3e06ee59e3",
+            "tags": "textbox4",
             "text": "     Platform 1     "
         },
         "4faab254-a7db-48cb-bcdd-187c9702c92b": {
@@ -1030,7 +1038,7 @@
                 false,
                 ""
             ],
-            "bbox": 11759,
+            "bbox": 12068,
             "dccaspects": [
                 [
                     [
@@ -1895,7 +1903,7 @@
                 20,
                 5
             ],
-            "bbox": 11765,
+            "bbox": 12074,
             "colour": "black",
             "endx": 550.0,
             "endy": 250.0,
@@ -1907,9 +1915,10 @@
             "tags": "line1"
         },
         "6788feaa-a049-4d62-978c-faa6f4dfd967": {
-            "bbox": 11769,
+            "bbox": 12078,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 1,
             "mirror": "",
@@ -1918,7 +1927,8 @@
             "tags": "section1"
         },
         "6f705b1a-e264-4bb7-a979-4520901eec1b": {
-            "bbox": 11773,
+            "bbox": 12082,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 4,
@@ -1939,6 +1949,7 @@
             "routecolour": "#1bb420",
             "routedescription": "Platform 2 departure\nto the rest of the world",
             "routename": "Depart Platform 2",
+            "setupsensor": 0,
             "signalsonroute": [
                 2
             ],
@@ -1949,18 +1960,19 @@
         },
         "87f435df-8da5-4999-b3ef-e7ea67977c03": {
             "background": "grey85",
-            "bbox": 11776,
+            "bbox": 12085,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 5,
             "justify": 2,
             "posx": 375.0,
             "posy": 175.0,
-            "tags": "87f435df-8da5-4999-b3ef-e7ea67977c03",
+            "tags": "textbox5",
             "text": "Siding"
         },
         "93406d3b-2a78-455f-b5cd-3fcd1fcdf640": {
@@ -1970,7 +1982,7 @@
                 1,
                 1
             ],
-            "bbox": 11782,
+            "bbox": 12091,
             "colour": "black",
             "endx": 900.0,
             "endy": 250.0,
@@ -1982,9 +1994,10 @@
             "tags": "line3"
         },
         "970e8948-a116-4023-847b-2e9269c0fa74": {
-            "bbox": 11786,
+            "bbox": 12095,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 2,
             "mirror": "",
@@ -1995,7 +2008,7 @@
         "990769c5-58eb-435b-befb-21b9263321b4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 11791,
+            "bbox": 12100,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -2025,7 +2038,7 @@
                 false,
                 ""
             ],
-            "bbox": 11802,
+            "bbox": 12111,
             "dccaspects": [
                 [
                     [
@@ -2895,9 +2908,10 @@
             ]
         },
         "abc1ad1d-e1b2-4129-a1eb-e33844a0166d": {
-            "bbox": 11806,
+            "bbox": 12115,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 5,
             "mirror": "",
@@ -2917,7 +2931,7 @@
                 false,
                 ""
             ],
-            "bbox": 11825,
+            "bbox": 12134,
             "dccaspects": [
                 [
                     [
@@ -3800,7 +3814,7 @@
         "b3241207-0377-4e6e-aeac-6cb08691c888": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 11832,
+            "bbox": 12141,
             "colour": "black",
             "dccaddress": 1000,
             "dccreversed": false,
@@ -3870,7 +3884,8 @@
             "ybuttonoffset": 0
         },
         "c622073d-27c0-4f32-aecb-f95dfebb93a0": {
-            "bbox": 11836,
+            "bbox": 12145,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 2,
@@ -3891,6 +3906,7 @@
             "routecolour": "#2916d9",
             "routedescription": "From the rest of the World\ninto Platform 2",
             "routename": "Into Platform 2",
+            "setupsensor": 0,
             "signalsonroute": [
                 1
             ],
@@ -3911,7 +3927,7 @@
                 false,
                 ""
             ],
-            "bbox": 11853,
+            "bbox": 12162,
             "dccaspects": [
                 [
                     [
@@ -4792,7 +4808,8 @@
             ]
         },
         "da49f189-a72b-4e08-969a-d222c5609644": {
-            "bbox": 11857,
+            "bbox": 12166,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 3,
@@ -4812,6 +4829,7 @@
             "routecolour": "#1bb420",
             "routedescription": "Platform 1 departure\nto rest of the world",
             "routename": "Depart Platform 1",
+            "setupsensor": 0,
             "signalsonroute": [
                 3
             ],
@@ -4821,7 +4839,8 @@
             "tracksensor": 1
         },
         "df3dcf3e-6882-4e86-84d9-f07049ac7129": {
-            "bbox": 11861,
+            "bbox": 12170,
+            "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
             "item": "route",
             "itemid": 1,
@@ -4841,6 +4860,7 @@
             "routecolour": "#2916d9",
             "routedescription": "From the rest of the world \ninto platform 1",
             "routename": "Into Platform 1",
+            "setupsensor": 0,
             "signalsonroute": [
                 1
             ],
@@ -4861,7 +4881,7 @@
                 false,
                 ""
             ],
-            "bbox": 11878,
+            "bbox": 12187,
             "dccaspects": [
                 [
                     [
@@ -5737,7 +5757,7 @@
                 1,
                 1
             ],
-            "bbox": 11884,
+            "bbox": 12193,
             "colour": "black",
             "endx": 900.0,
             "endy": 200.0,
@@ -5749,9 +5769,10 @@
             "tags": "line2"
         },
         "fc5c18e4-b05c-4941-9c64-476d0ae651a2": {
-            "bbox": 11888,
+            "bbox": 12197,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 3,
             "mirror": "",
@@ -5803,11 +5824,12 @@
         },
         "general": {
             "automation": true,
+            "buttonsize": 8,
             "editmode": true,
             "filename": "/home/john/model-railway-signalling/user_guide/quickstart_example1.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.6.1"
+            "version": "Version 4.7.0"
         },
         "gpio": {
             "portmappings": [

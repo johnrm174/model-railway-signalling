@@ -32,7 +32,7 @@
                 false,
                 ""
             ],
-            "bbox": 4448,
+            "bbox": 4452,
             "dccaspects": [
                 [
                     [
@@ -902,7 +902,7 @@
                 false,
                 ""
             ],
-            "bbox": 4465,
+            "bbox": 4469,
             "dccaspects": [
                 [
                     [
@@ -1782,9 +1782,10 @@
             ]
         },
         "13da3a2d-77af-4de3-989d-b64f7412bed4": {
-            "bbox": 4469,
+            "bbox": 4473,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 21,
             "mirror": "Box1-33",
@@ -1799,7 +1800,7 @@
                 1,
                 1
             ],
-            "bbox": 4475,
+            "bbox": 4479,
             "colour": "black",
             "endx": 725.0,
             "endy": 300.0,
@@ -1817,7 +1818,7 @@
                 20,
                 5
             ],
-            "bbox": 4481,
+            "bbox": 4485,
             "colour": "black",
             "endx": 225.0,
             "endy": 475.0,
@@ -1829,7 +1830,7 @@
             "tags": "line15"
         },
         "1673df65-f654-47c4-bfd6-4bfd169de38c": {
-            "bbox": 4496,
+            "bbox": 4500,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 11,
@@ -1841,9 +1842,10 @@
             "tags": "instrument11"
         },
         "17b8ab25-9197-49d6-b624-54f7696202c5": {
-            "bbox": 4500,
+            "bbox": 4504,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 31,
             "mirror": "Box1-23",
@@ -1852,9 +1854,10 @@
             "tags": "section31"
         },
         "19329487-2174-4d77-8f22-093a94fd6aa9": {
-            "bbox": 4504,
+            "bbox": 4508,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 4,
             "mirror": "Box1-14",
@@ -1869,7 +1872,7 @@
                 0,
                 0
             ],
-            "bbox": 4510,
+            "bbox": 4514,
             "colour": "black",
             "endx": 775.0,
             "endy": 475.0,
@@ -1892,7 +1895,7 @@
                 false,
                 ""
             ],
-            "bbox": 4527,
+            "bbox": 4531,
             "dccaspects": [
                 [
                     [
@@ -2783,7 +2786,7 @@
                 false,
                 ""
             ],
-            "bbox": 4544,
+            "bbox": 4548,
             "dccaspects": [
                 [
                     [
@@ -3653,7 +3656,7 @@
                 false,
                 ""
             ],
-            "bbox": 4561,
+            "bbox": 4565,
             "dccaspects": [
                 [
                     [
@@ -4514,7 +4517,7 @@
         "42bd0f07-f00e-4db9-98c0-1b1bf2254d6d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4568,
+            "bbox": 4572,
             "colour": "black",
             "dccaddress": 1011,
             "dccreversed": false,
@@ -4574,9 +4577,10 @@
             "ybuttonoffset": 0
         },
         "46a4dcc4-7246-4ea4-8f1f-5e939ed7c6f8": {
-            "bbox": 4572,
+            "bbox": 4576,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 11,
             "mirror": "",
@@ -4596,7 +4600,7 @@
                 false,
                 ""
             ],
-            "bbox": 4589,
+            "bbox": 4593,
             "dccaspects": [
                 [
                     [
@@ -5466,7 +5470,7 @@
                 false,
                 ""
             ],
-            "bbox": 4606,
+            "bbox": 4610,
             "dccaspects": [
                 [
                     [
@@ -6325,9 +6329,10 @@
             ]
         },
         "4b175fed-abf6-4577-93bf-4f9d3e9e75c0": {
-            "bbox": 4610,
+            "bbox": 4614,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 1,
             "mirror": "",
@@ -6347,7 +6352,7 @@
                 false,
                 ""
             ],
-            "bbox": 4627,
+            "bbox": 4631,
             "dccaspects": [
                 [
                     [
@@ -7212,7 +7217,7 @@
                 0,
                 0
             ],
-            "bbox": 4633,
+            "bbox": 4637,
             "colour": "black",
             "endx": 750.0,
             "endy": 400.0,
@@ -7230,7 +7235,7 @@
                 20,
                 5
             ],
-            "bbox": 4639,
+            "bbox": 4643,
             "colour": "black",
             "endx": 775.0,
             "endy": 450.0,
@@ -7253,7 +7258,7 @@
                 false,
                 ""
             ],
-            "bbox": 4656,
+            "bbox": 4660,
             "dccaspects": [
                 [
                     [
@@ -8112,9 +8117,10 @@
             ]
         },
         "69f67a39-c5b3-45bb-a6a0-d4b833292158": {
-            "bbox": 4660,
+            "bbox": 4664,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 23,
             "mirror": "Box1-31",
@@ -8123,9 +8129,10 @@
             "tags": "section23"
         },
         "6aedd8b7-fc51-4c13-a564-4b0e34a6f036": {
-            "bbox": 4664,
+            "bbox": 4668,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 13,
             "mirror": "",
@@ -8140,7 +8147,7 @@
                 1,
                 1
             ],
-            "bbox": 4670,
+            "bbox": 4674,
             "colour": "black",
             "endx": 250.0,
             "endy": 125.0,
@@ -8152,9 +8159,10 @@
             "tags": "line6"
         },
         "76e53459-d4c9-4116-8d77-03fdba76cbaf": {
-            "bbox": 4674,
+            "bbox": 4678,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 32,
             "mirror": "",
@@ -8169,7 +8177,7 @@
                 0,
                 0
             ],
-            "bbox": 4680,
+            "bbox": 4684,
             "colour": "black",
             "endx": 750.0,
             "endy": 525.0,
@@ -8181,9 +8189,10 @@
             "tags": "line10"
         },
         "905280e4-a705-45d6-bb9d-c7fd3b26236c": {
-            "bbox": 4684,
+            "bbox": 4688,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 33,
             "mirror": "Box1-21",
@@ -8203,7 +8212,7 @@
                 false,
                 ""
             ],
-            "bbox": 4701,
+            "bbox": 4705,
             "dccaspects": [
                 [
                     [
@@ -9089,7 +9098,7 @@
                 0,
                 0
             ],
-            "bbox": 4707,
+            "bbox": 4711,
             "colour": "black",
             "endx": 725.0,
             "endy": 300.0,
@@ -9112,7 +9121,7 @@
                 false,
                 ""
             ],
-            "bbox": 4724,
+            "bbox": 4728,
             "dccaspects": [
                 [
                     [
@@ -9977,7 +9986,7 @@
                 20,
                 5
             ],
-            "bbox": 4730,
+            "bbox": 4734,
             "colour": "black",
             "endx": 300.0,
             "endy": 75.0,
@@ -9995,7 +10004,7 @@
                 1,
                 1
             ],
-            "bbox": 4736,
+            "bbox": 4740,
             "colour": "black",
             "endx": 725.0,
             "endy": 250.0,
@@ -10013,7 +10022,7 @@
                 20,
                 5
             ],
-            "bbox": 4742,
+            "bbox": 4746,
             "colour": "black",
             "endx": 675.0,
             "endy": 250.0,
@@ -10025,9 +10034,10 @@
             "tags": "line4"
         },
         "b0f49fb4-18ad-4ab7-96c7-389aa0620a9b": {
-            "bbox": 4746,
+            "bbox": 4750,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 22,
             "mirror": "",
@@ -10042,7 +10052,7 @@
                 1,
                 1
             ],
-            "bbox": 4752,
+            "bbox": 4756,
             "colour": "black",
             "endx": 250.0,
             "endy": 75.0,
@@ -10065,7 +10075,7 @@
                 false,
                 ""
             ],
-            "bbox": 4769,
+            "bbox": 4773,
             "dccaspects": [
                 [
                     [
@@ -10951,7 +10961,7 @@
                 0,
                 0
             ],
-            "bbox": 4775,
+            "bbox": 4779,
             "colour": "black",
             "endx": 750.0,
             "endy": 400.0,
@@ -10963,9 +10973,10 @@
             "tags": "line9"
         },
         "bfed75b7-c5a8-4359-884e-64d60a15d756": {
-            "bbox": 4779,
+            "bbox": 4783,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 2,
             "mirror": "",
@@ -10974,9 +10985,10 @@
             "tags": "section2"
         },
         "d0582275-d5f9-4560-8d34-3a7b41144ba3": {
-            "bbox": 4783,
+            "bbox": 4787,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 14,
             "mirror": "Box1-4",
@@ -10985,9 +10997,10 @@
             "tags": "section14"
         },
         "d9e945b5-0996-45af-8f99-d685cf9b7b37": {
-            "bbox": 4787,
+            "bbox": 4791,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 12,
             "mirror": "",
@@ -11002,7 +11015,7 @@
                 0,
                 0
             ],
-            "bbox": 4793,
+            "bbox": 4797,
             "colour": "black",
             "endx": 750.0,
             "endy": 525.0,
@@ -11020,7 +11033,7 @@
                 0,
                 0
             ],
-            "bbox": 4799,
+            "bbox": 4803,
             "colour": "black",
             "endx": 225.0,
             "endy": 500.0,
@@ -11032,9 +11045,10 @@
             "tags": "line12"
         },
         "e122f2ea-41d1-451a-9429-83086e3fb36d": {
-            "bbox": 4803,
+            "bbox": 4807,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 3,
             "mirror": "",
@@ -11049,7 +11063,7 @@
                 0,
                 0
             ],
-            "bbox": 4809,
+            "bbox": 4813,
             "colour": "black",
             "endx": 250.0,
             "endy": 400.0,
@@ -11061,7 +11075,7 @@
             "tags": "line11"
         },
         "ee36a4a7-221f-4528-9a14-67fd5c0fde1a": {
-            "bbox": 4824,
+            "bbox": 4828,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -11075,7 +11089,7 @@
         "f174c280-de2b-400c-96cb-9e6dd664a0d1": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4831,
+            "bbox": 4835,
             "colour": "black",
             "dccaddress": 1001,
             "dccreversed": false,
@@ -11141,7 +11155,7 @@
                 0,
                 0
             ],
-            "bbox": 4837,
+            "bbox": 4841,
             "colour": "black",
             "endx": 225.0,
             "endy": 425.0,
@@ -11159,7 +11173,7 @@
                 0,
                 0
             ],
-            "bbox": 4843,
+            "bbox": 4847,
             "colour": "black",
             "endx": 275.0,
             "endy": 100.0,
@@ -11274,11 +11288,12 @@
         },
         "general": {
             "automation": true,
+            "buttonsize": 8,
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/configuration_examples/mqtt_networked_example.sig",
             "info": "This example includes two 'layouts', where each layout is split into two signalling areas with MQTT \nnetworking configured to provide the communication between each area. To run this example you will need\nto either stand up your own MQTT broker (I installed a broker on the local machine with basic username \nand password authentication) or use a third-party broker (there are free-to-use test brokers out there).\n\nAlthough all the signalling areas appear on the same schematic, all communication between the two \n'halves' of each layout is via the MQTT broker. Select 'Settings' => 'MQTT' from the menubar to view\nthe broker configuration and list of published and subscribed signals, sensors, sections and instruments.\n\nThe top layout is an example of a single line between two 'block sections', with the points and signals \nin in each block section interlocked - e.g. signal 1 is interlocked with point 1 and opposing signals 3 \nand 4. The distant signals are configured as 'fixed distants' (see the signal's 'interlocking' tab for\ndetails of how this has been configured). The only communication between each block section is via MQTT \nnetworking - in this case linking the two block instruments and 'mirroring' track sections 4 and 14 \n(i.e. section 4 on the top half of the layout represents section 14 on the bottom half of the layout).\n\nThe block instruments are used to coordinate train movements between the two block sections and allow \ncommunication via bell codes. In this example, the 'starter' signals for each block section have been \ninterlocked with their respective instruments (and the instruments linked together via the MQTT network)\nThis means signals 1/2 can only be cleared when instrument 2 (on the bottom) has been set to 'line clear' \nand signals 11/12 can only be cleared when instrument 1 (on the top) has been set to 'line clear'.\n\nTrack sections have been included on the schematic to provide a mimic display of track occupancy (when\na train passes a signal (signal is 'off') it gets passed from the section behind to the section ahead).\nThe desired behavior is again configured via the 'automation' tab of each signal. For example, signal 3\ncontrols two 'routes' so when passed, section 3 will be cleared and either section 1 or 2 will be set \nto occupied, depending on which route the signal is cleared for. As sections 4 and 14 are 'mirrored' \nvia the MQTT network, trains are seamlessly passed between each each half of the layout\n\nThe bottom layout represents a simple oval of track, but split into two signalling areas. Here, MQTT\nnetworking is used to track the displayed aspect of the 'signal ahead' (in the next signalling area)\nto ensure all signals display the correct aspects as the train moves around the track. MQTT networking\nis also used to 'mirror' the track sections across signalling area boundaries to seamlessly pass trains\nfrom one half of the layout to the other (section 21 mirrors 33 and section 23 mirrors 31).\n\nTo see how the layout functions in its entirity, set all signals (21, 22, 31, 31) to 'off' and right-\nclick the top-middle track section to enter a train code of your choice (this will set the section to\n'occupied'. Then, pass the train around the loop by clicking the small button at the base of each \nsignal in turn (22 => 31 => 32 => 21 etc).\n\nAlternatively, if you are running on a Raspberry Pi, you can trigger the 'signal passed' events via\nthe GPIO ports. GPIO ports 4,5,6 and 7 have been allocated to \"track sensors\" 1,2,3 and 4 (Select \n'Settings' => 'Sensors' from the menubar to view the track sensor configuration). To trigger, simply\nmomentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC supply pins. \n\nFor this example, the track sensors are published (and subscribed back to) via the MQTT broker (select \n'Settings' => 'MQTT' from the menubar to see the configuration) with the signal configured to trigger \nthe 'signal passed' events from on the subscribed sensors. The DCC command feed is also published (and\nsubscribed back to) via the MQTT broker. This demonstrates how multiple application instances can be \nconfigured to use a single R-Pi acting as the interface to the layout.\n",
             "spadpopups": false,
-            "version": "Version 4.6.1"
+            "version": "Version 4.7.0"
         },
         "gpio": {
             "portmappings": [

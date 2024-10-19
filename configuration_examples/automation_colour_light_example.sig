@@ -15,7 +15,7 @@
                 false,
                 ""
             ],
-            "bbox": 168,
+            "bbox": 172,
             "dccaspects": [
                 [
                     [
@@ -897,34 +897,36 @@
         },
         "05c99664-2259-4355-a881-4c3e2c4279d3": {
             "background": "grey85",
-            "bbox": 171,
+            "bbox": 175,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 1,
             "justify": 2,
             "posx": 1574.0,
             "posy": 185.0,
-            "tags": "05c99664-2259-4355-a881-4c3e2c4279d3",
+            "tags": "textbox1",
             "text": "TT-DS10"
         },
         "0cdde9d4-28ce-4644-8601-f613605ff8f4": {
             "background": "grey85",
-            "bbox": 174,
+            "bbox": 178,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 16,
             "fontstyle": "bold ",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 2,
             "justify": 2,
             "posx": 819.0,
             "posy": 44.0,
-            "tags": "0cdde9d4-28ce-4644-8601-f613605ff8f4",
+            "tags": "textbox2",
             "text": "Colour Light Automation Example"
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
@@ -934,7 +936,7 @@
                 0,
                 0
             ],
-            "bbox": 180,
+            "bbox": 184,
             "colour": "black",
             "endx": 1675,
             "endy": 275,
@@ -947,24 +949,26 @@
         },
         "147bdac0-2cb4-4de7-a45d-a87b46155eab": {
             "background": "grey85",
-            "bbox": 183,
+            "bbox": 187,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 3,
             "justify": 2,
             "posx": 36.0,
             "posy": 288.0,
-            "tags": "147bdac0-2cb4-4de7-a45d-a87b46155eab",
+            "tags": "textbox3",
             "text": "Up Main"
         },
         "233a09d0-5c3b-4fd7-9838-1045b392fc85": {
-            "bbox": 187,
+            "bbox": 191,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 10,
             "mirror": "",
@@ -974,34 +978,36 @@
         },
         "237bec79-c24f-4c2f-956a-a12133fa79db": {
             "background": "grey85",
-            "bbox": 190,
+            "bbox": 194,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 12,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 4,
             "justify": 2,
             "posx": 575.0,
             "posy": 150.0,
-            "tags": "237bec79-c24f-4c2f-956a-a12133fa79db",
+            "tags": "textbox4",
             "text": "MPD"
         },
         "2809aba0-8417-4ffe-b8ab-9d0bcfd4b777": {
             "background": "grey85",
-            "bbox": 193,
+            "bbox": 197,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 12,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 5,
             "justify": 2,
             "posx": 1460.0,
             "posy": 149.0,
-            "tags": "2809aba0-8417-4ffe-b8ab-9d0bcfd4b777",
+            "tags": "textbox5",
             "text": "Goods Yard"
         },
         "350ab106-55fd-4920-800f-606a103c9392": {
@@ -1011,7 +1017,7 @@
                 0,
                 0
             ],
-            "bbox": 199,
+            "bbox": 203,
             "colour": "black",
             "endx": 0,
             "endy": 275,
@@ -1025,7 +1031,7 @@
         "36c92467-cd2d-4608-bd3d-1ae2fe2fb9b0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 205,
+            "bbox": 209,
             "colour": "black",
             "dccaddress": 1005,
             "dccreversed": false,
@@ -1106,7 +1112,7 @@
                 false,
                 ""
             ],
-            "bbox": 222,
+            "bbox": 226,
             "dccaspects": [
                 [
                     [
@@ -1966,18 +1972,19 @@
         },
         "3d9905d7-3a8c-42d0-ada6-e78748273374": {
             "background": "grey85",
-            "bbox": 225,
+            "bbox": 229,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 6,
             "justify": 2,
             "posx": 690.0,
             "posy": 245.0,
-            "tags": "3d9905d7-3a8c-42d0-ada6-e78748273374",
+            "tags": "textbox6",
             "text": "AA-4Awpl&lhf"
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
@@ -1987,7 +1994,7 @@
                 0,
                 0
             ],
-            "bbox": 231,
+            "bbox": 235,
             "colour": "black",
             "endx": 1300.0,
             "endy": 225.0,
@@ -2010,7 +2017,7 @@
                 false,
                 ""
             ],
-            "bbox": 242,
+            "bbox": 246,
             "dccaspects": [
                 [
                     [
@@ -2902,40 +2909,43 @@
         },
         "4c400af8-bf96-447e-85f4-9928287360c5": {
             "background": "grey85",
-            "bbox": 245,
+            "bbox": 249,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 7,
             "justify": 2,
             "posx": 1141.0,
             "posy": 240.0,
-            "tags": "4c400af8-bf96-447e-85f4-9928287360c5",
+            "tags": "textbox7",
             "text": "AA-4Awpl"
         },
         "500f7750-b750-4d33-b9fe-1e6373da674d": {
             "background": "grey85",
-            "bbox": 248,
+            "bbox": 252,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 8,
             "justify": 2,
             "posx": 512.0,
             "posy": 239.0,
-            "tags": "500f7750-b750-4d33-b9fe-1e6373da674d",
+            "tags": "textbox8",
             "text": "TT-DS5HS"
         },
         "5424b00f-f0ad-4900-8b9c-7d858a2e05d0": {
-            "bbox": 252,
+            "bbox": 256,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 4,
             "mirror": "",
@@ -2955,7 +2965,7 @@
                 false,
                 ""
             ],
-            "bbox": 271,
+            "bbox": 275,
             "dccaspects": [
                 [
                     [
@@ -3836,7 +3846,7 @@
                 false,
                 ""
             ],
-            "bbox": 288,
+            "bbox": 292,
             "dccaspects": [
                 [
                     [
@@ -4706,7 +4716,7 @@
                 false,
                 ""
             ],
-            "bbox": 305,
+            "bbox": 309,
             "dccaspects": [
                 [
                     [
@@ -5597,7 +5607,7 @@
                 false,
                 ""
             ],
-            "bbox": 322,
+            "bbox": 326,
             "dccaspects": [
                 [
                     [
@@ -6457,18 +6467,19 @@
         },
         "632a3066-6bfb-4269-81f1-c73b4b294ae9": {
             "background": "grey85",
-            "bbox": 325,
+            "bbox": 329,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 9,
             "justify": 2,
             "posx": 335.0,
             "posy": 240.0,
-            "tags": "632a3066-6bfb-4269-81f1-c73b4b294ae9",
+            "tags": "textbox9",
             "text": "TT-DS5HS"
         },
         "64b572a6-a2d0-4010-b33f-cd73b16f3f24": {
@@ -6483,7 +6494,7 @@
                 false,
                 ""
             ],
-            "bbox": 342,
+            "bbox": 346,
             "dccaspects": [
                 [
                     [
@@ -7353,7 +7364,7 @@
                 false,
                 ""
             ],
-            "bbox": 353,
+            "bbox": 357,
             "dccaspects": [
                 [
                     [
@@ -8235,7 +8246,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 358,
+            "bbox": 362,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8255,56 +8266,60 @@
         },
         "6df4e851-8669-4940-8dc9-fec3e1873294": {
             "background": "grey85",
-            "bbox": 361,
+            "bbox": 365,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 10,
             "justify": 2,
             "posx": 51.0,
             "posy": 191.0,
-            "tags": "6df4e851-8669-4940-8dc9-fec3e1873294",
+            "tags": "textbox10",
             "text": "Set\nNext\nTrain"
         },
         "709c0d2f-3d16-4669-b53f-38614ef26ea2": {
             "background": "grey85",
-            "bbox": 364,
+            "bbox": 368,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 11,
             "justify": 2,
             "posx": 1636.0,
             "posy": 212.0,
-            "tags": "709c0d2f-3d16-4669-b53f-38614ef26ea2",
+            "tags": "textbox11",
             "text": "Down Main"
         },
         "75eb7e1b-08a6-4223-8ed8-f31381186102": {
             "background": "grey85",
-            "bbox": 367,
+            "bbox": 371,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 12,
             "justify": 2,
             "posx": 165.0,
             "posy": 237.0,
-            "tags": "75eb7e1b-08a6-4223-8ed8-f31381186102",
+            "tags": "textbox12",
             "text": "TT-DS10"
         },
         "7648db7c-97c7-41f3-beee-e60656b9173a": {
-            "bbox": 371,
+            "bbox": 375,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 14,
             "mirror": "",
@@ -8313,9 +8328,10 @@
             "tags": "section14"
         },
         "768c5e02-b80c-4025-a27a-ab5a225ae105": {
-            "bbox": 375,
+            "bbox": 379,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 9,
             "mirror": "",
@@ -8325,18 +8341,19 @@
         },
         "7b1d99fb-c02e-48be-9c48-c5645301eb85": {
             "background": "grey85",
-            "bbox": 378,
+            "bbox": 382,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 13,
             "justify": 2,
             "posx": 1143.0,
             "posy": 81.0,
-            "tags": "7b1d99fb-c02e-48be-9c48-c5645301eb85",
+            "tags": "textbox13",
             "text": "Signals 2 and 3 each\nControlled by a single\nSignalist SC1 Decoder\nBase Address = 601 and 633"
         },
         "8232da6f-9aeb-45bd-8519-039297c6d3b9": {
@@ -8346,7 +8363,7 @@
                 0,
                 0
             ],
-            "bbox": 384,
+            "bbox": 388,
             "colour": "black",
             "endx": 800.0,
             "endy": 225.0,
@@ -8369,7 +8386,7 @@
                 false,
                 ""
             ],
-            "bbox": 395,
+            "bbox": 399,
             "dccaspects": [
                 [
                     [
@@ -9240,18 +9257,19 @@
         },
         "8c773174-1179-4350-946c-4e8548569e33": {
             "background": "grey85",
-            "bbox": 398,
+            "bbox": 402,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 14,
             "justify": 2,
             "posx": 1144.0,
             "posy": 133.0,
-            "tags": "8c773174-1179-4350-946c-4e8548569e33",
+            "tags": "textbox14",
             "text": "AA-4Awpl"
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
@@ -9261,7 +9279,7 @@
                 0,
                 0
             ],
-            "bbox": 404,
+            "bbox": 408,
             "colour": "black",
             "endx": 1200.0,
             "endy": 175.0,
@@ -9274,72 +9292,77 @@
         },
         "956e68f3-b5ca-4869-9be5-186c3b2b2663": {
             "background": "grey85",
-            "bbox": 407,
+            "bbox": 411,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 15,
             "justify": 2,
             "posx": 1628.0,
             "posy": 311.0,
-            "tags": "956e68f3-b5ca-4869-9be5-186c3b2b2663",
+            "tags": "textbox15",
             "text": "Set\nNext\nTrain"
         },
         "9754f858-e3bb-4c96-a3a6-d70b3cc8287f": {
             "background": "grey85",
-            "bbox": 410,
+            "bbox": 414,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 16,
             "justify": 2,
             "posx": 1324.0,
             "posy": 135.0,
-            "tags": "9754f858-e3bb-4c96-a3a6-d70b3cc8287f",
+            "tags": "textbox16",
             "text": "Ground Signals 7, 13 & 14\nControlled by a single\nSignalist SC1 Decoder\nBase Address = 601"
         },
         "9a537d13-0794-4f88-8386-67b76bbd39d7": {
             "background": "grey85",
-            "bbox": 413,
+            "bbox": 417,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 17,
             "justify": 2,
             "posx": 501.0,
             "posy": 315.0,
-            "tags": "9a537d13-0794-4f88-8386-67b76bbd39d7",
+            "tags": "textbox17",
             "text": "TT-DS10"
         },
         "9f0bd8e5-accc-4abc-8491-8db955715941": {
             "background": "grey85",
-            "bbox": 416,
+            "bbox": 420,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 10,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 18,
             "justify": 1,
             "posx": 850.0,
             "posy": 387.0,
-            "tags": "9f0bd8e5-accc-4abc-8491-8db955715941",
+            "tags": "textbox18",
             "text": "TT-DS10 - Train Tech 4 aspect DCC signal\nTT-DS5HS - Train Tech 4 aspect DCC signal with flashing aspects\nAA-4Awpl - Absolute Aspects 4 aspect signal with position light\nAA-4wpl&lhf - Absolute Asp'ts 4 asp signal with pos light & LH Feather"
         },
         "a19e74b3-1746-478b-92c3-2ae4183b4c71": {
-            "bbox": 420,
+            "bbox": 424,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 6,
             "mirror": "",
@@ -9359,7 +9382,7 @@
                 false,
                 ""
             ],
-            "bbox": 437,
+            "bbox": 441,
             "dccaspects": [
                 [
                     [
@@ -10229,7 +10252,7 @@
                 false,
                 ""
             ],
-            "bbox": 454,
+            "bbox": 458,
             "dccaspects": [
                 [
                     [
@@ -11094,7 +11117,7 @@
                 1,
                 1
             ],
-            "bbox": 460,
+            "bbox": 464,
             "colour": "black",
             "endx": 1250.0,
             "endy": 175.0,
@@ -11107,18 +11130,19 @@
         },
         "abd81429-2c2a-4b04-bc62-81a103da6e24": {
             "background": "#76d0d9",
-            "bbox": 463,
+            "bbox": 467,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 9,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 19,
             "justify": 2,
             "posx": 950.0,
             "posy": 200.0,
-            "tags": "abd81429-2c2a-4b04-bc62-81a103da6e24",
+            "tags": "textbox19",
             "text": "    Platform 2/3    "
         },
         "acbd35af-8e88-400e-979b-44e1de8c927d": {
@@ -11133,7 +11157,7 @@
                 false,
                 ""
             ],
-            "bbox": 480,
+            "bbox": 484,
             "dccaspects": [
                 [
                     [
@@ -11993,24 +12017,26 @@
         },
         "b31a2cd1-3494-4f09-95b8-f50e6708bdeb": {
             "background": "grey85",
-            "bbox": 483,
+            "bbox": 487,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 20,
             "justify": 2,
             "posx": 121.0,
             "posy": 315.0,
-            "tags": "b31a2cd1-3494-4f09-95b8-f50e6708bdeb",
+            "tags": "textbox20",
             "text": "TT-DS10"
         },
         "b3b255c4-744a-4476-a7d0-3535e718fac1": {
-            "bbox": 487,
+            "bbox": 491,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 3,
             "mirror": "",
@@ -12019,9 +12045,10 @@
             "tags": "section3"
         },
         "b55de778-8bb5-4d62-965e-d62ca9aa136d": {
-            "bbox": 491,
+            "bbox": 495,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 13,
             "mirror": "",
@@ -12031,24 +12058,25 @@
         },
         "b778ffd2-cf39-4c24-b299-58e6131ff2d2": {
             "background": "grey85",
-            "bbox": 494,
+            "bbox": 498,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 21,
             "justify": 2,
             "posx": 304.0,
             "posy": 318.0,
-            "tags": "b778ffd2-cf39-4c24-b299-58e6131ff2d2",
+            "tags": "textbox21",
             "text": "TT-DS10"
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 501,
+            "bbox": 505,
             "colour": "black",
             "dccaddress": 1003,
             "dccreversed": false,
@@ -12114,7 +12142,7 @@
                 0,
                 0
             ],
-            "bbox": 507,
+            "bbox": 511,
             "colour": "black",
             "endx": -50.0,
             "endy": 225.0,
@@ -12128,7 +12156,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 514,
+            "bbox": 518,
             "colour": "black",
             "dccaddress": 1002,
             "dccreversed": false,
@@ -12194,7 +12222,7 @@
                 1,
                 1
             ],
-            "bbox": 520,
+            "bbox": 524,
             "colour": "black",
             "endx": 525.0,
             "endy": 175.0,
@@ -12217,7 +12245,7 @@
                 false,
                 ""
             ],
-            "bbox": 531,
+            "bbox": 535,
             "dccaspects": [
                 [
                     [
@@ -13107,9 +13135,10 @@
             ]
         },
         "cf7ab31e-b781-435b-8b96-0398da28e8f1": {
-            "bbox": 535,
+            "bbox": 539,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 7,
             "mirror": "",
@@ -13118,9 +13147,10 @@
             "tags": "section7"
         },
         "d2c6a4dd-630c-4836-ad26-52269177edcc": {
-            "bbox": 539,
+            "bbox": 543,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 1,
             "mirror": "",
@@ -13129,9 +13159,10 @@
             "tags": "section1"
         },
         "d53174a7-e4e9-425d-94a8-80507bd85a04": {
-            "bbox": 543,
+            "bbox": 547,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 5,
             "mirror": "",
@@ -13140,9 +13171,10 @@
             "tags": "section5"
         },
         "d5d3aa4e-cc00-4d66-a1c6-8b52bb7b1a92": {
-            "bbox": 547,
+            "bbox": 551,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 12,
             "mirror": "",
@@ -13162,7 +13194,7 @@
                 false,
                 ""
             ],
-            "bbox": 564,
+            "bbox": 568,
             "dccaspects": [
                 [
                     [
@@ -14023,7 +14055,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 569,
+            "bbox": 573,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14042,9 +14074,10 @@
             "ybuttonoffset": 0
         },
         "e3b1ad43-1e39-456d-aad8-7943e5864ac8": {
-            "bbox": 573,
+            "bbox": 577,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 11,
             "mirror": "",
@@ -14054,34 +14087,36 @@
         },
         "e4853677-978f-4fc5-b03d-c92d0bb216ea": {
             "background": "#76d0d9",
-            "bbox": 576,
+            "bbox": 580,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 9,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 22,
             "justify": 2,
             "posx": 950.0,
             "posy": 300.0,
-            "tags": "e4853677-978f-4fc5-b03d-c92d0bb216ea",
+            "tags": "textbox22",
             "text": "     Platform 1     "
         },
         "e54253c4-ec5b-4a4a-835d-5e3b5eb4e183": {
             "background": "grey85",
-            "bbox": 579,
+            "bbox": 583,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 23,
             "justify": 2,
             "posx": 586.0,
             "posy": 114.0,
-            "tags": "e54253c4-ec5b-4a4a-835d-5e3b5eb4e183",
+            "tags": "textbox23",
             "text": "Signal 1 Controlled by a \nsingle Signalist SC1 Decoder\nBase Address = 617"
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
@@ -14096,7 +14131,7 @@
                 false,
                 ""
             ],
-            "bbox": 590,
+            "bbox": 594,
             "dccaspects": [
                 [
                     [
@@ -14986,9 +15021,10 @@
             ]
         },
         "ee774c2b-3946-44aa-9254-a31f2bebecb8": {
-            "bbox": 594,
+            "bbox": 598,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 15,
             "mirror": "",
@@ -15008,7 +15044,7 @@
                 false,
                 ""
             ],
-            "bbox": 605,
+            "bbox": 609,
             "dccaspects": [
                 [
                     [
@@ -15930,9 +15966,10 @@
             ]
         },
         "f1dbf1a3-0d5b-43e2-a476-18ccb8b0b920": {
-            "bbox": 609,
+            "bbox": 613,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 8,
             "mirror": "",
@@ -15943,7 +15980,7 @@
         "f2b7d2d9-eb4d-4e55-859f-100131262fe2": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 614,
+            "bbox": 618,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15963,24 +16000,26 @@
         },
         "f514300f-50b5-477c-9673-8cacdaac0c5b": {
             "background": "grey85",
-            "bbox": 617,
+            "bbox": 621,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 24,
             "justify": 2,
             "posx": 836.0,
             "posy": 132.0,
-            "tags": "f514300f-50b5-477c-9673-8cacdaac0c5b",
+            "tags": "textbox24",
             "text": "Ground Signals 5, 6 & 15\nControlled by a single\nSignalist SC1 Decoder\nBase Address = 609"
         },
         "f771894a-e7a8-4e26-a9d0-d316f9aff774": {
-            "bbox": 621,
+            "bbox": 625,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "hidden": false,
             "item": "section",
             "itemid": 2,
             "mirror": "",
@@ -15990,18 +16029,19 @@
         },
         "f7dc96fe-3f96-4f6b-8a63-8589f6b82d33": {
             "background": "grey85",
-            "bbox": 624,
+            "bbox": 628,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 25,
             "justify": 2,
             "posx": 1343.0,
             "posy": 318.0,
-            "tags": "f7dc96fe-3f96-4f6b-8a63-8589f6b82d33",
+            "tags": "textbox25",
             "text": "TT-DS10"
         },
         "f7e885c9-faa7-4ee6-87df-9c035c5dadeb": {
@@ -16016,7 +16056,7 @@
                 true,
                 "8"
             ],
-            "bbox": 644,
+            "bbox": 648,
             "dccaspects": [
                 [
                     [
@@ -16938,7 +16978,7 @@
                 false,
                 ""
             ],
-            "bbox": 661,
+            "bbox": 665,
             "dccaspects": [
                 [
                     [
@@ -17798,34 +17838,36 @@
         },
         "ff661e89-2111-4e98-8191-9fe3d3e39471": {
             "background": "grey85",
-            "bbox": 664,
+            "bbox": 668,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 26,
             "justify": 2,
             "posx": 787.0,
             "posy": 316.0,
-            "tags": "ff661e89-2111-4e98-8191-9fe3d3e39471",
+            "tags": "textbox26",
             "text": "TT-DS10"
         },
         "ffc65294-6626-4af4-9a43-305530b7f891": {
             "background": "grey85",
-            "bbox": 667,
+            "bbox": 671,
             "border": 0,
             "colour": "black",
             "font": "Courier",
             "fontsize": 8,
             "fontstyle": "",
+            "hidden": false,
             "item": "textbox",
-            "itemid": 0,
+            "itemid": 27,
             "justify": 2,
             "posx": 1525.0,
             "posy": 317.0,
-            "tags": "ffc65294-6626-4af4-9a43-305530b7f891",
+            "tags": "textbox27",
             "text": "TT-DS10"
         }
     },
@@ -17932,11 +17974,12 @@
         },
         "general": {
             "automation": true,
+            "buttonsize": 8,
             "editmode": true,
             "filename": "/home/john/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nAlternatively, if running on a Raspberry pi, the track sensors can be triggered directly via the Ri-Pi's \nGPIO ports (momentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC pins). Select \n'Settings' =>'Sensors' from the Menubar to view the configuration. In this example the Track Sensor IDs\nhave been mapped to the GPIO port number, but any numbering scheme can be used (e.g. allocate the same ID \nfor the sensor as the signal ID it is triggering). \n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n\n",
             "spadpopups": false,
-            "version": "Version 4.6.1"
+            "version": "Version 4.7.0"
         },
         "gpio": {
             "portmappings": [
