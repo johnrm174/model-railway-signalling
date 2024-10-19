@@ -671,7 +671,7 @@ class main_menubar:
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
-                elif self.tuple_version(sig_file_version) < self.tuple_version("3.5.0"):
+                elif self.tuple_version(sig_file_version) < self.tuple_version("4.0.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
                     logging.error("Load File - File was saved by application "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)

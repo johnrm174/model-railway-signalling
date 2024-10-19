@@ -528,7 +528,6 @@ def set_all(new_objects):
     ##################################################################################
     ### Code block to Handle breaking changes - see later in the code for details ####
     ##################################################################################
-    list_of_track_sensors_to_create =[]
     one_up_text_box_id = 1
     ##################################################################################
     ################ End of code block to handle breaking changes ####################
@@ -624,66 +623,8 @@ def set_all(new_objects):
                 ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################
 
-                #################################################################################################
-                ### Handle change of GPIO sensor IDs being strings from Release 3.6.0 onwards ###################
-                ### This is something we can resolve without affecting the user so we resolve ###################
-                ### it silently without an Log message or load warning message ##################################
-                #################################################################################################
-                elif new_object_type == objects_common.object_type.signal and element == "passedsensor":
-                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
-                    if new_objects[object_id][element][1] == 0:
-                        objects_common.schematic_objects[object_id][element][1] = ""
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    elif isinstance(new_objects[object_id][element][1],int):
-                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
-                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    else:
-                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                elif new_object_type == objects_common.object_type.signal and element == "approachsensor":
-                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
-                    if new_objects[object_id][element][1] == 0:
-                        objects_common.schematic_objects[object_id][element][1] = ""
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    elif isinstance(new_objects[object_id][element][1],int):
-                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
-                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
-                    else:
-                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                #################################################################################################
-                ## End of Handle breaking change for GPIO sensor IDs ############################################
-                #################################################################################################
-
-                #################################################################################################
-                ## Handle bugfix for Signal point interlocking tables (i.e. list wrongly included 7 points ######
-                ## on point deletion whereas the list should only ever include 6 points #########################
-                #################################################################################################
-                elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
-                    for index, route in enumerate (new_objects[object_id][element]):
-                        objects_common.schematic_objects[object_id][element][index][0] = route[0][0:6]
-                        objects_common.schematic_objects[object_id][element][index][1] = route[1]
-                        objects_common.schematic_objects[object_id][element][index][2] = route[2]
-                #################################################################################################
-                ## End of Handle bugfix for Signal point interlocking tables ####################################
-                #################################################################################################
-
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-
-            #################################################################################################
-            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards ########################
-            #################################################################################################
-            if len(list_of_track_sensors_to_create) > 0:
-                logging.debug("LOAD LAYOUT - Populating track sensor mappings to handle version 3.6.0 breaking change")
-                settings.set_gpio(mappings = list_of_track_sensors_to_create)       
-            #################################################################################################
-            ## End of Handle breaking change for sensor IDs #################################################
-            #################################################################################################
 
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
