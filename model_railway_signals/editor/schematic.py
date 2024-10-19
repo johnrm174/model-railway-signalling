@@ -952,8 +952,9 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["sensor", lambda:create_object(objects.object_type.track_sensor) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
                                         block_instruments.instrument_type.single_line.value) ],
-                   ["route", lambda:create_object(objects.object_type.route)],
-                   ["switch", lambda:create_object(objects.object_type.switch)] ]
+                   ["route", lambda:create_object(objects.object_type.route)] ]      ########################
+#                    ["route", lambda:create_object(objects.object_type.route)],     ########################
+#                    ["switch", lambda:create_object(objects.object_type.switch)] ]  ########################
     # Create the buttons we need (Note that the button images are added to a global
     # list so they remain in scope (otherwise the buttons won't work)
     resource_folder = 'model_railway_signals.editor.resources'
