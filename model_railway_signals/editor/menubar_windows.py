@@ -259,7 +259,7 @@ class edit_layout_info():
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             # We need to pack the window buttons at the bottom and then pack the text
             # frame - so the buttons remain visible if the user re-sizes the window
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
             # Load the initial UI state
             self.load_state()
@@ -329,7 +329,7 @@ class edit_canvas_settings():
             self.snap.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
@@ -430,7 +430,7 @@ class edit_sprog_settings():
             self.status.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
 
@@ -523,7 +523,7 @@ class edit_logging_settings():
             self.log_level.frame.pack()
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
 
@@ -801,7 +801,7 @@ class edit_mqtt_settings():
             edit_mqtt_settings_window = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
@@ -1025,7 +1025,7 @@ class edit_gpio_settings():
             self.gpio = gpio_port_entry_frame(self.frame)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
@@ -1105,7 +1105,7 @@ class edit_general_settings():
             self.fontsize.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state

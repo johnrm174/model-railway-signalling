@@ -109,7 +109,7 @@ class edit_textbox():
             open_windows[object_id] = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create a frame to hold all UI elements (so they don't expand on window resize

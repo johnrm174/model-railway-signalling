@@ -1484,32 +1484,24 @@ class colour_selection():
         return(self.colour_chooser_open)
 
 #------------------------------------------------------------------------------------
-# Compound UI element for the Apply/OK/Reset/Cancel Buttons - will make callbacks
-# to the specified "load_callback" and "save_callback" functions as appropriate
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
+# Stand Alone UI element for a Tk.Frame containing the Apply/OK/Reset/Cancel Buttons.
+# Will make callbacks to the specified "load_callback" and "save_callback" functions
 #------------------------------------------------------------------------------------
 
-class window_controls():
+class window_controls(Tk.Frame):
     def __init__(self, parent_window, load_callback, save_callback, cancel_callback):
-        # Create the class instance variables
-        self.window = parent_window
-        self.save_callback = save_callback
-        self.load_callback = load_callback
-        self.cancel_callback = cancel_callback
-        self.frame = Tk.Frame(self.window)
+        super().__init__(parent_window)
         # Create the buttons and tooltips
-        self.B1 = Tk.Button (self.frame, text = "Ok",command=self.ok)
+        self.B1 = Tk.Button (self, text = "Ok",command=lambda:save_callback(True))
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = CreateToolTip(self.B1, "Apply selections and close window")
-        self.B2 = Tk.Button (self.frame, text = "Apply",command=self.apply)
+        self.B2 = Tk.Button (self, text = "Apply",command=lambda:save_callback(False))
         self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = CreateToolTip(self.B2, "Apply selections")
-        self.B3 = Tk.Button (self.frame, text = "Reset",command=self.reset)
+        self.B3 = Tk.Button (self, text = "Reset",command=load_callback)
         self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT3 = CreateToolTip(self.B3, "Abandon edit and reload original configuration")
-        self.B4 = Tk.Button (self.frame, text = "Cancel",command=self.cancel)
+        self.B4 = Tk.Button (self, text = "Cancel",command=cancel_callback)
         self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT4 = CreateToolTip(self.B4, "Abandon edit and close window")
 
