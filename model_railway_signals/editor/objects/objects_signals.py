@@ -105,38 +105,20 @@ default_signal_object["sigarms"] = [
             [ [False,0],[False,0],[False,0] ],
             [ [False,0],[False,0],[False,0] ] ]
 # The DCC aspects table comprises a list of DCC command sequences: [grn, red, ylw, dylw, fylw, fdylw]
-# Each DCC command sequence comprises a list of DCC commands [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+# Each DCC command sequence comprises a variable length list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
-default_signal_object["dccaspects"] = [
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]] ]
+default_signal_object["dccaspects"] = [ [], [], [], [], [], [] ] 
 # The DCC Feathers table comprises a list of DCC command sequences: [dark, main, lh1, lh2, rh1, rh2]
 # Note that 'dark' is the DCC command sequence to inhibit all route indications
-# Each DCC command sequence comprises a list of DCC commands: [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+# Each DCC command sequence comprises a variable length list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
-default_signal_object["dccfeathers"] = [
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
-            [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]] ]
+default_signal_object["dccfeathers"] =  [ [], [], [], [], [], [] ] 
 # The DCC Theatre table comprises a list of route elements: [dark, main, lh1, lh2, rh1, rh2]
 # Note that 'dark' is the DCC route element to inhibit all route indications ('#')
 # Each route element comprises: [character to be displayed, associated DCC command sequence]
-# Each DCC command sequence comprises a list of DCC commands: [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+# Each DCC command sequence comprises a variable length list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
-default_signal_object["dcctheatre"] = [
-           ["#", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
-           ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
-           ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
-           ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
-           ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
-           ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]] ]
+default_signal_object["dcctheatre"] = [ ["#", [] ], ["", [] ], ["", [] ], ["", [] ], ["", [] ], ["", [] ] ]
 # This is the default point interlocking table for a signal
 # The table comprises a list of route elements: [main, lh1, lh2, rh1, rh2]
 # Each route element comprises: [[p1, p2, p3, p4, p5, p6] sig_id, block_id]
