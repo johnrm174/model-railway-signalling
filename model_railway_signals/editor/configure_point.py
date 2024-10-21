@@ -21,7 +21,7 @@
 #    common.int_item_id_entry_box
 #    common.Createtool_tip
 #    common.check_box
-#    common.dcc_entry_box
+#    common.validated_dcc_entry_box
 #    common.object_id_selection
 #    common.selection_buttons
 #    common.signal_route_frame
@@ -192,41 +192,6 @@ class general_settings():
                 self.CB4.get_value(), self.CB2.get_value())
 
 #------------------------------------------------------------------------------------
-# Class for a point_dcc_entry_box - builds on the common DCC Entry Box class
-# Class instance methods inherited from the parent class are:
-#    "get_value" - will return the last valid entry box value (dcc address)
-# Public class instance methods provided/overridden by this child class are
-#    "set_value" - set the initial value of the dcc_entry_box (int) - Also
-#                  sets the current item ID (int) for validation purposes
-#    "validate" - Validates the DCC address is not mapped to another item
-#------------------------------------------------------------------------------------
-
-class point_dcc_entry_box(common.dcc_entry_box):
-    def __init__(self, parent_frame, callback):
-        # We need the current Point ID to validate the DCC Address entry
-        self.current_item_id = 0
-        super().__init__(parent_frame, callback=callback)
-        
-    def validate(self):
-        # Do the basic item validation first (exists and not current item ID)
-        valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            # Ensure the address is not mapped to another signal or point
-            dcc_address = int(self.entry.get())
-            dcc_mapping = dcc_control.dcc_address_mapping(dcc_address)
-            if dcc_mapping is not None and (dcc_mapping[0] != "Point" or dcc_mapping[1] != self.current_item_id):
-                # We need to correct the mapped signal ID for secondary distants
-                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
-                self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
-                valid = False
-        self.set_validation_status(valid)
-        return(valid)
-    
-    def set_value(self, value:int, item_id:int):
-        self.current_item_id = item_id
-        super().set_value(value)
-
-#------------------------------------------------------------------------------------
 # Class for the point DCC Address settings UI element - provides the following functions
 #    "set_values" - will set the entry/checkboxes (address:int, reversed:bool)
 #    "get_values" - will return the entry/checkboxes (address:int, reversed:bool]
@@ -242,7 +207,7 @@ class dcc_address_settings():
         # These are created in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.EB = point_dcc_entry_box(self.subframe, callback=self.entry_updated)
+        self.EB = common.validated_dcc_entry_box(self.subframe, callback=self.entry_updated, item_type="Point")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB = common.check_box(self.subframe, label="Reversed",
                     tool_tip="Select to reverse the DCC command logic")
