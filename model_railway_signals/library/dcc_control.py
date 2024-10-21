@@ -79,8 +79,8 @@
 #   map_dcc_switch - Generate DCC mappings for a DCC accessory
 #      Mandatory Parameters:
 #         switch_id:int - The ID for the point to create a DCC mapping for
-#         proceed[[add:int,state:bool],]              - List of DCC Commands for "Green"
-#         danger [[add:int,state:bool],]              - List of DCC Commands for "Red"
+#         on_commands[[add:int,state:bool],]           - List of DCC Commands for "ON"
+#         off_commands [[add:int,state:bool],]           - List of DCC Commands for "OFF"
 #
 #   delete_point_mapping(point_id:int) - Delete a DCC mapping (called when the Point is deleted)
 #
@@ -280,7 +280,8 @@ def remove_dcc_commands_from_dcc_address_mappings(commands:[[int,bool],]):
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Internal Functions to Validate DCC address and DCC Commands
+# Internal Functions to Validate DCC address and DCC Commands. Note that we allow a DCC address of zero.
+# this is a 'null' command - accepted as a valid DCC mapping, but the command won't be sent out
 #----------------------------------------------------------------------------------------------------
 
 def dcc_address_valid(func_text:str, item_text:str, item_id:int, address:int):
@@ -364,12 +365,15 @@ def map_dcc_signal(sig_id:int,
         # Create a list of DCC commands [address,state] to validate (aspects and feathers)
         list_of_commands = ( danger + proceed + caution + prelim_caution + flash_caution +
                              flash_prelim_caution + LH1 + LH2 + RH1 + RH2 + MAIN + NONE )
-        # Add the DCC commands for the Theatre route indicator and subsidary signal (single address)
+        # Add the DCC commands for the Theatre route indicator 
         list_of_commands = list_of_commands + get_list_of_theatre_dcc_commands(THEATRE)
-        list_of_commands = list_of_commands + [[subsidary, True]]
-        # Validate all DCC commands and adddresses for the Colour Light Signal DCC Mapping
-        # If all DCC commands are valid then we can create the DCC Mapping for the signal
-        if dcc_commands_valid("map_dcc_signal", "Signal", sig_id, list_of_commands):
+        # Validate all DCC commands for the Colour Light Signal DCC Mapping
+        commands_valid = dcc_commands_valid ("map_dcc_signal", "Signal", sig_id, list_of_commands)
+        # Validate all DCC addresses for the Colour Light Signal (this is the Subsidary DCC address)
+        list_of_addresses = [subsidary]
+        addresses_valid = dcc_addresses_valid("map_dcc_signal", "Signal", sig_id, list_of_addresses)
+        # If all DCC commands and addresses are valid then we can create the DCC Mapping
+        if commands_valid and addresses_valid:
             logging.debug ("DCC Control - Creating DCC Address mapping for Colour Light Signal "+str(sig_id))
             # Create the DCC Mapping entry for the signal
             new_dcc_mapping = {
@@ -428,7 +432,7 @@ def map_semaphore_signal(sig_id:int,
         # Validate the DCC commands for the Theatre route indicator
         list_of_commands = get_list_of_theatre_dcc_commands(THEATRE)
         commands_valid = dcc_commands_valid("map_semaphore_signal", "Signal", sig_id, list_of_commands)
-        # If all individual DCC addresses and DCC commands are valid then we can create the Mapping
+        # If all individual DCC addresses and commands are valid then we can create the DCC Mapping
         if addresses_valid and commands_valid:
             logging.debug("Signal "+str(sig_id)+": Creating DCC Address mapping for a Semaphore Signal")
             # Create the DCC Mapping entry for the Semaphore signal.
@@ -530,12 +534,13 @@ def update_dcc_switch(switch_id:int, state:bool):
         if state: commands = dcc_switch_mappings[str(switch_id)]["oncommands"]
         else: commands = dcc_switch_mappings[str(switch_id)]["offcommands"]
         for entry in commands:
-            # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
-            # Note that the commands will only be sent if the pi-sprog interface is configured
-            pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
-            # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-            # Commands will only be published if networking is configured and publishing is enabled
-            publish_accessory_short_event(entry[0],entry[1])
+            if entry[0] > 0:
+                # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
+                # Note that the commands will only be sent if the pi-sprog interface is configured
+                pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
+                # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+                # Commands will only be published if networking is configured and publishing is enabled
+                publish_accessory_short_event(entry[0],entry[1])
     return()
 
 #----------------------------------------------------------------------------------------------------
