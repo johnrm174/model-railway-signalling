@@ -642,7 +642,6 @@ def set_all(new_objects):
                                 new_dccfeathers_table[index].append(dcc_command)
                     objects_common.schematic_objects[object_id][element] = new_dccfeathers_table
                 elif new_object_type == objects_common.object_type.signal and element == "dcctheatre":
-                    print(new_objects[object_id][element])
                     new_dcctheatre_table = [[],[],[],[],[],[]]
                     old_dcctheatre_table = new_objects[object_id][element]
                     for index, dcctheatre_route in enumerate(old_dcctheatre_table):
@@ -652,8 +651,6 @@ def set_all(new_objects):
                                 new_theatre_route_entry[1].append(dcc_command)
                         new_dcctheatre_table[index] = new_theatre_route_entry
                     objects_common.schematic_objects[object_id][element] = new_dcctheatre_table
-                    print(objects_common.schematic_objects[object_id][element])
-                    print("  ")
                 #################################################################################################
                 ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################
