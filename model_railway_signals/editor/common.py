@@ -1155,7 +1155,6 @@ class selection_buttons():
         self.B6.configure(state="disabled")
         self.B7.configure(state="disabled")
 
-
 #------------------------------------------------------------------------------------
 # Base Class for a fixed length row_of_widgets of the specified base class.
 # All of the kwargs are passed through to the specified base class on creation.
