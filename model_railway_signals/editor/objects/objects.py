@@ -615,6 +615,49 @@ def set_all(new_objects):
                 ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################
 
+                #################################################################################################
+                ## Handle breaking change of DCC command sequences being variable length lists rather than ######
+                ## fixed length lists from Release 4.8.0 onwards. This applies to the following elements: #######
+                ##    "dccaspects" - each of the 6 possible aspects for a 4-aspect colour light signal ##########
+                ##    "dccfeathers" - each of the 6 possible route indications (including 'dark') ###############
+                ##    "dcctheatre" - each of the 6 possible route indications (including 'dark') ################
+                ## Up to Release 4.7.0, each 'dcc sequence' was a fixed length list of 6 dcc commands ###########
+                ## From Release 4.8.0 each 'dcc sequence' is a variable length list of dcc commands #############
+                ## We need to handle this at load time otherwise creating the dcc the mappings will error #######
+                #################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "dccaspects":
+                    new_dccaspects_table = [[],[],[],[],[],[]]
+                    old_dccaspects_table = new_objects[object_id][element]
+                    for index, dccaspects_route in enumerate(old_dccaspects_table):
+                        for dcc_command in dccaspects_route:
+                            if dcc_command[0] > 0:
+                                new_dccaspects_table[index].append(dcc_command)
+                    objects_common.schematic_objects[object_id][element] = new_dccaspects_table
+                elif new_object_type == objects_common.object_type.signal and element == "dccfeathers":
+                    new_dccfeathers_table = [[],[],[],[],[],[]]
+                    old_dccfeathers_table = new_objects[object_id][element]
+                    for index, dccfeathers_route in enumerate(old_dccfeathers_table):
+                        for dcc_command in dccfeathers_route:
+                            if dcc_command[0] > 0:
+                                new_dccfeathers_table[index].append(dcc_command)
+                    objects_common.schematic_objects[object_id][element] = new_dccfeathers_table
+                elif new_object_type == objects_common.object_type.signal and element == "dcctheatre":
+                    print(new_objects[object_id][element])
+                    new_dcctheatre_table = [[],[],[],[],[],[]]
+                    old_dcctheatre_table = new_objects[object_id][element]
+                    for index, dcctheatre_route in enumerate(old_dcctheatre_table):
+                        new_theatre_route_entry = [dcctheatre_route[0], [] ]
+                        for dcc_command in dcctheatre_route[1]:
+                            if dcc_command[0] > 0:
+                                new_theatre_route_entry[1].append(dcc_command)
+                        new_dcctheatre_table[index] = new_theatre_route_entry
+                    objects_common.schematic_objects[object_id][element] = new_dcctheatre_table
+                    print(objects_common.schematic_objects[object_id][element])
+                    print("  ")
+                #################################################################################################
+                ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
+                #################################################################################################
+
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
 
