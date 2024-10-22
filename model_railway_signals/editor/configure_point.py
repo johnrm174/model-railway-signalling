@@ -15,7 +15,6 @@
 #
 # Makes the following external API calls to library modules:
 #    points.point_exists(point_id) - To see if a specified point ID exists (local)
-#    dcc_control.dcc_address_mapping - To see if a DCC address is already mapped
 #
 # Inherits the following common editor base classes (from common):
 #    common.int_item_id_entry_box
@@ -39,7 +38,6 @@ from . import common
 from . import objects
 
 from ..library import points
-from ..library import dcc_control
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID

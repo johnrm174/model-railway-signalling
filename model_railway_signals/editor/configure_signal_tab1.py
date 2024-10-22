@@ -3,7 +3,6 @@
 #
 # Makes the following external API calls to library modules:
 #    signals.signal_exists(id) - To see if the signal exists (local)
-#    dcc_control.dcc_address_mapping(address) - To see if an address is already mapped
 #
 # Inherits the following common editor base classes (from common):
 #    common.validated_dcc_entry_box
@@ -20,7 +19,6 @@ import tkinter as Tk
 
 from . import common
 from ..library import signals
-from ..library import dcc_control
     
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element - Builds on the common checkbox class
