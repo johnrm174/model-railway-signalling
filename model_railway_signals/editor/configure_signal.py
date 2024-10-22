@@ -1018,7 +1018,7 @@ class edit_signal:
                 else: self.load_state()
             else:
                 # Display the validation error message
-                self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+                self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

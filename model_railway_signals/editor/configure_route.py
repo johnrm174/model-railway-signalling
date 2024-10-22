@@ -120,7 +120,7 @@ class edit_route():
             #------------------------------------------------------------------
             self.frame2 = Tk.LabelFrame(self.main_frame, text="Points to set")
             self.frame2.pack(padx=2, pady=2, fill='x')
-            self.points = common.entry_box_grid(self.frame2, base_class=common.point_interlocking_entry, columns=7,
+            self.points = common.entry_box_grid(self.frame2, base_class=common.point_settings_entry, columns=7,
                                             tool_tip="Specify the points that need to be set and locked "+
                                             "for the route and their required configuration (normal/switched)")
             self.frame3 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
@@ -269,7 +269,7 @@ class edit_route():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

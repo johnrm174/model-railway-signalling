@@ -22,7 +22,7 @@
 #    signal_route_frame() - read only list of signal_route_selections()  ######### TO REVIEW #########
 #    selection_buttons() - combines multiple RadioButtons  ######### TO REVIEW #########
 #    colour_selection() - Allows the colour of an item to be changed  ######### TO REVIEW #########
-#    window_controls() - apply/ok/reset/cancel  ######### TO REVIEW #########
+#    window_controls() - apply/ok/reset/cancel
 #    row_of_widgets() - Pass in the base class to create a fixed length row of the base class
 #    row_of_validated_dcc_commands() - A fixed length (user specified) row of DCC commands
 #    entry_box_grid() - an expandable grid of widgets ######### TO REVIEW #########
@@ -797,7 +797,7 @@ class scrollable_text_frame(Tk.Frame):
         self.text_box.configure(font=(font, font_size, font_style))
 
 #------------------------------------------------------------------------------------
-# Compound UI element for a validated_dcc_command_entry (address + command logic).
+# Compound UI element for a validated_dcc_command_entry [address:int, state:bool].
 # Uses the validated_dcc_entry_box and state_box classes, with the state_box only
 # only enabled when a valid DCC address has been entered into the entry_box.
 #
@@ -861,7 +861,7 @@ class validated_dcc_command_entry(Tk.Frame):
         self.set_value(dcc_command=[0, False], item_id=0)
 
 #------------------------------------------------------------------------------------
-# Compound UI element for a point_interlocking_entry element (point_id + point_state).
+# Compound UI element for a point_settings_entry [point_id:int, point_state:bool].
 # This is broadly similar to the validated_dcc_command_entry class (above).
 #
 # Main class methods used by the editor are:
@@ -874,7 +874,7 @@ class validated_dcc_command_entry(Tk.Frame):
 #    "pack"  for packing the compound UI element
 #------------------------------------------------------------------------------------
 
-class point_interlocking_entry(Tk.Frame):
+class point_settings_entry(Tk.Frame):
     def __init__(self, parent_frame, tool_tip:str):
         # Use the parent class frame to pack everything into
         super().__init__(parent_frame)
@@ -1185,11 +1185,15 @@ class row_of_widgets(Tk.Frame):
     def set_values(self, list_of_values_to_set:list):
         for index, widget_to_set in enumerate(self.list_of_widgets):
             # Only set the value if we haven't reached the end of the list of values_to_set
-            # Otherwise we set the default value we have been given (to blank the widget)
-            # Note there may be multiple parameters so we have to unpack them
+            # Otherwise we 'reset' the widget to its default state (to blank the widget)
+            # Note if there are multiple parameters in the list entry (detected by testing
+            # if the list entry is a tuple) then we unpack them before passing to the widget
             if index < len(list_of_values_to_set):
                 params_to_pass = list_of_values_to_set[index]
-                widget_to_set.set_value(*params_to_pass)
+                if type(params_to_pass) is tuple:
+                    widget_to_set.set_value(*params_to_pass)
+                else:
+                    widget_to_set.set_value(params_to_pass)
             else:
                 widget_to_set.reset()
         
@@ -1218,8 +1222,10 @@ class row_of_widgets(Tk.Frame):
 
 #------------------------------------------------------------------------------------
 # Class for a fixed row_of_validated_dcc_commands - builds on the row_of_widgets class
-# The set_values and get_values functions are overridden to simplify the
-# save and load interface of the calling editor functions
+# The set_values function is overridden as we need to provide the current item_id to
+# all validated_dcc_command_entry elements for validation purposes, even if we aren't
+# setting values for them. The get_values function is overridden to remove any blank
+# entries from the list (dcc_address=0).
 #
 # Main class methods used by the editor are:
 #    "set_values" - will set the intial values from the provided list
@@ -1231,15 +1237,17 @@ class row_of_widgets(Tk.Frame):
 #------------------------------------------------------------------------------------
 
 class row_of_validated_dcc_commands(row_of_widgets):
-    def __init__(self, parent_frame, columns:int, item_type:str):
+    def __init__(self, parent_frame, columns:int, **kwargs):
         # The overridden set_values function will need to know the number of columns as each
         # validated_dcc_command_entry will need the current item id for validation purposes
         self.number_of_columns = columns
         # Use the parent class frame to pack everything into
-        super().__init__(parent_frame, validated_dcc_command_entry, columns, item_type=item_type)
+        super().__init__(parent_frame, validated_dcc_command_entry, columns, **kwargs)
 
     def set_values(self, list_of_dcc_commands:list, item_id:int):
         list_of_values_to_set = []
+        # The validated_dcc_command_entry class needs the current item_id to perform
+        # validation - so we need to provide this even for currently empty entry boxes
         for index in range(self.number_of_columns):
             if index < len(list_of_dcc_commands):
                 list_of_values_to_set.append((list_of_dcc_commands[index], item_id))
@@ -1247,6 +1255,35 @@ class row_of_validated_dcc_commands(row_of_widgets):
                 list_of_values_to_set.append(([0, False], item_id))
         super().set_values(list_of_values_to_set)
         
+    def get_values(self):
+        # Validate all the entries to accept the current (as entered) values
+        self.validate()
+        # Compile a list of values to return (removing any blanks)
+        values_to_return = []
+        entered_values = super().get_values()
+        for entered_value in entered_values:
+            if entered_value[0] > 0:
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+#------------------------------------------------------------------------------------
+# Class for a fixed row_of_point_settings - builds on the row_of_widgets class
+# The get_values function is overridden to remove any blank enties (point_id=0)
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
+#    "validate" - Will validate all entries
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class row_of_point_settings(row_of_widgets):
+    def __init__(self, parent_frame, columns:int, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, point_settings_entry, columns, **kwargs)
+
     def get_values(self):
         # Validate all the entries to accept the current (as entered) values
         self.validate()
