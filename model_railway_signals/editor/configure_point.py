@@ -273,14 +273,14 @@ class point_configuration_tab():
         # Create the UI Element for Point ID selection
         self.pointid = common.object_id_selection(self.frame, "Point ID",
                                 exists_function = points.point_exists) 
-        self.pointid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.pointid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point Type",
                     "Select Point Type", self.point_type_updated, "RH", "LH", "Y-Point")
         self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create the Point colour selection element
         self.colour = common.colour_selection(self.frame, label="Colour")
-        self.colour.frame.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
+        self.colour.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
         # Create the point subtype selection
         subtype_tooltip= ("Select Point Subtype:\nNorm=Default Point\nTRP=Trap Point\n"+
                     "SS1=Single Slip - side 1\nSS2=Single Slip - side 2\nDS1=Double Slip - side 1\n"+

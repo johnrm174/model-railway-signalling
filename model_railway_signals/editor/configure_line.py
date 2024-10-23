@@ -155,10 +155,10 @@ class edit_line():
             # Create the UI Element for Line ID selection
             self.lineid = common.object_id_selection(self.frame, "Line ID",
                                     exists_function = lines.line_exists) 
-            self.lineid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.lineid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the line colour selection element
             self.colour = common.colour_selection(self.frame, label="Colour")
-            self.colour.frame.pack(padx=2, pady=2, fill='x')
+            self.colour.pack(padx=2, pady=2, fill='x')
             # Create the line Attributes UI Element
             self.attributes = line_attributes(self.main_frame)
             self.attributes.frame.pack(padx=2, pady=2)

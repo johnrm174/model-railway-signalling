@@ -975,7 +975,7 @@ class signal_configuration_tab:
         # be selected - so we can safely use this function here for consistency.
         self.sigid = common.object_id_selection(self.frame1,"Signal ID",
                                 exists_function = signals.signal_exists)
-        self.sigid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
+        self.sigid.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
         self.sigtype = common.selection_buttons(self.frame1,"Signal Type",
                     "Select signal type",sig_type_updated,"Colour Light",
                         "Ground Pos","Semaphore","Ground Disc")

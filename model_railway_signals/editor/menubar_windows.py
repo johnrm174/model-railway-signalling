@@ -666,24 +666,29 @@ class mqtt_subscribe_tab():
         # Create the Serial Port and baud rate UI elements 
         self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = common.entry_box_grid(self.frame1, base_class=common.entry_box, columns=4, width=8,
+        self.dcc = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
             tool_tip="Specify the remote network nodes to take a DCC command feed from")
+        self.dcc.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = common.entry_box_grid(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote signals to subscribe to (in the form 'node-ID')")
+        self.signals.pack(padx=2, pady=2, fill='x')
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = common.entry_box_grid(self.frame3, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.sections = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sections to subscribe to (in the form 'node-ID')")
+        self.sections.pack(padx=2, pady=2, fill='x')
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = common.entry_box_grid(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
+        self.instruments.pack(padx=2, pady=2, fill='x')
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = common.entry_box_grid(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
+        self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
         return (self.dcc.validate() and self.signals.validate() and self.sections.validate()
@@ -702,23 +707,27 @@ class mqtt_publish_tab():
                 tool_tip="Select to publish all DCC commands from this node via the "+
                     "MQTT Network (so the feed can be picked up by the node hosting "+
                     "the Pi-SPROG DCC interface) and sent out to the layout")
-        self.dcc.pack(padx=2, pady=2)
+        self.dcc.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = common.entry_box_grid(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the signals (on the local schematic) to publish via the MQTT network")
+        self.signals.pack(padx=2, pady=2, fill='x')
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sections = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sections (on the local schematic) to publish via the MQTT network")
+        self.sections.pack(padx=2, pady=2, fill='x')
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = common.entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
+        self.instruments.pack(padx=2, pady=2, fill='x')
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
+        self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
         return (self.signals.validate() and self.sections.validate()

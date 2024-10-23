@@ -25,7 +25,7 @@
 #    common.entry_box
 #    common.integer_entry_box
 #    common.point_interlocking_entry
-#    common.entry_box_grid
+#    common.grid_of_widgets
 #    common.scrollable_text_frame
 #    common.window_controls
 #    common.check_box
@@ -87,7 +87,7 @@ class edit_route():
             # Create the UI Element for Line ID selection
             self.routeid = common.object_id_selection(self.frame, "Button ID",
                                     exists_function = buttons.button_exists) 
-            self.routeid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.routeid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y', expand=True)
             # Create the line colour and button colour selection elements
             self.labelframe1 = Tk.LabelFrame(self.frame, text="Button width")
             self.labelframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='y' )
@@ -97,9 +97,9 @@ class edit_route():
                         tool_tip="Specify the width of the route selection button (5 to 25 characters)")
             self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
             self.buttoncolour = common.colour_selection(self.frame, label="Button colour")
-            self.buttoncolour.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+            self.buttoncolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
             self.routecolour = common.colour_selection(self.frame, label="Route highlighting")
-            self.routecolour.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+            self.routecolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
             #-----------------------------------------------------------------
             # Create the route name and description elements
             #------------------------------------------------------------------
@@ -120,29 +120,33 @@ class edit_route():
             #------------------------------------------------------------------
             self.frame2 = Tk.LabelFrame(self.main_frame, text="Points to set")
             self.frame2.pack(padx=2, pady=2, fill='x')
-            self.points = common.entry_box_grid(self.frame2, base_class=common.point_settings_entry, columns=7,
-                                            tool_tip="Specify the points that need to be set and locked "+
-                                            "for the route and their required configuration (normal/switched)")
+            self.points = common.grid_of_point_settings(self.frame2, columns=7, tool_tip="Specify the points that need "
+                            "to be set and locked for the route and their required configuration (normal/switched)")
+            self.points.pack(padx=2, pady=2, fill='x')
             self.frame3 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
             self.frame3.pack(padx=2, pady=2, fill='x')
-            self.signals = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=12,
-                width=3, exists_function = signals.signal_exists, tool_tip="Specify the main signals that need "+
-                                                                          "to be cleared for the route")
+            self.signals = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.int_item_id_entry_box,
+                            columns=12, width=3, exists_function = signals.signal_exists, tool_tip=
+                            "Specify the main signals that need "+ "to be cleared for the route")
+            self.signals.pack(padx=2, pady=2, fill='x')
             self.frame4 = Tk.LabelFrame(self.main_frame, text="Subsidary signals to clear")
             self.frame4.pack(padx=2, pady=2, fill='x')
-            self.subsidaries = common.entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=12,
-                width=3, exists_function = signals.signal_exists, tool_tip="Specify the subsidary signals "+
-                                    "(associated with a main signal) that need to be cleared for the route")
+            self.subsidaries = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box,
+                            columns=12, width=3, exists_function = signals.signal_exists, tool_tip="Specify the "+
+                            "subsidary signals (associated with a main signal) that need to be cleared for the route")
+            self.subsidaries.pack(padx=2, pady=2, fill='x')
             self.frame5 = Tk.LabelFrame(self.main_frame, text="Route lines to highlight")
             self.frame5.pack(padx=2, pady=2, fill='x')
-            self.highlightlines = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=12,
-                width=3, exists_function = lines.line_exists, tool_tip="Specify the track lines comprising the route "+
-                                                               "(these will be highlighted when the route is selected)")
+            self.highlightlines = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box,
+                            columns=12, width=3, exists_function = lines.line_exists, tool_tip="Specify the track "+
+                            "lines comprising the route (these will be highlighted when the route is selected)")
+            self.highlightlines.pack(padx=2, pady=2, fill='x')
             self.frame6 = Tk.LabelFrame(self.main_frame, text="Points to highlight")
             self.frame6.pack(padx=2, pady=2, fill='x')
-            self.highlightpoints = common.entry_box_grid(self.frame6, base_class=common.int_item_id_entry_box, columns=12,
-                width=3, exists_function = points.point_exists, tool_tip="Specify the points (manual or automatic) that "+
-                                                "comprise the route (these will be highlighted when the route is selected)")
+            self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame6, base_class=common.int_item_id_entry_box,
+                            columns=12, width=3, exists_function = points.point_exists, tool_tip="Specify the points (manual "+
+                            "or automatic) that comprise the route (these will be highlighted when the route is selected)")
+            self.highlightpoints.pack(padx=2, pady=2, fill='x')
             #-----------------------------------------------------------------            
             # Create the switching delay entry element
             #------------------------------------------------------------------
@@ -219,7 +223,8 @@ class edit_route():
             # the lines of [[1:True], [3:False]] so we have to convert it before loading the UI element
             point_settings_list = []
             point_settings_dict = objects.schematic_objects[self.object_id]["pointsonroute"]
-            for key,value in point_settings_dict.items(): point_settings_list.append([int(key),value])
+            for key,value in point_settings_dict.items():
+                point_settings_list.append([int(key),value])
             self.points.set_values(point_settings_list)
             # Hide the validation error message
             self.validation_error.pack_forget()        
@@ -256,11 +261,11 @@ class edit_route():
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element returns a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before saving in the configuration.
-            # Note we ignore any null entries (point ID is zero)
             point_settings_dict = {}
             point_settings_list = self.points.get_values()
+            print(point_settings_list)
             for [key, value] in point_settings_list:
-                if key > 0: point_settings_dict[str(key)] = value
+                point_settings_dict[str(key)] = value
             new_object_configuration["pointsonroute"] = point_settings_dict
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)

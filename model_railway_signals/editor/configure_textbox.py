@@ -126,9 +126,9 @@ class edit_textbox():
             self.frame2.pack(padx=2, pady=2, fill='x')
             # Create the text colour and text background colour selection elements
             self.colour = common.colour_selection(self.frame2, label="Text colour")
-            self.colour.frame.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
+            self.colour.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
             self.background = common.colour_selection(self.frame2, label="Background colour", transparent_option=True)
-            self.background.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
+            self.background.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
             # Create a Frame for the Text Justification
             self.frame3 = Tk.Frame(self.main_frame)
             self.frame3.pack(fill='x')

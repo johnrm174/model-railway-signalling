@@ -228,7 +228,7 @@ class instrument_configuration_tab():
         # be selected - so we can safely use this function here for consistency.
         self.instid = common.object_id_selection(self.frame, "Inst ID",
                         exists_function = block_instruments.instrument_exists) 
-        self.instid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.instid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Inst Type selection
         self.insttype = common.selection_buttons(self.frame, "Point type",
                     "Select block Instrument Type", None, "Single line", "Double Line")

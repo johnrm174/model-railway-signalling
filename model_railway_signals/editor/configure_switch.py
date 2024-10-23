@@ -78,7 +78,7 @@ class edit_switch():
             # Create the UI Element for Button ID selection
             self.buttonid = common.object_id_selection(self.frame1, "Button ID",
                                     exists_function = buttons.button_exists) 
-            self.buttonid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.buttonid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the button width and colour selection elements in a second label frame
             self.frame1subframe2 = Tk.LabelFrame(self.frame1, text="Button width")
             self.frame1subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='y' )
@@ -88,7 +88,7 @@ class edit_switch():
                         max_value= 25, tool_tip="Specify the width of the button (5 to 25 characters)")
             self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
             self.buttoncolour = common.colour_selection(self.frame1, label="Button colour")
-            self.buttoncolour.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+            self.buttoncolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
             # Create the general settings in a third label frame
             self.frame1subframe4 = Tk.LabelFrame(self.frame1, text="General Settings")
             self.frame1subframe4.pack(padx=2, pady=2, fill='both', expand=True)

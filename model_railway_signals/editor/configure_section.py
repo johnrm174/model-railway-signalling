@@ -237,7 +237,7 @@ class section_configuration_tab():
         # Create the UI Element for Section ID selection
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
                                 exists_function = track_sections.section_exists) 
-        self.sectionid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.sectionid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create a labelframe for the General settings
         self.subframe1 = Tk.LabelFrame(self.frame1, text="General Settings")
         self.subframe1.pack(padx=2, pady=2, fill='x')

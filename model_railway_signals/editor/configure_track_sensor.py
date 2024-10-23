@@ -227,7 +227,7 @@ class edit_track_sensor():
             # Create the UI Element for Item ID selection
             self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
                                 exists_function = track_sensors.track_sensor_exists)
-            self.sensorid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.sensorid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the UI Element for the GPIO Sensor selection.
             self.gpiosensor = gpio_sensor_selection(self.frame)
             self.gpiosensor.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')

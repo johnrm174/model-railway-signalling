@@ -219,24 +219,29 @@ class conflicting_signals_frame():
         tool_tip = "Specify any signals/routes that would conflict with this signal route"
         self.main_frame = Tk.LabelFrame(self.frame, text="MAIN Route - interlocking with conflicting signals")
         self.main_frame.pack(padx=2, pady=2, fill='x')
-        self.main = common.entry_box_grid(self.main_frame, base_class=common.signal_route_selections,
+        self.main = common.grid_of_widgets(self.main_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.main.pack()
         self.lh1_frame = Tk.LabelFrame(self.frame, text="LH1 Route - interlocking with conflicting signals")
         self.lh1_frame.pack(padx=2, pady=2, fill='x')
-        self.lh1 = common.entry_box_grid(self.lh1_frame, base_class=common.signal_route_selections,
+        self.lh1 = common.grid_of_widgets(self.lh1_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.lh1.pack()
         self.lh2_frame = Tk.LabelFrame(self.frame, text="LH2 Route - interlocking with conflicting signals")
         self.lh2_frame.pack(padx=2, pady=2, fill='x')
-        self.lh2 = common.entry_box_grid(self.lh2_frame, base_class=common.signal_route_selections,
+        self.lh2 = common.grid_of_widgets(self.lh2_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.lh2.pack()
         self.rh1_frame = Tk.LabelFrame(self.frame, text="RH1 Route - interlocking with conflicting signals")
         self.rh1_frame.pack(padx=2, pady=2, fill='x')
-        self.rh1 = common.entry_box_grid(self.rh1_frame, base_class=common.signal_route_selections,
+        self.rh1 = common.grid_of_widgets(self.rh1_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.rh1.pack()
         self.rh2_frame = Tk.LabelFrame(self.frame, text="RH2 Route - interlocking with conflicting signals")
         self.rh2_frame.pack(padx=2, pady=2, fill='x')
-        self.rh2 = common.entry_box_grid(self.rh2_frame, base_class=common.signal_route_selections,
+        self.rh2 = common.grid_of_widgets(self.rh2_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.rh2.pack()
 
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
