@@ -564,7 +564,7 @@ def set_all(new_objects):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 #################################################################################################
-                ## Handle breaking change of text boxes being library objects from Release 4.7 onwards ##########
+                ## Handle breaking change of text boxes being library objects from Release 4.7.0 onwards ########
                 ## and hence requiring a unique item ID (even if this is 'under the hood') ######################
                 #################################################################################################
                 elif (new_object_type == objects_common.object_type.textbox and
@@ -576,32 +576,11 @@ def set_all(new_objects):
                 #################################################################################################
 
                 #################################################################################################
-                ## Handle breaking change of tracks sections now a list of 3 sections from release 4.0.0 #########
-                ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
-                ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
-                ## Before release 4.0.0, each route element was a single track section (integer value) ##########
-                ## From Release 4.0.0 onwards, each element comprises a list of track sections [T1, T2, T3] #####
-                #################################################################################################
-                elif new_object_type == objects_common.object_type.signal and element == "tracksections":
-                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
-                    if type(new_objects[object_id][element][1][0]) == int:
-                        for index, route in enumerate(new_objects[object_id][element][1]):
-                            list_of_sections = [new_objects[object_id][element][1][index],0,0]
-                            objects_common.schematic_objects[object_id][element][1][index] = list_of_sections
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 4.0.0 breaking change to : '"+element+"'")
-                    else:
-                        objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
-                #################################################################################################
-                ## End of Handle breaking change for Track sections #############################################
-                #################################################################################################
-
-                #################################################################################################
                 ## Handle non-breaking change of signal interlocking table for opposing signals. ################
                 ## Up to Release 4.4.0, each 'route' element was a fixed length list of 4 signals ###############
                 ## From Release 4.5.0 each 'route' element is a variable length list of signals #################
                 ## We don't really need to handle this at load time, but it 'tidies up' the lists ###############
-                ## for the next time the layout is saved (without having to edit/apply each signal config #######
+                ## for the next time the layout is saved (without having to edit/apply each signal config) ######
                 #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "siginterlock":
                     new_sig_interlock_table = [[],[],[],[],[]]
@@ -651,6 +630,51 @@ def set_all(new_objects):
                                 new_theatre_route_entry[1].append(dcc_command)
                         new_dcctheatre_table[index] = new_theatre_route_entry
                     objects_common.schematic_objects[object_id][element] = new_dcctheatre_table
+                #################################################################################################
+                ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
+                #################################################################################################
+
+                #################################################################################################
+                ## Handle breaking change of Point Settings Lists being variable length lists rather than #######
+                ## fixed length lists from Release 4.8.0 onwards. This applies to the following elements: #######
+                ##    Signals - "pointinterlock" - The list of point settings for each signal route  ############
+                ##    Sensors - "routeahead" - The list of point settings for each sensor route #################
+                ##    Sensors - "routebehind" - The list of point settings for each sensor route ################
+                ## Up to Release 4.7.0, the point settings were a fixed length list of 6 points #################
+                ## From Release 4.8.0 the point settings are a variable length list of points ##################
+                ## We don't really need to handle this at load time, but it 'tidies up' the lists ###############
+                ## for the next time the layout is saved (without having to edit/apply each object config) ######
+                #################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
+                    new_point_interlock_table = [[],[],[],[],[]]
+                    old_point_interlock_table = new_objects[object_id][element]
+                    for index, old_interlocked_route in enumerate(old_point_interlock_table):
+                        new_point_interlock_entry = [ [], old_interlocked_route[1], old_interlocked_route[2] ]
+                        for point_setting in old_interlocked_route[0]:
+                            if point_setting[0] > 0:
+                                new_point_interlock_entry[0].append(point_setting)
+                        new_point_interlock_table[index] = new_point_interlock_entry
+                    objects_common.schematic_objects[object_id][element] = new_point_interlock_table
+                elif new_object_type == objects_common.object_type.track_sensor and element == "routeahead":
+                    new_route_table = [[],[],[],[],[]]
+                    old_route_table = new_objects[object_id][element]
+                    for index, old_route in enumerate(old_route_table):
+                        new_route_entry = [ [], old_route[1] ]
+                        for point_setting in old_route[0]:
+                            if point_setting[0] > 0:
+                                new_route_entry[0].append(point_setting)
+                        new_route_table[index] = new_route_entry
+                    objects_common.schematic_objects[object_id][element] = new_route_table
+                elif new_object_type == objects_common.object_type.track_sensor and element == "routebehind":
+                    new_route_table = [[],[],[],[],[]]
+                    old_route_table = new_objects[object_id][element]
+                    for index, old_route in enumerate(old_route_table):
+                        new_route_entry = [ [], old_route[1] ]
+                        for point_setting in old_route[0]:
+                            if point_setting[0] > 0:
+                                new_route_entry[0].append(point_setting)
+                        new_route_table[index] = new_route_entry
+                    objects_common.schematic_objects[object_id][element] = new_route_table
                 #################################################################################################
                 ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################
