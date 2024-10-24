@@ -7,7 +7,6 @@
 #    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
 #    update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    set_bbox - Common function to create/update the boundary box for a schematic object
-#    find_initial_canvas_position - common function to return the next 'free' position (x,y)
 #    new_item_id - Common function - common function to return the next 'free' item ID
 #    get_offset_colour - Get a colour with a specified brightness offset to a specified colour
 #    get_text_colour - Get text colour (black/white) for max contrast with the background colour
@@ -159,35 +158,6 @@ def set_bbox(object_id:str, canvas_tags:str):
     else:
         schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')
     return()
-
-#------------------------------------------------------------------------------------
-# Internal function to find an initial canvas position for the created object.
-# This is used by all the object type-specific creation functions (below).
-#------------------------------------------------------------------------------------
-
-def find_initial_canvas_position():
-    global schematic_objects
-    # Default position (top left) to try first and Deltas to use for object spacing
-    startx, starty = 75, 50
-    deltax, deltay = 25, 50
-    # Find an intial position not taken up with an existing object
-    x, y = startx, starty
-    while True:
-        posfree = True
-        for object_id in schematic_objects:
-            # See if another object already exists at this position
-            if (schematic_objects[object_id]["posx"] == x and
-                 schematic_objects[object_id]["posy"] == y):
-                posfree = False
-                break
-        # If the current x/y position is "free" now have iterated through all other
-        # schematic objects then we can use this position to create the new object
-        if posfree: break
-        # Else, apply the deltas and try again
-        x, y = x + deltax, y + deltay
-        # Take into account the size of the canvas (so nothing gets created "off scene"
-        if y > canvas_height - 50: y = starty
-    return(x, y)
 
 #------------------------------------------------------------------------------------
 # Internal function to assign a unique type-specific id for a newly created object

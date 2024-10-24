@@ -24,7 +24,6 @@
 #    run_routes.set_schematic_route_callback - setting the object callbacks when created/recreated
 #    run_routes.clear_schematic_route_callback - setting the object callbacks when created/recreated
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.get_offset_colour - Get a colour with a specified brightness offset to a specified colour
 #    objects_common.get_text_colour - Get text colour (black/white) for max contrast with the background colour
@@ -269,17 +268,16 @@ def redraw_route_object(object_id):
 # Function to Create a new default Route object (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_route():
+def create_route(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_route_object)
-    # Find the initial canvas position and assign the initial ID
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
     objects_common.route_index[str(item_id)] = object_id
     # Draw the Route Object on the canvas

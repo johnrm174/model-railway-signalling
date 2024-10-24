@@ -19,7 +19,6 @@
 #    run_layout.sensor_passed_callback - the callback specified when creating the library objects
 #    objects_common.set_bbox - to create/update the boundary box for the canvas drawing objects
 #    objects_common.new_item_id - to get the next 'free' type-specific Item ID (when creating objects)
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.track_sensor - to find the object_id from a given item_id
 #    objects_routes.remove_references_to_sensor - called when the Sensor ID is changed
 #    objects_routes.update_references_to_sensor - called when the Sensor is deleted
@@ -223,17 +222,17 @@ def redraw_track_sensor_object(object_id):
 # Function to Create a new default object (and create the associated library objects)
 #------------------------------------------------------------------------------------------------------------------
         
-def create_track_sensor():
+def create_track_sensor(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_track_sensor_object)
-    # Find the initial canvas position for the new object
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     # Add the specific elements for this particular instance of the object
+    # Note we offset the position slightly so we're not over the "sensor passed" button
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos + 10
     # Add the new object to the type-specific index
     objects_common.track_sensor_index[str(item_id)] = object_id
     # Create the associated library objects

@@ -14,7 +14,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    
 # Accesses the following external editor objects directly:
@@ -128,17 +127,16 @@ def redraw_switch_object(object_id):
 # Function to Create a new default Switch object (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_switch():
+def create_switch(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_switch_object)
-    # Find the initial canvas position and assign the initial ID
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
     objects_common.switch_index[str(item_id)] = object_id
     # Draw the Object on the canvas

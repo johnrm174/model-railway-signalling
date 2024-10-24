@@ -84,6 +84,8 @@ schematic_state["lastx"] = 0
 schematic_state["lasty"] = 0
 schematic_state["movewindow"] = False
 schematic_state["moveobjects"] = False
+schematic_state["createobject"] = None
+schematic_state["placeobject"] = False
 schematic_state["editlineend1"] = False
 schematic_state["editlineend2"] = False
 schematic_state["selectarea"] = False
@@ -146,12 +148,34 @@ def draw_grid():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to create an object (and make it the only selected object)
+# Internal functions to create and place (and cancel the placing of) a new object.
+# The 'create_object' function gets called when a new object is 'added' by the user
+# clicking on the buttons to the left hand side of the canvas and records the object
+# to be added as a tuple of function call parameters in the dict of schematic state.
+# The 'create_object_on_canvas' function gets called as soon as the first 'motion'
+# event is detected (when the user moves) the cursor back onto the canvas. This then
+# creates the object on the canvas at the current cursor position, before changing to
+# 'place object' mode where the object moves with the cursor.
+# The 'cancel_place_object_in_progress' function is called if the 'esc' key is pressed
+# during an object place - it resets the mode and deletes the newly created object
 #------------------------------------------------------------------------------------
 
 def create_object(new_object_type, item_type=None, item_subtype=None):
     deselect_all_objects()
-    object_id = objects.create_object(new_object_type, item_type, item_subtype)
+    # Set "Create Object" Mode
+    schematic_state["createobject"] = (new_object_type, item_type, item_subtype)
+    # Change the cursor to indicate we are in "Place Object" Mode
+    root.config(cursor="crosshair")
+    # Set keyboard focus for the canvas (so that any key bindings will work)
+    # and unbind keypresses (apart from 'esc') until the object is 'placed'
+    canvas.focus_set()
+    disable_all_keypress_events_during_move()
+    canvas.bind('<Escape>',cancel_place_object_in_progress)
+    return()
+
+def create_object_on_canvas(posx:int, posy:int):
+    # Create the object on the canvas and select it
+    object_id = objects.create_object(posx, posy, *schematic_state["createobject"])
     select_object(object_id)
     return()
 
@@ -487,49 +511,74 @@ def right_button_click(event):
 
 def left_button_click(event):
     global schematic_state
-    # set keyboard focus for the canvas (so that any key bindings will work)
-    canvas.focus_set()
     # Get the canvas coordinates (to take into account any scroll bar offsets) 
     canvas_x, canvas_y = canvas_coordinates(event)
-    schematic_state["startx"] = canvas_x 
-    schematic_state["starty"] = canvas_y
-    schematic_state["lastx"] = canvas_x 
-    schematic_state["lasty"] = canvas_y
+    # The function to perform will depend on the Editor Mode
     if edit_mode_active:
-        # See if the cursor is over the "end" of an already selected line
-        highlighted_object = find_highlighted_line_end(canvas_x,canvas_y)
-        if highlighted_object:
-            # Clear selections and select the highlighted line. Note that the edit line
-            # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
-            deselect_all_objects()
-            select_object(highlighted_object)
+        if schematic_state["placeobject"]:
+            # Calculate the total deltas for the move (from the start position)
+            # and finalise the move by updating the current object position
+            finalx = canvas_x - schematic_state["startx"]
+            finaly = canvas_y - schematic_state["starty"]
+            objects.move_objects(schematic_state["selectedobjects"],
+                    xdiff1=finalx, ydiff1=finaly, xdiff2=finalx, ydiff2=finaly)
+            # Now Snap the object to the grid
+            snap_selected_objects_to_grid()
+            # Finally, reset the "Place Object" Mode and revert the cursor to normal
+            schematic_state["placeobject"] = False
+            root.config(cursor="arrow")
         else:
-            # See if the cursor is over any other canvas object
-            highlighted_object = find_highlighted_object(canvas_x,canvas_y)
+            # Could be the start of "Move Object(s)" (if the cursor is over an object) or
+            # the start of "Move Line End" (if the cursor is over the 'end' of a line) or
+            # the start of an "Area Selection" (if the cursor isn't over anything)
+            schematic_state["startx"] = canvas_x
+            schematic_state["starty"] = canvas_y
+            schematic_state["lastx"] = canvas_x
+            schematic_state["lasty"] = canvas_y
+            # See if the cursor is over the "end" of an already selected line
+            highlighted_object = find_highlighted_line_end(canvas_x,canvas_y)
             if highlighted_object:
-                schematic_state["moveobjects"] = True
-                if highlighted_object not in schematic_state["selectedobjects"]:
-                    # Clear any current selections and select the highlighted object
-                    deselect_all_objects()
-                    select_object(highlighted_object)
-            else:
-                # Cursor is not over any object - Could be the start of a new area selection or
-                # just clearing the current selection - In either case we deselect all objects
+                # Clear selections and select the highlighted line. Note that the edit line
+                # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
                 deselect_all_objects()
-                schematic_state["selectarea"] = True
-                # Make the 'selectareabox' visible. This will create the box on first use
-                # or after a 'delete_all_objects (when the box is set to 'None')
-                if schematic_state["selectareabox"] is None:
-                    schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
-                canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
-                canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
+                select_object(highlighted_object)
+                # Change the cursor style
+                root.config(cursor="hand1")
+            else:
+                # See if the cursor is over any other canvas object
+                highlighted_object = find_highlighted_object(canvas_x,canvas_y)
+                if highlighted_object:
+                    schematic_state["moveobjects"] = True
+                    if highlighted_object not in schematic_state["selectedobjects"]:
+                        # Clear any current selections and select the highlighted object
+                        deselect_all_objects()
+                        select_object(highlighted_object)
+                    # Change the cursor style
+                    root.config(cursor="hand1")
+                else:
+                    # Cursor is not over any object - Could be the start of a new area selection or
+                    # just clearing the current selection - In either case we deselect all objects
+                    deselect_all_objects()
+                    schematic_state["selectarea"] = True
+                    # Make the 'selectareabox' visible. This will create the box on first use
+                    # or after a 'delete_all_objects (when the box is set to 'None')
+                    if schematic_state["selectareabox"] is None:
+                        schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
+                    canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
+                    canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
+                    # Change the cursor style
+                    root.config(cursor="cross")
     else:
         # This could be a 'drag and drop' scroll of the canvas within the window
+        # Note that drag and drop scroll of the canvas is Run Mode Only
         canvas.scan_mark(event.x, event.y)
         schematic_state["movewindow"] = True
-    # Unbind the canvas keypresses until left button release to prevent mode changes,
-    # rotate/delete of objects (i.e. prevent undesirable editor behavior)
+        root.config(cursor="hand1")
+    # set keyboard focus for the canvas (so that any key bindings will work) but unbind keypress
+    # events (apart from 'esc') until left button release to prevent udesirable editor behavior
+    canvas.focus_set()
     disable_all_keypress_events_during_move()
+    canvas.bind('<Escape>',cancel_move_in_progress)
     return()
 
 #------------------------------------------------------------------------------------
@@ -577,7 +626,20 @@ def track_cursor(event):
     global schematic_state
     # Get the canvas coordinates (to take into account any scroll bar offsets) 
     canvas_x, canvas_y = canvas_coordinates(event)
-    if schematic_state["moveobjects"]:
+    # If the event is the first 'motion' event detected on the canvas and we are in
+    # 'Create Object' Mode then we can 'create' the object at the current cursor
+    # position and change into 'Place Object' Mode (where we move it into position)
+    if schematic_state["createobject"] is not None:
+        create_object_on_canvas(canvas_x, canvas_y)
+        schematic_state["createobject"] = None
+        schematic_state["placeobject"] = True
+        schematic_state["startx"] = canvas_x
+        schematic_state["starty"] = canvas_y
+        schematic_state["lastx"] = canvas_x
+        schematic_state["lasty"] = canvas_y
+    # If we are in "Move Objects" or "Place Object" Mode we want the selected
+    # object(s) to move across the schematic with the cursor
+    elif schematic_state["moveobjects"] or schematic_state["placeobject"]:
         # Work out the delta movement since the last re-draw
         xdiff = canvas_x - schematic_state["lastx"]
         ydiff = canvas_y - schematic_state["lasty"]
@@ -586,6 +648,8 @@ def track_cursor(event):
         # Set the 'last' position for the next move event
         schematic_state["lastx"] = canvas_x
         schematic_state["lasty"] = canvas_y
+    # If we are in "Line Edit" Mode them we want the selected line end to move
+    # across the schematic with the cusrsor (leaving the other line end in place)
     elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
         xdiff = canvas_x - schematic_state["lastx"]
         ydiff = canvas_y - schematic_state["lasty"]
@@ -598,11 +662,14 @@ def track_cursor(event):
         # Reset the "start" position for the next move
         schematic_state["lastx"] = canvas_x
         schematic_state["lasty"] = canvas_y
+    # If we are in select area mode then we want the selection area box to expand
+    # following the cursor (with the opposite corner left at the start position)
     elif schematic_state["selectarea"]:
         # Dynamically resize the selection area
         x1 = schematic_state["startx"]
         y1 = schematic_state["starty"]
         canvas.coords(schematic_state["selectareabox"],x1,y1,canvas_x,canvas_y)
+    # If we are in "Move Window" Mode (RUN Mode only) then move the canvas with the cusror
     elif schematic_state["movewindow"]:
         # Scroll the canvas within the main window
         canvas.scan_dragto(event.x, event.y, gain=1)
@@ -665,14 +732,15 @@ def left_button_release(event):
     elif schematic_state["movewindow"]:
         # Clear the scroll canvas mode
         schematic_state["movewindow"] = False
-    # Re-bind the canvas keypresses on completion of area selection or Move Objects
+    # Re-bind all canvas keypresses events and revert the cursor style to normal
     enable_all_keypress_events_after_completion_of_move()
+    root.config(cursor="arrow")
     return()
 
 #------------------------------------------------------------------------------------
-# Left Button Release - Finish Object or line end Moves (by snapping to grid)
-# or select all objects within the canvas area selection box
-# The event will only be bound to the canvas in "Edit" Mode
+# Function to cancel a move in progress (on the 'esc' key event). All selected objects
+# will revert to their original positions and the "Move" Objects" mode will be cancelled
+# The 'esc' key event is only bound to this function when a move is in progress.
 #------------------------------------------------------------------------------------
 
 def cancel_move_in_progress(event=None):
@@ -704,6 +772,19 @@ def cancel_move_in_progress(event=None):
         schematic_state["selectarea"] = False
     # Re-bind the canvas keypresses on completion of area selection or Move Objects
     enable_all_keypress_events_after_completion_of_move()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to cancel the creation (and placing) of an object (on the 'esc' key event).
+# The created object will be deleted and the "Move" Objects" mode will be cancelled
+# The 'esc' key event is only bound when a "create/place" action is in progress.
+#------------------------------------------------------------------------------------
+
+def cancel_place_object_in_progress(event=None):
+    schematic_state["createobject"] = None
+    schematic_state["placeobject"] = False
+    root.config(cursor="arrow")
+    delete_selected_objects()
     return()
 
 #------------------------------------------------------------------------------------
@@ -773,7 +854,7 @@ def enable_all_keypress_events_after_completion_of_move():
 def disable_all_keypress_events_during_move():
     disable_edit_keypress_events()
     disable_arrow_keypress_events()
-    canvas.bind('<Escape>',cancel_move_in_progress)
+    # Unbind the  Toggle mode and revert canvas size buttons (or this will screw up the move)
     canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
     canvas.unbind('<Control-Key-r>')                             # Revert Canvas Size
     # Unbind the other mouse buttons to prevent inadvertant clicks
@@ -952,9 +1033,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["sensor", lambda:create_object(objects.object_type.track_sensor) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
                                         block_instruments.instrument_type.single_line.value) ],
-                   ["route", lambda:create_object(objects.object_type.route)] ]      ########################
-#                    ["route", lambda:create_object(objects.object_type.route)],     ########################
-#                    ["switch", lambda:create_object(objects.object_type.switch)] ]  ########################
+                   ["route", lambda:create_object(objects.object_type.route)],
+                   ["switch", lambda:create_object(objects.object_type.switch)] ]
     # Create the buttons we need (Note that the button images are added to a global
     # list so they remain in scope (otherwise the buttons won't work)
     resource_folder = 'model_railway_signals.editor.resources'

@@ -14,7 +14,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.point - To get The Object_ID for a given Item_ID
 #    objects_common.signal - To get The Object_ID for a given Item_ID
@@ -222,19 +221,18 @@ def redraw_point_object(object_id):
 # Function to Create a new default Point (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_point(item_type, item_subtype):
+def create_point(xpos:int, ypos:int, item_type, item_subtype):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_point_object)
-    # Find the initial canvas position for the new object and assign the item ID
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=points.point_exists)
     # Add the specific elements for this particular instance of the point
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
     objects_common.schematic_objects[object_id]["itemsubtype"] = item_subtype
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the index of points
     objects_common.point_index[str(item_id)] = object_id
     # Draw the object on the canvas

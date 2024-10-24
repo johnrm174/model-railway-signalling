@@ -285,25 +285,25 @@ def reset_objects():
 # Called from the Schematic Module when an "add object" button is clicked
 #------------------------------------------------------------------------------------
 
-def create_object(new_object_type, item_type=None, item_subtype=None):
+def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subtype=None):
     if new_object_type == objects_common.object_type.line:
-        object_id = objects_lines.create_line() 
+        object_id = objects_lines.create_line(xpos, ypos)
     elif new_object_type == objects_common.object_type.textbox:
-        object_id = objects_textboxes.create_textbox()
+        object_id = objects_textboxes.create_textbox(xpos, ypos)
     elif new_object_type == objects_common.object_type.signal:
-        object_id = objects_signals.create_signal(item_type, item_subtype)
+        object_id = objects_signals.create_signal(xpos, ypos, item_type, item_subtype)
     elif new_object_type == objects_common.object_type.point:
-         object_id = objects_points.create_point(item_type, item_subtype)
+         object_id = objects_points.create_point(xpos, ypos, item_type, item_subtype)
     elif new_object_type == objects_common.object_type.section:
-        object_id = objects_sections.create_section()
+        object_id = objects_sections.create_section(xpos, ypos)
     elif new_object_type == objects_common.object_type.instrument:
-        object_id = objects_instruments.create_instrument(item_type)
+        object_id = objects_instruments.create_instrument(xpos, ypos, item_type)
     elif new_object_type == objects_common.object_type.track_sensor:
-        object_id = objects_sensors.create_track_sensor()
+        object_id = objects_sensors.create_track_sensor(xpos, ypos)
     elif new_object_type == objects_common.object_type.route:
-        object_id = objects_routes.create_route()
+        object_id = objects_routes.create_route(xpos, ypos)
     elif new_object_type == objects_common.object_type.switch:
-        object_id = objects_switches.create_switch()
+        object_id = objects_switches.create_switch(xpos, ypos)
     else:
         object_id = None
     # save the current state (for undo/redo)
