@@ -57,21 +57,11 @@ default_track_sensor_object = copy.deepcopy(objects_common.default_object)
 default_track_sensor_object["item"] = objects_common.object_type.track_sensor
 default_track_sensor_object["passedsensor"] = ""
 default_track_sensor_object["hidden"] = False
-# The "routeahead" element comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-# Each point element in the point list comprises [point_id, point_state]
-default_track_sensor_object["routeahead"] = [
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ]
-default_track_sensor_object["routebehind"] = [
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ]
+# The "route" elements comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route in the list comprises: [list_of_point_settings, section_id]
+# Each point element in the list_of_point_settings comprises [point_id, point_state]
+default_track_sensor_object["routeahead"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
+default_track_sensor_object["routebehind"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from both of the Track Sensor's

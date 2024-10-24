@@ -121,15 +121,10 @@ default_signal_object["dccfeathers"] =  [ [], [], [], [], [], [] ]
 default_signal_object["dcctheatre"] = [ ["#", [] ], ["", [] ], ["", [] ], ["", [] ], ["", [] ], ["", [] ] ]
 # This is the default point interlocking table for a signal
 # The table comprises a list of route elements: [main, lh1, lh2, rh1, rh2]
-# Each route element comprises: [[p1, p2, p3, p4, p5, p6] sig_id, block_id]
-# Where Each point element (in the list of points) comprises [point_id, point_state]
+# Each route element comprises: [variable_length_list_of_point_settings, sig_id, block_id]
+# Where Each point setting (in the list of point_settings) comprises [point_id, point_state]
 # Note that Sig IDs in this case are strings (local or remote IDs)
-default_signal_object["pointinterlock"] = [
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ]
+default_signal_object["pointinterlock"] = [ [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0] ]
 # This is the default Track Section interlocking table for a signal
 # Track Section interlocking table comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
 # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
