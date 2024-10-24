@@ -82,7 +82,7 @@ from ..library import mqtt_interface
 help_text = """
 Schematic editor functions (Edit Mode):
  
-1) Use the buttons on the left to add objects to the schematic.
+1) Use the buttons on the left to add objects to the schematic (left-click to place).
 2) Left-click to select objects (shift-left-click will add/remove from the selection).
 3) Left-click/release when over an object to drag/drop selected objects.
 4) Left-click/release when not over an object to seleact an 'area'.
