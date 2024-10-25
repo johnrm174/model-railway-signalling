@@ -24,10 +24,12 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release 4.8.0:
 
-* Improved creation and initial placing of objects on the schematic - when you click a button to add an
-object, this now tracks the cursor until you 'place' it on the canvas in the desired position (by left 
-mouse click). Useful for working onlayout schematics larger than the displayed window area.
-provides flexibility for implementing other niche automation use cases on your layout.
+* Improved object creation - when you click a button to add a new object to the schematic, the object
+now moves with the cursor until 'placed' on the canvas in the desired position (by left mouse click).
+Useful for working on layout schematics larger than the displayed window area.
+* Improved copy function - The new objects now appear on the schematic as soon as you have copied them.
+They then track the cursor until 'placed' on the canvas in the desired position (by left mouse click).
+Useful for working on 'busy' layout schematics where the copied items would have overlayed other objects.
 * Other minor improvements to the schematic editor in terms of cursor styles during object moves and area
 selections (Edit Mode), and scrolling of the displayed canvas area via the mouse/touchscreen (Run Mode).
 * New DCC Accessory switches feature, enabling you to add and configure buttons on the schematic to 

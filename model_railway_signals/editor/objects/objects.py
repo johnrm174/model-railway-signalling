@@ -477,8 +477,9 @@ def copy_objects(list_of_object_ids):
 
 def paste_objects():
     list_of_new_object_ids=[]
-    # New objects are "pasted" at a slightly offset position on the canvas
-    deltax, deltay = objects_common.canvas_grid, objects_common.canvas_grid
+    # New objects are "pasted" at a slightly offset position on the canvas so
+    # its clear that new objects have been created (to move/place on the canvas)
+    deltax, deltay = 3, 3
     # Create a copy of each object in the clipboard (depending on type)
     for object_to_paste in clipboard:
         type_of_object = object_to_paste["item"]

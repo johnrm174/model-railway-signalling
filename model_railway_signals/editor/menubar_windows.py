@@ -82,17 +82,17 @@ from ..library import mqtt_interface
 help_text = """
 Schematic editor functions (Edit Mode):
  
-1) Use the buttons on the left to add objects to the schematic (left-click to place).
-2) Left-click to select objects (shift-left-click will add/remove from the selection).
-3) Left-click/release when over an object to drag/drop selected objects.
-4) Left-click/release when not over an object to seleact an 'area'.
+1) Use the buttons on the left to add objects to the schematic (left-click to place)
+2) Left-click to select objects (shift-left-click will add/remove from the selection)
+3) Left-click/release when over an object to drag/drop selected objects
+4) Left-click/release when not over an object to seleact an 'area'
 5) Left-click/release on the 'end' of a selected line to move the line end.
 6) Double-left-click on a schematic object to open the object configuraton window
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
 9) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
 10) <backspace> will delete all currently selected objects from the schematic
-11) <cntl-c> / <cntl-v> will copy/paste all currently selected objects
+11) <cntl-c> will copy all currently selected objects (to be moved/placed as required)
 12) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
 13) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
 14) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)

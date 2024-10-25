@@ -78,19 +78,20 @@ import copy
 
 # The schematic_state dict holds the current schematic editor status
 schematic_state:dict = {}
-schematic_state["startx"] = 0
-schematic_state["starty"] = 0
-schematic_state["lastx"] = 0
-schematic_state["lasty"] = 0
-schematic_state["movewindow"] = False
-schematic_state["moveobjects"] = False
-schematic_state["createobject"] = None
-schematic_state["placeobject"] = False
-schematic_state["editlineend1"] = False
-schematic_state["editlineend2"] = False
-schematic_state["selectarea"] = False
+schematic_state["startx"] = 0                # The start cursor coordinates of a move/place/copy
+schematic_state["starty"] = 0                # The start cursor coordinates of a move/place/copy
+schematic_state["lastx"] = 0                 # The last cursor coordinates during a move/place
+schematic_state["lasty"] = 0                 # The last cursor coordinates during a move/place
+schematic_state["createobject"] = None       # Create object has been initiated (object not yet created)
+schematic_state["placeobjects"] = False      # Schematic is in Place Object mode (new object(s) created)
+schematic_state["moveobjects"] = False       # Schematic is in Move Selected Object(s) mode
+schematic_state["copyobjects"] = False       # Schematic is in Copy Selected Object(s) mode
+schematic_state["editlineend1"] = False      # Schematic is in line edit mode (end 1)
+schematic_state["editlineend2"] = False      # Schematic is in line edit mode (end 2)
+schematic_state["selectarea"] = False        # Schematic is in Select Area mode
+schematic_state["movewindow"] = False        # Schematic is in Scroll canvas mode(Run Mode only)
 schematic_state["selectareabox"] = None      # Tkinter drawing object
-schematic_state["selectedobjects"] = []
+schematic_state["selectedobjects"] = []      # List of currently selected Object IDs
 # The Root reference is used when calling a "configure object" module (to open a popup window)
 # The Canvas reference is used for configuring and moving canvas widgets for schematic editing
 # canvas_width / canvas_height / canvas_grid are used for positioning of objects.
@@ -150,12 +151,12 @@ def draw_grid():
 #------------------------------------------------------------------------------------
 # Internal functions to create and place (and cancel the placing of) a new object.
 # The 'create_object' function gets called when a new object is 'added' by the user
-# clicking on the buttons to the left hand side of the canvas and records the object
+# (clicking the buttons to the left hand side of the canvas) and records the object
 # to be added as a tuple of function call parameters in the dict of schematic state.
 # The 'create_object_on_canvas' function gets called as soon as the first 'motion'
-# event is detected (when the user moves) the cursor back onto the canvas. This then
-# creates the object on the canvas at the current cursor position, before changing to
-# 'place object' mode where the object moves with the cursor.
+# event is detected (when the user moves the cursor back onto the canvas). This then
+# creates the object on the canvas at the current cursor position, The object will
+# then move with the cursor until 'placed' on the canvas ('placeobjects' mode).
 # The 'cancel_place_object_in_progress' function is called if the 'esc' key is pressed
 # during an object place - it resets the mode and deletes the newly created object
 #------------------------------------------------------------------------------------
@@ -178,6 +179,52 @@ def create_object_on_canvas(posx:int, posy:int):
     object_id = objects.create_object(posx, posy, *schematic_state["createobject"])
     select_object(object_id)
     return()
+
+def cancel_place_object_in_progress(event=None):
+    schematic_state["createobject"] = None
+    schematic_state["placeobjects"] = False
+    root.config(cursor="arrow")
+    delete_selected_objects()
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to Copy selected objects to the clipboard (Cntl-c and popup menu)
+# Also the callback to cancel the copy if the escape key is pressed before 'place'
+#------------------------------------------------------------------------------------
+
+def copy_selected_objects(event=None):
+    # Copy the objects and paste the copies
+    objects.copy_objects(schematic_state["selectedobjects"])
+    list_of_new_object_ids = objects.paste_objects()
+    objects.copy_objects(list_of_new_object_ids)
+    # Select the pasted (new) objects
+    deselect_all_objects()
+    for object_id in list_of_new_object_ids:
+        select_object(object_id)
+    # Get the canvas coordinates (to take into account any scroll bar offsets)
+    # Put the editor into place object mode and reset the cursor position
+    canvas_x, canvas_y = canvas_coordinates(event)
+    schematic_state["copyobjects"] = True
+    schematic_state["startx"] = canvas_x
+    schematic_state["starty"] = canvas_y
+    schematic_state["lastx"] = canvas_x
+    schematic_state["lasty"] = canvas_y
+    # Change the cursor to indicate we are in "Place Object" Mode
+    root.config(cursor="crosshair")
+    # Set keyboard focus for the canvas (so that any key bindings will work)
+    # and unbind keypresses (apart from 'esc') until the object is 'placed'
+    canvas.focus_set()
+    disable_all_keypress_events_during_move()
+    canvas.bind('<Escape>',cancel_copy_object_in_progress)
+    return()
+
+def cancel_copy_object_in_progress(event=None):
+    schematic_state["copyobjects"] = False
+    #delete the copied objects (all selected objects)
+    delete_selected_objects()
+    # Re-bind all canvas keypresses events and revert the cursor style to normal
+    enable_all_keypress_events_after_completion_of_move()
+    root.config(cursor="arrow")
 
 #------------------------------------------------------------------------------------
 # Internal function to select an object (adding to the list of selected objects)
@@ -388,28 +435,6 @@ def rotate_selected_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Copy selected objects to the clipboard (Cntl-c and popup menu)
-#------------------------------------------------------------------------------------
-        
-def copy_selected_objects(event=None):
-    objects.copy_objects(schematic_state["selectedobjects"])
-    return()
-
-#------------------------------------------------------------------------------------
-# Internal function to paste previously copied objects (Cntl-V and popup menu)
-#------------------------------------------------------------------------------------
-
-def paste_clipboard_objects(event=None):
-    # Paste the objects and re-copy (for a subsequent paste)
-    list_of_new_object_ids = objects.paste_objects()
-    objects.copy_objects(list_of_new_object_ids)
-    # Select the pasted objects (in case the user wants to paste again)
-    deselect_all_objects()
-    for object_id in list_of_new_object_ids:
-        select_object(object_id)
-    return()
-
-#------------------------------------------------------------------------------------
 # Internal function to return the ID of the Object the cursor is "highlighting"
 # Returns the UUID of the highlighted item add details of the highlighted element
 # Main = (True,False), Secondary = (False, True), All = (True, True)
@@ -515,7 +540,7 @@ def left_button_click(event):
     canvas_x, canvas_y = canvas_coordinates(event)
     # The function to perform will depend on the Editor Mode
     if edit_mode_active:
-        if schematic_state["placeobject"]:
+        if schematic_state["placeobjects"] or schematic_state["copyobjects"]:
             # Calculate the total deltas for the move (from the start position)
             # and finalise the move by updating the current object position
             finalx = canvas_x - schematic_state["startx"]
@@ -525,7 +550,8 @@ def left_button_click(event):
             # Now Snap the object to the grid
             snap_selected_objects_to_grid()
             # Finally, reset the "Place Object" Mode and revert the cursor to normal
-            schematic_state["placeobject"] = False
+            schematic_state["placeobjects"] = False
+            schematic_state["copyobjects"] = False
             root.config(cursor="arrow")
         else:
             # Could be the start of "Move Object(s)" (if the cursor is over an object) or
@@ -632,14 +658,14 @@ def track_cursor(event):
     if schematic_state["createobject"] is not None:
         create_object_on_canvas(canvas_x, canvas_y)
         schematic_state["createobject"] = None
-        schematic_state["placeobject"] = True
+        schematic_state["placeobjects"] = True
         schematic_state["startx"] = canvas_x
         schematic_state["starty"] = canvas_y
         schematic_state["lastx"] = canvas_x
         schematic_state["lasty"] = canvas_y
     # If we are in "Move Objects" or "Place Object" Mode we want the selected
     # object(s) to move across the schematic with the cursor
-    elif schematic_state["moveobjects"] or schematic_state["placeobject"]:
+    elif schematic_state["moveobjects"] or schematic_state["placeobjects"] or schematic_state["copyobjects"]:
         # Work out the delta movement since the last re-draw
         xdiff = canvas_x - schematic_state["lastx"]
         ydiff = canvas_y - schematic_state["lasty"]
@@ -775,19 +801,6 @@ def cancel_move_in_progress(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to cancel the creation (and placing) of an object (on the 'esc' key event).
-# The created object will be deleted and the "Move" Objects" mode will be cancelled
-# The 'esc' key event is only bound when a "create/place" action is in progress.
-#------------------------------------------------------------------------------------
-
-def cancel_place_object_in_progress(event=None):
-    schematic_state["createobject"] = None
-    schematic_state["placeobject"] = False
-    root.config(cursor="arrow")
-    delete_selected_objects()
-    return()
-
-#------------------------------------------------------------------------------------
 # Externally called Function to resize the canvas (called from menubar module on load
 # of new schematic or re-size of canvas via menubar). Updates the global variables
 #------------------------------------------------------------------------------------
@@ -872,7 +885,6 @@ def enable_edit_keypress_events():
     canvas.bind('<Delete>', delete_selected_objects)
     canvas.bind('<Escape>', deselect_all_objects)
     canvas.bind('<Control-Key-c>', copy_selected_objects)
-    canvas.bind('<Control-Key-v>', paste_clipboard_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
     canvas.bind('<Control-Key-s>', canvas_event_callback)    # Toggle Snap to Grid Mode
@@ -885,7 +897,6 @@ def disable_edit_keypress_events():
     canvas.unbind('<Delete>')
     canvas.unbind('<Escape>')
     canvas.unbind('<Control-Key-c>')
-    canvas.unbind('<Control-Key-v>')
     canvas.unbind('<Control-Key-z>')
     canvas.unbind('<Control-Key-y>')
     canvas.unbind('<Control-Key-s>')
@@ -999,14 +1010,12 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     canvas.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Define the Object Popup menu for Right Click (something selected)
     popup1 = Tk.Menu(tearoff=0)
-    popup1.add_command(label="Copy", command=copy_selected_objects)
     popup1.add_command(label="Edit", command=edit_selected_object)
     popup1.add_command(label="Rotate", command=rotate_selected_objects)
     popup1.add_command(label="Delete", command=delete_selected_objects)
     popup1.add_command(label="Snap to Grid", command=snap_selected_objects_to_grid)
     # Define the Canvas Popup menu for Right Click (nothing selected)
     popup2 = Tk.Menu(tearoff=0)
-    popup2.add_command(label="Paste", command=paste_clipboard_objects)
     popup2.add_command(label="Select all", command=select_all_objects)
     # Define the object buttons [filename, function_to_call]
     selections = [ ["textbox", lambda:create_object(objects.object_type.textbox) ],
