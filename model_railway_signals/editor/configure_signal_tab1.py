@@ -969,7 +969,7 @@ class signal_configuration_tab:
                 sub_routes_updated, dist_routes_updated):
         # Create a Frame to hold the Signal ID and Signal Type Selections
         self.frame1 = Tk.Frame(parent_tab)
-        self.frame1.pack(padx=2, pady=2, fill='x')
+        self.frame1.pack(fill='x')
         # Create the UI Element for Item ID selection. Note that although the signals.signal_exists
         # function will match both local and remote Signal IDs, the object_id_selection only allows integers to
         # be selected - so we can safely use this function here for consistency.

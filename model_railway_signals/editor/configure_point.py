@@ -269,7 +269,7 @@ class point_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Point ID, Point Type and point colour Selections
         self.frame = Tk.Frame(parent_tab)
-        self.frame.pack(padx=2, pady=2, fill='x')
+        self.frame.pack(fill='x')
         # Create the UI Element for Point ID selection
         self.pointid = common.object_id_selection(self.frame, "Point ID",
                                 exists_function = points.point_exists) 

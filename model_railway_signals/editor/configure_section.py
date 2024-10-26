@@ -233,7 +233,7 @@ class section_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Section ID and General Settings
         self.frame1 = Tk.Frame(parent_tab)
-        self.frame1.pack(padx=2, pady=2, fill='x')
+        self.frame1.pack(fill='x')
         # Create the UI Element for Section ID selection
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
                                 exists_function = track_sections.section_exists) 

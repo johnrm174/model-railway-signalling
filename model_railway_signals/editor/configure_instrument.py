@@ -222,7 +222,7 @@ class instrument_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Inst ID and Inst Type Selections
         self.frame = Tk.Frame(parent_tab)
-        self.frame.pack(padx=2, pady=2, fill='x')
+        self.frame.pack(fill='x')
         # Create the UI Element for Item ID selection. Note that although the block_instruments.instrument_exists
         # function will match both local and remote Instrument IDs, the object_id_selection only allows integers to
         # be selected - so we can safely use this function here for consistency.

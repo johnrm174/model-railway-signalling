@@ -223,7 +223,7 @@ class edit_track_sensor():
             open_windows[object_id] = self.window
             # Create a Frame to hold the Item ID and GPIO Sensor UI elements
             self.frame = Tk.Frame(self.window)
-            self.frame.pack(padx=2, pady=2, fill='x')
+            self.frame.pack(fill='x')
             # Create the UI Element for Item ID selection
             self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
                                 exists_function = track_sensors.track_sensor_exists)

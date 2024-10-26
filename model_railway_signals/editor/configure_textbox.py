@@ -117,26 +117,23 @@ class edit_textbox():
             self.main_frame = Tk.Frame(self.window)
             self.main_frame.pack(fill='both', expand=True)
             self.frame1 = Tk.Frame(self.main_frame)
-            self.frame1.pack(padx=2, pady=2, fill='both', expand=True)
+            self.frame1.pack(fill='both', expand=True)
             self.text = common.scrollable_text_frame(self.frame1, max_height=15,max_width=50,
                     min_height=1, min_width=10, editable=True, auto_resize=True)
             self.text.pack(padx=2, pady=2, fill='both', expand=True)
             # Create a Frame for the colour selections
             self.frame2 = Tk.Frame(self.main_frame)
-            self.frame2.pack(padx=2, pady=2, fill='x')
+            self.frame2.pack(fill='x')
             # Create the text colour and text background colour selection elements
             self.colour = common.colour_selection(self.frame2, label="Text colour")
             self.colour.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
             self.background = common.colour_selection(self.frame2, label="Background colour", transparent_option=True)
             self.background.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
-            # Create a Frame for the Text Justification
-            self.frame3 = Tk.Frame(self.main_frame)
-            self.frame3.pack(fill='x')
             # Use radio buttons for the text justification selection
-            self.justify = common.selection_buttons(self.frame3, label="Text Justification",
-                    tool_tip="Select text justification", callback=self.justification_updated,
-                                        button_labels = ("Left", "Centre", "Right"))
-            self.justify.pack(padx=2, pady=2, fill='x')
+            self.justify = common.selection_buttons(self.main_frame, label="Text justification",
+                        tool_tip="Select text justification", callback=self.justification_updated,
+                            button_labels = ("Left", "Centre", "Right"))
+            self.justify.pack(padx=2, pady=2, fill='x', expand=True)
             # Create a Frame for the Text Style Entry widgey
             self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
             self.textstyle.frame.pack(padx=2, pady=2, fill='x')

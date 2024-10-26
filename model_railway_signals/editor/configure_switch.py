@@ -71,37 +71,53 @@ class edit_switch():
             self.main_frame = Tk.Frame(self.window)
             self.main_frame.pack()
             #----------------------------------------------------------------------------------
-            # Create a Frame to hold the ID, Colour, Width and general settings (frame1)
+            # Create a Frame to hold the ID, Colour and Width (frame1)
             #----------------------------------------------------------------------------------
             self.frame1 = Tk.Frame(self.main_frame)
-            self.frame1.pack(padx=2, pady=2, fill='x', expand=True)
+            self.frame1.pack(fill='x', expand=True)
             # Create the UI Element for Button ID selection
             self.buttonid = common.object_id_selection(self.frame1, "Button ID",
                                     exists_function = buttons.button_exists) 
             self.buttonid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the button width and colour selection elements in a second label frame
-            self.frame1subframe2 = Tk.LabelFrame(self.frame1, text="Button width")
-            self.frame1subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='y' )
+            self.frame1subframe1 = Tk.LabelFrame(self.frame1, text="Button width")
+            self.frame1subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+            # Create another frame to centre all the button width UI elements
+            self.frame1subframe2 = Tk.Frame(self.frame1subframe1)
+            self.frame1subframe2.pack(fill="y", expand=True)
             self.frame1subframe2label1 = Tk.Label(self.frame1subframe2, text="Chars:")
-            self.frame1subframe2label1.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.frame1subframe2label1.pack(side=Tk.LEFT, padx=2, pady=2)
             self.buttonwidth = common.integer_entry_box(self.frame1subframe2, width=3, min_value=5,
                         max_value= 25, tool_tip="Specify the width of the button (5 to 25 characters)")
-            self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.buttonwidth.pack(side=Tk.LEFT, padx=2, pady=2)
+            # Create the button colour selection element labelframe
             self.buttoncolour = common.colour_selection(self.frame1, label="Button colour")
-            self.buttoncolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+            self.buttoncolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
+            #----------------------------------------------------------------------------------
+            # Create a Label Frame for the switch type and general settings UI element (frame2)
+            #----------------------------------------------------------------------------------
+            self.frame2 = Tk.Frame(self.main_frame)
+            self.frame2.pack(fill='x', expand=True)
+            self.switchtype = common.selection_buttons(self.frame2, label="DCC accessory switch type",
+                        tool_tip="Select DCC Accessory switch type", callback=self.switch_type_updated,
+                        button_labels=("On/off", "Momentary"))
+            self.switchtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
             # Create the general settings in a third label frame
-            self.frame1subframe4 = Tk.LabelFrame(self.frame1, text="General Settings")
-            self.frame1subframe4.pack(padx=2, pady=2, fill='both', expand=True)
-            self.buttonhidden = common.check_box(self.frame1subframe4, label="Hidden",
+            self.frame2subframe2 = Tk.LabelFrame(self.frame2, text="General Settings")
+            self.frame2subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+            self.buttonhidden = common.check_box(self.frame2subframe2, label="Hidden",
                      tool_tip= "Select to hide the Button in Run Mode")
             self.buttonhidden.pack(padx=2, pady=2)
+            
             #----------------------------------------------------------------------------------
-            # Create a Label Frame for the switch type UI element (frame2)
+            # Create a Label Frame for the text style Settings
             #----------------------------------------------------------------------------------
-            self.switchtype = common.selection_buttons(self.main_frame, label="DCC accessory switch type",
-                        tool_tip="Select DCC Accessory switch type", callback=self.switch_type_updated,
-                        button_labels=("On/off switch", "Momentary switch"))
-            self.switchtype.pack(padx=2, pady=2, fill='both', expand=True)
+#             self.frame5 = Tk.LabelFrame(self.main_frame, text="Label styles")
+#             self.frame5.pack(padx=2, pady=2, fill='x')
+#             self.textcolour=common.
+            
+            
+            
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the Button name and description elements (frame3)
             #----------------------------------------------------------------------------------
@@ -129,14 +145,14 @@ class edit_switch():
             self.frame4subframe1.pack()
             self.frame4subframe1label1 = Tk.Label(self.frame4subframe1, width=14, text= " ON commands:")
             self.frame4subframe1label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.oncommands = common.row_of_validated_dcc_commands(self.frame4subframe1, columns=4, item_type="Switch")
+            self.oncommands = common.row_of_validated_dcc_commands(self.frame4subframe1, columns=3, item_type="Switch")
             self.oncommands.pack(side=Tk.LEFT, padx=2, pady=2)                        
             # Create a subframe for the OFF labels and DCC command sequence
             self.frame4subframe2 = Tk.Frame(self.frame4)
             self.frame4subframe2.pack()
             self.frame4subframe2label1 = Tk.Label(self.frame4subframe2, width=14, text= " OFF commands:")
             self.frame4subframe2label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.offcommands = common.row_of_validated_dcc_commands(self.frame4subframe2, columns=4, item_type="Switch")
+            self.offcommands = common.row_of_validated_dcc_commands(self.frame4subframe2, columns=3, item_type="Switch")
             self.offcommands.pack(side=Tk.LEFT, padx=2, pady=2)
             #------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window

@@ -151,7 +151,7 @@ class edit_line():
             self.main_frame.pack()
             # Create a Frame to hold the Line ID and Line Colour Selections
             self.frame = Tk.Frame(self.main_frame)
-            self.frame.pack(padx=2, pady=2, fill='x')
+            self.frame.pack(fill='x')
             # Create the UI Element for Line ID selection
             self.lineid = common.object_id_selection(self.frame, "Line ID",
                                     exists_function = lines.line_exists) 

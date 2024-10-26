@@ -83,7 +83,7 @@ class edit_route():
             # Create a Frame to hold the Route ID, Colour and Width Selections
             #------------------------------------------------------------------
             self.frame = Tk.Frame(self.main_frame)
-            self.frame.pack(padx=2, pady=2, fill='x', expand=True)
+            self.frame.pack(fill='x', expand=True)
             # Create the UI Element for Line ID selection
             self.routeid = common.object_id_selection(self.frame, "Button ID",
                                     exists_function = buttons.button_exists) 
