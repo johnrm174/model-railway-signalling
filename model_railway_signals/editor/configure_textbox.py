@@ -134,9 +134,9 @@ class edit_textbox():
             self.frame3.pack(fill='x')
             # Use radio buttons for the text justification selection
             self.justify = common.selection_buttons(self.frame3, label="Text Justification",
-                    tool_tip= "select text justification", b1="Left", b2="Centre", b3="Right",
-                    callback=self.justification_updated)
-            self.justify.frame.pack(padx=2, pady=2, fill='x')
+                    tool_tip="Select text justification", callback=self.justification_updated,
+                                        button_labels = ("Left", "Centre", "Right"))
+            self.justify.pack(padx=2, pady=2, fill='x')
             # Create a Frame for the Text Style Entry widgey
             self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
             self.textstyle.frame.pack(padx=2, pady=2, fill='x')

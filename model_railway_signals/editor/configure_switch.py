@@ -98,9 +98,10 @@ class edit_switch():
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the switch type UI element (frame2)
             #----------------------------------------------------------------------------------
-            self.switchtype = common.selection_buttons(self.main_frame, "DCC accessory switch type",
-                        "Select DCC Accessory switch type", self.switch_type_updated, "On/off switch", "Momentary switch")
-            self.switchtype.frame.pack(padx=2, pady=2, fill='both', expand=True)
+            self.switchtype = common.selection_buttons(self.main_frame, label="DCC accessory switch type",
+                        tool_tip="Select DCC Accessory switch type", callback=self.switch_type_updated,
+                        button_labels=("On/off switch", "Momentary switch"))
+            self.switchtype.pack(padx=2, pady=2, fill='both', expand=True)
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the Button name and description elements (frame3)
             #----------------------------------------------------------------------------------
@@ -121,19 +122,19 @@ class edit_switch():
             #----------------------------------------------------------------------------------
             # Create a Frame for the DCC command sequences (frame4)
             #----------------------------------------------------------------------------------
-            self.frame4 = Tk.LabelFrame(self.main_frame, text="DCC")
+            self.frame4 = Tk.LabelFrame(self.main_frame, text="DCC command sequences")
             self.frame4.pack(padx=2, pady=2, fill='x')
             # Create a subframe for the ON labels and DCC command sequence
             self.frame4subframe1 = Tk.Frame(self.frame4)
             self.frame4subframe1.pack()
-            self.frame4subframe1label1 = Tk.Label(self.frame4subframe1, width=5, text= "ON")
+            self.frame4subframe1label1 = Tk.Label(self.frame4subframe1, width=14, text= " ON commands:")
             self.frame4subframe1label1.pack(side=Tk.LEFT, padx=2, pady=2)
             self.oncommands = common.row_of_validated_dcc_commands(self.frame4subframe1, columns=4, item_type="Switch")
             self.oncommands.pack(side=Tk.LEFT, padx=2, pady=2)                        
             # Create a subframe for the OFF labels and DCC command sequence
             self.frame4subframe2 = Tk.Frame(self.frame4)
             self.frame4subframe2.pack()
-            self.frame4subframe2label1 = Tk.Label(self.frame4subframe2, width=5, text= "OFF")
+            self.frame4subframe2label1 = Tk.Label(self.frame4subframe2, width=14, text= " OFF commands:")
             self.frame4subframe2label1.pack(side=Tk.LEFT, padx=2, pady=2)
             self.offcommands = common.row_of_validated_dcc_commands(self.frame4subframe2, columns=4, item_type="Switch")
             self.offcommands.pack(side=Tk.LEFT, padx=2, pady=2)

@@ -233,34 +233,34 @@ def update_tab1_signal_ui_elements(signal):
 
 def update_tab1_signal_subtype_selections(signal):
     if signal.config.sigtype.get_value() == signals.signal_type.colour_light.value:
-        signal.config.subtype.B1.configure(text="2 Asp G/R")
-        signal.config.subtype.B2.configure(text="2 Asp G/Y")
-        signal.config.subtype.B3.configure(text="2 Asp Y/R")
-        signal.config.subtype.B4.configure(text="3 Aspect")
-        signal.config.subtype.B5.configure(text="4 Aspect")
-        signal.config.subtype.B3.pack(side=Tk.LEFT)
-        signal.config.subtype.B4.pack(side=Tk.LEFT)
-        signal.config.subtype.B5.pack(side=Tk.LEFT)
+        signal.config.subtype.buttons[0].configure(text="2 Asp G/R")
+        signal.config.subtype.buttons[1].configure(text="2 Asp G/Y")
+        signal.config.subtype.buttons[2].configure(text="2 Asp Y/R")
+        signal.config.subtype.buttons[3].configure(text="3 Aspect")
+        signal.config.subtype.buttons[4].configure(text="4 Aspect")
+        signal.config.subtype.buttons[2].pack(side=Tk.LEFT)
+        signal.config.subtype.buttons[3].pack(side=Tk.LEFT)
+        signal.config.subtype.buttons[4].pack(side=Tk.LEFT)
     elif signal.config.sigtype.get_value() == signals.signal_type.semaphore.value:
-        signal.config.subtype.B1.configure(text="Home")
-        signal.config.subtype.B2.configure(text="Distant")
-        signal.config.subtype.B3.pack_forget()
-        signal.config.subtype.B4.pack_forget()
-        signal.config.subtype.B5.pack_forget()
+        signal.config.subtype.buttons[0].configure(text="Home")
+        signal.config.subtype.buttons[1].configure(text="Distant")
+        signal.config.subtype.buttons[2].pack_forget()
+        signal.config.subtype.buttons[3].pack_forget()
+        signal.config.subtype.buttons[4].pack_forget()
     elif signal.config.sigtype.get_value() == signals.signal_type.ground_position.value:
-        signal.config.subtype.B1.configure(text="Norm (post'96)")
-        signal.config.subtype.B2.configure(text="Shunt (post'96)")
-        signal.config.subtype.B3.configure(text="Norm (early)")
-        signal.config.subtype.B4.configure(text="Shunt (early)")
-        signal.config.subtype.B3.pack(side=Tk.LEFT)
-        signal.config.subtype.B4.pack(side=Tk.LEFT)
-        signal.config.subtype.B5.pack_forget()
+        signal.config.subtype.buttons[0].configure(text="Norm (post'96)")
+        signal.config.subtype.buttons[1].configure(text="Shunt (post'96)")
+        signal.config.subtype.buttons[2].configure(text="Norm (early)")
+        signal.config.subtype.buttons[3].configure(text="Shunt (early)")
+        signal.config.subtype.buttons[2].pack(side=Tk.LEFT)
+        signal.config.subtype.buttons[3].pack(side=Tk.LEFT)
+        signal.config.subtype.buttons[4].pack_forget()
     elif signal.config.sigtype.get_value() == signals.signal_type.ground_disc.value:
-        signal.config.subtype.B1.configure(text="Normal")
-        signal.config.subtype.B2.configure(text="Shunt Ahead")
-        signal.config.subtype.B3.pack_forget()
-        signal.config.subtype.B4.pack_forget()
-        signal.config.subtype.B5.pack_forget()
+        signal.config.subtype.buttons[0].configure(text="Normal")
+        signal.config.subtype.buttons[1].configure(text="Shunt Ahead")
+        signal.config.subtype.buttons[2].pack_forget()
+        signal.config.subtype.buttons[3].pack_forget()
+        signal.config.subtype.buttons[4].pack_forget()
     return()
 
 #------------------------------------------------------------------------------------
@@ -337,9 +337,9 @@ def update_tab1_route_selection_elements(signal):
             # 2 aspect distant signals do not support route indications so set the route indications
             # to 'None' and disable all associated route selections (these UI elements will be hidden)
             signal.config.routetype.set_value(1)
-            signal.config.routetype.B2.configure(state="disabled")
-            signal.config.routetype.B3.configure(state="disabled")
-            signal.config.routetype.B4.configure(state="disabled")
+            signal.config.routetype.buttons[1].configure(state="disabled")
+            signal.config.routetype.buttons[2].configure(state="disabled")
+            signal.config.routetype.buttons[3].configure(state="disabled")
             # Disable all route selections (main signal and subsidary)
             signal.config.feathers.disable_selection()
             signal.config.theatre.disable_selection()
@@ -349,9 +349,9 @@ def update_tab1_route_selection_elements(signal):
             # If 'Route Arms' are selected (semaphore only) then change to 'Feathers'
             if signal.config.routetype.get_value() == 4: signal.config.routetype.set_value(2)
             # Non-distant signals can support 'None', 'Feathers' or 'Theatre' route indications
-            signal.config.routetype.B2.configure(state="normal")
-            signal.config.routetype.B3.configure(state="normal")
-            signal.config.routetype.B4.configure(state="disabled")
+            signal.config.routetype.buttons[1].configure(state="normal")
+            signal.config.routetype.buttons[2].configure(state="normal")
+            signal.config.routetype.buttons[3].configure(state="disabled")
             # Enable/disable the appropriate UI elements based on the selected indication type
             if signal.config.routetype.get_value() == 1:
                 signal.config.feathers.disable_selection()
@@ -382,9 +382,9 @@ def update_tab1_route_selection_elements(signal):
             # Distant signals only support 'Route Arms' or 'None' so disable all other selections
             # If 'Theatre' is selected (not valid for a distant signal then change to 'Route arms'
             if signal.config.routetype.get_value() == 3: signal.config.routetype.set_value(4)
-            signal.config.routetype.B2.configure(state="disabled")
-            signal.config.routetype.B3.configure(state="disabled")
-            signal.config.routetype.B4.configure(state="normal")
+            signal.config.routetype.buttons[1].configure(state="disabled")
+            signal.config.routetype.buttons[2].configure(state="disabled")
+            signal.config.routetype.buttons[3].configure(state="normal")
             # Enable/disable the appropriate UI elements based on the selected indication type
             if signal.config.routetype.get_value() == 1:
                 signal.config.semaphores.disable_diverging_routes()
@@ -399,9 +399,9 @@ def update_tab1_route_selection_elements(signal):
             signal.config.sub_routes.disable_selection()
         else:
             # Home signals can support 'None', 'Route Arms', or 'Theatre'
-            signal.config.routetype.B2.configure(state="disabled")
-            signal.config.routetype.B3.configure(state="normal")
-            signal.config.routetype.B4.configure(state="normal")
+            signal.config.routetype.buttons[1].configure(state="disabled")
+            signal.config.routetype.buttons[2].configure(state="normal")
+            signal.config.routetype.buttons[3].configure(state="normal")
             # Home signals can support subsidaries and secondary distant arms
             signal.config.semaphores.enable_subsidaries()
             signal.config.semaphores.enable_distants()
@@ -431,9 +431,9 @@ def update_tab1_route_selection_elements(signal):
     elif signal.config.sigtype.get_value() == signals.signal_type.ground_disc.value:
         # No route indications supported for ground signals
         signal.config.routetype.set_value(1)
-        signal.config.routetype.B2.configure(state="disabled")
-        signal.config.routetype.B3.configure(state="disabled")
-        signal.config.routetype.B4.configure(state="disabled")
+        signal.config.routetype.buttons[1].configure(state="disabled")
+        signal.config.routetype.buttons[2].configure(state="disabled")
+        signal.config.routetype.buttons[3].configure(state="disabled")
         # Only the main signal arm is supported but this can support multiple routes
         signal.config.semaphores.enable_main_route()
         signal.config.sig_routes.enable_selection()
@@ -448,9 +448,9 @@ def update_tab1_route_selection_elements(signal):
     elif signal.config.sigtype.get_value() == signals.signal_type.ground_position.value:
         # No route indications supported for ground signals
         signal.config.routetype.set_value(1)
-        signal.config.routetype.B2.configure(state="disabled")
-        signal.config.routetype.B3.configure(state="disabled")
-        signal.config.routetype.B4.configure(state="disabled")
+        signal.config.routetype.buttons[1].configure(state="disabled")
+        signal.config.routetype.buttons[2].configure(state="disabled")
+        signal.config.routetype.buttons[3].configure(state="disabled")
         # A ground signal can also support multiple routes
         signal.config.sig_routes.enable_selection()
         # All other subsidary, secondary distant and route selections are sisabled

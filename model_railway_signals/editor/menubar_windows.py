@@ -518,9 +518,9 @@ class edit_logging_settings():
             edit_logging_settings_window = self.window
             # Create the logging Level selections element
             self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
-                                                b1="Error", b2="Warning", b3="Info", b4="Debug",
-                                                tool_tip="Set the logging level for running the layout")
-            self.log_level.frame.pack()
+                                        tool_tip="Set the logging level for running the layout",
+                                        button_labels=("Error", "Warning", "Info", "Debug") )
+            self.log_level.pack()
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)

@@ -19,7 +19,7 @@
 #    point_interlocking_entry() - combines int_item_id_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes ################ TO REVIEW #########
 #    signal_route_frame() - read only list of signal_route_selections()  ######################### TO REVIEW #########
-#    selection_buttons() - combines multiple RadioButtons  ####################################### TO REVIEW #########
+#    selection_buttons() - combines multiple RadioButtons
 #    row_of_widgets() - Pass in the base class to create a fixed length row of the base class
 #    row_of_validated_dcc_commands() - Similar to above but 'get_values' removes blanks 
 #    row_of_point_settings() - Similar to above but 'get_values' removes duplicates and blanks
@@ -1069,71 +1069,38 @@ class signal_route_frame():
             self.label.pack()
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for a LabelFrame containing up to 7 radio buttons
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
+# Compound UI Element for a LabelFrame containing one or more RadioButtons
+# Value to be set/returned is 0 to n (zero to support no radio button selected)
 #
-# Class instance elements to use externally are:
-#    "B1" to "B7" - to access the button widgets (i.e. for reconfiguration)
-#
-# Class instance functions to use externally are:
+# Main class methods used by the editor are:
 #    "set_value" - will set the current value (integer 1-5)
 #    "get_value" - will return the last "valid" value (integer 1-5)
 #    "enable" - enable all radio buttons
 #    "disable" - disable all radio buttons
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
+#
+# The individual buttons can be accessed via the button[x] class object.
 #------------------------------------------------------------------------------------
 
-class selection_buttons():
-    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, 
-                        b1=None, b2=None, b3=None, b4=None, b5=None, b6=None, b7=None):
-        # Create a labelframe to hold the buttons
-        self.frame = Tk.LabelFrame(parent_frame, text=label)
-        self.value = Tk.IntVar(self.frame, 0)
-        # This is the external callback to make when a selection is made
+class selection_buttons(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+        # Create the labelframe to hold the buttons
+        super().__init__(parent_frame, text=label)
+        self.value = Tk.IntVar(self, 0)
         self.callback = callback
-        # Create a subframe (so the buttons are centered)
-        self.subframe = Tk.Frame(self.frame)
+        # Create a subframe to center the buttons in the label frame
+        self.subframe=Tk.Frame(self)
         self.subframe.pack()
         # Only create as many buttons as we need
-        if b1 is not None:
-            self.B1 = Tk.Radiobutton(self.subframe, text=b1, anchor='w',
-                command=self.updated, variable=self.value, value=1)
-            self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B1TT = CreateToolTip(self.B1, tool_tip)
-        if b2 is not None:
-            self.B2 = Tk.Radiobutton(self.subframe, text=b2, anchor='w',
-                command=self.updated, variable=self.value, value=2)
-            self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B2TT = CreateToolTip(self.B2, tool_tip)
-        if b3 is not None:
-            self.B3 = Tk.Radiobutton(self.subframe, text=b3, anchor='w',
-                command=self.updated, variable=self.value, value=3)
-            self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B3TT = CreateToolTip(self.B3, tool_tip)
-        if b4 is not None:
-            self.B4 = Tk.Radiobutton(self.subframe, text=b4, anchor='w',
-                command=self.updated, variable=self.value, value=4)
-            self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B4TT = CreateToolTip(self.B4, tool_tip)
-        if b5 is not None:
-            self.B5 = Tk.Radiobutton(self.subframe, text=b5, anchor='w', 
-                command=self.updated, variable=self.value, value=5)
-            self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B5TT = CreateToolTip(self.B5, tool_tip)
-        if b6 is not None:
-            self.B6 = Tk.Radiobutton(self.subframe, text=b6, anchor='w',
-                command=self.updated, variable=self.value, value=6)
-            self.B6.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B6TT = CreateToolTip(self.B6, tool_tip)
-        if b7 is not None:
-            self.B7 = Tk.Radiobutton(self.subframe, text=b7, anchor='w',
-                command=self.updated, variable=self.value, value=7)
-            self.B7.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B7TT = CreateToolTip(self.B7, tool_tip)
-            
+        button_value = 1
+        self.buttons = []
+        for button_label in button_labels:
+            self.buttons.append( Tk.Radiobutton(self.subframe, text=button_label, anchor='w',
+                                command=self.updated, variable=self.value, value=button_value) )
+            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            CreateToolTip(self.buttons[-1], tool_tip)
+            button_value = button_value + 1
+
     def updated(self):
-        self.frame.focus()
         if self.callback is not None: self.callback()
 
     def set_value(self, value:int):
@@ -1143,22 +1110,12 @@ class selection_buttons():
         return(self.value.get())
 
     def enable(self):
-        self.B1.configure(state="normal")
-        self.B2.configure(state="normal")
-        self.B3.configure(state="normal")
-        self.B4.configure(state="normal")
-        self.B5.configure(state="normal")
-        self.B6.configure(state="normal")
-        self.B7.configure(state="normal")
+        for button in self.buttons:
+            button.configure(state="normal")
 
     def disable(self):
-        self.B1.configure(state="disabled")
-        self.B2.configure(state="disabled")
-        self.B3.configure(state="disabled")
-        self.B4.configure(state="disabled")
-        self.B5.configure(state="disabled")
-        self.B6.configure(state="disabled")
-        self.B7.configure(state="disabled")
+        for button in self.buttons:
+            button.configure(state="disabled")
 
 #------------------------------------------------------------------------------------
 # Base Class for a fixed length row_of_widgets of the specified base class.

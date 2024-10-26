@@ -976,23 +976,24 @@ class signal_configuration_tab:
         self.sigid = common.object_id_selection(self.frame1,"Signal ID",
                                 exists_function = signals.signal_exists)
         self.sigid.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
-        self.sigtype = common.selection_buttons(self.frame1,"Signal Type",
-                    "Select signal type",sig_type_updated,"Colour Light",
-                        "Ground Pos","Semaphore","Ground Disc")
-        self.sigtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.sigtype = common.selection_buttons(self.frame1, label="Signal Type",
+                    tool_tip="Select signal type",callback=sig_type_updated,
+                    button_labels=("Colour Light", "Ground Pos", "Semaphore", "Ground Disc") )
+        self.sigtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
         # Create the UI Element for Signal subtype selection (always packed)
-        self.subtype = common.selection_buttons(parent_tab,"Signal Subtype",
-                    "Select signal subtype",sub_type_updated,"-","-","-","-","-")
-        self.subtype.frame.pack(padx=2, pady=2, fill='x')
+        self.subtype = common.selection_buttons(parent_tab, label="Signal Subtype",
+                    tool_tip="Select signal subtype", callback=sub_type_updated,
+                    button_labels=("-----","-----","-----","-----","-----") )
+        self.subtype.pack(padx=2, pady=2, fill='x')
         # Create a Frame to hold the Gen settings and Route type Selections (always packed)
         self.frame2 = Tk.Frame(parent_tab)
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.settings = general_settings(self.frame2)
         self.settings.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
-        self.routetype = common.selection_buttons(self.frame2, "Route Indications",
-                    "Select the route indications for the main signal", route_type_updated,
-                    "None", "Route feathers", "Theatre indicator", "Route arms")
-        self.routetype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.routetype = common.selection_buttons(self.frame2, label="Route Indications",
+                    tool_tip="Select the route indications for the main signal", callback=route_type_updated,
+                    button_labels=("None", "Route feathers", "Theatre indicator", "Route arms") )
+        self.routetype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
         # Create the Checkboxes and DCC Entry Box frames for the type-specific selections
         # These frames are packed / hidden depending on the signal type and route 
         # indication type selections by the callback functions in "configure_signal.py"

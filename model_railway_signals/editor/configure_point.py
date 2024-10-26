@@ -275,9 +275,9 @@ class point_configuration_tab():
                                 exists_function = points.point_exists) 
         self.pointid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
-        self.pointtype = common.selection_buttons(self.frame, "Point Type",
-                    "Select Point Type", self.point_type_updated, "RH", "LH", "Y-Point")
-        self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+        self.pointtype = common.selection_buttons(self.frame, label="Point Type", tool_tip="Select Point Type",
+                                    callback=self.point_type_updated, button_labels=("RH", "LH", "Y-Point"))
+        self.pointtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create the Point colour selection element
         self.colour = common.colour_selection(self.frame, label="Colour")
         self.colour.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
@@ -285,9 +285,9 @@ class point_configuration_tab():
         subtype_tooltip= ("Select Point Subtype:\nNorm=Default Point\nTRP=Trap Point\n"+
                     "SS1=Single Slip - side 1\nSS2=Single Slip - side 2\nDS1=Double Slip - side 1\n"+
                     "DS2=Double slip - side 2\nSX=Scissors crossover (or 3-way Point) components")
-        self.pointsubtype = common.selection_buttons(parent_tab, "Point Subtype", subtype_tooltip,
-                                        None, "Norm", "TRP", "SS1", "SS2", "DS1", "DS2", "SX")
-        self.pointsubtype.frame.pack(padx=2, pady=2, fill='x')
+        self.pointsubtype = common.selection_buttons(parent_tab, label="Point Subtype", tool_tip=subtype_tooltip,
+                                    callback=None, button_labels=("Norm", "TRP", "SS1", "SS2", "DS1", "DS2", "SX"))
+        self.pointsubtype.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the point button offset settings
         self.buttonoffsets = button_offsets(parent_tab)
         self.buttonoffsets.frame.pack(padx=2, pady=2, fill='x')

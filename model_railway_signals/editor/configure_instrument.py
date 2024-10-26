@@ -230,9 +230,9 @@ class instrument_configuration_tab():
                         exists_function = block_instruments.instrument_exists) 
         self.instid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Inst Type selection
-        self.insttype = common.selection_buttons(self.frame, "Point type",
-                    "Select block Instrument Type", None, "Single line", "Double Line")
-        self.insttype.frame.pack(padx=2, pady=2, fill='x')
+        self.insttype = common.selection_buttons(self.frame, label= "Point type",
+                    tool_tip="Select block Instrument Type", button_labels=("Single line", "Double Line"))
+        self.insttype.pack(padx=2, pady=2, fill='x')
         self.linkedto = linked_to_selection(parent_tab)
         self.linkedto.frame.pack(padx=2, pady=2, fill='x')
         self.sounds = sound_file_selections(parent_tab)
