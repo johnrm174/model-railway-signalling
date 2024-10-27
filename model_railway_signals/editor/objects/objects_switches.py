@@ -51,8 +51,12 @@ default_switch_object["item"] = objects_common.object_type.switch
 default_switch_object["itemtype"] = buttons.button_type.switched.value
 default_switch_object["switchname"] = "DCC Switch"
 default_switch_object["switchdescription"] = "Switch description (Run Mode tooltip)"
-default_switch_object["buttonwidth"] = 10
+default_switch_object["buttonwidth"] = 12
 default_switch_object["buttoncolour"] = "SkyBlue2"
+default_switch_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
+default_switch_object["font"] = "TkFixedFont"
+default_switch_object["fontsize"] = 8
+default_switch_object["fontstyle"] = ""
 default_switch_object["hidden"] = False
 # Each DCC command sequence comprises a variable list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
@@ -98,12 +102,20 @@ def redraw_switch_object(object_id):
                                objects_common.schematic_objects[object_id]["dccoffcommands"])
     # Turn the button type value back into the required enumeration type
     button_type = buttons.button_type(objects_common.schematic_objects[object_id]["itemtype"])
+    # Create the Tkinter Font tuple
+    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
+                          objects_common.schematic_objects[object_id]["fontsize"],
+                          objects_common.schematic_objects[object_id]["fontstyle"])
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-    # Work out what the text colour should be - using the brightest of the three
-    text_colour = objects_common.get_text_colour(selected_colour)
+    # Work out what the text colour should be (auto uses middle of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    if  text_colour_type == 2 : text_colour = "Black"
+    elif text_colour_type == 3 : text_colour = "White"
+    else: text_colour = objects_common.get_text_colour(active_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -116,8 +128,11 @@ def redraw_switch_object(object_id):
                 label = objects_common.schematic_objects[object_id]["switchname"],
                 tooltip = objects_common.schematic_objects[object_id]["switchdescription"],
                 hidden = objects_common.schematic_objects[object_id]["hidden"],
-                button_colour = button_colour, active_colour = active_colour,
-                selected_colour = selected_colour, text_colour = text_colour)
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour,
+                font = tkinter_font_tuple)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)

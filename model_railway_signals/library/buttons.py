@@ -25,6 +25,7 @@
 #       active_colour:str - the colour to use for the button when 'active' (default='SeaGreen2')
 #       selected_colour:str - the colour to use for the button when 'selected' (default='SeaGreen1')
 #       text_colour:str - the colour to use for the button text (default='black')
+#       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "normal")
 #
 #   button_exists(button_id:int) - returns true if the Button object 'exists' on the schematic
 #
@@ -231,9 +232,10 @@ def button_state(button_id:int):
 # Public API function to create a Button object (drawing objects plus internal state)
 #---------------------------------------------------------------------------------------------
 
-def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, selected_callback, deselected_callback,
-                   width:int=10, label:str="Button", tooltip="Tooltip", hidden:bool=False, button_colour:str="SeaGreen3",
-                   active_colour:str="SeaGreen2", selected_colour:str="SeaGreen1", text_colour:str="black"):
+def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, selected_callback,
+                   deselected_callback, width:int=10, label:str="Button", tooltip="Tooltip", hidden:bool=False,
+                   button_colour:str="SeaGreen3", active_colour:str="SeaGreen2", selected_colour:str="SeaGreen1",
+                   text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "button"+str(button_id)
@@ -246,12 +248,10 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         logging.error("Button "+str(button_id)+": create_button - Invalid Button Type specified")
     else:
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
-        # Specify the fontsize locally
-        fontsize = 9
         # Create the Button and its canvas window (for Run Mode operation). Note the Window is created
         # as 'hidden' - assuming we are in edit mode - but changed later if we are in Run Mode
         button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, foreground="grey40",
-                        font=('Courier',fontsize,"normal"), bg=button_colour, activebackground=active_colour, padx=2, pady=2,
+                        font=font, bg=button_colour, activebackground=active_colour, padx=2, pady=2,
                         activeforeground=text_colour, fg=text_colour,  command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag, state="hidden")
         # Create and store a tool-tip for the button
@@ -261,8 +261,8 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
         # Note that the 'width' parameter is the maximum width in pixels before the text starts to wrap. To set the
         # minimum width we need to specify an initial 'text' value that contains the required number of characters.
-        placeholder1 = canvas.create_text(x, y, text=label.zfill(width), width=width*fontsize,                  
-                            font=('Courier',fontsize,"normal"), fill=text_colour, tags=canvas_tag)
+        # The font size is the  2nd parameter of the 'font' tuple
+        placeholder1 = canvas.create_text(x, y, text="".zfill(width), font=font, fill=text_colour, tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-4, bbox[2]+4, bbox[3]+2,
                                             tags=canvas_tag, fill=button_colour, width=1)
