@@ -19,7 +19,6 @@
 #    point_interlocking_entry() - combines int_item_id_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes ################ TO REVIEW #########
 #    signal_route_frame() - read only list of signal_route_selections()  ######################### TO REVIEW #########
-#    selection_buttons() - combines multiple RadioButtons
 #    row_of_widgets() - Pass in the base class to create a fixed length row of the base class
 #    row_of_validated_dcc_commands() - Similar to above but 'get_values' removes blanks 
 #    row_of_point_settings() - Similar to above but 'get_values' removes duplicates and blanks
@@ -28,8 +27,10 @@
 #    grid_of_point_settings() - similar to above but 'get_values' removes duplicates and blanks
 #
 # Provides the following "Stand Alone" UI Elements:
-#    object_id_selection(Tk.integer_entry_box)
-#    colour_selection() - Allows the colour of an item to be changed
+#    object_id_selection() - Object ID integer entry box in a LabelFrame
+#    selection_buttons() - combines multiple RadioButtons  in a LabelFrame
+#    selection_check_boxes() - combines multiple check_boxes in a LabelFrame
+#    colour_selection() - Colour plus colour chooser button in a LabelFrame
 #    window_controls() - Frame containing the 'apply/ok/reset/cancel' buttons
 #------------------------------------------------------------------------------------
 
@@ -1069,55 +1070,6 @@ class signal_route_frame():
             self.label.pack()
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for a LabelFrame containing one or more RadioButtons
-# Value to be set/returned is 0 to n (zero to support no radio button selected)
-#
-# Main class methods used by the editor are:
-#    "set_value" - will set the current value (integer 1-5)
-#    "get_value" - will return the last "valid" value (integer 1-5)
-#    "enable" - enable all radio buttons
-#    "disable" - disable all radio buttons
-#
-# The individual buttons can be accessed via the button[x] class object.
-#------------------------------------------------------------------------------------
-
-class selection_buttons(Tk.LabelFrame):
-    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
-        # Create the labelframe to hold the buttons
-        super().__init__(parent_frame, text=label)
-        self.value = Tk.IntVar(self, 0)
-        self.callback = callback
-        # Create a subframe to center the buttons in the label frame
-        self.subframe=Tk.Frame(self)
-        self.subframe.pack()
-        # Only create as many buttons as we need
-        button_value = 1
-        self.buttons = []
-        for button_label in button_labels:
-            self.buttons.append( Tk.Radiobutton(self.subframe, text=button_label, anchor='w',
-                                command=self.updated, variable=self.value, value=button_value) )
-            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
-            CreateToolTip(self.buttons[-1], tool_tip)
-            button_value = button_value + 1
-
-    def updated(self):
-        if self.callback is not None: self.callback()
-
-    def set_value(self, value:int):
-        self.value.set(value)
-        
-    def get_value(self):
-        return(self.value.get())
-
-    def enable(self):
-        for button in self.buttons:
-            button.configure(state="normal")
-
-    def disable(self):
-        for button in self.buttons:
-            button.configure(state="disabled")
-
-#------------------------------------------------------------------------------------
 # Base Class for a fixed length row_of_widgets of the specified base class.
 # All of the kwargs are passed through to the specified base class on creation.
 # If the list provided to 'set_values' contains less values than the number of widgets in the
@@ -1469,6 +1421,108 @@ class object_id_selection(integer_entry_box):
     
     def pack(self, **kwargs):
         self.labelframe.pack(**kwargs)
+
+#------------------------------------------------------------------------------------
+# Compound UI Element for a LabelFrame containing one or more RadioButtons
+# Value to be set/returned is 0 to n (zero to support no radio button selected)
+#
+# Main class methods used by the editor are:
+#    "set_value" - will set the current value (integer 1-5)
+#    "get_value" - will return the last "valid" value (integer 1-5)
+#    "enable" - enable all radio buttons
+#    "disable" - disable all radio buttons
+#
+# The individual buttons can be accessed via the button[x] class object.
+#------------------------------------------------------------------------------------
+
+class selection_buttons(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+        # Create the labelframe to hold the buttons
+        super().__init__(parent_frame, text=label)
+        self.value = Tk.IntVar(self, 0)
+        self.callback = callback
+        # Create a subframe to center the buttons in the label frame
+        self.subframe=Tk.Frame(self)
+        self.subframe.pack(fill="y")
+        # Only create as many buttons as we need
+        button_value = 1
+        self.buttons = []
+        for button_label in button_labels:
+            self.buttons.append( Tk.Radiobutton(self.subframe, text=button_label, anchor='w',
+                                command=self.updated, variable=self.value, value=button_value) )
+            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            CreateToolTip(self.buttons[-1], tool_tip)
+            button_value = button_value + 1
+
+    def updated(self):
+        if self.callback is not None: self.callback()
+
+    def set_value(self, value:int):
+        self.value.set(value)
+
+    def get_value(self):
+        return(self.value.get())
+
+    def enable(self):
+        for button in self.buttons:
+            button.configure(state="normal")
+
+    def disable(self):
+        for button in self.buttons:
+            button.configure(state="disabled")
+
+#------------------------------------------------------------------------------------
+# Compound UI Element for a LabelFrame containing one or more Checkboxes
+# Value to be set/returned is a list of checkbox values (True/False)
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the current value (integer 1-5)
+#    "get_values" - will return the last "valid" value (integer 1-5)
+#    "enable" - enable all radio buttons
+#    "disable" - disable all radio buttons
+#
+# The individual buttons can be accessed via the button[x] class object.
+#------------------------------------------------------------------------------------
+
+class selection_check_boxes(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+        # Create the labelframe to hold the buttons
+        super().__init__(parent_frame, text=label)
+        self.callback = callback
+        # Create a subframe to center the buttons in the label frame
+        self.subframe=Tk.Frame(self)
+        self.subframe.pack(fill="y")
+        # Only create as many buttons as we need
+        button_value = 1
+        self.buttons = []
+        for button_label in button_labels:
+            self.buttons.append( check_box(self.subframe, label=button_label, 
+                                 tool_tip=tool_tip, callback=self.updated) )
+            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            CreateToolTip(self.buttons[-1], tool_tip)
+            button_value = button_value + 1
+
+    def updated(self):
+        if self.callback is not None: self.callback()
+
+    def set_values(self, values:list[bool,]):
+        for index, value in enumerate(values):
+            if index < len(self.buttons):
+                self.buttons[index].set_value(value)
+
+    def get_values(self):
+        list_to_return=[]
+        for button in self.buttons:
+            list_to_return.append(button.get_value())
+        return(list_to_return)
+
+    def enable(self):
+        for button in self.buttons:
+            button.configure(state="normal")
+
+    def disable(self):
+        for button in self.buttons:
+            button.configure(state="disabled")
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a colour selection LabelFrame - uses the Tk.LabelFrame
