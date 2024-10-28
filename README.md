@@ -35,6 +35,7 @@ selections (Edit Mode), and scrolling of the displayed canvas area via the mouse
 * New DCC Accessory switches feature, enabling you to add and configure buttons on the schematic to 
 control other DCC-enabled accessories on your layout (e.g. If you are still analogue for control of trains,
 then you can use this feature with external DCC-relay modules for operating track isolating sections).
+* Bugfix to colour chooser - Previous colour will now be retained if cancelled (without errors)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

@@ -1560,7 +1560,8 @@ class colour_selection(Tk.LabelFrame):
     def colour_updated(self):
         self.colour_chooser_open = True
         colour_code = colorchooser.askcolor(self.colour, parent=self, title ="Select Colour")
-        self.colour = colour_code[1]
+        # If the colour chooser is cancelled it will return None - so we don't update
+        if colour_code[1] is not None: self.colour = colour_code[1]
         self.label1.config(bg=self.colour)
         self.colour_chooser_open = False
 
