@@ -73,7 +73,7 @@ class edit_switch():
             self.main_frame = Tk.Frame(self.window)
             self.main_frame.pack()
             #----------------------------------------------------------------------------------
-            # Create a Frame to hold the ID, button name and button colour elements (Frame 1)
+            # Create a Frame to hold the ID, button name and button width elements (Frame 1)
             #----------------------------------------------------------------------------------
             self.frame1 = Tk.Frame(self.main_frame)
             self.frame1.pack(fill='x')
@@ -82,11 +82,12 @@ class edit_switch():
                                     exists_function = buttons.button_exists) 
             self.buttonid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
              # Create the button label elements in a second label frame
-            self.frame1subframe1 = Tk.LabelFrame(self.frame1, text="Button label")
+            self.frame1subframe1 = Tk.LabelFrame(self.frame1, text="DCC switch name")
             self.frame1subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
             self.frame1subframe2 = Tk.Frame(self.frame1subframe1)
             self.frame1subframe2.pack(fill="both", expand=True)
-            self.buttonname = common.entry_box(self.frame1subframe2, width=25, tool_tip="Specify the label for the button")
+            self.buttonname = common.entry_box(self.frame1subframe2, width=25,
+                          tool_tip="Specify the button label for the DCC switch")
             self.buttonname.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the button width entry in the third label frame
             self.frame1subframe3 = Tk.LabelFrame(self.frame1, text="Button width")
@@ -108,14 +109,14 @@ class edit_switch():
                     min_height=2, min_width=28, editable=True, auto_resize=False)
             self.description.pack(padx=2, pady=2, fill='both', expand=True)
             #----------------------------------------------------------------------------------
-            # Create a Frame for the button colour and label elements (Frame 3)
+            # Create a Frame for the button colour and text colour elements (Frame 3)
             #----------------------------------------------------------------------------------
             self.frame3 = Tk.Frame(self.main_frame)
             self.frame3.pack(fill='x')
             self.buttoncolour = common.colour_selection(self.frame3, label="Button colour")
             self.buttoncolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
             self.textcolourtype = common.selection_buttons(self.frame3, label="Button label text colour",
-                            tool_tip="Select the text colour (auto to select best contrast with background",
+                            tool_tip="Select the text colour (auto to select best contrast with background)",
                             button_labels=("Auto", "Black", "White"))
             self.textcolourtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
             #----------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ class edit_switch():
             self.frame4label1 = Tk.Label(self.frame4subframe2, text="Pixels:")
             self.frame4label1.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
             self.fontsize = common.integer_entry_box(self.frame4subframe2, width=3, min_value=8, max_value=20,
-                                            tool_tip="Select font size (between 8 and 20)", allow_empty=False)
+                   tool_tip="Select the font size (between 8 and 20 pixels)", allow_empty=False)
             self.fontsize.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
             # The final subframe is for the text style selection
             self.fontstyle = common.selection_check_boxes(self.frame4, label="Button font style",
@@ -206,12 +207,12 @@ class edit_switch():
             self.buttonname.set_value(objects.schematic_objects[self.object_id]["switchname"])
             self.description.set_value(objects.schematic_objects[self.object_id]["switchdescription"])
             self.switchtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
-            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
-            self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.buttonhidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.oncommands.set_values(objects.schematic_objects[self.object_id]["dcconcommands"], item_id=item_id)
             self.offcommands.set_values(objects.schematic_objects[self.object_id]["dccoffcommands"], item_id=item_id)
-            # Set the font size, font style and text colour selection elements
+            # Set the button appearance elements
+            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
+            self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             font_style = objects.schematic_objects[self.object_id]["fontstyle"]
             self.fontstyle.set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
             self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
@@ -238,12 +239,12 @@ class edit_switch():
             new_object_configuration["switchname"] = self.buttonname.get_value()
             new_object_configuration["switchdescription"] = self.description.get_value()
             new_object_configuration["itemtype"] = self.switchtype.get_value()
-            new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
-            new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
             new_object_configuration["hidden"] = self.buttonhidden.get_value()
             new_object_configuration["dcconcommands"] = self.oncommands.get_values()
             new_object_configuration["dccoffcommands"] = self.offcommands.get_values()
-            # Get the font size, font style and text colour selection elements
+            # Get the button appearance elements
+            new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
+            new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
             font_style = ""
             font_style_selections = self.fontstyle.get_values()
             if font_style_selections[0]: font_style=font_style + "bold "
