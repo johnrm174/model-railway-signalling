@@ -20,6 +20,8 @@
 #    route(item_id:int) - helper function to find the object Id by Item ID
 #    switch(item_id:int) - helper function to find the object Id by Item ID
 #
+#    switch_exists(item_id:int) - helper function to see if a Switch of a given ID exists
+#
 # Objects intended to be accessed directly by other editor modules:
 #
 #    root - global reference to the Tkinter root object
@@ -90,6 +92,15 @@ def line(ID:int): return (line_index[str(ID)])
 def track_sensor(ID:int): return (track_sensor_index[str(ID)])
 def route(ID:int): return (route_index[str(ID)])
 def switch(ID:int): return (switch_index[str(ID)])
+
+#------------------------------------------------------------------------------------
+# Externally used functions to see if a DCC Switch exists. We need to have a specific
+# Function here rather than use the Library function 'button_exists' as both Routes
+# and DCC Switches use the common button library objects
+#------------------------------------------------------------------------------------
+
+def switch_exists(ID:int):
+    return (str(ID) in switch_index.keys())
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)

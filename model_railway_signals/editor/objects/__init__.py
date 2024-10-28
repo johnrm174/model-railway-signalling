@@ -15,6 +15,8 @@
 #    route(item_id:int) - helper function to find the object Id by Item ID
 #    switch(item_id:int) - helper function to find the object Id by Item ID
 #
+#    switch_exists(item_id:int) - helper function to find if a DCC Switch Exists
+#
 #    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
@@ -76,6 +78,8 @@ from .objects_common import track_sensor
 from .objects_common import route
 from .objects_common import switch
 
+from .objects_common import switch_exists
+
 from .objects_common import object_type
 from .objects_common import schematic_objects 
 from .objects_common import signal_index 
@@ -121,6 +125,8 @@ __all__ = [
     'track_sensor',
     'route',
     'switch',
+    # Helper functions to See if a DCC switch of a given ID exists
+    'switch_exists',
     # Main schematic object dict and the type-specific indexes
     'schematic_objects',
     'signal_index',
