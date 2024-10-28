@@ -15,6 +15,8 @@
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
+#    objects_routes.update_references_to_switch - called when the Switch ID is changed
+#    objects_routes.remove_references_to_switch - called when the Switch is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -41,6 +43,7 @@ import copy
 from ...library import buttons
 from ...library import dcc_control
 from . import objects_common
+from . import objects_routes
 
 #------------------------------------------------------------------------------------
 # Default Switch Object (i.e. state at creation)
@@ -80,6 +83,8 @@ def update_switch(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.switch_index[str(old_item_id)]
         objects_common.switch_index[str(new_item_id)] = object_id
+        # Update any references to the switch in the route tables
+        objects_routes.update_references_to_switch(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -110,12 +115,12 @@ def redraw_switch_object(object_id):
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-    # Work out what the text colour should be (auto uses middle of the three for max contrast)
+    # Work out what the text colour should be (auto uses the lightest of the three for max contrast)
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
     if  text_colour_type == 2 : text_colour = "Black"
     elif text_colour_type == 3 : text_colour = "White"
-    else: text_colour = objects_common.get_text_colour(active_colour)
+    else: text_colour = objects_common.get_text_colour(selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -206,6 +211,8 @@ def delete_switch_object(object_id):
 def delete_switch(object_id):
     # Soft delete the associated library objects from the canvas
     delete_switch_object(object_id)
+    # Remove any references to the switch from the route tables
+    objects_routes.remove_references_to_switch(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and
     # deleting the object from the dictionary of schematic objects
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

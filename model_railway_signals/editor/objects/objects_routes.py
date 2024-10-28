@@ -19,6 +19,8 @@
 #    update_references_to_point(old_id, new_id) - update point_id references in the route's configuration
 #    remove_references_to_line(line_id) - remove line_id references from the route's configuration
 #    update_references_to_line(old_id, new_id) - update line_id references in the route's configuration
+#    remove_references_to_switch(switch_id) - remove switch_id references from the route's configuration
+#    update_references_to_switch(old_id, new_id) - update switch_id references in the route's configuration
 #
 # Makes the following external API calls to other editor modules:
 #    run_routes.set_schematic_route_callback - setting the object callbacks when created/recreated
@@ -59,16 +61,21 @@ from . import objects_common
 
 default_route_object = copy.deepcopy(objects_common.default_object)
 default_route_object["item"] = objects_common.object_type.route
-default_route_object["routename"] = "Route Name"
+default_route_object["routename"] = "Route"
 default_route_object["routedescription"] = "Route description (Run Mode tooltip)"
 default_route_object["buttonwidth"] = 15
+default_route_object["buttoncolour"] = "SeaGreen3"
+default_route_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
+default_route_object["font"] = "TkFixedFont"
+default_route_object["fontsize"] = 8
+default_route_object["fontstyle"] = ""
 default_route_object["signalsonroute"] = []
 default_route_object["subsidariesonroute"] = []
 default_route_object["pointsonroute"] = {}
+default_route_object["switchesonroute"] = {}
 default_route_object["linestohighlight"] = []
 default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
-default_route_object["buttoncolour"] = "SeaGreen3"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
 default_route_object["tracksensor"] = 0
@@ -216,6 +223,34 @@ def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to remove references to a Line ID from the Route's configuration
+# The 'linestohighlight' table comprises a list of line IDs for the route.
+#------------------------------------------------------------------------------------
+
+def remove_references_to_switch(switch_id:int):
+    for route_id in objects_common.route_index:
+        current_switches_table = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"]
+        new_switches_table = []
+        for item_id in current_switches_table:
+            if item_id != switch_id:
+                new_switches_table.append(item_id)
+        objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"] = new_switches_table
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Line ID in the Route's configuration.
+# The 'linestohighlight' table comprises a list of line IDs for the route.
+#------------------------------------------------------------------------------------
+
+def update_references_to_switch(old_switch_id:int, new_switch_id:int):
+    for route_id in objects_common.route_index:
+        current_switches_table = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"]
+        for index, item_id in enumerate(current_switches_table):
+            if item_id == old_switch_id:
+                objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][index] = new_switch_id
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to to update a Route object following a configuration change
 #------------------------------------------------------------------------------------
 
@@ -240,12 +275,20 @@ def update_route(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
         
 def redraw_route_object(object_id):
+    # Create the Tkinter Font tuple
+    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
+                          objects_common.schematic_objects[object_id]["fontsize"],
+                          objects_common.schematic_objects[object_id]["fontstyle"])
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-    # Work out what the text colour should be - using the brightest of the three
-    text_colour = objects_common.get_text_colour(selected_colour)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    if  text_colour_type == 2 : text_colour = "Black"
+    elif text_colour_type == 3 : text_colour = "White"
+    else: text_colour = objects_common.get_text_colour(selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -257,8 +300,12 @@ def redraw_route_object(object_id):
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
                 tooltip = objects_common.schematic_objects[object_id]["routedescription"],
-                button_colour = button_colour, active_colour = active_colour,
-                selected_colour = selected_colour, text_colour = text_colour)
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour,
+                font = tkinter_font_tuple)
+
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
