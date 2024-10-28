@@ -234,9 +234,9 @@ class edit_route():
             # Reset DCC Switches on Route Deselection            
             self.frame11bsubframe5 = Tk.Frame(self.frame11b)
             self.frame11bsubframe5.pack()
-            self.resetpoints = common.check_box(self.frame11bsubframe5, label="Reset Switches on deselection",
+            self.resetswitches = common.check_box(self.frame11bsubframe5, label="Reset Switches on deselection",
                     tool_tip="Select to reset all DCC Switches back to 'OFF' when route is deselected")
-            self.resetpoints.pack(padx=2, side=Tk.LEFT)
+            self.resetswitches.pack(padx=2, side=Tk.LEFT)
             #------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             #------------------------------------------------------------------
@@ -274,6 +274,7 @@ class edit_route():
             self.sensor1.set_value(objects.schematic_objects[self.object_id]["setupsensor"])
             self.sensor2.set_value(objects.schematic_objects[self.object_id]["tracksensor"])
             self.resetpoints.set_value(objects.schematic_objects[self.object_id]["resetpoints"])
+            self.resetswitches.set_value(objects.schematic_objects[self.object_id]["resetswitches"])
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element needs a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before loading the UI element
@@ -320,6 +321,7 @@ class edit_route():
             new_object_configuration["setupsensor"] = self.sensor1.get_value()
             new_object_configuration["tracksensor"] = self.sensor2.get_value()
             new_object_configuration["resetpoints"] = self.resetpoints.get_value()
+            new_object_configuration["resetswitches"] = self.resetswitches.get_value()
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element returns a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before saving in the configuration.

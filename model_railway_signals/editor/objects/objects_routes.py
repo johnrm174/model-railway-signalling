@@ -78,6 +78,7 @@ default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
+default_route_object["resetswitches"] = False
 default_route_object["tracksensor"] = 0
 default_route_object["setupsensor"] = 0
 
