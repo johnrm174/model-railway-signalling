@@ -608,12 +608,11 @@ def create_signal(xpos:int, ypos:int, item_type, item_subtype):
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=signals.signal_exists)
     # Add the specific elements for this particular instance of the object
-    # Note we offset the position slightly so we're not over the "sig passed" button
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
     objects_common.schematic_objects[object_id]["itemsubtype"] = item_subtype
     objects_common.schematic_objects[object_id]["posx"] = xpos
-    objects_common.schematic_objects[object_id]["posy"] = ypos + 10
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the index of signals
     objects_common.signal_index[str(item_id)] = object_id
     # Draw the object on the canvas

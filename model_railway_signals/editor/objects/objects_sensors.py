@@ -229,10 +229,9 @@ def create_track_sensor(xpos:int, ypos:int):
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     # Add the specific elements for this particular instance of the object
-    # Note we offset the position slightly so we're not over the "sensor passed" button
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = xpos
-    objects_common.schematic_objects[object_id]["posy"] = ypos + 10
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
     objects_common.track_sensor_index[str(item_id)] = object_id
     # Create the associated library objects

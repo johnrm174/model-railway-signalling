@@ -31,8 +31,7 @@
 #    delete_objects([object_IDs]) - Delete the selected objects from the canvas
 #    rotate_objects([object_IDs]) - Rotate the selected objects on the canvas
 #    move_objects([object_IDs]) - Finalises the move of selected objects
-#    copy_objects([object_IDs]) - Copy the selected objects to the clipboard
-#    paste_objects() - Paste Clipboard objects onto the canvas (returns list of new IDs)
+#    copy_objects([object_IDs]) - Copy the selected objects (returns list of new IDs)
 #    update_object(object_ID, new_object) - update the config of an existing object
 #    undo() / redo() - Undo and re-do functions as you would expect
 #
@@ -62,7 +61,6 @@ from .objects import delete_objects
 from .objects import rotate_objects
 from .objects import move_objects
 from .objects import copy_objects
-from .objects import paste_objects
 from .objects import update_object
 from .objects import save_schematic_state
 from .objects import reset_objects
@@ -113,7 +111,6 @@ __all__ = [
     'rotate_objects',
     'move_objects',
     'copy_objects',
-    'paste_objects',
     'update_object',
     'reset_objects',
     # Helper functions to get the obj ID of an item ID

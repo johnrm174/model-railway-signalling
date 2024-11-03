@@ -18,8 +18,7 @@
 #    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
 #    move_objects(list of obj IDs) - Finalises the move of selected objects
-#    copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
-#    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
+#    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    reset_objects() - resets all points, signals, instruments and sections to default state
 #
@@ -306,9 +305,9 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
         object_id = objects_switches.create_switch(xpos, ypos)
     else:
         object_id = None
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are creating 'new' objects we don't need to process layout changes
+    # Note that we do not save the schematic state after the 'create' as, although the item now
+    # exists, it has yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
+    # Also - as we are just creating a 'new' object, we don't need to process layout changes
     return(object_id)
 
 #------------------------------------------------------------------------------------
@@ -425,8 +424,8 @@ def rotate_objects(list_of_object_ids):
 # passed to signify which end of the line needs to be updated
 #------------------------------------------------------------------------------------
 
-def move_objects(list_of_object_ids, xdiff1:int=None,
-            ydiff1:int=None, xdiff2:int=None, ydiff2:int=None):
+def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
+                 xdiff2:int=None, ydiff2:int=None, update_schematic_state:bool=True):
     # Only bother processing the update if there has been a change
     if ( (xdiff1 is not None and xdiff1 !=0) or (ydiff1 is not None and ydiff1 !=0) or
          (xdiff2 is not None and xdiff2 !=0) or (ydiff2 is not None and ydiff2 !=0) ): 
@@ -449,25 +448,54 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                 objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
         bring_track_sections_to_the_front()
-        # save the current state (for undo/redo)
-        save_schematic_state()
+        # Save the current state (for undo/redo) - This is True for all objeect moves apart
+        # from the interim moves when 'placing' objects after creation and/or copying
+        if update_schematic_state: save_schematic_state()
     # As we are just moving objects we don't need to process layout changes
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Copy one or more objects on the schematic to the clipboard
-# Called from the Schematic Module when selected objects are copied
+# Function to Copy one or more objects on the schematic and create new versions at
+# slightly offset positions that will then track the cursor until 'placed'
+# Called from the Schematic Module when selected objects are copied.
 #------------------------------------------------------------------------------------
 
-clipboard=[]
-
-def copy_objects(list_of_object_ids):
-    global clipboard
-    clipboard=[]
+def copy_objects(list_of_object_ids, deltax:int, deltay:int):
+    # New objects are "pasted" at a slightly offset position on the canvas so
+    # its clear that new objects have been created (to move/place on the canvas)
+    # We need to return a list of new object IDs
+    list_of_new_object_ids = []
+    # Create a copy of each object in the clipboard (depending on type)
     for object_id in list_of_object_ids:
-        # Take a deep copy of the object and add to the clipboard
-        clipboard.append(copy.deepcopy(objects_common.schematic_objects[object_id]))
-    return()
+        object_to_copy = objects_common.schematic_objects[object_id]
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
+        if type_of_object == objects_common.object_type.line:
+            new_object_id = objects_lines.paste_line(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.textbox:
+            new_object_id = objects_textboxes.paste_textbox(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.signal:
+            new_object_id = objects_signals.paste_signal(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.point:
+            new_object_id = objects_points.paste_point(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.section:
+            new_object_id = objects_sections.paste_section(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.instrument:
+            new_object_id = objects_instruments.paste_instrument(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.track_sensor:
+            new_object_id = objects_sensors.paste_track_sensor(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.route:
+            new_object_id = objects_routes.paste_route(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.switch:
+            new_object_id = objects_switches.paste_switch(object_to_copy, deltax, deltay)
+        # Add the new object to the list of clipboard objects
+        # in case the user wants to paste the same objects again
+        list_of_new_object_ids.append(new_object_id)
+    # Ensure all track sections are in front of any lines
+    bring_track_sections_to_the_front()
+    # Note that we do not save the schematic state after the 'copy' as, although the copied items now
+    # exist, they have yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
+    # Also - as we are just copying 'new' objects we don't need to process layout changes
+    return(list_of_new_object_ids)
 
 #------------------------------------------------------------------------------------
 # Function to paste copies of the current clipboard objects to the canvas

@@ -18,6 +18,7 @@
 #    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
 #    objects.undo() / objects.redo() - Undo and re-do functions as you would expect
+#    objects.save_schematic_state() - Take a snapshot of the current objects (for undo/redo)
 #    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
 #    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
 #    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
@@ -192,12 +193,10 @@ def cancel_place_object_in_progress(event=None):
 # Also the callback to cancel the copy if the escape key is pressed before 'place'
 #------------------------------------------------------------------------------------
 
-def copy_selected_objects(event=None):
-    # Copy the objects and paste the copies
-    objects.copy_objects(schematic_state["selectedobjects"])
-    list_of_new_object_ids = objects.paste_objects()
-    objects.copy_objects(list_of_new_object_ids)
-    # Select the pasted (new) objects
+def copy_selected_objects(event):
+    # Copy the objects and get a list of the new object IDs
+    list_of_new_object_ids = objects.copy_objects(schematic_state["selectedobjects"], deltax=25, deltay=25)
+    # Deselect the objects that were copied and select the 'new' objects
     deselect_all_objects()
     for object_id in list_of_new_object_ids:
         select_object(object_id)
@@ -337,7 +336,9 @@ def close_edit_window (ok:bool=False, cancel:bool=False, apply:bool=False, reset
 #------------------------------------------------------------------------------------
 # Internal function to snap all selected objects to the grid ('s' keypress). We do
 # this an object at a time as each object may require different offsets to be applied.
-# Note that for lines, we need to snap each end to the grid seperately because the
+# Note that we inhibit the saving of schematic state (for undo/redo) after each individual
+# move - we only save the schematic state when all items have been snapped to the grid.
+# Note also that for lines, we need to snap each end to the grid seperately because the
 # line ends may have been previously edited with snap-to-grid disabled. If we just
 # snap the line to the grid, line end 2 may still be off the grid.
 #------------------------------------------------------------------------------------
@@ -352,13 +353,16 @@ def snap_selected_objects_to_grid(event=None):
             posy = objects.schematic_objects[object_id]["endy"]
             xdiff2,ydiff2 = snap_to_grid(posx,posy, force_snap=True)
             lines.move_line_end_1(objects.schematic_objects[object_id]["itemid"],xdiff1,ydiff1)
-            objects.move_objects([object_id],xdiff1=xdiff1,ydiff1=ydiff1)
+            objects.move_objects([object_id],xdiff1=xdiff1,ydiff1=ydiff1,update_schematic_state=False)
             lines.move_line_end_2(objects.schematic_objects[object_id]["itemid"],xdiff2,ydiff2)
-            objects.move_objects([object_id],xdiff2=xdiff2,ydiff2=ydiff2)
+            objects.move_objects([object_id],xdiff2=xdiff2,ydiff2=ydiff2,update_schematic_state=False)
         else:
             canvas.move(objects.schematic_objects[object_id]["tags"],xdiff1,ydiff1)
             canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff1,ydiff1)
-            objects.move_objects([object_id],xdiff1=xdiff1, ydiff1=ydiff1, xdiff2=xdiff1, ydiff2=ydiff1)
+            objects.move_objects([object_id],xdiff1=xdiff1, ydiff1=ydiff1,
+                xdiff2=xdiff1, ydiff2=ydiff1, update_schematic_state=False)
+    # Save a snapshot of the current schematic state when finished
+    objects.save_schematic_state()
     return()
 
 #------------------------------------------------------------------------------------
@@ -541,14 +545,22 @@ def left_button_click(event):
     # The function to perform will depend on the Editor Mode
     if edit_mode_active:
         if schematic_state["placeobjects"] or schematic_state["copyobjects"]:
-            # Calculate the total deltas for the move (from the start position)
-            # and finalise the move by updating the current object position
-            finalx = canvas_x - schematic_state["startx"]
-            finaly = canvas_y - schematic_state["starty"]
-            objects.move_objects(schematic_state["selectedobjects"],
-                    xdiff1=finalx, ydiff1=finaly, xdiff2=finalx, ydiff2=finaly)
-            # Now Snap the object to the grid
-            snap_selected_objects_to_grid()
+            # Calculate the total deltas for the move (from the start position) and finalise
+            # the move by updating the schematic object(s) position. Note that the object creation
+            # position may have been offset from the cursor position (for signal creation and
+            # copy operations), so we need to 'snap to grid' after finalising the move
+            xdiff = canvas_x - schematic_state["startx"]
+            ydiff = canvas_y - schematic_state["starty"]
+            objects.move_objects(schematic_state["selectedobjects"], xdiff1=xdiff, ydiff1=ydiff,
+                                     xdiff2=xdiff, ydiff2=ydiff, update_schematic_state=False)
+            # Now snap to grid (using the first selected object) moving the object(s) if required
+            posx = objects.schematic_objects[schematic_state["selectedobjects"][0]]["posx"]
+            posy = objects.schematic_objects[schematic_state["selectedobjects"][0]]["posy"]
+            xdiff, ydiff = snap_to_grid(posx, posy)
+            move_selected_objects(xdiff, ydiff)
+            # Now finalise the move (to take account of the snap to grid)
+            objects.move_objects(schematic_state["selectedobjects"], xdiff1=xdiff,
+                                       ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff)
             # Finally, reset the "Place Object" Mode and revert the cursor to normal
             schematic_state["placeobjects"] = False
             schematic_state["copyobjects"] = False
@@ -656,7 +668,13 @@ def track_cursor(event):
     # 'Create Object' Mode then we can 'create' the object at the current cursor
     # position and change into 'Place Object' Mode (where we move it into position)
     if schematic_state["createobject"] is not None:
-        create_object_on_canvas(canvas_x, canvas_y)
+        # Note that signals and track sensors are created with an  offset so the
+        # cursor isn't directly over the 'passed' button object for 'placing'
+        if ( schematic_state["createobject"][0] == objects.object_type.signal or
+             schematic_state["createobject"][0] == objects.object_type.track_sensor ):
+            create_object_on_canvas(canvas_x, canvas_y + 15)
+        else:
+            create_object_on_canvas(canvas_x, canvas_y)
         schematic_state["createobject"] = None
         schematic_state["placeobjects"] = True
         schematic_state["startx"] = canvas_x
