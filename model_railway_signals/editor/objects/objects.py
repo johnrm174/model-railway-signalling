@@ -448,9 +448,9 @@ def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
                 objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
         bring_track_sections_to_the_front()
-        # Save the current state (for undo/redo) - This is True for all objeect moves apart
-        # from the interim moves when 'placing' objects after creation and/or copying
-        if update_schematic_state: save_schematic_state()
+    # Save the current state (for undo/redo) - This is True for all object moves apart
+    # from the interim moves when 'placing' objects after creation and/or copying
+    if update_schematic_state: save_schematic_state()
     # As we are just moving objects we don't need to process layout changes
     return()
 
