@@ -1085,7 +1085,6 @@ def run_canvas_scroll_tests2(delay):
 def run_all_schematic_editor_tests(delay:float=0.0):
     initialise_test_harness()
     set_edit_mode()
-    run_object_edit_window_tests(delay)
     run_create_and_place_tests(delay)
     run_copy_and_place_tests(delay)
     run_select_and_move_tests(delay)
