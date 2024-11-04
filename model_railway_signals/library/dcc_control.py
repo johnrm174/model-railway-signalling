@@ -370,8 +370,7 @@ def map_dcc_signal(sig_id:int,
         # Validate all DCC commands for the Colour Light Signal DCC Mapping
         commands_valid = dcc_commands_valid ("map_dcc_signal", "Signal", sig_id, list_of_commands)
         # Validate all DCC addresses for the Colour Light Signal (this is the Subsidary DCC address)
-        list_of_addresses = [subsidary]
-        addresses_valid = dcc_addresses_valid("map_dcc_signal", "Signal", sig_id, list_of_addresses)
+        addresses_valid = dcc_address_valid("map_dcc_signal", "Signal", sig_id, subsidary)
         # If all DCC commands and addresses are valid then we can create the DCC Mapping
         if commands_valid and addresses_valid:
             logging.debug ("DCC Control - Creating DCC Address mapping for Colour Light Signal "+str(sig_id))
@@ -397,6 +396,7 @@ def map_dcc_signal(sig_id:int,
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
             # Update the DCC mappings dictionary with all addresses used by the signal
             add_dcc_commands_to_dcc_address_mappings("Signal", sig_id, list_of_commands)
+            add_dcc_address_to_dcc_address_mappings("Signal", sig_id, subsidary)
     return()
 
 #----------------------------------------------------------------------------------------------------
