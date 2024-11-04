@@ -194,27 +194,29 @@ def cancel_place_object_in_progress(event=None):
 #------------------------------------------------------------------------------------
 
 def copy_selected_objects(event):
-    # Copy the objects and get a list of the new object IDs
-    list_of_new_object_ids = objects.copy_objects(schematic_state["selectedobjects"], deltax=25, deltay=25)
-    # Deselect the objects that were copied and select the 'new' objects
-    deselect_all_objects()
-    for object_id in list_of_new_object_ids:
-        select_object(object_id)
-    # Get the canvas coordinates (to take into account any scroll bar offsets)
-    # Put the editor into place object mode and reset the cursor position
-    canvas_x, canvas_y = canvas_coordinates(event)
-    schematic_state["copyobjects"] = True
-    schematic_state["startx"] = canvas_x
-    schematic_state["starty"] = canvas_y
-    schematic_state["lastx"] = canvas_x
-    schematic_state["lasty"] = canvas_y
-    # Change the cursor to indicate we are in "Place Object" Mode
-    root.config(cursor="crosshair")
-    # Set keyboard focus for the canvas (so that any key bindings will work)
-    # and unbind keypresses (apart from 'esc') until the object is 'placed'
-    canvas.focus_set()
-    disable_all_keypress_events_during_move()
-    canvas.bind('<Escape>',cancel_copy_object_in_progress)
+    # Only go into 'copyobjects' mode if one or more objects are selected
+    if len(schematic_state["selectedobjects"]) > 0:
+        # Copy the objects and get a list of the new object IDs
+        list_of_new_object_ids = objects.copy_objects(schematic_state["selectedobjects"], deltax=25, deltay=25)
+        # Deselect the objects that were copied and select the 'new' objects
+        deselect_all_objects()
+        for object_id in list_of_new_object_ids:
+            select_object(object_id)
+        # Get the canvas coordinates (to take into account any scroll bar offsets)
+        # Put the editor into place object mode and reset the cursor position
+        canvas_x, canvas_y = canvas_coordinates(event)
+        schematic_state["copyobjects"] = True
+        schematic_state["startx"] = canvas_x
+        schematic_state["starty"] = canvas_y
+        schematic_state["lastx"] = canvas_x
+        schematic_state["lasty"] = canvas_y
+        # Change the cursor to indicate we are in "Place Object" Mode
+        root.config(cursor="crosshair")
+        # Set keyboard focus for the canvas (so that any key bindings will work)
+        # and unbind keypresses (apart from 'esc') until the object is 'placed'
+        canvas.focus_set()
+        disable_all_keypress_events_during_move()
+        canvas.bind('<Escape>',cancel_copy_object_in_progress)
     return()
 
 def cancel_copy_object_in_progress(event=None):
@@ -553,14 +555,16 @@ def left_button_click(event):
             ydiff = canvas_y - schematic_state["starty"]
             objects.move_objects(schematic_state["selectedobjects"], xdiff1=xdiff, ydiff1=ydiff,
                                      xdiff2=xdiff, ydiff2=ydiff, update_schematic_state=False)
-            # Now snap to grid (using the first selected object) moving the object(s) if required
+            # Snap to grid (using the first selected object) moving the object(s) if required
             posx = objects.schematic_objects[schematic_state["selectedobjects"][0]]["posx"]
             posy = objects.schematic_objects[schematic_state["selectedobjects"][0]]["posy"]
             xdiff, ydiff = snap_to_grid(posx, posy)
             move_selected_objects(xdiff, ydiff)
             # Now finalise the move (to take account of the snap to grid)
-            objects.move_objects(schematic_state["selectedobjects"], xdiff1=xdiff,
-                                       ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff)
+            objects.move_objects(schematic_state["selectedobjects"], xdiff1=xdiff,  ydiff1=ydiff,
+                                     xdiff2=xdiff, ydiff2=ydiff, update_schematic_state=False)
+            # Save the schematic state (for undo/redo) now we have placed everything
+            objects.save_schematic_state()
             # Finally, reset the "Place Object" Mode and revert the cursor to normal
             schematic_state["placeobjects"] = False
             schematic_state["copyobjects"] = False
@@ -629,12 +633,12 @@ def left_shift_click(event):
     canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
     highlighted_object = find_highlighted_object(canvas_x,canvas_y)
-    if highlighted_object and highlighted_object in schematic_state["selectedobjects"]:
-        # Deselect just the highlighted object (leave everything else selected)
-        deselect_object(highlighted_object)
-    else:
-        # Select the highlighted object to the list of selected objects
-        select_object(highlighted_object)
+    if highlighted_object:
+        # Select or deselect the highlighted object as appropriate
+        if highlighted_object in schematic_state["selectedobjects"]:
+            deselect_object(highlighted_object)
+        else:
+            select_object(highlighted_object)
     return()
 
 #------------------------------------------------------------------------------------

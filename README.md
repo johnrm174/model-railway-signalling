@@ -26,7 +26,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 * Improved object creation - when you click a button to add a new object to the schematic, the object
 now moves with the cursor until 'placed' on the canvas in the desired position (by left mouse click).
-Useful for working on layout schematics larger than the displayed window area.
+Useful for working on layout schematics larger than the displayed window scroll area.
 * Improved copy function - The new objects now appear on the schematic as soon as you have copied them.
 They then track the cursor until 'placed' on the canvas in the desired position (by left mouse click).
 Useful for working on 'busy' layout schematics where the copied items would have overlayed other objects.
@@ -35,7 +35,11 @@ selections (Edit Mode), and scrolling of the displayed canvas area via the mouse
 * New DCC Accessory switches feature, enabling you to add and configure buttons on the schematic to 
 control other DCC-enabled accessories on your layout (e.g. If you are still analogue for control of trains,
 then you can use this feature with external DCC-relay modules for operating track isolating sections).
+* Improved Route Feature - DCC switches can be added to the route configuration to operate DCC accessories
+needed to complete the route setup (level crossings, track isolating sections etc). Also, more options have
+been provided for configuring the appearance of the buttons in terms of font size, and font style.
 * Bugfix to colour chooser - Previous colour will now be retained if cancelled (without errors)
+* Bugfix to object selection (shift-left-click) - will now no longer error if cursor is not over an object
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

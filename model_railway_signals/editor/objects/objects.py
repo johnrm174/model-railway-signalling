@@ -448,10 +448,10 @@ def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
                 objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
         bring_track_sections_to_the_front()
-    # Save the current state (for undo/redo) - This is True for all object moves apart
-    # from the interim moves when 'placing' objects after creation and/or copying
-    if update_schematic_state: save_schematic_state()
-    # As we are just moving objects we don't need to process layout changes
+        # Save the current state (for undo/redo) if there has been a change - This is True for
+        # all object moves apart from the interim moves when 'placing' objects after creation/copying
+        if update_schematic_state: save_schematic_state()
+        # As we are just moving objects we don't need to process layout changes
     return()
 
 #------------------------------------------------------------------------------------
@@ -495,48 +495,6 @@ def copy_objects(list_of_object_ids, deltax:int, deltay:int):
     # Note that we do not save the schematic state after the 'copy' as, although the copied items now
     # exist, they have yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
     # Also - as we are just copying 'new' objects we don't need to process layout changes
-    return(list_of_new_object_ids)
-
-#------------------------------------------------------------------------------------
-# Function to paste copies of the current clipboard objects to the canvas
-# Called from the Schematic Modulee on 'paste' - returns a list of new object_ids
-# Note that the object_ids, item_ids and canvas positions are reassigned on 'paste'
-#------------------------------------------------------------------------------------
-
-def paste_objects():
-    list_of_new_object_ids=[]
-    # New objects are "pasted" at a slightly offset position on the canvas so
-    # its clear that new objects have been created (to move/place on the canvas)
-    deltax, deltay = 3, 3
-    # Create a copy of each object in the clipboard (depending on type)
-    for object_to_paste in clipboard:
-        type_of_object = object_to_paste["item"]
-        if type_of_object == objects_common.object_type.line:
-            new_object_id = objects_lines.paste_line(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.textbox:
-            new_object_id = objects_textboxes.paste_textbox(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.signal:
-            new_object_id = objects_signals.paste_signal(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.point:
-            new_object_id = objects_points.paste_point(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.section:
-            new_object_id = objects_sections.paste_section(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.instrument:
-            new_object_id = objects_instruments.paste_instrument(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.track_sensor:
-            new_object_id = objects_sensors.paste_track_sensor(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.route:
-            new_object_id = objects_routes.paste_route(object_to_paste, deltax, deltay)
-        elif type_of_object == objects_common.object_type.switch:
-            new_object_id = objects_switches.paste_switch(object_to_paste, deltax, deltay)
-        # Add the new object to the list of clipboard objects
-        # in case the user wants to paste the same objects again
-        list_of_new_object_ids.append(new_object_id)
-    # Ensure all track sections are in front of any lines
-    bring_track_sections_to_the_front()
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are just pasting 'new' objects we don't need to process layout changes
     return(list_of_new_object_ids)
 
 #------------------------------------------------------------------------------------
