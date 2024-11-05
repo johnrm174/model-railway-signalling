@@ -38,6 +38,7 @@ then you can use this feature with external DCC-relay modules for operating trac
 * Improved Route Feature - DCC switches can be added to the route configuration to operate DCC accessories
 needed to complete the route setup (level crossings, track isolating sections etc). Also, more options have
 been provided for configuring the appearance of the buttons in terms of font size, and font style.
+* Improved Text Box configuration - The base font can now be changed (also a general UI tidy up)
 * Bugfix to colour chooser - Previous colour will now be retained if cancelled (without errors)
 * Bugfix to object selection (shift-left-click) - will now no longer error if cursor is not over an object
 
