@@ -36,8 +36,9 @@ def test_edit_object_windows(delay:float=0.0):
 
 def really_do_test_all_object_edit_windows(delay:float=0.0, test_all_controls:bool=False, report_object_tested:bool=False):
     print("Testing all object edit windows")
-    object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point, objects.object_type.signal,
-        objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor, objects.object_type.route)
+    object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point,
+                    objects.object_type.signal,objects.object_type.section, objects.object_type.instrument,
+                    objects.object_type.track_sensor, objects.object_type.route, objects.object_type.switch)
     for object_type in object_types:
         for object_id in objects.schematic_objects.keys():
             if objects.schematic_objects[object_id]["item"] == object_type:
