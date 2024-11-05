@@ -44,6 +44,7 @@ from ...library import buttons
 from ...library import dcc_control
 from . import objects_common
 from . import objects_routes
+from .. import run_layout
 
 #------------------------------------------------------------------------------------
 # Default Switch Object (i.e. state at creation)
@@ -52,7 +53,7 @@ from . import objects_routes
 default_switch_object = copy.deepcopy(objects_common.default_object)
 default_switch_object["item"] = objects_common.object_type.switch
 default_switch_object["itemtype"] = buttons.button_type.switched.value
-default_switch_object["switchname"] = "DCC Switch"
+default_switch_object["switchname"] = "Switch"
 default_switch_object["switchdescription"] = "Switch description (Run Mode tooltip)"
 default_switch_object["buttonwidth"] = 12
 default_switch_object["buttoncolour"] = "SkyBlue2"
@@ -88,14 +89,6 @@ def update_switch(object_id, new_object_configuration):
     return()
 
 #------------------------------------------------------------------------------------
-# Null callback for the DCC Accessory buttons as these are just sending out DCC
-# Commands when selected/deselected - there is no other processing to do.
-#------------------------------------------------------------------------------------
-
-def local_null_callback(button_id):
-    return()
-
-#------------------------------------------------------------------------------------
 # Function to re-draw a Switch object on the schematic. Called when the object
 # is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
@@ -127,8 +120,8 @@ def redraw_switch_object(object_id):
                 buttontype = button_type,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                selected_callback = local_null_callback,
-                deselected_callback = local_null_callback,
+                selected_callback = run_layout.switch_updated_callback,
+                deselected_callback = run_layout.switch_updated_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["switchname"],
                 tooltip = objects_common.schematic_objects[object_id]["switchdescription"],
@@ -155,6 +148,7 @@ def create_switch(xpos:int, ypos:int):
     item_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
+    objects_common.schematic_objects[object_id]["switchname"] = "Switch "+str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
@@ -174,13 +168,13 @@ def paste_switch(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
+    objects_common.schematic_objects[new_object_id]["switchname"] = "Switch "+str(new_id)
     objects_common.switch_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
     # The bits we want to copy are - buttonwidth, buttoncolour, hidden
-    objects_common.schematic_objects[new_object_id]["switchname"] = default_switch_object["switchname"]
     objects_common.schematic_objects[new_object_id]["switchdescription"] = default_switch_object["switchdescription"]
     objects_common.schematic_objects[new_object_id]["dcconcommands"] = default_switch_object["dcconcommands"]
     objects_common.schematic_objects[new_object_id]["dccoffcommands"] = default_switch_object["dccoffcommands"]

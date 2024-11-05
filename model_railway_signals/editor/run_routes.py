@@ -334,6 +334,17 @@ def check_routes_valid_after_point_change(point_id:int, route_id:int):
                     complete_route_cleardown(int(str_route_id))
     return()
 
+def check_routes_valid_after_switch_change(switch_id:int, route_id:int):
+    for str_route_id in objects.route_index:
+        if int(str_route_id) != route_id and buttons.button_state(int(str_route_id)):
+            route_object = objects.schematic_objects[objects.route(str_route_id)]
+            if str(switch_id) in route_object["switchesonroute"].keys():
+                required_state = route_object["switchesonroute"][str(switch_id)]
+                if buttons.button_state(switch_id) != required_state:
+                    buttons.toggle_button(int(str_route_id))
+                    complete_route_cleardown(int(str_route_id))
+    return()
+
 #------------------------------------------------------------------------------------
 # Function to automatically set/reset a schematic route after a track sensor passed event
 #------------------------------------------------------------------------------------
@@ -382,6 +393,13 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
 class schedule_task():
     def __init__(self, delay:int, function, *args):
         root.after(delay, lambda:function(*args))
+
+def set_switch_state(route_id:int, switch_id:int, state:bool):
+    if run_mode:
+        if buttons.button_state(switch_id) != state:
+            buttons.toggle_button(switch_id)
+            run_layout.switch_updated_callback(switch_id, route_id)
+    return()
 
 def set_signal_state(route_id:int, signal_id:int, state:bool):
     if run_mode:
@@ -435,12 +453,17 @@ def complete_route_setup(route_id:int):
         # that invalidate the route whilst we have been working through the scheduled tasks to set it up
         route_set_up_and_locked = True
         points_on_route = objects.schematic_objects[objects.route(route_id)]["pointsonroute"]
+        switches_on_route = objects.schematic_objects[objects.route(route_id)]["pointsonroute"]
         signals_on_route = objects.schematic_objects[objects.route(route_id)]["signalsonroute"]
         subsidaries_on_route = objects.schematic_objects[objects.route(route_id)]["subsidariesonroute"]
         for str_point_id in points_on_route.keys():
             required_state = points_on_route[str_point_id]
             # If a point does not have a FPL then the 'has_fpl' function will return True
             if points.point_switched(int(str_point_id)) != required_state or not points.fpl_active(int(str_point_id)):
+                route_set_up_and_locked = False
+        for str_switch_id in switches_on_route.keys():
+            required_state = switches_on_route[str_switch_id]
+            if buttons.button_state(int(str_switch_id)) != required_state:
                 route_set_up_and_locked = False
         for int_signal_id in signals_on_route:
             if not signals.signal_clear(int_signal_id):
@@ -521,6 +544,14 @@ def set_schematic_route_callback(route_id:int):
         elif not automatic_point and point_has_fpl and not points.fpl_active(int_point_id):
             schedule_task(delay, set_fpl_state, route_id, int_point_id, True)
             delay = delay + route_object["switchdelay"]
+    # Iterate through all the required DCC Switch settings and schedule the tasks to change them
+    for str_switch_id in route_object["switchesonroute"].keys():
+        required_switch_state = route_object["switchesonroute"][str_switch_id]
+        int_switch_id = int(str_switch_id)
+        if buttons.button_state(int_switch_id) != required_switch_state:
+            # We've found a switch that needs changing
+            schedule_task(delay, set_switch_state, route_id, int_switch_id, required_switch_state)
+            delay = delay + route_object["switchdelay"]
     # Iterate through all the signals/subsidaries in the route definition and schedule the tasks to set them OFF,
     # ensuring that we change the associated subsidary/signal to ON first (so they don't interlock each other)
     # Note the user may have specified the same signal ID in both the signals and subsidaries route lists (we can't
@@ -592,6 +623,13 @@ def clear_schematic_route_callback(route_id:int):
                 if point_has_fpl:
                     schedule_task(delay, set_fpl_state, route_id, int_point_id, True)
                     delay = delay + route_object["switchdelay"]
+    # Schedule tasks to reset all the DCC Switches back to "OFF"
+    if route_object["resetswitches"]:
+        for str_switch_id in route_object["switchesonroute"].keys():
+            int_switch_id = int(str_switch_id)
+            if buttons.button_state(int_switch_id):
+                schedule_task(delay, set_switch_state, route_id, int_switch_id, False)
+                delay = delay + route_object["switchdelay"]
     # Reset the colour of all points/lines back to their default colours
     schedule_task(delay, complete_route_cleardown, route_id)
     # Finally lock/unlock any other route buttons as required

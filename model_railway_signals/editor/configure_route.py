@@ -54,6 +54,96 @@ from ..library import track_sensors
 
 open_windows={}
 
+#------------------------------------------------------------------------------------
+# Compound UI element for a switch_state_entry [switch_id, switch_state].
+# This is broadly similar to the common point_settings_entry class.
+#
+# Main class methods used by the editor are:
+#    "validate" - validate the current entry box value and return True/false
+#    "set_value" - will set the current value [switch_id:int, switch_state:bool]
+#    "get_value" - will return the last "valid" value [switch_id:int, switch_state:bool]
+#    "disable" - disables/blanks the entry box (and associated state button)
+#    "enable"  enables/loads the entry box (and associated state button)
+#    "reset" - resets the UI Element to its default value ([0, False])
+#    "pack"  for packing the compound UI element
+#------------------------------------------------------------------------------------
+
+class switch_state_entry(Tk.Frame):
+    def __init__(self, parent_frame, tool_tip:str):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame)
+        # Note the use of the 'objects.switch_exists' function rather than using the library 'exists'
+        # function as DCC Switches and Routes both use the same common 'button' library objects
+        self.EB = common.int_item_id_entry_box(self, exists_function=objects.switch_exists,
+                                    tool_tip = tool_tip, callback=self.eb_updated)
+        self.EB.pack(side=Tk.LEFT)
+        self.CB = common.state_box(self, label_off="OFF", label_on="ON", width=4,
+                    tool_tip="Select the required state for the switch (On or Off)")
+        self.CB.pack(side=Tk.LEFT)
+        # Disable the checkbox (default state when no Switch ID is entered)
+        self.CB.disable()
+
+    def eb_updated(self):
+        if self.EB.entry.get() == "":
+            self.CB.disable()
+        else:
+            self.CB.enable()
+
+    def validate(self):
+        return (self.EB.validate())
+
+    def enable(self):
+        self.EB.enable()
+        self.eb_updated()
+
+    def disable(self):
+        self.EB.disable()
+        self.eb_updated()
+
+    def set_value(self, switch:[int, bool]):
+        # A Switch comprises a 2 element list of [Switch_id, Switch_state]
+        self.EB.set_value(switch[0])
+        self.CB.set_value(switch[1])
+        self.eb_updated()
+
+    def get_value(self):
+        # Returns a 2 element list of [Switch_id, Switch_state]
+        # When disabled (or empty) will always return [0, False]
+        # When invalid will return [last valid id, current state]
+        return([self.EB.get_value(), self.CB.get_value()])
+
+    def reset(self):
+        self.set_value(switch=[0, False])
+
+#------------------------------------------------------------------------------------
+# Class for a variable grid_of_switch_settings - builds on the grid_of_widgets class
+# The get_values function is overridden to remove blanks (id=0) and duplicates
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
+#    "validate" - Will validate all entries
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class grid_of_switch_settings(common.grid_of_widgets):
+    def __init__(self, parent_frame, columns:int, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, switch_state_entry, columns, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (Switch_id=0) or duplicates
+        values_to_return = []
+        for entered_value in entered_values:
+            if entered_value[0] > 0 and entered_value not in values_to_return:
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+
 #####################################################################################
 # Top level Class for the Edit Route window
 # This window doesn't have any tabs (unlike other object configuration windows)
@@ -154,26 +244,23 @@ class edit_route():
             self.points = common.grid_of_point_settings(self.frame5, columns=7, tool_tip="Specify the points that need "
                             "to be set and locked for the route and their required configuration (normal/switched)")
             self.points.pack(padx=2, pady=2, fill='x')
-            self.frame6 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
+            self.frame6 = Tk.LabelFrame(self.main_frame, text="DCC Switches to set")
             self.frame6.pack(padx=2, pady=2, fill='x')
-            self.signals = common.grid_of_generic_entry_boxes(self.frame6, base_class=common.int_item_id_entry_box,
+            self.switches = grid_of_switch_settings(self.frame6, columns=5, tool_tip="Specify any DCC Accessory "+
+                                        "Switches that need to be selected or deselected to complete the route setup")
+            self.switches.pack(padx=2, pady=2, fill='x')
+            self.frame7 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
+            self.frame7.pack(padx=2, pady=2, fill='x')
+            self.signals = common.grid_of_generic_entry_boxes(self.frame7, base_class=common.int_item_id_entry_box,
                             columns=12, width=3, exists_function = signals.signal_exists, tool_tip=
                             "Specify the main signals that need "+ "to be cleared for the route")
             self.signals.pack(padx=2, pady=2, fill='x')
-            self.frame7 = Tk.LabelFrame(self.main_frame, text="Subsidary signals to clear")
-            self.frame7.pack(padx=2, pady=2, fill='x')
-            self.subsidaries = common.grid_of_generic_entry_boxes(self.frame7, base_class=common.int_item_id_entry_box,
+            self.frame8 = Tk.LabelFrame(self.main_frame, text="Subsidary signals to clear")
+            self.frame8.pack(padx=2, pady=2, fill='x')
+            self.subsidaries = common.grid_of_generic_entry_boxes(self.frame8, base_class=common.int_item_id_entry_box,
                             columns=12, width=3, exists_function = signals.signal_exists, tool_tip="Specify the "+
                             "subsidary signals (associated with a main signal) that need to be cleared for the route")
             self.subsidaries.pack(padx=2, pady=2, fill='x')
-            self.frame8 = Tk.LabelFrame(self.main_frame, text="DCC Switches to Set")
-            self.frame8.pack(padx=2, pady=2, fill='x')
-            # Note the use of the 'objects.switch_exists' function rather than using the library 'exists'
-            # function as DCC Switches and Routes both use the same common 'button' library objects 
-            self.switches = common.grid_of_generic_entry_boxes(self.frame8, base_class=common.int_item_id_entry_box,
-                            columns=12, width=3, exists_function=objects.switch_exists, tool_tip="Specify any "+
-                            "DCC Accessory Switches that need to be activated to complete the route setup")
-            self.switches.pack(padx=2, pady=2, fill='x')
             #----------------------------------------------------------------------------------
             # Create the point and line to highlight lists (frames 9,10)
             #----------------------------------------------------------------------------------
@@ -205,7 +292,7 @@ class edit_route():
                         tool_tip="Specify the time delay between signal and/or point switching events when "+
                                                   "setting up and clearing down the route (0-5000ms)")         
             self.delay.pack(padx=2, pady=2)
-            # Right hand Frame to hold other route settinga
+            # Right hand Frame to hold other route settings
             self.frame11b = Tk.LabelFrame(self.frame11, text="Route settings")
             self.frame11b.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             # Track Sensor for route set up
@@ -267,7 +354,6 @@ class edit_route():
             self.description.set_value(objects.schematic_objects[self.object_id]["routedescription"])
             self.signals.set_values(objects.schematic_objects[self.object_id]["signalsonroute"])
             self.subsidaries.set_values(objects.schematic_objects[self.object_id]["subsidariesonroute"])
-            self.switches.set_values(objects.schematic_objects[self.object_id]["switchesonroute"])
             self.highlightlines.set_values(objects.schematic_objects[self.object_id]["linestohighlight"])
             self.highlightpoints.set_values(objects.schematic_objects[self.object_id]["pointstohighlight"])
             self.delay.set_value(objects.schematic_objects[self.object_id]["switchdelay"])
@@ -283,6 +369,12 @@ class edit_route():
             for key,value in point_settings_dict.items():
                 point_settings_list.append([int(key),value])
             self.points.set_values(point_settings_list)
+            # The "switchesonroute" element is also a dict along the lines of {"1":True, "3":False}
+            switch_settings_list = []
+            switch_settings_dict = objects.schematic_objects[self.object_id]["switchesonroute"]
+            for key,value in switch_settings_dict.items():
+                switch_settings_list.append([int(key),value])
+            self.switches.set_values(switch_settings_list)
             # Set the button appearance elements
             self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
@@ -330,6 +422,12 @@ class edit_route():
             for [key, value] in point_settings_list:
                 point_settings_dict[str(key)] = value
             new_object_configuration["pointsonroute"] = point_settings_dict
+            # The "switchesonroute" element is also a dict along the lines of {"1":True, "3":False}
+            switch_settings_dict = {}
+            switch_settings_list = self.switches.get_values()
+            for [key, value] in switch_settings_list:
+                switch_settings_dict[str(key)] = value
+            new_object_configuration["switchesonroute"] = switch_settings_dict
             # Get the button appearance elements
             new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
