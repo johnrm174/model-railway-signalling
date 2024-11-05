@@ -453,7 +453,7 @@ def complete_route_setup(route_id:int):
         # that invalidate the route whilst we have been working through the scheduled tasks to set it up
         route_set_up_and_locked = True
         points_on_route = objects.schematic_objects[objects.route(route_id)]["pointsonroute"]
-        switches_on_route = objects.schematic_objects[objects.route(route_id)]["pointsonroute"]
+        switches_on_route = objects.schematic_objects[objects.route(route_id)]["switchesonroute"]
         signals_on_route = objects.schematic_objects[objects.route(route_id)]["signalsonroute"]
         subsidaries_on_route = objects.schematic_objects[objects.route(route_id)]["subsidariesonroute"]
         for str_point_id in points_on_route.keys():
