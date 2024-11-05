@@ -324,6 +324,7 @@ def create_route(xpos:int, ypos:int):
     item_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
+    objects_common.schematic_objects[object_id]["routename"] = "Route "+str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
@@ -343,13 +344,13 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
+    objects_common.schematic_objects[new_object_id]["routename"] = "Route "+str(new_id)
     objects_common.route_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
     # The bits we want to copy are - buttonwidth, routecolour, switchdelay, resetpoints
-    objects_common.schematic_objects[new_object_id]["routename"] = default_route_object["routename"]
     objects_common.schematic_objects[new_object_id]["routedescription"] = default_route_object["routedescription"]
     objects_common.schematic_objects[new_object_id]["signalsonroute"] = default_route_object["signalsonroute"]
     objects_common.schematic_objects[new_object_id]["subsidariesonroute"] = default_route_object["subsidariesonroute"]
