@@ -212,17 +212,22 @@ class edit_route():
             self.frame3.pack(fill='x')
             self.buttoncolour = common.colour_selection(self.frame3, label="Button colour")
             self.buttoncolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
-            self.textcolourtype = common.selection_buttons(self.frame3, label="Button label text colour",
+            self.textcolourtype = common.selection_buttons(self.frame3, label="Text colour",
                             tool_tip="Select the text colour (auto to select best contrast with background)",
                             button_labels=("Auto", "Black", "White"))
             self.textcolourtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+            #----------------------------------------------------------------------------------
+            # Create the Font selection element
+            #----------------------------------------------------------------------------------
+            self.font=common.font_selection(self.main_frame)
+            self.font.pack(padx=2, pady=2, fill="x")
             #----------------------------------------------------------------------------------
             # Create a Frame for the font size and text style elements (Frame 4)
             #----------------------------------------------------------------------------------
             self.frame4 = Tk.Frame(self.main_frame)
             self.frame4.pack(fill='x')
             # Create a Label Frame for the Font Size Entry components
-            self.frame4subframe1 = Tk.LabelFrame(self.frame4, text="Button font size")
+            self.frame4subframe1 = Tk.LabelFrame(self.frame4, text="Font size")
             self.frame4subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
             # Create a subframe to hold the font size and border configuration elements
             self.frame4subframe2 = Tk.Frame(self.frame4subframe1)
@@ -233,8 +238,7 @@ class edit_route():
                         tool_tip="Select the font size (between 8 and 20 pixels)", allow_empty=False)
             self.fontsize.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
             # The final subframe is for the text style selection
-            self.fontstyle = common.selection_check_boxes(self.frame4, label="Button font style",
-                tool_tip="Select the font style", button_labels=("Bold", "Itallic", "Underline"))
+            self.fontstyle = common.font_style_selection(self.frame4)
             self.fontstyle.pack(padx=2, pady=2, side=Tk.LEFT, fill='x', expand=True)
             #----------------------------------------------------------------------------------
             # Create the point, signal, subsidary and switch entry lists (frames 5,6,7,8)
@@ -378,8 +382,8 @@ class edit_route():
             # Set the button appearance elements
             self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
-            font_style = objects.schematic_objects[self.object_id]["fontstyle"]
-            self.fontstyle.set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
+            self.font.set_value(objects.schematic_objects[self.object_id]["font"])
+            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["fontstyle"])
             self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
             self.textcolourtype.set_value(objects.schematic_objects[self.object_id]["textcolourtype"])
             # Hide the validation error message
@@ -431,12 +435,8 @@ class edit_route():
             # Get the button appearance elements
             new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
-            font_style = ""
-            font_style_selections = self.fontstyle.get_values()
-            if font_style_selections[0]: font_style=font_style + "bold "
-            if font_style_selections[1]: font_style=font_style + "italic "
-            if font_style_selections[2]: font_style=font_style + "underline "
-            new_object_configuration["fontstyle"] = font_style
+            new_object_configuration["font"] = self.font.get_value()
+            new_object_configuration["fontstyle"] = self.fontstyle.get_value()
             new_object_configuration["fontsize"] = self.fontsize.get_value()
             new_object_configuration["textcolourtype"] = self.textcolourtype.get_value()
             # Save the updated configuration (and re-draw the object)

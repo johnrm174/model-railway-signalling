@@ -58,8 +58,8 @@ default_switch_object["switchdescription"] = "Switch description (Run Mode toolt
 default_switch_object["buttonwidth"] = 12
 default_switch_object["buttoncolour"] = "SkyBlue2"
 default_switch_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
-default_switch_object["font"] = "TkFixedFont"
-default_switch_object["fontsize"] = 8
+default_switch_object["font"] = "Courier"
+default_switch_object["fontsize"] = 9
 default_switch_object["fontstyle"] = ""
 default_switch_object["hidden"] = False
 # Each DCC command sequence comprises a variable list of DCC commands

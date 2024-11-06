@@ -66,8 +66,8 @@ default_route_object["routedescription"] = "Route description (Run Mode tooltip)
 default_route_object["buttonwidth"] = 15
 default_route_object["buttoncolour"] = "SeaGreen3"
 default_route_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
-default_route_object["font"] = "TkFixedFont"
-default_route_object["fontsize"] = 8
+default_route_object["font"] = "Courier"
+default_route_object["fontsize"] = 9
 default_route_object["fontstyle"] = ""
 default_route_object["signalsonroute"] = []
 default_route_object["subsidariesonroute"] = []

@@ -43,7 +43,7 @@ default_textbox_object["item"] = objects_common.object_type.textbox
 default_textbox_object["text"] = "Text"
 default_textbox_object["colour"] = "black"
 default_textbox_object["justify"] = 2   ## 1=Left, 2=Center, 3=right
-default_textbox_object["background"] = "grey85"
+default_textbox_object["background"] = ""
 default_textbox_object["font"] = "Courier"  
 default_textbox_object["fontsize"] = 10  
 default_textbox_object["fontstyle"] = ""  

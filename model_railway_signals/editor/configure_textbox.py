@@ -97,8 +97,7 @@ class edit_textbox():
             #----------------------------------------------------------------------------------
             # Create a Frame for the font selection
             #----------------------------------------------------------------------------------
-            self.font = common.selection_buttons(self.main_frame, label="Font", callback=self.font_style_updated,
-                    tool_tip="Select the font style", button_labels=("Courier", "Times", "Helvetica", "TkFixedFont"))
+            self.font = common.font_selection(self.main_frame, callback=self.font_style_updated)
             self.font.pack(padx=2, pady=2, fill="x")
             #----------------------------------------------------------------------------------
             # Create a Frame for the font size, text style and border width elements (Frame 3)
@@ -121,8 +120,7 @@ class edit_textbox():
                                             tool_tip="Select the border width (between 8 and 20 pixels)")
             self.fontsize.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create a Label Frame for the Text Style selection (grid 1,0)
-            self.fontstyle = common.selection_check_boxes(self.frame3, label="Font style", callback=self.font_style_updated,
-                                tool_tip="Select the font style", button_labels=("Bold", "Itallic", "Underline"))
+            self.fontstyle = common.font_style_selection(self.frame3, callback=self.font_style_updated)
             self.fontstyle.grid(row=0, column=1, padx=2, pady=2, sticky='NSWE')
             # Create a Label Frame for the Border Width selection (grid 0,1)
             self.frame3subframe3 = Tk.LabelFrame(self.frame3, text="Border width")
@@ -147,34 +145,7 @@ class edit_textbox():
         self.text.set_justification(self.textjustify.get_value())
 
     def font_style_updated(self):
-        self.text.set_font(self.get_font(), self.fontsize.get_value(), self.get_font_style())
-
-    def get_font_style(self):
-        font_style = ""
-        font_style_selections = self.fontstyle.get_values()
-        if font_style_selections[0]: font_style=font_style + "bold "
-        if font_style_selections[1]: font_style=font_style + "italic "
-        if font_style_selections[2]: font_style=font_style + "underline "
-        return(font_style)
-
-    def get_font(self):
-        font_selection = self.font.get_value()
-        if font_selection == 1: font = "Courier"
-        elif font_selection == 2: font = "Times"
-        elif font_selection == 3: font = "Helvetica"
-        elif font_selection == 4: font = "TkFixedFont"
-        else: font = "TkFixedFont"
-        return(font)
-
-    def set_font(self, font:str):
-        font_selection = self.font.get_value()
-        if font == "Courier": font_selection = 1
-        elif font == "Times": font_selection = 2
-        elif font == "Helvetica": font_selection = 3
-        elif font == "TkFixedFont":font_selection = 4
-        else: font == "TkFixedFont"
-        self.font.set_value(font_selection)
-        return()
+        self.text.set_font(self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
 
     def load_state(self):
         # Check the object we are editing still exists (hasn't been deleted from the schematic)
@@ -185,20 +156,15 @@ class edit_textbox():
             # Label the edit window
             self.window.title("Textbox")
             # Set the Initial UI state from the current object settings
-            # Note that we do not change the actual 'font' setting via the UI at present
-            font = objects.schematic_objects[self.object_id]["font"]
-            font_style = objects.schematic_objects[self.object_id]["fontstyle"]
-            font_size = objects.schematic_objects[self.object_id]["fontsize"]
-            justification = objects.schematic_objects[self.object_id]["justify"]
             self.text.set_value(objects.schematic_objects[self.object_id]["text"])
             self.textcolour.set_value(objects.schematic_objects[self.object_id]["colour"])
             self.background.set_value(objects.schematic_objects[self.object_id]["background"])
             self.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
-            self.fontstyle.set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
-            self.set_font(objects.schematic_objects[self.object_id]["font"])
+            self.font.set_value(objects.schematic_objects[self.object_id]["font"])
+            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["fontstyle"])
+            self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
+            self.textjustify.set_value(objects.schematic_objects[self.object_id]["justify"])
             self.borderwidth.set_value(objects.schematic_objects[self.object_id]["border"])
-            self.fontsize.set_value(font_size)
-            self.textjustify.set_value(justification)
             # Justify the text and set/resize the font/style to match the initial selection
             self.justification_updated()
             self.font_style_updated()
@@ -220,11 +186,11 @@ class edit_textbox():
             new_object_configuration["colour"] = self.textcolour.get_value()
             new_object_configuration["background"] = self.background.get_value()
             new_object_configuration["hidden"] = self.hidden.get_value()
-            new_object_configuration["font"] = self.get_font()
+            new_object_configuration["font"] = self.font.get_value()
             new_object_configuration["fontsize"] = self.fontsize.get_value()
-            new_object_configuration["fontstyle"] = self.get_font_style()            
-            new_object_configuration["border"] = self.borderwidth.get_value()
+            new_object_configuration["fontstyle"] = self.fontstyle.get_value()
             new_object_configuration["justify"] = self.textjustify.get_value()
+            new_object_configuration["border"] = self.borderwidth.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

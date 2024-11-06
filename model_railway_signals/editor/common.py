@@ -1431,6 +1431,7 @@ class object_id_selection(integer_entry_box):
 #    "get_value" - will return the last "valid" value (integer 1-5)
 #    "enable" - enable all radio buttons
 #    "disable" - disable all radio buttons
+#    "pack" - for packing the UI element
 #
 # The individual buttons can be accessed via the button[x] class object.
 #------------------------------------------------------------------------------------
@@ -1480,6 +1481,7 @@ class selection_buttons(Tk.LabelFrame):
 #    "get_values" - will return the last "valid" value (integer 1-5)
 #    "enable" - enable all radio buttons
 #    "disable" - disable all radio buttons
+#    "pack" - for packing the UI element
 #
 # The individual buttons can be accessed via the button[x] class object.
 #------------------------------------------------------------------------------------
@@ -1533,6 +1535,7 @@ class selection_check_boxes(Tk.LabelFrame):
 #    "set_value" - will set the current value (colour code string)
 #    "get_value" - will return the last "valid" value (colour code string)
 #    "is_open" - Test if the colour chooser is still open
+#    "pack" - for packing the UI element
 #------------------------------------------------------------------------------------
 
 class colour_selection(Tk.LabelFrame):
@@ -1587,6 +1590,65 @@ class colour_selection(Tk.LabelFrame):
 
     def is_open(self):
         return(self.colour_chooser_open)
+
+#------------------------------------------------------------------------------------
+# Stand Alone UI element for a Labelframe containing the font selection radio buttons
+# Builds on the selection_buttons class with overridden get_value and set_value methods
+#
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (string)
+#    "get_value" - will return the current value (string)
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class font_selection(selection_buttons):
+    def __init__(self, parent_frame, callback=None):
+        super().__init__(parent_frame, label="Font", callback=callback,tool_tip="Select the font style",
+                            button_labels=("Courier", "Times", "Helvetica", "TkFixedFont"))
+
+    def get_value(self):
+        font_selection = super().get_value()
+        if font_selection == 1: font = "Courier"
+        elif font_selection == 2: font = "Times"
+        elif font_selection == 3: font = "Helvetica"
+        elif font_selection == 4: font = "TkFixedFont"
+        else: font = "TkFixedFont"
+        return(font)
+
+    def set_value(self, font:str):
+        if font == "Courier": font_selection = 1
+        elif font == "Times": font_selection = 2
+        elif font == "Helvetica": font_selection = 3
+        elif font == "TkFixedFont":font_selection = 4
+        else: font_selection = 4
+        super().set_value(font_selection)
+        return()
+
+#------------------------------------------------------------------------------------
+# Stand Alone UI element for a Labelframe containing the font style selection checkboxes
+# Builds on the selection_check_boxes class with overridden get_value and set_value methods
+#
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (string)
+#    "get_value" - will return the current value (string)
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class font_style_selection(selection_check_boxes):
+    def __init__(self, parent_frame, callback=None):
+        super().__init__(parent_frame, label="Font style", callback=callback,
+                tool_tip="Select the font style", button_labels=("Bold", "Itallic", "Underline"))
+
+    def get_value(self):
+        font_style = ""
+        font_style_selections = super().get_values()
+        if font_style_selections[0]: font_style=font_style + "bold "
+        if font_style_selections[1]: font_style=font_style + "italic "
+        if font_style_selections[2]: font_style=font_style + "underline "
+        return(font_style)
+
+    def set_value(self, font_style:str):
+        super().set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
 
 #------------------------------------------------------------------------------------
 # Stand Alone UI element for a Tk.Frame containing the Apply/OK/Reset/Cancel Buttons.
