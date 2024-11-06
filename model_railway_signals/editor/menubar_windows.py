@@ -302,31 +302,46 @@ class edit_canvas_settings():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             canvas_settings_window = self.window
-            # Create the entry box elements for the width, height and grid
-            # Pack the elements as a grid to get an aligned layout
-            self.frame = Tk.Frame(self.window)
-            self.frame.pack()
-            self.frame.grid_columnconfigure(0, weight=1)
-            self.frame.grid_columnconfigure(1, weight=1)
-            self.label1 = Tk.Label(self.frame, text="Canvas width:")
+            # Create a label frame for the general settings
+            self.frame1 = Tk.LabelFrame(self.window, text="General settings")
+            self.frame1.pack(padx=2, pady=2, fill="x")
+            # Create the entry box elements for the width, height and grid in a subframe
+            # Pack the elements as into the subframe using 'grid' to get an aligned layout
+            self.subframe1 = Tk.Frame(self.frame1)
+            self.subframe1.pack()
+            self.subframe1.grid_columnconfigure(0, weight=1)
+            self.subframe1.grid_columnconfigure(1, weight=1)
+            self.label1 = Tk.Label(self.subframe1, text="Canvas width:")
             self.label1.grid(row=0, column=0)
-            self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=8000,
+            self.width = common.integer_entry_box(self.subframe1, width=5, min_value=400, max_value=8000,
                             allow_empty=False, tool_tip="Enter width in pixels (400-8000)")
             self.width.grid(row=0, column=1)
-            self.label2 = Tk.Label(self.frame, text="Canvas height:")
+            self.label2 = Tk.Label(self.subframe1, text="Canvas height:")
             self.label2.grid(row=1, column=0)
-            self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=4000,
+            self.height = common.integer_entry_box(self.subframe1, width=5, min_value=200, max_value=4000,
                             allow_empty=False, tool_tip="Enter height in pixels (200-4000)")
             self.height.grid(row=1, column=1)
-            self.label3 = Tk.Label(self.frame, text="Canvas Grid:")
+            self.label3 = Tk.Label(self.subframe1, text="Canvas Grid:")
             self.label3.grid(row=2, column=0)
-            self.grid = common.integer_entry_box(self.frame, width=5, min_value=5, max_value=25,
+            self.gridsize = common.integer_entry_box(self.subframe1, width=5, min_value=5, max_value=25,
                             allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
-            self.grid.grid(row=2, column=1)
-            # Create the check box element for snap to grid
-            self.snap = common.check_box (self.window, label="Snap to Grid",
-                            tool_tip="Enable/Disable 'Snap-to-Grid' for schematic editing")
-            self.snap.pack(padx=2, pady=2)
+            self.gridsize.grid(row=2, column=1)
+            # Create the elements for the other settings in a second subframe (within the labelframe
+            self.subframe2 = Tk.Frame(self.frame1)
+            self.subframe2.pack()
+            self.snaptogrid = common.check_box (self.subframe2, label="Snap to grid",
+                            tool_tip="Enable/disable 'Snap-to-Grid' for schematic editing")
+            self.snaptogrid.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.displaygrid = common.check_box (self.subframe2, label="Display grid",
+                            tool_tip="Display/hide the grid in edit mode")
+            self.displaygrid.pack(padx=2, pady=2, side=Tk.LEFT)
+            # Create another Frame to hold the colour selections
+            self.frame2 = Tk.Frame(self.window)
+            self.frame2.pack(fill="x")
+            self.canvascolour = common.colour_selection(self.frame2, label="Canvas colour")
+            self.canvascolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
+            self.gridcolour = common.colour_selection(self.frame2, label="Grid colour")
+            self.gridcolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
@@ -337,21 +352,28 @@ class edit_canvas_settings():
 
     def load_state(self):
         self.validation_error.pack_forget()
-        width, height, grid, snap_to_grid = settings.get_canvas()
+        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
         self.width.set_value(width)
         self.height.set_value(height)
-        self.grid.set_value(grid)
-        self.snap.set_value(snap_to_grid)
+        self.gridsize.set_value(grid)
+        self.snaptogrid.set_value(snap_to_grid)
+        self.displaygrid.set_value(display_grid)
+        self.canvascolour.set_value(canvas_colour)
+        self.gridcolour.set_value(grid_colour)
         
     def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
-        if self.width.validate() and self.height.validate() and self.grid.validate():
+        if self.width.validate() and self.height.validate() and self.gridsize.validate():
             self.validation_error.pack_forget()
             width = self.width.get_value()
             height = self.height.get_value()
-            grid = self.grid.get_value()
-            snap_to_grid = self.snap.get_value()
-            settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid)
+            grid = self.gridsize.get_value()
+            snap_to_grid = self.snaptogrid.get_value()
+            display_grid = self.displaygrid.get_value()
+            canvas_colour = self.canvascolour.get_value()
+            grid_colour = self.gridcolour.get_value()
+            settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid,
+                    display_grid=display_grid, canvas_colour=canvas_colour, grid_colour=grid_colour)
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
@@ -362,8 +384,11 @@ class edit_canvas_settings():
             
     def close_window(self):
         global canvas_settings_window
-        canvas_settings_window = None
-        self.window.destroy()
+        # Prevent the dialog being closed if the colour chooser is still open as
+        # for some reason this doesn't get destroyed when the parent is destroyed
+        if not self.canvascolour.is_open() and not self.gridcolour.is_open():
+            canvas_settings_window = None
+            self.window.destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the SPROG settings selection toolbar window. Note the init function takes

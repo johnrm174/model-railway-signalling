@@ -39,6 +39,7 @@ then you can use this feature with external DCC-relay modules for operating trac
 needed to complete the route setup (level crossings, track isolating sections etc). 
 * The font, font size, font colour (black, white or auto) and font style can now be specified for Route
 Buttons (these options can also be applied to text boxes and DCC Switches)
+* The canvas (background) colour and grid colour can now be changed and the grid hidden in edit mode
 * Bugfix to colour chooser - Previous colour will now be retained if cancelled (without errors)
 * Bugfix to object selection (shift-left-click) - will now no longer error if cursor is not over an object
 

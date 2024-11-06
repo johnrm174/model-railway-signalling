@@ -60,6 +60,9 @@ default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
 default_settings["canvas"]["grid"] = 25
 default_settings["canvas"]["snaptogrid"] = True
+default_settings["canvas"]["displaygrid"] = True
+default_settings["canvas"]["canvascolour"] = "grey85"
+default_settings["canvas"]["gridcolour"] = "#999"
 default_settings["logging"] = {}
 default_settings["logging"]["level"] = 2   # Warning
 default_settings["sprog"] = {}
@@ -185,13 +188,20 @@ def get_canvas():
     height = settings["canvas"]["height"]
     grid = settings["canvas"]["grid"]
     snap_to_grid = settings["canvas"]["snaptogrid"]
-    return (width, height, grid, snap_to_grid)
+    display_grid = settings["canvas"]["displaygrid"]
+    canvas_colour = settings["canvas"]["canvascolour"]
+    grid_colour = settings["canvas"]["gridcolour"]
+    return (width, height, grid, snap_to_grid,display_grid, canvas_colour, grid_colour)
 
-def set_canvas(width:int=None, height:int=None, grid:int=None, snap_to_grid:bool=None):
+def set_canvas(width:int=None, height:int=None, grid:int=None, snap_to_grid:bool=None,
+               display_grid:bool=None, canvas_colour:str=None, grid_colour:str=None):
     if width is not None: settings["canvas"]["width"] = width
     if height is not None: settings["canvas"]["height"] = height
     if grid is not None: settings["canvas"]["grid"] = grid
     if snap_to_grid is not None: settings["canvas"]["snaptogrid"] = snap_to_grid
+    if display_grid is not None: settings["canvas"]["displaygrid"] = display_grid
+    if canvas_colour is not None: settings["canvas"]["canvascolour"] = canvas_colour
+    if grid_colour is not None: settings["canvas"]["gridcolour"] = grid_colour
     return()
 
 #------------------------------------------------------------------------------------

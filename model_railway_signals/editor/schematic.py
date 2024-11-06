@@ -98,11 +98,11 @@ schematic_state["selectedobjects"] = []      # List of currently selected Object
 # canvas_width / canvas_height / canvas_grid are used for positioning of objects.
 root = None
 canvas = None
-canvas_width = 0
-canvas_height = 0
-canvas_grid = 0
-canvas_grid_state = "normal"
-canvas_snap_to_grid = True
+canvas_width = None
+canvas_height = None
+canvas_grid = None
+canvas_snap_to_grid = None
+canvas_display_grid = None
 # The callback to make (for selected canvas events) - Mode change, toggle Snap to Grid etc
 # event makes this callback (to enable the application mode to be toggled between edit and run)
 canvas_event_callback = None
@@ -130,24 +130,6 @@ def canvas_coordinates(event):
     x = canvas.canvasx(event.x)
     y = canvas.canvasy(event.y)
     return(x, y)
-
-#------------------------------------------------------------------------------------
-# Internal Function to draw (or redraw) the grid on the screen (after re-sizing)
-# Uses the global canvas_width, canvas_height, canvas_grid variables
-#------------------------------------------------------------------------------------
-
-def draw_grid():
-    # Note we leave the 'state' of the grid  unchanged when re-drawing
-    # As the 'state' is set (normal or hidden) when enabling/disabling editing
-    canvas.delete("grid")
-    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline='#999', fill="", tags="grid", state=canvas_grid_state)
-    for i in range(0, canvas_height, canvas_grid):
-        canvas.create_line(0,i,canvas_width,i,fill='#999',tags="grid",state=canvas_grid_state)
-    for i in range(0, canvas_width, canvas_grid):
-        canvas.create_line(i,0,i,canvas_height,fill='#999',tags="grid",state=canvas_grid_state)
-    # Push the grid to the back (behind any drawing objects)
-    canvas.tag_lower("grid")
-    return()
 
 #------------------------------------------------------------------------------------
 # Internal functions to create and place (and cancel the placing of) a new object.
@@ -827,19 +809,29 @@ def cancel_move_in_progress(event=None):
 # of new schematic or re-size of canvas via menubar). Updates the global variables
 #------------------------------------------------------------------------------------
 
-def update_canvas(width:int, height:int, grid:int, snap_to_grid:bool):
-    global canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid
-    # Update the tkinter canvas object if the size has been updated
+def update_canvas(width:int, height:int, grid:int, snap_to_grid:bool,
+                  display_grid:bool, canvas_colour:str, grid_colour:str):
+    global canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid, canvas_display_grid
+    # If the size has changed then set the global variables and resize the window
     if canvas_width != width or canvas_height != height:
         canvas_width, canvas_height = width, height
         reset_window_size()
-    else:
-        canvas_width, canvas_height = width, height
-    # Set the global variables (used in the 'draw_grid' function)
-    canvas_grid, canvas_snap_to_grid = grid, snap_to_grid
-    draw_grid()
-    # Also update the objects module with the new settings
-    objects.update_canvas(canvas_width, canvas_height, canvas_grid)
+    # Set the other global variables (used by other functions)
+    canvas_grid, canvas_snap_to_grid, canvas_display_grid = grid, snap_to_grid, display_grid
+    # Work out whether we display the grid or not
+    if display_grid and edit_mode_active: grid_state = "normal"
+    else: grid_state = "hidden"
+    # Change the colour of the canvas
+    canvas.configure(bg=canvas_colour)
+    # Redraw the grid to reflect the new settings
+    canvas.delete("grid")
+    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline=grid_colour, fill="", tags="grid", state=grid_state)
+    for i in range(0, canvas_height, canvas_grid):
+        canvas.create_line(0, i, canvas_width, i, fill=grid_colour, tags="grid", state=grid_state)
+    for i in range(0, canvas_width, canvas_grid):
+        canvas.create_line(i, 0, i, canvas_height, fill=grid_colour, tags="grid", state=grid_state)
+    # Push the grid to the back (behind any drawing objects)
+    canvas.tag_lower("grid")
     return()
 
 #------------------------------------------------------------------------------------
@@ -932,14 +924,16 @@ def disable_edit_keypress_events():
 #------------------------------------------------------------------------------------
 
 def configure_edit_mode(edit_mode:bool):
-    global canvas_grid_state
+    global canvas_grid_hidden
     global edit_mode_active
     # Save the edit mode state in a global variable (for use by the mouse button functions)
     edit_mode_active = edit_mode
     if edit_mode:
-        # Display the Edit Mode Grid
-        canvas_grid_state = "normal"
-        canvas.itemconfig("grid",state=canvas_grid_state)
+        # Display the Edit Mode Grid (if enabled)
+        if edit_mode_active and canvas_display_grid:
+            canvas.itemconfig("grid",state="normal")
+        else:
+            canvas.itemconfig("grid",state="hidden")
         # Re-pack the subframe containing the "add object" buttons to display it. Note that we
         # first 'forget' the canvas_frame and then re-pack the button_frame first, followed by
         # the canvas_frame - this ensures that the buttons don't dissapear on window re-size
@@ -965,8 +959,7 @@ def configure_edit_mode(edit_mode:bool):
         canvas.unbind('<Control-Key-a>')
     else:
         # Hide the Edit Mode Grid
-        canvas_grid_state = "hidden"
-        canvas.itemconfig("grid",state=canvas_grid_state)
+        canvas.itemconfig("grid",state="hidden")
         # Deselect any currently selected objects
         deselect_all_objects()
         # Forget the subframe containing the "add object" buttons to hide it
@@ -992,16 +985,19 @@ def configure_edit_mode(edit_mode:bool):
 # Externally Called Initialisation function for the Canvas object
 #------------------------------------------------------------------------------------
 
-def initialise (root_window, event_callback, width:int, height:int, grid:int, snap_to_grid:bool, edit_mode:bool):
+def initialise (root_window, event_callback, width:int, height:int, grid:int, snap_to_grid:bool,
+                 display_grid:bool, background_colour:str, edit_mode:bool):
     global root, canvas, popup1, popup2
-    global canvas_width, canvas_height, canvas_grid, canvas_grid_state, canvas_snap_to_grid
+    global canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid, canvas_display_grid
     global button_frame, canvas_frame, button_images
     global canvas_event_callback
     global edit_mode_active
-    # Store the global variables we need within the schematic module
-    edit_mode_active = edit_mode
+    # Set the global variables (used by other functions)
     root = root_window
+    edit_mode_active = edit_mode
     canvas_event_callback = event_callback
+    canvas_width, canvas_height, canvas_grid = width, height, grid
+    canvas_snap_to_grid, canvas_display_grid = snap_to_grid, display_grid
     # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
     frame = Tk.Frame(root_window)
     frame.pack (expand=True, fill=Tk.BOTH)
@@ -1013,13 +1009,10 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     # Create a subframe to hold the canvas and scrollbars
     canvas_frame = Tk.Frame(frame, borderwidth=1)
     canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
-    # Save the Default values for the canvas as global variables
-    canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid = width, height, grid, snap_to_grid
-    if edit_mode: canvas_grid_state = "normal"
-    else: canvas_grid_state = "hidden"
     # Create the canvas and scrollbars inside the parent frame
     # We also set focus on the canvas so the keypress events will take effect
-    canvas = Tk.Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
+    canvas = Tk.Canvas(canvas_frame ,bg=background_colour,
+                scrollregion=(0, 0, canvas_width, canvas_height))
     canvas.focus_set()
     hbar = Tk.Scrollbar(canvas_frame, orient=Tk.HORIZONTAL)
     hbar.pack(side=Tk.BOTTOM, fill=Tk.X)
@@ -1083,7 +1076,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')
     # Initialise the Objects and run_layout modules with the canvas details
-    objects.initialise(root_window, canvas, canvas_width, canvas_height, canvas_grid)
+    objects.initialise(root_window, canvas)
     run_layout.initialise(root_window, canvas)
     run_routes.initialise(root_window, canvas)
     return()
