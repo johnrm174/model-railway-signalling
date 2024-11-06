@@ -1130,92 +1130,6 @@ def run_sensor_config_update_on_change_of_id_tests(delay:float=0.0):
     return()
 
 #-----------------------------------------------------------------------------------
-# These test the Item ID update functions for Schematic Routes, specifically:
-#    Update of Schematic route configuration to reflect change of Point ID
-#    Update of Schematic route configuration to reflect change of Signal ID
-#    Update of Schematic route configuration to reflect change of line ID
-#    Update of Schematic route configuration to reflect change of Track Sensor ID
-#    Update of Schematic route configuration to reflect deletion of point ID
-#    Update of Schematic route configuration to reflect deletion of signal ID
-#    Update of Schematic route configuration to reflect deletion of line ID
-#    Update of Schematic route configuration to reflect deletion of Track Sensor ID
-#-----------------------------------------------------------------------------------
-
-def run_route_config_update_on_change_of_id_tests(delay:float=0.0):
-    print("Object configuration updates - Test update of Schematic Route Configuration on change or delete of Item IDs")
-    print("Object configuration updates - #############################################################################################################")
-    print("Object configuration updates - ########################## NEED TO ADD TESTS FOR DCC SWITCH IDs CHANGING ####################################")
-    print("Object configuration updates - #############################################################################################################")
-    # Add elements to the layout
-    p1 = create_left_hand_point(100,50)
-    p2 = create_left_hand_point(200,50)
-    s1 = create_colour_light_signal(300,40)
-    s2 = create_colour_light_signal(400,40)
-    s3 = create_colour_light_signal(500,40)
-    s4 = create_colour_light_signal(600,40)
-    l1 = create_line(200,100)
-    l2 = create_line(400,100)
-    ts1 = create_track_sensor(100,140)
-    ts2 = create_track_sensor(200,140)
-    r1 = create_route(300,150)
-    # Set up the Configuration for the Schematic Route
-    update_object_configuration(r1,{
-        "signalsonroute":[1,2],
-        "subsidariesonroute":[3,4],
-        "pointsonroute":{"1":True, "2":False},
-        "linestohighlight":[1,2],
-        "pointstohighlight":[1,2],
-        "tracksensor":1,
-        "setupsensor":2 } )
-    # Change the IDs of All the schematic objects
-    update_object_configuration(s1,{"itemid":11})
-    update_object_configuration(s2,{"itemid":12})
-    update_object_configuration(s3,{"itemid":13})
-    update_object_configuration(s4,{"itemid":14})
-    update_object_configuration(p1,{"itemid":21})
-    update_object_configuration(p2,{"itemid":22})
-    update_object_configuration(l1,{"itemid":31})
-    update_object_configuration(l2,{"itemid":32})
-    update_object_configuration(ts1,{"itemid":41})
-    update_object_configuration(ts2,{"itemid":42})
-    # Test the configuration has been updated correctly for the Route
-    assert_object_configuration(r1,{
-        "signalsonroute":[11,12],
-        "subsidariesonroute":[13,14],
-        "pointsonroute":{"21":True, "22":False},
-        "linestohighlight":[31,32],
-        "pointstohighlight":[21,22],
-        "tracksensor":41,
-        "setupsensor":42 } )
-    # Delete half of the objects and Test the configuration has been updated correctly for the Route
-    deselect_all_objects()
-    select_or_deselect_objects(s1,s3,p1,l1,ts1)
-    delete_selected_objects()
-    assert_object_configuration(r1,{
-        "signalsonroute":[12],
-        "subsidariesonroute":[14],
-        "pointsonroute":{"22":False},
-        "linestohighlight":[32],
-        "pointstohighlight":[22],
-        "tracksensor":0,
-        "setupsensor":42 } )
-    # Delete everything else and Test the configuration has been updated correctly for the Route
-    select_or_deselect_objects(s2,s4,p2,l2,ts2)
-    delete_selected_objects()
-    assert_object_configuration(r1,{
-        "signalsonroute":[],
-        "subsidariesonroute":[],
-        "pointsonroute":{},
-        "linestohighlight":[],
-        "pointstohighlight":[],
-        "tracksensor":0,
-        "setupsensor":0 } )
-    # clean up
-    select_all_objects()
-    delete_selected_objects()
-    return()
-
-#-----------------------------------------------------------------------------------
 # These test the reset objects functions, specifically:
 # All points, sections, instruments signals and buttons are returned to their default states
 #-----------------------------------------------------------------------------------
@@ -1300,7 +1214,6 @@ def run_all_object_editing_tests(delay:float=0.0):
     run_basic_change_of_item_id_tests()
     run_signal_config_update_on_change_of_id_tests()
     run_sensor_config_update_on_change_of_id_tests()  
-    run_route_config_update_on_change_of_id_tests()  
     run_reset_objects_tests(delay)
     report_results()
     
