@@ -118,34 +118,16 @@ default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 
 #------------------------------------------------------------------------------------
 # Function to set the required defaults for the Objects package at application start
-# The Tkinter Canvas Object and default canvas attributes (dimentions and grid size)
-# are saved as global variables for easy referencing. The Canvas width, height and grid
-# are used for optimising the positioning of objects on creation or 'paste'
-# Also calls the run_layout.initialise function to set the tkinter canvas object
+# The Tkinter Canvas & Root references are saved as global variables for easy referencing.
 #------------------------------------------------------------------------------------
 
 canvas = None
 root = None
-canvas_width = 0
-canvas_height = 0
-canvas_grid = 0
 
-def initialise (root_object, canvas_object, width:int, height:int, grid:int):
+def initialise (root_object, canvas_object):
     global canvas, root
     canvas = canvas_object
     root = root_object
-    update_canvas(canvas_width, canvas_height, grid)
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to update the Canvas Attributes (following layout load or canvas resize)
-#------------------------------------------------------------------------------------
-
-def update_canvas(width:int, height:int, grid:int):
-    global canvas_width, canvas_height, canvas_grid
-    canvas_width = width
-    canvas_height = height
-    canvas_grid = grid
     return()
     
 #------------------------------------------------------------------------------------

@@ -66,7 +66,6 @@ from .objects import save_schematic_state
 from .objects import reset_objects
 
 from .objects_common import initialise
-from .objects_common import update_canvas
 from .objects_common import signal 
 from .objects_common import point 
 from .objects_common import section
