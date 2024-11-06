@@ -5,7 +5,7 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 10445,
+            "bbox": 10758,
             "border": 2,
             "colour": "#0000ff",
             "font": "Courier",
@@ -37,7 +37,7 @@
             "filename": "/home/john/model-railway-signalling/configuration_examples/sensor_node.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.7.0"
+            "version": "Version 4.8.0"
         },
         "gpio": {
             "portmappings": [
