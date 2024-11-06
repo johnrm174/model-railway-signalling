@@ -224,31 +224,28 @@ def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to remove references to a Line ID from the Route's configuration
-# The 'linestohighlight' table comprises a list of line IDs for the route.
+# Function to remove references to a Switch ID from the Route's configuration
+# The 'switchesonroute' table comprises a dict of switch settings (True/False)
+# with the key of str(Switch_ID).
 #------------------------------------------------------------------------------------
 
 def remove_references_to_switch(switch_id:int):
     for route_id in objects_common.route_index:
-        current_switches_table = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"]
-        new_switches_table = []
-        for item_id in current_switches_table:
-            if item_id != switch_id:
-                new_switches_table.append(item_id)
-        objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"] = new_switches_table
+        if str(switch_id) in objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].keys():
+            del objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][str(switch_id)]
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update references to a Line ID in the Route's configuration.
-# The 'linestohighlight' table comprises a list of line IDs for the route.
+# Function to update references to a Switch ID in the Route's configuration.
+# The 'switchesonroute' table comprises a dict of switch settings (True/False)
+# with the key of str(Switch_ID).
 #------------------------------------------------------------------------------------
 
 def update_references_to_switch(old_switch_id:int, new_switch_id:int):
     for route_id in objects_common.route_index:
-        current_switches_table = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"]
-        for index, item_id in enumerate(current_switches_table):
-            if item_id == old_switch_id:
-                objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][index] = new_switch_id
+        if str(old_switch_id) in objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].keys():
+            value = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].pop(str(old_switch_id))
+            objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][str(new_switch_id)] = value
     return()
 
 #------------------------------------------------------------------------------------
@@ -355,9 +352,11 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["signalsonroute"] = default_route_object["signalsonroute"]
     objects_common.schematic_objects[new_object_id]["subsidariesonroute"] = default_route_object["subsidariesonroute"]
     objects_common.schematic_objects[new_object_id]["pointsonroute"] = default_route_object["pointsonroute"]
+    objects_common.schematic_objects[new_object_id]["switchesonroute"] = default_route_object["switchesonroute"]
     objects_common.schematic_objects[new_object_id]["linestohighlight"] = default_route_object["linestohighlight"]
     objects_common.schematic_objects[new_object_id]["pointstohighlight"] = default_route_object["pointstohighlight"]
     objects_common.schematic_objects[new_object_id]["tracksensor"] = default_route_object["tracksensor"]
+    objects_common.schematic_objects[new_object_id]["setupsensor"] = default_route_object["setupsensor"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create the associated library objects
