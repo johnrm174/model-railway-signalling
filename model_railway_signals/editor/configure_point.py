@@ -15,13 +15,12 @@
 #
 # Makes the following external API calls to library modules:
 #    points.point_exists(point_id) - To see if a specified point ID exists (local)
-#    dcc_control.dcc_address_mapping - To see if a DCC address is already mapped
 #
 # Inherits the following common editor base classes (from common):
 #    common.int_item_id_entry_box
 #    common.Createtool_tip
 #    common.check_box
-#    common.dcc_entry_box
+#    common.validated_dcc_entry_box
 #    common.object_id_selection
 #    common.selection_buttons
 #    common.signal_route_frame
@@ -39,7 +38,6 @@ from . import common
 from . import objects
 
 from ..library import points
-from ..library import dcc_control
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID
@@ -192,41 +190,6 @@ class general_settings():
                 self.CB4.get_value(), self.CB2.get_value())
 
 #------------------------------------------------------------------------------------
-# Class for a point_dcc_entry_box - builds on the common DCC Entry Box class
-# Class instance methods inherited from the parent class are:
-#    "get_value" - will return the last valid entry box value (dcc address)
-# Public class instance methods provided/overridden by this child class are
-#    "set_value" - set the initial value of the dcc_entry_box (int) - Also
-#                  sets the current item ID (int) for validation purposes
-#    "validate" - Validates the DCC address is not mapped to another item
-#------------------------------------------------------------------------------------
-
-class point_dcc_entry_box(common.dcc_entry_box):
-    def __init__(self, parent_frame, callback):
-        # We need the current Point ID to validate the DCC Address entry
-        self.current_item_id = 0
-        super().__init__(parent_frame, callback=callback)
-        
-    def validate(self):
-        # Do the basic item validation first (exists and not current item ID)
-        valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            # Ensure the address is not mapped to another signal or point
-            dcc_address = int(self.entry.get())
-            dcc_mapping = dcc_control.dcc_address_mapping(dcc_address)
-            if dcc_mapping is not None and (dcc_mapping[0] != "Point" or dcc_mapping[1] != self.current_item_id):
-                # We need to correct the mapped signal ID for secondary distants
-                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
-                self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
-                valid = False
-        self.set_validation_status(valid)
-        return(valid)
-    
-    def set_value(self, value:int, item_id:int):
-        self.current_item_id = item_id
-        super().set_value(value)
-
-#------------------------------------------------------------------------------------
 # Class for the point DCC Address settings UI element - provides the following functions
 #    "set_values" - will set the entry/checkboxes (address:int, reversed:bool)
 #    "get_values" - will return the entry/checkboxes (address:int, reversed:bool]
@@ -242,7 +205,7 @@ class dcc_address_settings():
         # These are created in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.EB = point_dcc_entry_box(self.subframe, callback=self.entry_updated)
+        self.EB = common.validated_dcc_entry_box(self.subframe, callback=self.entry_updated, item_type="Point")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB = common.check_box(self.subframe, label="Reversed",
                     tool_tip="Select to reverse the DCC command logic")
@@ -306,25 +269,25 @@ class point_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Point ID, Point Type and point colour Selections
         self.frame = Tk.Frame(parent_tab)
-        self.frame.pack(padx=2, pady=2, fill='x')
+        self.frame.pack(fill='x')
         # Create the UI Element for Point ID selection
         self.pointid = common.object_id_selection(self.frame, "Point ID",
                                 exists_function = points.point_exists) 
-        self.pointid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.pointid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
-        self.pointtype = common.selection_buttons(self.frame, "Point Type",
-                    "Select Point Type", self.point_type_updated, "RH", "LH", "Y-Point")
-        self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+        self.pointtype = common.selection_buttons(self.frame, label="Point Type", tool_tip="Select Point Type",
+                                    callback=self.point_type_updated, button_labels=("RH", "LH", "Y-Point"))
+        self.pointtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create the Point colour selection element
         self.colour = common.colour_selection(self.frame, label="Colour")
-        self.colour.frame.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
+        self.colour.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
         # Create the point subtype selection
         subtype_tooltip= ("Select Point Subtype:\nNorm=Default Point\nTRP=Trap Point\n"+
                     "SS1=Single Slip - side 1\nSS2=Single Slip - side 2\nDS1=Double Slip - side 1\n"+
                     "DS2=Double slip - side 2\nSX=Scissors crossover (or 3-way Point) components")
-        self.pointsubtype = common.selection_buttons(parent_tab, "Point Subtype", subtype_tooltip,
-                                        None, "Norm", "TRP", "SS1", "SS2", "DS1", "DS2", "SX")
-        self.pointsubtype.frame.pack(padx=2, pady=2, fill='x')
+        self.pointsubtype = common.selection_buttons(parent_tab, label="Point Subtype", tool_tip=subtype_tooltip,
+                                    callback=None, button_labels=("Norm", "TRP", "SS1", "SS2", "DS1", "DS2", "SX"))
+        self.pointsubtype.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the point button offset settings
         self.buttonoffsets = button_offsets(parent_tab)
         self.buttonoffsets.frame.pack(padx=2, pady=2, fill='x')
@@ -377,7 +340,7 @@ class edit_point():
             open_windows[object_id] = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
@@ -490,7 +453,7 @@ class edit_point():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

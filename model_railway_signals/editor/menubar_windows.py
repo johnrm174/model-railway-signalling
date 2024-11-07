@@ -82,17 +82,17 @@ from ..library import mqtt_interface
 help_text = """
 Schematic editor functions (Edit Mode):
  
-1) Use the buttons on the left to add objects to the schematic.
-2) Left-click to select objects (shift-left-click will add/remove from the selection).
-3) Left-click/release when over an object to drag/drop selected objects.
-4) Left-click/release when not over an object to seleact an 'area'.
+1) Use the buttons on the left to add objects to the schematic (left-click to place)
+2) Left-click to select objects (shift-left-click will add/remove from the selection)
+3) Left-click/release when over an object to drag/drop selected objects
+4) Left-click/release when not over an object to seleact an 'area'
 5) Left-click/release on the 'end' of a selected line to move the line end.
 6) Double-left-click on a schematic object to open the object configuraton window
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
 9) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
 10) <backspace> will delete all currently selected objects from the schematic
-11) <cntl-c> / <cntl-v> will copy/paste all currently selected objects
+11) <cntl-c> will copy all currently selected objects (to be moved/placed as required)
 12) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
 13) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
 14) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
@@ -259,7 +259,7 @@ class edit_layout_info():
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             # We need to pack the window buttons at the bottom and then pack the text
             # frame - so the buttons remain visible if the user re-sizes the window
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
             # Load the initial UI state
             self.load_state()
@@ -302,34 +302,49 @@ class edit_canvas_settings():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             canvas_settings_window = self.window
-            # Create the entry box elements for the width, height and grid
-            # Pack the elements as a grid to get an aligned layout
-            self.frame = Tk.Frame(self.window)
-            self.frame.pack()
-            self.frame.grid_columnconfigure(0, weight=1)
-            self.frame.grid_columnconfigure(1, weight=1)
-            self.label1 = Tk.Label(self.frame, text="Canvas width:")
+            # Create a label frame for the general settings
+            self.frame1 = Tk.LabelFrame(self.window, text="General settings")
+            self.frame1.pack(padx=2, pady=2, fill="x")
+            # Create the entry box elements for the width, height and grid in a subframe
+            # Pack the elements as into the subframe using 'grid' to get an aligned layout
+            self.subframe1 = Tk.Frame(self.frame1)
+            self.subframe1.pack()
+            self.subframe1.grid_columnconfigure(0, weight=1)
+            self.subframe1.grid_columnconfigure(1, weight=1)
+            self.label1 = Tk.Label(self.subframe1, text="Canvas width:")
             self.label1.grid(row=0, column=0)
-            self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=8000,
+            self.width = common.integer_entry_box(self.subframe1, width=5, min_value=400, max_value=8000,
                             allow_empty=False, tool_tip="Enter width in pixels (400-8000)")
             self.width.grid(row=0, column=1)
-            self.label2 = Tk.Label(self.frame, text="Canvas height:")
+            self.label2 = Tk.Label(self.subframe1, text="Canvas height:")
             self.label2.grid(row=1, column=0)
-            self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=4000,
+            self.height = common.integer_entry_box(self.subframe1, width=5, min_value=200, max_value=4000,
                             allow_empty=False, tool_tip="Enter height in pixels (200-4000)")
             self.height.grid(row=1, column=1)
-            self.label3 = Tk.Label(self.frame, text="Canvas Grid:")
+            self.label3 = Tk.Label(self.subframe1, text="Canvas Grid:")
             self.label3.grid(row=2, column=0)
-            self.grid = common.integer_entry_box(self.frame, width=5, min_value=5, max_value=25,
+            self.gridsize = common.integer_entry_box(self.subframe1, width=5, min_value=5, max_value=25,
                             allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
-            self.grid.grid(row=2, column=1)
-            # Create the check box element for snap to grid
-            self.snap = common.check_box (self.window, label="Snap to Grid",
-                            tool_tip="Enable/Disable 'Snap-to-Grid' for schematic editing")
-            self.snap.pack(padx=2, pady=2)
+            self.gridsize.grid(row=2, column=1)
+            # Create the elements for the other settings in a second subframe (within the labelframe
+            self.subframe2 = Tk.Frame(self.frame1)
+            self.subframe2.pack()
+            self.snaptogrid = common.check_box (self.subframe2, label="Snap to grid",
+                            tool_tip="Enable/disable 'Snap-to-Grid' for schematic editing")
+            self.snaptogrid.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.displaygrid = common.check_box (self.subframe2, label="Display grid",
+                            tool_tip="Display/hide the grid in edit mode")
+            self.displaygrid.pack(padx=2, pady=2, side=Tk.LEFT)
+            # Create another Frame to hold the colour selections
+            self.frame2 = Tk.Frame(self.window)
+            self.frame2.pack(fill="x")
+            self.canvascolour = common.colour_selection(self.frame2, label="Canvas colour")
+            self.canvascolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
+            self.gridcolour = common.colour_selection(self.frame2, label="Grid colour")
+            self.gridcolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
@@ -337,21 +352,28 @@ class edit_canvas_settings():
 
     def load_state(self):
         self.validation_error.pack_forget()
-        width, height, grid, snap_to_grid = settings.get_canvas()
+        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
         self.width.set_value(width)
         self.height.set_value(height)
-        self.grid.set_value(grid)
-        self.snap.set_value(snap_to_grid)
+        self.gridsize.set_value(grid)
+        self.snaptogrid.set_value(snap_to_grid)
+        self.displaygrid.set_value(display_grid)
+        self.canvascolour.set_value(canvas_colour)
+        self.gridcolour.set_value(grid_colour)
         
     def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
-        if self.width.validate() and self.height.validate() and self.grid.validate():
+        if self.width.validate() and self.height.validate() and self.gridsize.validate():
             self.validation_error.pack_forget()
             width = self.width.get_value()
             height = self.height.get_value()
-            grid = self.grid.get_value()
-            snap_to_grid = self.snap.get_value()
-            settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid)
+            grid = self.gridsize.get_value()
+            snap_to_grid = self.snaptogrid.get_value()
+            display_grid = self.displaygrid.get_value()
+            canvas_colour = self.canvascolour.get_value()
+            grid_colour = self.gridcolour.get_value()
+            settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid,
+                    display_grid=display_grid, canvas_colour=canvas_colour, grid_colour=grid_colour)
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
@@ -362,8 +384,11 @@ class edit_canvas_settings():
             
     def close_window(self):
         global canvas_settings_window
-        canvas_settings_window = None
-        self.window.destroy()
+        # Prevent the dialog being closed if the colour chooser is still open as
+        # for some reason this doesn't get destroyed when the parent is destroyed
+        if not self.canvascolour.is_open() and not self.gridcolour.is_open():
+            canvas_settings_window = None
+            self.window.destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the SPROG settings selection toolbar window. Note the init function takes
@@ -430,7 +455,7 @@ class edit_sprog_settings():
             self.status.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
 
@@ -518,12 +543,12 @@ class edit_logging_settings():
             edit_logging_settings_window = self.window
             # Create the logging Level selections element
             self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
-                                                b1="Error", b2="Warning", b3="Info", b4="Debug",
-                                                tool_tip="Set the logging level for running the layout")
-            self.log_level.frame.pack()
+                                        tool_tip="Set the logging level for running the layout",
+                                        button_labels=("Error", "Warning", "Info", "Debug") )
+            self.log_level.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
 
@@ -666,24 +691,29 @@ class mqtt_subscribe_tab():
         # Create the Serial Port and baud rate UI elements 
         self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = common.entry_box_grid(self.frame1, base_class=common.entry_box, columns=4, width=8,
+        self.dcc = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
             tool_tip="Specify the remote network nodes to take a DCC command feed from")
+        self.dcc.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = common.entry_box_grid(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote signals to subscribe to (in the form 'node-ID')")
+        self.signals.pack(padx=2, pady=2, fill='x')
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = common.entry_box_grid(self.frame3, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.sections = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sections to subscribe to (in the form 'node-ID')")
+        self.sections.pack(padx=2, pady=2, fill='x')
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = common.entry_box_grid(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
+        self.instruments.pack(padx=2, pady=2, fill='x')
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = common.entry_box_grid(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
+        self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
+        self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
         return (self.dcc.validate() and self.signals.validate() and self.sections.validate()
@@ -702,23 +732,27 @@ class mqtt_publish_tab():
                 tool_tip="Select to publish all DCC commands from this node via the "+
                     "MQTT Network (so the feed can be picked up by the node hosting "+
                     "the Pi-SPROG DCC interface) and sent out to the layout")
-        self.dcc.pack(padx=2, pady=2)
+        self.dcc.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = common.entry_box_grid(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the signals (on the local schematic) to publish via the MQTT network")
+        self.signals.pack(padx=2, pady=2, fill='x')
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sections = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sections (on the local schematic) to publish via the MQTT network")
+        self.sections.pack(padx=2, pady=2, fill='x')
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = common.entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
+        self.instruments.pack(padx=2, pady=2, fill='x')
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
+        self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
         return (self.signals.validate() and self.sections.validate()
@@ -801,7 +835,7 @@ class edit_mqtt_settings():
             edit_mqtt_settings_window = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
@@ -1025,7 +1059,7 @@ class edit_gpio_settings():
             self.gpio = gpio_port_entry_frame(self.frame)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
@@ -1105,7 +1139,7 @@ class edit_general_settings():
             self.fontsize.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state

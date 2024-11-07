@@ -22,16 +22,26 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.7.0:
+## What's new for Release 4.8.0:
 
-* Track Sections, Track Sensors and Text Boxes can be hidden in RUN Mode if required - this enables the
-schematic to be annonated with design notes in Edit Mode (which are then hidden in Run Mode). Also
-provides flexibility for implementing other niche automation use cases on your layout.
-* Ability to set the background colour of Text Boxes to 'Transparent (i.e. no fill colour)
-* Point/signal button sizes can be changed via general settings (aids selection via touchscreen monitors)
-* The colour of the Schematic Route buttons can now be set by the user (for differentiating route groups)
-* Setup of Schematic Routes can now be triggered from Track Sensors (useful for converging routes)
-* Bugfix to schematic editor - to prevent right mouse clicks whilst object moves ae in progress
+* Improved object creation - when you click a button to add a new object to the schematic, the object
+now moves with the cursor until 'placed' on the canvas in the desired position (by left mouse click).
+Useful for working on layout schematics larger than the displayed window scroll area.
+* Improved copy function - The new objects now appear on the schematic as soon as you have copied them.
+They then track the cursor until 'placed' on the canvas in the desired position (by left mouse click).
+Useful for working on 'busy' layout schematics where the copied items would have overlayed other objects.
+* Other minor improvements to the schematic editor in terms of cursor styles during object moves and area
+selections (Edit Mode), and scrolling of the displayed canvas area via the mouse/touchscreen (Run Mode).
+* New DCC Accessory switches feature, enabling you to add and configure buttons on the schematic to 
+control other DCC-enabled accessories on your layout (e.g. If you are still analogue for control of trains,
+then you can use this feature with external DCC-relay modules for operating track isolating sections).
+* Improved Route Feature - DCC switches can be added to the route configuration to operate DCC accessories
+needed to complete the route setup (level crossings, track isolating sections etc). 
+* The font, font size, font colour (black, white or auto) and font style can now be specified for Route
+Buttons (these options can also be applied to text boxes and DCC Switches)
+* The canvas (background) colour and grid colour can now be changed and the grid hidden in edit mode
+* Bugfix to colour chooser - Previous colour will now be retained if cancelled (without errors)
+* Bugfix to object selection (shift-left-click) - will now no longer error if cursor is not over an object
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

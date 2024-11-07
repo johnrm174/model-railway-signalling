@@ -15,17 +15,23 @@
 #    scrollable_text_frame(Tk.Frame)
 #
 # Provides the following 'compound' UI elements for the application
-#    object_id_selection(Tk.integer_entry_box)  ######### TO REVIEW #########
 #    validated_dcc_command_entry() - combines int_entry_box and state_box
 #    point_interlocking_entry() - combines int_item_id_entry_box and state_box
-#    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes ######### TO REVIEW #########
-#    signal_route_frame() - read only list of signal_route_selections()  ######### TO REVIEW #########
-#    selection_buttons() - combines multiple RadioButtons  ######### TO REVIEW #########
-#    colour_selection() - Allows the colour of an item to be changed  ######### TO REVIEW #########
-#    window_controls() - apply/ok/reset/cancel  ######### TO REVIEW #########
+#    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes ################ TO REVIEW #########
+#    signal_route_frame() - read only list of signal_route_selections()  ######################### TO REVIEW #########
 #    row_of_widgets() - Pass in the base class to create a fixed length row of the base class
-#    row_of_validated_dcc_commands() - A fixed length (user specified) row of DCC commands
-#    entry_box_grid() - an expandable grid of widgets ######### TO REVIEW #########
+#    row_of_validated_dcc_commands() - Similar to above but 'get_values' removes blanks 
+#    row_of_point_settings() - Similar to above but 'get_values' removes duplicates and blanks
+#    grid_of_widgets() - an expandable grid of widgets (pass in the base class)
+#    grid_of_generic_entry_boxes - As above but 'get_values' removes duplicates and blanks 
+#    grid_of_point_settings() - similar to above but 'get_values' removes duplicates and blanks
+#
+# Provides the following "Stand Alone" UI Elements:
+#    object_id_selection() - Object ID integer entry box in a LabelFrame
+#    selection_buttons() - combines multiple RadioButtons  in a LabelFrame
+#    selection_check_boxes() - combines multiple check_boxes in a LabelFrame
+#    colour_selection() - Colour plus colour chooser button in a LabelFrame
+#    window_controls() - Frame containing the 'apply/ok/reset/cancel' buttons
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -103,6 +109,7 @@ class CreateToolTip():
 #    "get_value" - will return the state (False if disabled) (bool)
 #    "disable/disable1/disable2" - disables/blanks the check_box
 #    "enable/enable1/enable2" - enables/loads the check_box (with the last state)
+#    "reset" - resets the checkbox to its default value (False)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -186,6 +193,9 @@ class check_box(Tk.Checkbutton):
         # Will always return False if disabled
         return(self.selection.get())
 
+    def reset(self):
+        self.set_value(False)
+
 #------------------------------------------------------------------------------------
 # Common class for a generic 'state_box' (like a check_box but with labels for off/on 
 # and blank when disabled) - Builds on the check_box class (defined above).
@@ -195,6 +205,7 @@ class check_box(Tk.Checkbutton):
 #    "get_value" - will return the current state (False if disabled) (bool)
 #    "disable/disable1/disable2" - disables/blanks the state_box
 #    "enable/enable1/enable2"  enables/loads the state_box (with the last state)
+#    "reset" - resets the checkbox to its default value (False)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -254,6 +265,7 @@ class state_box(check_box):
 #    "validate" - This gets overridden by the child class function
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Empty String)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -355,6 +367,9 @@ class entry_box(Tk.Entry):
         if self.enabled0 and self.enabled1 and self.enabled2: return(self.value)
         else: return("")
 
+    def reset(self):
+        self.set_value("")
+
 #------------------------------------------------------------------------------------
 # Common Class for an integer_entry_box - builds on the entry_box class (above).
 # This will only allow valid integers (within the defined range) to be entered.
@@ -365,6 +380,7 @@ class entry_box(Tk.Entry):
 #    "validate" - Validates the entry is an integer within the specified range
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (None or zero)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -421,6 +437,10 @@ class integer_entry_box(entry_box):
             else: return(None)
         else: return(int(super().get_value()))
 
+    def reset(self):
+        if self.empty_allowed: super().set_value("")
+        else: super().set_value(str(0))
+
 #------------------------------------------------------------------------------------
 # Common class for a DCC address entry box - builds on the integer_entry_box class
 # Adds additional validation to ensure the entry is within the DCC address range.
@@ -431,6 +451,7 @@ class integer_entry_box(entry_box):
 #    "validate" - Validates the entry is an integer between 1 and 2047 (or blank)
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Zero)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -458,6 +479,7 @@ class dcc_entry_box(integer_entry_box):
 #    "validate" - Validates entry is a DCC address and not assigned to anything else
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Zero)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -510,6 +532,7 @@ class validated_dcc_entry_box(dcc_entry_box):
 #    "validate" - validates entry in range (1-999) - also see comments above
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (zero)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -562,6 +585,7 @@ class int_item_id_entry_box(integer_entry_box):
 #    "validate" - Validation described in comments above
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Empty string)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -620,6 +644,7 @@ class str_item_id_entry_box(entry_box):
 #    "validate" - Validation described in comments above
 #    "disable/disable1/disable2" - disables/blanks the entry_box
 #    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Empty string)
 #    "pack" - for packing the UI element
 #
 # Class methods/objects for use by child classes:
@@ -777,63 +802,8 @@ class scrollable_text_frame(Tk.Frame):
     def set_font(self, font:str, font_size:int, font_style:str):
         self.text_box.configure(font=(font, font_size, font_style))
 
-#####################################################################################
-######################## COMMON COMPOUND UI ELEMENTS ################################
-#####################################################################################
-
 #------------------------------------------------------------------------------------
-# Compound UI element for an object_id_selection LabelFrame - uses the integer_entry_box.
-# This is used across all object windows for displaying / changing the item ID.
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
-#
-# Public class instance methods inherited from the base integer_entry_box are:
-#    "get_value" - get the last "validated" value of the entry_box (int) 
-#    "disable/disable1/disable2" - disables/blanks the entry_box
-#    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
-#
-# Public class instance methods provided/overridden by this class are
-#    "set_value" - set the initial value of the entry_box (int)
-#    "validate" - Validates that the entered Item ID is "free" (and can therefore be
-#               assigned to this item) or is being changed back to the initial value.
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
-#------------------------------------------------------------------------------------
-
-class object_id_selection(integer_entry_box):
-    def __init__(self, parent_frame, label:str, exists_function):
-        # We need to know the current Item ID for validation purposes
-        self.current_item_id = 0
-        # This is the function to call to see if the object already exists
-        self.exists_function = exists_function
-        # Create a Label Frame for the UI element
-        self.frame = Tk.LabelFrame(parent_frame, text=label)
-        # Call the common base class init function to create the EB
-        tool_tip = ("Enter new ID (1-999) \n" + "Once saved/applied any references "+
-                    "to this object will be updated in other objects")
-        super().__init__(self.frame, width=3, min_value=1, max_value=999,
-                         tool_tip=tool_tip, allow_empty=False)
-        # Pack the Entry box centrally in the label frame
-        self.pack()
-        
-    def validate(self):
-        # Do the basic integer validation first (integer, in range, not empty)
-        valid = super().validate(update_validation_status=False)
-        if valid:
-            # Validate that the entered ID is not assigned to another item
-            # Ignoring the initial value set at load time (which is the current ID)
-            entered_item_id = int(self.entry.get())
-            if self.exists_function(entered_item_id) and entered_item_id != self.current_item_id:
-                self.TT.text = "ID already assigned"
-                valid = False
-        self.set_validation_status(valid)
-        return(valid)
-    
-    def set_value(self, value:int):
-        self.current_item_id = value
-        super().set_value(value)
-
-#------------------------------------------------------------------------------------
-# Compound UI element for a validated_dcc_command_entry (address + command logic).
+# Compound UI element for a validated_dcc_command_entry [address:int, state:bool].
 # Uses the validated_dcc_entry_box and state_box classes, with the state_box only
 # only enabled when a valid DCC address has been entered into the entry_box.
 #
@@ -843,6 +813,7 @@ class object_id_selection(integer_entry_box):
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
 #    "disable" - disables/blanks the entry_box (and associated state button)
 #    "enable"  enables/loads the entry_box (and associated state button)
+#    "reset" - resets the UI Element to its default value ([0, False])
 #    "pack"  for packing the compound UI element
 #
 # The validated_dcc_entry_box class needs the current Item ID and Item Type to validate
@@ -892,10 +863,12 @@ class validated_dcc_command_entry(Tk.Frame):
         # When invalid will return [last valid address, current state]
         return([self.EB.get_value(), self.CB.get_value()])
     
+    def reset(self):
+        self.set_value(dcc_command=[0, False], item_id=0)
+
 #------------------------------------------------------------------------------------
-# Compound UI element for a point_interlocking_entry element (point_id + point_state).
-# This is broadly similar to the validated_dcc_command_entry class (above) but
-# the differences mean its more appropriate to make this a class in its own right
+# Compound UI element for a point_settings_entry [point_id:int, point_state:bool].
+# This is broadly similar to the validated_dcc_command_entry class (above).
 #
 # Main class methods used by the editor are:
 #    "validate" - validate the current entry box value and return True/false
@@ -903,10 +876,11 @@ class validated_dcc_command_entry(Tk.Frame):
 #    "get_value" - will return the last "valid" value [point_id:int, state:bool]
 #    "disable" - disables/blanks the entry box (and associated state button)
 #    "enable"  enables/loads the entry box (and associated state button)
+#    "reset" - resets the UI Element to its default value ([0, False])
 #    "pack"  for packing the compound UI element
 #------------------------------------------------------------------------------------
 
-class point_interlocking_entry(Tk.Frame):
+class point_settings_entry(Tk.Frame):
     def __init__(self, parent_frame, tool_tip:str):
         # Use the parent class frame to pack everything into
         super().__init__(parent_frame)
@@ -936,7 +910,6 @@ class point_interlocking_entry(Tk.Frame):
     def disable(self):
         self.EB.disable()
         self.eb_updated()
-
     def set_value(self, point:[int, bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
         self.EB.set_value(point[0])
@@ -948,6 +921,9 @@ class point_interlocking_entry(Tk.Frame):
         # When disabled (or empty) will always return [0, False]
         # When invalid will return [last valid id, current state]
         return([self.EB.get_value(), self.CB.get_value()])
+
+    def reset(self):
+        self.set_value(point=[0, False])
 
 #------------------------------------------------------------------------------------
 # Class for a signal route selection element (Sig ID EB and route selection CBs)
@@ -1094,212 +1070,11 @@ class signal_route_frame():
             self.label.pack()
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for a LabelFrame containing up to 7 radio buttons
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
-#
-# Class instance elements to use externally are:
-#    "B1" to "B7" - to access the button widgets (i.e. for reconfiguration)
-#
-# Class instance functions to use externally are:
-#    "set_value" - will set the current value (integer 1-5)
-#    "get_value" - will return the last "valid" value (integer 1-5)
-#    "enable" - enable all radio buttons
-#    "disable" - disable all radio buttons
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
-#------------------------------------------------------------------------------------
-
-class selection_buttons():
-    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, 
-                        b1=None, b2=None, b3=None, b4=None, b5=None, b6=None, b7=None):
-        # Create a labelframe to hold the buttons
-        self.frame = Tk.LabelFrame(parent_frame, text=label)
-        self.value = Tk.IntVar(self.frame, 0)
-        # This is the external callback to make when a selection is made
-        self.callback = callback
-        # Create a subframe (so the buttons are centered)
-        self.subframe = Tk.Frame(self.frame)
-        self.subframe.pack()
-        # Only create as many buttons as we need
-        if b1 is not None:
-            self.B1 = Tk.Radiobutton(self.subframe, text=b1, anchor='w',
-                command=self.updated, variable=self.value, value=1)
-            self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B1TT = CreateToolTip(self.B1, tool_tip)
-        if b2 is not None:
-            self.B2 = Tk.Radiobutton(self.subframe, text=b2, anchor='w',
-                command=self.updated, variable=self.value, value=2)
-            self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B2TT = CreateToolTip(self.B2, tool_tip)
-        if b3 is not None:
-            self.B3 = Tk.Radiobutton(self.subframe, text=b3, anchor='w',
-                command=self.updated, variable=self.value, value=3)
-            self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B3TT = CreateToolTip(self.B3, tool_tip)
-        if b4 is not None:
-            self.B4 = Tk.Radiobutton(self.subframe, text=b4, anchor='w',
-                command=self.updated, variable=self.value, value=4)
-            self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B4TT = CreateToolTip(self.B4, tool_tip)
-        if b5 is not None:
-            self.B5 = Tk.Radiobutton(self.subframe, text=b5, anchor='w', 
-                command=self.updated, variable=self.value, value=5)
-            self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B5TT = CreateToolTip(self.B5, tool_tip)
-        if b6 is not None:
-            self.B6 = Tk.Radiobutton(self.subframe, text=b6, anchor='w',
-                command=self.updated, variable=self.value, value=6)
-            self.B6.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B6TT = CreateToolTip(self.B6, tool_tip)
-        if b7 is not None:
-            self.B7 = Tk.Radiobutton(self.subframe, text=b7, anchor='w',
-                command=self.updated, variable=self.value, value=7)
-            self.B7.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.B7TT = CreateToolTip(self.B7, tool_tip)
-            
-    def updated(self):
-        self.frame.focus()
-        if self.callback is not None: self.callback()
-
-    def set_value(self, value:int):
-        self.value.set(value)
-        
-    def get_value(self):
-        return(self.value.get())
-
-    def enable(self):
-        self.B1.configure(state="normal")
-        self.B2.configure(state="normal")
-        self.B3.configure(state="normal")
-        self.B4.configure(state="normal")
-        self.B5.configure(state="normal")
-        self.B6.configure(state="normal")
-        self.B7.configure(state="normal")
-
-    def disable(self):
-        self.B1.configure(state="disabled")
-        self.B2.configure(state="disabled")
-        self.B3.configure(state="disabled")
-        self.B4.configure(state="disabled")
-        self.B5.configure(state="disabled")
-        self.B6.configure(state="disabled")
-        self.B7.configure(state="disabled")
-
-#------------------------------------------------------------------------------------
-# Compound UI Element for Colour selection. Also has an option to select "transparent"
-# if the 'transparent_option' is set to True (useful for 'fill' colours
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
-#
-# Class instance functions to use externally are:
-#    "set_value" - will set the current value (colour code string)
-#    "get_value" - will return the last "valid" value (colour code string)
-#    "is_open" - Test if the colour chooser is still open
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
-#------------------------------------------------------------------------------------
-
-class colour_selection():
-    def __init__(self, parent_frame, label:str, transparent_option:bool=False):
-        # Flag to test if a colour chooser window is open or not
-        self.colour_chooser_open = False
-        # Variable to hold the currently selected colour (the default background colour)
-        self.colour = 'Grey85'
-        # Create a Labelframe to hold all the tkinter widgets
-        self.frame = Tk.LabelFrame(parent_frame,text=label)
-        # Create a sub frame for the selected colour and the colour chooser button
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack()
-        self.label1 = Tk.Label(self.subframe1, width=3, bg=self.colour, borderwidth=1, relief="solid")
-        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.label1, "Currently selected colour")
-        self.B1 = Tk.Button(self.subframe1, text="Change", command=self.colour_updated)
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
-        # Create the checkbox for "transparent (only pack it if specified at creation time)
-        self.transparent = check_box(self.frame,label="Transparent ",callback=self.transparent_updated,
-                     tool_tip= "Select to make transparent (no fill)")
-        if transparent_option: self.transparent.pack()
-        
-    def colour_updated(self):
-        self.colour_chooser_open = True
-        colour_code = colorchooser.askcolor(self.colour, parent=self.frame, title ="Select Colour")
-        self.colour = colour_code[1]
-        self.label1.config(bg=self.colour)
-        self.colour_chooser_open = False
-
-    def transparent_updated(self):
-        if self.transparent.get_value():
-            self.label1.config(text="X", bg='Grey85')
-        else:
-            self.label1.config(text="", bg=self.colour)
-
-    def get_value(self):
-        if self.transparent.get_value(): colour = ""
-        else: colour = self.colour
-        return(colour)
-        
-    def set_value(self,colour:str):
-        if colour == "":
-            self.transparent.set_value(True)
-            self.colour = 'Grey85'
-        else:
-            self.transparent.set_value(False)
-            self.colour = colour
-        self.transparent_updated()
-        
-    def is_open(self):
-        return(self.colour_chooser_open)
-
-#------------------------------------------------------------------------------------
-# Compound UI element for the Apply/OK/Reset/Cancel Buttons - will make callbacks
-# to the specified "load_callback" and "save_callback" functions as appropriate 
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
-#------------------------------------------------------------------------------------
-
-class window_controls():
-    def __init__(self, parent_window, load_callback, save_callback, cancel_callback):
-        # Create the class instance variables
-        self.window = parent_window
-        self.save_callback = save_callback
-        self.load_callback = load_callback
-        self.cancel_callback = cancel_callback
-        self.frame = Tk.Frame(self.window)
-        # Create the buttons and tooltips
-        self.B1 = Tk.Button (self.frame, text = "Ok",command=self.ok)
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = CreateToolTip(self.B1, "Apply selections and close window")
-        self.B2 = Tk.Button (self.frame, text = "Apply",command=self.apply)
-        self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.B2, "Apply selections")
-        self.B3 = Tk.Button (self.frame, text = "Reset",command=self.reset)
-        self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT3 = CreateToolTip(self.B3, "Abandon edit and reload original configuration")
-        self.B4 = Tk.Button (self.frame, text = "Cancel",command=self.cancel)
-        self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT4 = CreateToolTip(self.B4, "Abandon edit and close window")
-        
-    def apply(self):
-        self.window.focus()
-        self.save_callback(False)
-        
-    def ok(self):
-        self.window.focus()
-        self.save_callback(True)
-        
-    def reset(self):
-        self.window.focus()
-        self.load_callback()
-        
-    def cancel(self):
-        self.cancel_callback()
-
-#------------------------------------------------------------------------------------
-# Base Class for a fixed row_of_widgets of the specified base class.
-# All of the kwargs are passed through to the specified base class on creation
-# Note the need to specify a 'default_value_to_set' to 'blank' any widgets
-# beyond the provided 'list_of_values_to_set' for the 'set_values' function
+# Base Class for a fixed length row_of_widgets of the specified base class.
+# All of the kwargs are passed through to the specified base class on creation.
+# If the list provided to 'set_values' contains less values than the number of widgets in the
+# row then the remaining widgets will be reset to their default state. If the list contains
+# more values than the number of widgets then values beyond the number of widgets are ignored
 #
 # Main class methods used by the editor are:
 #    "set_values" - will set the intial values from the provided list
@@ -1321,15 +1096,20 @@ class row_of_widgets(Tk.Frame):
             self.list_of_widgets.append(base_class(self, **kwargs))
             self.list_of_widgets[-1].pack(side=Tk.LEFT)
 
-    def set_values(self, list_of_values_to_set:list, default_value_to_set):
+    def set_values(self, list_of_values_to_set:list):
         for index, widget_to_set in enumerate(self.list_of_widgets):
             # Only set the value if we haven't reached the end of the list of values_to_set
-            # Otherwise we set the default value we have been given (to blank the widget)
-            # Note there may be multiple parameters so we have to unpack them
+            # Otherwise we 'reset' the widget to its default state (to blank the widget)
+            # Note if there are multiple parameters in the list entry (detected by testing
+            # if the list entry is a tuple) then we unpack them before passing to the widget
             if index < len(list_of_values_to_set):
-                widget_to_set.set_value(*list_of_values_to_set[index])
+                params_to_pass = list_of_values_to_set[index]
+                if type(params_to_pass) is tuple:
+                    widget_to_set.set_value(*params_to_pass)
+                else:
+                    widget_to_set.set_value(params_to_pass)
             else:
-                widget_to_set.set_value(*default_value_to_set)
+                widget_to_set.reset()
         
     def get_values(self):
         # Validate all the entries to accept the current (as entered) values
@@ -1356,8 +1136,10 @@ class row_of_widgets(Tk.Frame):
 
 #------------------------------------------------------------------------------------
 # Class for a fixed row_of_validated_dcc_commands - builds on the row_of_widgets class
-# The set_values and get_values functions are overridden to simplify the
-# save and load interface of the calling editor functions
+# The set_values function is overridden as we need to provide the current item_id to
+# all validated_dcc_command_entry elements for validation purposes, even if we aren't
+# setting values for them. The get_values function is overridden to remove any blank
+# entries from the list (dcc_address=0).
 #
 # Main class methods used by the editor are:
 #    "set_values" - will set the intial values from the provided list
@@ -1369,77 +1151,118 @@ class row_of_widgets(Tk.Frame):
 #------------------------------------------------------------------------------------
 
 class row_of_validated_dcc_commands(row_of_widgets):
-    def __init__(self, parent_frame, columns:int, item_type:str):
+    def __init__(self, parent_frame, columns:int, **kwargs):
+        # The overridden set_values function will need to know the number of columns as each
+        # validated_dcc_command_entry will need the current item id for validation purposes
+        self.number_of_columns = columns
         # Use the parent class frame to pack everything into
-        super().__init__(parent_frame, validated_dcc_command_entry, columns, item_type=item_type)
+        super().__init__(parent_frame, validated_dcc_command_entry, columns, **kwargs)
 
     def set_values(self, list_of_dcc_commands:list, item_id:int):
-        default_value_to_set = ([0, False], item_id)
         list_of_values_to_set = []
-        for dcc_command in list_of_dcc_commands:
-            list_of_values_to_set.append((dcc_command, item_id))
-        super().set_values(list_of_values_to_set, default_value_to_set)
+        # The validated_dcc_command_entry class needs the current item_id to perform
+        # validation - so we need to provide this even for currently empty entry boxes
+        for index in range(self.number_of_columns):
+            if index < len(list_of_dcc_commands):
+                list_of_values_to_set.append((list_of_dcc_commands[index], item_id))
+            else:
+                list_of_values_to_set.append(([0, False], item_id))
+        super().set_values(list_of_values_to_set)
         
     def get_values(self):
-        # Validate all the entries to accept the current (as entered) values
-        self.validate()
-        # Compile a list of values to return (removing any blanks)
-        values_to_return = []
+        # Get a list of currently entered values
         entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (dcc_address=0))
+        # Note that we don't remove any duplicates for DCC Command sequences
+        values_to_return = []
         for entered_value in entered_values:
             if entered_value[0] > 0:
                 values_to_return.append(entered_value)
         return(values_to_return)
 
 #------------------------------------------------------------------------------------
-# Base Class for a dynamic entry_box_grid of the specified base class.
+# Class for a fixed row_of_point_settings - builds on the row_of_widgets class
+# The get_values function is overridden to remove blanks (id=0) and duplicates
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
+#    "validate" - Will validate all entries
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class row_of_point_settings(row_of_widgets):
+    def __init__(self, parent_frame, columns:int, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, point_settings_entry, columns, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (Point_id=0) or duplicates
+        values_to_return = []
+        for entered_value in entered_values:
+            if entered_value[0] > 0 and entered_value not in values_to_return:
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+#------------------------------------------------------------------------------------
+# Base Class for a dynamic grid_of_widgets of the specified base class. Will create as many
+# fixed-length rows of widgets as are needed to accommodate the list of values provided to
+# the 'set_values' function, with buttons at the end of each row to insert or delete rows.
+# If there are not enough values provided to populate an entire row, then the remainder of
+# widgets in the row are created in their default state (usually enablled but blankk)
 # All of the kwargs are passed through to the specified base class on creation
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
 #
 # Class instance functions to use externally are:
 #    "set_values" - will set the intial values from the provided list
 #    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
 #    "validate" - Will validate all entries
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
-#################### MAYBE MAKE USE OF THE ROW_OF_WIDGETS CLASS #####################
+#    "pack" - for packing the UI element
 #------------------------------------------------------------------------------------
 
-class entry_box_grid():
-    def __init__(self, parent_frame, base_class, tool_tip:str, columns:int=5, **kwargs):
+class grid_of_widgets(Tk.Frame):
+    def __init__(self, parent_frame, base_class, columns:int, **kwargs):
         self.parent_frame = parent_frame
         self.base_class = base_class
-        self.tool_tip = tool_tip
         self.columns = columns
-        # Create a frame (with padding) in which to pack everything
-        self.frame = Tk.Frame(self.parent_frame)
-        self.frame.pack(side=Tk.LEFT,padx=2,pady=2)
         self.kwargs = kwargs
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame)
+        # Maintain a list of subframes, widgets and buttons (to keep everything in scope)
         self.list_of_subframes = []
-        self.list_of_entry_boxes = []
+        self.list_of_widgets = []
         self.list_of_buttons = []
 
     def create_row(self, pack_after=None):
-        # Create the Frame for the row
-        self.list_of_subframes.append(Tk.Frame(self.frame))
-        self.list_of_subframes[-1].pack(after=pack_after, padx=2, fill='x')
+        # Create a new Frame for the row and pack it
+        self.list_of_subframes.append(Tk.Frame(self))
+        self.list_of_subframes[-1].pack(after=pack_after, fill='x')
         # Create the entry_boxes for the row
         for value in range (self.columns):
-            self.list_of_entry_boxes.append(self.base_class(self.list_of_subframes[-1], tool_tip=self.tool_tip, **self.kwargs))
-            self.list_of_entry_boxes[-1].pack(side=Tk.LEFT)
+            self.list_of_widgets.append(self.base_class(self.list_of_subframes[-1], **self.kwargs))
+            self.list_of_widgets[-1].pack(side=Tk.LEFT)
             # Only set the value if we haven't reached the end of the values_to_setlist
-            if len(self.list_of_entry_boxes) <= len(self.values_to_set):
-                self.list_of_entry_boxes[-1].set_value(self.values_to_set[len(self.list_of_entry_boxes)-1])
+            if len(self.list_of_widgets) <= len(self.values_to_set):
+                params_to_pass = self.values_to_set[len(self.list_of_widgets)-1]
+                if type(params_to_pass) is tuple:
+                    self.list_of_widgets[-1].set_value(*params_to_pass)
+                else:
+                    self.list_of_widgets[-1].set_value(params_to_pass)
         # Create the button for inserting rows
         this_subframe = self.list_of_subframes[-1]
-        self.list_of_buttons.append(Tk.Button(self.list_of_subframes[-1], text="+", height= 1, width=1,
-                    padx=2, pady=0, font=('Courier',8,"normal"), command=lambda:self.create_row(this_subframe)))
+        self.list_of_buttons.append(Tk.Button(this_subframe, text="+", height= 1, width=1, padx=2, pady=0,
+                                font=('Courier',8,"normal"), command=lambda:self.create_row(this_subframe)))
         self.list_of_buttons[-1].pack(side=Tk.LEFT, padx=5)
         CreateToolTip(self.list_of_buttons[-1], "Insert new row (below)")
         # Create the button for deleting rows (apart from the first row)
-        if len(self.list_of_subframes)>1:
-            self.list_of_buttons.append(Tk.Button(self.list_of_subframes[-1], text="-", height= 1, width=1,
-                    padx=2, pady=0, font=('Courier',8,"normal"), command=lambda:self.delete_row(this_subframe)))
+        if len(self.list_of_subframes) > 1:
+            self.list_of_buttons.append(Tk.Button(this_subframe, text="-", height= 1, width=1, padx=2, pady=0,
+                                font=('Courier',8,"normal"), command=lambda:self.delete_row(this_subframe)))
             self.list_of_buttons[-1].pack(side=Tk.LEFT)
             CreateToolTip(self.list_of_buttons[-1], "Delete row")
 
@@ -1447,52 +1270,421 @@ class entry_box_grid():
         this_subframe.destroy()
 
     def set_values(self, values_to_set:list):
-        # Destroy and re-create the parent frame - this should also destroy all child widgets
-        self.frame.destroy()
-        self.frame = Tk.Frame(self.parent_frame)
-        self.frame.pack(side=Tk.LEFT,padx=2,pady=2)
+        # Destroy and re-create the all the subframes - this should also destroy all child widgets
+        for subframe in self.list_of_subframes:
+            if subframe.winfo_exists():
+                subframe.destroy()
+        # Start afresh and create what we need to hold the provided values
         self.list_of_subframes = []
-        self.list_of_entry_boxes = []                
+        self.list_of_widgets = []                
         self.list_of_buttons = []                
         # Ensure at least one row is created - even if the list of values_to_set is empty
         self.values_to_set = values_to_set
-        while len(self.list_of_entry_boxes) < len(values_to_set) or self.list_of_subframes == []:
+        while len(self.list_of_widgets) < len(values_to_set) or self.list_of_subframes == []:
             self.create_row()
                         
     def get_values(self):
         # Validate all the entries to accept the current (as entered) values
         self.validate()
+        # Compile a list of values to return (we don't remove any blanks here)
         entered_values = []
-        for entry_box in self.list_of_entry_boxes:
-            if entry_box.winfo_exists():
-                # Ignore all default entries for int and str entry boxes types
-                # Other types get passed through (as the base class could be anything)
-                if ( (type(entry_box.get_value())==str and entry_box.get_value() != "") or
-                     (type(entry_box.get_value())==int and entry_box.get_value() != 0) or
-                     (type(entry_box.get_value())!=str and type(entry_box.get_value())!=int) ):
-                    entered_values.append(entry_box.get_value())
-        # Remove any duplicate entries from the list
-        return_values = []
-        for entered_value in entered_values:
-            if entered_value not in return_values:
-                return_values.append(entered_value)
-        return(return_values)
+        for widget in self.list_of_widgets:
+            if widget.winfo_exists():
+                entered_values.append(widget.get_value())
+        return(entered_values)
     
     def validate(self):
         valid = True
-        for entry_box in self.list_of_entry_boxes:
-            if entry_box.winfo_exists():
-                if not entry_box.validate(): valid = False
+        for widget in self.list_of_widgets:
+            if widget.winfo_exists():
+                if not widget.validate(): valid = False
         return(valid)
 
     def enable(self):
-        for entry_box in self.list_of_entry_boxes:
-            if entry_box.winfo_exists():
-                entry_box.enable()
+        for widget in self.list_of_widgets:
+            if widget.winfo_exists():
+                widget.enable()
 
     def disable(self):
-        for entry_box in self.list_of_entry_boxes:
-            if entry_box.winfo_exists():
-                entry_box.disable()
+        for widget in self.list_of_widgets:
+            if widget.winfo_exists():
+                widget.disable()
+
+#------------------------------------------------------------------------------------
+# Class for a variable grid_of_generic_entry boxes - builds on the grid_of_widgets class
+# The get_values function is overridden to remove blanks and/or duplicates
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
+#    "validate" - Will validate all entries
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class grid_of_generic_entry_boxes(grid_of_widgets):
+    def __init__(self, parent_frame, base_class, columns:int, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, base_class, columns, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks and/or duplicates
+        values_to_return = []
+        for entered_value in entered_values:
+            if ( ( (type(entered_value)==str and entered_value != "") or
+                   (type(entered_value)==int and entered_value != 0) )
+                      and entered_value not in values_to_return ):
+                values_to_return.append(entered_value)
+        return(values_to_return)
+    
+#------------------------------------------------------------------------------------
+# Class for a variable grid_of_point_settings - builds on the grid_of_widgets class
+# The get_values function is overridden to remove blanks (id=0) and duplicates
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
+#    "validate" - Will validate all entries
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class grid_of_point_settings(grid_of_widgets):
+    def __init__(self, parent_frame, columns:int, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, point_settings_entry, columns, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (Point_id=0) or duplicates
+        values_to_return = []
+        for entered_value in entered_values:
+            if entered_value[0] > 0 and entered_value not in values_to_return:
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+#####################################################################################
+############################ STAND ALONE UI ELEMENTS ################################
+#####################################################################################
+
+#------------------------------------------------------------------------------------
+# Compound UI element for an object_id_selection LabelFrame - uses the integer_entry_box
+# as the base class. Used across the object config windows for changing the item ID.
+#
+# Main class methods used by the editor are:
+#    "set_value" - will set the check_box state (bool)
+#    "get_value" - will return the state (False if disabled) (bool)
+#    "validate" - Validates that the entered Item ID is "free" (and can therefore be
+#               assigned to this item) or is being changed back to the initial value.
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class object_id_selection(integer_entry_box):
+    def __init__(self, parent_frame, label:str, exists_function):
+        # We need to know the current Item ID for validation purposes
+        self.current_item_id = 0
+        # This is the function to call to see if the object already exists
+        self.exists_function = exists_function
+        # Create a Label Frame for the UI element and then a frame within that to centre things
+        self.labelframe = Tk.LabelFrame(parent_frame, text=label)
+        self.subframe = Tk.Frame(self.labelframe)
+        self.subframe.pack(fill="y", expand=True)
+        # Call the common base class init function to create the EB
+        tool_tip = ("Enter new ID (1-999) \n" + "Once saved/applied any references "+
+                    "to this object will be updated in other objects")
+        super().__init__(self.subframe, width=3, min_value=1, max_value=999,
+                         tool_tip=tool_tip, allow_empty=False)
+        # Pack the Entry box centrally in the label frame
+        super().pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def validate(self):
+        # Do the basic integer validation first (integer, in range, not empty)
+        valid = super().validate(update_validation_status=False)
+        if valid:
+            # Validate that the entered ID is not assigned to another item
+            # Ignoring the initial value set at load time (which is the current ID)
+            entered_item_id = int(self.entry.get())
+            if self.exists_function(entered_item_id) and entered_item_id != self.current_item_id:
+                self.TT.text = "ID already assigned"
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+
+    def set_value(self, value:int):
+        self.current_item_id = value
+        super().set_value(value)
+    
+    def pack(self, **kwargs):
+        self.labelframe.pack(**kwargs)
+
+#------------------------------------------------------------------------------------
+# Compound UI Element for a LabelFrame containing one or more RadioButtons
+# Value to be set/returned is 0 to n (zero to support no radio button selected)
+#
+# Main class methods used by the editor are:
+#    "set_value" - will set the current value (integer 1-5)
+#    "get_value" - will return the last "valid" value (integer 1-5)
+#    "enable" - enable all radio buttons
+#    "disable" - disable all radio buttons
+#    "pack" - for packing the UI element
+#
+# The individual buttons can be accessed via the button[x] class object.
+#------------------------------------------------------------------------------------
+
+class selection_buttons(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+        # Create the labelframe to hold the buttons
+        super().__init__(parent_frame, text=label)
+        self.value = Tk.IntVar(self, 0)
+        self.callback = callback
+        # Create a subframe to center the buttons in the label frame
+        self.subframe=Tk.Frame(self)
+        self.subframe.pack(fill="y")
+        # Only create as many buttons as we need
+        button_value = 1
+        self.buttons = []
+        for button_label in button_labels:
+            self.buttons.append( Tk.Radiobutton(self.subframe, text=button_label, anchor='w',
+                                command=self.updated, variable=self.value, value=button_value) )
+            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            CreateToolTip(self.buttons[-1], tool_tip)
+            button_value = button_value + 1
+
+    def updated(self):
+        if self.callback is not None: self.callback()
+
+    def set_value(self, value:int):
+        self.value.set(value)
+
+    def get_value(self):
+        return(self.value.get())
+
+    def enable(self):
+        for button in self.buttons:
+            button.configure(state="normal")
+
+    def disable(self):
+        for button in self.buttons:
+            button.configure(state="disabled")
+
+#------------------------------------------------------------------------------------
+# Compound UI Element for a LabelFrame containing one or more Checkboxes
+# Value to be set/returned is a list of checkbox values (True/False)
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the current value (integer 1-5)
+#    "get_values" - will return the last "valid" value (integer 1-5)
+#    "enable" - enable all radio buttons
+#    "disable" - disable all radio buttons
+#    "pack" - for packing the UI element
+#
+# The individual buttons can be accessed via the button[x] class object.
+#------------------------------------------------------------------------------------
+
+class selection_check_boxes(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+        # Create the labelframe to hold the buttons
+        super().__init__(parent_frame, text=label)
+        self.callback = callback
+        # Create a subframe to center the buttons in the label frame
+        self.subframe=Tk.Frame(self)
+        self.subframe.pack(fill="y")
+        # Only create as many buttons as we need
+        button_value = 1
+        self.buttons = []
+        for button_label in button_labels:
+            self.buttons.append( check_box(self.subframe, label=button_label, 
+                                 tool_tip=tool_tip, callback=self.updated) )
+            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            CreateToolTip(self.buttons[-1], tool_tip)
+            button_value = button_value + 1
+
+    def updated(self):
+        if self.callback is not None: self.callback()
+
+    def set_values(self, values:list[bool,]):
+        for index, value in enumerate(values):
+            if index < len(self.buttons):
+                self.buttons[index].set_value(value)
+
+    def get_values(self):
+        list_to_return=[]
+        for button in self.buttons:
+            list_to_return.append(button.get_value())
+        return(list_to_return)
+
+    def enable(self):
+        for button in self.buttons:
+            button.configure(state="normal")
+
+    def disable(self):
+        for button in self.buttons:
+            button.configure(state="disabled")
+
+#------------------------------------------------------------------------------------
+# Compound UI element for a colour selection LabelFrame - uses the Tk.LabelFrame
+# as the base class. Used across object config windows for changing colours of
+# text, buttons, backgrounds etc. Also has an option to select "transparent"
+#
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (colour code string)
+#    "get_value" - will return the last "valid" value (colour code string)
+#    "is_open" - Test if the colour chooser is still open
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class colour_selection(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, transparent_option:bool=False):
+        # Flag to test if a colour chooser window is open or not
+        self.colour_chooser_open = False
+        # Variable to hold the currently selected colour (the default background colour)
+        self.colour = 'Grey85'
+        # Create the parent Labelframe to hold all the tkinter widgets
+        super().__init__(parent_frame, text=label)
+        # Create a sub frame for the selected colour and the colour chooser button
+        self.subframe1 = Tk.Frame(self)
+        self.subframe1.pack()
+        self.label1 = Tk.Label(self.subframe1, width=3, bg=self.colour, borderwidth=1, relief="solid")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.label1, "Currently selected colour")
+        self.B1 = Tk.Button(self.subframe1, text="Change", command=self.colour_updated)
+        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
+        # Create the checkbox for "transparent (only pack it if specified at creation time)
+        self.transparent = check_box(self,label="Transparent ",callback=self.transparent_updated,
+                     tool_tip= "Select to make transparent (no fill)")
+        if transparent_option: self.transparent.pack()
+
+    def colour_updated(self):
+        self.colour_chooser_open = True
+        colour_code = colorchooser.askcolor(self.colour, parent=self, title ="Select Colour")
+        # If the colour chooser is cancelled it will return None - so we don't update
+        if colour_code[1] is not None: self.colour = colour_code[1]
+        self.label1.config(bg=self.colour)
+        self.colour_chooser_open = False
+
+    def transparent_updated(self):
+        if self.transparent.get_value():
+            self.label1.config(text="X", bg='Grey85')
+        else:
+            self.label1.config(text="", bg=self.colour)
+
+    def get_value(self):
+        if self.transparent.get_value(): colour = ""
+        else: colour = self.colour
+        return(colour)
+
+    def set_value(self,colour:str):
+        if colour == "":
+            self.transparent.set_value(True)
+            self.colour = 'Grey85'
+        else:
+            self.transparent.set_value(False)
+            self.colour = colour
+        self.transparent_updated()
+
+    def is_open(self):
+        return(self.colour_chooser_open)
+
+#------------------------------------------------------------------------------------
+# Stand Alone UI element for a Labelframe containing the font selection radio buttons
+# Builds on the selection_buttons class with overridden get_value and set_value methods
+#
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (string)
+#    "get_value" - will return the current value (string)
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class font_selection(selection_buttons):
+    def __init__(self, parent_frame, callback=None):
+        super().__init__(parent_frame, label="Font", callback=callback,tool_tip="Select the font style",
+                            button_labels=("Courier", "Times", "Helvetica", "TkFixedFont"))
+
+    def get_value(self):
+        font_selection = super().get_value()
+        if font_selection == 1: font = "Courier"
+        elif font_selection == 2: font = "Times"
+        elif font_selection == 3: font = "Helvetica"
+        elif font_selection == 4: font = "TkFixedFont"
+        else: font = "TkFixedFont"
+        return(font)
+
+    def set_value(self, font:str):
+        if font == "Courier": font_selection = 1
+        elif font == "Times": font_selection = 2
+        elif font == "Helvetica": font_selection = 3
+        elif font == "TkFixedFont":font_selection = 4
+        else: font_selection = 4
+        super().set_value(font_selection)
+        return()
+
+#------------------------------------------------------------------------------------
+# Stand Alone UI element for a Labelframe containing the font style selection checkboxes
+# Builds on the selection_check_boxes class with overridden get_value and set_value methods
+#
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (string)
+#    "get_value" - will return the current value (string)
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class font_style_selection(selection_check_boxes):
+    def __init__(self, parent_frame, callback=None):
+        super().__init__(parent_frame, label="Font style", callback=callback,
+                tool_tip="Select the font style", button_labels=("Bold", "Itallic", "Underline"))
+
+    def get_value(self):
+        font_style = ""
+        font_style_selections = super().get_values()
+        if font_style_selections[0]: font_style=font_style + "bold "
+        if font_style_selections[1]: font_style=font_style + "italic "
+        if font_style_selections[2]: font_style=font_style + "underline "
+        return(font_style)
+
+    def set_value(self, font_style:str):
+        super().set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
+
+#------------------------------------------------------------------------------------
+# Stand Alone UI element for a Tk.Frame containing the Apply/OK/Reset/Cancel Buttons.
+# Will make callbacks to the specified "load_callback" and "save_callback" functions
+#------------------------------------------------------------------------------------
+
+class window_controls(Tk.Frame):
+    def __init__(self, parent_window, load_callback, save_callback, cancel_callback):
+        super().__init__(parent_window)
+        # Create the buttons and tooltips
+        self.B1 = Tk.Button (self, text = "Ok",command=lambda:save_callback(True))
+        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT1 = CreateToolTip(self.B1, "Apply selections and close window")
+        self.B2 = Tk.Button (self, text = "Apply",command=lambda:save_callback(False))
+        self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.B2, "Apply selections")
+        self.B3 = Tk.Button (self, text = "Reset",command=load_callback)
+        self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT3 = CreateToolTip(self.B3, "Abandon edit and reload original configuration")
+        self.B4 = Tk.Button (self, text = "Cancel",command=cancel_callback)
+        self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT4 = CreateToolTip(self.B4, "Abandon edit and close window")
+
+    def apply(self):
+        self.window.focus()
+        self.save_callback(False)
+
+    def ok(self):
+        self.window.focus()
+        self.save_callback(True)
+
+    def reset(self):
+        self.window.focus()
+        self.load_callback()
+
+    def cancel(self):
+        self.cancel_callback()
 
 ###########################################################################################

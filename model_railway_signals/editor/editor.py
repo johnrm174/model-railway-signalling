@@ -13,9 +13,9 @@
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.configure_remote_gpio_sensor_event_mappings() - set up the GPIO Sensor event mappings
-#    schematic.initialise(root, callback, width, height, grid, snap) - Create the canvas
+#    schematic.initialise(root, callback, *canvasargs) - Create the canvas
 #    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
-#    schematic.update_canvas(width,height,grid,snap) - Update the canvas following reload/resizing
+#    schematic.update_canvas(*canvasargs) - Update the canvas following reload/resizing
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
@@ -211,9 +211,10 @@ class main_menubar:
         self.file_has_been_saved = False
         # Initialise the schematic - the Edit Mode flag is the 2nd param in the returned tuple from get_general
         # Note the schematic module will then initialise the objects and run_layout modules with the canvas
-        width, height, grid, snap_to_grid = settings.get_canvas()
+        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
         edit_mode = settings.get_general()[1]
-        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid, snap_to_grid, edit_mode)
+        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid,
+                                snap_to_grid, display_grid, canvas_colour, edit_mode)
         # Parse the command line arguments
         parser = argparse.ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2],
                             formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=27))
@@ -564,8 +565,8 @@ class main_menubar:
     #------------------------------------------------------------------------------------------
 
     def canvas_update(self):
-        width, height, grid, snap_to_grid = settings.get_canvas()
-        schematic.update_canvas(width, height, grid, snap_to_grid)
+        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
+        schematic.update_canvas(width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour)
         
     def logging_update(self):
         log_level = settings.get_logging()

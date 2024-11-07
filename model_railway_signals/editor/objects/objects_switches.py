@@ -14,8 +14,9 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
+#    objects_routes.update_references_to_switch - called when the Switch ID is changed
+#    objects_routes.remove_references_to_switch - called when the Switch is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -42,6 +43,8 @@ import copy
 from ...library import buttons
 from ...library import dcc_control
 from . import objects_common
+from . import objects_routes
+from .. import run_layout
 
 #------------------------------------------------------------------------------------
 # Default Switch Object (i.e. state at creation)
@@ -50,10 +53,14 @@ from . import objects_common
 default_switch_object = copy.deepcopy(objects_common.default_object)
 default_switch_object["item"] = objects_common.object_type.switch
 default_switch_object["itemtype"] = buttons.button_type.switched.value
-default_switch_object["switchname"] = "DCC Switch"
+default_switch_object["switchname"] = "Switch"
 default_switch_object["switchdescription"] = "Switch description (Run Mode tooltip)"
-default_switch_object["buttonwidth"] = 10
+default_switch_object["buttonwidth"] = 12
 default_switch_object["buttoncolour"] = "SkyBlue2"
+default_switch_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
+default_switch_object["font"] = "Courier"
+default_switch_object["fontsize"] = 9
+default_switch_object["fontstyle"] = ""
 default_switch_object["hidden"] = False
 # Each DCC command sequence comprises a variable list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
@@ -77,14 +84,8 @@ def update_switch(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.switch_index[str(old_item_id)]
         objects_common.switch_index[str(new_item_id)] = object_id
-    return()
-
-#------------------------------------------------------------------------------------
-# Null callback for the DCC Accessory buttons as these are just sending out DCC
-# Commands when selected/deselected - there is no other processing to do.
-#------------------------------------------------------------------------------------
-
-def local_null_callback(button_id):
+        # Update any references to the switch in the route tables
+        objects_routes.update_references_to_switch(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -99,26 +100,37 @@ def redraw_switch_object(object_id):
                                objects_common.schematic_objects[object_id]["dccoffcommands"])
     # Turn the button type value back into the required enumeration type
     button_type = buttons.button_type(objects_common.schematic_objects[object_id]["itemtype"])
+    # Create the Tkinter Font tuple
+    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
+                          objects_common.schematic_objects[object_id]["fontsize"],
+                          objects_common.schematic_objects[object_id]["fontstyle"])
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-    # Work out what the text colour should be - using the brightest of the three
-    text_colour = objects_common.get_text_colour(selected_colour)
+    # Work out what the text colour should be (auto uses the lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    if  text_colour_type == 2 : text_colour = "Black"
+    elif text_colour_type == 3 : text_colour = "White"
+    else: text_colour = objects_common.get_text_colour(selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
                 buttontype = button_type,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                selected_callback = local_null_callback,
-                deselected_callback = local_null_callback,
+                selected_callback = run_layout.switch_updated_callback,
+                deselected_callback = run_layout.switch_updated_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["switchname"],
                 tooltip = objects_common.schematic_objects[object_id]["switchdescription"],
                 hidden = objects_common.schematic_objects[object_id]["hidden"],
-                button_colour = button_colour, active_colour = active_colour,
-                selected_colour = selected_colour, text_colour = text_colour)
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour,
+                font = tkinter_font_tuple)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
@@ -128,17 +140,17 @@ def redraw_switch_object(object_id):
 # Function to Create a new default Switch object (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_switch():
+def create_switch(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_switch_object)
-    # Find the initial canvas position and assign the initial ID
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["switchname"] = "Switch "+str(item_id)
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
     objects_common.switch_index[str(item_id)] = object_id
     # Draw the Object on the canvas
@@ -156,13 +168,13 @@ def paste_switch(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
+    objects_common.schematic_objects[new_object_id]["switchname"] = "Switch "+str(new_id)
     objects_common.switch_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
     # The bits we want to copy are - buttonwidth, buttoncolour, hidden
-    objects_common.schematic_objects[new_object_id]["switchname"] = default_switch_object["switchname"]
     objects_common.schematic_objects[new_object_id]["switchdescription"] = default_switch_object["switchdescription"]
     objects_common.schematic_objects[new_object_id]["dcconcommands"] = default_switch_object["dcconcommands"]
     objects_common.schematic_objects[new_object_id]["dccoffcommands"] = default_switch_object["dccoffcommands"]
@@ -193,6 +205,8 @@ def delete_switch_object(object_id):
 def delete_switch(object_id):
     # Soft delete the associated library objects from the canvas
     delete_switch_object(object_id)
+    # Remove any references to the switch from the route tables
+    objects_routes.remove_references_to_switch(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and
     # deleting the object from the dictionary of schematic objects
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

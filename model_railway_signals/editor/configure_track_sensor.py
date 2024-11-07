@@ -20,7 +20,7 @@
 # Inherits the following common editor base classes (from common):
 #    common.str_int_item_id_entry_box
 #    common.int_item_id_entry_box
-#    common.point_interlocking_entry
+#    common.row_of_point_settings
 #    common.object_id_selection
 #    common.window_controls
 #
@@ -106,7 +106,7 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
     
 #------------------------------------------------------------------------------------
 # Class for a track_sensor_route_group (comprising 6 points, and a track section)
-# Uses the common point_interlocking_entry class for each point entry
+# Uses the common row_of_point_settings class for the point entries
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set the route elements (Points & Track Section)
@@ -122,18 +122,8 @@ class track_sensor_route_group():
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify the points that need to be configured for the route"
-        self.p1 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p2 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p3 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p4 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p5 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p6 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p1.pack(side = Tk.LEFT)
-        self.p2.pack(side = Tk.LEFT)
-        self.p3.pack(side = Tk.LEFT)
-        self.p4.pack(side = Tk.LEFT)
-        self.p5.pack(side = Tk.LEFT)
-        self.p6.pack(side = Tk.LEFT)
+        self.points = common.row_of_point_settings(self.frame, columns=6, tool_tip=tool_tip)
+        self.points.pack (side=Tk.LEFT)
         # Create the Track Section element (always packed)
         self.label = Tk.Label(self.frame, text="  Section:")
         self.label.pack(side=Tk.LEFT)
@@ -144,37 +134,23 @@ class track_sensor_route_group():
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
         valid = True
-        if not self.p1.validate(): valid = False
-        if not self.p2.validate(): valid = False
-        if not self.p3.validate(): valid = False
-        if not self.p4.validate(): valid = False
-        if not self.p5.validate(): valid = False
-        if not self.p6.validate(): valid = False
+        if not self.points.validate(): valid = False
         if not self.section.validate(): valid = False
         return(valid)
 
-    def set_route(self, interlocking_route:[[int,bool],int]):
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-        # Each point element in the point list comprises [point_id, point_state]
-        self.p1.set_value(interlocking_route[0][0])
-        self.p2.set_value(interlocking_route[0][1])
-        self.p3.set_value(interlocking_route[0][2])
-        self.p4.set_value(interlocking_route[0][3])
-        self.p5.set_value(interlocking_route[0][4])
-        self.p6.set_value(interlocking_route[0][5])
-        self.section.set_value(interlocking_route[1])
+    def set_route(self, route:[[int,bool],int]):
+        # A route comprises: [variable_length_list_of_point_settings, section_id]
+        # Each element in the list_of_point_settings comprises [point_id, point_state]
+        # The section_id is the refrence to the track section associated with the route
+        self.points.set_values(route[0])
+        self.section.set_value(route[1])
         
     def get_route(self):
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-        # Each point element in the point list comprises [point_id, point_state]
-        route =  [ [ self.p1.get_value(),
-                     self.p2.get_value(),
-                     self.p3.get_value(),
-                     self.p4.get_value(),
-                     self.p5.get_value(),
-                     self.p6.get_value() ],
-                     self.section.get_value() ]
-        return (route)
+        # A route comprises: [variable_length_list_of_point_settings, section_id]
+        # Each element in the list_of_point_settings comprises [point_id, point_state]
+        # The section_id is the refrence to the track section associated with the route
+        route = [ self.points.get_values(), self.section.get_value() ]
+        return(route)
 
 #------------------------------------------------------------------------------------
 # Class for a track_sensor_route_frame (uses the base track_sensor_route_group class)
@@ -247,11 +223,11 @@ class edit_track_sensor():
             open_windows[object_id] = self.window
             # Create a Frame to hold the Item ID and GPIO Sensor UI elements
             self.frame = Tk.Frame(self.window)
-            self.frame.pack(padx=2, pady=2, fill='x')
+            self.frame.pack(fill='x')
             # Create the UI Element for Item ID selection
             self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
                                 exists_function = track_sensors.track_sensor_exists)
-            self.sensorid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.sensorid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the UI Element for the GPIO Sensor selection.
             self.gpiosensor = gpio_sensor_selection(self.frame)
             self.gpiosensor.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
@@ -268,7 +244,7 @@ class edit_track_sensor():
             self.ahead.frame.pack(padx=2, pady=2, fill='x')
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # load the initial UI state
@@ -321,7 +297,7 @@ class edit_track_sensor():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

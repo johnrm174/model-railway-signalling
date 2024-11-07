@@ -7,7 +7,6 @@
 #    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
 #    update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    set_bbox - Common function to create/update the boundary box for a schematic object
-#    find_initial_canvas_position - common function to return the next 'free' position (x,y)
 #    new_item_id - Common function - common function to return the next 'free' item ID
 #    get_offset_colour - Get a colour with a specified brightness offset to a specified colour
 #    get_text_colour - Get text colour (black/white) for max contrast with the background colour
@@ -20,6 +19,8 @@
 #    track_sensor(item_id:int) - helper function to find the object Id by Item ID
 #    route(item_id:int) - helper function to find the object Id by Item ID
 #    switch(item_id:int) - helper function to find the object Id by Item ID
+#
+#    switch_exists(item_id:int) - helper function to see if a Switch of a given ID exists
 #
 # Objects intended to be accessed directly by other editor modules:
 #
@@ -93,6 +94,15 @@ def route(ID:int): return (route_index[str(ID)])
 def switch(ID:int): return (switch_index[str(ID)])
 
 #------------------------------------------------------------------------------------
+# Externally used functions to see if a DCC Switch exists. We need to have a specific
+# Function here rather than use the Library function 'button_exists' as both Routes
+# and DCC Switches use the common button library objects
+#------------------------------------------------------------------------------------
+
+def switch_exists(ID:int):
+    return (str(ID) in switch_index.keys())
+
+#------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
 # These elements are common to all schematic layout objects and are primarily
 # used to support the schematic editor functions (move, select, etc)
@@ -108,34 +118,16 @@ default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 
 #------------------------------------------------------------------------------------
 # Function to set the required defaults for the Objects package at application start
-# The Tkinter Canvas Object and default canvas attributes (dimentions and grid size)
-# are saved as global variables for easy referencing. The Canvas width, height and grid
-# are used for optimising the positioning of objects on creation or 'paste'
-# Also calls the run_layout.initialise function to set the tkinter canvas object
+# The Tkinter Canvas & Root references are saved as global variables for easy referencing.
 #------------------------------------------------------------------------------------
 
 canvas = None
 root = None
-canvas_width = 0
-canvas_height = 0
-canvas_grid = 0
 
-def initialise (root_object, canvas_object, width:int, height:int, grid:int):
+def initialise (root_object, canvas_object):
     global canvas, root
     canvas = canvas_object
     root = root_object
-    update_canvas(canvas_width, canvas_height, grid)
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to update the Canvas Attributes (following layout load or canvas resize)
-#------------------------------------------------------------------------------------
-
-def update_canvas(width:int, height:int, grid:int):
-    global canvas_width, canvas_height, canvas_grid
-    canvas_width = width
-    canvas_height = height
-    canvas_grid = grid
     return()
     
 #------------------------------------------------------------------------------------
@@ -159,35 +151,6 @@ def set_bbox(object_id:str, canvas_tags:str):
     else:
         schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')
     return()
-
-#------------------------------------------------------------------------------------
-# Internal function to find an initial canvas position for the created object.
-# This is used by all the object type-specific creation functions (below).
-#------------------------------------------------------------------------------------
-
-def find_initial_canvas_position():
-    global schematic_objects
-    # Default position (top left) to try first and Deltas to use for object spacing
-    startx, starty = 75, 50
-    deltax, deltay = 25, 50
-    # Find an intial position not taken up with an existing object
-    x, y = startx, starty
-    while True:
-        posfree = True
-        for object_id in schematic_objects:
-            # See if another object already exists at this position
-            if (schematic_objects[object_id]["posx"] == x and
-                 schematic_objects[object_id]["posy"] == y):
-                posfree = False
-                break
-        # If the current x/y position is "free" now have iterated through all other
-        # schematic objects then we can use this position to create the new object
-        if posfree: break
-        # Else, apply the deltas and try again
-        x, y = x + deltax, y + deltay
-        # Take into account the size of the canvas (so nothing gets created "off scene"
-        if y > canvas_height - 50: y = starty
-    return(x, y)
 
 #------------------------------------------------------------------------------------
 # Internal function to assign a unique type-specific id for a newly created object

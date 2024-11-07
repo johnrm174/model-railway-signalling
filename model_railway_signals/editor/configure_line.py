@@ -151,20 +151,20 @@ class edit_line():
             self.main_frame.pack()
             # Create a Frame to hold the Line ID and Line Colour Selections
             self.frame = Tk.Frame(self.main_frame)
-            self.frame.pack(padx=2, pady=2, fill='x')
+            self.frame.pack(fill='x')
             # Create the UI Element for Line ID selection
             self.lineid = common.object_id_selection(self.frame, "Line ID",
                                     exists_function = lines.line_exists) 
-            self.lineid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.lineid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the line colour selection element
             self.colour = common.colour_selection(self.frame, label="Colour")
-            self.colour.frame.pack(padx=2, pady=2, fill='x')
+            self.colour.pack(padx=2, pady=2, fill='x')
             # Create the line Attributes UI Element
             self.attributes = line_attributes(self.main_frame)
             self.attributes.frame.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
+            self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # load the initial UI state
@@ -216,7 +216,7 @@ class edit_line():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

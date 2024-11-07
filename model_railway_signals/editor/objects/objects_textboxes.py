@@ -13,7 +13,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -44,7 +43,7 @@ default_textbox_object["item"] = objects_common.object_type.textbox
 default_textbox_object["text"] = "Text"
 default_textbox_object["colour"] = "black"
 default_textbox_object["justify"] = 2   ## 1=Left, 2=Center, 3=right
-default_textbox_object["background"] = "grey85"
+default_textbox_object["background"] = ""
 default_textbox_object["font"] = "Courier"  
 default_textbox_object["fontsize"] = 10  
 default_textbox_object["fontstyle"] = ""  
@@ -100,19 +99,17 @@ def redraw_textbox_object(object_id):
 # text boxes at run time so we don't need to maintain a type-specific index
 #------------------------------------------------------------------------------------
         
-def create_textbox():
+def create_textbox(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID
     # Note that we don't need to assign the 'itemID' as textboxes are just
     # for annotating the schematic (not used in layout configuration/automation)
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_textbox_object)
-    # Find the initial canvas position
-    x, y = objects_common.find_initial_canvas_position()
     # Add the specific elements for this particular instance of the object
     item_id = objects_common.new_item_id(exists_function=text_boxes.text_box_exists)
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Draw the text box on the canvas
     redraw_textbox_object(object_id)
     return(object_id)

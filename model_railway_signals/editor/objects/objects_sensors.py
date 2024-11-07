@@ -19,7 +19,6 @@
 #    run_layout.sensor_passed_callback - the callback specified when creating the library objects
 #    objects_common.set_bbox - to create/update the boundary box for the canvas drawing objects
 #    objects_common.new_item_id - to get the next 'free' type-specific Item ID (when creating objects)
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.track_sensor - to find the object_id from a given item_id
 #    objects_routes.remove_references_to_sensor - called when the Sensor ID is changed
 #    objects_routes.update_references_to_sensor - called when the Sensor is deleted
@@ -57,21 +56,11 @@ default_track_sensor_object = copy.deepcopy(objects_common.default_object)
 default_track_sensor_object["item"] = objects_common.object_type.track_sensor
 default_track_sensor_object["passedsensor"] = ""
 default_track_sensor_object["hidden"] = False
-# The "routeahead" element comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-# Each point element in the point list comprises [point_id, point_state]
-default_track_sensor_object["routeahead"] = [
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ]
-default_track_sensor_object["routebehind"] = [
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-        [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ]
+# The "route" elements comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route in the list comprises: [list_of_point_settings, section_id]
+# Each point element in the list_of_point_settings comprises [point_id, point_state]
+default_track_sensor_object["routeahead"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
+default_track_sensor_object["routebehind"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from both of the Track Sensor's
@@ -233,17 +222,16 @@ def redraw_track_sensor_object(object_id):
 # Function to Create a new default object (and create the associated library objects)
 #------------------------------------------------------------------------------------------------------------------
         
-def create_track_sensor():
+def create_track_sensor(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_track_sensor_object)
-    # Find the initial canvas position for the new object
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
     objects_common.track_sensor_index[str(item_id)] = object_id
     # Create the associated library objects

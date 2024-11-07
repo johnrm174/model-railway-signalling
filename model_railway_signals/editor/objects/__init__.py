@@ -15,6 +15,8 @@
 #    route(item_id:int) - helper function to find the object Id by Item ID
 #    switch(item_id:int) - helper function to find the object Id by Item ID
 #
+#    switch_exists(item_id:int) - helper function to find if a DCC Switch Exists
+#
 #    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
@@ -29,8 +31,7 @@
 #    delete_objects([object_IDs]) - Delete the selected objects from the canvas
 #    rotate_objects([object_IDs]) - Rotate the selected objects on the canvas
 #    move_objects([object_IDs]) - Finalises the move of selected objects
-#    copy_objects([object_IDs]) - Copy the selected objects to the clipboard
-#    paste_objects() - Paste Clipboard objects onto the canvas (returns list of new IDs)
+#    copy_objects([object_IDs]) - Copy the selected objects (returns list of new IDs)
 #    update_object(object_ID, new_object) - update the config of an existing object
 #    undo() / redo() - Undo and re-do functions as you would expect
 #
@@ -60,13 +61,11 @@ from .objects import delete_objects
 from .objects import rotate_objects
 from .objects import move_objects
 from .objects import copy_objects
-from .objects import paste_objects
 from .objects import update_object
 from .objects import save_schematic_state
 from .objects import reset_objects
 
 from .objects_common import initialise
-from .objects_common import update_canvas
 from .objects_common import signal 
 from .objects_common import point 
 from .objects_common import section
@@ -75,6 +74,8 @@ from .objects_common import line
 from .objects_common import track_sensor
 from .objects_common import route
 from .objects_common import switch
+
+from .objects_common import switch_exists
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -109,7 +110,6 @@ __all__ = [
     'rotate_objects',
     'move_objects',
     'copy_objects',
-    'paste_objects',
     'update_object',
     'reset_objects',
     # Helper functions to get the obj ID of an item ID
@@ -121,6 +121,8 @@ __all__ = [
     'track_sensor',
     'route',
     'switch',
+    # Helper functions to See if a DCC switch of a given ID exists
+    'switch_exists',
     # Main schematic object dict and the type-specific indexes
     'schematic_objects',
     'signal_index',

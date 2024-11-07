@@ -222,17 +222,17 @@ class instrument_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Inst ID and Inst Type Selections
         self.frame = Tk.Frame(parent_tab)
-        self.frame.pack(padx=2, pady=2, fill='x')
+        self.frame.pack(fill='x')
         # Create the UI Element for Item ID selection. Note that although the block_instruments.instrument_exists
         # function will match both local and remote Instrument IDs, the object_id_selection only allows integers to
         # be selected - so we can safely use this function here for consistency.
         self.instid = common.object_id_selection(self.frame, "Inst ID",
                         exists_function = block_instruments.instrument_exists) 
-        self.instid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.instid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Inst Type selection
-        self.insttype = common.selection_buttons(self.frame, "Point type",
-                    "Select block Instrument Type", None, "Single line", "Double Line")
-        self.insttype.frame.pack(padx=2, pady=2, fill='x')
+        self.insttype = common.selection_buttons(self.frame, label= "Point type",
+                    tool_tip="Select block Instrument Type", button_labels=("Single line", "Double Line"))
+        self.insttype.pack(padx=2, pady=2, fill='x')
         self.linkedto = linked_to_selection(parent_tab)
         self.linkedto.frame.pack(padx=2, pady=2, fill='x')
         self.sounds = sound_file_selections(parent_tab)
@@ -270,7 +270,7 @@ class edit_instrument():
             open_windows[object_id] = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
@@ -340,7 +340,7 @@ class edit_instrument():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

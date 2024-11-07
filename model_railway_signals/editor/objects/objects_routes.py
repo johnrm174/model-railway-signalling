@@ -19,12 +19,13 @@
 #    update_references_to_point(old_id, new_id) - update point_id references in the route's configuration
 #    remove_references_to_line(line_id) - remove line_id references from the route's configuration
 #    update_references_to_line(old_id, new_id) - update line_id references in the route's configuration
+#    remove_references_to_switch(switch_id) - remove switch_id references from the route's configuration
+#    update_references_to_switch(old_id, new_id) - update switch_id references in the route's configuration
 #
 # Makes the following external API calls to other editor modules:
 #    run_routes.set_schematic_route_callback - setting the object callbacks when created/recreated
 #    run_routes.clear_schematic_route_callback - setting the object callbacks when created/recreated
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.get_offset_colour - Get a colour with a specified brightness offset to a specified colour
 #    objects_common.get_text_colour - Get text colour (black/white) for max contrast with the background colour
@@ -60,18 +61,24 @@ from . import objects_common
 
 default_route_object = copy.deepcopy(objects_common.default_object)
 default_route_object["item"] = objects_common.object_type.route
-default_route_object["routename"] = "Route Name"
+default_route_object["routename"] = "Route"
 default_route_object["routedescription"] = "Route description (Run Mode tooltip)"
 default_route_object["buttonwidth"] = 15
+default_route_object["buttoncolour"] = "SeaGreen3"
+default_route_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
+default_route_object["font"] = "Courier"
+default_route_object["fontsize"] = 9
+default_route_object["fontstyle"] = ""
 default_route_object["signalsonroute"] = []
 default_route_object["subsidariesonroute"] = []
 default_route_object["pointsonroute"] = {}
+default_route_object["switchesonroute"] = {}
 default_route_object["linestohighlight"] = []
 default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
-default_route_object["buttoncolour"] = "SeaGreen3"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
+default_route_object["resetswitches"] = False
 default_route_object["tracksensor"] = 0
 default_route_object["setupsensor"] = 0
 
@@ -217,6 +224,31 @@ def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to remove references to a Switch ID from the Route's configuration
+# The 'switchesonroute' table comprises a dict of switch settings (True/False)
+# with the key of str(Switch_ID).
+#------------------------------------------------------------------------------------
+
+def remove_references_to_switch(switch_id:int):
+    for route_id in objects_common.route_index:
+        if str(switch_id) in objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].keys():
+            del objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][str(switch_id)]
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Switch ID in the Route's configuration.
+# The 'switchesonroute' table comprises a dict of switch settings (True/False)
+# with the key of str(Switch_ID).
+#------------------------------------------------------------------------------------
+
+def update_references_to_switch(old_switch_id:int, new_switch_id:int):
+    for route_id in objects_common.route_index:
+        if str(old_switch_id) in objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].keys():
+            value = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].pop(str(old_switch_id))
+            objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][str(new_switch_id)] = value
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to to update a Route object following a configuration change
 #------------------------------------------------------------------------------------
 
@@ -241,12 +273,20 @@ def update_route(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
         
 def redraw_route_object(object_id):
+    # Create the Tkinter Font tuple
+    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
+                          objects_common.schematic_objects[object_id]["fontsize"],
+                          objects_common.schematic_objects[object_id]["fontstyle"])
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-    # Work out what the text colour should be - using the brightest of the three
-    text_colour = objects_common.get_text_colour(selected_colour)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    if  text_colour_type == 2 : text_colour = "Black"
+    elif text_colour_type == 3 : text_colour = "White"
+    else: text_colour = objects_common.get_text_colour(selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -258,8 +298,12 @@ def redraw_route_object(object_id):
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
                 tooltip = objects_common.schematic_objects[object_id]["routedescription"],
-                button_colour = button_colour, active_colour = active_colour,
-                selected_colour = selected_colour, text_colour = text_colour)
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour,
+                font = tkinter_font_tuple)
+
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
@@ -269,17 +313,17 @@ def redraw_route_object(object_id):
 # Function to Create a new default Route object (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_route():
+def create_route(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_route_object)
-    # Find the initial canvas position and assign the initial ID
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["routename"] = "Route "+str(item_id)
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the type-specific index
     objects_common.route_index[str(item_id)] = object_id
     # Draw the Route Object on the canvas
@@ -297,20 +341,22 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=buttons.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
+    objects_common.schematic_objects[new_object_id]["routename"] = "Route "+str(new_id)
     objects_common.route_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
     # The bits we want to copy are - buttonwidth, routecolour, switchdelay, resetpoints
-    objects_common.schematic_objects[new_object_id]["routename"] = default_route_object["routename"]
     objects_common.schematic_objects[new_object_id]["routedescription"] = default_route_object["routedescription"]
     objects_common.schematic_objects[new_object_id]["signalsonroute"] = default_route_object["signalsonroute"]
     objects_common.schematic_objects[new_object_id]["subsidariesonroute"] = default_route_object["subsidariesonroute"]
     objects_common.schematic_objects[new_object_id]["pointsonroute"] = default_route_object["pointsonroute"]
+    objects_common.schematic_objects[new_object_id]["switchesonroute"] = default_route_object["switchesonroute"]
     objects_common.schematic_objects[new_object_id]["linestohighlight"] = default_route_object["linestohighlight"]
     objects_common.schematic_objects[new_object_id]["pointstohighlight"] = default_route_object["pointstohighlight"]
     objects_common.schematic_objects[new_object_id]["tracksensor"] = default_route_object["tracksensor"]
+    objects_common.schematic_objects[new_object_id]["setupsensor"] = default_route_object["setupsensor"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create the associated library objects

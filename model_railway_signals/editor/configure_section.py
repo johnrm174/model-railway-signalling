@@ -233,11 +233,11 @@ class section_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Section ID and General Settings
         self.frame1 = Tk.Frame(parent_tab)
-        self.frame1.pack(padx=2, pady=2, fill='x')
+        self.frame1.pack(fill='x')
         # Create the UI Element for Section ID selection
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
                                 exists_function = track_sections.section_exists) 
-        self.sectionid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.sectionid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create a labelframe for the General settings
         self.subframe1 = Tk.LabelFrame(self.frame1, text="General Settings")
         self.subframe1.pack(padx=2, pady=2, fill='x')
@@ -308,7 +308,7 @@ class edit_section():
             open_windows[object_id] = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create a frame to hold all UI elements (so they don't expand on window resize
@@ -386,7 +386,7 @@ class edit_section():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
         return()
 
     def close_window(self):

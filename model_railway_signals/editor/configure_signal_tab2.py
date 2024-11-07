@@ -13,7 +13,7 @@
 #    common.int_item_id_entry_box
 #    common.str_int_item_id_entry_box
 #    common.signal_route_selections
-#    common.point_interlocking_entry
+#    common.point_settings_entry
 #
 #------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ from ..library import track_sections
                 
 #------------------------------------------------------------------------------------
 # Class for a route interlocking group (comprising 6 points, a signal and an instrument)
-# Uses the common point_interlocking_entry class for each point entry
+# Uses the common point_settings_entry class for each point entry
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set the route elements (points, sig_ahead and inst_ahead)
@@ -54,18 +54,8 @@ class interlocking_route_group:
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify any points that need to be set and locked before the signal can be cleared for the route"
-        self.p1 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p2 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p3 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p4 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p5 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p6 = common.point_interlocking_entry(self.frame, tool_tip)
-        self.p1.pack(side = Tk.LEFT)
-        self.p2.pack(side = Tk.LEFT)
-        self.p3.pack(side = Tk.LEFT)
-        self.p4.pack(side = Tk.LEFT)
-        self.p5.pack(side = Tk.LEFT)
-        self.p6.pack(side = Tk.LEFT)
+        self.points = common.row_of_point_settings(self.frame, columns=6, tool_tip=tool_tip)
+        self.points.pack(side = Tk.LEFT)
         # Create the signal ahead and instrument ahead elements (always packed)
         self.label1 = Tk.Label(self.frame, text=" Sig:")
         self.label1.pack(side=Tk.LEFT)
@@ -84,12 +74,7 @@ class interlocking_route_group:
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
         valid = True
-        if not self.p1.validate(): valid = False
-        if not self.p2.validate(): valid = False
-        if not self.p3.validate(): valid = False
-        if not self.p4.validate(): valid = False
-        if not self.p5.validate(): valid = False
-        if not self.p6.validate(): valid = False
+        if not self.points.validate(): valid = False
         if not self.sig.validate(): valid = False
         if not self.block.validate(): valid = False
         return(valid)
@@ -107,52 +92,30 @@ class interlocking_route_group:
         self.block.disable1()
     
     def enable_route(self):
-        self.p1.enable()
-        self.p2.enable()
-        self.p3.enable()
-        self.p4.enable()
-        self.p5.enable()
-        self.p6.enable()
+        self.points.enable()
         self.sig.enable()
         self.block.enable()
 
     def disable_route(self):
-        self.p1.disable()
-        self.p2.disable()
-        self.p3.disable()
-        self.p4.disable()
-        self.p5.disable()
-        self.p6.disable()
+        self.points.disable()
         self.sig.disable()
         self.block.disable()
 
     def set_route(self, interlocking_route:[[int,bool],str,int], item_id:int):
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
-        # Each point element in the point list comprises [point_id, point_state]
+        # A route comprises: [variable_length_list_of_point_settings, sig_id:str, inst_id:int]
+        # Each element in the list_of_point_settings comprises [point_id, point_state]
         # Note that the sig ID can be a local or remote Signal (so a string)
-        self.p1.set_value(interlocking_route[0][0])
-        self.p2.set_value(interlocking_route[0][1])
-        self.p3.set_value(interlocking_route[0][2])
-        self.p4.set_value(interlocking_route[0][3])
-        self.p5.set_value(interlocking_route[0][4])
-        self.p6.set_value(interlocking_route[0][5])
+        self.points.set_values(interlocking_route[0])
         # Note we pass in the current signal_id for validation (to prevent selection)
         self.sig.set_value(interlocking_route[1], item_id)
         self.block.set_value(interlocking_route[2])
         
     def get_route(self):
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
-        # Each point element in the point list comprises [point_id, point_state]
+        # A route comprises: [variable_length_list_of_point_settings, sig_id:str, inst_id:int]
+        # Each element in the list_of_point_settings comprises [point_id, point_state]
         # Note that the sig ID can be a local or remote Signal (so a string)
-        route =  [ [ self.p1.get_value(),
-                     self.p2.get_value(),
-                     self.p3.get_value(),
-                     self.p4.get_value(),
-                     self.p5.get_value(),
-                     self.p6.get_value() ],
-                     self.sig.get_value(),
-                     self.block.get_value() ]
-        return (route)
+        route =  [ self.points.get_values(), self.sig.get_value(), self.block.get_value() ]
+        return(route)
 
 #------------------------------------------------------------------------------------
 # Class for a route interlocking frame 
@@ -256,24 +219,29 @@ class conflicting_signals_frame():
         tool_tip = "Specify any signals/routes that would conflict with this signal route"
         self.main_frame = Tk.LabelFrame(self.frame, text="MAIN Route - interlocking with conflicting signals")
         self.main_frame.pack(padx=2, pady=2, fill='x')
-        self.main = common.entry_box_grid(self.main_frame, base_class=common.signal_route_selections,
+        self.main = common.grid_of_widgets(self.main_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.main.pack()
         self.lh1_frame = Tk.LabelFrame(self.frame, text="LH1 Route - interlocking with conflicting signals")
         self.lh1_frame.pack(padx=2, pady=2, fill='x')
-        self.lh1 = common.entry_box_grid(self.lh1_frame, base_class=common.signal_route_selections,
+        self.lh1 = common.grid_of_widgets(self.lh1_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.lh1.pack()
         self.lh2_frame = Tk.LabelFrame(self.frame, text="LH2 Route - interlocking with conflicting signals")
         self.lh2_frame.pack(padx=2, pady=2, fill='x')
-        self.lh2 = common.entry_box_grid(self.lh2_frame, base_class=common.signal_route_selections,
+        self.lh2 = common.grid_of_widgets(self.lh2_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.lh2.pack()
         self.rh1_frame = Tk.LabelFrame(self.frame, text="RH1 Route - interlocking with conflicting signals")
         self.rh1_frame.pack(padx=2, pady=2, fill='x')
-        self.rh1 = common.entry_box_grid(self.rh1_frame, base_class=common.signal_route_selections,
+        self.rh1 = common.grid_of_widgets(self.rh1_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.rh1.pack()
         self.rh2_frame = Tk.LabelFrame(self.frame, text="RH2 Route - interlocking with conflicting signals")
         self.rh2_frame.pack(padx=2, pady=2, fill='x')
-        self.rh2 = common.entry_box_grid(self.rh2_frame, base_class=common.signal_route_selections,
+        self.rh2 = common.grid_of_widgets(self.rh2_frame, base_class=common.signal_route_selections,
                                     tool_tip=tool_tip, columns=2, exists_function=signals.signal_exists)
+        self.rh2.pack()
 
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI

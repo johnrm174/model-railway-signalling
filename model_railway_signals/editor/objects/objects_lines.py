@@ -12,7 +12,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
-#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_routes.update_references_to_line - called when the Line ID is changed
 #    objects_routes.remove_references_to_line - called when the Line is deleted
@@ -99,19 +98,18 @@ def redraw_line_object(object_id, create_selected:bool=False):
 # Function to Create a new default Line (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_line():
+def create_line(xpos:int, ypos:int):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_line_object)
-    # Find the initial canvas position for the new object and assign the item ID
-    x, y = objects_common.find_initial_canvas_position()
+    # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=lines.line_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = x
-    objects_common.schematic_objects[object_id]["posy"] = y
-    objects_common.schematic_objects[object_id]["endx"] = x + 50
-    objects_common.schematic_objects[object_id]["endy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = xpos - 50
+    objects_common.schematic_objects[object_id]["posy"] = ypos
+    objects_common.schematic_objects[object_id]["endx"] = xpos + 50
+    objects_common.schematic_objects[object_id]["endy"] = ypos
     # Add the new object to the index of lines
     objects_common.line_index[str(item_id)] = object_id 
     # Draw the Line on the canvas

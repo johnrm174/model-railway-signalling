@@ -10,21 +10,20 @@ from system_test_harness import *
 #-----------------------------------------------------------------------------------
 
 def test_edit_object_windows(delay:float=0.0):
-    print("Testing all object edit windows")
     # Create new default objects on the schematic
-    b1 = create_block_instrument()
-    select_and_move_objects(b1,500,200,delay=delay)
-    create_line()
-    create_colour_light_signal()
-    create_semaphore_signal()
-    create_ground_position_signal()
-    create_ground_disc_signal()
-    create_track_section()
-    create_left_hand_point()
-    create_right_hand_point()
-    create_textbox()
-    create_track_sensor()
-    create_route()
+    create_line(150,50)
+    create_colour_light_signal(300,40)
+    create_semaphore_signal(400,40)
+    create_ground_position_signal(500,40)
+    create_ground_disc_signal(600,40)
+    create_track_section(100,100)
+    create_left_hand_point(200,100)
+    create_right_hand_point(300,100)
+    create_textbox(400,100)
+    create_track_sensor(500,90)
+    create_route(100,200)
+    create_switch(300,200)
+    create_block_instrument(300,400)
     # Test the configuration remains unchanged with Edit/Save
     really_do_test_all_object_edit_windows(test_all_controls=True)
     return()
@@ -37,17 +36,18 @@ def test_edit_object_windows(delay:float=0.0):
 
 def really_do_test_all_object_edit_windows(delay:float=0.0, test_all_controls:bool=False, report_object_tested:bool=False):
     print("Testing all object edit windows")
-    object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point, objects.object_type.signal,
-        objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor, objects.object_type.route)
+    object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point,
+                    objects.object_type.signal,objects.object_type.section, objects.object_type.instrument,
+                    objects.object_type.track_sensor, objects.object_type.route, objects.object_type.switch)
     for object_type in object_types:
         for object_id in objects.schematic_objects.keys():
             if objects.schematic_objects[object_id]["item"] == object_type:
                 configuration = copy.deepcopy(objects.schematic_objects[object_id])
                 if report_object_tested:
                     print("Testing object edit window for:",configuration["item"],configuration["itemid"])
-                run_function(lambda:schematic.deselect_all_objects())
-                run_function(lambda:schematic.select_object(object_id))
-                run_function(lambda:schematic.edit_selected_object(), delay=1.0)
+                xpos, ypos = get_selection_position(object_id)
+                event = dummy_event(xpos, ypos)
+                run_function(lambda:schematic.left_double_click(event), delay=1.0)
                 if test_all_controls:
                     run_function(lambda:schematic.close_edit_window(reset=True), delay=0.2)
                     run_function(lambda:schematic.close_edit_window(apply=True), delay=0.2)

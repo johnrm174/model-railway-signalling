@@ -18,8 +18,7 @@
 #    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
 #    move_objects(list of obj IDs) - Finalises the move of selected objects
-#    copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
-#    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
+#    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    reset_objects() - resets all points, signals, instruments and sections to default state
 #
@@ -285,30 +284,30 @@ def reset_objects():
 # Called from the Schematic Module when an "add object" button is clicked
 #------------------------------------------------------------------------------------
 
-def create_object(new_object_type, item_type=None, item_subtype=None):
+def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subtype=None):
     if new_object_type == objects_common.object_type.line:
-        object_id = objects_lines.create_line() 
+        object_id = objects_lines.create_line(xpos, ypos)
     elif new_object_type == objects_common.object_type.textbox:
-        object_id = objects_textboxes.create_textbox()
+        object_id = objects_textboxes.create_textbox(xpos, ypos)
     elif new_object_type == objects_common.object_type.signal:
-        object_id = objects_signals.create_signal(item_type, item_subtype)
+        object_id = objects_signals.create_signal(xpos, ypos, item_type, item_subtype)
     elif new_object_type == objects_common.object_type.point:
-         object_id = objects_points.create_point(item_type, item_subtype)
+         object_id = objects_points.create_point(xpos, ypos, item_type, item_subtype)
     elif new_object_type == objects_common.object_type.section:
-        object_id = objects_sections.create_section()
+        object_id = objects_sections.create_section(xpos, ypos)
     elif new_object_type == objects_common.object_type.instrument:
-        object_id = objects_instruments.create_instrument(item_type)
+        object_id = objects_instruments.create_instrument(xpos, ypos, item_type)
     elif new_object_type == objects_common.object_type.track_sensor:
-        object_id = objects_sensors.create_track_sensor()
+        object_id = objects_sensors.create_track_sensor(xpos, ypos)
     elif new_object_type == objects_common.object_type.route:
-        object_id = objects_routes.create_route()
+        object_id = objects_routes.create_route(xpos, ypos)
     elif new_object_type == objects_common.object_type.switch:
-        object_id = objects_switches.create_switch()
+        object_id = objects_switches.create_switch(xpos, ypos)
     else:
         object_id = None
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are creating 'new' objects we don't need to process layout changes
+    # Note that we do not save the schematic state after the 'create' as, although the item now
+    # exists, it has yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
+    # Also - as we are just creating a 'new' object, we don't need to process layout changes
     return(object_id)
 
 #------------------------------------------------------------------------------------
@@ -425,8 +424,8 @@ def rotate_objects(list_of_object_ids):
 # passed to signify which end of the line needs to be updated
 #------------------------------------------------------------------------------------
 
-def move_objects(list_of_object_ids, xdiff1:int=None,
-            ydiff1:int=None, xdiff2:int=None, ydiff2:int=None):
+def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
+                 xdiff2:int=None, ydiff2:int=None, update_schematic_state:bool=True):
     # Only bother processing the update if there has been a change
     if ( (xdiff1 is not None and xdiff1 !=0) or (ydiff1 is not None and ydiff1 !=0) or
          (xdiff2 is not None and xdiff2 !=0) or (ydiff2 is not None and ydiff2 !=0) ): 
@@ -449,65 +448,53 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                 objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
         bring_track_sections_to_the_front()
-        # save the current state (for undo/redo)
-        save_schematic_state()
-    # As we are just moving objects we don't need to process layout changes
+        # Save the current state (for undo/redo) if there has been a change - This is True for
+        # all object moves apart from the interim moves when 'placing' objects after creation/copying
+        if update_schematic_state: save_schematic_state()
+        # As we are just moving objects we don't need to process layout changes
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Copy one or more objects on the schematic to the clipboard
-# Called from the Schematic Module when selected objects are copied
+# Function to Copy one or more objects on the schematic and create new versions at
+# slightly offset positions that will then track the cursor until 'placed'
+# Called from the Schematic Module when selected objects are copied.
 #------------------------------------------------------------------------------------
 
-clipboard=[]
-
-def copy_objects(list_of_object_ids):
-    global clipboard
-    clipboard=[]
-    for object_id in list_of_object_ids:
-        # Take a deep copy of the object and add to the clipboard
-        clipboard.append(copy.deepcopy(objects_common.schematic_objects[object_id]))
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to paste copies of the current clipboard objects to the canvas
-# Called from the Schematic Modulee on 'paste' - returns a list of new object_ids
-# Note that the object_ids, item_ids and canvas positions are reassigned on 'paste'
-#------------------------------------------------------------------------------------
-
-def paste_objects():
-    list_of_new_object_ids=[]
-    # New objects are "pasted" at a slightly offset position on the canvas
-    deltax, deltay = objects_common.canvas_grid, objects_common.canvas_grid
+def copy_objects(list_of_object_ids, deltax:int, deltay:int):
+    # New objects are "pasted" at a slightly offset position on the canvas so
+    # its clear that new objects have been created (to move/place on the canvas)
+    # We need to return a list of new object IDs
+    list_of_new_object_ids = []
     # Create a copy of each object in the clipboard (depending on type)
-    for object_to_paste in clipboard:
-        type_of_object = object_to_paste["item"]
+    for object_id in list_of_object_ids:
+        object_to_copy = objects_common.schematic_objects[object_id]
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
         if type_of_object == objects_common.object_type.line:
-            new_object_id = objects_lines.paste_line(object_to_paste, deltax, deltay)
+            new_object_id = objects_lines.paste_line(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.textbox:
-            new_object_id = objects_textboxes.paste_textbox(object_to_paste, deltax, deltay)
+            new_object_id = objects_textboxes.paste_textbox(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.signal:
-            new_object_id = objects_signals.paste_signal(object_to_paste, deltax, deltay)
+            new_object_id = objects_signals.paste_signal(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.point:
-            new_object_id = objects_points.paste_point(object_to_paste, deltax, deltay)
+            new_object_id = objects_points.paste_point(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.section:
-            new_object_id = objects_sections.paste_section(object_to_paste, deltax, deltay)
+            new_object_id = objects_sections.paste_section(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.instrument:
-            new_object_id = objects_instruments.paste_instrument(object_to_paste, deltax, deltay)
+            new_object_id = objects_instruments.paste_instrument(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.track_sensor:
-            new_object_id = objects_sensors.paste_track_sensor(object_to_paste, deltax, deltay)
+            new_object_id = objects_sensors.paste_track_sensor(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.route:
-            new_object_id = objects_routes.paste_route(object_to_paste, deltax, deltay)
+            new_object_id = objects_routes.paste_route(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.switch:
-            new_object_id = objects_switches.paste_switch(object_to_paste, deltax, deltay)
+            new_object_id = objects_switches.paste_switch(object_to_copy, deltax, deltay)
         # Add the new object to the list of clipboard objects
         # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are just pasting 'new' objects we don't need to process layout changes
+    # Note that we do not save the schematic state after the 'copy' as, although the copied items now
+    # exist, they have yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
+    # Also - as we are just copying 'new' objects we don't need to process layout changes
     return(list_of_new_object_ids)
 
 #------------------------------------------------------------------------------------
@@ -564,7 +551,7 @@ def set_all(new_objects):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 #################################################################################################
-                ## Handle breaking change of text boxes being library objects from Release 4.7 onwards ##########
+                ## Handle breaking change of text boxes being library objects from Release 4.7.0 onwards ########
                 ## and hence requiring a unique item ID (even if this is 'under the hood') ######################
                 #################################################################################################
                 elif (new_object_type == objects_common.object_type.textbox and
@@ -576,32 +563,11 @@ def set_all(new_objects):
                 #################################################################################################
 
                 #################################################################################################
-                ## Handle breaking change of tracks sections now a list of 3 sections from release 4.0.0 #########
-                ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
-                ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
-                ## Before release 4.0.0, each route element was a single track section (integer value) ##########
-                ## From Release 4.0.0 onwards, each element comprises a list of track sections [T1, T2, T3] #####
-                #################################################################################################
-                elif new_object_type == objects_common.object_type.signal and element == "tracksections":
-                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
-                    if type(new_objects[object_id][element][1][0]) == int:
-                        for index, route in enumerate(new_objects[object_id][element][1]):
-                            list_of_sections = [new_objects[object_id][element][1][index],0,0]
-                            objects_common.schematic_objects[object_id][element][1][index] = list_of_sections
-                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                                " - Handling version 4.0.0 breaking change to : '"+element+"'")
-                    else:
-                        objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
-                #################################################################################################
-                ## End of Handle breaking change for Track sections #############################################
-                #################################################################################################
-
-                #################################################################################################
                 ## Handle non-breaking change of signal interlocking table for opposing signals. ################
                 ## Up to Release 4.4.0, each 'route' element was a fixed length list of 4 signals ###############
                 ## From Release 4.5.0 each 'route' element is a variable length list of signals #################
                 ## We don't really need to handle this at load time, but it 'tidies up' the lists ###############
-                ## for the next time the layout is saved (without having to edit/apply each signal config #######
+                ## for the next time the layout is saved (without having to edit/apply each signal config) ######
                 #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "siginterlock":
                     new_sig_interlock_table = [[],[],[],[],[]]
@@ -611,6 +577,91 @@ def set_all(new_objects):
                             if interlocked_signal[0] > 0:
                                 new_sig_interlock_table[index].append(interlocked_signal)
                     objects_common.schematic_objects[object_id][element] = new_sig_interlock_table
+                #################################################################################################
+                ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
+                #################################################################################################
+
+                #################################################################################################
+                ## Handle breaking change of DCC command sequences being variable length lists rather than ######
+                ## fixed length lists from Release 4.8.0 onwards. This applies to the following elements: #######
+                ##    "dccaspects" - each of the 6 possible aspects for a 4-aspect colour light signal ##########
+                ##    "dccfeathers" - each of the 6 possible route indications (including 'dark') ###############
+                ##    "dcctheatre" - each of the 6 possible route indications (including 'dark') ################
+                ## Up to Release 4.7.0, each 'dcc sequence' was a fixed length list of 6 dcc commands ###########
+                ## From Release 4.8.0 each 'dcc sequence' is a variable length list of dcc commands #############
+                ## We need to handle this at load time otherwise creating the dcc the mappings will error #######
+                #################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "dccaspects":
+                    new_dccaspects_table = [[],[],[],[],[],[]]
+                    old_dccaspects_table = new_objects[object_id][element]
+                    for index, dccaspects_route in enumerate(old_dccaspects_table):
+                        for dcc_command in dccaspects_route:
+                            if dcc_command[0] > 0:
+                                new_dccaspects_table[index].append(dcc_command)
+                    objects_common.schematic_objects[object_id][element] = new_dccaspects_table
+                elif new_object_type == objects_common.object_type.signal and element == "dccfeathers":
+                    new_dccfeathers_table = [[],[],[],[],[],[]]
+                    old_dccfeathers_table = new_objects[object_id][element]
+                    for index, dccfeathers_route in enumerate(old_dccfeathers_table):
+                        for dcc_command in dccfeathers_route:
+                            if dcc_command[0] > 0:
+                                new_dccfeathers_table[index].append(dcc_command)
+                    objects_common.schematic_objects[object_id][element] = new_dccfeathers_table
+                elif new_object_type == objects_common.object_type.signal and element == "dcctheatre":
+                    new_dcctheatre_table = [[],[],[],[],[],[]]
+                    old_dcctheatre_table = new_objects[object_id][element]
+                    for index, dcctheatre_route in enumerate(old_dcctheatre_table):
+                        new_theatre_route_entry = [dcctheatre_route[0], [] ]
+                        for dcc_command in dcctheatre_route[1]:
+                            if dcc_command[0] > 0:
+                                new_theatre_route_entry[1].append(dcc_command)
+                        new_dcctheatre_table[index] = new_theatre_route_entry
+                    objects_common.schematic_objects[object_id][element] = new_dcctheatre_table
+                #################################################################################################
+                ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
+                #################################################################################################
+
+                #################################################################################################
+                ## Handle breaking change of Point Settings Lists being variable length lists rather than #######
+                ## fixed length lists from Release 4.8.0 onwards. This applies to the following elements: #######
+                ##    Signals - "pointinterlock" - The list of point settings for each signal route  ############
+                ##    Sensors - "routeahead" - The list of point settings for each sensor route #################
+                ##    Sensors - "routebehind" - The list of point settings for each sensor route ################
+                ## Up to Release 4.7.0, the point settings were a fixed length list of 6 points #################
+                ## From Release 4.8.0 the point settings are a variable length list of points ##################
+                ## We don't really need to handle this at load time, but it 'tidies up' the lists ###############
+                ## for the next time the layout is saved (without having to edit/apply each object config) ######
+                #################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
+                    new_point_interlock_table = [[],[],[],[],[]]
+                    old_point_interlock_table = new_objects[object_id][element]
+                    for index, old_interlocked_route in enumerate(old_point_interlock_table):
+                        new_point_interlock_entry = [ [], old_interlocked_route[1], old_interlocked_route[2] ]
+                        for point_setting in old_interlocked_route[0]:
+                            if point_setting[0] > 0:
+                                new_point_interlock_entry[0].append(point_setting)
+                        new_point_interlock_table[index] = new_point_interlock_entry
+                    objects_common.schematic_objects[object_id][element] = new_point_interlock_table
+                elif new_object_type == objects_common.object_type.track_sensor and element == "routeahead":
+                    new_route_table = [[],[],[],[],[]]
+                    old_route_table = new_objects[object_id][element]
+                    for index, old_route in enumerate(old_route_table):
+                        new_route_entry = [ [], old_route[1] ]
+                        for point_setting in old_route[0]:
+                            if point_setting[0] > 0:
+                                new_route_entry[0].append(point_setting)
+                        new_route_table[index] = new_route_entry
+                    objects_common.schematic_objects[object_id][element] = new_route_table
+                elif new_object_type == objects_common.object_type.track_sensor and element == "routebehind":
+                    new_route_table = [[],[],[],[],[]]
+                    old_route_table = new_objects[object_id][element]
+                    for index, old_route in enumerate(old_route_table):
+                        new_route_entry = [ [], old_route[1] ]
+                        for point_setting in old_route[0]:
+                            if point_setting[0] > 0:
+                                new_route_entry[0].append(point_setting)
+                        new_route_table[index] = new_route_entry
+                    objects_common.schematic_objects[object_id][element] = new_route_table
                 #################################################################################################
                 ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################

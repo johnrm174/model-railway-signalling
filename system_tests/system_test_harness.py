@@ -95,6 +95,7 @@
 #    create_right_hand_point()
 #    create_textbox()
 #    create_route()
+#    create_switch()
 #
 # Supported Schematic keypress / right click menu invocations:
 #    toggle_mode()                    - 'Cntl-m'
@@ -117,6 +118,7 @@
 #    select_or_deselect_objects(*object_ids)
 #    select_single_object(object_id)
 #    select_and_edit_single_object (object_id)
+#    drag_and_drop_event(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True)
 #    select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True)
 #    select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True)
 #    select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True):
@@ -828,72 +830,99 @@ class dummy_event():
 # Functions to excersise the schematic Editor - Create Functions
 # ------------------------------------------------------------------------------
 
-def create_line():
+def place_object(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
+    move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
+    event = dummy_event(x=xpos, y=ypos)
+    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress())
+    run_function(lambda:schematic.left_button_click(event))
+    run_function(lambda:schematic.left_button_release(event))
+
+def create_line(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.line))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_track_sensor():
+def create_track_sensor(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.track_sensor))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_colour_light_signal():
+def create_colour_light_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                         signals.signal_type.colour_light.value,
                         signals.signal_subtype.four_aspect.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_semaphore_signal():
+def create_semaphore_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.semaphore.value,
                            signals.semaphore_subtype.home.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_ground_position_signal():
+def create_ground_position_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.ground_position.value,
                            signals.ground_pos_subtype.standard.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_ground_disc_signal():
+def create_ground_disc_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.ground_disc.value,
                            signals.ground_disc_subtype.standard.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_track_section():
+def create_track_section(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.section))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_block_instrument():
+def create_block_instrument(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.instrument,
                     block_instruments.instrument_type.single_line.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_left_hand_point():
-    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value,points.point_subtype.normal.value))
+def create_left_hand_point(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+    run_function(lambda:schematic.create_object(objects.object_type.point,
+                points.point_type.LH.value, points.point_subtype.normal.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_right_hand_point():
-    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value,points.point_subtype.normal.value))
+def create_right_hand_point(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+    run_function(lambda:schematic.create_object(objects.object_type.point,
+                points.point_type.RH.value, points.point_subtype.normal.value))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_textbox():
+def create_textbox(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.textbox))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
-def create_route():
+def create_route(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.route))
+    place_object(xpos, ypos, steps, delay, test_cancel)
+    object_id = list(objects.schematic_objects)[-1]
+    return(object_id)
+
+def create_switch(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+    run_function(lambda:schematic.create_object(objects.object_type.switch))
+    place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -919,7 +948,7 @@ def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, de
     ydiff = yfinish - ystart
     sleep_delay = delay/steps
     for step in range(steps+1):
-        event = dummy_event(x=xstart+step*(xdiff/steps),y=ystart+step*(ydiff/steps))
+        event = dummy_event(x=int(xstart+step*(xdiff/steps)),y=int(ystart+step*(ydiff/steps)))
         run_function(lambda:schematic.track_cursor(event))
         sleep(sleep_delay)
 
@@ -1045,7 +1074,16 @@ def select_and_edit_single_object(object_id):
         run_function(lambda:schematic.close_edit_window(cancel=True))
         
 # Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
-# The canvas coords of the initial event is determined from the line position so calling scripts need
+def drag_and_drop_event(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+        event = dummy_event(x=xstart, y=ystart)
+        run_function(lambda:schematic.left_button_click(event))
+        move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+        if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
+        event = dummy_event(x=xfinish, y=yfinish)
+        run_function(lambda:schematic.left_button_release(event))
+        
+# Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
+# The canvas coords of the initial event is determined from the object position so calling scripts need
 # to be careful that there are no overlapping objects at that position (that might get selected instead)
 # These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)
 # If the 'test_cancel' flag is set then an <esc> event is raised before the <left_button_release>
@@ -1055,14 +1093,7 @@ def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, d
         raise_test_warning ("select_and_move_objects - object: "+str(object_id)+" does not exist")
     else:
         xstart, ystart = get_selection_position(object_id)
-        event = dummy_event(x=xstart, y=ystart)
-        run_function(lambda:schematic.left_button_click(event))
-        if object_id in schematic.schematic_state["selectedobjects"]: 
-            move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
-        else:
-            raise_test_warning("select_and_move_objects - move aborted - object: "+str(object_id)+" was not selected")
-        if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
-        run_function(lambda:schematic.left_button_release(event))
+        drag_and_drop_event(xstart, ystart, xfinish, yfinish, steps, delay, test_cancel)
 
 # Simulates <right_button_click> followed by a series of <motion> events then <right_button_release>
 # The canvas coords of the events are determined from the coordinates passed into the test function. Note
@@ -1072,14 +1103,7 @@ def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, d
 # If the 'test_cancel' flag is set then an <esc> event is raised before the <left_button_release>
 # event to cancel the move and return all selected objects to their initial positions
 def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
-    event = dummy_event(x=xstart, y=ystart)
-    run_function(lambda:schematic.left_button_click(event))
-    if schematic.schematic_state["selectedobjects"] != []:
-        raise_test_warning ("select_area - area selection aborted - cursor was over an object")
-    else:
-        move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
-    if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
-    run_function(lambda:schematic.left_button_release(event))
+    drag_and_drop_event(xstart, ystart, xfinish, yfinish, steps, delay, test_cancel)
 
 # Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
 # The canvas coords of the initial event is determined from the line position so calling scripts need
@@ -1102,14 +1126,7 @@ def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, 
         elif line_end == 2:
             xstart = objects.schematic_objects[object_id]["endx"]
             ystart = objects.schematic_objects[object_id]["endy"]
-        event = dummy_event(x=xstart, y=ystart)
-        run_function(lambda:schematic.left_button_click(event))
-        if not schematic.schematic_state["editlineend1"] and not schematic.schematic_state["editlineend2"]:
-            raise_test_warning ("select_and_move_line_end - move aborted - Line end was not selected")
-        else:
-            move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
-        if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
-        run_function(lambda:schematic.left_button_release(event))
+        drag_and_drop_event(xstart, ystart, xfinish, yfinish, steps, delay, test_cancel)
         
 # Simulates the <up>, <down>, <left> or <right> 'arrow' keypresses
 # These events are enabled in both EDIT Mode (disabled when move in progress) and RUN Mode
@@ -1149,13 +1166,11 @@ def delete_selected_objects():
     
 # Simulates the <cntl-c> keypress or 'copy' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
-def copy_selected_objects():
-    run_function(lambda:schematic.copy_selected_objects())
-    
-# Simulates the <cntl-v> keypress or 'paste' selection from the canvas popup menu
-# These events are normally only enabled in EDIT Mode (disabled when move in progress)
-def paste_clipboard_objects():
-    run_function(lambda:schematic.paste_clipboard_objects(),delay=0.5)
+def copy_selected_objects(xdiff:int, ydiff:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+    event = dummy_event(x=0, y=0)
+    run_function(lambda:schematic.copy_selected_objects(event))
+    place_object(xdiff, ydiff, steps, delay, test_cancel)
+    object_id = list(objects.schematic_objects)[-1]
     return(schematic.schematic_state["selectedobjects"])
 
 # Simulates the <cntl-z> keypress event on the canvas
