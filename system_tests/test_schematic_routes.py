@@ -37,7 +37,15 @@ def run_change_of_item_id_tests(delay:float=0.0):
     sleep(delay)
     ts1 = create_track_sensor(50,200)
     sleep(delay)
-    ts2 = create_track_sensor(150,200)
+    ts2 = create_track_sensor(100,200)
+    sleep(delay)
+    ts3 = create_track_sensor(150,200)
+    sleep(delay)
+    sw1 = create_switch(250,225)
+    sleep(delay)
+    sw2 = create_switch(400,225)
+    sleep(delay)
+    sw3 = create_switch(550,225)
     sleep(delay)
     # Test the 'one-up' IDs have been correctly generated
     assert_object_configuration(l1,{"itemid":1})
@@ -54,29 +62,38 @@ def run_change_of_item_id_tests(delay:float=0.0):
     assert_object_configuration(s4,{"itemid":4})
     assert_object_configuration(ts1,{"itemid":1})
     assert_object_configuration(ts2,{"itemid":2})
+    assert_object_configuration(ts3,{"itemid":3})
+    assert_object_configuration(sw1,{"itemid":1})
+    assert_object_configuration(sw2,{"itemid":2})
+    assert_object_configuration(sw3,{"itemid":3})
     # Create the Route buttons (and check the 1-up IDs have been correctly generated)
+    # As they use 'Button' objects (the same as switches) the next IDs will be 4 and 5
     rb1 = create_route(100,300)
     sleep(delay)
     rb2 = create_route(300,300)
     sleep(delay)
-    assert_object_configuration(rb1,{"itemid":1})
-    assert_object_configuration(rb2,{"itemid":2})
+    assert_object_configuration(rb1,{"itemid":4})
+    assert_object_configuration(rb2,{"itemid":5})
     # Configure the routes
     update_object_configuration(rb1,{
         "signalsonroute": [1,2,3],
         "subsidariesonroute": [1,2,3],
         "pointsonroute":{"1":True, "2":False, "3":True},
+        "switchesonroute":{"1":True, "2":False, "3":True},
         "linestohighlight":[1,2,3],
         "pointstohighlight":[1,2,3],
-        "tracksensor":1 } )
+        "tracksensor":1,
+        "setupsensor":2} )
     sleep(delay)
     update_object_configuration(rb2,{
         "signalsonroute": [1,2,4],
         "subsidariesonroute": [1,2,4],
         "pointsonroute":{"1":False, "2":True, "4":False},
+        "switchesonroute":{"1":False, "2":True, "3":False},
         "linestohighlight":[1,2,4],
         "pointstohighlight":[1,2,4],
-        "tracksensor":2 } )
+        "tracksensor":2,
+        "setupsensor":1} )
     sleep(delay)
     # Update the IDs of the signals, lines, points and track sensors
     update_object_configuration(l1,{"itemid":11})
@@ -93,6 +110,10 @@ def run_change_of_item_id_tests(delay:float=0.0):
     update_object_configuration(s4,{"itemid":34})
     update_object_configuration(ts1,{"itemid":41})
     update_object_configuration(ts2,{"itemid":42})
+    update_object_configuration(ts3,{"itemid":43})
+    update_object_configuration(sw1,{"itemid":51})
+    update_object_configuration(sw2,{"itemid":52})
+    update_object_configuration(sw3,{"itemid":53})
     sleep(delay)
     # Test the Item IDs have been successfully changed
     assert_object_configuration(l1,{"itemid":11})
@@ -109,35 +130,32 @@ def run_change_of_item_id_tests(delay:float=0.0):
     assert_object_configuration(s4,{"itemid":34})
     assert_object_configuration(ts1,{"itemid":41})
     assert_object_configuration(ts2,{"itemid":42})
+    assert_object_configuration(sw1,{"itemid":51})
+    assert_object_configuration(sw2,{"itemid":52})
+    assert_object_configuration(sw3,{"itemid":53})
     # Test the Route configurations have been successfully updated
     assert_object_configuration(rb1,{
         "signalsonroute": [31,32,33],
         "subsidariesonroute": [31,32,33],
         "pointsonroute":{"21":True, "22":False, "23":True},
+        "switchesonroute":{"51":True, "52":False, "53":True},
         "linestohighlight":[11,12,13],
         "pointstohighlight":[21,22,23],
-        "tracksensor":41 } )
+        "tracksensor":41,
+        "setupsensor":42} )
     assert_object_configuration(rb2,{
         "signalsonroute": [31,32,34],
         "subsidariesonroute": [31,32,34],
         "pointsonroute":{"21":False, "22":True, "24":False},
+        "switchesonroute":{"51":False, "52":True, "53":False},
         "linestohighlight":[11,12,14],
         "pointstohighlight":[21,22,24],
-        "tracksensor":42 } )
+        "tracksensor":42,
+        "setupsensor":41} )
     # Test Item deletion ( i.e items are removed from the route configuration
-    select_single_object(p1)
+    deselect_all_objects()
     sleep(delay)
-    delete_selected_objects()
-    sleep(delay)
-    select_single_object(s2)
-    sleep(delay)
-    delete_selected_objects()
-    sleep(delay)
-    select_single_object(l3)
-    sleep(delay)
-    delete_selected_objects()
-    sleep(delay)
-    select_single_object(ts1)
+    select_or_deselect_objects(sw1, p1, s2, l3, ts1)
     sleep(delay)
     delete_selected_objects()
     sleep(delay)
@@ -146,30 +164,22 @@ def run_change_of_item_id_tests(delay:float=0.0):
         "signalsonroute": [31,33],
         "subsidariesonroute": [31,33],
         "pointsonroute":{"22":False, "23":True},
+        "switchesonroute":{"52":False, "53":True},
         "linestohighlight":[11,12],
         "pointstohighlight":[22,23],
-        "tracksensor":0 } )
+        "tracksensor":0,
+        "setupsensor":42} )
     assert_object_configuration(rb2,{
         "signalsonroute": [31,34],
         "subsidariesonroute": [31,34],
         "pointsonroute":{"22":True, "24":False},
+        "switchesonroute":{"52":True, "53":False},
         "linestohighlight":[11,12,14],
         "pointstohighlight":[22,24],
-        "tracksensor":42 } )
+        "tracksensor":42,
+        "setupsensor":0} )
     # Test deletion again - just for the hell of it
-    select_single_object(p4)
-    sleep(delay)
-    delete_selected_objects()
-    sleep(delay)
-    select_single_object(s4)
-    sleep(delay)
-    delete_selected_objects()
-    sleep(delay)
-    select_single_object(l4)
-    sleep(delay)
-    delete_selected_objects()
-    sleep(delay)
-    select_single_object(ts2)
+    select_or_deselect_objects(sw3, p4, s4, l4, ts2)
     sleep(delay)
     delete_selected_objects()
     sleep(delay)
@@ -178,17 +188,31 @@ def run_change_of_item_id_tests(delay:float=0.0):
         "signalsonroute": [31,33],
         "subsidariesonroute": [31,33],
         "pointsonroute":{"22":False, "23":True},
+        "switchesonroute":{"52":False},
         "linestohighlight":[11,12],
         "pointstohighlight":[22,23],
-        "tracksensor":0 } )
+        "tracksensor":0,
+        "setupsensor":0 } )
     assert_object_configuration(rb2,{
         "signalsonroute": [31],
         "subsidariesonroute": [31],
         "pointsonroute":{"22":True},
+        "switchesonroute":{"52":True},
         "linestohighlight":[11,12],
         "pointstohighlight":[22],
-        "tracksensor":0 } )
+        "tracksensor":0,
+        "setupsensor":0 } )
     # Test Copy and Paste of a route
+    update_object_configuration(rb1,{"tracksensor":43, "setupsensor":43})
+    assert_object_configuration(rb1,{
+        "signalsonroute": [31,33],
+        "subsidariesonroute": [31,33],
+        "pointsonroute":{"22":False, "23":True},
+        "switchesonroute":{"52":False},
+        "linestohighlight":[11,12],
+        "pointstohighlight":[22,23],
+        "tracksensor":43,
+        "setupsensor":43 } )
     select_single_object(rb1)
     sleep(delay)
     [rb3] = copy_selected_objects(0,50)
@@ -197,9 +221,11 @@ def run_change_of_item_id_tests(delay:float=0.0):
         "signalsonroute": [],
         "subsidariesonroute": [],
         "pointsonroute":{},
+        "switchesonroute":{},
         "linestohighlight":[],
         "pointstohighlight":[],
-        "tracksensor":0 } )
+        "tracksensor":0,
+        "setupsensor":0 } )
     # Clean up
     select_all_objects()
     sleep(delay)
@@ -216,19 +242,22 @@ def run_initial_state_tests(delay:float=0.0):
     # Test_initial condition (at layout load)
     # Route 5 should be active with Point 2 switched and Signal 1 OFF
     # Instrument is BLOCKED so Route 1 will not be viable (when Route 5 de-selected)
-    assert_buttons_selected(5)
+    assert_buttons_selected(5)          # Route 3 Main
     assert_buttons_disabled(1,2,3,4)
     assert_buttons_enabled(5,6)
     assert_points_switched(2)
     assert_points_normal(1)
     assert_signals_PROCEED(1)
-    simulate_buttons_clicked(5)
-    sleep(delay+1.5)
+    assert_buttons_deselected(9,10)     # Switch 9,10
+    assert_buttons_selected(11)         # Switch 11
+    simulate_buttons_clicked(5)         # Route 3 Main deselected - Events = sig1 on, sw11 off, pt2 nor
+    sleep(delay+2.0)                    
     assert_points_normal(1,2)
     assert_signals_DANGER(1)
-    assert_buttons_deselected(5)
+    assert_buttons_deselected(5)        # Route 3 Main
     assert_buttons_enabled(2,3,4,5,6)
     assert_buttons_disabled(1)
+    assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     return()
 
 def run_schematic_routes_tests(delay:float=0.0):
@@ -236,24 +265,28 @@ def run_schematic_routes_tests(delay:float=0.0):
     assert_block_section_ahead_not_clear(1)
     assert_buttons_disabled(1)
     assert_buttons_deselected(1)
+    assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     set_instrument_clear(2)
     sleep(delay)
     assert_block_section_ahead_clear(1)
     assert_buttons_enabled(1)
-    simulate_buttons_clicked(1)
-    sleep(delay+1.5)
+    simulate_buttons_clicked(1)    # Route 1 Main selected - Events = pt1 switched, sw9 on, sig1 off
+    sleep(delay+2.0)
     # Test Route can still be cleared down if instrument is not clear
     assert_buttons_selected(1)
     assert_buttons_enabled(1)
+    assert_buttons_selected(9)        # Switch 9
+    assert_buttons_deselected(10,11)  # Switch 10,11
     set_instrument_blocked(2)
     sleep(delay)
     assert_block_section_ahead_not_clear(1)
     assert_buttons_selected(1)
     assert_buttons_enabled(1)
-    simulate_buttons_clicked(1)
-    sleep(delay+1.5)
+    simulate_buttons_clicked(1)    # Route 1 Main deselected - Events = sig1 on, sw9 off, pt1 norm
+    sleep(delay+2.0)
     assert_buttons_disabled(1)
     assert_buttons_deselected(1)
+    assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     # Instruments are set to CLEAR so they dont affect with the following tests
     set_instrument_clear(2) 
     sleep(delay)
@@ -288,17 +321,20 @@ def run_schematic_routes_tests(delay:float=0.0):
     sleep(delay)
     assert_buttons_enabled(1,2,3,4,5,6)
     # Test Route can still be cleared down if signals are locked by Track Sections
-    simulate_buttons_clicked(5)
-    sleep(delay+1.5)
+    simulate_buttons_clicked(5)       # Route 3 Main - Events = pt2 sw, sw11 on, sig1 off
+    sleep(delay+2.0)
     assert_buttons_selected(5)
+    assert_buttons_selected(11)         # Switch 11
+    assert_buttons_deselected(9,10)     # Switch 9,10
     set_sections_occupied(7,8,9)
     sleep(delay)
     assert_buttons_enabled(5)
     assert_buttons_selected(5)
-    simulate_buttons_clicked(5)
-    sleep(delay+1.5)
+    simulate_buttons_clicked(5)         # Route 3 Main - Events = sig1 on, pt2 norm, sw1 off
+    sleep(delay+2.0)
     assert_buttons_disabled(5)
     assert_buttons_deselected(5)
+    assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     set_sections_clear(7,8,9)
     sleep(delay)
     assert_buttons_enabled(1,2,3,4,5,6)
@@ -333,23 +369,72 @@ def run_schematic_routes_tests(delay:float=0.0):
     set_subsidaries_on(6,7,8)
     sleep(delay)
     assert_buttons_enabled(1,2,3,4,5,6)
-    # Test Basic setup and cleardown of Signal Routes
-    simulate_buttons_clicked(5)
-    sleep(delay+1.5)
+    # Test Basic setup and cleardown of Signal Routes (using sensor triggers)
+    assert_buttons_deselected(1,2,3,4,5,6)
+    assert_buttons_deselected(9,10,11)    # Switch 9,10,11
+    assert_points_normal(1,2)
+    assert_signals_DANGER(1)
+    trigger_sensors_passed(3)             # Route 3 Main - Events = pt2 sw, sw11 on, sig1 off
+    sleep(delay+2.0)
     assert_buttons_selected(5)
-    simulate_buttons_clicked(5)
-    sleep(delay+1.5)
-    assert_buttons_deselected(5)
+    assert_buttons_deselected(1,2,3,4,6)
+    assert_buttons_disabled(1,2,3,4)
+    assert_buttons_enabled(5,6)
+    assert_buttons_selected(11)           # Switch 11
+    assert_buttons_deselected(9,10)       # Switch 9,10
+    assert_points_normal(1)
+    assert_points_switched(2)
+    assert_signals_PROCEED(1)
+    trigger_sensors_passed(6)             # Route 3 Main - Events = sig1 on, sw11 off, pt2 norm
+    sleep(delay+2.0)
+    assert_buttons_deselected(1,2,3,4,5,6)
     assert_buttons_enabled(1,2,3,4,5,6)
-    # Test Basic setup and cleardown of Subsidary Routes
-    simulate_buttons_clicked(2)
-    sleep(delay+1.5)
+    assert_buttons_deselected(9,10,11)    # Switch 9,10,11
+    assert_points_normal(1,2)
+    assert_signals_DANGER(1)
+    # Test Basic setup and cleardown of Subsidary Routes (using sensor triggers)
+    # Note that shunting routes DO NOT clear down points and switches
+    trigger_sensors_passed(7)       # Route 1 Shunt - Events = pt1 sw, sw9 on, sig1 off
+    sleep(delay+2.0)
     assert_buttons_selected(2)
-    simulate_buttons_clicked(2)
-    sleep(delay+1.5)
-    assert_buttons_deselected(2)
+    assert_buttons_deselected(1,3,4,5,6)
+    assert_buttons_enabled(1,2)
+    assert_buttons_disabled(3,4,5,6)
+    assert_buttons_selected(9)            # Switch 9
+    assert_buttons_deselected(10,11)      # Switch 10,11
+    assert_points_normal(2)
+    assert_points_switched(1)
+    trigger_sensors_passed(4)             # Route 1 Shunt - Events = sig1 off
+    sleep(delay+2.0)
+    assert_buttons_deselected(1,2,3,4,5,6)
     assert_buttons_enabled(1,2,3,4,5,6)
+    assert_buttons_selected(9)            # Switch 9 (Still Selected)
+    assert_buttons_deselected(10,11)      # Switch 10,11
+    assert_points_normal(2)
+    assert_points_switched(1)             # Still Selected
+    # Test Basic setup and cleardown of another Subsidary Route (using sensor triggers)
+    # Note that shunting routes DO NOT clear down points and switches
+    trigger_sensors_passed(9)             # Route 3 Shunt - Events = pt1 norm, pt2sw, sw9 off, sw11 on, sig1 off
+    sleep(delay+3.0)
+    assert_buttons_selected(6)
+    assert_buttons_deselected(1,2,3,4,5)
+    assert_buttons_enabled(5,6)
+    assert_buttons_disabled(1,2,3,4)
+    assert_buttons_selected(11)           # Switch 11
+    assert_buttons_deselected(9,10)       # Switch 9,10
+    assert_points_normal(1)
+    assert_points_switched(2)
+    trigger_sensors_passed(6)             # Route 1 Shunt - Events = sig1 off
+    sleep(delay+2.0)
+    assert_buttons_deselected(1,2,3,4,5,6)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    assert_buttons_selected(11)           # Switch 11 (Still Selected)
+    assert_buttons_deselected(9,10)       # Switch 9,10
+    assert_points_normal(1)
+    assert_points_switched(2)             # Still Selected
     # Test Basic setup and cleardown of Signal Routes - where signals are already clear
+    # Note we need to put the points back to normal first
+    set_points_normal(2)
     set_signals_off(1)
     sleep(delay)
     assert_buttons_enabled(3,4)
@@ -396,36 +481,38 @@ def run_schematic_routes_tests(delay:float=0.0):
     assert_buttons_deselected(5)
     # Test Subsidary Change invalidating an established route clears the route
     simulate_buttons_clicked(4)
-    sleep(delay+1.5)
+    sleep(delay+2.0)
     assert_buttons_selected(4)
     set_subsidaries_on(1)
     sleep(delay+0.1)
     assert_buttons_deselected(4)
     # Test Signal Change invalidating an route in progress clears the route
     simulate_buttons_clicked(5)
-    sleep(delay+1.1)
+    sleep(delay+2.2)
     set_signals_on(1)
-    sleep(delay+0.4)
+    sleep(delay+0.3)
     assert_buttons_deselected(5)
     # Test Subsidary Change invalidating a route in progress clears the route
     simulate_buttons_clicked(4)
-    sleep(delay+1.1)
+    sleep(delay+2.2)
     set_subsidaries_on(1)
-    sleep(delay+0.4)
+    sleep(delay+0.1)
     assert_buttons_deselected(4)
     # Test Signal Change (not on the route) invalidates a route in progress
+    set_points_switched(1,2)  # Give the route setup something to do
     simulate_buttons_clicked(5)
-    sleep(delay+0.6)
+    sleep(delay+0.3)
     set_signals_off(8)
-    sleep(delay+0.9)
+    sleep(delay+2.2)
     assert_buttons_deselected(5)
     set_signals_on(8)
     sleep(delay)
     # Test Subsidary Change (not on the route) invalidates a route in progress
+    set_points_switched(1)  # Give the route setup something to do
     simulate_buttons_clicked(4)
-    sleep(delay+0.6)
+    sleep(delay+0.3)
     set_subsidaries_off(7)
-    sleep(delay+0.9)
+    sleep(delay+2.7)
     assert_buttons_deselected(4)
     set_subsidaries_on(7)
     sleep(delay)
@@ -434,7 +521,7 @@ def run_schematic_routes_tests(delay:float=0.0):
     assert_points_normal(3)
     assert_buttons_deselected(7)
     simulate_buttons_clicked(7)
-    sleep(delay+1.5)
+    sleep(delay+2.0)
     assert_buttons_selected(7)
     assert_points_switched(3)
     assert_signals_PROCEED(5)
@@ -450,7 +537,7 @@ def run_schematic_routes_tests(delay:float=0.0):
     sleep(delay+0.6)
     assert_points_switched(3)
     set_points_normal(3)
-    sleep(delay+0.9)
+    sleep(delay+1.4)
     assert_buttons_deselected(7)
     set_signals_on(5)
     sleep(delay)
@@ -461,18 +548,61 @@ def run_schematic_routes_tests(delay:float=0.0):
     sleep(delay)
     assert_points_normal(3)
     set_points_switched(3)
-    sleep(delay+1.5)
+    sleep(delay+2.0)
     assert_buttons_selected(7)
     assert_points_switched(3)
     # Now clear down the route
     simulate_buttons_clicked(7)
     sleep(delay)
     set_points_normal(3)
-    sleep(delay+1.5)
+    sleep(delay+2.0)
     assert_buttons_deselected(7)
     assert_points_normal(3)
     sleep(delay)
+    # Test Switch Change invalidating a route that HAS been successfully set up
+    assert_signals_DANGER(5)
+    assert_points_normal(3)
+    assert_buttons_deselected(12)   # Switch 12
+    assert_buttons_deselected(7)
+    simulate_buttons_clicked(7)     # Branch - Events = pt3 switched, sw12 on, sig 5 off
+    sleep(delay+2.0)
+    assert_buttons_selected(7)
+    assert_buttons_selected(12)   # Switch 12
+    assert_points_switched(3)
+    assert_signals_PROCEED(5)
+    simulate_buttons_clicked(12)    # Switch 12
+    sleep(delay+0.1)
+    assert_buttons_deselected(7)
+    assert_buttons_deselected(12)   # Switch 12
+    set_signals_on(5)
+    set_points_normal(3)
+    sleep(delay)
+    # Test Switch Change invalidating a route IN THE PROCESS OF set up
+    assert_buttons_deselected(7)
+    simulate_buttons_clicked(7)     # Branch - Events = pt3 switched, sw12 on, sig 5 off
+    sleep(delay+1.3)
+    assert_buttons_selected(12)     # Switch 12
+    simulate_buttons_clicked(12)    # Switch 12
+    sleep(delay+0.7)
+    assert_buttons_deselected(12)   # Switch 12
+    assert_buttons_deselected(7)
+    set_signals_on(5)
+    set_points_normal(3)
+    sleep(delay)
+    # Test Switch Change (to the correct state) immediately after route button is clicked
+    assert_buttons_deselected(7)    # Branch - Events = pt3 switched, sw12 on, sig5 off
+    simulate_buttons_clicked(7)
+    sleep(delay)
+    assert_buttons_deselected(12)   # Switch 12
+    simulate_buttons_clicked(12)    # Switch 12
+    sleep(delay+2.0)
+    assert_buttons_selected(7)
+    assert_buttons_selected(12)     # Switch 12
     # Return Layout to normal
+    simulate_buttons_clicked(7)     # Branch - Events = sig5 on, pt3 normal, sw12 off, sig5 on
+    sleep(delay+2.5)
+    # Return Layout to normal
+    simulate_buttons_clicked(10)
     set_instrument_blocked(2) 
     sleep(delay)
     return()
