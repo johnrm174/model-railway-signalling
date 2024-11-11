@@ -75,6 +75,7 @@ default_point_object["colour"] = "black"
 default_point_object["alsoswitch"] = 0
 default_point_object["reverse"] = False
 default_point_object["automatic"] = False
+default_point_object["hidebuttons"] = False
 default_point_object["hasfpl"] = False
 default_point_object["dccaddress"] = 0
 default_point_object["dccreversed"] = False

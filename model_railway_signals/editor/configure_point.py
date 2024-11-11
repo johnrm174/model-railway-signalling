@@ -53,163 +53,164 @@ open_windows={}
 #####################################################################################
 
 #------------------------------------------------------------------------------------
-# Class for the "Also Switch" Entry Box - builds on the common int_item_id_entry_box. 
-# Class instance methods inherited/used from the parent classes are:
-#    "set_value" - set the initial value of the entry_box (str) - Also sets
-#                  the current Point item ID (int) for validation purposes
-#    "get_value" - will return the last "valid" value of the entry box (int)
-# Class instance methods provided/overridden by this class are:
-#    "validate" - Also validate the selected point is automatic and not already 'switched by'
-#    "set_switched_with" - to set the read-only value for the "switched_with" point
-# Note that we use the current_item_id variable (from the base class) for validation.
+# Class for the General Settings UI Element (based on a Tk.LabelFrame)
+# Provides the following functions:
+#     "set_values" - will set the checkbox states (rot, fpl, rev)
+#     "get_values" - will return the checkbox states (rot, fpl, rev)
+#     "pack" - to pack the UI element
 #------------------------------------------------------------------------------------
 
-class also_switch_selection(common.int_item_id_entry_box):
+class general_settings(Tk.LabelFrame):
     def __init__(self, parent_frame):
-        # We need to know the current Point ID (for validation)
-        self.point_id = 0
-        # Create the Label Frame for the "also switch" entry box
-        self.frame = Tk.LabelFrame(parent_frame, text="Automatic switching")
-        # Create a subframe to centre all other UI elements
-        self.subframe = Tk.Frame(self.frame)
+        # We need to know the current Item ID for validation
+        self.current_item_id = 0
+        # Create a Label frame to hold the general settings
+        super().__init__(parent_frame, text="General configuration")
+        # Create a subframe to center the buttons
+        self.subframe = Tk.Frame(self)
         self.subframe.pack()
-        # Call the common base class init function to create the EB
-        self.label1 = Tk.Label(self.subframe,text="Switch point:")
+        self.CB1 = common.check_box(self.subframe, label="Rotated",width=9,
+                        tool_tip="Select to rotate point by 180 degrees")
+        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.CB2 = common.check_box(self.subframe, label="Facing point lock", width=14,
+                tool_tip="Select to include a Facing Point Lock (manually switched points only)")
+        self.CB2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.CB3 = common.check_box(self.subframe, label="Reversed", width=9,
+                        tool_tip="Select to reverse the point blades")
+        self.CB3.pack(side=Tk.LEFT, padx=2, pady=2)    
+    
+    def set_values(self, rot:bool, fpl:bool, rev:bool):
+        self.CB1.set_value(rot)
+        self.CB2.set_value(fpl)
+        self.CB3.set_value(rev)
+        
+    def get_values(self):
+        return(self.CB1.get_value(), self.CB2.get_value(), self.CB3.get_value())
+
+#------------------------------------------------------------------------------------
+# Class for the Automation UI Element (based on a Tk.LabelFrame)
+# Provides the following functions:
+#     "validate" - validate the current settings and return True/false
+#     "set_values" - will set the automation elements (switch, switched_with, switched_with_id, item_id)
+#     "get_values" - will return the automation elements (switch, switched_with)
+#     "pack" - to pack the UI element
+# Validation on the 'Switched with' checkbox - Invalid if the box is unchecked
+# if another point is already configured to "auto switch" this point
+#------------------------------------------------------------------------------------
+
+class automation(Tk.LabelFrame):
+    def __init__(self, parent_frame, callback):
+        # We need to know the current Item ID for validation
+        self.callback = callback
+        self.current_item_id = 0
+        # Create the Label frame to hold the automation settings
+        super().__init__(parent_frame, text="Automation")
+        # Create a subframe to center the buttons
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack()
+        # Create the Entry box for the 'also switch' point
+        self.label1 = Tk.Label(self.subframe, text="Switch point:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.subframe, tool_tip = "Enter the ID of another (fully "+
-                "automatic) point to be switched with this point (or leave blank)",
-                 exists_function=points.point_exists)
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB1 = common.int_item_id_entry_box(self.subframe, tool_tip = "Enter the ID "+
+                "of another point to be 'switched with' this point (or leave blank)",
+                 exists_function=points.point_exists, callback=self.validate_also_switch_entry_box)
+        self.EB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create a dummy label for spacing
+        self.label2 = Tk.Label(self.subframe, text="    ")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create the checkbox for the 'Switched With' Selection
+        self.CB1 = common.check_box(self.subframe, label="Switched with", callback=self.switched_with_updated,
+                        tool_tip="Select to enable this point to be automatically 'switched with' another point "+
+                                "(point will be created without a Facing Point Lock and control buttons)")
+        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
         # This is the read-only element for the point this point is switched with
         self.switched_with = Tk.StringVar(parent_frame, "")
-        self.label2 = Tk.Label(self.subframe,text="Switched with:")
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.switched_eb = Tk.Entry(self.subframe, width=3, textvariable=self.switched_with,
-                                            justify='center',state="disabled")
-        self.switched_eb.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.switched_eb, "ID of the point that "+
-                                       "will automatically switch this point")
-            
+        self.EB2 = common.entry_box(self.subframe, width=3, tool_tip="ID of the point configured to "+
+                    "automatically switch this point (read only)")
+        self.EB2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB2.disable()
+    
+    def switched_with_updated(self):
+        self.validate_switched_with_checkbox()
+        self.callback()
+        
     def validate(self):
+        valid = True
+        if not self.validate_switched_with_checkbox(): valid=False
+        if not self.validate_also_switch_entry_box(): valid=False
+        return(valid)
+    
+    def validate_also_switch_entry_box(self):
         # Do the basic item validation first (exists and not current item ID)
-        valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            autoswitch = int(self.entry.get())
+        valid = self.EB1.validate(update_validation_status=False)
+        if valid and self.EB1.entry.get() != "":
+            autoswitch = int(self.EB1.entry.get())
             # Validate the other point is fully automatic
             if not objects.schematic_objects[objects.point(autoswitch)]["automatic"]:
-                self.TT.text = "Point "+str(autoswitch)+" is not 'fully automatic'"
+                self.EB1.TT.text = ("Point "+str(autoswitch)+" is not currently configured to be 'switched "+
+                "with' another point (edit point "+str(autoswitch)+" and check the 'switched with' box first)")
                 valid = False
             else:
                 # Test to see if the entered point is already being autoswitched by another point
                 for point_id in objects.point_index:
                     other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
                     if other_autoswitch == autoswitch and point_id != str(self.current_item_id):
-                        self.TT.text = ("Point "+str(autoswitch)+" is already configured "+
+                        self.EB1.TT.text = ("Point "+str(autoswitch)+" is already configured "+
                                               "to be switched with point "+point_id)
                         valid = False       
-        self.set_validation_status(valid)
+        self.EB1.set_validation_status(valid)
         return(valid)
 
-    def set_switched_with(self, point_id:int):
-        if point_id > 0: self.switched_with.set(str(point_id))
-        else: self.switched_with.set("")
-
-#------------------------------------------------------------------------------------
-# Class for the General Settings UI Element.
-# Class instance methods provided by this class:
-#     "validate" - validate the current settings and return True/false
-#     "set_values" - will set the checkbox states (rot, rev, auto, fpl, item_id)
-#                Note that the current item ID (int) is u=sed for for validation
-#     "get_values" - will return the checkbox states (rot, rev, auto, fpl)
-# Validation on "Automatic" checkbox only - Invalid if 'fully automatic' is
-# unchecked when another point is configured to "auto switch" this point
-#------------------------------------------------------------------------------------
-
-class general_settings():
-    def __init__(self, parent_frame):
-        # We need to know the current Item ID for validation
-        self.current_item_id = 0
-        # Create a Label frame to hold the general settings
-        self.frame = Tk.LabelFrame(parent_frame,text="General configuration")
-        # Create a subframe to hold the first 2 buttons
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack()
-        self.CB1 = common.check_box(self.subframe1, label="Rotated",width=9,
-                        tool_tip="Select to rotate point by 180 degrees")
-        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.CB2 = common.check_box(self.subframe1, label="Facing point lock", width=16,
-                tool_tip="Select to include a Facing Point Lock (manually switched points only)")
-        self.CB2.pack(side=Tk.LEFT, padx=2, pady=2)
-        # Create a subframe to hold the second 2 buttons
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack()
-        self.CB3 = common.check_box(self.subframe2, label="Reversed", width=9,
-                        tool_tip="Select to reverse the switching logic of the point blades")
-        self.CB3.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.CB4 = common.check_box(self.subframe2, label="Fully automatic", width=16,
-            tool_tip="Select to create the point without manual controls (to be switched "+
-                        "with another point)", callback= self.automatic_updated)
-        self.CB4.pack(side=Tk.LEFT, padx=2, pady=2)
-
-    def automatic_updated(self):
-        self.validate()
-        # Enable/disable the FPL checkbox based on the 'fully automatic' state
-        if self.CB4.get_value(): self.CB2.disable()
-        else: self.CB2.enable()
-    
-    def validate(self):
-        # "Automatic" checkbox validation = if the point is not "automatic" then the Point ID  
-        # must not be specified as an "auto switched" point in another point configuration
+        
+    def validate_switched_with_checkbox(self):
+        # 'Switched With' checkbox validation - if the point is not "automatic" then the Point ID  
+        #  must not be specified as an 'auto switched' point in another point configuration
         valid = True
-        if not self.CB4.get_value():
+        if not self.CB1.get_value():
             # Ensure the point isn't configured to "auto switch" with another point
             for point_id in objects.point_index:
                 other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
                 if other_autoswitch == self.current_item_id:
-                    self.CB4.TT.text = ("Point is configured to switch with point " +
-                                           point_id + " so must remain 'fully automatic'")
-                    self.CB4.config(fg="red")
+                    self.CB1.TT.text = ("Point is configured to switch with point " +
+                                point_id + " so must remain 'switched with'")
+                    self.CB1.config(fg="red")
                     valid = False
         if valid:
-            self.CB4.TT.text = ("Select to enable this point to be " +
-                                "'also switched' by another point")
-            self.CB4.config(fg="black")
+            self.CB1.TT.text = ("Select to enable this point to be automatically 'switched with' another point "+
+                                "(point will be created without a Facing Point Lock and control buttons)")
+            self.CB1.config(fg="black")
         return(valid)
     
-    def set_values(self, rot:bool, rev:bool, auto:bool, fpl:bool, item_id:int):
+    def set_values(self, switch_point:int, switched_with:bool, switched_with_id:int, item_id:int):
         self.current_item_id = item_id
-        self.CB1.set_value(rot)
-        self.CB2.set_value(fpl)
-        self.CB3.set_value(rev)
-        self.CB4.set_value(auto)
-        # Set the initial state (Enabled/Disabled) of the FPL selection
-        self.automatic_updated()
+        self.EB1.set_value(switch_point, item_id)
+        self.CB1.set_value(switched_with)
+        self.EB2.set_value(switched_with_id)
         
     def get_values(self):
-        return (self.CB1.get_value(), self.CB3.get_value(),
-                self.CB4.get_value(), self.CB2.get_value())
+        return (self.EB1.get_value(), self.CB1.get_value())
 
 #------------------------------------------------------------------------------------
-# Class for the point DCC Address settings UI element - provides the following functions
-#    "set_values" - will set the entry/checkboxes (address:int, reversed:bool)
+# Class for the point DCC Address settings UI element (based on a Tk.LabelFrame)
+# Provides the following functions:
+#    "set_values" - will set the entry/checkboxes (address:int, reversed:bool, point_id:int))
 #    "get_values" - will return the entry/checkboxes (address:int, reversed:bool]
-#    "set_point_id" - sets the current point ID (for validation) 
 #    "validate" - Ensure the DCC address is valid and not mapped to another item
 #------------------------------------------------------------------------------------
 
-class dcc_address_settings():
+class dcc_address_settings(Tk.LabelFrame):
     def __init__(self, parent_frame):
         # Create a Label frame to hold the DCC Address settings
-        self.frame = Tk.LabelFrame(parent_frame,text="DCC Address and command logic")
+        super().__init__(parent_frame, text="DCC Address and command logic")
         # Create a DCC Address element and a checkbox for the "reversed" selection
         # These are created in a seperate subframe so they are centered in the LabelFrame
-        self.subframe = Tk.Frame(self.frame)
+        self.subframe = Tk.Frame(self)
         self.subframe.pack()
         self.EB = common.validated_dcc_entry_box(self.subframe, callback=self.entry_updated, item_type="Point")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.CB = common.check_box(self.subframe, label="Reversed",
+        self.CB = common.check_box(self.subframe, label="Reversed logic",
                     tool_tip="Select to reverse the DCC command logic")
-        self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.CB.pack(side=Tk.LEFT, padx=10, pady=2)
         
     def entry_updated(self):
         if self.EB.entry.get()=="": self.CB.disable()
@@ -227,22 +228,25 @@ class dcc_address_settings():
         return (self.EB.get_value(), self.CB.get_value())
 
 #------------------------------------------------------------------------------------
-# Class for the point Button Offset settings UI element - provides the following functions
-#    "set_values" - will set the entry box values (xoff:int, yoff:int)
-#    "get_values" - will return the entry box values (xoff:int, yoff:int]
+# Class for the point Button Offset settings UI element (based on a Tk.LabelFrame)
+# Provides the following functions:
+#    "set_values" - will set the entry box values (hidden:bool, xoff:int, yoff:int)
+#    "get_values" - will return the entry box values (hidden:bool, xoff:int, yoff:int]
 #    "validate" - Ensure the Entry boxes are valid
 #------------------------------------------------------------------------------------
 
-class button_offsets():
+class button_offsets(Tk.LabelFrame):
     def __init__(self, parent_frame):
-        # Create a Label frame to hold the Offset entry boxes
-        self.frame = Tk.LabelFrame(parent_frame,text="Point Control Button Offsets")
-        # Create the two entry boxes in a seperate subframe so they are centered in the LabelFrame
-        self.subframe = Tk.Frame(self.frame)
+        # Create the Label frame to hold the Offset entry boxes
+        super().__init__(parent_frame,text="Control buttons")
+        # Create the UI Elementsin a seperate subframe so they are centered in the LabelFrame
+        self.subframe = Tk.Frame(self)
         self.subframe.pack()
+        self.CB1 = common.check_box(self.subframe, label="Hidden", tool_tip="Select to hide the point buttons in Run Mode")
+        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
         tooltip=("Specify any offsets (pixels -100 to +100) for the point buttons "+
                     "(note that for rotated points the offsets will will be applied in the opposite direction)")
-        self.L1 =Tk.Label(self.subframe, text="Button X offset:")
+        self.L1 =Tk.Label(self.subframe, text="   Button X offset:")
         self.L1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.EB1 = common.integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
         self.EB1.pack(side=Tk.LEFT, padx=2, pady=2)
@@ -254,12 +258,13 @@ class button_offsets():
     def validate(self):
         return(self.EB1.validate() and self.EB2.validate())
 
-    def set_values(self, xoffset:int, yoffset:int):
+    def set_values(self, hide_buttons:bool, xoffset:int, yoffset:int):
+        self.CB1.set_value(hide_buttons)
         self.EB1.set_value(xoffset)
         self.EB2.set_value(yoffset)
 
     def get_values(self):
-        return (self.EB1.get_value(), self.EB2.get_value())
+        return (self.CB1.get_value(), self.EB1.get_value(), self.EB2.get_value())
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Point Configuration Tab
@@ -290,17 +295,29 @@ class point_configuration_tab():
         self.pointsubtype.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the point button offset settings
         self.buttonoffsets = button_offsets(parent_tab)
-        self.buttonoffsets.frame.pack(padx=2, pady=2, fill='x')
+        self.buttonoffsets.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the general settings
         self.settings = general_settings(parent_tab)
-        self.settings.frame.pack(padx=2, pady=2, fill='x')
+        self.settings.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the "Also Switch" entry 
-        self.alsoswitch = also_switch_selection(parent_tab)
-        self.alsoswitch.frame.pack(padx=2, pady=2, fill='x')
+        self.automation = automation(parent_tab, callback=self.switched_with_updated)
+        self.automation.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the DCC Settings 
         self.dccsettings = dcc_address_settings(parent_tab)
-        self.dccsettings.frame.pack(padx=2, pady=2, fill='x')
+        self.dccsettings.pack(padx=2, pady=2, fill='x')
 
+    def switched_with_updated(self):
+        # If 'Switched With' is selected then disable the FPL checkbox. Also set the point control
+        # buttons to be hidden (note we need to manipulate the parent Tk checkbox to do this)
+        if self.automation.CB1.get_value():
+            self.settings.CB2.disable()
+            self.buttonoffsets.CB1.selection.set(True)
+            self.buttonoffsets.CB1.configure(state='disabled')
+        else:
+            self.settings.CB2.enable()
+            self.buttonoffsets.CB1.selection.set(False)
+            self.buttonoffsets.CB1.configure(state='normal')
+    
     def point_type_updated(self):
         if self.pointtype.get_value() == points.point_type.Y.value:
             self.pointsubtype.set_value(points.point_subtype.normal.value)
@@ -363,11 +380,11 @@ class edit_point():
 #------------------------------------------------------------------------------------
 
     def switched_with_point(self, object_id):
-        switched_with_point_id = 0
+        switched_with_point_id = ""
         for point_id in objects.point_index:
             also_switch_point_id = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
             if also_switch_point_id == objects.schematic_objects[object_id]["itemid"]:
-                switched_with_point_id = int(point_id)
+                switched_with_point_id = str(point_id)
         return(switched_with_point_id)
 
 #------------------------------------------------------------------------------------
@@ -383,24 +400,26 @@ class edit_point():
             item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Point ID
             self.window.title("Point "+str(item_id))
-            # Set the Initial UI state (Note the alsoswitch element needs the current point ID)
+            # Set the Initial UI state (Note the automation element needs the current point ID)
             self.config.pointid.set_value(item_id)
-            self.config.alsoswitch.set_value(objects.schematic_objects[self.object_id]["alsoswitch"],item_id)
-            self.config.alsoswitch.set_switched_with(self.switched_with_point(self.object_id))
             self.config.pointtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.config.pointsubtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
             self.config.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
-            # These are the general settings for the point (note the function also needs the current point id)
-            auto = objects.schematic_objects[self.object_id]["automatic"]
-            rev = objects.schematic_objects[self.object_id]["reverse"]
-            fpl = objects.schematic_objects[self.object_id]["hasfpl"]
-            if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
-            else:rot = False
-            self.config.settings.set_values(rot, rev, auto, fpl, item_id)
             # These are the point button position offsets:
+            hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
             xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
             yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
-            self.config.buttonoffsets.set_values(xoffset, yoffset)
+            self.config.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
+            # These are the general settings for the point
+            rot = objects.schematic_objects[self.object_id]["orientation"] == 180
+            fpl = objects.schematic_objects[self.object_id]["hasfpl"]
+            rev = objects.schematic_objects[self.object_id]["reverse"]
+            self.config.settings.set_values(rot, fpl, rev)
+            # These are the automation settings (Note the current point ID is needed for validation)
+            switch_point = objects.schematic_objects[self.object_id]["alsoswitch"]
+            switched_with = objects.schematic_objects[self.object_id]["automatic"]
+            switched_with_id = self.switched_with_point(self.object_id)
+            self.config.automation.set_values(switch_point, switched_with, switched_with_id, item_id)
             # Set the initial DCC address values (note the function also needs the current point id)
             add = objects.schematic_objects[self.object_id]["dccaddress"]
             rev = objects.schematic_objects[self.object_id]["dccreversed"]
@@ -411,6 +430,8 @@ class edit_point():
             self.validation_error.pack_forget()
             # Enable or disable the point subtype selections depending on the point_type
             self.config.point_type_updated()
+            # Update the general settings selections depending on the "switched with" flag
+            self.config.switched_with_updated()
         return()
         
     def save_state(self, close_window:bool):
@@ -420,28 +441,30 @@ class edit_point():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
-        elif (self.config.pointid.validate() and self.config.alsoswitch.validate() and
-              self.config.settings.validate() and self.config.dccsettings.validate() and
-              self.config.buttonoffsets.validate()):
+        elif (self.config.pointid.validate() and self.config.automation.validate() and
+              self.config.dccsettings.validate() and self.config.buttonoffsets.validate()):
             # Copy the original point Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the point coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.config.pointid.get_value()
             new_object_configuration["itemtype"] = self.config.pointtype.get_value()
             new_object_configuration["itemsubtype"] = self.config.pointsubtype.get_value()
-            new_object_configuration["alsoswitch"] = self.config.alsoswitch.get_value()
             new_object_configuration["colour"] = self.config.colour.get_value()
+            # These are the point button position offsets:
+            hidden, xoffset, yoffset = self.config.buttonoffsets.get_values()
+            new_object_configuration["hidebuttons"] = hidden
+            new_object_configuration["xbuttonoffset"] = xoffset
+            new_object_configuration["ybuttonoffset"] = yoffset
             # These are the general settings
-            rot, rev, auto, fpl = self.config.settings.get_values()
+            rot, fpl, rev = self.config.settings.get_values()
             new_object_configuration["reverse"] = rev
-            new_object_configuration["automatic"] = auto
             new_object_configuration["hasfpl"] = fpl
             if rot: new_object_configuration["orientation"] = 180
             else: new_object_configuration["orientation"] = 0
-            # These are the point button position offsets:
-            xoffset, yoffset = self.config.buttonoffsets.get_values()
-            new_object_configuration["xbuttonoffset"] = xoffset
-            new_object_configuration["ybuttonoffset"] = yoffset
+            # These are the automation settings
+            switch_point, switched_with = self.config.automation.get_values()
+            new_object_configuration["alsoswitch"] = switch_point
+            new_object_configuration["automatic"] = switched_with
             # Get the  DCC address
             add, rev = self.config.dccsettings.get_values()
             new_object_configuration["dccaddress"] = add
