@@ -307,16 +307,9 @@ class point_configuration_tab():
         self.dccsettings.pack(padx=2, pady=2, fill='x')
 
     def switched_with_updated(self):
-        # If 'Switched With' is selected then disable the FPL checkbox. Also set the point control
-        # buttons to be hidden (note we need to manipulate the parent Tk checkbox to do this)
-        if self.automation.CB1.get_value():
-            self.settings.CB2.disable()
-            self.buttonoffsets.CB1.selection.set(True)
-            self.buttonoffsets.CB1.configure(state='disabled')
-        else:
-            self.settings.CB2.enable()
-            self.buttonoffsets.CB1.selection.set(False)
-            self.buttonoffsets.CB1.configure(state='normal')
+        # If 'Switched With' is selected then disable the FPL checkbox.
+        if self.automation.CB1.get_value(): self.settings.CB2.disable()
+        else: self.settings.CB2.enable()
     
     def point_type_updated(self):
         if self.pointtype.get_value() == points.point_type.Y.value:
