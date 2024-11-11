@@ -211,7 +211,8 @@ def redraw_point_object(object_id):
                 orientation = objects_common.schematic_objects[object_id]["orientation"],
                 also_switch = objects_common.schematic_objects[object_id]["alsoswitch"],
                 reverse = objects_common.schematic_objects[object_id]["reverse"],
-                auto = objects_common.schematic_objects[object_id]["automatic"],
+                switched_with = objects_common.schematic_objects[object_id]["automatic"],
+                hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                 fpl = objects_common.schematic_objects[object_id]["hasfpl"])
     # Create/update the canvas "tags" and selection rectangle for the point
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags

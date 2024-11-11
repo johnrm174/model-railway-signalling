@@ -36,6 +36,7 @@ from . import track_sensors
 from . import track_sections
 from . import text_boxes
 from . import buttons
+from . import points
 
 # -------------------------------------------------------------------------
 # Global variables used within the Library Modules
@@ -114,6 +115,7 @@ def configure_edit_mode(edit_mode:bool):
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)
     buttons.configure_edit_mode(edit_mode)
+    points.configure_edit_mode(edit_mode)
     return()
 
 #------------------------------------------------------------------------------------

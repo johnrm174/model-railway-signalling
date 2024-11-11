@@ -38,7 +38,8 @@
 #       reverse:bool - If the switching logic is to be reversed - Default = False
 #       fpl:bool - If the point is to have a Facing point lock - Default = False (no FPL)
 #       also_switch:int - the Id of another point to switch with this point - Default = 0 (none)
-#       auto:bool - Point is fully automatic (i.e. no point control buttons) - Default = False.
+#       switched_with:bool - Point is configured to be 'switched with' another point (i.e. no buttons) - Default = False.
+#       hide_buttons:bool - Point is configured to have the control buttons hidden in Run Mode - Default = False.
 #
 #   delete_point(point_id:int) - To delete the specified point from the schematic
 #
@@ -62,6 +63,10 @@
 #   set_point_colour(point_id:int, colour:str) - change the colour of a point
 #
 #   reset_point_colour(point_id:int) - reset the colour of a point back to default
+#
+# External API - classes and functions (used by the other library modules):
+#
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
 #---------------------------------------------------------------------------------------------------
 
@@ -96,6 +101,30 @@ class point_subtype(enum.Enum):
 # -------------------------------------------------------------------------
 
 points: dict = {}
+
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+# Point buttons will be hidden in Run Mode if the 'hidden' flag is set
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    # Update all existing library objects (according to the current mode)
+    for point_id in points:
+        point = points[point_id]
+        if editing_enabled:
+            # In Edit mode the button windows are always displayed (if they exist)
+            if point["window1"] is not None: point["canvas"].itemconfig(point["window1"], state="normal")
+            if point["window2"] is not None: point["canvas"].itemconfig(point["window2"], state="normal")
+        elif point["hidebuttons"]:
+           # In Run Mode - If the point buttons are configured as 'hidden' then hide the button windows
+            if point["window1"] is not None: point["canvas"].itemconfig(point["window1"], state="hidden")
+            if point["window2"] is not None: point["canvas"].itemconfig(point["window2"], state="hidden")
+    return()
 
 # -------------------------------------------------------------------------
 # API Function to check if a Point exists in the dictionary of Points
@@ -194,9 +223,9 @@ def update_downstream_points(point_id:int):
         if not point_exists(points[str(point_id)]["alsoswitch"]):
             logging.error("Point "+str(point_id)+": update_downstream_points - Can't 'also switch' point "
                     +str(points[str(point_id)]["alsoswitch"]) +" as that point does not exist")
-        elif not points[str(points[str(point_id)]["alsoswitch"])]["automatic"]:
+        elif not points[str(points[str(point_id)]["alsoswitch"])]["switchedwith"]:
             logging.error("Point "+str(point_id)+": update_downstream_points - Can't 'also switch' point "
-                    +str(points[str(point_id)]["alsoswitch"]) +" as that point is not automatic")
+                    +str(points[str(point_id)]["alsoswitch"]) +" as that point is not configured as 'switched with'")
         elif point_switched(point_id) != point_switched(points[str(point_id)]["alsoswitch"]):
             logging.info("Point "+str(point_id)+": Also changing point "+str(points[str(point_id)]["alsoswitch"]))
             # Recursively call back into the toggle_point function to change the point
@@ -215,8 +244,8 @@ def toggle_point(point_id:int, switched_by_another_point:bool=False):
         logging.error("Point "+str(point_id)+": toggle_point - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": toggle_point - Point ID does not exist")
-    elif points[str(point_id)]["automatic"] and not switched_by_another_point:
-        logging.error("Point "+str(point_id)+": toggle_point - Point is automatic (should be 'also switched' by another point)")
+    elif points[str(point_id)]["switchedwith"] and not switched_by_another_point:
+        logging.error("Point "+str(point_id)+": toggle_point - Point should be 'also switched' by another point")
     else:
         if points[str(point_id)]["locked"]:
             logging.warning("Point "+str(point_id)+": toggle_point - Point is externally locked - Toggling anyway")
@@ -233,14 +262,18 @@ def toggle_point(point_id:int, switched_by_another_point:bool=False):
 # Used for all points apart from 'Y' Points.
 # -------------------------------------------------------------------------
 
-def create_button_windows(canvas, point_coords, fpl, auto, canvas_tag, point_button, fpl_button):
+def create_button_windows(canvas, point_coords, fpl, switched_with, canvas_tag, point_button, fpl_button):
     # Create the control button windows in the correct position (taking into account the orientation
     if fpl:
-        canvas.create_window(point_coords, anchor=Tk.W, window=point_button, tags=canvas_tag)
-        canvas.create_window(point_coords, anchor=Tk.E, window=fpl_button, tags=canvas_tag)
-    elif not auto:
-        canvas.create_window(point_coords, window=point_button, tags=canvas_tag)
-    return()
+        point_button_window = canvas.create_window(point_coords, anchor=Tk.W, window=point_button, tags=canvas_tag)
+        fpl_button_window = canvas.create_window(point_coords, anchor=Tk.E, window=fpl_button, tags=canvas_tag)
+    elif not switched_with:
+        point_button_window = canvas.create_window(point_coords, window=point_button, tags=canvas_tag)
+        fpl_button_window = None
+    else:
+        point_button_window = None
+        fpl_button_window = None
+    return(point_button_window, fpl_button_window)
 
 # -------------------------------------------------------------------------
 # Public API function to create a Point (drawing objects + state)
@@ -254,7 +287,8 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                   x:int, y:int, point_callback, fpl_callback, colour:str="black",
                   button_xoffset:int=0, button_yoffset:int=0,
                   orientation:int = 0, also_switch:int = 0,
-                  reverse:bool=False, auto:bool=False, fpl:bool=False):
+                  reverse:bool=False, switched_with:bool=False,
+                  fpl:bool=False, hide_buttons:bool=False):
     global points
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "point"+str(point_id)
@@ -274,7 +308,7 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         logging.error("Point "+str(point_id)+": create_point - Invalid Point Subtype specified")
     elif pointtype == point_type.Y and pointsubtype != point_subtype.normal:
         logging.error("Point "+str(point_id)+": create_point - Y-points should be created with a subtype of 'normal'")
-    elif fpl and auto:
+    elif fpl and switched_with:
         logging.error("Point "+str(point_id)+": create_point - Automatic point should be created without a FPL")
     else:
         logging.debug("Point "+str(point_id)+": Creating library object on the schematic")
@@ -325,7 +359,8 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             elif fpl: button_xoffset = button_xoffset - 16 + common.fontsize
             else: button_xoffset = button_xoffset - 20 + common.fontsize
             point_coords = common.rotate_point (x, y, button_xoffset, button_yoffset, orientation)
-            create_button_windows(canvas, point_coords, fpl, auto, canvas_tag, point_button, fpl_button)
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
+                                                    switched_with, canvas_tag, point_button, fpl_button)
         # Normal Point or Trap Point or Scissors Crossover Point - Left Hand
         elif pointtype == point_type.LH and pointsubtype in (point_subtype.normal, point_subtype.trap, point_subtype.xcross):
             # Create the line objects to represent the point blades
@@ -353,7 +388,8 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             elif fpl: button_xoffset = button_xoffset - 16 + common.fontsize
             else: button_xoffset = button_xoffset - 20 + common.fontsize
             point_coords = common.rotate_point(x, y, button_xoffset, button_yoffset, orientation)
-            create_button_windows(canvas, point_coords, fpl, auto, canvas_tag, point_button, fpl_button)
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
+                                                switched_with, canvas_tag, point_button, fpl_button)
         # Y Point (the point subtype is ignored)
         elif pointtype==point_type.Y:
             # Create the line objects to represent the point
@@ -373,13 +409,16 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             # Work out the offsets of the buttons and create them (in windows)
             if fpl:
                 point_coords = common.rotate_point(x, y, button_xoffset ,button1_yoffset, orientation)
-                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag))
+                point_button_window = canvas.create_window(point_coords, window=point_button, tags=(canvas_tag))
                 point_coords = common.rotate_point(x, y, button_xoffset, button2_yoffset, orientation)
-                canvas.create_window(point_coords, window=fpl_button, tags=(canvas_tag))
-            elif not auto:
+                fpl_button_window = canvas.create_window(point_coords, window=fpl_button, tags=(canvas_tag))
+            elif not switched_with:
                 point_coords = common.rotate_point(x, y, button_xoffset, button1_yoffset, orientation)
-                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag))
-                
+                point_button_window = canvas.create_window(point_coords, window=point_button, tags=(canvas_tag))
+                fpl_button_window = None
+            else:
+                point_button_window = None
+                fpl_button_window = None
         # Parts 1 and 2 of a Single Slip or Double Slip - Left Hand
         elif pointtype == point_type.LH and pointsubtype in (point_subtype.sslip1, point_subtype.dslip1, point_subtype.sslip2, point_subtype.dslip2):
             # If the point is part 2 of a single slip them we reverse the blades to give a 'crossover'
@@ -417,7 +456,8 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             if orientation == 180 and fpl: button_xoffset = button_xoffset + 22 - (common.fontsize*3)
             elif fpl: button_xoffset = button_xoffset + 8 - (common.fontsize*2)
             point_coords = common.rotate_point(x, y, button_xoffset, button_yoffset, orientation)
-            create_button_windows(canvas, point_coords, fpl, auto, canvas_tag, point_button, fpl_button)
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
+                                                    switched_with, canvas_tag, point_button, fpl_button)
         # Note that we use apply both the 'route1' and 'route2' tags to all sslip and dslip route lines so the whole point will be
         # highlighted (for a route) rather than just the selected route through the point. This is because the route we ideally need
         # to highlight will also depend on the state of the other 'half' of the sslip or dslip point (and in the case of single slips
@@ -460,7 +500,12 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             if orientation == 180 and fpl: button_xoffset = button_xoffset + 22 - (common.fontsize*3)
             elif fpl: button_xoffset = button_xoffset + 8 - (common.fontsize*2)
             point_coords = common.rotate_point(x, y, button_xoffset, button_yoffset, orientation)
-            create_button_windows(canvas, point_coords, fpl, auto, canvas_tag, point_button, fpl_button)
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
+                                                    switched_with, canvas_tag, point_button, fpl_button)
+        # hide the buttons if we are in Run Mode and the "hide_buttons" flag is set
+        if not editing_enabled and hide_buttons:
+            if point_button_window is not None: canvas.itemconfig(point_button_window, state="hidden")
+            if fpl_button_window is not None: canvas.itemconfig(fpl_button_window, state="hidden")
         # Disable the change button if the point has FPL (default state = FPL active)
         if fpl: point_button.config(state="disabled")
         # Hide the line for the switched route (display it later when we need it)
@@ -472,12 +517,15 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         points[str(point_id)]["blade2"] = blade2_tag             # Tkinter tag for blade2 (switched)
         points[str(point_id)]["route1"] = route1_tag             # Tkinter tag for "normal" route lines
         points[str(point_id)]["route2"] = route2_tag             # Tkinter tag for "switched" route lines
+        points[str(point_id)]["window1"] = point_button_window   # Tkinter tag for the point button window
+        points[str(point_id)]["window2"] = fpl_button_window     # Tkinter tag for the FPL button window
         points[str(point_id)]["changebutton"] = point_button     # Tkinter button object
         points[str(point_id)]["lockbutton"] = fpl_button         # Tkinter button object
         points[str(point_id)]["fplcallback"] = fpl_callback      # The callback to make on an event
         points[str(point_id)]["pointcallback"] = point_callback  # The callback to make on an event
         points[str(point_id)]["alsoswitch"] = also_switch        # Point to automatically switch (0=none)
-        points[str(point_id)]["automatic"] = auto                # Whether the point is automatic or not
+        points[str(point_id)]["switchedwith"] = switched_with    # The point will be 'switched with' another point
+        points[str(point_id)]["hidebuttons"] = hide_buttons      # Whether the point buttons should be hidden in Run Mode
         points[str(point_id)]["hasfpl"] = fpl                    # Whether the point has a FPL or not
         points[str(point_id)]["fpllock"] = fpl                   # Initial state of the FPL (locked if it has FPL)
         points[str(point_id)]["locked"] = False                  # Initial "interlocking" state of the point
