@@ -203,23 +203,19 @@ class default_label_entry(common.entry_box):
     def __init__(self, parent_frame):
         # Create the Label Frame for the "mirrored section" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Default section label")
-        self.packing1 = Tk.Label(self.frame, width=6)
-        self.packing1.pack(side=Tk.LEFT)
-        super().__init__(self.frame, width=16, tool_tip = "Enter the default label to "+
+        super().__init__(self.frame, width=22, tool_tip = "Enter the default label to "+
                          "display when the section is occupied (this defines the default "+
                          "width of the Track Section object on the schematic). The default "+
-                         "label should be between 4 and 10 characters")
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.packing2 = Tk.Label(self.frame, width=6)
-        self.packing2.pack(side=Tk.LEFT)
+                         "label should be between 4 and 20 characters")
+        self.pack(padx=2, pady=2)
 
     def validate(self):
         label = self.entry.get()
-        if len(label) >= 4 and len(label) <=10:
+        if len(label) >= 4 and len(label) <=20:
             valid = True
         else:
             valid = False
-            self.TT.text = ("The default label should be between 4 and 10 characters")
+            self.TT.text = ("The default label should be between 4 and 20 characters")
             # If invalid and the entry is empty or spaces we need to show the error
             if len(label.strip())== 0: self.entry.set("#")
         self.set_validation_status(valid)
