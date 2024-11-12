@@ -62,6 +62,7 @@ from typing import Union
 
 from . import mqtt_interface
 from . import file_interface
+from . import common
     
 #---------------------------------------------------------------------------------------------
 # Track sections are to be added to a global dictionary when created
@@ -185,10 +186,87 @@ def section_exists(section_id:Union[int,str]):
     return(section_exists)
 
 #---------------------------------------------------------------------------------------------
-# Internal callback for processing Button presses (manual toggling of Track Sections)
+# Internal callbacks for processing Button presses (toggling and cut/paste of Track Sections)
+# Example sequence of events for toggling track section 1:
+#     S1_entered => S1_pressed, S1_released
+# Example sequence of events for a 'transfer' of section identifier
+#     S1_entered => S1_pressed, S1_left1, S1_released => S1_left2 => S2_entered => S2_left
+#     Note that we get two seperate S1_Left events that we have to handle in the sequence
 #---------------------------------------------------------------------------------------------
 
-def section_button_event (section_id:int):
+section_pressed = None
+section_released = None
+section_left1 = None
+section_left2 = None
+
+def clear_section_button_released_event():
+    logging.info("Resetting button released event *****************************************************")
+    global section_pressed, section_released, section_left1, section_left2
+    section_pressed = None
+    section_released = None
+    section_left1 = None
+    section_left2 = None
+    return()
+
+def section_button_pressed_event(section_id:int):
+    global section_pressed, section_released, section_left1, section_left2
+    logging.debug("Section "+str(section_id)+": Track Section pressed event ***********************************************")
+    section_pressed = section_id
+    section_released = None
+    section_left1 = None
+    section_left2 = None
+    return()
+
+def section_button_left_event(section_id:int):
+    global section_pressed, section_released, section_left1, section_left2
+    logging.debug("Section "+str(section_id)+": Track Section left event **************************************************")
+    if section_pressed == section_id:
+        section_left1 = section_id
+        section_left2 = None
+        common.root_window.config(cursor="hand1")
+    elif section_released == section_id:
+        section_left2 = section_id
+        section_left1 = None
+    section_pressed = None
+    section_released = None
+    return()
+
+def section_button_released_event(section_id:int):
+    global section_pressed, section_released, section_left1, section_left2
+    logging.debug("Section "+str(section_id)+": Track Section released event **********************************************")
+    if section_pressed == section_id:
+        section_state_toggled(section_id)
+        section_released = None
+    elif section_left1 == section_id:
+        section_released = section_id
+        common.root_window.after(1, clear_section_button_released_event)
+    section_pressed = None
+    section_left1 = None
+    section_left2 = None
+    common.root_window.config(cursor="arrow")
+    return()
+
+def section_button_entered_event(section_id:int):
+    global section_pressed, section_released, section_left1, section_left2
+    logging.debug("Section "+str(section_id)+": Track Section entered event ***********************************************")
+    if section_left2 is not None:
+        if section_occupied(section_left2):
+            set_section_occupied(section_id, clear_section_occupied(section_left2))
+            # Make the external callback - Note that we only make a single callback for the
+            # Track section we have just updated as the 'run_layout' code processes any
+            # changes based on the current state of all track sections (not the one changed)
+            sections[str(section_id)]["extcallback"] (section_id)
+    section_left1 = None
+    section_left2 = None
+    section_pressed = None
+    section_released = None
+    common.root_window.config(cursor="arrow")
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Internal callbacks for processing Button presses (toggling and cut/paste of Track Sections)
+
+def section_state_toggled(section_id:int):
     logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
     # Toggle the state of the track section button itself
     toggle_section_button(section_id)
@@ -346,7 +424,10 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         # Bind the mouse button events to the Track Section - only if the Section is editable
         # If not editable we also make the button disabled to prevent responses to clicking
         if editable:
-            section_button.bind('<Button-1>', lambda event:section_button_event(section_id))
+            section_button.bind('<Enter>', lambda event:section_button_entered_event(section_id))
+            section_button.bind('<Leave>', lambda event:section_button_left_event(section_id))
+            section_button.bind('<Button-1>', lambda event:section_button_pressed_event(section_id))
+            section_button.bind('<ButtonRelease-1>', lambda event:section_button_released_event(section_id))
             section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
         else:
             section_button.config(state="disabled")
