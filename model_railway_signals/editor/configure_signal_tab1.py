@@ -12,6 +12,7 @@
 #    common.entry_box
 #    common.object_id_selection
 #    common.selection_buttons
+#    common.button_configuration
 #
 #------------------------------------------------------------------------------------
 
@@ -994,6 +995,9 @@ class signal_configuration_tab:
                     tool_tip="Select the route indications for the main signal", callback=route_type_updated,
                     button_labels=("None", "Route feathers", "Theatre indicator", "Route arms") )
         self.routetype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        # Create the labelframe for the signal button configuration elements
+        self.buttonoffsets = common.button_configuration(parent_tab)
+        self.buttonoffsets.pack(padx=2, pady=2, fill='x')
         # Create the Checkboxes and DCC Entry Box frames for the type-specific selections
         # These frames are packed / hidden depending on the signal type and route 
         # indication type selections by the callback functions in "configure_signal.py"

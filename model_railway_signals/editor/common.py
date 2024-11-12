@@ -31,6 +31,7 @@
 #    selection_buttons() - combines multiple RadioButtons  in a LabelFrame
 #    selection_check_boxes() - combines multiple check_boxes in a LabelFrame
 #    colour_selection() - Colour plus colour chooser button in a LabelFrame
+#    button_configuration() - Hidden button plus x and y offsets in a LabelFrame
 #    window_controls() - Frame containing the 'apply/ok/reset/cancel' buttons
 #------------------------------------------------------------------------------------
 
@@ -1650,6 +1651,46 @@ class font_style_selection(selection_check_boxes):
     def set_value(self, font_style:str):
         super().set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
 
+#------------------------------------------------------------------------------------
+# Class for the point Button Offset settings UI element (based on a Tk.LabelFrame)
+# Class instance functions to use externally are:
+#    "set_values" - will set the entry box values (hidden:bool, xoff:int, yoff:int)
+#    "get_values" - will return the entry box values (hidden:bool, xoff:int, yoff:int]
+#    "validate" - Ensure the Entry boxes are valid
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class button_configuration(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        # Create the Label frame to hold the Offset entry boxes
+        super().__init__(parent_frame, text="Control buttons")
+        # Create the UI Elementsin a seperate subframe so they are centered in the LabelFrame
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack()
+        self.CB1 = check_box(self.subframe, label="Hidden", tool_tip="Select to hide the point buttons in Run Mode")
+        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        tooltip=("Specify any offsets (pixels -100 to +100) for the point buttons "+
+                    "(note that for rotated points the offsets will will be applied in the opposite direction)")
+        self.L1 =Tk.Label(self.subframe, text="   Button X offset:")
+        self.L1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB1 = integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
+        self.EB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.L2 =Tk.Label(self.subframe, text="  Button Y offset:")
+        self.L2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB2 = integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
+        self.EB2.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def validate(self):
+        return(self.EB1.validate() and self.EB2.validate())
+
+    def set_values(self, hide_buttons:bool, xoffset:int, yoffset:int):
+        self.CB1.set_value(hide_buttons)
+        self.EB1.set_value(xoffset)
+        self.EB2.set_value(yoffset)
+
+    def get_values(self):
+        return (self.CB1.get_value(), self.EB1.get_value(), self.EB2.get_value())
+    
 #------------------------------------------------------------------------------------
 # Stand Alone UI element for a Tk.Frame containing the Apply/OK/Reset/Cancel Buttons.
 # Will make callbacks to the specified "load_callback" and "save_callback" functions

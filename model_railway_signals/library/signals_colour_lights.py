@@ -17,7 +17,6 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
-#       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       has_subsidary:bool - Creates a subsidary position light signal - Default = False
 #       mainfeather:bool - Creates a MAIN route feather - Default = False
@@ -27,6 +26,9 @@
 #       rhfeather90:bool - Creates a RH route feather at 90 degrees - Default = False
 #       theatre_route_indicator:bool -  Creates a Theatre route indicator - Default = False
 #       fully_automatic:bool - Creates a signal without a manual controls - Default = False
+#       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
+#       button_yoffset:int - Position offset for the point buttons (from default) - default = 0
+#       hide_buttons:bool - Point is configured to have the control buttons hidden in Run Mode - Default = False
 #
 # Classes and functions used by the other library modules:
 #
@@ -62,7 +64,6 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 sig_passed_callback,
                                 sig_updated_callback,
                                 orientation:int=0,
-                                sig_passed_button:bool=False,
                                 sig_release_button:bool=False,
                                 has_subsidary:bool=False,
                                 mainfeather:bool=False,
@@ -71,7 +72,10 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
                                 theatre_route_indicator:bool=False,
-                                fully_automatic:bool=False):
+                                fully_automatic:bool=False,
+                                button_xoffset:int=0,
+                                button_yoffset:int=0,
+                                hide_buttons:bool=False):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Get some info about the signal to help validation of the parameters we have been given
@@ -96,15 +100,12 @@ def create_colour_light_signal (canvas, sig_id:int,
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
-        canvas_tag = signals.create_common_signal_elements (canvas, sig_id,
-                                                signals.signal_type.colour_light,
-                                                x, y, orientation,
-                                                sig_switched_callback,
-                                                sig_passed_callback,
-                                                sig_updated_callback,
-                                                sub_switched_callback,
+        canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.colour_light,
+                                                x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
+                                                sig_switched_callback, sig_passed_callback,
+                                                sig_updated_callback = sig_updated_callback,
+                                                sub_switched_callback = sub_switched_callback,
                                                 has_subsidary = has_subsidary,
-                                                sig_passed_button = sig_passed_button,
                                                 sig_automatic = fully_automatic)
         # Draw the signal base line & signal post   
         line_coords = common.rotate_line (x,y,0,0,0,-15,orientation) 

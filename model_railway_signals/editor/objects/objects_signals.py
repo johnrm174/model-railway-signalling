@@ -88,6 +88,9 @@ default_signal_object["item"] = objects_common.object_type.signal
 default_signal_object["itemtype"] = signals.signal_type.colour_light.value
 default_signal_object["itemsubtype"] = signals.signal_subtype.four_aspect.value
 default_signal_object["orientation"] = 0 
+default_signal_object["xbuttonoffset"] = 0
+default_signal_object["ybuttonoffset"] = 0
+default_signal_object["hidebuttons"] = False
 default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
 default_signal_object["feathers"] = [False,False,False,False,False]  # [MAIN,LH1,LH2,RH1,RH2]
@@ -494,7 +497,6 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     has_subsidary = objects_common.schematic_objects[object_id]["subsidary"][0],
                     mainfeather = objects_common.schematic_objects[object_id]["feathers"][0],
@@ -503,7 +505,10 @@ def redraw_signal_object(object_id):
                     rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][3],
                     rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
-                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"])
+                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"])
         # set the initial theatre route indication (for MAIN) for the signal if appropriate
         if objects_common.schematic_objects[object_id]["theatreroute"]:
             signals.set_route(sig_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -527,7 +532,6 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     main_signal = True,
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][0][0],
@@ -540,7 +544,10 @@ def redraw_signal_object(object_id):
                     rh1_subsidary = objects_common.schematic_objects[object_id]["sigarms"][3][1][0],
                     rh2_subsidary = objects_common.schematic_objects[object_id]["sigarms"][4][1][0],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
-                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"])
+                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"])
         # Create the associated distant signal
         # From Release 4.5.1 the Signal_ID for the Secondary Distant is Home Signal ID + 1000
         if has_associated_distant(object_id):
@@ -563,7 +570,10 @@ def redraw_signal_object(object_id):
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][2][0],
                     rh1_signal = objects_common.schematic_objects[object_id]["sigarms"][3][2][0],
                     rh2_signal = objects_common.schematic_objects[object_id]["sigarms"][4][2][0],
-                    fully_automatic = objects_common.schematic_objects[object_id]["distautomatic"])
+                    fully_automatic = objects_common.schematic_objects[object_id]["distautomatic"],
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"])
     elif sig_type == signals.signal_type.ground_position:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals.ground_pos_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
@@ -577,7 +587,9 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0])
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"])
     elif sig_type == signals.signal_type.ground_disc:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals.ground_disc_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
@@ -591,7 +603,9 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"])
     # Create/update the canvas "tags" and selection rectangle for the signal
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox (object_id, objects_common.schematic_objects[object_id]["tags"])

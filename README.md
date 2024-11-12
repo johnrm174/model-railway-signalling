@@ -22,26 +22,12 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.8.0:
+## What's new for Release 4.9.0:
 
-* Improved object creation - when you click a button to add a new object to the schematic, the object
-now moves with the cursor until 'placed' on the canvas in the desired position (by left mouse click).
-Useful for working on layout schematics larger than the displayed window scroll area.
-* Improved copy function - The new objects now appear on the schematic as soon as you have copied them.
-They then track the cursor until 'placed' on the canvas in the desired position (by left mouse click).
-Useful for working on 'busy' layout schematics where the copied items would have overlayed other objects.
-* Other minor improvements to the schematic editor in terms of cursor styles during object moves and area
-selections (Edit Mode), and scrolling of the displayed canvas area via the mouse/touchscreen (Run Mode).
-* New DCC Accessory switches feature, enabling you to add and configure buttons on the schematic to 
-control other DCC-enabled accessories on your layout (e.g. If you are still analogue for control of trains,
-then you can use this feature with external DCC-relay modules for operating track isolating sections).
-* Improved Route Feature - DCC switches can be added to the route configuration to operate DCC accessories
-needed to complete the route setup (level crossings, track isolating sections etc). 
-* The font, font size, font colour (black, white or auto) and font style can now be specified for Route
-Buttons (these options can also be applied to text boxes and DCC Switches)
-* The canvas (background) colour and grid colour can now be changed and the grid hidden in edit mode
-* Bugfix to colour chooser - Previous colour will now be retained if cancelled (without errors)
-* Bugfix to object selection (shift-left-click) - will now no longer error if cursor is not over an object
+* New feature to drag and drop train designators between track sections (for cassette fiddle yards)
+* New option to offset the position of signal buttons (useful for busy schematics to deconflict)
+* New option to hide point buttons in Run Mode (if they are only going to be changed via route setting)
+* Increased maximum width of Track Sections to accommodate 20 character descriptive train designators
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

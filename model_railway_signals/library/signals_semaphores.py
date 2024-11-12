@@ -17,7 +17,6 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
-#       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       main_signal:bool - To create a signal arm for the main route - default = True
 #                        (Only set this to False when creating an "associated" distant signal
@@ -37,6 +36,9 @@
 #                        Provide the ID of a previously created home signal (and use the same
 #                        x and y coords to create the distant signal on the same post as the home
 #                        signal with appropriate "slotting" between the signal arms - Default = False  
+#       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
+#       button_yoffset:int - Position offset for the point buttons (from default) - default = 0
+#       hide_buttons:bool - Point is configured to have the control buttons hidden in Run Mode - Default = False
 #
 # Classes and functions used by the other library modules:
 #
@@ -73,7 +75,6 @@ def create_semaphore_signal(canvas, sig_id:int,
                             sig_passed_callback,
                             sig_updated_callback,
                             orientation:int=0,
-                            sig_passed_button:bool=False,
                             sig_release_button:bool=False,
                             main_signal:bool=True,
                             lh1_signal:bool=False,
@@ -87,7 +88,10 @@ def create_semaphore_signal(canvas, sig_id:int,
                             rh2_subsidary:bool=False,
                             theatre_route_indicator:bool=False,
                             fully_automatic:bool=False,
-                            associated_home:int=0):
+                            associated_home:int=0,
+                            button_xoffset:int=0,
+                            button_yoffset:int=0,
+                            hide_buttons:bool=False):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Get some info about the signal to help validation of the parameters we have been given
@@ -128,15 +132,12 @@ def create_semaphore_signal(canvas, sig_id:int,
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
-        canvas_tag = signals.create_common_signal_elements (canvas, sig_id,
-                                                signals.signal_type.semaphore,
-                                                x, y, orientation,
-                                                sig_switched_callback,
-                                                sig_passed_callback,
-                                                sig_updated_callback,
-                                                sub_switched_callback,
+        canvas_tag = signals.create_common_signal_elements (canvas, sig_id,signals.signal_type.semaphore,
+                                                x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
+                                                sig_switched_callback, sig_passed_callback,
+                                                sig_updated_callback = sig_updated_callback,
+                                                sub_switched_callback = sub_switched_callback,
                                                 has_subsidary = has_subsidary,
-                                                sig_passed_button = sig_passed_button,
                                                 sig_automatic = fully_automatic,
                                                 associated_home = associated_home)
         # Work out the offset for the post depending on the combination of signal arms. Note that if

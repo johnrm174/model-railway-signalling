@@ -359,18 +359,12 @@ def reset_sig_released_button(sig_id:int):
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 
-def create_common_signal_elements(canvas, sig_id:int,
-                                  signal_type:signal_type,
-                                  x:int, y:int,
-                                  orientation:int,
-                                  sig_switched_callback,
-                                  sig_passed_callback,
-                                  sig_updated_callback = None,
-                                  sub_switched_callback = None,
-                                  has_subsidary:bool=False,
-                                  sig_passed_button:bool=False,
-                                  sig_automatic:bool=False,
-                                  associated_home:int=0):
+def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type,
+                    x:int, y:int, button_xoffset:int, button_yoffset:int, hide_buttons:bool,
+                    orientation:int, sig_switched_callback, sig_passed_callback,
+                    sig_updated_callback=None, sub_switched_callback=None,
+                    has_subsidary:bool=False,sig_automatic:bool=False,
+                    associated_home:int=0):
     global signals
     # Define the "Tags" for all drawing objects for this signal instance.  If it is an associated distant
     # signal then we assign 2 tags - the tag associated with the signal itself (this is stored in the 
@@ -402,31 +396,39 @@ def create_common_signal_elements(canvas, sig_id:int,
     # special case of a semaphore distant signal being created on the same "post" as a home signal.
     # In this case we apply an additional offset to deconflict with the home signal buttons.
     # Note the code also applies offsets to take into account the default font size in 'common'
-    yoffset = -9-common.fontsize/2
+    yoffset = button_yoffset - 9 - common.fontsize/2
     if associated_home > 0:
         if signals[str(associated_home)]["hassubsidary"]:
-            if orientation == 0: xoffset = -common.fontsize/2*7-24
-            else: xoffset = -common.fontsize*4-20
+            if orientation == 0: xoffset = button_xoffset - common.fontsize/2*7 - 24
+            else: xoffset = button_xoffset - common.fontsize*4 - 20
         else:
-            if orientation == 0: xoffset = -common.fontsize/2*5-18
-            else: xoffset = -common.fontsize*3-14
+            if orientation == 0: xoffset = button_xoffset - common.fontsize/2*5 - 18
+            else: xoffset = button_xoffset - common.fontsize*3-14
         button_position = common.rotate_point(x, y, xoffset, yoffset, orientation)
         if not sig_automatic: canvas.create_window(button_position, window=sig_button, tags=canvas_tag)
     elif has_subsidary:
-        if orientation == 0: xoffset = -common.fontsize-14
-        else: xoffset = -common.fontsize*2-12
+        if orientation == 0: xoffset = button_xoffset - common.fontsize - 14
+        else: xoffset = button_xoffset - common.fontsize*2 - 12
         button_position = common.rotate_point(x, y, xoffset, yoffset, orientation) 
         canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=canvas_tag)
         canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=canvas_tag)          
     else:
-        xoffset = -14-common.fontsize/2
+        xoffset = button_xoffset - 14 - common.fontsize/2
         button_position = common.rotate_point (x, y, xoffset, yoffset, orientation) 
         canvas.create_window(button_position,window=sig_button,tags=canvas_tag)
     # Signal passed button is created on the track at the base of the signal
-    if sig_passed_button: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
+    # Note we only create this if the signal IS NOT an 'associated distant' signal
+    if associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
     # Disable the main signal button if the signal is fully automatic
     if sig_automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
+    
+    #############################################################################################################
+    ################## TO DO - save the references to the button windows in the dict of signal config
+    ################## Also need to pass in the hidden flag from the create functions and save that
+    ################# then a function for displaying/hiding the windows depending on mode and hidden flag
+    #############################################################################################################
+    
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]              = canvas                 # MANDATORY - canvas object
     signals[str(sig_id)]["sigtype"]             = signal_type            # MANDATORY - Type of the signal
