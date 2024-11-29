@@ -669,6 +669,18 @@ def set_all(new_objects):
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
 
+            #################################################################################################
+            ## Handle non-breaking change of Track Section width being a parameter in its own right #########
+            # (rather than determined by the default section label) from Release 4.9.0 onwards ##############
+            #################################################################################################
+            if ( new_object_type == objects_common.object_type.section and
+                 "sectionwidth" not in new_objects[object_id].keys() ):
+                section_width = len(objects_common.schematic_objects[object_id]["defaultlabel"])
+                objects_common.schematic_objects[object_id]["sectionwidth"] = section_width
+            #################################################################################################
+            ## End of Handle non-breaking change for Track Sections #########################################
+            #################################################################################################
+
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
