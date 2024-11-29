@@ -1652,7 +1652,7 @@ class font_style_selection(selection_check_boxes):
         super().set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
 
 #------------------------------------------------------------------------------------
-# Class for the point Button Offset settings UI element (based on a Tk.LabelFrame)
+# Class for the Point/Signal Button Offset settings UI element (based on a Tk.LabelFrame)
 # Class instance functions to use externally are:
 #    "set_values" - will set the entry box values (hidden:bool, xoff:int, yoff:int)
 #    "get_values" - will return the entry box values (hidden:bool, xoff:int, yoff:int]
@@ -1664,13 +1664,14 @@ class button_configuration(Tk.LabelFrame):
     def __init__(self, parent_frame):
         # Create the Label frame to hold the Offset entry boxes
         super().__init__(parent_frame, text="Control buttons")
-        # Create the UI Elementsin a seperate subframe so they are centered in the LabelFrame
+        # Create the UI Elements in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self)
         self.subframe.pack()
-        self.CB1 = check_box(self.subframe, label="Hidden", tool_tip="Select to hide the point buttons in Run Mode")
+        self.CB1 = check_box(self.subframe, label="Hidden", tool_tip="Select to hide the control buttons in Run Mode "+
+                             "(to declutter the schematic if only controlling via set up / clear down of routes)")
         self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
-        tooltip=("Specify any offsets (pixels -100 to +100) for the point buttons "+
-                    "(note that for rotated points the offsets will will be applied in the opposite direction)")
+        tooltip=("Specify any offsets (pixels -100 to +100) for the control buttons "+
+                    "(note that for rotated objects the offsets will will be applied in the opposite direction)")
         self.L1 =Tk.Label(self.subframe, text="   Button X offset:")
         self.L1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.EB1 = integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
