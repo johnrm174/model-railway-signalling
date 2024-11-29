@@ -279,17 +279,18 @@ def configure_edit_mode(edit_mode:bool):
     global editing_enabled
     # Maintain a global flag (for creating new library objects)
     editing_enabled = edit_mode
-    # Update all existing library objects (according to the current mode)
+    # Update all existing LOCAL library objects (signal_id is an int) according to the current mode
     for signal_id in signals:
-        signal = signals[signal_id]
-        if not editing_enabled and signal["hidebuttons"]:
-            # In Run Mode - Signal button windows are hidden if configured to be so
-            if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='hidden')
-            if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='hidden')
-        else:
-            # In Edit Mode (or buttons not hidden) - Signal button windows are always displayed
-            if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='normal')
-            if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='normal')
+        if signal_id.isdigit():
+            signal = signals[signal_id]
+            if not editing_enabled and signal["hidebuttons"]:
+                # In Run Mode - Signal button windows are hidden if configured to be so
+                if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='hidden')
+                if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='hidden')
+            else:
+                # In Edit Mode (or buttons not hidden) - Signal button windows are always displayed
+                if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='normal')
+                if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='normal')
     return()
 
 # -------------------------------------------------------------------------
