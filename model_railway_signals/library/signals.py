@@ -179,6 +179,8 @@
 #
 #   send_mqtt_signal_updated_event(sig_id:int) - called on changes to the displayed aspect (all signal types)
 #
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#
 #---------------------------------------------------------------------------------------------
 
 # NOTE - MORE IMPORTS ARE DECLARED BELOW THE GLOBAL API CLASS DEFINITIONS
@@ -265,6 +267,30 @@ signals:dict = {}
 # -------------------------------------------------------------------------
 
 list_of_signals_to_publish=[]
+
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+# Signal buttons will be hidden in Run mode if they are configured to be 'hidden'
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    # Update all existing library objects (according to the current mode)
+    for signal_id in signals:
+        signal = signals[signal_id]
+        if not editing_enabled and signal["hidebuttons"]:
+            # In Run Mode - Signal button windows are hidden if configured to be so
+            if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='hidden')
+            if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='hidden')
+        else:
+            # In Edit Mode (or buttons not hidden) - Signal button windows are always displayed
+            if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='normal')
+            if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='normal')
+    return()
 
 # -------------------------------------------------------------------------
 # Library API Function to check if a Signal exists in the dictionary of Signals.
@@ -405,30 +431,33 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type,
             if orientation == 0: xoffset = button_xoffset - common.fontsize/2*5 - 18
             else: xoffset = button_xoffset - common.fontsize*3-14
         button_position = common.rotate_point(x, y, xoffset, yoffset, orientation)
-        if not sig_automatic: canvas.create_window(button_position, window=sig_button, tags=canvas_tag)
+        if sig_automatic:
+            button_window1 = None
+            button_window2 = None
+        else:
+            button_window1 = canvas.create_window(button_position, window=sig_button, tags=canvas_tag)
+            button_window2 = None
     elif has_subsidary:
         if orientation == 0: xoffset = button_xoffset - common.fontsize - 14
         else: xoffset = button_xoffset - common.fontsize*2 - 12
         button_position = common.rotate_point(x, y, xoffset, yoffset, orientation) 
-        canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=canvas_tag)
-        canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=canvas_tag)          
+        button_window1 = canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=canvas_tag)
+        button_window2 = canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=canvas_tag)
     else:
         xoffset = button_xoffset - 14 - common.fontsize/2
         button_position = common.rotate_point (x, y, xoffset, yoffset, orientation) 
-        canvas.create_window(button_position,window=sig_button,tags=canvas_tag)
+        button_window1 = canvas.create_window(button_position,window=sig_button,tags=canvas_tag)
+        button_window2 = None
     # Signal passed button is created on the track at the base of the signal
     # Note we only create this if the signal IS NOT an 'associated distant' signal
     if associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
     # Disable the main signal button if the signal is fully automatic
     if sig_automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
+    # Hide the buttons if we are in run mode and the buttons are configured as 'hidden'
+    if not editing_enabled and hide_buttons:
+        if button_window1 is not None: canvas.itemconfig(button_window1, state='hidden')
+        if button_window2 is not None: canvas.itemconfig(button_window2, state='hidden')
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
-    
-    #############################################################################################################
-    ################## TO DO - save the references to the button windows in the dict of signal config
-    ################## Also need to pass in the hidden flag from the create functions and save that
-    ################# then a function for displaying/hiding the windows depending on mode and hidden flag
-    #############################################################################################################
-    
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]              = canvas                 # MANDATORY - canvas object
     signals[str(sig_id)]["sigtype"]             = signal_type            # MANDATORY - Type of the signal
@@ -449,6 +478,9 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type,
     signals[str(sig_id)]["sigbutton"]           = sig_button             # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]           = sub_button             # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"]        = passed_button          # MANDATORY - Button drawing object (subsidary signal)
+    signals[str(sig_id)]["buttonwindow1"]       = button_window1         # MANDATORY - Button window object (main signal)
+    signals[str(sig_id)]["buttonwindow2"]       = button_window2         # MANDATORY - Button window object (subsidary signal)
+    signals[str(sig_id)]["hidebuttons"]         = hide_buttons           # MANDATORY - Flag to hide buttons in Run Mode
     signals[str(sig_id)]["tags"]                = main_canvas_tag        # MANDATORY - Canvas Tags for all drawing objects
     return(canvas_tag)
 
