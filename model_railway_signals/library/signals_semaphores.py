@@ -125,8 +125,6 @@ def create_semaphore_signal(canvas, sig_id:int,
         logging.error("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" is not a semaphore")
     elif associated_home > 0 and signals.signals[str(associated_home)]["subtype"] == semaphore_subtype.distant:
         logging.error("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" is not a home signal")
-    elif associated_home > 0 and sig_passed_button:
-        logging.error("Signal "+str(sig_id)+": create_signal - Cannot create a 'passed' button if associated with another signal")
     elif associated_home == 0 and not main_signal:
         logging.error("Signal "+str(sig_id)+": create_signal - Signal must have a signal arm for the main route")
     else:
