@@ -28,7 +28,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New option to offset the position of signal buttons (useful for busy schematics to deconflict)
 * New option to hide point buttons in Run Mode (if controlling only via setup/cleardown of routes)
 * New option to hide signal buttons in Run Mode (if controlling only via setup/cleardown of routes)
-* Increased maximum width of Track Sections to accommodate 20 character descriptive train designators
+* Width of track sections is now specified independently to the default label (4 to 30 characters)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
