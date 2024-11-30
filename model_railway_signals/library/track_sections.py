@@ -201,8 +201,8 @@ section_left1 = None
 section_left2 = None
 
 def clear_section_button_released_event():
-    logging.info("Resetting button released event *****************************************************")
     global section_pressed, section_released, section_left1, section_left2
+    # logging.debug("Resetting button released event *****************************************************")
     section_pressed = None
     section_released = None
     section_left1 = None
@@ -211,7 +211,7 @@ def clear_section_button_released_event():
 
 def section_button_pressed_event(section_id:int):
     global section_pressed, section_released, section_left1, section_left2
-    logging.debug("Section "+str(section_id)+": Track Section pressed event ***********************************************")
+    # logging.debug("Section "+str(section_id)+": Track Section pressed event ***********************************************")
     section_pressed = section_id
     section_released = None
     section_left1 = None
@@ -220,7 +220,7 @@ def section_button_pressed_event(section_id:int):
 
 def section_button_left_event(section_id:int):
     global section_pressed, section_released, section_left1, section_left2
-    logging.debug("Section "+str(section_id)+": Track Section left event **************************************************")
+    #logging.debug("Section "+str(section_id)+": Track Section left event **************************************************")
     if section_pressed == section_id:
         section_left1 = section_id
         section_left2 = None
@@ -234,7 +234,7 @@ def section_button_left_event(section_id:int):
 
 def section_button_released_event(section_id:int):
     global section_pressed, section_released, section_left1, section_left2
-    logging.debug("Section "+str(section_id)+": Track Section released event **********************************************")
+    #logging.debug("Section "+str(section_id)+": Track Section released event **********************************************")
     if section_pressed == section_id:
         section_state_toggled(section_id)
         section_released = None
@@ -249,7 +249,7 @@ def section_button_released_event(section_id:int):
 
 def section_button_entered_event(section_id:int):
     global section_pressed, section_released, section_left1, section_left2
-    logging.debug("Section "+str(section_id)+": Track Section entered event ***********************************************")
+    #logging.debug("Section "+str(section_id)+": Track Section entered event ***********************************************")
     if section_left2 is not None:
         if section_occupied(section_left2):
             set_section_occupied(section_id, clear_section_occupied(section_left2))
@@ -330,6 +330,7 @@ def send_mqtt_section_updated_event(section_id:int):
 
 #---------------------------------------------------------------------------------------------
 # Internal function to toggle the state of a Track Section button
+# Note we don't change the relief for the track section
 #---------------------------------------------------------------------------------------------
 
 def toggle_section_button(section_id:int):
@@ -338,13 +339,13 @@ def toggle_section_button(section_id:int):
     if section["occupied"]:
         logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label '"+section["labeltext"]+"'")
         section["occupied"] = False
-        section["button"].config(relief="raised", background=section["deselectedbgcolour"], foreground=section["deselectedfgcolour"],
-                                    activebackground=section["deselectedbgcolour"], activeforeground=section["deselectedfgcolour"])
+        section["button"].config(background=section["deselectedbgcolour"], foreground=section["deselectedfgcolour"])
+        section["button"].config(activebackground=section["deselectedbgcolour"], activeforeground=section["deselectedfgcolour"])
     else:
         logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label '"+section["labeltext"]+"'")
         section["occupied"] = True
-        section["button"].config(relief="sunken", background=section["selectedbgcolour"], foreground=section["selectedfgcolour"],
-                                    activebackground=section["selectedbgcolour"], activeforeground=section["selectedfgcolour"])
+        section["button"].config(background=section["selectedbgcolour"], foreground=section["selectedfgcolour"])
+        section["button"].config(activebackground=section["selectedbgcolour"], activeforeground=section["selectedfgcolour"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -418,9 +419,10 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         selected_bg_colour = "black"
         deselected_bg_colour = "grey"
         # Create the Track Section Button
-        section_button = Tk.Button(canvas, text=default_label, state="normal", relief="raised", width=section_width,
-                        font=font, background=deselected_bg_colour, padx=3, pady=0, foreground=deselected_fg_colour,
-                        activeforeground=deselected_fg_colour, activebackground=deselected_bg_colour)
+        section_button = Tk.Button(canvas, text=default_label, width=section_width, highlightthickness=0,
+                            state="normal", relief="raised", padx=3, pady=2, font=font, borderwidth=0,
+                            background=deselected_bg_colour, activebackground=deselected_bg_colour,
+                            foreground=deselected_fg_colour, activeforeground=deselected_fg_colour)
         # Bind the mouse button events to the Track Section Button- only if the Section is editable
         # If not editable we also make the button disabled to prevent responses to clicking
         if editable:

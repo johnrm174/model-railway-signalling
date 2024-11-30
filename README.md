@@ -29,6 +29,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New option to hide point buttons in Run Mode (if controlling only via setup/cleardown of routes)
 * New option to hide signal buttons in Run Mode (if controlling only via setup/cleardown of routes)
 * Width of track sections is now specified independently to the default label (4 to 30 characters)
+* Improved appearance of all buttons when displayed different colour canvas backgrounds
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

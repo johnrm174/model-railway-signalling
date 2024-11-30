@@ -129,7 +129,7 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback, hidden:bo
         # only displayed in Edit mode (to aid identification and selection). These are both initially created
         # assuming we are in Run Mode (Oval has a width of zero to make it invisible and the text is hidden).
         # Similarly the button is created as visible (Changed later if in Run Mode and 'hidden' is selected)
-        sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"))
+        sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"), highlightthickness=0)
         sensor_button.config(command=lambda:track_sensor_triggered(sensor_id))
         button_window = canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
         selection_circle = canvas.create_oval(x-20, y-20, x+20, y+20, outline="grey60", tags=canvas_tag, width=0)

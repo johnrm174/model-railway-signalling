@@ -250,7 +250,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
         # Create the Button and its canvas window (for Run Mode operation). Note the Window is created
         # as 'hidden' - assuming we are in edit mode - but changed later if we are in Run Mode
-        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width,
+        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, highlightthickness=0,
                         font=font, background=button_colour, activebackground=active_colour, padx=2, pady=2,
                         activeforeground=text_colour, foreground=text_colour, command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag, state="hidden")

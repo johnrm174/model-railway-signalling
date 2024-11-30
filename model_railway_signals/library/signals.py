@@ -409,13 +409,13 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type,
     else: main_button_text = format(sig_id,'02d')
     # Create the Signal and Subsidary Button objects and their callbacks
     sig_button = Tk.Button (canvas, text=main_button_text, padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"), highlightthickness=0,
                 bg=common.bgraised, command=lambda:signal_button_event(sig_id))
-    sub_button = Tk.Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
+    sub_button = Tk.Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding, highlightthickness=0,
                 state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                 bg=common.bgraised, command=lambda:subsidary_button_event(sig_id))
     # Signal Passed Button - We only want a small button - hence a small font size
-    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
+    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"), highlightthickness=0,
                 command=lambda:sig_passed_button_event(sig_id))
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
     # created if the signal has a subsidary, but the Button positions are adjusted so they always

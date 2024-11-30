@@ -314,13 +314,11 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         logging.debug("Point "+str(point_id)+": Creating library object on the schematic")
         # Create the tkinter button objects
         point_button = Tk.Button(canvas, text=format(point_id,'02d'), state="normal", relief="raised",
-                                 font=('Courier',common.fontsize,"normal"),bg=common.bgraised,
-                                 padx=common.xpadding, pady=common.ypadding,
-                                 command = lambda:change_button_event(point_id))
-        fpl_button = Tk.Button(canvas,text="L",state="normal", relief="sunken",
-                               font=('Courier',common.fontsize,"normal"), bg=common.bgsunken,
-                               padx=common.xpadding, pady=common.ypadding,
-                               command = lambda:fpl_button_event(point_id))
+                        font=('Courier',common.fontsize,"normal"), bg=common.bgraised, highlightthickness=0,
+                        padx=common.xpadding, pady=common.ypadding, command=lambda:change_button_event(point_id))
+        fpl_button = Tk.Button(canvas,text="L",state="normal", relief="sunken", highlightthickness=0,
+                        font=('Courier',common.fontsize,"normal"), bg=common.bgsunken,
+                        padx=common.xpadding, pady=common.ypadding, command=lambda:fpl_button_event(point_id))
         # Create the Tkinter drawing objects (lines) for each point/ We use tkinter 'tags' to uniquely identify
         # each point's 'blades' and route lines so these can easily be hidden/displayed/highlighted as required
         # 'route1' is the tag for route lines through the point when the point is in its unswitched configuration
