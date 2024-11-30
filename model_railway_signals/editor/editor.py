@@ -607,8 +607,7 @@ class main_menubar:
             # power and disconnect from the serial port, Revert all GPIO ports to their default states
             # and then wait until all scheduled Tkinter tasks have completed before destroying root)
             schematic.shutdown()
-            library_common.shutdown()
-            self.root.destroy()
+            library_common.orderly_shutdown()
         return()
                 
     def new_schematic(self, ask_for_confirm:bool=True):
@@ -743,11 +742,11 @@ def run_editor():
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
         # Kill off the PhotoImage objects so we don't get spurious exceptions on window close and
-        # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
+        # perform an instant shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
         # power and disconnect from the serial port, Revert all GPIO ports to their default states
         # and then wait until all scheduled Tkinter tasks have completed before destroying root
         schematic.shutdown()
-        library_common.shutdown()
+        library_common.instant_shutdown()
     print("Exiting Model Railway Signalling application")
 
 ####################################################################################

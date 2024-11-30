@@ -131,14 +131,16 @@ from .file_interface import purge_loaded_state_information
 from .file_interface import save_schematic
 
 from .common import set_root_window
-from .common import shutdown
+from .common import orderly_shutdown
+from .common import instant_shutdown
 from .common import configure_edit_mode
 from .common import configure_button_size
 
 __all__ = [
       # Public common functions
         'set_root_window',
-        'shutdown',
+        'orderly_shutdown',
+        'instant_shutdown',
         'configure_edit_mode',
         'configure_button_size',
       # Public point types/functions

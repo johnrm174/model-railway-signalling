@@ -7,7 +7,14 @@
 #
 #   set_root_window(root) - initialise the library with the root window reference
 #
-#   shutdown() - perform an orderly shutdown of the library functions (clean up)
+#   orderly_shutdown() - perform an orderly shutdown of the library functions by scheduling
+#                        a sequence of shutdown tasks in the root.main_loop to try and avoid
+#                        any exceptions caused by subsequent MQTT and GPIO events.
+#
+#   instant_shutdown() - perform an instant shutdown of the library functions - This is called
+#                        on keyboard interrupt when the root.main_loop has been killed and does
+#                        the best of a bad job shutting down everything (although there may be
+#                        reported exceptions caused by subsequent MQTT and GPIO events)
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
@@ -75,36 +82,80 @@ def set_root_window(root):
     return()
 
 #-------------------------------------------------------------------------
-# Function to perfor an orderly shutdown of the library modules:
+# Functions to perform a shutdown of the library modules:
+#   Prevent further events being raised in the Tkinter main loop
+#   MQTT Networking - send a shutdown message (if so configured)
 #   MQTT Networking - clean up the published topics and disconnect
 #   SPROG interface - switch off the DCC power and close the serial port
-#   GPIO Sensors - revert all GPIO pins to their default states
 #   Finally - wait for all scheduled TKinter events to complete
+#
+# The instant_shutdown function is called on keyboard interrupt (when the
+# Tkinter main_loop has already exited and shuts down everything else)
+#
+# The orderly_shutdown function schedules a series of steps (within the
+# Tkinter main_loop) to do things a bit more elegantly as I've seen the MQTT
+# client refuse to disconnect if we try and do everything in one go (maybe
+# its because the orderly_shutdown is called from a pop_up window?)
 #-------------------------------------------------------------------------
 
-def shutdown():
+def instant_shutdown():
     global shutdown_initiated
     if not shutdown_initiated:
-        logging.info ("Initiating Application Shutdown")
+        logging.info ("Initiating Instant Application Shutdown")
         shutdown_initiated = True
-        # Clear out any retained messages and disconnect from broker
-        mqtt_interface.mqtt_shutdown()
-        # Turn off the DCC bus power and close the comms port
+        mqtt_interface.mqtt_publish_shutdown_message()
+        mqtt_interface.mqtt_broker_disconnect()
         pi_sprog_interface.request_dcc_power_off()
         pi_sprog_interface.sprog_disconnect()
-        # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
-        # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
-        # (although its unlikely the user would initiate a shut down until these have finished)
-        timeout_start = time.time()
-        while time.time() < timeout_start + 30:
-            if root_window.tk.call('after','info') != "":
-                root_window.update()
-                time.sleep(0.01)
-            else:
-                logging.info ("Exiting Application")
-                break
-        if time.time() >= timeout_start + 30:
-            logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+        root_window.destroy()
+
+def orderly_shutdown():
+    global shutdown_initiated
+    if not shutdown_initiated:
+        logging.info ("Initiating Orderly Application Shutdown")
+        shutdown_initiated = True
+        root_window.after(0, lambda:shutdown_step1())
+        return()
+
+def shutdown_step1():
+    # Publish the shutdown message
+    mqtt_interface.mqtt_publish_shutdown_message()
+    root_window.after(100, lambda:shutdown_step2())
+    return()
+
+def shutdown_step2():
+    # Clear out any retained messages and disconnect from broker
+    mqtt_interface.mqtt_broker_disconnect()
+    root_window.after(100, lambda:shutdown_step3())
+    return()
+
+def shutdown_step3():
+    # Turn off the DCC bus power
+    pi_sprog_interface.request_dcc_power_off()
+    root_window.after(100, lambda:shutdown_step4())
+    return()
+
+def shutdown_step4():
+    # Close the comms port to the SPROG
+    pi_sprog_interface.sprog_disconnect()
+    root_window.after(100, shutdown_step5)
+    return()
+
+def shutdown_step5():
+    # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
+    # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
+    # (although its unlikely the user would initiate a shut down until these have finished)
+    timeout_start = time.time()
+    while time.time() < timeout_start + 30:
+        if root_window.tk.call('after','info') != "":
+            root_window.update()
+            time.sleep(0.01)
+        else:
+            logging.info ("Exiting Application")
+            break
+    if time.time() >= timeout_start + 30:
+        logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+    root_window.destroy()
     return()
 
 #------------------------------------------------------------------------------------
@@ -161,7 +212,7 @@ def handle_callback_in_tkinter_thread(*args):
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
-    if root_window is not None:
+    if not shutdown_initiated:
         event_queue.put(callback_function)
         # When loading a layout file on startup, there were a number of possible edge cases that could cause
         # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
@@ -174,8 +225,6 @@ def execute_function_in_tkinter_thread(callback_function):
         except Exception as exception:
             logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
             logging.error(str(exception))
-    else:
-        logging.error("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
     return()
 
 ##################################################################################################
