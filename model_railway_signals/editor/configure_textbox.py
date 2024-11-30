@@ -97,7 +97,7 @@ class edit_textbox():
             #----------------------------------------------------------------------------------
             # Create a Frame for the font selection
             #----------------------------------------------------------------------------------
-            self.font = common.font_selection(self.main_frame, callback=self.font_style_updated)
+            self.font = common.font_selection(self.main_frame, label="Text font", callback=self.font_style_updated)
             self.font.pack(padx=2, pady=2, fill="x")
             #----------------------------------------------------------------------------------
             # Create a Frame for the font size, text style and border width elements (Frame 3)
@@ -120,7 +120,7 @@ class edit_textbox():
                                             tool_tip="Select the border width (between 8 and 20 pixels)")
             self.fontsize.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create a Label Frame for the Text Style selection (grid 1,0)
-            self.fontstyle = common.font_style_selection(self.frame3, callback=self.font_style_updated)
+            self.fontstyle = common.font_style_selection(self.frame3, label="Font style", callback=self.font_style_updated)
             self.fontstyle.grid(row=0, column=1, padx=2, pady=2, sticky='NSWE')
             # Create a Label Frame for the Border Width selection (grid 0,1)
             self.frame3subframe3 = Tk.LabelFrame(self.frame3, text="Border width")

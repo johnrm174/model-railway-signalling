@@ -1603,8 +1603,8 @@ class colour_selection(Tk.LabelFrame):
 #------------------------------------------------------------------------------------
 
 class font_selection(selection_buttons):
-    def __init__(self, parent_frame, callback=None):
-        super().__init__(parent_frame, label="Font", callback=callback,tool_tip="Select the font style",
+    def __init__(self, parent_frame, label:str, callback=None):
+        super().__init__(parent_frame, label=label, callback=callback,tool_tip="Select the font style",
                             button_labels=("Courier", "Times", "Helvetica", "TkFixedFont"))
 
     def get_value(self):
@@ -1636,7 +1636,7 @@ class font_selection(selection_buttons):
 #------------------------------------------------------------------------------------
 
 class font_style_selection(selection_check_boxes):
-    def __init__(self, parent_frame, callback=None):
+    def __init__(self, parent_frame, label:str, callback=None):
         super().__init__(parent_frame, label="Font style", callback=callback,
                 tool_tip="Select the font style", button_labels=("Bold", "Itallic", "Underline"))
 

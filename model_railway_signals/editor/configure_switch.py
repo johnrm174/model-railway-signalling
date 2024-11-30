@@ -122,7 +122,7 @@ class edit_switch():
             #----------------------------------------------------------------------------------
             # Create the Font selection element
             #----------------------------------------------------------------------------------
-            self.font=common.font_selection(self.main_frame)
+            self.font=common.font_selection(self.main_frame, label="Button font")
             self.font.pack(padx=2, pady=2, fill="x")
             #----------------------------------------------------------------------------------
             # Create a Frame for the font size and text style elements (Frame 4)
@@ -141,7 +141,7 @@ class edit_switch():
                    tool_tip="Select the font size (between 8 and 20 pixels)", allow_empty=False)
             self.fontsize.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
             # The final subframe is for the text style selection
-            self.fontstyle = common.font_style_selection(self.frame4)
+            self.fontstyle = common.font_style_selection(self.frame4, label="Font style")
             self.fontstyle.pack(padx=2, pady=2, side=Tk.LEFT, fill='x', expand=True)
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the switch type and general settings UI element (frame 5)
