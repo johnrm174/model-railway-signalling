@@ -380,12 +380,12 @@ class edit_route():
                 switch_settings_list.append([int(key),value])
             self.switches.set_values(switch_settings_list)
             # Set the button appearance elements
-            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
-            self.font.set_value(objects.schematic_objects[self.object_id]["font"])
-            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["fontstyle"])
-            self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
+            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["backgroundcolour"])
             self.textcolourtype.set_value(objects.schematic_objects[self.object_id]["textcolourtype"])
+            self.font.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][0])
+            self.fontsize.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][1])
+            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][2])
             # Hide the validation error message
             self.validation_error.pack_forget()        
         return()
@@ -433,12 +433,11 @@ class edit_route():
                 switch_settings_dict[str(key)] = value
             new_object_configuration["switchesonroute"] = switch_settings_dict
             # Get the button appearance elements
-            new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
+            text_font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
-            new_object_configuration["font"] = self.font.get_value()
-            new_object_configuration["fontstyle"] = self.fontstyle.get_value()
-            new_object_configuration["fontsize"] = self.fontsize.get_value()
+            new_object_configuration["backgroundcolour"] = self.buttoncolour.get_value()
             new_object_configuration["textcolourtype"] = self.textcolourtype.get_value()
+            new_object_configuration["textfonttuple"] = text_font_tuple
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

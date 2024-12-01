@@ -13,6 +13,7 @@
 #    default_switch_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
+#    settings.get_style - To retrieve the default layout styles for the object
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_routes.update_references_to_switch - called when the Switch ID is changed
@@ -32,6 +33,7 @@
 #    buttons.button_exists - to find out if the specified Item ID already exists
 #    dcc_control.map_dcc_switch - Create a DCC mapping for the Accessory Switch
 #    dcc_control.delete_switch_mapping - Delete the DCC mapping for the switch
+#
 # Accesses the following external library objects directly:
 #    button.button_type - for setting the enum value when creating the object
 #
@@ -45,6 +47,7 @@ from ...library import dcc_control
 from . import objects_common
 from . import objects_routes
 from .. import run_layout
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Default Switch Object (i.e. state at creation)
@@ -56,16 +59,16 @@ default_switch_object["itemtype"] = buttons.button_type.switched.value
 default_switch_object["switchname"] = "Switch"
 default_switch_object["switchdescription"] = "Switch description (Run Mode tooltip)"
 default_switch_object["buttonwidth"] = 12
-default_switch_object["buttoncolour"] = "SkyBlue2"
-default_switch_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
-default_switch_object["font"] = "Courier"
-default_switch_object["fontsize"] = 9
-default_switch_object["fontstyle"] = ""
-default_switch_object["hidden"] = False
+# Styles are initially set to the default application styles (defensive programming)
+default_switch_object["backgroundcolour"] = settings.get_style("dccswitches", "backgroundcolour")
+default_switch_object["textcolourtype"] = settings.get_style("dccswitches", "textcolourtype")
+default_switch_object["textfonttuple"] = settings.get_style("dccswitches", "textfonttuple")
 # Each DCC command sequence comprises a variable list of DCC commands
 # Each DCC command comprises: [DCC address, DCC state]
 default_switch_object["dcconcommands"] = []
 default_switch_object["dccoffcommands"] = []
+# Other object-specific parameters:
+default_switch_object["hidden"] = False
 
 #------------------------------------------------------------------------------------
 # Function to to update a Switch object following a configuration change
@@ -101,11 +104,8 @@ def redraw_switch_object(object_id):
     # Turn the button type value back into the required enumeration type
     button_type = buttons.button_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Create the Tkinter Font tuple
-    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
-                          objects_common.schematic_objects[object_id]["fontsize"],
-                          objects_common.schematic_objects[object_id]["fontstyle"])
     # Work out what the active and selected colours for the button should be
-    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    button_colour = objects_common.schematic_objects[object_id]["backgroundcolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
     # Work out what the text colour should be (auto uses the lightest of the three for max contrast)
@@ -126,11 +126,11 @@ def redraw_switch_object(object_id):
                 label = objects_common.schematic_objects[object_id]["switchname"],
                 tooltip = objects_common.schematic_objects[object_id]["switchdescription"],
                 hidden = objects_common.schematic_objects[object_id]["hidden"],
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
                 button_colour = button_colour,
                 active_colour = active_colour,
                 selected_colour = selected_colour,
-                text_colour = text_colour,
-                font = tkinter_font_tuple)
+                text_colour = text_colour)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
@@ -151,6 +151,10 @@ def create_switch(xpos:int, ypos:int):
     objects_common.schematic_objects[object_id]["switchname"] = "Switch "+str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
+    # Styles for the new object are set to the current default styles
+    objects_common.schematic_objects[object_id]["backgroundcolour"] = settings.get_style("dccswitches", "backgroundcolour")
+    objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("dccswitches", "textcolourtype")
+    objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("dccswitches", "textfonttuple")
     # Add the new object to the type-specific index
     objects_common.switch_index[str(item_id)] = object_id
     # Draw the Object on the canvas

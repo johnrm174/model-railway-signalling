@@ -54,7 +54,7 @@ default_settings["general"]["version"] = "Version 4.8.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
-default_settings["general"]["buttonsize"] = 8
+default_settings["general"]["buttonsize"] = 8   #########################################
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
@@ -96,12 +96,22 @@ default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
 default_settings["gpio"]["portmappings"] = []
+# The following settings define the default application styles (object appearance)
+default_settings["styles"] = {}
+default_settings["styles"]["routebuttons"] = {}
+default_settings["styles"]["routebuttons"]["backgroundcolour"] = "SeaGreen3"
+default_settings["styles"]["routebuttons"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["routebuttons"]["textfonttuple"] = ("Courier", 9, "")
+default_settings["styles"]["dccswitches"] = {}
+default_settings["styles"]["dccswitches"]["backgroundcolour"] = "SkyBlue2"
+default_settings["styles"]["dccswitches"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["dccswitches"]["textfonttuple"] = ("Courier", 9, "")
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
 #------------------------------------------------------------------------------------
 
-settings = copy.deepcopy (default_settings)
+settings = copy.deepcopy(default_settings)
 
 #------------------------------------------------------------------------------------
 # Function to restore the default settings
@@ -109,7 +119,7 @@ settings = copy.deepcopy (default_settings)
 
 def restore_defaults():
     global filename, settings
-    settings = copy.deepcopy (default_settings)
+    settings = copy.deepcopy(default_settings)
     return()
 
 #------------------------------------------------------------------------------------
@@ -154,7 +164,21 @@ def set_all(new_settings):
     # Maintain the logging level across re-loads (use case - set debugging to see load warnings)
     settings["logging"]["level"] = current_logging_level
     return()
-    
+
+#------------------------------------------------------------------------------------
+# Functions to set/get the default and current application styles
+#------------------------------------------------------------------------------------
+
+def get_default_style(object_type:str, parameter:str):
+    return(default_settings["styles"][object_type][parameter])
+
+def get_style(object_type:str, parameter:str):
+    return(settings["styles"][object_type][parameter])
+
+def set_style(object_type:str, parameter:str, value):
+    settings["styles"][object_type][parameter] = value
+    return()
+
 #------------------------------------------------------------------------------------
 # Functions to set/get the general settings
 #------------------------------------------------------------------------------------
