@@ -16,6 +16,9 @@
 #       editable:bool - If the section can be manually toggled and/or edited - default = True
 #       hidden:bool - Whether the Track section should be 'hidden' in Run Mode - default = False
 #       mirror_id:str - The ID of another local/remote Section to mirror - default = None
+#       button_colour:str - the colour to use for the button when 'normal' (default='Black')
+#       text_colour:str - the colour to use for the button text (default='White')
+#       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "")
 #
 #   section_exists(section_id:int/str) - returns true if the Track Section object 'exists' (either the
 #             Track Section exists on the local schematic or has been subscribed to via MQTT networking)
@@ -130,9 +133,15 @@ def close_entry_box(section_id:int):
 def update_identifier(section_id:int, new_label:str):
     global sections
     logging.info ("Section "+str(section_id)+": Label Updated to '"+new_label+"' ****************************")
-    update_label(section_id, new_label)
-    # Assume that by entering a value the user wants to set the section to OCCUPIED.
-    if not sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
+    if len(new_label) > 0:
+        # Assume that by entering a value the user wants to set the section to OCCUPIED.
+        update_label(section_id, new_label)
+        if not sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
+    else:
+        # Assume that by entering a null value the user wants to set the section to CLEAR.
+        # In which case we clear the section and reset it to the default label
+        update_label(section_id, sections[str(section_id)]["defaultlabel"])
+        if sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
     # Publish the label change to the MQTT broker (if the section has been configured to publish updates)
     send_mqtt_section_updated_event(section_id)
     # Update any Local mirrored sections (no callbacks will be raised for updating these)
@@ -162,7 +171,7 @@ def configure_edit_mode(edit_mode:bool):
                 # configuration (placeholder1 is the text object and placeholder2 is the rectangle object)
                 track_section["canvas"].itemconfig(track_section["buttonwindow"], state='hidden')
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='normal')
-                track_section["canvas"].itemconfig(track_section["placeholder2"], fill='black')
+                track_section["canvas"].itemconfig(track_section["placeholder2"], fill=track_section["selectedbgcolour"])
             else:
                 # In Run Mode - If the object is configured as 'hidden' then we hide the text object but set
                 # the rectangle object to transparent - effectively hiding it whilst maintaining its 'presence'
@@ -340,12 +349,16 @@ def toggle_section_button(section_id:int):
         logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label '"+section["labeltext"]+"'")
         section["occupied"] = False
         section["button"].config(background=section["deselectedbgcolour"], foreground=section["deselectedfgcolour"])
-        section["button"].config(activebackground=section["deselectedbgcolour"], activeforeground=section["deselectedfgcolour"])
+        section["button"].config(activebackground=section["deselectedbgcolour"])
+        section["button"].config(activeforeground=section["deselectedfgcolour"])
+        section["button"].config(disabledforeground=section["deselectedfgcolour"])
     else:
         logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label '"+section["labeltext"]+"'")
         section["occupied"] = True
         section["button"].config(background=section["selectedbgcolour"], foreground=section["selectedfgcolour"])
-        section["button"].config(activebackground=section["selectedbgcolour"], activeforeground=section["selectedfgcolour"])
+        section["button"].config(activebackground=section["selectedbgcolour"])
+        section["button"].config(activeforeground=section["selectedfgcolour"])
+        section["button"].config(disabledforeground=section["selectedfgcolour"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -393,7 +406,8 @@ def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
 #---------------------------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int, section_callback, default_label:str="XXXXX",
-                    section_width:int=5, editable:bool=True, hidden=False, mirror_id:str=""):
+                    section_width:int=5, editable:bool=True, hidden=False, mirror_id:str="",
+                    button_colour:str="Black", text_colour:str="White", font=("TkFixedFont",8,"")):
     global sections
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "section"+str(section_id)
@@ -412,17 +426,17 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         logging.error("Section "+str(section_id)+": create_section - (Remote) Mirrored Section ID is invalid format")        
     else:
         logging.debug("Section "+str(section_id)+": Creating Track Occupancy Section")
-        # Specify the font and colours locally (we might allow the user to change these in a future release)
-        font = ('Courier',9,"bold")
-        selected_fg_colour = "white"
-        deselected_fg_colour = "grey40"
-        selected_bg_colour = "black"
-        deselected_bg_colour = "grey"
+        # Specify the various parameters we need for the button/placeholder styles
+        selected_fg_colour = text_colour
+        deselected_fg_colour = button_colour
+        selected_bg_colour = button_colour
+        deselected_bg_colour = button_colour
         # Create the Track Section Button
         section_button = Tk.Button(canvas, text=default_label, width=section_width, highlightthickness=0,
-                            state="normal", relief="raised", padx=3, pady=2, font=font, borderwidth=0,
-                            background=deselected_bg_colour, activebackground=deselected_bg_colour,
-                            foreground=deselected_fg_colour, activeforeground=deselected_fg_colour)
+                        state="normal", relief="raised", padx=3, pady=1, font=font, borderwidth=0,
+                        activebackground=deselected_bg_colour, activeforeground=deselected_fg_colour,
+                        background=deselected_bg_colour, foreground=deselected_fg_colour,
+                        disabledforeground=deselected_fg_colour)
         # Bind the mouse button events to the Track Section Button- only if the Section is editable
         # If not editable we also make the button disabled to prevent responses to clicking
         if editable:
@@ -444,7 +458,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         placeholder1 = canvas.create_text(x, y, text="".zfill(section_width), font=font,
                                             fill=selected_fg_colour, tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
-        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-2, bbox[2]+4, bbox[3]+0,
+        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
                                             tags=canvas_tag, fill=selected_bg_colour, width=0)
         # Raise the text item to be in front of the rectangle item
         canvas.tag_raise(placeholder1, placeholder2)
@@ -480,6 +494,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         sections[str(section_id)]["selectedfgcolour"] = selected_fg_colour      # Section colour in its selected state
         sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour  # Section colour in its normal/unselected state
         sections[str(section_id)]["deselectedbgcolour"] = deselected_bg_colour  # Section colour in its normal/unselected state
+        sections[str(section_id)]["defaultlabel"] = default_label               # The default label for OCCUPIED
         sections[str(section_id)]["tags"] = canvas_tag                          # Canvas Tag for ALL drawing objects
         # Get the initial state for the section (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("sections",section_id)

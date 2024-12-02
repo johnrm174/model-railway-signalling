@@ -317,7 +317,7 @@ class edit_section():
             self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
             self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
-            self.config.sectionwidth.set_value(objects.schematic_objects[self.object_id]["sectionwidth"])
+            self.config.sectionwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.automation.ahead.set_values(signals_ahead(self.object_id))
             signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
@@ -349,7 +349,7 @@ class edit_section():
             new_object_configuration["hidden"] = self.config.hidden.get_value()
             new_object_configuration["mirror"] = self.config.mirror.get_value()
             new_object_configuration["defaultlabel"] = self.config.label.get_value()
-            new_object_configuration["sectionwidth"] = self.config.sectionwidth.get_value()
+            new_object_configuration["buttonwidth"] = self.config.sectionwidth.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"
