@@ -216,7 +216,7 @@ class edit_switch():
             self.offcommands.set_values(objects.schematic_objects[self.object_id]["dccoffcommands"], item_id=item_id)
             # Set the button appearance elements
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
-            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["backgroundcolour"])
+            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.textcolourtype.set_value(objects.schematic_objects[self.object_id]["textcolourtype"])
             self.font.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][0])
             self.fontsize.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][1])
@@ -249,7 +249,7 @@ class edit_switch():
             # Get the button appearance elements
             text_font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
-            new_object_configuration["backgroundcolour"] = self.buttoncolour.get_value()
+            new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
             new_object_configuration["textcolourtype"] = self.textcolourtype.get_value()
             new_object_configuration["textfonttuple"] = text_font_tuple
             # Save the updated configuration (and re-draw the object)
