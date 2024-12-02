@@ -58,9 +58,9 @@ default_switch_object["item"] = objects_common.object_type.switch
 default_switch_object["itemtype"] = buttons.button_type.switched.value
 default_switch_object["switchname"] = "Switch"
 default_switch_object["switchdescription"] = "Switch description (Run Mode tooltip)"
-default_switch_object["buttonwidth"] = 12
 # Styles are initially set to the default application styles (defensive programming)
-default_switch_object["backgroundcolour"] = settings.get_style("dccswitches", "backgroundcolour")
+default_switch_object["buttonwidth"] = settings.get_style("dccswitches", "buttonwidth")
+default_switch_object["buttoncolour"] = settings.get_style("dccswitches", "buttoncolour")
 default_switch_object["textcolourtype"] = settings.get_style("dccswitches", "textcolourtype")
 default_switch_object["textfonttuple"] = settings.get_style("dccswitches", "textfonttuple")
 # Each DCC command sequence comprises a variable list of DCC commands
@@ -105,7 +105,7 @@ def redraw_switch_object(object_id):
     button_type = buttons.button_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Create the Tkinter Font tuple
     # Work out what the active and selected colours for the button should be
-    button_colour = objects_common.schematic_objects[object_id]["backgroundcolour"]
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
     # Work out what the text colour should be (auto uses the lightest of the three for max contrast)
@@ -152,7 +152,8 @@ def create_switch(xpos:int, ypos:int):
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
-    objects_common.schematic_objects[object_id]["backgroundcolour"] = settings.get_style("dccswitches", "backgroundcolour")
+    objects_common.schematic_objects[object_id]["buttonwidth"] = settings.get_style("dccswitches", "buttonwidth")
+    objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("dccswitches", "buttoncolour")
     objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("dccswitches", "textcolourtype")
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("dccswitches", "textfonttuple")
     # Add the new object to the type-specific index

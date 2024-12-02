@@ -99,13 +99,21 @@ default_settings["gpio"]["portmappings"] = []
 # The following settings define the default application styles (object appearance)
 default_settings["styles"] = {}
 default_settings["styles"]["routebuttons"] = {}
-default_settings["styles"]["routebuttons"]["backgroundcolour"] = "SeaGreen3"
+default_settings["styles"]["routebuttons"]["buttonwidth"] = 15
+default_settings["styles"]["routebuttons"]["buttoncolour"] = "SeaGreen3"
 default_settings["styles"]["routebuttons"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["routebuttons"]["textfonttuple"] = ("Courier", 9, "")
 default_settings["styles"]["dccswitches"] = {}
-default_settings["styles"]["dccswitches"]["backgroundcolour"] = "SkyBlue2"
+default_settings["styles"]["dccswitches"]["buttonwidth"] = 12
+default_settings["styles"]["dccswitches"]["buttoncolour"] = "SkyBlue2"
 default_settings["styles"]["dccswitches"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["dccswitches"]["textfonttuple"] = ("Courier", 9, "")
+default_settings["styles"]["tracksections"] = {}
+default_settings["styles"]["tracksections"]["buttonwidth"] = 5
+default_settings["styles"]["tracksections"]["buttoncolour"] = "Black"
+default_settings["styles"]["tracksections"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["tracksections"]["textfonttuple"] = ("Courier", 9, "bold")
+default_settings["styles"]["tracksections"]["defaultlabel"] = "XXXXX"
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required

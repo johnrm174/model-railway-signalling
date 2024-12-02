@@ -65,9 +65,9 @@ default_route_object = copy.deepcopy(objects_common.default_object)
 default_route_object["item"] = objects_common.object_type.route
 default_route_object["routename"] = "Route"
 default_route_object["routedescription"] = "Route description (Run Mode tooltip)"
-default_route_object["buttonwidth"] = 15
 # Styles are initially set to the default styles (defensive programming)
-default_route_object["backgroundcolour"] = settings.get_style("routebuttons", "backgroundcolour")
+default_route_object["buttonwidth"] = settings.get_style("routebuttons", "buttonwidth")
+default_route_object["buttoncolour"] = settings.get_style("routebuttons", "buttoncolour")
 default_route_object["textcolourtype"] = settings.get_style("routebuttons", "textcolourtype")
 default_route_object["textfonttuple"] = settings.get_style("routebuttons", "textfonttuple")
 # Signals and subsidaries on route comprise variable length lists of Item IDs
@@ -279,7 +279,7 @@ def update_route(object_id, new_object_configuration):
         
 def redraw_route_object(object_id):
     # Work out what the active and selected colours for the button should be
-    button_colour = objects_common.schematic_objects[object_id]["backgroundcolour"]
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
     # Work out what the text colour should be (auto uses lightest of the three for max contrast)
@@ -325,7 +325,8 @@ def create_route(xpos:int, ypos:int):
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
-    objects_common.schematic_objects[object_id]["backgroundcolour"] = settings.get_style("routebuttons", "backgroundcolour")
+    objects_common.schematic_objects[object_id]["buttonwidth"] = settings.get_style("routebuttons", "buttonwidth")
+    objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("routebuttons", "buttoncolour")
     objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("routebuttons", "textcolourtype")
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("routebuttons", "textfonttuple")
     # Add the new object to the type-specific index

@@ -673,12 +673,30 @@ def set_all(new_objects):
             ## Handle non-breaking change of Track Section width being a parameter in its own right #########
             # (rather than determined by the default section label) from Release 4.9.0 onwards ##############
             #################################################################################################
-            if ( new_object_type == objects_common.object_type.section and
-                 "sectionwidth" not in new_objects[object_id].keys() ):
+            if ( new_object_type == objects_common.object_type.section and "buttonwidth" not in new_objects[object_id].keys() ):
+                # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
                 section_width = len(objects_common.schematic_objects[object_id]["defaultlabel"])
-                objects_common.schematic_objects[object_id]["sectionwidth"] = section_width
+                objects_common.schematic_objects[object_id]["buttonwidth"] = section_width
+                new_objects[object_id]["buttonwidth"] = section_width
+                logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: "
+                        +"'buttonwidth' - Asigning value to match the default label : "+str(section_width))
             #################################################################################################
             ## End of Handle non-breaking change for Track Sections #########################################
+            #################################################################################################
+
+            #################################################################################################
+            ## Handle breaking changes related to how fonts are stored from Release 4.9.0 onwards ###########
+            #################################################################################################
+            if new_object_type == objects_common.object_type.route or new_object_type == objects_common.object_type.switch:
+                if "textfonttuple" not in new_objects[object_id].keys() and "font" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    fonttuple = (new_objects[object_id]["font"], new_objects[object_id]["fontsize"] ,new_objects[object_id]["fontstyle"])
+                    objects_common.schematic_objects[object_id]["textfonttuple"] = fonttuple
+                    new_objects[object_id]["textfonttuple"] = fonttuple
+                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: "
+                            +"'textfonttuple' - Asigning value from legacy parameters' : "+str(fonttuple))
+            #################################################################################################
+            ## End of Handle breaking changes related to how fonts are stored ###############################
             #################################################################################################
 
             # Now report any elements missing from the new object - intended to provide a
