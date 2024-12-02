@@ -33,16 +33,16 @@
 #    settings.get_sprog() - to get the current SPROG settings
 #    settings.get_gpio() - to get the current track sensor GPIO mappings
 #    settings.restore_defaults() - Following user selection of "new"
-#    menubar_windows.edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
-#    menubar_windows.edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
-#    menubar_windows.edit_logging_settings(root, logging_update_callback)
-#    menubar_windows.edit_canvas_settings(root, canvas_update_callback)
-#    menubar_windows.edit_gpio_settings(root, gpio_update_callback)
-#    menubar_windows.display_help(parent_window) - opens the config window
-#    menubar_windows.display_about(parent_window) - opens the config window
-#    menubar_windows.edit_layout_info(parent_window) - opens the config window
-#    utilities.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
-#    utilities.dcc_mappings(root)
+#    menubar_settings.edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
+#    menubar_settings.edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
+#    menubar_settings.edit_logging_settings(root, logging_update_callback)
+#    menubar_settings.edit_canvas_settings(root, canvas_update_callback)
+#    menubar_settings.edit_gpio_settings(root, gpio_update_callback)
+#    menubar_help.display_help(parent_window) - opens the config window
+#    menubar_help.display_about(parent_window) - opens the config window
+#    menubar_help.edit_layout_info(parent_window) - opens the config window
+#    menubar_utilities.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
+#    menubar_utilities.dcc_mappings(root)
 #
 # Makes the following external API calls to library modules:
 #    library_common.set_root_window(widget) - To set the root window
@@ -96,8 +96,9 @@ from . import settings
 from . import schematic
 from . import run_layout
 from . import run_routes
-from . import menubar_windows
-from . import utilities
+from . import menubar_help
+from . import menubar_settings
+from . import menubar_utilities
 from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
@@ -180,31 +181,31 @@ class main_menubar:
         # Create the various menubar items for the Utilities Dropdown
         self.utilities_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.utilities_menu.add_command(label =" DCC Programming...",
-                command=lambda:utilities.dcc_programming(self.root, self.dcc_programming_enabled,
+                command=lambda:menubar_utilities.dcc_programming(self.root, self.dcc_programming_enabled,
                                                          self.dcc_power_off, self.dcc_power_on))
         self.utilities_menu.add_command(label =" DCC Mappings...",
-                command=lambda:utilities.dcc_mappings(self.root))
+                command=lambda:menubar_utilities.dcc_mappings(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.settings_menu.add_command(label =" Canvas...",
-                command=lambda:menubar_windows.edit_canvas_settings(self.root, self.canvas_update))
+                command=lambda:menubar_settings.edit_canvas_settings(self.root, self.canvas_update))
         self.settings_menu.add_command(label =" General...",
-                command=lambda:menubar_windows.edit_general_settings(self.root, self.general_settings_update))
+                command=lambda:menubar_settings.edit_general_settings(self.root, self.general_settings_update))
         self.settings_menu.add_command(label =" GPIO...",
-                command=lambda:menubar_windows.edit_gpio_settings(self.root, self.gpio_update))
+                command=lambda:menubar_settings.edit_gpio_settings(self.root, self.gpio_update))
         self.settings_menu.add_command(label =" Logging...",
-                command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
+                command=lambda:menubar_settings.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
-                command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
+                command=lambda:menubar_settings.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
         self.settings_menu.add_command(label =" SPROG...",
-                command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
+                command=lambda:menubar_settings.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.help_menu.add_command(label =" Help...", command=lambda:menubar_windows.display_help(self.root))
-        self.help_menu.add_command(label =" About...", command=lambda:menubar_windows.display_about(self.root))
-        self.help_menu.add_command(label =" Info...", command=lambda:menubar_windows.edit_layout_info(self.root))
+        self.help_menu.add_command(label =" Help...", command=lambda:menubar_help.display_help(self.root))
+        self.help_menu.add_command(label =" About...", command=lambda:menubar_help.display_about(self.root))
+        self.help_menu.add_command(label =" Info...", command=lambda:menubar_help.edit_layout_info(self.root))
         self.mainmenubar.add_cascade(label = "Help", menu=self.help_menu)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
