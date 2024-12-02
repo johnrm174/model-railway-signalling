@@ -43,6 +43,10 @@
 #    menubar_help.edit_layout_info(parent_window) - opens the config window
 #    menubar_utilities.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
 #    menubar_utilities.dcc_mappings(root)
+#    menubar_styles.edit_switch_styles(root)
+#    menubar_styles.edit_route_styles(root)
+#    menubar_styles.edit_section_styles(root)
+#    ###################### MORE TO COME ########################################
 #
 # Makes the following external API calls to library modules:
 #    library_common.set_root_window(widget) - To set the root window
@@ -99,6 +103,7 @@ from . import run_routes
 from . import menubar_help
 from . import menubar_settings
 from . import menubar_utilities
+from . import menubar_styles
 from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
@@ -201,6 +206,16 @@ class main_menubar:
         self.settings_menu.add_command(label =" SPROG...",
                 command=lambda:menubar_settings.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
+        # Create the various menubar items for the Styles Dropdown
+        self.styles_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.styles_menu.add_command(label =" Route buttons...",
+                command=lambda:menubar_styles.edit_route_styles(self.root))
+        self.styles_menu.add_command(label =" DCC switches...",
+                command=lambda:menubar_styles.edit_switch_styles(self.root))
+        self.styles_menu.add_command(label =" Track sections...",
+                command=lambda:menubar_styles.edit_section_styles(self.root))
+        self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)
+        ############################# MORE TO COME ###################################
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:menubar_help.display_help(self.root))
