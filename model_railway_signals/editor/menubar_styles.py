@@ -15,6 +15,8 @@
 import tkinter as Tk
 
 from . import common
+from . import objects
+from . import schematic
 from . import settings
 
 #------------------------------------------------------------------------------------
@@ -22,7 +24,8 @@ from . import settings
 #------------------------------------------------------------------------------------
 
 class common_style_settings(Tk.Frame):
-    def __init__(self, parent_frame, object_type:str, max_font_size:int):
+    def __init__(self, parent_frame, object_type:str, max_font_size:int,
+                         apply_all_callback=None, apply_selected_callback=None):
         self.object_type = object_type
         # Create the frame
         super().__init__(parent_frame)
@@ -68,30 +71,20 @@ class common_style_settings(Tk.Frame):
         # Create a Frame for the apply Buttons
         self.frame4 = Tk.Frame(self)
         self.frame4.pack(fill="x")
-        self.button3 = Tk.Button(self.frame4, text="Apply to all", command=self.apply_all)
-        self.button3.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
-        self.button3TT = common.CreateToolTip(self.button3, "Select to apply the above settings to ALL schematic objects "+
-                                    "(note that changes will only take effect on the next layout save/load or layout reset)")
-        self.button4 = Tk.Button(self.frame4, text="Apply to selected", command=self.apply_selected)
-        self.button4.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
-        self.button4TT = common.CreateToolTip(self.button4, "Select to apply the above settings to SELECTED schematic objects "+
-                                    "(note that changes will only take effect on the next layout save/load or layout reset)")
+        if apply_all_callback is not None:
+            self.button3 = Tk.Button(self.frame4, text="Apply to all", command=apply_all_callback)
+            self.button3.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
+            self.button3TT = common.CreateToolTip(self.button3, "Select to apply the above settings to ALL objects")
+        if apply_selected_callback is not None:
+            self.button4 = Tk.Button(self.frame4, text="Apply to selected", command=apply_selected_callback)
+            self.button4.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
+            self.button4TT = common.CreateToolTip(self.button4, "Select to apply the above settings to SELECTED objects")
         # Add the button to set new layout defaults
         self.button5 = Tk.Button(self.frame4, text="Set as defaults", command=self.set_defaults)
         self.button5.pack(padx=5, pady=2, fill="x", expand=True)
         self.button5TT = common.CreateToolTip(self.button5, "Select to save the above settings as the new layout defaults "+
                                                         "(which will be applied to new objects as they are created)")
 
-    def apply_selected(self):
-        if self.validate():
-            ############################# TODO ################################
-            pass
-    
-    def apply_all(self):
-        if self.validate():
-            ############################# TODO ################################
-            pass
-        
     def set_defaults(self):
         if self.validate():
             font_tuple = (self.textfont.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
@@ -113,6 +106,14 @@ class common_style_settings(Tk.Frame):
         self.textcolourtype.set_value(settings.get_style(self.object_type,"textcolourtype"))
         self.widgetcolour.set_value(settings.get_style(self.object_type,"buttoncolour"))
 
+    def get_values(self):
+        styles_to_return = {}
+        font_tuple = (self.textfont.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+        styles_to_return["textfonttuple"] = font_tuple
+        styles_to_return["textcolourtype"] = self.textcolourtype.get_value()
+        styles_to_return["buttoncolour"] = self.widgetcolour.get_value()
+        return(styles_to_return)
+        
     def validate(self):
         return(self.fontsize.validate())
     
@@ -123,10 +124,11 @@ class common_style_settings(Tk.Frame):
 #------------------------------------------------------------------------------------
 
 class button_style_selections(common_style_settings):
-    def __init__(self, parent_frame, object_type:str):
+    def __init__(self, parent_frame, object_type:str, max_font_size=20,
+                 apply_all_callback=None, apply_selected_callback=None):
         # Create the basic style settings elements
-        super().__init__(parent_frame, object_type, max_font_size=20)
-        # Create a Frame for the Button Width & default label Entry components
+        super().__init__(parent_frame, object_type, max_font_size, apply_all_callback, apply_selected_callback)
+        # Create a Frame for the Button Width components
         self.frame2a = Tk.Frame(self)
         self.frame2a.pack(after=self.frame2, fill="x", expand=True)
         # Create The Label frame for the button width
@@ -140,45 +142,115 @@ class button_style_selections(common_style_settings):
         self.buttonwidth = common.integer_entry_box(self.frame2asubframe2, width=3, min_value=5, max_value=25,
                tool_tip="Select the button width (between 5 and 25 characters)", allow_empty=False)
         self.buttonwidth.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
-        self.frame2asubframe2 = Tk.LabelFrame(self.frame2a, text="Default section label")
-        self.defaultlabel = common.entry_box(self.frame2asubframe2, width=30, tool_tip = "Enter the default "+
-                                         "label to display when the Track Section is occupied")
-        self.defaultlabel.pack(padx=2, pady=2)
-        if self.object_type == "tracksections":
-            self.frame2asubframe2.pack(padx=2, pady=2, fill='x')
-
-    def apply_selected(self):
-        if self.validate():
-            ############################# TODO ################################
-            pass
-    
-    def apply_all(self):
-        if self.validate():
-            ############################# TODO ################################
-            pass
 
     def set_defaults(self):
         if self.validate():
             super().set_defaults()
             settings.set_style(self.object_type,"buttonwidth", self.buttonwidth.get_value())
-            if self.object_type == "tracksections":
-                settings.set_style(self.object_type,"defaultlabel", self.defaultlabel.get_value())
                 
     def load_app_defaults(self):
         super().load_app_defaults()
         self.buttonwidth.set_value(settings.get_default_style(self.object_type,"buttonwidth"))
-        if self.object_type == "tracksections":
-            self.defaultlabel.set_value(settings.get_default_style(self.object_type,"defaultlabel"))
         
     def load_layout_defaults(self):
         super().load_layout_defaults()
         self.buttonwidth.set_value(settings.get_style(self.object_type,"buttonwidth"))
-        if self.object_type == "tracksections":
-            self.defaultlabel.set_value(settings.get_style(self.object_type,"defaultlabel"))
+
+    def get_values(self):
+        styles_to_return = super().get_values()
+        styles_to_return["buttonwidth"] = self.buttonwidth.get_value()
+        return(styles_to_return)
 
     def validate(self):
-        return(super().validate() and self.buttonwidth.validate() and self.defaultlabel.validate())
+        return(super().validate() and self.buttonwidth.validate())
 
+#------------------------------------------------------------------------------------
+# Class for the track_section_style_selections UI Element. Builds on the
+# button_style_selections class with the addition of a default label entry
+#------------------------------------------------------------------------------------
+
+class track_section_style_selections(button_style_selections):
+    def __init__(self, parent_frame, object_type:str, apply_all_callback=None, apply_selected_callback=None):
+        # Create the parent style settings elements
+        super().__init__(parent_frame, object_type, 14, apply_all_callback, apply_selected_callback)
+        # Create the default label elements
+        self.frame2asubframe2 = Tk.LabelFrame(self.frame2a, text="Default section label")
+        self.defaultlabel = common.entry_box(self.frame2asubframe2, width=30, tool_tip = "Enter the default "+
+                                         "label to display when the Track Section is occupied")
+        self.defaultlabel.pack(padx=2, pady=2)
+        self.frame2asubframe2.pack(padx=2, pady=2, fill='x')
+
+    def set_defaults(self):
+        if self.validate():
+            super().set_defaults()
+            settings.set_style(self.object_type,"defaultlabel", self.defaultlabel.get_value())
+                
+    def load_app_defaults(self):
+        super().load_app_defaults()
+        self.defaultlabel.set_value(settings.get_default_style(self.object_type,"defaultlabel"))
+        
+    def load_layout_defaults(self):
+        super().load_layout_defaults()
+        self.defaultlabel.set_value(settings.get_style(self.object_type,"defaultlabel"))
+
+    def get_values(self):
+        styles_to_return = super().get_values()
+        styles_to_return["defaultlabel"] = self.defaultlabel.get_value()
+        return(styles_to_return)
+
+    def validate(self):
+        return(super().validate() and self.defaultlabel.validate())
+
+#####################################################################################
+    
+#------------------------------------------------------------------------------------
+# Class for the Track Section Style Settings toolbar window.
+#------------------------------------------------------------------------------------
+
+edit_section_styles_window = None
+            
+class edit_section_styles():
+    def __init__(self, root_window):
+        global edit_section_styles_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_section_styles_window is not None:
+            edit_section_styles_window.lift()
+            edit_section_styles_window.state('normal')
+            edit_section_styles_window.focus_force()
+        else:
+            # Create the (non resizable) top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Track Section Styles")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_section_styles_window = self.window
+            # Create the UI Elements
+            self.styles = track_section_style_selections(self.window, object_type="tracksections",
+                        apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected)
+            self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
+            # Create the close window button and tooltip
+            self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
+            self.B1.pack(padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            # Load the initial UI state
+            self.styles.load_layout_defaults()
+
+    def apply_all(self):
+        if self.styles.validate():
+            objects_to_update = list(objects.section_index.values())
+            objects.update_styles(objects_to_update, self.styles.get_values())
+
+    def apply_selected(self):
+        if self.styles.validate():
+            objects_to_update = schematic.get_selected_objects(object_type=objects.object_type.section)
+            objects.update_styles(objects_to_update, self.styles.get_values())
+
+    def close_window(self):
+        global edit_section_styles_window
+        if not self.styles.widgetcolour.is_open():
+            edit_section_styles_window = None
+            self.window.destroy()
+        
 #------------------------------------------------------------------------------------
 # Class for the Route Button Style Settings toolbar window.
 #------------------------------------------------------------------------------------
@@ -201,7 +273,8 @@ class edit_route_styles():
             self.window.resizable(False, False)
             edit_route_styles_window = self.window
             # Create the UI Elements
-            self.styles = button_style_selections(self.window, object_type="routebuttons")
+            self.styles = button_style_selections(self.window, object_type="routebuttons",
+                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected)
             self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
             # Create the close window button and tooltip
             self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
@@ -209,6 +282,16 @@ class edit_route_styles():
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
             # Load the initial UI state
             self.styles.load_layout_defaults()
+
+    def apply_all(self):
+        if self.styles.validate():
+            objects_to_update = list(objects.route_index.values())
+            objects.update_styles(objects_to_update, self.styles.get_values())
+
+    def apply_selected(self):
+        if self.styles.validate():
+            objects_to_update = schematic.get_selected_objects(object_type=objects.object_type.route)
+            objects.update_styles(objects_to_update, self.styles.get_values())
 
     def close_window(self):
         global edit_route_styles_window
@@ -238,7 +321,8 @@ class edit_switch_styles():
             self.window.resizable(False, False)
             edit_switch_styles_window = self.window
             # Create the UI Elements
-            self.styles = button_style_selections(self.window, object_type="dccswitches")
+            self.styles = button_style_selections(self.window, object_type="dccswitches",
+                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected)
             self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
             # Create the close window button and tooltip
             self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
@@ -246,51 +330,23 @@ class edit_switch_styles():
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
             # Load the initial UI state
             self.styles.load_layout_defaults()
+
+    def apply_all(self):
+        if self.styles.validate():
+            objects_to_update = list(objects.switch_index.values())
+            objects.update_styles(objects_to_update, self.styles.get_values())
+
+    def apply_selected(self):
+        if self.styles.validate():
+            objects_to_update = schematic.get_selected_objects(object_type=objects.object_type.switch)
+            objects.update_styles(objects_to_update, self.styles.get_values())
 
     def close_window(self):
         global edit_switch_styles_window
         if not self.styles.widgetcolour.is_open():
             edit_switch_styles_window = None
             self.window.destroy()
-
-#------------------------------------------------------------------------------------
-# Class for the Track Section Style Settings toolbar window.
-#------------------------------------------------------------------------------------
-
-edit_section_styles_window = None
             
-class edit_section_styles():
-    def __init__(self, root_window):
-        global edit_section_styles_window
-        # If there is already a  window open then we just make it jump to the top and exit
-        if edit_section_styles_window is not None:
-            edit_section_styles_window.lift()
-            edit_section_styles_window.state('normal')
-            edit_section_styles_window.focus_force()
-        else:
-            # Create the (non resizable) top level window
-            self.window = Tk.Toplevel(root_window)
-            self.window.title("Track Section Styles")
-            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
-            self.window.resizable(False, False)
-            edit_section_styles_window = self.window
-            # Create the UI Elements
-            self.styles = button_style_selections(self.window, object_type="tracksections")
-            self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
-            # Create the close window button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
-            self.B1.pack(padx=2, pady=2)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
-            # Load the initial UI state
-            self.styles.load_layout_defaults()
-
-    def close_window(self):
-        global edit_section_styles_window
-        if not self.styles.widgetcolour.is_open():
-            edit_section_styles_window = None
-            self.window.destroy()
-        
-
             ## TODO - Line and Point Button Styles
             ## TODO - Line and point colour styles
             ## TODO - Text Box Styles ???
