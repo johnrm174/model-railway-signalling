@@ -178,29 +178,18 @@ class section_configuration_tab():
         self.sectionid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the General settings in a second label frame
         self.frame1subframe2 = Tk.LabelFrame(self.frame1, text="General Settings")
-        self.frame1subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-        self.readonly = common.check_box(self.frame1subframe2, width=10, label="Read only",
+        self.frame1subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+        self.readonly = common.check_box(self.frame1subframe2, label="Read only",
                      tool_tip= "Select to make the Track Section non-editable")
-        self.readonly.pack(padx=2)
-        self.hidden = common.check_box(self.frame1subframe2, width=10, label="Hidden",
+        self.readonly.pack(padx=2, side=Tk.LEFT, fill="y")
+        self.hidden = common.check_box(self.frame1subframe2, label="Hidden",
                      tool_tip= "Select to hide the Track Section in Run Mode")
-        self.hidden.pack(padx=2)
-        # Create the section width entry in the third label frame
-        self.frame1subframe3 = Tk.LabelFrame(self.frame1, text="Section width")
-        self.frame1subframe3.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
-        # Create another frame to centre all the button width UI elements
-        self.frame1subframe4 = Tk.Frame(self.frame1subframe3)
-        self.frame1subframe4.pack(fill="y", expand=True)
-        self.frame1subframe4label1 = Tk.Label(self.frame1subframe4, text="Chars:")
-        self.frame1subframe4label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.sectionwidth = common.integer_entry_box(self.frame1subframe4, width=3, min_value=4,
-                    max_value= 30, tool_tip="Specify the width of the Track Section (4 to 30 characters)")
-        self.sectionwidth.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.hidden.pack(padx=2, side=Tk.LEFT, fill="y")
         #----------------------------------------------------------------------------------
         # Create a Label Frame to hold the Link to aother track section elements (Frame2)
         #----------------------------------------------------------------------------------
         self.frame2 = Tk.LabelFrame(parent_tab, text="Link to other track section")
-        self.frame2.pack(fill='x')
+        self.frame2.pack(fill='x', padx=2, pady=2)
         # Create a subframe to center all UI elements in
         self.frame2subframe1 = Tk.Frame(self.frame2)
         self.frame2subframe1.pack()
@@ -212,14 +201,6 @@ class section_configuration_tab():
                     "(in the form 'Node-ID') which has been subscribed to via MQTT networking",
                     exists_function = track_sections.section_exists)
         self.mirror.pack(side=Tk.LEFT, padx=2, pady=2)
-        #----------------------------------------------------------------------------------
-        # Create a Label Frame to hold the Default Section Label (Frame3)
-        #----------------------------------------------------------------------------------
-        self.frame3 = Tk.LabelFrame(parent_tab, text="Default section label")
-        self.frame3.pack(fill='x')
-        self.label = common.entry_box(self.frame3, width=30, tool_tip = "Enter the default "+
-                             "label to display when the Track Section is occupied")
-        self.label.pack(padx=2, pady=2)
 
 #####################################################################################
 # Class for the Track Section Interlocking Tab
@@ -316,8 +297,6 @@ class edit_section():
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
             self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
-            self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
-            self.config.sectionwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.automation.ahead.set_values(signals_ahead(self.object_id))
             signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
@@ -337,10 +316,7 @@ class edit_section():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then.
-        # There is no validation of the 'label' as such, but we do it to 'accept' the entry
-        # just in case it has not already been accepted by a 'focus out' event
-        elif ( self.config.sectionid.validate() and self.config.mirror.validate() and
-               self.config.label.validate() and self.config.sectionwidth.validate() ):
+        elif self.config.sectionid.validate() and self.config.mirror.validate() :
             # Copy the original section Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the section coniguration elements from the current user selections
@@ -348,8 +324,6 @@ class edit_section():
             new_object_configuration["editable"] = not self.config.readonly.get_value()
             new_object_configuration["hidden"] = self.config.hidden.get_value()
             new_object_configuration["mirror"] = self.config.mirror.get_value()
-            new_object_configuration["defaultlabel"] = self.config.label.get_value()
-            new_object_configuration["buttonwidth"] = self.config.sectionwidth.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"
