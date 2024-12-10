@@ -285,9 +285,7 @@ def redraw_route_object(object_id):
     # Work out what the text colour should be (auto uses lightest of the three for max contrast)
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-    if  text_colour_type == 2 : text_colour = "Black"
-    elif text_colour_type == 3 : text_colour = "White"
-    else: text_colour = objects_common.get_text_colour(selected_colour)
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
