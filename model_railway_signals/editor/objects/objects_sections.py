@@ -218,7 +218,6 @@ def update_section_styles(object_id, dict_of_new_styles:dict):
     # The text_colour is set according to the text colour type and background colour
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-    print(objects_common.get_text_colour(text_colour_type, button_colour))
     # Update the styles of the library object
     track_sections.update_section_styles(
             section_id = objects_common.schematic_objects[object_id]["itemid"],
