@@ -109,8 +109,9 @@ def open_entry_box(section_id):
         canvas.delete(entry_box_window)
     # Set the length for the text entry box
     label_length = sections[str(section_id)]["sectionwidth"]
+    text_font = sections[str(section_id)]["textfont"]
     # Create the entry box and bind the RETURN, ESCAPE and FOCUSOUT events to it
-    text_entry_box = Tk.Entry(canvas,width=label_length,font=('Courier',9,"bold"))
+    text_entry_box = Tk.Entry(canvas,width=label_length,font=text_font)
     text_entry_box.bind('<Return>', lambda event:accept_entered_value(section_id))
     text_entry_box.bind('<Escape>', lambda event:close_entry_box(section_id))
     text_entry_box.bind('<FocusOut>', lambda event:accept_entered_value(section_id))
@@ -507,6 +508,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour  # Section colour in its normal/unselected state
         sections[str(section_id)]["deselectedbgcolour"] = deselected_bg_colour  # Section colour in its normal/unselected state
         sections[str(section_id)]["defaultlabel"] = default_label               # The default label for OCCUPIED
+        sections[str(section_id)]["textfont"] = font                            # The font to use (for the edit window)
         sections[str(section_id)]["tags"] = canvas_tag                          # Canvas Tag for ALL drawing objects
         # Get the initial state for the section (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("sections",section_id)
@@ -585,12 +587,13 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
         # Update the label text if it is still set to the original default label text
         if section["labeltext"] == section["defaultlabel"]: update_label(section_id, default_label)
         # Store the parameters we need to track
-        section["defaultlabel"] = default_label
-        section["sectionwidth"] = section_width
-        section["selectedbgcolour"] = selected_bg_colour
-        section["selectedfgcolour"] = selected_fg_colour
-        section["deselectedfgcolour"] = deselected_fg_colour
-        section["deselectedbgcolour"] = deselected_bg_colour
+        sections[str(section_id)]["textfont"] = font
+        sections[str(section_id)]["defaultlabel"] = default_label
+        sections[str(section_id)]["sectionwidth"] = section_width
+        sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour
+        sections[str(section_id)]["selectedfgcolour"] = selected_fg_colour
+        sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour
+        sections[str(section_id)]["deselectedbgcolour"] = deselected_bg_colour
     return()
 
 #---------------------------------------------------------------------------------------------
