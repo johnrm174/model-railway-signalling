@@ -6,6 +6,7 @@
 #    create_section(type) - Create a default track section object on the schematic
 #    delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    update_section(obj_id,new_obj) - Update the configuration of an existing section object
+#    update_section_style(obj_id, params) - Update the styles of an existing section object
 #    paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
@@ -132,9 +133,7 @@ def redraw_section_object(object_id):
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-    if  text_colour_type == 2 : text_colour = "Black"
-    elif text_colour_type == 3 : text_colour = "White"
-    else: text_colour = objects_common.get_text_colour(button_colour)
+    text_colour = objects_common.get_text_colour(text_colour_type, button_colour)
     # Create the Track Section library object
     canvas_tags = track_sections.create_section(
                 canvas = objects_common.canvas,
@@ -206,6 +205,31 @@ def paste_section(object_to_paste, deltax:int, deltay:int):
     # Draw the new object
     redraw_section_object(new_object_id)
     return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of a Track section library object - called after
+# the style elements in the object dictionary have been set to the required values
+#------------------------------------------------------------------------------------
+
+def update_section_styles(object_id, dict_of_new_styles:dict):
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # The text_colour is set according to the text colour type and background colour
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    print(objects_common.get_text_colour(text_colour_type, button_colour))
+    # Update the styles of the library object
+    track_sections.update_section_styles(
+            section_id = objects_common.schematic_objects[object_id]["itemid"],
+            default_label = objects_common.schematic_objects[object_id]["defaultlabel"],
+            section_width = objects_common.schematic_objects[object_id]["buttonwidth"],
+            button_colour = objects_common.schematic_objects[object_id]["buttoncolour"],
+            text_colour = objects_common.get_text_colour(text_colour_type, button_colour),
+            font = objects_common.schematic_objects[object_id]["textfonttuple"] )
+    # Create/update the selection rectangle for the Track Section
+    objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to "soft delete" the section object from the canvas - Primarily used to

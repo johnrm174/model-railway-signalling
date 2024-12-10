@@ -33,6 +33,7 @@
 #    move_objects([object_IDs]) - Finalises the move of selected objects
 #    copy_objects([object_IDs]) - Copy the selected objects (returns list of new IDs)
 #    update_object(object_ID, new_object) - update the config of an existing object
+#    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
 #    undo() / redo() - Undo and re-do functions as you would expect
 #
 # Objects intended to be accessed directly by other editor modules:
@@ -62,6 +63,7 @@ from .objects import rotate_objects
 from .objects import move_objects
 from .objects import copy_objects
 from .objects import update_object
+from .objects import update_styles
 from .objects import save_schematic_state
 from .objects import reset_objects
 
@@ -111,6 +113,7 @@ __all__ = [
     'move_objects',
     'copy_objects',
     'update_object',
+    'update_styles',
     'reset_objects',
     # Helper functions to get the obj ID of an item ID
     'signal',

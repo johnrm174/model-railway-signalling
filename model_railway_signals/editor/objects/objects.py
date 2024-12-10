@@ -20,6 +20,7 @@
 #    move_objects(list of obj IDs) - Finalises the move of selected objects
 #    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
+#    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
 #    reset_objects() - resets all points, signals, instruments and sections to default state
 #
 # Makes the following external API calls to other editor modules:
@@ -376,7 +377,7 @@ def delete_object(object_id):
 # Called from the Schematic Module when selected objects are deleted
 #------------------------------------------------------------------------------------
 
-def delete_objects(list_of_object_ids, initialise_layout_after_delete:bool=True):
+def delete_objects(list_of_object_ids:list, initialise_layout_after_delete:bool=True):
     for object_id in list_of_object_ids:
         delete_object(object_id)
     # save the current state (for undo/redo)
@@ -392,7 +393,7 @@ def delete_objects(list_of_object_ids, initialise_layout_after_delete:bool=True)
 # Only Points and Signals can be rotated - all other objects are unchanged
 #------------------------------------------------------------------------------------
 
-def rotate_objects(list_of_object_ids):
+def rotate_objects(list_of_object_ids:list):
     # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
     # processing a load of intermixed deletes/creates when it returns to the main loop
     for object_id in list_of_object_ids:
@@ -424,7 +425,7 @@ def rotate_objects(list_of_object_ids):
 # passed to signify which end of the line needs to be updated
 #------------------------------------------------------------------------------------
 
-def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
+def move_objects(list_of_object_ids:list, xdiff1:int=None, ydiff1:int=None,
                  xdiff2:int=None, ydiff2:int=None, update_schematic_state:bool=True):
     # Only bother processing the update if there has been a change
     if ( (xdiff1 is not None and xdiff1 !=0) or (ydiff1 is not None and ydiff1 !=0) or
@@ -460,7 +461,7 @@ def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
 # Called from the Schematic Module when selected objects are copied.
 #------------------------------------------------------------------------------------
 
-def copy_objects(list_of_object_ids, deltax:int, deltay:int):
+def copy_objects(list_of_object_ids:list, deltax:int, deltay:int):
     # New objects are "pasted" at a slightly offset position on the canvas so
     # its clear that new objects have been created (to move/place on the canvas)
     # We need to return a list of new object IDs
@@ -496,6 +497,36 @@ def copy_objects(list_of_object_ids, deltax:int, deltay:int):
     # exist, they have yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
     # Also - as we are just copying 'new' objects we don't need to process layout changes
     return(list_of_new_object_ids)
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of one or more objects on the schematic
+#------------------------------------------------------------------------------------
+
+def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
+    for object_id in list_of_object_ids:
+        # Call the object-specific function to perform the update
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
+        if type_of_object == objects_common.object_type.line:
+            pass
+        elif type_of_object == objects_common.object_type.textbox:
+            pass
+        elif type_of_object == objects_common.object_type.signal:
+            pass
+        elif type_of_object == objects_common.object_type.point:
+            pass
+        elif type_of_object == objects_common.object_type.section:
+            objects_sections.update_section_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.instrument:
+            pass
+        elif type_of_object == objects_common.object_type.track_sensor:
+            pass
+        elif type_of_object == objects_common.object_type.route:
+            pass
+        elif type_of_object == objects_common.object_type.switch:
+            pass
+    # save the current state (for undo/redo)
+    save_schematic_state()
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to set (re-create) all schematic objects (following a file load)

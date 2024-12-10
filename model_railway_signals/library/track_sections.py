@@ -20,6 +20,16 @@
 #       text_colour:str - the colour to use for the button text (default='White')
 #       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "")
 #
+#   update_section_styles - Updates the style of a track section object
+#     Mandatory Parameters:
+#       section_id:int - The ID to be used for the section 
+#     Optional parameters:
+#       default_label:str - The default label to display when occupied - default = 'XXXXX'
+#       section_width:int - The default width of the track section (chars) - default = 5
+#       button_colour:str - the colour to use for the button when 'normal' (default='Black')
+#       text_colour:str - the colour to use for the button text (default='White')
+#       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "")
+#
 #   section_exists(section_id:int/str) - returns true if the Track Section object 'exists' (either the
 #             Track Section exists on the local schematic or has been subscribed to via MQTT networking)
 #
@@ -344,21 +354,22 @@ def send_mqtt_section_updated_event(section_id:int):
 
 def toggle_section_button(section_id:int):
     global sections
-    section = sections[str(section_id)]
-    if section["occupied"]:
-        logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label '"+section["labeltext"]+"'")
-        section["occupied"] = False
-        section["button"].config(background=section["deselectedbgcolour"], foreground=section["deselectedfgcolour"])
-        section["button"].config(activebackground=section["deselectedbgcolour"])
-        section["button"].config(activeforeground=section["deselectedfgcolour"])
-        section["button"].config(disabledforeground=section["deselectedfgcolour"])
+    if sections[str(section_id)]["occupied"]:
+        logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label '"+sections[str(section_id)]["labeltext"]+"'")
+        sections[str(section_id)]["occupied"] = False
+        sections[str(section_id)]["button"].config(background=sections[str(section_id)]["deselectedbgcolour"])
+        sections[str(section_id)]["button"].config(foreground=sections[str(section_id)]["deselectedfgcolour"])
+        sections[str(section_id)]["button"].config(activebackground=sections[str(section_id)]["deselectedbgcolour"])
+        sections[str(section_id)]["button"].config(activeforeground=sections[str(section_id)]["deselectedfgcolour"])
+        sections[str(section_id)]["button"].config(disabledforeground=sections[str(section_id)]["deselectedfgcolour"])
     else:
-        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label '"+section["labeltext"]+"'")
-        section["occupied"] = True
-        section["button"].config(background=section["selectedbgcolour"], foreground=section["selectedfgcolour"])
-        section["button"].config(activebackground=section["selectedbgcolour"])
-        section["button"].config(activeforeground=section["selectedfgcolour"])
-        section["button"].config(disabledforeground=section["selectedfgcolour"])
+        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label '"+sections[str(section_id)]["labeltext"]+"'")
+        sections[str(section_id)]["occupied"] = True
+        sections[str(section_id)]["button"].config(background=sections[str(section_id)]["selectedbgcolour"])
+        sections[str(section_id)]["button"].config(foreground=sections[str(section_id)]["selectedfgcolour"])
+        sections[str(section_id)]["button"].config(activebackground=sections[str(section_id)]["selectedbgcolour"])
+        sections[str(section_id)]["button"].config(activeforeground=sections[str(section_id)]["selectedfgcolour"])
+        sections[str(section_id)]["button"].config(disabledforeground=sections[str(section_id)]["selectedfgcolour"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -379,6 +390,7 @@ def update_label(section_id:int, new_label:str):
 #---------------------------------------------------------------------------------------------
 
 def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
+    global sections
     # Iterate through all other local track sections (where the section ID will be a digit rather than a remote
     # identifier) to see if any of them are configured to mirror this track section. If so then we need to update
     # the label and/or state of the other track section to match the label/state of the current track section
@@ -520,10 +532,73 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
     return(canvas_tag)
 
 #---------------------------------------------------------------------------------------------
+# Public API function to Update the Track Section Styles
+#---------------------------------------------------------------------------------------------
+
+def update_section_styles(section_id:int, default_label:str="XXXXX", section_width:int=5,
+                button_colour:str="Black", text_colour:str="White", font=("TkFixedFont",8,"")):
+    global sections
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(section_id, int) or section_id < 1 or section_id > 999:
+        logging.error("Section "+str(section_id)+": update_section_styles - Section ID must be an int (1-999)")
+    elif not section_exists(section_id):
+        logging.error("Section "+str(section_id)+": update_section_styles - Section ID does not exist")
+    else:
+        logging.debug("Section "+str(section_id)+": Updating Track Section Styles")
+        section = sections[str(section_id)]
+        # Specify the various parameters we need for the button/placeholder styles
+        selected_fg_colour = text_colour
+        deselected_fg_colour = button_colour
+        selected_bg_colour = button_colour
+        deselected_bg_colour = button_colour
+        # Update the Button Styles depending on the state of the button
+        if section["occupied"]:
+            section["button"].config(background=selected_bg_colour)
+            section["button"].config(foreground=selected_fg_colour)
+            section["button"].config(activebackground=selected_bg_colour)
+            section["button"].config(activeforeground=selected_fg_colour)
+            section["button"].config(disabledforeground=selected_fg_colour)
+        else:
+            section["button"].config(background=deselected_bg_colour)
+            section["button"].config(foreground=deselected_fg_colour)
+            section["button"].config(activebackground=deselected_bg_colour)
+            section["button"].config(activeforeground=deselected_fg_colour)
+            section["button"].config(disabledforeground=deselected_fg_colour)
+        section["button"].config(width=section_width)
+        section["button"].config(font=font)
+        # Update the Placeholder Styles. This is relatively complex operation as we first
+        # need to ensure the text isn't "hidden" otherwise we will not be able to use the
+        # 'bbox' method to get the new boundary coordinates (after we have updated the font).
+        if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='normal')
+        section["canvas"].itemconfigure(section["placeholder1"], font=font)
+        section["canvas"].itemconfigure(section["placeholder1"], fill=selected_fg_colour)
+        section["canvas"].itemconfigure(section["placeholder1"], text="".zfill(section_width))
+        bbox = section["canvas"].bbox(section["placeholder1"])
+        # Now we have the boundary coordinates we can re-hide the placeholder if we are in run mode
+        if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='hidden')
+        # The second placeholder (the background rectangle) can now be updated as required
+        section["canvas"].coords(section["placeholder2"], bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1)
+        # Finally we can change the placeholder text to the appropriate string
+        section["canvas"].itemconfigure(section["placeholder1"], text=format(section_id,'02d'))
+        # Only update the background colour if we are in edit mode (to make it visible)
+        if editing_enabled: section["canvas"].itemconfig(section["placeholder2"], fill=selected_bg_colour)
+        # Update the label text if it is still set to the original default label text
+        if section["labeltext"] == section["defaultlabel"]: update_label(section_id, default_label)
+        # Store the parameters we need to track
+        section["defaultlabel"] = default_label
+        section["sectionwidth"] = section_width
+        section["selectedbgcolour"] = selected_bg_colour
+        section["selectedfgcolour"] = selected_fg_colour
+        section["deselectedfgcolour"] = deselected_fg_colour
+        section["deselectedbgcolour"] = deselected_bg_colour
+    return()
+
+#---------------------------------------------------------------------------------------------
 # Public API function to Update the "Mirrored Section" Reference
 #---------------------------------------------------------------------------------------------
 
 def update_mirrored(section_id:int, mirror_id:str):
+    global sections
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(section_id, int):
         logging.error("Section "+str(section_id)+": update_mirrored - Section ID must be an integer")
