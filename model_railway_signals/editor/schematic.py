@@ -8,6 +8,7 @@
 #    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #    update_canvas(width,height,grid,snap) - Call following a size update (or layout load/canvas resize)
 #    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
+#    get_selected_objects(object_type=None) - return a list of selected object IDs (filtered on type)
 #
 # Makes the following external API calls to other editor modules:
 #    objects.initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
@@ -119,6 +120,18 @@ button_frame = None
 button_images = []
 # The global flag to track whether we are in edit mode or not
 edit_mode_active = True
+
+#------------------------------------------------------------------------------------
+# Function to return a list of currently selected Object Ids - Filtered on the object
+# type if one is specified (if not then the liust will contain all selected objects)
+#------------------------------------------------------------------------------------
+
+def get_selected_objects(object_type=None):
+    list_of_object_ids_to_return = []
+    for selected_object_id in schematic_state["selectedobjects"]:
+        if object_type is None or object_type == objects.schematic_objects[selected_object_id]["item"]:
+            list_of_object_ids_to_return.append(selected_object_id)
+    return(list_of_object_ids_to_return)
 
 #------------------------------------------------------------------------------------
 # Internal Function to return the absolute canvas coordinates for an event
