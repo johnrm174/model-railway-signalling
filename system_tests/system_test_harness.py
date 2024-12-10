@@ -419,7 +419,7 @@ def set_sections_occupied(*sectionids):
                 # Two calls are needed - we first set the label using the 'update_label' function
                 # then we call the section callback library function to simulate the 'click'
                 run_function(lambda:track_sections.update_label(secid,str(train_identifier)))
-                run_function(lambda:track_sections.section_button_event(secid))
+                run_function(lambda:track_sections.section_state_toggled(secid))
             train_identifier=train_identifier+1
 
 def toggle_sections(*sectionids):
@@ -427,7 +427,7 @@ def toggle_sections(*sectionids):
         if str(secid) not in track_sections.sections.keys():
             raise_test_warning ("set_sections_occupied - Section: "+str(secid)+" does not exist")
         else:
-            run_function(lambda:track_sections.section_button_event(secid))
+            run_function(lambda:track_sections.section_state_toggled(secid))
 
 def set_sections_clear(*sectionids):
     for secid in sectionids:
@@ -437,7 +437,7 @@ def set_sections_clear(*sectionids):
             if not track_sections.section_occupied(secid):
                 raise_test_warning ("set_sections_clear - Section: "+str(secid)+" is already CLEAR")
             else:
-                run_function(lambda:track_sections.section_button_event(secid))
+                run_function(lambda:track_sections.section_state_toggled(secid))
     
 def set_instrument_blocked(*instrumentids):
     for instid in instrumentids:

@@ -193,10 +193,10 @@ def run_track_section_library_tests():
     assert track_sections.section_occupied(4)
     assert track_sections.section_label(3) == "Train1"
     assert track_sections.section_label(4) == "Train1"
-    track_sections.section_button_event(3)
+    track_sections.section_state_toggled(3)
     assert not track_sections.section_occupied(3)
     assert not track_sections.section_occupied(4)
-    track_sections.section_button_event(4)
+    track_sections.section_state_toggled(4)
     assert track_sections.section_occupied(3)
     assert track_sections.section_occupied(4)
     track_sections.update_identifier(4,"Train2")
@@ -210,10 +210,10 @@ def run_track_section_library_tests():
     assert track_sections.section_occupied(4)
     assert track_sections.section_label(3) == "Train1"
     assert track_sections.section_label(4) == "Train1"
-    track_sections.section_button_event(3)
+    track_sections.section_state_toggled(3)
     assert not track_sections.section_occupied(3)
     assert not track_sections.section_occupied(4)
-    track_sections.section_button_event(4)
+    track_sections.section_state_toggled(4)
     assert track_sections.section_occupied(3)
     assert track_sections.section_occupied(4)
     track_sections.update_identifier(4,"Train2")
@@ -254,7 +254,7 @@ def run_track_section_library_tests():
     assert track_sections.section_occupied(2)
     assert track_sections.section_occupied(7)
     assert track_sections.section_label(7) == "Train4"
-    track_sections.section_button_event(2)
+    track_sections.section_state_toggled(2)
     assert not track_sections.section_occupied(2)
     assert not track_sections.section_occupied(7)
     print("Library Tests - update_mirrored - 9 errors will be generated")
@@ -293,8 +293,8 @@ def run_track_section_library_tests():
     track_sections.set_section_occupied(1,"Train10")
     track_sections.clear_section_occupied(1)
     track_sections.update_identifier(2,"Train11")
-    track_sections.section_button_event(2)
-    track_sections.section_button_event(3)
+    track_sections.section_state_toggled(2)
+    track_sections.section_state_toggled(3)
     print("Library Tests - subscribe_to_remote_sections - 5 Errors and 2 warnings will be generated")
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # Success
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # 2 Warnings - already subscribed
@@ -340,7 +340,7 @@ def run_track_section_library_tests():
     track_sections.accept_entered_value(2)
     time.sleep(0.1)
     assert track_sections.section_label(1) == "Train22"
-    assert track_sections.section_label(2) == ""
+    assert track_sections.section_label(2) == "OCCUPIED" # This is the default label
     print("Library Tests - delete_section - 2 errors will be generated")
     track_sections.delete_section(1)
     track_sections.delete_section(2)
@@ -377,11 +377,11 @@ def run_point_library_tests():
     # Point ID and point_type combinations
     print("Library Tests - create_point - will generate 11 errors:")
     points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red") #  Valid
-    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, auto=True)  # Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True)  # Valid
     points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)  # Valid
-    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, auto=True)  # Valid
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)  # Valid
     points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
-    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, auto=True)  # Valid
+    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)  # Valid
     points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
     points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)   # Error (<1)
     points.create_point(canvas, 1000, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error (>999)
@@ -395,7 +395,7 @@ def run_point_library_tests():
     points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=19) # Error (switch itself)
     points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=1000) # Error (out of range)
     # Automatic and FPL combinations
-    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, auto=True, fpl=True) # Error
+    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, switched_with=True, fpl=True) # Error
     assert len(points.points) == 7
     # point_exists
     print("Library Tests - point_exists - will generate 1 error:")
@@ -590,7 +590,7 @@ def run_point_library_tests():
     print("Library Tests - create autoswitched point - will generate 1 warning:")
     points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=11) # Valid
     points.toggle_point_state(10)
-    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, auto=True) # Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True) # Valid
     assert len(points.points) == 2
     assert points.point_switched(10)
     assert points.point_switched(11)

@@ -561,8 +561,6 @@ def run_mqtt_interface_tests():
     time.sleep(0.2)
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
-    print("Library Tests - mqtt_shutdown")
-    mqtt_interface.mqtt_shutdown()
     time.sleep(0.2)
     print("----------------------------------------------------------------------------------------")
     print("")

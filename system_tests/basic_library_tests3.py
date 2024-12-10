@@ -95,7 +95,7 @@ def run_library_api_tests():
     create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated, sig_release_button=True)  # Error - Dist & App control
     assert len(signals.signals) == 2
-    print("Library Tests - create_semaphore_signal (validate associated home params) - will generate 6 errors:")
+    print("Library Tests - create_semaphore_signal (validate associated home params) - will generate 5 errors:")
     create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)        # Success
     create_semaphore_signal(canvas, 4, signals.semaphore_subtype.distant, 250, 100,
@@ -107,15 +107,13 @@ def run_library_api_tests():
     create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=4)        # Error - associated sig does not exist
     create_semaphore_signal(canvas, 8, signals.semaphore_subtype.home, 250, 100,
-                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)           # Error - sig type is a home
-    create_semaphore_signal(canvas, 9, signals.semaphore_subtype.distant, 250, 100,
-                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2, sig_passed_button=True)  # Error - passed button
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)        # Error - sig type is a home
     assert len(signals.signals) == 3
     print("Library Tests - create_ground_disc_signal - will generate 5 errors:")
     create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Success
     create_ground_disc_signal(canvas, "5", signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - not an int
     create_ground_disc_signal(canvas, 0, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - out of range
-    create_ground_disc_signal(canvas, 1000, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - out of range
+    create_ground_disc_signal(canvas, 1000, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)     # Error - out of range
     create_ground_disc_signal(canvas, 1, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - already exists
     create_ground_disc_signal(canvas, 6, signals.signal_type.colour_light, 400, 100, sig_switched, sig_passed)            # Error - invalid subtype
     assert len(signals.signals) == 4
@@ -123,7 +121,7 @@ def run_library_api_tests():
     create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Success
     create_ground_position_signal(canvas, "6", signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - not an int
     create_ground_position_signal(canvas, 0, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - out of range
-    create_ground_position_signal(canvas, 1000, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - out of range
+    create_ground_position_signal(canvas, 1000, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)     # Error - out of range
     create_ground_position_signal(canvas, 1, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - already exists
     create_ground_position_signal(canvas, 7, signals.signal_type.colour_light, 550, 100, sig_switched, sig_passed)           # Error - invalid subtype
     assert len(signals.signals) == 5
@@ -1178,14 +1176,14 @@ def run_signal_button_tests():
     # Set up the initial test conditions
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
-                            has_subsidary=True, sig_passed_button=True, sig_release_button=True)
+                            has_subsidary=True, sig_release_button=True)
     create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 300, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
-                            main_subsidary=True, sig_passed_button=True, sig_release_button=True)
+                            main_subsidary=True, sig_release_button=True)
     create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 300, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)
-    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 500, 100, sig_switched, sig_passed, sig_passed_button=True)
-    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 650, 100, sig_switched,sig_passed, sig_passed_button=True)
+    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 500, 100, sig_switched, sig_passed)
+    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 650, 100, sig_switched,sig_passed)
     # Test the main control buttons
     assert not signals.signal_clear(1)
     assert not signals.signal_clear(2)
@@ -1259,11 +1257,9 @@ def run_approach_control_tests():
     canvas = schematic.canvas
     # Create some signals for this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
-                               sig_passed_button=True, sig_release_button=True)
+                    sig_switched, sub_switched, sig_released, sig_passed, sig_updated, sig_release_button=True)
     create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 100,
-                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
-                            sig_passed_button=True, sig_release_button=True)
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, sig_release_button=True)
     print("Library Tests - Approach Control Tests - Release on Red - no errors")
     # Set up the initial test conditions (for Approach Control Release on Red)
     signals.toggle_signal(10)
