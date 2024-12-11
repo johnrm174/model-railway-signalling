@@ -585,27 +585,25 @@ def update_point_button_styles(point_id:int, button_colour:str="Grey85", active_
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": update_point_button_styles - Point ID does not exist")
     else:
-        global points
         logging.debug("Point "+str(point_id)+": Updating Point Button Styles")
         # Update the Point Change Button Styles
-        if points[str(point_id)]["changebutton"] is not None:
-            if points[str(point_id)]["switched"]: points[str(point_id)]["changebutton"].config(background=selected_colour)
-            else: points[str(point_id)]["changebutton"].config(background=button_colour)
-            points[str(point_id)]["changebutton"].config(font=font)
-            points[str(point_id)]["changebutton"].config(activebackground=active_colour)
-            points[str(point_id)]["changebutton"].config(activeforeground=text_colour)
-            points[str(point_id)]["changebutton"].config(foreground=text_colour)
-            points[str(point_id)]["selectedcolour"] = selected_colour
-            points[str(point_id)]["deselectedcolour"] = button_colour
-        if points[str(point_id)]["lockbutton"] is not None:
-            if points[str(point_id)]["fpllock"]: points[str(point_id)]["lockbutton"].config(background=selected_colour)
-            else: points[str(point_id)]["lockbutton"].config(background=button_colour)
-            points[str(point_id)]["lockbutton"].config(font=font)
-            points[str(point_id)]["lockbutton"].config(activebackground=active_colour)
-            points[str(point_id)]["lockbutton"].config(activeforeground=text_colour)
-            points[str(point_id)]["lockbutton"].config(foreground=text_colour)
-            points[str(point_id)]["selectedcolour"] = selected_colour
-            points[str(point_id)]["deselectedcolour"] = button_colour
+        if points[str(point_id)]["switched"]: points[str(point_id)]["changebutton"].config(background=selected_colour)
+        else: points[str(point_id)]["changebutton"].config(background=button_colour)
+        points[str(point_id)]["changebutton"].config(font=font)
+        points[str(point_id)]["changebutton"].config(activebackground=active_colour)
+        points[str(point_id)]["changebutton"].config(activeforeground=text_colour)
+        points[str(point_id)]["changebutton"].config(foreground=text_colour)
+        points[str(point_id)]["selectedcolour"] = selected_colour
+        points[str(point_id)]["deselectedcolour"] = button_colour
+        # Update the Point FPL Button Styles
+        if points[str(point_id)]["fpllock"]: points[str(point_id)]["lockbutton"].config(background=selected_colour)
+        else: points[str(point_id)]["lockbutton"].config(background=button_colour)
+        points[str(point_id)]["lockbutton"].config(font=font)
+        points[str(point_id)]["lockbutton"].config(activebackground=active_colour)
+        points[str(point_id)]["lockbutton"].config(activeforeground=text_colour)
+        points[str(point_id)]["lockbutton"].config(foreground=text_colour)
+        points[str(point_id)]["selectedcolour"] = selected_colour
+        points[str(point_id)]["deselectedcolour"] = button_colour
         return()
 
 # -------------------------------------------------------------------------
