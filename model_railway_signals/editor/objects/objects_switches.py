@@ -105,7 +105,6 @@ def redraw_switch_object(object_id):
                                objects_common.schematic_objects[object_id]["dccoffcommands"])
     # Turn the button type value back into the required enumeration type
     button_type = buttons.button_type(objects_common.schematic_objects[object_id]["itemtype"])
-    # Create the Tkinter Font tuple
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
