@@ -349,13 +349,13 @@ def update_button_styles(button_id:int, width:int=10, button_colour:str="SeaGree
         # Update the Placeholder Styles. This is relatively complex operation as we first
         # need to ensure the text isn't "hidden" otherwise we will not be able to use the
         # 'bbox' method to get the new boundary coordinates (after we have updated the font).
-        if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='normal')
+        if not editing_enabled: button["canvas"].itemconfig(button["placeholder1"], state='normal')
         button["canvas"].itemconfigure(button["placeholder1"], font=font)
         button["canvas"].itemconfigure(button["placeholder1"], fill=text_colour)
         button["canvas"].itemconfigure(button["placeholder1"], text="".zfill(width))
         bbox = button["canvas"].bbox(button["placeholder1"])
         # Now we have the boundary coordinates we can re-hide the placeholder if we are in run mode
-        if not editing_enabled: button["canvas"].itemconfig(section["placeholder1"], state='hidden')
+        if not editing_enabled: button["canvas"].itemconfig(button["placeholder1"], state='hidden')
         # The second placeholder (the background rectangle) can now be updated as required
         button["canvas"].coords(button["placeholder2"], bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1)
         # Finally we can change the placeholder text to the appropriate string
