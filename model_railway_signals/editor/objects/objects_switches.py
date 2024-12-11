@@ -7,6 +7,7 @@
 #    create_switch() - Create a default "accessory switch" object on the schematic
 #    delete_switch(object_id) - Hard Delete an object when deleted from the schematic
 #    update_switch(obj_id,new_obj) - Update the configuration of an existing object
+#    update_switch_style(obj_id, params) - Update the styles of an existing DCC switch button object
 #    paste_switch_(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_switch_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_switch_object(object_id) - Redraw the object on the canvas following an update
@@ -186,6 +187,36 @@ def paste_switch(object_to_paste, deltax:int, deltay:int):
     # Create the associated library objects
     redraw_switch_object(new_object_id)
     return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of a Route Button object - called after
+# the style elements in the object dictionary have been set to the required values
+#------------------------------------------------------------------------------------
+
+def update_switch_styles(object_id, dict_of_new_styles:dict):
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+    # Update the styles of the library object
+    buttons.update_button_styles(
+            button_id = objects_common.schematic_objects[object_id]["itemid"],
+            width = objects_common.schematic_objects[object_id]["buttonwidth"],
+            font = objects_common.schematic_objects[object_id]["textfonttuple"],
+            button_colour = button_colour,
+            active_colour = active_colour,
+            selected_colour = selected_colour,
+            text_colour = text_colour)
+    # Create/update the selection rectangle for the button
+    objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to "soft delete" the Switch object from the canvas - Primarily used to

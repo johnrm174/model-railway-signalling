@@ -57,6 +57,7 @@
 #    objects_sections.create_section(type) - Create a default object on the schematic
 #    objects_sections.delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_sections.update_section(obj_id,new_obj) - Update the configuration of an existing section object
+#    objects_sections.update_section_styles(obj_id, params) - Update the styles of an existing object
 #    objects_sections.paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_sections.delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_sections.redraw_section_object(object_id) - Redraw the object on the canvas following an update
@@ -71,6 +72,7 @@
 #    objects_routes.create_route() - Create a default object on the schematic
 #    objects_routes.delete_route(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_routes.update_route(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_routes.update_route_styles(obj_id, params) - Update the styles of an existing object
 #    objects_routes.paste_route(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_routes.delete_route_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_routes.redraw_route_object(object_id) - Redraw the object on the canvas following an update
@@ -78,6 +80,7 @@
 #    objects_switches.create_switch() - Create a default object on the schematic
 #    objects_switches.delete_switch(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_switches.update_switch(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_switches.update_switch_styles(obj_id, params) - Update the styles of an existing object
 #    objects_switches.paste_switch(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_switches.delete_switch_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_switches.redraw_switch_object(object_id) - Redraw the object on the canvas following an update
@@ -521,9 +524,9 @@ def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
         elif type_of_object == objects_common.object_type.track_sensor:
             pass
         elif type_of_object == objects_common.object_type.route:
-            pass
+            objects_routes.update_route_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.switch:
-            pass
+            objects_switches.update_switch_styles(object_id, dict_of_new_styles)
     # save the current state (for undo/redo)
     save_schematic_state()
     return()

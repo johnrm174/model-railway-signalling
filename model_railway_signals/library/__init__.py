@@ -59,6 +59,7 @@ from .track_sections import section_exists
 from .track_sections import delete_section
 from .track_sections import section_occupied
 from .track_sections import section_label
+from .track_sections import update_section_styles
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
 from .track_sections import reset_sections_mqtt_configuration
@@ -117,6 +118,7 @@ from .block_instruments import set_instruments_to_publish_state
 from .block_instruments import subscribe_to_remote_instruments
 
 from .buttons import create_button
+from .buttons import update_button_styles
 from .buttons import button_exists
 from .buttons import delete_button
 from .buttons import toggle_button
@@ -209,6 +211,7 @@ __all__ = [
         'delete_section',
         'section_occupied',
         'section_label',
+        'update_section_styles',
         'set_section_occupied',
         'clear_section_occupied',
         'reset_sections_mqtt_configuration',
@@ -259,6 +262,7 @@ __all__ = [
         'set_instruments_to_publish_state',
       # public Button types/functions
         'create_button',
+        'update_button_styles',
         'button_exists',
         'delete_button',
         'toggle_button',
