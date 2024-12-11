@@ -20,12 +20,49 @@ from . import schematic
 from . import settings
 
 #------------------------------------------------------------------------------------
+# Class for the common_buttons UI Element
+#------------------------------------------------------------------------------------
+
+class common_buttons(Tk.Frame):
+    def __init__(self, parent_frame, load_app_defaults_callback, load_layout_defaults_callback,
+                 apply_all_callback, apply_selected_callback, set_defaults_callback, close_window_callback):
+        super().__init__(parent_frame)
+        # Create a Frame for the "reset" buttons
+        self.frame3 = Tk.Frame(self)
+        self.frame3.pack(fill="x")
+        # Create a subframe to center the buttons in
+        self.button1 = Tk.Button(self.frame3, text="Load app defaults", width=17, command=load_app_defaults_callback)
+        self.button1.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
+        self.button1TT = common.CreateToolTip(self.button1, "Click to load the application defaults")
+        self.button2 = Tk.Button(self.frame3, text="Load layout defaults", width=17, command=load_layout_defaults_callback)
+        self.button2.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
+        self.button2TT = common.CreateToolTip(self.button2, "Click to load the current layout defaults")
+        # Create a Frame for the apply Buttons
+        self.frame4 = Tk.Frame(self)
+        self.frame4.pack(fill="x")
+        self.button3 = Tk.Button(self.frame4, text="Apply to all", command=apply_all_callback)
+        self.button3.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
+        self.button3TT = common.CreateToolTip(self.button3, "Select to apply the above settings to ALL objects")
+        self.button4 = Tk.Button(self.frame4, text="Apply to selected", command=apply_selected_callback)
+        self.button4.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
+        self.button4TT = common.CreateToolTip(self.button4, "Select to apply the above settings to SELECTED objects")
+        # Add the button to set new layout defaults
+        self.button5 = Tk.Button(self.frame4, text="Set as defaults", command=set_defaults_callback)
+        self.button5.pack(padx=5, pady=2, fill="x", expand=True)
+        self.button5TT = common.CreateToolTip(self.button5, "Select to save the above settings as the new layout defaults "+
+                                                        "(which will be applied to new objects as they are created)")
+        # Create the close window button and tooltip
+        self.button6 = Tk.Button (self, text = "Close Window", command=close_window_callback)
+        self.button6.pack(padx=2, pady=2)
+        self.button6TT = common.CreateToolTip(self.button6, "Close window")
+        
+#------------------------------------------------------------------------------------
 # Class for the common_style_settings UI Element
 #------------------------------------------------------------------------------------
 
 class common_style_settings(Tk.Frame):
     def __init__(self, parent_frame, object_type:str, max_font_size:int,
-                         apply_all_callback=None, apply_selected_callback=None):
+                    apply_all_callback, apply_selected_callback, close_window_callback):
         self.object_type = object_type
         # Create the frame
         super().__init__(parent_frame)
@@ -58,32 +95,10 @@ class common_style_settings(Tk.Frame):
         # The final label frame is for the text style selection
         self.fontstyle = common.font_style_selection(self.frame2, label="Font style")
         self.fontstyle.pack(padx=2, pady=2, side=Tk.LEFT, fill='x', expand=True)
-        # Create a Frame for the "reset" buttons
-        self.frame3 = Tk.Frame(self)
-        self.frame3.pack(fill="x")
-        # Create a subframe to center the buttons in
-        self.button1 = Tk.Button(self.frame3, text="Load app defaults", width=17, command=self.load_app_defaults)
-        self.button1.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
-        self.button1TT = common.CreateToolTip(self.button1, "Click to load the application defaults")
-        self.button2 = Tk.Button(self.frame3, text="Load layout defaults", width=17, command=self.load_layout_defaults)
-        self.button2.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
-        self.button2TT = common.CreateToolTip(self.button2, "Click to load the current layout defaults")
-        # Create a Frame for the apply Buttons
-        self.frame4 = Tk.Frame(self)
-        self.frame4.pack(fill="x")
-        if apply_all_callback is not None:
-            self.button3 = Tk.Button(self.frame4, text="Apply to all", command=apply_all_callback)
-            self.button3.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
-            self.button3TT = common.CreateToolTip(self.button3, "Select to apply the above settings to ALL objects")
-        if apply_selected_callback is not None:
-            self.button4 = Tk.Button(self.frame4, text="Apply to selected", command=apply_selected_callback)
-            self.button4.pack(padx=5, pady=2, side=Tk.LEFT, fill="x", expand=True)
-            self.button4TT = common.CreateToolTip(self.button4, "Select to apply the above settings to SELECTED objects")
-        # Add the button to set new layout defaults
-        self.button5 = Tk.Button(self.frame4, text="Set as defaults", command=self.set_defaults)
-        self.button5.pack(padx=5, pady=2, fill="x", expand=True)
-        self.button5TT = common.CreateToolTip(self.button5, "Select to save the above settings as the new layout defaults "+
-                                                        "(which will be applied to new objects as they are created)")
+        # Create the common button elements
+        self.buttons = common_buttons(parent_frame, self.load_app_defaults, self.load_layout_defaults,
+                        apply_all_callback, apply_selected_callback, self.set_defaults, close_window_callback)
+        self.buttons.pack(side=Tk.BOTTOM, fill='x')
 
     def set_defaults(self):
         if self.validate():
@@ -124,10 +139,11 @@ class common_style_settings(Tk.Frame):
 #------------------------------------------------------------------------------------
 
 class button_style_selections(common_style_settings):
-    def __init__(self, parent_frame, object_type:str, max_font_size=20,
-                 apply_all_callback=None, apply_selected_callback=None):
+    def __init__(self, parent_frame, object_type:str, max_font_size:int,
+                 apply_all_callback, apply_selected_callback, close_window_callback):
         # Create the basic style settings elements
-        super().__init__(parent_frame, object_type, max_font_size, apply_all_callback, apply_selected_callback)
+        super().__init__(parent_frame, object_type, max_font_size, apply_all_callback,
+                             apply_selected_callback, close_window_callback)
         # Create a Frame for the Button Width components
         self.frame2a = Tk.Frame(self)
         self.frame2a.pack(after=self.frame2, fill="x", expand=True)
@@ -170,9 +186,9 @@ class button_style_selections(common_style_settings):
 #------------------------------------------------------------------------------------
 
 class track_section_style_selections(button_style_selections):
-    def __init__(self, parent_frame, object_type:str, apply_all_callback=None, apply_selected_callback=None):
+    def __init__(self, parent_frame, object_type:str, apply_all_callback, apply_selected_callback, close_window_callback):
         # Create the parent style settings elements
-        super().__init__(parent_frame, object_type, 14, apply_all_callback, apply_selected_callback)
+        super().__init__(parent_frame, object_type, 14, apply_all_callback, apply_selected_callback, close_window_callback)
         # Create the default label elements
         self.frame2asubframe2 = Tk.LabelFrame(self.frame2a, text="Default section label")
         self.defaultlabel = common.entry_box(self.frame2asubframe2, width=30, tool_tip = "Enter the default "+
@@ -226,12 +242,9 @@ class edit_section_styles():
             edit_section_styles_window = self.window
             # Create the UI Elements
             self.styles = track_section_style_selections(self.window, object_type="tracksections",
-                        apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected)
-            self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
-            # Create the close window button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
-            self.B1.pack(padx=2, pady=2)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+                        apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected,
+                        close_window_callback=self.close_window)
+            self.styles.pack(padx=5, pady=5, fill='x')
             # Load the initial UI state
             self.styles.load_layout_defaults()
 
@@ -273,13 +286,10 @@ class edit_route_styles():
             self.window.resizable(False, False)
             edit_route_styles_window = self.window
             # Create the UI Elements
-            self.styles = button_style_selections(self.window, object_type="routebuttons",
-                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected)
-            self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
-            # Create the close window button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
-            self.B1.pack(padx=2, pady=2)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            self.styles = button_style_selections(self.window, object_type="routebuttons", max_font_size=20,
+                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected,
+                    close_window_callback=self.close_window)
+            self.styles.pack(padx=5, pady=5, fill='x')
             # Load the initial UI state
             self.styles.load_layout_defaults()
 
@@ -321,13 +331,10 @@ class edit_switch_styles():
             self.window.resizable(False, False)
             edit_switch_styles_window = self.window
             # Create the UI Elements
-            self.styles = button_style_selections(self.window, object_type="dccswitches",
-                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected)
-            self.styles.pack(padx=5, pady=5, fill='x', side=Tk.TOP)
-            # Create the close window button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Close Window", command=self.close_window)
-            self.B1.pack(padx=2, pady=2)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            self.styles = button_style_selections(self.window, object_type="dccswitches", max_font_size=20,
+                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected,
+                    close_window_callback=self.close_window)
+            self.styles.pack(padx=5, pady=5, fill='x')
             # Load the initial UI state
             self.styles.load_layout_defaults()
 
@@ -347,10 +354,88 @@ class edit_switch_styles():
             edit_switch_styles_window = None
             self.window.destroy()
             
-            ## TODO - Line and Point Button Styles
-            ## TODO - Line and point colour styles
-            ## TODO - Text Box Styles ???
-            ## TODO - Menubar font size (easier via touchscreen)???
+#------------------------------------------------------------------------------------
+# Class for the Route Line Styles toolbar window.
+#------------------------------------------------------------------------------------
+
+edit_route_line_styles_window = None
+            
+class edit_route_line_styles():
+    def __init__(self, root_window):
+        global edit_route_line_styles_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if edit_route_line_styles_window is not None:
+            edit_route_line_styles_window.lift()
+            edit_route_line_styles_window.state('normal')
+            edit_route_line_styles_window.focus_force()
+        else:
+            # Create the (non resizable) top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Route & Point Lines")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_route_line_styles_window = self.window
+            # Create a subframe to center everything in
+            self.frame1 = Tk.Frame(self.window)
+            self.frame1.pack(fill='x')
+            # Create the UI Elements
+            self.colour = common.colour_selection(self.frame1, label="Default line colour")
+            self.colour.pack(padx=5, pady=5, side=Tk.LEFT, fill='x', expand=True)
+            # Create a Labelframe for the Line Width
+            self.subframe1 = Tk.LabelFrame(self.frame1, text="Route line width")
+            self.subframe1.pack(padx=5, pady=5, fill='both', expand=True, side=Tk.LEFT)
+            # Create another subframe so all the other elements float in the labelframe
+            self.subframe2 = Tk.Frame(self.subframe1)
+            self.subframe2.pack(fill='y', expand=True)
+            # Create a subframe to center the line width elements in
+            self.label1 = Tk.Label(self.subframe2, text="Pixels:")
+            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.linewidth = common.integer_entry_box(self.subframe2, width=3, min_value=1, max_value=6,
+                   tool_tip="Select the line width (between 1 and 6 pixels)", allow_empty=False)
+            self.linewidth.pack(padx=2, pady=2, side=Tk.LEFT)
+            # Create the common buttons
+            self.buttons = common_buttons(self.window, self.load_app_defaults, self.load_layout_defaults,
+                            self.apply_all, self.apply_selected, self.set_layout_defaults, self.close_window)
+            self.buttons.pack(padx=5, pady=5, side=Tk.BOTTOM, fill='x', expand=True)
+            # Load the initial UI state
+            self.load_layout_defaults()
+            
+    def load_app_defaults(self):
+        self.colour.set_value(settings.get_default_style("routelines", "colour"))
+        self.linewidth.set_value(settings.get_default_style("routelines", "linewidth"))
+        
+    def load_layout_defaults(self):
+        self.colour.set_value(settings.get_style("routelines", "colour"))
+        self.linewidth.set_value(settings.get_style("routelines", "linewidth"))
+        
+    def set_layout_defaults(self):
+        if self.linewidth.validate():
+            settings.set_style("routelines","colour", self.colour.get_value())
+            settings.set_style("routelines","linewidth", self.linewidth.get_value())
+
+    def apply_all(self):
+        if self.linewidth.validate():
+            objects_to_update = list(objects.point_index.values())+list(objects.line_index.values())
+            styles_to_apply = {"colour": self.colour.get_value(), "linewidth": self.linewidth.get_value()}
+            objects.update_styles(objects_to_update, styles_to_apply)
+
+    def apply_selected(self):
+        if self.linewidth.validate():
+            objects_to_update = ( schematic.get_selected_objects(object_type=objects.object_type.point) +
+                                  schematic.get_selected_objects(object_type=objects.object_type.line) )
+            styles_to_apply = {"colour": self.colour.get_value(), "linewidth": self.linewidth.get_value()}
+            objects.update_styles(objects_to_update, styles_to_apply)
+
+    def close_window(self):
+        global edit_route_line_styles_window
+        if not self.colour.is_open():
+            edit_route_line_styles_window = None
+            self.window.destroy()
+            
+    
+        ## TODO - Line and Point Button Styles
+        ## TODO - Text Box Styles ???
+        ## TODO - Menubar font size (easier via touchscreen)???
 
 
 #############################################################################################

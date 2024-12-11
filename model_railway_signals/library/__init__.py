@@ -41,6 +41,7 @@ from .signals_ground_disc import create_ground_disc_signal
 
 from .points import point_type
 from .points import create_point
+from .points import update_point_styles
 from .points import delete_point
 from .points import update_autoswitch
 from .points import point_exists
@@ -80,6 +81,13 @@ from .gpio_sensors import subscribe_to_remote_gpio_sensors
 from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
 from .track_sensors import delete_track_sensor
+
+from .lines import create_line
+from .lines import update_line_styles
+from .lines import line_exists
+from .lines import delete_line
+from .lines import set_line_colour
+from .lines import reset_line_colour
 
 from .text_boxes import create_text_box
 from .text_boxes import text_box_exists
@@ -148,6 +156,7 @@ __all__ = [
       # Public point types/functions
         'point_type',
         'create_point',
+        'update_point_styles',
         'delete_point',
         'update_autoswitch',
         'point_exists',
@@ -160,6 +169,13 @@ __all__ = [
         'toggle_fpl',
         'set_point_colour',
         'reset_point_colour',
+      # Public line types/functions
+        'create_line',
+        'update_line_styles',
+        'line_exists',
+        'delete_line',
+        'set_line_colour',
+        'reset_line_colour',
       # public track sensor types/functions
         'create_track_sensor',
         'delete_track_sensor',

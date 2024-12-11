@@ -5,12 +5,15 @@
 # External API functions intended for use by other editor modules: 
 #    create_line() - Create a default line object on the schematic
 #    delete_line(object_id) - Hard Delete an object when deleted from the schematic
+#    update_line(obj_id,new_obj) - Update the configuration of an existing line object
+#    update_line_style(obj_id, params) - Update the styles of an existing line object
 #    paste_line(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_line_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_line_object(object_id) - Redraw the object on the canvas following an update
 #    default_line_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
+#    settings.get_style - To retrieve the default application styles for the object
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_routes.update_references_to_line - called when the Line ID is changed
@@ -27,6 +30,8 @@
 #    lines.line_exists - Common function to see if a given item exists
 #    lines.delete_line(id) - delete library drawing object (part of soft delete)
 #    lines.create_line(id) -  To create the library object (create or redraw)
+#    lines.update_line_styles(id,styles) - to change the styles of an existing line
+#
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -35,6 +40,7 @@ import copy
 from . import objects_common
 from . import objects_routes
 from ...library import lines
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Default Line Objects (i.e. state at creation)
@@ -42,9 +48,12 @@ from ...library import lines
 
 default_line_object = copy.deepcopy(objects_common.default_object)
 default_line_object["item"] = objects_common.object_type.line
+# Styles are initially set to the default styles (defensive programming)
+default_line_object["colour"] = settings.get_style("routelines", "colour")
+default_line_object["linewidth"] = settings.get_style("routelines", "linewidth")
+# Other object-specific parameters
 default_line_object["endx"] = 0
 default_line_object["endy"] = 0
-default_line_object["colour"] = "black"
 default_line_object["arrowtype"] = [0,0,0]   # eg: [15,15,10],[10,15,10],[15,15,5]
 default_line_object["arrowends"] = 0         # 0=none, 1=start, 2=end, 3=both
 default_line_object["selection"] = None      # Tkinter tags for the "selection" circles
@@ -87,6 +96,7 @@ def redraw_line_object(object_id, create_selected:bool=False):
                 colour = objects_common.schematic_objects[object_id]["colour"],
                 arrow_type = objects_common.schematic_objects[object_id]["arrowtype"],
                 arrow_ends = objects_common.schematic_objects[object_id]["arrowends"],
+                line_width = objects_common.schematic_objects[object_id]["linewidth"],
                 selected = create_selected)
     # Store the canvas "tags" - for all line objects and for the selection circles
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
@@ -104,6 +114,9 @@ def create_line(xpos:int, ypos:int):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_line_object)
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=lines.line_exists)
+    # Styles for the new object are set to the current default styles
+    objects_common.schematic_objects[object_id]["colour"] = settings.get_style("routelines", "colour")
+    objects_common.schematic_objects[object_id]["linewidth"] = settings.get_style("routelines", "linewidth")
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = xpos - 50
@@ -138,6 +151,21 @@ def paste_line(object_to_paste, deltax:int, deltay:int):
     # Draw the new object
     redraw_line_object(new_object_id)
     return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of a line object
+#------------------------------------------------------------------------------------
+
+def update_line_styles(object_id, dict_of_new_styles:dict):
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # Update the styles of the library object
+    lines.update_line_styles(
+            line_id = objects_common.schematic_objects[object_id]["itemid"],
+            colour = objects_common.schematic_objects[object_id]["colour"],
+            line_width = objects_common.schematic_objects[object_id]["linewidth"])
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to "soft delete" the section object from the canvas - Primarily used to

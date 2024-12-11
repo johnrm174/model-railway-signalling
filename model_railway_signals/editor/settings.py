@@ -114,6 +114,9 @@ default_settings["styles"]["tracksections"]["buttoncolour"] = "Black"
 default_settings["styles"]["tracksections"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["tracksections"]["textfonttuple"] = ("Courier", 9, "bold")
 default_settings["styles"]["tracksections"]["defaultlabel"] = "XXXXX"
+default_settings["styles"]["routelines"] = {}
+default_settings["styles"]["routelines"]["colour"] = "Black"
+default_settings["styles"]["routelines"]["linewidth"] = 3
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
@@ -126,7 +129,7 @@ settings = copy.deepcopy(default_settings)
 #------------------------------------------------------------------------------------
 
 def restore_defaults():
-    global filename, settings
+    global settings
     settings = copy.deepcopy(default_settings)
     return()
 
