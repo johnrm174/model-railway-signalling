@@ -216,6 +216,8 @@ class main_menubar:
                 command=lambda:menubar_styles.edit_section_styles(self.root))
         self.styles_menu.add_command(label =" Route lines...",
                 command=lambda:menubar_styles.edit_route_line_styles(self.root))
+        self.styles_menu.add_command(label =" Point buttons...",
+                command=lambda:menubar_styles.edit_point_styles(self.root))
         self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)
         ############################# MORE TO COME ###################################
         # Create the various menubar items for the Help Dropdown

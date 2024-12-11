@@ -117,6 +117,14 @@ default_settings["styles"]["tracksections"]["defaultlabel"] = "XXXXX"
 default_settings["styles"]["routelines"] = {}
 default_settings["styles"]["routelines"]["colour"] = "Black"
 default_settings["styles"]["routelines"]["linewidth"] = 3
+default_settings["styles"]["points"] = {}
+default_settings["styles"]["points"]["buttoncolour"] = "Grey85"
+default_settings["styles"]["points"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["points"]["textfonttuple"] = ("Courier", 8, "")
+default_settings["styles"]["signals"] = {}
+default_settings["styles"]["signals"]["buttoncolour"] = "Grey85"
+default_settings["styles"]["signals"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["signals"]["textfonttuple"] = ("Courier", 8, "")
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required

@@ -76,6 +76,9 @@ default_point_object["itemsubtype"] = points.point_subtype.normal.value
 # Styles are initially set to the default styles (defensive programming)
 default_point_object["colour"] = settings.get_style("routelines", "colour")
 default_point_object["linewidth"] = settings.get_style("routelines", "linewidth")
+default_point_object["buttoncolour"] = settings.get_style("points", "buttoncolour")
+default_point_object["textcolourtype"] = settings.get_style("points", "textcolourtype")
+default_point_object["textfonttuple"] = settings.get_style("points", "textfonttuple")
 # Other object-specific parameters
 default_point_object["orientation"] = 0
 default_point_object["xbuttonoffset"] = 0
@@ -204,6 +207,14 @@ def redraw_point_object(object_id):
     # Turn the point type and subtype values back into the required enumeration type
     point_type = points.point_type(objects_common.schematic_objects[object_id]["itemtype"])
     point_subtype = points.point_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
     # Create the new point object
     canvas_tags = points.create_point (
                 canvas = objects_common.canvas,
@@ -223,7 +234,12 @@ def redraw_point_object(object_id):
                 switched_with = objects_common.schematic_objects[object_id]["automatic"],
                 hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                 fpl = objects_common.schematic_objects[object_id]["hasfpl"],
-                line_width = objects_common.schematic_objects[object_id]["linewidth"])
+                line_width = objects_common.schematic_objects[object_id]["linewidth"],
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour)
     # Create/update the canvas "tags" and selection rectangle for the point
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)        
@@ -242,6 +258,9 @@ def create_point(xpos:int, ypos:int, item_type, item_subtype):
     # Styles for the new object are set to the current default styles
     objects_common.schematic_objects[object_id]["colour"] = settings.get_style("routelines", "colour")
     objects_common.schematic_objects[object_id]["linewidth"] = settings.get_style("routelines", "linewidth")
+    objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("points", "buttoncolour")
+    objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("points", "textcolourtype")
+    objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("points", "textfonttuple")
     # Add the specific elements for this particular instance of the point
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -298,25 +317,25 @@ def update_point_styles(object_id, dict_of_new_styles:dict):
                 point_id = objects_common.schematic_objects[object_id]["itemid"],
                 colour = objects_common.schematic_objects[object_id]["colour"],
                 line_width = objects_common.schematic_objects[object_id]["linewidth"])
-#     else:
-#         # Work out what the active and selected colours for the button should be
-#         button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
-#         active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
-#         selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-#         # Work out what the text colour should be (auto uses lightest of the three for max contrast)
-#         # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
-#         text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-#         text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
-#         # Update the styles of the library object
-#         points.update_point_button_styles(
-#                 point_id = objects_common.schematic_objects[object_id]["itemid"],
-#                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
-#                 button_colour = button_colour,
-#                 active_colour = active_colour,
-#                 selected_colour = selected_colour,
-#                 text_colour = text_colour)
-#         # Create/update the selection rectangle for the button
-#         objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    else:
+        # Work out what the active and selected colours for the button should be
+        button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+        active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+        selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+        # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+        # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+        text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+        text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+        # Update the styles of the library object
+        points.update_point_button_styles(
+                point_id = objects_common.schematic_objects[object_id]["itemid"],
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour)
+        # Create/update the selection rectangle for the button
+        objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
     return()
 
 #------------------------------------------------------------------------------------

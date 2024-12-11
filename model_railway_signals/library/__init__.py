@@ -42,6 +42,7 @@ from .signals_ground_disc import create_ground_disc_signal
 from .points import point_type
 from .points import create_point
 from .points import update_point_styles
+from .points import update_point_button_styles
 from .points import delete_point
 from .points import update_autoswitch
 from .points import point_exists
@@ -157,6 +158,7 @@ __all__ = [
         'point_type',
         'create_point',
         'update_point_styles',
+        'update_point_button_styles',
         'delete_point',
         'update_autoswitch',
         'point_exists',

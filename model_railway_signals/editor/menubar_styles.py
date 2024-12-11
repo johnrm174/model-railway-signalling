@@ -431,9 +431,54 @@ class edit_route_line_styles():
         if not self.colour.is_open():
             edit_route_line_styles_window = None
             self.window.destroy()
+
+
+#------------------------------------------------------------------------------------
+# Class for the Point Style Settings toolbar window.
+#------------------------------------------------------------------------------------
+
+edit_point_styles_window = None
             
+class edit_point_styles():
+    def __init__(self, root_window):
+        global edit_point_styles_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_point_styles_window is not None:
+            edit_point_styles_window.lift()
+            edit_point_styles_window.state('normal')
+            edit_point_styles_window.focus_force()
+        else:
+            # Create the (non resizable) top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Point Button Styles")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_point_styles_window = self.window
+            # Create the UI Elements
+            self.styles = common_style_settings(self.window, object_type="points", max_font_size=12,
+                    apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected,
+                    close_window_callback=self.close_window)
+            self.styles.pack(padx=5, pady=5, fill='x')
+            # Load the initial UI state
+            self.styles.load_layout_defaults()
+
+    def apply_all(self):
+        if self.styles.validate():
+            objects_to_update = list(objects.point_index.values())
+            objects.update_styles(objects_to_update, self.styles.get_values())
+
+    def apply_selected(self):
+        if self.styles.validate():
+            objects_to_update = schematic.get_selected_objects(object_type=objects.object_type.point)
+            objects.update_styles(objects_to_update, self.styles.get_values())
+
+    def close_window(self):
+        global edit_point_styles_window
+        if not self.styles.widgetcolour.is_open():
+            edit_point_styles_window = None
+            self.window.destroy()
     
-        ## TODO - Line and Point Button Styles
+        ## TODO - Signal Button Styles
         ## TODO - Text Box Styles ???
         ## TODO - Menubar font size (easier via touchscreen)???
 
