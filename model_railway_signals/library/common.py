@@ -50,14 +50,6 @@ from . import signals
 # Global variables used within the Library Modules
 # -------------------------------------------------------------------------
 
-# Global variables for how the signals/points/sections buttons appear
-# on the screen. This is to allow the appearance to be optimised for
-# particular window sizes/screen resolutions.
-fontsize = 8  # Used by the Signals and Points modules
-xpadding = 2  # Used by the Signals and Points modules
-ypadding = -1  # Used by the Signals and Points modules
-bgraised = "grey85"   # Used by the Signals and Points modules
-bgsunken = "white"    # Used by the Signals and Points modules
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
 # Global variable to signal (to other modules) that application is closing

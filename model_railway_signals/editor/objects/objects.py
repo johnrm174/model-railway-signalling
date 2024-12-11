@@ -511,22 +511,22 @@ def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
         type_of_object = objects_common.schematic_objects[object_id]["item"]
         if type_of_object == objects_common.object_type.line:
             objects_lines.update_line_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.textbox:
-            pass
         elif type_of_object == objects_common.object_type.signal:
-            pass
+            objects_signals.update_signal_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.point:
             objects_points.update_point_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.section:
             objects_sections.update_section_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.instrument:
-            pass
-        elif type_of_object == objects_common.object_type.track_sensor:
-            pass
         elif type_of_object == objects_common.object_type.route:
             objects_routes.update_route_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.switch:
             objects_switches.update_switch_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.textbox:
+            pass
+        elif type_of_object == objects_common.object_type.instrument:
+            pass
+        elif type_of_object == objects_common.object_type.track_sensor:
+            pass
     # save the current state (for undo/redo)
     save_schematic_state()
     return()

@@ -75,7 +75,12 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 fully_automatic:bool=False,
                                 button_xoffset:int=0,
                                 button_yoffset:int=0,
-                                hide_buttons:bool=False):
+                                hide_buttons:bool=False,
+                                button_colour:str="Grey85",
+                                active_colour:str="Grey95",
+                                selected_colour:str="White",
+                                text_colour:str="black",
+                                font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Get some info about the signal to help validation of the parameters we have been given
@@ -106,7 +111,12 @@ def create_colour_light_signal (canvas, sig_id:int,
                                                 sig_updated_callback = sig_updated_callback,
                                                 sub_switched_callback = sub_switched_callback,
                                                 has_subsidary = has_subsidary,
-                                                sig_automatic = fully_automatic)
+                                                sig_automatic = fully_automatic,
+                                                button_colour = button_colour,
+                                                active_colour = active_colour,
+                                                selected_colour = selected_colour,
+                                                text_colour = text_colour,
+                                                font = font)
         # Draw the signal base line & signal post   
         line_coords = common.rotate_line (x,y,0,0,0,-15,orientation) 
         canvas.create_line (line_coords,width=2,tags=canvas_tag,fill="snow")

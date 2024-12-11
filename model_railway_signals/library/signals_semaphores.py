@@ -91,7 +91,12 @@ def create_semaphore_signal(canvas, sig_id:int,
                             associated_home:int=0,
                             button_xoffset:int=0,
                             button_yoffset:int=0,
-                            hide_buttons:bool=False):
+                            hide_buttons:bool=False,
+                            button_colour:str="Grey85",
+                            active_colour:str="Grey95",
+                            selected_colour:str="White",
+                            text_colour:str="black",
+                            font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Get some info about the signal to help validation of the parameters we have been given
@@ -137,7 +142,12 @@ def create_semaphore_signal(canvas, sig_id:int,
                                                 sub_switched_callback = sub_switched_callback,
                                                 has_subsidary = has_subsidary,
                                                 sig_automatic = fully_automatic,
-                                                associated_home = associated_home)
+                                                associated_home = associated_home,
+                                                button_colour = button_colour,
+                                                active_colour = active_colour,
+                                                selected_colour = selected_colour,
+                                                text_colour = text_colour,
+                                                font = font)
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)

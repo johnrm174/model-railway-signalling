@@ -218,8 +218,9 @@ class main_menubar:
                 command=lambda:menubar_styles.edit_route_line_styles(self.root))
         self.styles_menu.add_command(label =" Point buttons...",
                 command=lambda:menubar_styles.edit_point_styles(self.root))
+        self.styles_menu.add_command(label =" Signal buttons...",
+                command=lambda:menubar_styles.edit_signal_styles(self.root))
         self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)
-        ############################# MORE TO COME ###################################
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:menubar_help.display_help(self.root))

@@ -48,7 +48,12 @@ def create_ground_disc_signal (canvas, sig_id:int,
                                orientation:int=0,
                                button_xoffset:int=0,
                                button_yoffset:int=0,
-                               hide_buttons:bool=False):
+                               hide_buttons:bool=False,
+                               button_colour:str="Grey85",
+                               active_colour:str="Grey95",
+                               selected_colour:str="White",
+                               text_colour:str="black",
+                               font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Common validation (common to all signal types) 
@@ -64,7 +69,12 @@ def create_ground_disc_signal (canvas, sig_id:int,
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.ground_disc,
                                                 x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
-                                                sig_switched_callback, sig_passed_callback)
+                                                sig_switched_callback, sig_passed_callback,
+                                                button_colour = button_colour,
+                                                active_colour = active_colour,
+                                                selected_colour = selected_colour,
+                                                text_colour = text_colour,
+                                                font = font)
         # Draw the signal base
         line_coords = common.rotate_line (x,y,0,0,0,-11,orientation)
         canvas.create_line (line_coords,width=2,tags=canvas_tag)
