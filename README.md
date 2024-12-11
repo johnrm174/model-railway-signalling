@@ -28,9 +28,12 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New option to offset the position of signal buttons (useful for busy schematics to deconflict)
 * New option to hide point buttons in Run Mode (if controlling only via setup/cleardown of routes)
 * New option to hide signal buttons in Run Mode (if controlling only via setup/cleardown of routes)
+* New menubar 'styles' feature to set (and apply) default styles for Route buttons, DCC Switches,
+Track Sections and Route Lines (points and lines)
 * Width of track sections is now specified independently to the default label (4 to 30 characters)
 * Improved appearance of buttons and track sections when displayed on different colour backgrounds
 * Bugfix to prevent schematic items being selected in Run Mode after scrolling the displayed area
+* Bugfix to route line highlighting (colour of the end-stops are now updated to show the route)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
