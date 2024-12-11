@@ -6,7 +6,7 @@
 #    create_section(type) - Create a default track section object on the schematic
 #    delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    update_section(obj_id,new_obj) - Update the configuration of an existing section object
-#    update_section_style(obj_id, params) - Update the styles of an existing section object
+#    update_section_styles(obj_id, params) - Update the styles of an existing section object
 #    paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
@@ -34,6 +34,7 @@
 #    track_sections.section_exists - Common function to see if a given item exists
 #    track_sections.delete_section(id) - delete library drawing object (part of soft delete)
 #    track_sections.create_section(id) -  To create the library object (create or redraw)
+#    track_sections.update_section_styles(id,styles) - Update the styles of an existing library object
 #    track_sections.update_mirrored(id, mirrored_id) - To update the mirrored section reference
 #
 #------------------------------------------------------------------------------------
@@ -207,8 +208,7 @@ def paste_section(object_to_paste, deltax:int, deltay:int):
     return(new_object_id)
 
 #------------------------------------------------------------------------------------
-# Function to update the styles of a Track section library object - called after
-# the style elements in the object dictionary have been set to the required values
+# Function to update the styles of a Track section library object
 #------------------------------------------------------------------------------------
 
 def update_section_styles(object_id, dict_of_new_styles:dict):

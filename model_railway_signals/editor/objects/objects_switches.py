@@ -32,6 +32,7 @@
 #    buttons.create_button(id) - Create the library object
 #    buttons.delete_button(id) - Delete the library object
 #    buttons.button_exists - to find out if the specified Item ID already exists
+#    buttons.update_button_styles(id,styles) - Update the styles of the library object
 #    dcc_control.map_dcc_switch - Create a DCC mapping for the Accessory Switch
 #    dcc_control.delete_switch_mapping - Delete the DCC mapping for the switch
 #
@@ -189,8 +190,7 @@ def paste_switch(object_to_paste, deltax:int, deltay:int):
     return(new_object_id)
 
 #------------------------------------------------------------------------------------
-# Function to update the styles of a Route Button object - called after
-# the style elements in the object dictionary have been set to the required values
+# Function to update the styles of a Route Button object
 #------------------------------------------------------------------------------------
 
 def update_switch_styles(object_id, dict_of_new_styles:dict):

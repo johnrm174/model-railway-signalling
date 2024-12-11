@@ -42,6 +42,7 @@
 #
 # Makes the following external API calls to library modules:
 #    buttons.create_button(id) - Create the library object
+#    buttons.update_button_styles(id,styles) - Update the styles of the library object
 #    buttons.delete_button(id) - Delete the library object
 #    buttons.button_exists - to find out if the specified Item ID already exists
 #
@@ -368,8 +369,7 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     return(new_object_id)
 
 #------------------------------------------------------------------------------------
-# Function to update the styles of a Route Button object - called after
-# the style elements in the object dictionary have been set to the required values
+# Function to update the styles of a Route Button object
 #------------------------------------------------------------------------------------
 
 def update_route_styles(object_id, dict_of_new_styles:dict):
