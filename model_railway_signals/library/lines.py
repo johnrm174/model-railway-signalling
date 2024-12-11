@@ -203,6 +203,8 @@ def set_line_colour(line_id:int, colour:str):
         logging.error("Line "+str(line_id)+": set_line_colour - Line ID does not exist")
     else:
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
     return()
 
 # -------------------------------------------------------------------------
