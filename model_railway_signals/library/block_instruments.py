@@ -126,6 +126,11 @@ list_of_instruments_to_publish = []
 # Global variable to hold the handle to the Bell Code hints window
 bell_code_hints_window = None
 
+# Global variables for the button styles
+bgraised_colour = "Grey80"
+bgsunken_colour = "White"
+button_font = ('Courier',8,"bold")
+
 # Function to close the Telegraph Bell Codes window (when "X" is clicked)
 def close_bell_code_hints():
     global bell_code_hints_window
@@ -352,9 +357,9 @@ def set_repeater_blocked(inst_id:int,make_callback:bool=True):
         # For single line instruments we set the local instrument buttons to mirror the remote instrument
         # and also enable the local buttons (as the remote instrument has been returned to LINE BLOCKED)
         if instruments[str(inst_id)]["insttype"] == instrument_type.single_line:
-            instruments[str(inst_id)]["blockbutton"].config(state="normal",relief="sunken",bg=common.bgsunken)
-            instruments[str(inst_id)]["clearbutton"].config(state="normal",relief="raised",bg=common.bgraised)
-            instruments[str(inst_id)]["occupbutton"].config(state="normal",relief="raised",bg=common.bgraised)
+            instruments[str(inst_id)]["blockbutton"].config(state="normal",relief="sunken",bg=bgsunken_colour)
+            instruments[str(inst_id)]["clearbutton"].config(state="normal",relief="raised",bg=bgraised_colour)
+            instruments[str(inst_id)]["occupbutton"].config(state="normal",relief="raised",bg=bgraised_colour)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
@@ -378,9 +383,9 @@ def set_repeater_clear(inst_id:int,make_callback:bool=True):
         # For single line instruments we set the local instrument buttons to mirror the remote instrument
         # and also inhibit the local buttons (until the remote instrument is returned to LINE BLOCKED)
         if instruments[str(inst_id)]["insttype"] == instrument_type.single_line:
-            instruments[str(inst_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
-            instruments[str(inst_id)]["clearbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
-            instruments[str(inst_id)]["occupbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(inst_id)]["blockbutton"].config(state="disabled",relief="raised",bg=bgraised_colour)
+            instruments[str(inst_id)]["clearbutton"].config(state="disabled",relief="sunken",bg=bgsunken_colour)
+            instruments[str(inst_id)]["occupbutton"].config(state="disabled",relief="raised",bg=bgraised_colour)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
@@ -404,9 +409,9 @@ def set_repeater_occupied(inst_id:int,make_callback:bool=True):
         # For single line instruments we set the local instrument buttons to mirror the remote instrument
         # and also inhibit the local buttons (until the remote instrument is returned to LINE BLOCKED)
         if instruments[str(inst_id)]["insttype"] == instrument_type.single_line:
-            instruments[str(inst_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
-            instruments[str(inst_id)]["clearbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
-            instruments[str(inst_id)]["occupbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
+            instruments[str(inst_id)]["blockbutton"].config(state="disabled",relief="raised",bg=bgraised_colour)
+            instruments[str(inst_id)]["clearbutton"].config(state="disabled",relief="raised",bg=bgraised_colour)
+            instruments[str(inst_id)]["occupbutton"].config(state="disabled",relief="sunken",bg=bgsunken_colour)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
@@ -425,9 +430,9 @@ def set_section_blocked(inst_id:int,update_remote_instrument:bool=True):
     if instruments[str(inst_id)]["sectionstate"] is not None:
         logging.info ("Instrument "+str(inst_id)+": Changing block section indicator to LINE BLOCKED")
         # Set the state of the buttons accordingly
-        instruments[str(inst_id)]["blockbutton"].config(relief="sunken",bg=common.bgsunken)
-        instruments[str(inst_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(inst_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["blockbutton"].config(relief="sunken",bg=bgsunken_colour)
+        instruments[str(inst_id)]["clearbutton"].config(relief="raised",bg=bgraised_colour)
+        instruments[str(inst_id)]["occupbutton"].config(relief="raised",bg=bgraised_colour)
         # Set the internal state of the block instrument and the local indicator
         instruments[str(inst_id)]["sectionstate"] = None
         instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatoroccup"],state = "hidden")
@@ -452,9 +457,9 @@ def set_section_clear(inst_id:int,update_remote_instrument:bool=True):
     if instruments[str(inst_id)]["sectionstate"] != True:
         logging.info ("Instrument "+str(inst_id)+": Changing block section indicator to LINE CLEAR")
         # Set the state of the buttons accordingly
-        instruments[str(inst_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(inst_id)]["clearbutton"].config(relief="sunken",bg=common.bgsunken)
-        instruments[str(inst_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["blockbutton"].config(relief="raised",bg=bgraised_colour)
+        instruments[str(inst_id)]["clearbutton"].config(relief="sunken",bg=bgsunken_colour)
+        instruments[str(inst_id)]["occupbutton"].config(relief="raised",bg=bgraised_colour)
         # Set the internal state of the block instrument and the local indicator
         instruments[str(inst_id)]["sectionstate"] = True
         instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatoroccup"],state = "hidden")
@@ -479,9 +484,9 @@ def set_section_occupied(inst_id:int,update_remote_instrument:bool=True):
     if instruments[str(inst_id)]["sectionstate"] != False:
         logging.info ("Instrument "+str(inst_id)+": Changing block section indicator to TRAIN ON LINE")
         # Set the state of the buttons accordingly
-        instruments[str(inst_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(inst_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(inst_id)]["occupbutton"].config(relief="sunken",bg=common.bgsunken)
+        instruments[str(inst_id)]["blockbutton"].config(relief="raised",bg=bgraised_colour)
+        instruments[str(inst_id)]["clearbutton"].config(relief="raised",bg=bgraised_colour)
+        instruments[str(inst_id)]["occupbutton"].config(relief="sunken",bg=bgsunken_colour)
         # Set the internal state of the block instrument and the local indicator
         instruments[str(inst_id)]["sectionstate"] = False
         instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatoroccup"],state = "normal")
@@ -569,19 +574,18 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
             canvas.create_rectangle (x-48, y-18, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
         else:
             canvas.create_rectangle (x-48, y-73, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
-        # Create the button objects and their callbacks. Note that for block instruments we don't use
-        # The default font size defined in 'common' as the buttons are (hopefully) big enough
-        occup_button = Tk.Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="raised", font=('Courier',8,"normal"),
-                    bg=common.bgraised, command = lambda:occup_button_event(inst_id))
-        clear_button = Tk.Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="raised", font=('Courier',8,"normal"),
-                    bg=common.bgraised, command = lambda:clear_button_event(inst_id))
-        block_button = Tk.Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="sunken", font=('Courier',8,"normal"),
-                    bg=common.bgsunken, command = lambda:blocked_button_event(inst_id))
-        bell_button = Tk.Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="raised", font=('Courier',8,"normal"),
+        # Create the button objects and their callbacks.
+        occup_button = Tk.Button (canvas, text="OCCUP", padx=2, pady=0,
+                    state="normal", relief="raised", font=button_font,
+                    bg=bgraised_colour, command = lambda:occup_button_event(inst_id))
+        clear_button = Tk.Button (canvas, text="CLEAR", padx=2, pady=0,
+                    state="normal", relief="raised", font=button_font,
+                    bg=bgraised_colour, command = lambda:clear_button_event(inst_id))
+        block_button = Tk.Button (canvas, text="LINE BLOCKED", padx=2, pady=0,
+                    state="normal", relief="sunken", font=button_font,
+                    bg=bgsunken_colour, command = lambda:blocked_button_event(inst_id))
+        bell_button = Tk.Button (canvas, text="TELEGRAPH", padx=2, pady=0,
+                    state="normal", relief="raised", font=button_font,
                     bg="black", fg="white", activebackground="black", activeforeground="white",
                     command = lambda:telegraph_key_button(inst_id))
         # Bind a right click on the Telegraph button to open the bell code hints
