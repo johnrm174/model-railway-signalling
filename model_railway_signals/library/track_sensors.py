@@ -134,8 +134,8 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback, hidden:bo
         button_window = canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
         selection_circle = canvas.create_oval(x-20, y-20, x+20, y+20, outline="grey60", tags=canvas_tag, width=0)
         # Note that the label is offset to take into account the default font size in 'common'
-        sensor_label = canvas.create_text(x, y+9+(common.fontsize/2), text=format(sensor_id,'02d'), tags=canvas_tag,
-                                          state="hidden", font=('Courier',common.fontsize,"normal"))
+        sensor_label = canvas.create_text(x, y-10, text=format(sensor_id,'02d'), tags=canvas_tag,
+                                          state="hidden", font=('Courier',8,"bold"))
         # In Edit mode - all drawing objects (button, selection circle and Item ID text) are visible
         # In Run Mode, only the button is visible (unless this needs to be 'hidden' in Run Mode)
         if editing_enabled:
