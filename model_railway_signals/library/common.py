@@ -18,8 +18,6 @@
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
-#   configure_button_size(button_size:int) - Specify the Font size for layout control buttons)
-#
 # External API - classes and functions (used by the other library modules):
 #
 #   rotate_point(ox,oy,px,py,angle) - Rotate a point (px,py) around the origin (ox,oy)
@@ -161,15 +159,6 @@ def configure_edit_mode(edit_mode:bool):
     buttons.configure_edit_mode(edit_mode)
     points.configure_edit_mode(edit_mode)
     signals.configure_edit_mode(edit_mode)
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to configure the font size for layout control buttons (points/signals)
-#------------------------------------------------------------------------------------
-
-def configure_button_size(button_size:int):
-    global fontsize
-    fontsize = button_size
     return()
 
 # -------------------------------------------------------------------------

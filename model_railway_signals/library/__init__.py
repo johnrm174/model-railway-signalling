@@ -146,7 +146,6 @@ from .common import set_root_window
 from .common import orderly_shutdown
 from .common import instant_shutdown
 from .common import configure_edit_mode
-from .common import configure_button_size
 
 __all__ = [
       # Public common functions
@@ -154,7 +153,6 @@ __all__ = [
         'orderly_shutdown',
         'instant_shutdown',
         'configure_edit_mode',
-        'configure_button_size',
       # Public point types/functions
         'point_type',
         'create_point',
