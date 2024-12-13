@@ -807,7 +807,7 @@ def override_signals_based_on_track_sections_ahead():
                        and signal_object["sigroutes"][signal_route.value-1] ):
                     override_signal = True
                     break
-            if override_signal: set_signal_override(int_signal_id)
+            if signals.signal_clear(int_signal_id) and override_signal: set_signal_override(int_signal_id)
             else: clear_signal_override(int_signal_id)
         else:
             clear_signal_override(int_signal_id)
@@ -990,6 +990,7 @@ def signal_updated_callback(signal_id:Union[int,str]):
 def signal_switched_callback(signal_id:int, route_id:int=0):
     if enhanced_debugging: print("########## signal_switched_callback "+str(signal_id))
     if run_mode and automation_enabled:
+        override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals(signal_id)    
         override_distant_signals_based_on_signals_ahead()
     else:
