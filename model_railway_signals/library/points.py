@@ -334,10 +334,12 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         # Create the tkinter button objects
         point_button = Tk.Button(canvas, text=format(point_id,'02d'), state="normal", relief="raised",
                             font=font, highlightthickness=0, padx=2, pady=0, background=button_colour,
-                            activebackground=active_colour, command=lambda:change_button_event(point_id))
+                            activebackground=active_colour, activeforeground=text_colour,
+                            foreground=text_colour, command=lambda:change_button_event(point_id))
         fpl_button = Tk.Button(canvas, text="L", state="normal", relief="sunken", font=font,
                             highlightthickness=0, padx=2, pady=0, background=selected_colour,
-                            activebackground=active_colour, command=lambda:fpl_button_event(point_id))
+                            activebackground=active_colour, activeforeground=text_colour,
+                            foreground=text_colour, command=lambda:fpl_button_event(point_id))
         # Create the Tkinter drawing objects (lines) for each point/ We use tkinter 'tags' to uniquely identify
         # each point's 'blades' and route lines so these can easily be hidden/displayed/highlighted as required
         # 'route1' is the tag for route lines through the point when the point is in its unswitched configuration

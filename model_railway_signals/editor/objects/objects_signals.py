@@ -758,6 +758,15 @@ def update_signal_styles(object_id, dict_of_new_styles:dict):
             active_colour = active_colour,
             selected_colour = selected_colour,
             text_colour = text_colour)
+    # Update the associated distant signal buttons as well
+    if has_associated_distant(object_id):
+        signals.update_signal_button_styles(
+                signal_id = objects_common.schematic_objects[object_id]["itemid"] + 1000,
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour)
     # Create/update the selection rectangle for the button
     objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
     return()
