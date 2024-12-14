@@ -39,6 +39,7 @@
 #    track_sensor_index - for iterating through all the sensor objects
 #    route_index - for iterating through all the route objects
 #    switch_index - for iterating through all the switch objects
+#    textbox_index - for iterating through all the textbox objects
 #
 #------------------------------------------------------------------------------------
 
@@ -79,6 +80,7 @@ line_index:dict={}
 track_sensor_index:dict={}
 route_index:dict={}
 switch_index:dict={}
+textbox_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id

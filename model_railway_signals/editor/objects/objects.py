@@ -720,8 +720,10 @@ def set_all(new_objects):
 
             #################################################################################################
             ## Handle breaking changes related to how fonts are stored from Release 4.9.0 onwards ###########
+            ## This applies to route buttons, DCC Switch Buttons and Text Boxes #############################
             #################################################################################################
-            if new_object_type == objects_common.object_type.route or new_object_type == objects_common.object_type.switch:
+            if ( new_object_type == objects_common.object_type.route or new_object_type == objects_common.object_type.switch
+                or new_object_type == objects_common.object_type.textbox):
                 if "textfonttuple" not in new_objects[object_id].keys() and "font" in new_objects[object_id].keys():
                     # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
                     fonttuple = (new_objects[object_id]["font"], new_objects[object_id]["fontsize"] ,new_objects[object_id]["fontstyle"])
@@ -731,6 +733,26 @@ def set_all(new_objects):
                             +"'textfonttuple' - Asigning value from legacy parameters' : "+str(fonttuple))
             #################################################################################################
             ## End of Handle breaking changes related to how fonts are stored ###############################
+            #################################################################################################
+
+            #################################################################################################
+            ## Handle breaking changes as to how textbox parameters are stored (Release 4.9.0 onwards) ######
+            #################################################################################################
+            if new_object_type == objects_common.object_type.textbox:
+                if "textcolour" not in new_objects[object_id].keys() and "colour" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    objects_common.schematic_objects[object_id]["textcolour"] = new_objects[object_id]["colour"]
+                    new_objects[object_id]["textcolour"] = new_objects[object_id]["colour"]
+                if "borderwidth" not in new_objects[object_id].keys() and "border" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    objects_common.schematic_objects[object_id]["borderwidth"] = new_objects[object_id]["border"]
+                    new_objects[object_id]["borderwidth"] = new_objects[object_id]["border"]
+                if "justification" not in new_objects[object_id].keys() and "justify" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    objects_common.schematic_objects[object_id]["justification"] = new_objects[object_id]["justify"]
+                    new_objects[object_id]["justification"] = new_objects[object_id]["justify"]
+            #################################################################################################
+            ## End of Handle breaking changes related to how text box parameters are stored  #################
             #################################################################################################
 
             # Now report any elements missing from the new object - intended to provide a

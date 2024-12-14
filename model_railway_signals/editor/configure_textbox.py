@@ -157,14 +157,15 @@ class edit_textbox():
             self.window.title("Textbox")
             # Set the Initial UI state from the current object settings
             self.text.set_value(objects.schematic_objects[self.object_id]["text"])
-            self.textcolour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            self.textcolour.set_value(objects.schematic_objects[self.object_id]["textcolour"])
             self.background.set_value(objects.schematic_objects[self.object_id]["background"])
             self.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
-            self.font.set_value(objects.schematic_objects[self.object_id]["font"])
-            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["fontstyle"])
-            self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
-            self.textjustify.set_value(objects.schematic_objects[self.object_id]["justify"])
-            self.borderwidth.set_value(objects.schematic_objects[self.object_id]["border"])
+            self.textjustify.set_value(objects.schematic_objects[self.object_id]["justification"])
+            self.borderwidth.set_value(objects.schematic_objects[self.object_id]["borderwidth"])
+            font, font_size, font_style = objects.schematic_objects[self.object_id]["textfonttuple"]
+            self.font.set_value(font)
+            self.fontsize.set_value(font_size)
+            self.fontstyle.set_value(font_style)
             # Justify the text and set/resize the font/style to match the initial selection
             self.justification_updated()
             self.font_style_updated()
@@ -182,15 +183,14 @@ class edit_textbox():
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             # Note that we do not change the actual 'font' setting via the UI at present
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            new_object_configuration["textfonttuple"] = font_tuple
             new_object_configuration["text"] = self.text.get_value()
-            new_object_configuration["colour"] = self.textcolour.get_value()
+            new_object_configuration["textcolour"] = self.textcolour.get_value()
             new_object_configuration["background"] = self.background.get_value()
+            new_object_configuration["justification"] = self.textjustify.get_value()
+            new_object_configuration["borderwidth"] = self.borderwidth.get_value()
             new_object_configuration["hidden"] = self.hidden.get_value()
-            new_object_configuration["font"] = self.font.get_value()
-            new_object_configuration["fontsize"] = self.fontsize.get_value()
-            new_object_configuration["fontstyle"] = self.fontstyle.get_value()
-            new_object_configuration["justify"] = self.textjustify.get_value()
-            new_object_configuration["border"] = self.borderwidth.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

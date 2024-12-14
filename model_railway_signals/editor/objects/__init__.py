@@ -46,6 +46,7 @@
 #    track_sensor_index - for iterating through all the track_sensor objects
 #    route_index - for iterating through all the route objects
 #    switch_index - for iterating through all the switch objects
+#    textbox_index - for iterating through all the textbox objects
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -89,6 +90,7 @@ from .objects_common import line_index
 from .objects_common import track_sensor_index
 from .objects_common import route_index
 from .objects_common import switch_index
+from .objects_common import textbox_index
 
 from .objects_gpio import create_gpio_sensors
 from .objects_gpio import configure_remote_gpio_sensor_event_mappings
@@ -136,6 +138,7 @@ __all__ = [
     'track_sensor_index',
     'route_index',
     'switch_index',
+    'textbox_index',
     # GPIO Event configuration functions
     'create_gpio_sensors',
     'configure_remote_gpio_sensor_event_mappings',

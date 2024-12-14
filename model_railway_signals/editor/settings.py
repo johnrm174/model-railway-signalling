@@ -125,6 +125,12 @@ default_settings["styles"]["signals"] = {}
 default_settings["styles"]["signals"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["signals"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["signals"]["textfonttuple"] = ("Courier", 8, "")
+default_settings["styles"]["textboxes"] = {}
+default_settings["styles"]["textboxes"]["textcolour"] = "Black"
+default_settings["styles"]["textboxes"]["background"] = ""     # Empty String = Transparent
+default_settings["styles"]["textboxes"]["textfonttuple"] = ("Courier", 10, "")
+default_settings["styles"]["textboxes"]["justification"] = 2   # 1=Left, 2=Center, 3=right
+default_settings["styles"]["textboxes"]["borderwidth"] = 0     # border width
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
