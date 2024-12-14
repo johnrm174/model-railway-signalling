@@ -77,23 +77,14 @@ class edit_textbox():
                     min_height=2, min_width=30, editable=True, auto_resize=True)
             self.text.pack(padx=2, pady=2, fill='both', expand=True)
             #----------------------------------------------------------------------------------
-            # Create a Frame for the Text colour, background colour and other elements (Frame 2)
+            # Create a Frame for the Text colour and background colour (Frame 2)
             #----------------------------------------------------------------------------------
             self.frame2 = Tk.Frame(self.main_frame)
             self.frame2.pack(fill='x')
             self.textcolour = common.colour_selection(self.frame2, label="Text colour")
             self.textcolour.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
-            self.background = common.colour_selection(self.frame2, label="Background", transparent_option=True)
+            self.background = common.colour_selection(self.frame2, label="Background Colour", transparent_option=True)
             self.background.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
-            # Create a Frame for the other general settings
-            self.frame2subframe1 = Tk.LabelFrame(self.frame2, text="General Settings")
-            self.frame2subframe1.pack(padx=2, pady=2, fill='both', expand=True)
-            self.frame2subframe2 = Tk.Frame(self.frame2subframe1)
-            self.frame2subframe2.pack(fill="y", expand=True)
-            # Create a subframe to center the UI elements in
-            self.hidden = common.check_box(self.frame2subframe2, label="Hidden",
-                     tool_tip= "Select to hide the Text Box in Run Mode")
-            self.hidden.pack(padx=2, pady=2, fill="y", expand=True)
             #----------------------------------------------------------------------------------
             # Create a Frame for the font selection
             #----------------------------------------------------------------------------------
@@ -137,7 +128,16 @@ class edit_textbox():
             self.textjustify = common.selection_buttons(self.frame3, label="Text justification",
                         tool_tip="Select text justification", callback=self.justification_updated,
                             button_labels = ("Left", "Centre", "Right"))
-            self.textjustify.grid(row=1, column=1, padx=2, pady=2, sticky='NSWE')            
+            self.textjustify.grid(row=1, column=1, padx=2, pady=2, sticky='NSWE')
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the General Settings (Frame 4)
+            #----------------------------------------------------------------------------------
+            self.frame4 =  Tk.LabelFrame(self.main_frame, text="General Settings")
+            self.frame4.pack(fill='x')
+            self.hidden = common.check_box(self.frame4, label="Hidden",
+                     tool_tip= "Select to hide the Text Box in Run Mode")
+            self.hidden.pack(padx=2, pady=2)
+
             # load the initial UI state
             self.load_state()
         
