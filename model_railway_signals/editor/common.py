@@ -1557,16 +1557,20 @@ class colour_selection(Tk.LabelFrame):
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
         # Create the checkbox for "transparent (only pack it if specified at creation time)
-        self.transparent = check_box(self,label="Transparent ",callback=self.transparent_updated,
-                     tool_tip= "Select to make transparent (no fill)")
-        if transparent_option: self.transparent.pack()
+        self.transparent = check_box(self.subframe1, label="Transparent ", callback=self.transparent_updated,
+                                     tool_tip= "Select to make transparent (no fill)")
+        if transparent_option: self.transparent.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
 
     def colour_updated(self):
         self.colour_chooser_open = True
         colour_code = colorchooser.askcolor(self.colour, parent=self, title ="Select Colour")
         # If the colour chooser is cancelled it will return None - so we don't update
-        if colour_code[1] is not None: self.colour = colour_code[1]
-        self.label1.config(bg=self.colour)
+        # If the user has selected a colour then we de-select the transparent option
+        if colour_code[1] is not None:
+            self.colour = colour_code[1]
+            self.transparent.set_value(False)
+        # Update the current colour selection accordingly
+        self.transparent_updated()
         self.colour_chooser_open = False
 
     def transparent_updated(self):
