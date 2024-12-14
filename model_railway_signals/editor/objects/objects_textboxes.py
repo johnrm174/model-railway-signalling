@@ -149,7 +149,6 @@ def paste_textbox(object_to_paste, deltax:int, deltay:int):
 #------------------------------------------------------------------------------------
 
 def update_textbox_styles(object_id, dict_of_new_styles:dict):
-    print (objects_common.schematic_objects[object_id]["itemid"])
     # Update the appropriate elements in the object configuration
     for element_to_change in dict_of_new_styles.keys():
         objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
