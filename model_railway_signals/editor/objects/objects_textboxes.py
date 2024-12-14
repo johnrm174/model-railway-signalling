@@ -145,6 +145,32 @@ def paste_textbox(object_to_paste, deltax:int, deltay:int):
     return(new_object_id)
 
 #------------------------------------------------------------------------------------
+# Function to update the styles of a Text Box object
+#------------------------------------------------------------------------------------
+
+def update_textbox_styles(object_id, dict_of_new_styles:dict):
+    print (objects_common.schematic_objects[object_id]["itemid"])
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # Work out what the Tkinter Justification should be
+    if objects_common.schematic_objects[object_id]["justification"] == 1: tkinter_justification=Tk.LEFT
+    elif objects_common.schematic_objects[object_id]["justification"] == 2: tkinter_justification=Tk.CENTER
+    elif objects_common.schematic_objects[object_id]["justification"] == 3: tkinter_justification=Tk.RIGHT
+    else: tkinter_justification=Tk.CENTER
+    # Update the library object
+    text_boxes.update_text_box_styles(
+                    textbox_id = objects_common.schematic_objects[object_id]["itemid"],
+                    colour = objects_common.schematic_objects[object_id]["textcolour"],
+                    background = objects_common.schematic_objects[object_id]["background"],
+                    justify = tkinter_justification,
+                    borderwidth = objects_common.schematic_objects[object_id]["borderwidth"],
+                    font = objects_common.schematic_objects[object_id]["textfonttuple"])
+    # Create/update the selection rectangle for the button
+    objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to "soft delete" the object from the canvas - Primarily used to
 # delete the textbox in its current configuration prior to re-creating in its
 # new configuration - also called as part of a hard delete (below).

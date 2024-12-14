@@ -177,6 +177,8 @@ def reset_all_schematic_indexes():
             objects_common.route_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.switch:
             objects_common.switch_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.textbox:
+            objects_common.textbox_index[str(this_object_item_id)] = object_id
         # Note that textboxes don't have an index as we don't track their IDs
     return()
 
@@ -522,7 +524,7 @@ def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
         elif type_of_object == objects_common.object_type.switch:
             objects_switches.update_switch_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.textbox:
-            pass
+            objects_textboxes.update_textbox_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.instrument:
             pass
         elif type_of_object == objects_common.object_type.track_sensor:

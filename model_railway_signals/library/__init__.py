@@ -94,6 +94,7 @@ from .lines import reset_line_colour
 from .text_boxes import create_text_box
 from .text_boxes import text_box_exists
 from .text_boxes import delete_text_box
+from .text_boxes import update_text_box_styles
 
 from .pi_sprog_interface import sprog_connect
 from .pi_sprog_interface import sprog_disconnect
@@ -183,6 +184,7 @@ __all__ = [
         'track_sensor_exists',
       # public text box types/functions
         'create_text_box',
+        'update_text_box_styles',
         'delete_text_box',
         'text_box_exists',
       # Public signal types/functions

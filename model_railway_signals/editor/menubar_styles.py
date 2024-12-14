@@ -522,10 +522,140 @@ class edit_signal_styles():
         if not self.styles.widgetcolour.is_open():
             edit_signal_styles_window = None
             self.window.destroy()
-            
-        ## TODO - Text Box Styles ???
-        ## TODO - Menubar font size (easier via touchscreen)???
-        ## TO DO - signal buttons are getting reset by overrides or approach control
 
+#------------------------------------------------------------------------------------
+# Class for the Textbox Style Settings toolbar window.
+#------------------------------------------------------------------------------------
+
+edit_textbox_styles_window = None
+            
+class edit_textbox_styles():
+    def __init__(self, root_window):
+        global edit_textbox_styles_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_textbox_styles_window is not None:
+            edit_textbox_styles_window.lift()
+            edit_textbox_styles_window.state('normal')
+            edit_textbox_styles_window.focus_force()
+        else:
+            # Create the (non resizable) top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Text Box Styles")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_textbox_styles_window = self.window
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the Text colour and background colour (Frame 2)
+            #----------------------------------------------------------------------------------
+            self.frame2 = Tk.Frame(self.window)
+            self.frame2.pack(fill='x')
+            self.textcolour = common.colour_selection(self.frame2, label="Text colour")
+            self.textcolour.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
+            self.background = common.colour_selection(self.frame2, label="Background Colour", transparent_option=True)
+            self.background.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the font selection
+            #----------------------------------------------------------------------------------
+            self.font = common.font_selection(self.window, label="Text font")
+            self.font.pack(padx=2, pady=2, fill="x")
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the font size, text style and border width elements (Frame 3)
+            # Pack the elements as a grid to get an aligned layout
+            #----------------------------------------------------------------------------------
+            self.frame3 = Tk.Frame(self.window)
+            self.frame3.pack(fill='x')
+            self.frame3.grid_columnconfigure(0, weight=1)
+            self.frame3.grid_columnconfigure(1, weight=1)
+            # Create a Label Frame for the Font Size Entry components (grid 0,0)
+            self.frame3subframe1 = Tk.LabelFrame(self.frame3, text="Font size")
+            self.frame3subframe1.grid(row=0, column=0, padx=2, pady=2, sticky='NSWE')
+            # Create a subframe to center the label and entrybox
+            self.frame3subframe2 = Tk.Frame(self.frame3subframe1)
+            self.frame3subframe2.pack()
+            self.frame3label1 = Tk.Label(self.frame3subframe2, text="Pixels:")
+            self.frame3label1.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
+            self.fontsize = common.integer_entry_box(self.frame3subframe2, width=3, min_value=8, max_value=20,
+                            allow_empty=False, tool_tip="Select the border width (between 8 and 20 pixels)")
+            self.fontsize.pack(padx=2, pady=2, side=Tk.LEFT)
+            # Create a Label Frame for the Text Style selection (grid 1,0)
+            self.fontstyle = common.font_style_selection(self.frame3, label="Font style")
+            self.fontstyle.grid(row=0, column=1, padx=2, pady=2, sticky='NSWE')
+            # Create a Label Frame for the Border Width selection (grid 0,1)
+            self.frame3subframe3 = Tk.LabelFrame(self.frame3, text="Border width")
+            self.frame3subframe3.grid(row=1, column=0, padx=2, pady=2, sticky='NSWE')
+            # Create a subframe to center the label and entrybox
+            self.frame3subframe4 = Tk.Frame(self.frame3subframe3)
+            self.frame3subframe4.pack()
+            self.frame3label2 = Tk.Label(self.frame3subframe4, text="Pixels:")
+            self.frame3label2.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
+            self.borderwidth = common.integer_entry_box(self.frame3subframe4, width=3, min_value=0, max_value=5,
+                    allow_empty=False, tool_tip="Select border width between 0 and 5 (0 to disable border)")
+            self.borderwidth.pack(padx=2, pady=2, side=Tk.LEFT, fill="x")
+            # Create a Label Frame for the Text Justification selection (grid 1,1)
+            self.textjustify = common.selection_buttons(self.frame3, label="Text justification",
+                    tool_tip="Select text justification", button_labels = ("Left", "Centre", "Right"))
+            self.textjustify.grid(row=1, column=1, padx=2, pady=2, sticky='NSWE')
+            #----------------------------------------------------------------------------------
+            # Create the common buttons and Load the initial UI state
+            #----------------------------------------------------------------------------------
+            self.buttons = common_buttons(self.window, self.load_app_defaults, self.load_layout_defaults,
+                            self.apply_all, self.apply_selected, self.set_layout_defaults, self.close_window)
+            self.buttons.pack(padx=5, pady=5, side=Tk.BOTTOM, fill='x', expand=True)
+            self.load_layout_defaults()
+
+    def load_app_defaults(self):
+        self.textcolour.set_value(settings.get_default_style("textboxes", "textcolour"))
+        self.background.set_value(settings.get_default_style("textboxes", "background"))
+        self.font.set_value(settings.get_default_style("textboxes", "textfonttuple")[0])
+        self.fontsize.set_value(settings.get_default_style("textboxes", "textfonttuple")[1])
+        self.fontstyle.set_value(settings.get_default_style("textboxes", "textfonttuple")[2])
+        self.borderwidth.set_value(settings.get_default_style("textboxes", "borderwidth"))
+        self.textjustify.set_value(settings.get_default_style("textboxes", "justification"))
+
+    def load_layout_defaults(self):
+        self.textcolour.set_value(settings.get_style("textboxes", "textcolour"))
+        self.background.set_value(settings.get_style("textboxes", "background"))
+        self.font.set_value(settings.get_style("textboxes", "textfonttuple")[0])
+        self.fontsize.set_value(settings.get_style("textboxes", "textfonttuple")[1])
+        self.fontstyle.set_value(settings.get_style("textboxes", "textfonttuple")[2])
+        self.borderwidth.set_value(settings.get_style("textboxes", "borderwidth"))
+        self.textjustify.set_value(settings.get_style("textboxes", "justification"))
+
+    def set_layout_defaults(self):
+        if self.fontsize.validate() and self.borderwidth.validate():
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            settings.set_style("textboxes","textfonttuple", font_tuple)
+            settings.set_style("textboxes","textcolour", self.textcolour.get_value())
+            settings.set_style("textboxes","background", self.background.get_value())
+            settings.set_style("textboxes","borderwidth", self.borderwidth.get_value())
+            settings.set_style("textboxes","justification", self.textjustify.get_value())
+
+    def apply_all(self):
+        if self.fontsize.validate() and self.borderwidth.validate():
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            styles_to_apply = {"textfonttuple": font_tuple,
+                               "textcolour": self.textcolour.get_value(),
+                               "background": self.background.get_value(),
+                               "borderwidth": self.borderwidth.get_value(),
+                               "justification": self.textjustify.get_value() }
+            objects_to_update = list(objects.textbox_index.values())
+            objects.update_styles(objects_to_update, styles_to_apply)
+
+    def apply_selected(self):
+        if self.fontsize.validate() and self.borderwidth.validate():
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            styles_to_apply = {"textfonttuple": font_tuple,
+                               "textcolour": self.textcolour.get_value(),
+                               "background": self.background.get_value(),
+                               "borderwidth": self.borderwidth.get_value(),
+                               "justification": self.textjustify.get_value() }
+            objects_to_update = schematic.get_selected_objects(object_type=objects.object_type.textbox)
+            objects.update_styles(objects_to_update, styles_to_apply)
+
+    def close_window(self):
+        global edit_textbox_styles_window
+        if not self.textcolour.is_open() and not self.background.is_open():
+            edit_textbox_styles_window = None
+            self.window.destroy()
 
 #############################################################################################
