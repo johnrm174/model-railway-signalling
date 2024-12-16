@@ -151,7 +151,7 @@ def set_bbox(object_id:str, canvas_tags:str):
     if schematic_objects[object_id]["bbox"]:
         canvas.coords(schematic_objects[object_id]["bbox"],x1,y1,x2,y2)
     else:
-        schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')
+        schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden', outline="orange", width=2)
     return()
 
 #------------------------------------------------------------------------------------

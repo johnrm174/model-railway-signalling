@@ -586,7 +586,7 @@ def left_button_click(event):
                     # Make the 'selectareabox' visible. This will create the box on first use
                     # or after a 'delete_all_objects (when the box is set to 'None')
                     if schematic_state["selectareabox"] is None:
-                        schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
+                        schematic_state["selectareabox"] = canvas.create_rectangle(0, 0, 0, 0, outline="orange", width=2)
                     canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
                     canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
                     # Change the cursor style
