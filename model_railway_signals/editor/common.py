@@ -58,8 +58,11 @@ class CreateToolTip():
         self.widget.bind("<Enter>", self.enter)
         self.widget.bind("<Leave>", self.leave)
         self.widget.bind("<ButtonPress>", self.leave)
-        self.id = None
-        self.tw = None
+        self.tool_tip_scheduled = None
+        self.tool_tip_window = None
+        # Note we make the available screen area slightly smaller
+        self.screen_width = self.widget.winfo_screenwidth() - 25
+        self.screen_height = self.widget.winfo_screenheight() - 25
         
     def enter(self, event=None):
         self.schedule()
@@ -70,33 +73,53 @@ class CreateToolTip():
         
     def schedule(self):
         self.unschedule()
-        self.id = self.widget.after(self.waittime, self.showtip)
+        self.tool_tip_scheduled = self.widget.after(self.waittime, self.showtip)
         
     def unschedule(self):
-        id = self.id
-        self.id = None
-        if id: self.widget.after_cancel(id)
+        tool_tip_scheduled = self.tool_tip_scheduled
+        self.tool_tip_scheduled = None
+        if tool_tip_scheduled: self.widget.after_cancel(tool_tip_scheduled)
         
     def showtip(self, event=None):
-        x = y = 0
-        x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 20
-        # creates a toplevel window
-        self.tw = Tk.Toplevel(self.widget)
-        self.tw.attributes('-topmost',True)
-        # Leaves only the label and removes the app window
-        self.tw.wm_overrideredirect(True)
-        self.tw.wm_geometry("+%d+%d" % (x, y))
-        label = Tk.Label(self.tw, text=self.text, justify='left',
-                       background="#ffffff", relief='solid', borderwidth=1,
-                       wraplength = self.wraplength)
-        label.pack(ipadx=1)
+        # The winfo_rootx/y calls return the position of the top left corner of the
+        # widget relative to the top-left corner of the screen (not the root window)
+        tool_tip_x1 = self.widget.winfo_rootx()
+        tool_tip_y1 = self.widget.winfo_rooty()
+        # Create a toplevel window for the tooltip at the appropriate screen position
+        # and use the wm_overrideredirect method to remove the window titlebar etc
+        # Note the offsets applied to the window (created slightly below and to the
+        # right of the top-left corner of the widget)
+        self.tool_tip_window = Tk.Toplevel(self.widget)
+        self.tool_tip_window.attributes('-topmost',True)
+        self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1+25))
+        self.tool_tip_window.wm_overrideredirect(True)
+        # Create a label for displaying the tooltip and pack it in the window (internal padding)
+        tool_tip_label = Tk.Label(self.tool_tip_window, text=self.text, justify='left',
+                background="#ffffff", relief='solid', borderwidth=1, wraplength = self.wraplength)
+        tool_tip_label.pack(ipadx=1)
+        # Update idletasks and then query the width/height to get the displayed coords
+        self.widget.update_idletasks()
+        tool_tip_window_width = self.tool_tip_window.winfo_width()
+        tool_tip_window_height = self.tool_tip_window.winfo_height()
+        tool_tip_x2 = tool_tip_x1 + tool_tip_window_width
+        tool_tip_y2 = tool_tip_y1 + tool_tip_window_height
+        # Now move the tooltip window if it is going off-screen. Note the slightly different
+        # offsets applied to 'optimise' the position
+        if tool_tip_x2 > self.screen_width and tool_tip_y2 > self.screen_height:
+            tool_tip_x1 = tool_tip_x1 - tool_tip_window_width
+            tool_tip_y1 = tool_tip_y1 - tool_tip_window_height
+            self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1))
+        elif tool_tip_x2 > self.screen_width:
+            tool_tip_x1 = tool_tip_x1 - tool_tip_window_width
+            self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1+25))
+        elif tool_tip_y2 > self.screen_height:
+            tool_tip_y1 = tool_tip_y1 - tool_tip_window_height
+            self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1))
         
     def hidetip(self):
-        tw = self.tw
-        self.tw= None
-        if tw: tw.destroy()
+        tool_tip_window = self.tool_tip_window
+        self.tool_tip_window= None
+        if tool_tip_window: tool_tip_window.destroy()
 
 #####################################################################################
 ########################### COMMON BASIC UI ELEMENTS ################################
