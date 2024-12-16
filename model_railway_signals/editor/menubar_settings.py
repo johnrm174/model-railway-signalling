@@ -920,21 +920,6 @@ class edit_general_settings():
                     tool_tip="Select to Enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.enablespadpopups.pack(padx=2, pady=2)
             #----------------------------------------------------------------------------------
-            # Create a Label Frame for the Point/signal Button Fontsize settings
-            #----------------------------------------------------------------------------------
-            # Create a labelframe for the run Layout Settings
-            self.labelframe2 = Tk.LabelFrame(self.window, text = "Appearance Settings")
-            self.labelframe2.pack(padx=2, pady=2, fill=Tk.BOTH)
-            # Create the "Button Fontsize" selection element
-            self.subframe = Tk.Frame(self.labelframe2)
-            self.subframe.pack(padx=2, pady=2)
-            self.label1 = Tk.Label(self.subframe, text="Control button fontsize")
-            self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.buttonfontsize = common.integer_entry_box(self.subframe, min_value=8, max_value=12, width=3, allow_empty=False,
-                        tool_tip="Specify the font-size to use for the point and signal control buttons on the schematic "+
-                                "(8-12). Note that the new fontsize will only be applied on layout save/load or layout reset")
-            self.buttonfontsize.pack(side=Tk.LEFT, padx=2, pady=2)
-            #----------------------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             #----------------------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -949,13 +934,11 @@ class edit_general_settings():
         # Spad Popups flag is the 6th parameter returned from get_general
         # fontsize is the 7th parameter returned from get_general
         self.enablespadpopups.set_value(settings.get_general()[5])
-        self.buttonfontsize.set_value(settings.get_general()[6])
 
     def save_state(self, close_window:bool):
-        if self.buttonfontsize.validate():
+        if True:   ### We would normally validate any entries here ######
             self.validation_error.pack_forget()
             settings.set_general(spad=self.enablespadpopups.get_value())
-            settings.set_general(buttonsize=self.buttonfontsize.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )
