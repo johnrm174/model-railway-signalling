@@ -2,13 +2,39 @@
 # This module contains all the functions for the menubar Styles windows
 # 
 # Classes (pop up windows) called from the main editor module menubar selections
-#    ######## TO DO ########
+#    edit_section_styles
+#    edit_route_styles
+#    edit_switch_styles
+#    edit_route_line_styles
+#    edit_point_styles
+#    edit_signal_styles
+#    edit_textbox_styles
 #
 # Makes the following external API calls to other editor modules:
-#    ######## TO DO ########
+#    schematic.get_selected_objects
+#    settings.get_default_style
+#    settings.get_style
+#    settings.set_style
+#    objects.update_styles
+#
+# Accesses the following elements directly from other editor modules:
+#    objects.object_type
+#    objects.section_index
+#    objects.route_index
+#    objects.switch_index
+#    objects.point_index
+#    objects.line_index
+#    objects.signal_index
+#    objects.textbox_index
 #
 # Uses the following common editor UI elements:
-#    ######## TO DO #############
+#    common.CreateToolTip
+#    common.colour_selection
+#    common.selection_buttons
+#    common.font_selection
+#    common.font_style_selection
+#    common.integer_entry_box
+#    common.entry_box
 #
 #------------------------------------------------------------------------------------
 
