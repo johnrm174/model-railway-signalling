@@ -110,11 +110,12 @@ def create_text_box(canvas, textbox_id:int, x:int, y:int, text:str, colour:str="
         logging.debug("Text Box "+str(textbox_id)+": Creating library object on the schematic")
         # Create the new drawing objects (tagged with the canvas_tag) - These are initially created
         # assuming we are in Edit Mode (Objects always visible) and hidden later if required.
-        text_box = canvas.create_text(x, y, fill=colour, text=text, tags=canvas_tag, justify=justify, font=font)
+        text_box = canvas.create_text(x, y, fill=colour, text=text, tags=canvas_tag,
+                                      justify=justify, font=font, state='normal')
         # Find the boundary box and create the rectangle for the background
         bbox = canvas.bbox(text_box)
         rectangle = canvas.create_rectangle(bbox[0]-3, bbox[1]-3, bbox[2]+3, bbox[3]+2,
-                    width=borderwidth, tags=canvas_tag, fill=background, outline=colour)
+                    width=borderwidth, tags=canvas_tag, fill=background, outline=colour, state='normal')
         # Raise the text item to be in front of the rectangle item
         canvas.tag_raise(text_box, rectangle)
         # Hide the drawing objects if we are in Run Mode and 'hidden'. Note we can't just make the
@@ -166,6 +167,7 @@ def update_text_box_styles(textbox_id:int, colour:str="black", background:str="g
         textbox["canvas"].coords(textbox["rectangle"], bbox[0]-3, bbox[1]-3, bbox[2]+3, bbox[3]+2)
         if editing_enabled or not textbox["hidden"]:
             textbox["canvas"].itemconfig(textbox["rectangle"], fill=background)
+            textbox["canvas"].itemconfig(textbox["rectangle"], width=borderwidth)
         # Store the parameters we need to track
         text_boxes[str(textbox_id)]['borderwidth'] = borderwidth
         text_boxes[str(textbox_id)]['background'] = background
