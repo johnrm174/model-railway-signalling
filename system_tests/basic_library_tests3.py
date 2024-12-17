@@ -260,6 +260,11 @@ def run_library_api_tests():
     assert not signals.signal_clear(2)
     # Delete the automatic signal we specifically created for this test
     signals.delete_signal(10)
+    print("Library Tests - signal_locked and subsidary_locked - negative tests - will generate 4 errors:")
+    assert signals.signal_locked("1") == False      # Error - not an int
+    assert signals.signal_locked(99) == False       # Error - does not exist
+    assert signals.subsidary_locked("1") == False   # Error - not an int
+    assert signals.subsidary_locked(99) == False    # Error - does not exist
     print("Library Tests - lock_subsidary (also tests toggle_subsidary) - will generate 3 errors and 1 warning:")
     assert not signals.subsidary_locked(1)
     signals.lock_subsidary(1)
@@ -1166,7 +1171,7 @@ def run_signal_route_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
-# Test signal routes
+# Test signal buttons
 #---------------------------------------------------------------------------------------------------------
 
 def run_signal_button_tests():
@@ -1249,7 +1254,233 @@ def run_signal_button_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
-# Test signal routes
+# Test Mode changes (creation of signals and hide/unhide buttons)
+#---------------------------------------------------------------------------------------------------------
+
+def run_mode_change_tests():
+    canvas = schematic.canvas
+    print("Library Tests - Run Mode change tests (hidden buttons)")
+    # Create signals in Run Mode (This is the default mode and we haven't changed it in any other tests)
+    signals.configure_edit_mode(edit_mode=False)
+    # Buttons not hidden
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            has_subsidary=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 300, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            main_subsidary=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 300, 100,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)
+    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 500, 100, sig_switched, sig_passed)
+    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 650, 100, sig_switched,sig_passed)
+    # Buttons hidden
+    create_colour_light_signal(canvas, 6, signals.signal_subtype.home, 100, 200,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            has_subsidary=True, sig_release_button=True, hide_buttons=True)
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.home, 300, 200,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            main_subsidary=True, sig_release_button=True, hide_buttons=True)
+    create_semaphore_signal(canvas, 8, signals.semaphore_subtype.distant, 300, 200,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2, hide_buttons=True)
+    create_ground_disc_signal(canvas, 9, signals.ground_disc_subtype.standard, 500, 200, sig_switched, sig_passed, hide_buttons=True)
+    create_ground_position_signal(canvas, 10, signals.ground_pos_subtype.standard, 650, 200, sig_switched,sig_passed, hide_buttons=True)
+    # Test the buttons are hidden/displayed as required (Hidden buttons are only hidden in Run Mode)
+    print(signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow1"], 'state'))
+    assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(3)]["canvas"].itemcget(signals.signals[str(3)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(4)]["canvas"].itemcget(signals.signals[str(4)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(5)]["canvas"].itemcget(signals.signals[str(5)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(6)]["canvas"].itemcget(signals.signals[str(6)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(6)]["canvas"].itemcget(signals.signals[str(6)]["buttonwindow2"], 'state') == "hidden"
+    assert signals.signals[str(7)]["canvas"].itemcget(signals.signals[str(7)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(7)]["canvas"].itemcget(signals.signals[str(7)]["buttonwindow2"], 'state') == "hidden"
+    assert signals.signals[str(8)]["canvas"].itemcget(signals.signals[str(8)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(9)]["canvas"].itemcget(signals.signals[str(9)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(10)]["canvas"].itemcget(signals.signals[str(10)]["buttonwindow1"], 'state') == "hidden"
+    # Change the mode to test everything (including the 'hidden' buttons) is now displayed
+    signals.configure_edit_mode(edit_mode=True)
+    assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(3)]["canvas"].itemcget(signals.signals[str(3)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(4)]["canvas"].itemcget(signals.signals[str(4)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(5)]["canvas"].itemcget(signals.signals[str(5)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(6)]["canvas"].itemcget(signals.signals[str(6)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(6)]["canvas"].itemcget(signals.signals[str(6)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(7)]["canvas"].itemcget(signals.signals[str(7)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(7)]["canvas"].itemcget(signals.signals[str(7)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(8)]["canvas"].itemcget(signals.signals[str(8)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(9)]["canvas"].itemcget(signals.signals[str(9)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(10)]["canvas"].itemcget(signals.signals[str(5)]["buttonwindow1"], 'state') == "normal"
+    # Create some more signals in Edit Mode
+    #Buttons not hidden
+    create_colour_light_signal(canvas, 11, signals.signal_subtype.home, 100, 300,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            has_subsidary=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 12, signals.semaphore_subtype.home, 300, 300,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            main_subsidary=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 13, signals.semaphore_subtype.distant, 300, 300,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)
+    create_ground_disc_signal(canvas, 14, signals.ground_disc_subtype.standard, 500, 300, sig_switched, sig_passed)
+    create_ground_position_signal(canvas, 15, signals.ground_pos_subtype.standard, 650, 300, sig_switched,sig_passed)
+    # Buttons hidden
+    create_colour_light_signal(canvas, 16, signals.signal_subtype.home, 100, 400,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            has_subsidary=True, sig_release_button=True, hide_buttons=True)
+    create_semaphore_signal(canvas, 17, signals.semaphore_subtype.home, 300, 400,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            main_subsidary=True, sig_release_button=True, hide_buttons=True)
+    create_semaphore_signal(canvas, 18, signals.semaphore_subtype.distant, 300, 400,
+                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2, hide_buttons=True)
+    create_ground_disc_signal(canvas, 19, signals.ground_disc_subtype.standard, 500, 400, sig_switched, sig_passed, hide_buttons=True)
+    create_ground_position_signal(canvas, 20, signals.ground_pos_subtype.standard, 650, 400, sig_switched,sig_passed, hide_buttons=True)    
+    # Test the buttons are displayed (buttons always displayed in Run Mode)
+    assert signals.signals[str(11)]["canvas"].itemcget(signals.signals[str(11)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(11)]["canvas"].itemcget(signals.signals[str(11)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(12)]["canvas"].itemcget(signals.signals[str(12)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(12)]["canvas"].itemcget(signals.signals[str(12)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(13)]["canvas"].itemcget(signals.signals[str(13)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(14)]["canvas"].itemcget(signals.signals[str(14)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(15)]["canvas"].itemcget(signals.signals[str(15)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(16)]["canvas"].itemcget(signals.signals[str(16)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(16)]["canvas"].itemcget(signals.signals[str(16)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(17)]["canvas"].itemcget(signals.signals[str(17)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(17)]["canvas"].itemcget(signals.signals[str(17)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(18)]["canvas"].itemcget(signals.signals[str(18)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(19)]["canvas"].itemcget(signals.signals[str(19)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(20)]["canvas"].itemcget(signals.signals[str(20)]["buttonwindow1"], 'state') == "normal"
+    # Change the mode back to Run mode (to make sure buttons are hidden/displayed as appropriate)
+    # Note that the buttons have now been explicitly set to 'Normal' or 'Hidden' as required
+    signals.configure_edit_mode(edit_mode=False)
+    assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(3)]["canvas"].itemcget(signals.signals[str(3)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(4)]["canvas"].itemcget(signals.signals[str(4)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(5)]["canvas"].itemcget(signals.signals[str(5)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(6)]["canvas"].itemcget(signals.signals[str(6)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(6)]["canvas"].itemcget(signals.signals[str(6)]["buttonwindow2"], 'state') == "hidden"
+    assert signals.signals[str(7)]["canvas"].itemcget(signals.signals[str(7)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(7)]["canvas"].itemcget(signals.signals[str(7)]["buttonwindow2"], 'state') == "hidden"
+    assert signals.signals[str(8)]["canvas"].itemcget(signals.signals[str(8)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(9)]["canvas"].itemcget(signals.signals[str(9)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(10)]["canvas"].itemcget(signals.signals[str(10)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(11)]["canvas"].itemcget(signals.signals[str(11)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(11)]["canvas"].itemcget(signals.signals[str(11)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(12)]["canvas"].itemcget(signals.signals[str(12)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(12)]["canvas"].itemcget(signals.signals[str(12)]["buttonwindow2"], 'state') == "normal"
+    assert signals.signals[str(13)]["canvas"].itemcget(signals.signals[str(13)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(14)]["canvas"].itemcget(signals.signals[str(14)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(15)]["canvas"].itemcget(signals.signals[str(15)]["buttonwindow1"], 'state') == "normal"
+    assert signals.signals[str(16)]["canvas"].itemcget(signals.signals[str(16)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(16)]["canvas"].itemcget(signals.signals[str(16)]["buttonwindow2"], 'state') == "hidden"
+    assert signals.signals[str(17)]["canvas"].itemcget(signals.signals[str(17)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(17)]["canvas"].itemcget(signals.signals[str(17)]["buttonwindow2"], 'state') == "hidden"
+    assert signals.signals[str(18)]["canvas"].itemcget(signals.signals[str(18)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(19)]["canvas"].itemcget(signals.signals[str(19)]["buttonwindow1"], 'state') == "hidden"
+    assert signals.signals[str(20)]["canvas"].itemcget(signals.signals[str(20)]["buttonwindow1"], 'state') == "hidden"
+    # Clean up
+    signals.delete_signal(1)
+    signals.delete_signal(2)
+    signals.delete_signal(3)
+    signals.delete_signal(4)
+    signals.delete_signal(5)
+    signals.delete_signal(6)
+    signals.delete_signal(7)
+    signals.delete_signal(8)
+    signals.delete_signal(9)
+    signals.delete_signal(10)
+    signals.delete_signal(11)
+    signals.delete_signal(12)
+    signals.delete_signal(13)
+    signals.delete_signal(14)
+    signals.delete_signal(15)
+    signals.delete_signal(16)
+    signals.delete_signal(17)
+    signals.delete_signal(18)
+    signals.delete_signal(19)
+    signals.delete_signal(20)
+    return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test Mode changes (creation of signals and hide/unhide buttons)
+#---------------------------------------------------------------------------------------------------------
+
+def run_style_update_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    print("Library Tests - Run Style Update tests - will generate 2 Errors")
+    # Create signals in Run Mode (This is the default mode and we haven't changed it in any other tests)
+    signals.configure_edit_mode(edit_mode=False)
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
+                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                            has_subsidary=True, sig_release_button=True)
+    # Update the styles in Run Mode
+    signals.update_signal_button_styles("1", button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
+    signals.update_signal_button_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
+    # Test the styles have been updated
+    assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
+    assert signals.signals[str(1)]["sigbutton"].cget('background') == "Green4"
+    assert signals.signals[str(1)]["sigbutton"].cget('activebackground') == "Green3"
+    assert signals.signals[str(1)]["subbutton"].cget('foreground') == "White"
+    assert signals.signals[str(1)]["subbutton"].cget('background') == "Green4"
+    assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
+    # Test the button changes colour when selected
+    signals.toggle_signal(1)
+    assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
+    assert signals.signals[str(1)]["sigbutton"].cget('background') == "Green2"
+    assert signals.signals[str(1)]["sigbutton"].cget('activebackground') == "Green3"
+    assert signals.signals[str(1)]["subbutton"].cget('foreground') == "White"
+    assert signals.signals[str(1)]["subbutton"].cget('background') == "Green4"
+    assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
+
+    signals.toggle_subsidary(1)
+    assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
+    assert signals.signals[str(1)]["sigbutton"].cget('background') == "Green2"
+    assert signals.signals[str(1)]["sigbutton"].cget('activebackground') == "Green3"
+    assert signals.signals[str(1)]["subbutton"].cget('foreground') == "White"
+    assert signals.signals[str(1)]["subbutton"].cget('background') == "Green2"
+    assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
+    # Update the styles in Edit Mode
+    signals.configure_edit_mode(edit_mode=False)
+    signals.update_signal_button_styles(1, button_colour="Blue4", active_colour="Blue3", selected_colour="Blue2",
+                                        text_colour="Red", font=("Courier", 9 ,"italic"))
+    # Test the styles have been updated
+    assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "Red"
+    assert signals.signals[str(1)]["sigbutton"].cget('background') == "Blue2"
+    assert signals.signals[str(1)]["sigbutton"].cget('activebackground') == "Blue3"
+    assert signals.signals[str(1)]["subbutton"].cget('foreground') == "Red"
+    assert signals.signals[str(1)]["subbutton"].cget('background') == "Blue2"
+    assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Blue3"
+    # Test the button changes colour when selected
+    signals.toggle_signal(1)
+    assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "Red"
+    assert signals.signals[str(1)]["sigbutton"].cget('background') == "Blue4"
+    assert signals.signals[str(1)]["sigbutton"].cget('activebackground') == "Blue3"
+    assert signals.signals[str(1)]["subbutton"].cget('foreground') == "Red"
+    assert signals.signals[str(1)]["subbutton"].cget('background') == "Blue2"
+    assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Blue3"
+    signals.toggle_subsidary(1)
+    assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "Red"
+    assert signals.signals[str(1)]["sigbutton"].cget('background') == "Blue4"
+    assert signals.signals[str(1)]["sigbutton"].cget('activebackground') == "Blue3"
+    assert signals.signals[str(1)]["subbutton"].cget('foreground') == "Red"
+    assert signals.signals[str(1)]["subbutton"].cget('background') == "Blue4"
+    assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Blue3"
+    # Clean up
+    signals.delete_signal(1)
+    return()
+    
+#---------------------------------------------------------------------------------------------------------
+# Test signal approach control modes
 #---------------------------------------------------------------------------------------------------------
 
 def run_approach_control_tests():
@@ -1400,6 +1631,8 @@ def run_all_basic_library_tests():
     run_signal_route_tests()
     run_signal_button_tests()
     run_approach_control_tests()
+    run_mode_change_tests()
+    run_style_update_tests()
     # Check the creation of all supported Signal configurations
     print("Library Tests - Test creation of all supported signal configurations - no errors")
     system_test_harness.initialise_test_harness(filename="../configuration_examples/colour_light_signals.sig")
