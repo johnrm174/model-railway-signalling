@@ -109,7 +109,7 @@ def track_sensor_triggered (sensor_id:int, callback_type=None):
     return ()
 
 def reset_sensor_button (sensor_id:int):
-    if track_sensor_exists(sensor_id): track_sensors[str(sensor_id)]["button"].config(bg=common.bgraised)
+    if track_sensor_exists(sensor_id): track_sensors[str(sensor_id)]["button"].config(bg="grey85")
 
 #---------------------------------------------------------------------------------------------------
 # API Function to create a Track Sensor library object on the schematic

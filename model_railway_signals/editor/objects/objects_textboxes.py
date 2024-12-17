@@ -59,12 +59,19 @@ default_textbox_object["hidden"] = False
 #------------------------------------------------------------------------------------
 
 def update_textbox(object_id, new_object_configuration):
+    # Delete the existing object, copy across the new config and redraw. Note we don't really use the type-specific
+    # item IDs for textboxes but include code to handle it in case we allow the user to change them going forward
+    old_item_id = objects_common.schematic_objects[object_id]["itemid"]
+    new_item_id = new_object_configuration["itemid"]
     # Delete the existing object, copy across the new config and redraw
-    # Note we don't really use the type-specific item IDs so we don't allow
-    # the user to update these - hence no code to handle change of IDs here
     delete_textbox_object(object_id)
     objects_common.schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
     redraw_textbox_object(object_id)
+    # Check to see if the Type-specific ID has been changed
+    if old_item_id != new_item_id:
+        # Update the type-specific index
+        del objects_common.textbox_index[str(old_item_id)]
+        objects_common.textbox_index[str(new_item_id)] = object_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -132,9 +139,10 @@ def paste_textbox(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
-    # Assign a new type-specific ID for the object
+    # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=text_boxes.text_box_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
+    objects_common.textbox_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay

@@ -215,7 +215,7 @@ def start_application(callback_function):
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
         schematic.shutdown()
-        common.shutdown()
+        common.instant_shutdown()
         
 def run_function(test_function, delay:float=thread_delay_time):
     common.execute_function_in_tkinter_thread(test_function)
