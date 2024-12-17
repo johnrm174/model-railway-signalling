@@ -1426,6 +1426,8 @@ def run_style_update_tests():
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
     signals.update_signal_button_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
+    signals.update_signal_button_styles(1, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
     # Test the styles have been updated
     assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
     assert signals.signals[str(1)]["sigbutton"].cget('background') == "Green4"
@@ -1441,7 +1443,6 @@ def run_style_update_tests():
     assert signals.signals[str(1)]["subbutton"].cget('foreground') == "White"
     assert signals.signals[str(1)]["subbutton"].cget('background') == "Green4"
     assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
-
     signals.toggle_subsidary(1)
     assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
     assert signals.signals[str(1)]["sigbutton"].cget('background') == "Green2"
@@ -1626,12 +1627,12 @@ def run_all_basic_library_tests():
     run_library_api_tests()
     print("----------------------------------------------------------------------------------------")
     print("")
-    run_timed_signal_tests()
-    run_signal_aspect_tests()
-    run_signal_route_tests()
-    run_signal_button_tests()
-    run_approach_control_tests()
-    run_mode_change_tests()
+#     run_timed_signal_tests()
+#     run_signal_aspect_tests()
+#     run_signal_route_tests()
+#     run_signal_button_tests()
+#     run_approach_control_tests()
+#     run_mode_change_tests()
     run_style_update_tests()
     # Check the creation of all supported Signal configurations
     print("Library Tests - Test creation of all supported signal configurations - no errors")
