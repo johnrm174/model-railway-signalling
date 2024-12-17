@@ -472,6 +472,9 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     if not editing_enabled and hide_buttons:
         if button_window1 is not None: canvas.itemconfig(button_window1, state='hidden')
         if button_window2 is not None: canvas.itemconfig(button_window2, state='hidden')
+    else:
+        if button_window1 is not None: canvas.itemconfig(button_window1, state='normal')
+        if button_window2 is not None: canvas.itemconfig(button_window2, state='normal')
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]              = canvas                 # MANDATORY - canvas object
