@@ -52,10 +52,29 @@ def run_text_box_library_tests():
     text_boxes.configure_edit_mode(edit_mode=False)
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")
     text_boxes.create_text_box(canvas, 2, 200, 100, text="Textbox 1", hidden=True)
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"state") == "hidden"
     text_boxes.configure_edit_mode(edit_mode=True)
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"state") == "normal"
     text_boxes.create_text_box(canvas, 3, 300, 100, text="Textbox 1")
     text_boxes.create_text_box(canvas, 4, 400, 100, text="Textbox 1", hidden=True)
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(3)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(4)]["textwidget"],"state") == "normal"
     text_boxes.configure_edit_mode(edit_mode=False)
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"state") == "hidden"
+    assert canvas.itemcget(text_boxes.text_boxes[str(3)]["textwidget"],"state") == "normal"
+    assert canvas.itemcget(text_boxes.text_boxes[str(4)]["textwidget"],"state") == "hidden"
+    print("Library Tests - update_text_box_styles - will generate 2 errors:")
+    text_boxes.update_text_box_styles("1", colour="Red", background="Blue", borderwidth=2)    # Not an int
+    text_boxes.update_text_box_styles(99, colour="Red", background="Blue", borderwidth=2)     # Does not exist
+    text_boxes.update_text_box_styles(1, colour="Red", background="Blue", borderwidth=5)
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"fill") == "Red"
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["rectangle"],"fill") == "Blue"
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["rectangle"],"width") == "5.0"
     # Clean up
     text_boxes.delete_text_box(1) 
     text_boxes.delete_text_box(2)
@@ -986,6 +1005,19 @@ def run_line_library_tests():
     lines.delete_line(15)
     lines.delete_line(16)
     lines.delete_line(17)
+    print("Library Tests - update_line_styles - will generate 2 Errors")
+    # Create Lines (it doesn't matter what mode we are in)
+    lines.create_line(canvas, 1, 100, 100, 200, 100)
+    # Update the styles 
+    lines.update_line_styles("1", colour="Red", line_width=5)  # Not an Int
+    lines.update_line_styles(99, colour="Red", line_width=5)  # Does not exist
+    lines.update_line_styles(1, colour="Red", line_width=5)
+    canvas.update_idletasks()
+    # Test the styles have been updated
+    assert canvas.itemcget(lines.lines[str(1)]["line"],"fill") == "Red"
+    assert canvas.itemcget(lines.lines[str(1)]["line"],"width") == "5.0"
+    # Clean up
+    lines.delete_line(1)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1100,10 +1132,6 @@ def run_button_library_tests():
     buttons.create_button(canvas,3,buttontype,300,100,selected_callback,deselected_callback)      # Success
     assert len(buttons.buttons) == 3
     assert buttons.button_exists(3)
-    print("Library Tests - configure_edit_mode - Toggling between Run and Edit Mode - No errors:")
-    buttons.configure_edit_mode(edit_mode=False)
-    buttons.configure_edit_mode(edit_mode=True)
-    buttons.configure_edit_mode(edit_mode=False)
     print("Library Tests - delete_button - will generate 2 errors:")
     buttons.delete_button("1")         # Error - not an int
     buttons.delete_button(4)           # Error - does not exist
@@ -1145,6 +1173,81 @@ def run_button_library_tests():
     assert not buttons.button_state(4)
     buttons.delete_button(4)
     assert len(buttons.buttons) == 0    
+    print("Library Tests - configure_edit_mode - Toggling between Run and Edit Mode - No errors:")
+    # Create Buttons in Run Mode (This is the default mode and we haven't changed it in any other tests)
+    buttontype = buttons.button_type.switched
+    buttons.configure_edit_mode(edit_mode=False)
+    buttons.create_button(canvas,1,buttontype,100,100,selected_callback,deselected_callback, hidden=True)      # Success
+    buttons.create_button(canvas,2,buttontype,200,100,selected_callback,deselected_callback, hidden=False)     # Success
+    # Test the buttons are hidden/displayed as required (Hidden buttons are only hidden in Run Mode)
+    assert buttons.buttons[str(1)]["canvas"].itemcget(buttons.buttons[str(1)]["buttonwindow"], 'state') == "hidden"
+    assert buttons.buttons[str(1)]["canvas"].itemcget(buttons.buttons[str(1)]["placeholder1"], 'state') == "hidden"
+    assert buttons.buttons[str(2)]["canvas"].itemcget(buttons.buttons[str(2)]["buttonwindow"], 'state') == "normal"    
+    assert buttons.buttons[str(2)]["canvas"].itemcget(buttons.buttons[str(2)]["placeholder1"], 'state') == "hidden"    
+    # Change to edit mode and make sure all button placeholders are displayed
+    buttons.configure_edit_mode(edit_mode=True)
+    assert buttons.buttons[str(1)]["canvas"].itemcget(buttons.buttons[str(1)]["buttonwindow"], 'state') == "hidden"
+    assert buttons.buttons[str(1)]["canvas"].itemcget(buttons.buttons[str(1)]["placeholder1"], 'state') == "normal"
+    assert buttons.buttons[str(2)]["canvas"].itemcget(buttons.buttons[str(2)]["buttonwindow"], 'state') == "hidden"    
+    assert buttons.buttons[str(2)]["canvas"].itemcget(buttons.buttons[str(2)]["placeholder1"], 'state') == "normal"    
+    # Create Buttons in Edit Mode
+    buttons.create_button(canvas,3,buttontype,100,200,selected_callback,deselected_callback, hidden=True)      # Success
+    buttons.create_button(canvas,4,buttontype,200,200,selected_callback,deselected_callback, hidden=False)     # Success
+    assert buttons.buttons[str(3)]["canvas"].itemcget(buttons.buttons[str(3)]["buttonwindow"], 'state') == "hidden"
+    assert buttons.buttons[str(3)]["canvas"].itemcget(buttons.buttons[str(3)]["placeholder1"], 'state') == "normal"
+    assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["buttonwindow"], 'state') == "hidden"    
+    assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["placeholder1"], 'state') == "normal"    
+    # Change back to run mode and make sure all buttons are displayed/hidden as appropriate
+    buttons.configure_edit_mode(edit_mode=False)
+    assert buttons.buttons[str(1)]["canvas"].itemcget(buttons.buttons[str(1)]["buttonwindow"], 'state') == "hidden"
+    assert buttons.buttons[str(1)]["canvas"].itemcget(buttons.buttons[str(1)]["placeholder1"], 'state') == "hidden"
+    assert buttons.buttons[str(2)]["canvas"].itemcget(buttons.buttons[str(2)]["buttonwindow"], 'state') == "normal"    
+    assert buttons.buttons[str(2)]["canvas"].itemcget(buttons.buttons[str(2)]["placeholder1"], 'state') == "hidden"    
+    assert buttons.buttons[str(3)]["canvas"].itemcget(buttons.buttons[str(3)]["buttonwindow"], 'state') == "hidden"
+    assert buttons.buttons[str(3)]["canvas"].itemcget(buttons.buttons[str(3)]["placeholder1"], 'state') == "hidden"
+    assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["buttonwindow"], 'state') == "normal"    
+    assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["placeholder1"], 'state') == "hidden"
+    print("Library Tests - Run Style Update tests - will generate 2 Errors")
+    # Create / update Buttons in Run Mode (This is the default mode and we haven't changed it in any other tests)
+    buttons.configure_edit_mode(edit_mode=False)
+    buttons.update_button_styles("1", width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
+    buttons.update_button_styles(99, width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
+    buttons.update_button_styles(1, width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
+    assert buttons.buttons[str(1)]["button"].cget('foreground') == "White"
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
+    assert buttons.buttons[str(1)]["button"].cget('activebackground') == "Green3"
+    assert buttons.buttons[str(1)]["button"].cget('width') == 13
+    # Check the selected colour gets updated
+    buttons.toggle_button(1)
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Green2"
+    buttons.toggle_button(1)
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
+    # Change to Edit mode to ensure the placeholders are updated
+    buttons.configure_edit_mode(edit_mode=True)
+    assert canvas.itemcget(buttons.buttons[str(1)]["placeholder1"],"fill") == "White"
+    assert canvas.itemcget(buttons.buttons[str(1)]["placeholder2"],"fill") == "Green4"
+    # Update the styles in Edit Mode
+    buttons.update_button_styles(2, width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
+    assert canvas.itemcget(buttons.buttons[str(2)]["placeholder1"],"fill") == "White"
+    assert canvas.itemcget(buttons.buttons[str(2)]["placeholder2"],"fill") == "Green4"
+    # Change back to Run Mode
+    assert buttons.buttons[str(1)]["button"].cget('foreground') == "White"
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
+    assert buttons.buttons[str(1)]["button"].cget('activebackground') == "Green3"
+    assert buttons.buttons[str(1)]["button"].cget('width') == 13
+    assert buttons.buttons[str(2)]["button"].cget('foreground') == "White"
+    assert buttons.buttons[str(2)]["button"].cget('background') == "Green4"
+    assert buttons.buttons[str(2)]["button"].cget('activebackground') == "Green3"
+    assert buttons.buttons[str(2)]["button"].cget('width') == 13
+    # Tidy up
+    buttons.delete_button(1)
+    buttons.delete_button(2)
+    buttons.delete_button(3)
+    buttons.delete_button(4)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
