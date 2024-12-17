@@ -1285,7 +1285,6 @@ def run_mode_change_tests():
     create_ground_disc_signal(canvas, 9, signals.ground_disc_subtype.standard, 500, 200, sig_switched, sig_passed, hide_buttons=True)
     create_ground_position_signal(canvas, 10, signals.ground_pos_subtype.standard, 650, 200, sig_switched,sig_passed, hide_buttons=True)
     # Test the buttons are hidden/displayed as required (Hidden buttons are only hidden in Run Mode)
-    print(signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow1"], 'state'))
     assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow1"], 'state') == "normal"
     assert signals.signals[str(1)]["canvas"].itemcget(signals.signals[str(1)]["buttonwindow2"], 'state') == "normal"
     assert signals.signals[str(2)]["canvas"].itemcget(signals.signals[str(2)]["buttonwindow1"], 'state') == "normal"
@@ -1451,7 +1450,7 @@ def run_style_update_tests():
     assert signals.signals[str(1)]["subbutton"].cget('background') == "Green2"
     assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
     # Update the styles in Edit Mode
-    signals.configure_edit_mode(edit_mode=False)
+    signals.configure_edit_mode(edit_mode=True)
     signals.update_signal_button_styles(1, button_colour="Blue4", active_colour="Blue3", selected_colour="Blue2",
                                         text_colour="Red", font=("Courier", 9 ,"italic"))
     # Test the styles have been updated
@@ -1478,6 +1477,7 @@ def run_style_update_tests():
     assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Blue3"
     # Clean up
     signals.delete_signal(1)
+    signals.configure_edit_mode(edit_mode=False)
     return()
     
 #---------------------------------------------------------------------------------------------------------
@@ -1627,12 +1627,12 @@ def run_all_basic_library_tests():
     run_library_api_tests()
     print("----------------------------------------------------------------------------------------")
     print("")
-#     run_timed_signal_tests()
-#     run_signal_aspect_tests()
-#     run_signal_route_tests()
-#     run_signal_button_tests()
-#     run_approach_control_tests()
-#     run_mode_change_tests()
+    run_timed_signal_tests()
+    run_signal_aspect_tests()
+    run_signal_route_tests()
+    run_signal_button_tests()
+    run_approach_control_tests()
+    run_mode_change_tests()
     run_style_update_tests()
     # Check the creation of all supported Signal configurations
     print("Library Tests - Test creation of all supported signal configurations - no errors")
