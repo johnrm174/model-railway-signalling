@@ -274,10 +274,11 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         # before the text starts to wrap so we can't use this to set the minimum width of the placeholded object.
         # Instead, we need to specify an initial 'text' value that contains the required number of characters
         # (using zfill) and change this later.
-        placeholder1 = canvas.create_text(x, y, text="".zfill(width), font=font, fill=text_colour, tags=canvas_tag)
+        placeholder1 = canvas.create_text(x, y, text="".zfill(width), font=font,
+                                        fill=text_colour, tags=canvas_tag, state='normal')
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-4, bbox[2]+4, bbox[3]+2,
-                                            tags=canvas_tag, fill=button_colour, width=1)
+                                    tags=canvas_tag, fill=button_colour, width=1, state='normal')
         canvas.tag_raise(placeholder1, placeholder2)
         # Now we have created the textbox at the right width, update it to display the 'proper' label
         canvas.itemconfig(placeholder1, text=label)
