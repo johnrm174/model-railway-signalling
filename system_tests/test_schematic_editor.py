@@ -796,7 +796,7 @@ def run_copy_and_place_tests(delay):
     sleep(delay)
     assert_objects_selected(tb11,s11,s12,s13,s14,p11,p12,l11,l12,t11,ts11,rb11,sb11)
     assert_objects_deselected(tb1,s1,s2,s3,s4,p1,p2,l1,l2,t1,i1,ts1,rb1,sb1)
-    print("Schematic editor tests - Copy and paste selected objects (Cntl-c/Cntl-v)")
+    print("Schematic editor tests - Copy and paste selected objects (Cntl-c and 'place')")
     # Finally test copy/paste of block instrument
     select_single_object(i1)
     sleep(delay)
