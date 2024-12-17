@@ -31,7 +31,7 @@ def run_initial_state_tests(semaphore=False):
     if semaphore:
         assert_signals_PROCEED(17)
         assert_signals_override_caution_set(9,1016)
-        assert_signals_app_cntl_set(1,3,8)
+        assert_signals_app_cntl_clear(1,3,8)
     else:
         assert_signals_PRELIM_CAUTION(17)
         assert_signals_app_cntl_clear(1)
@@ -238,13 +238,17 @@ def run_signal_override_tests():
     # Signal 8
     assert_signals_override_clear(8)
     set_sections_occupied(2)
+    set_signals_off(8)
     assert_signals_override_set(8)
     set_sections_clear(2)
+    set_signals_on(8)
     assert_signals_override_clear(8)
     # Signal 1 - main route
     assert_signals_override_clear(1)
     set_sections_occupied(3)
+    set_signals_off(1)
     assert_signals_override_set(1)
+    set_signals_on(1)
     set_sections_clear(3)
     assert_signals_override_clear(1)
     set_fpls_off(2)
@@ -252,8 +256,10 @@ def run_signal_override_tests():
     set_fpls_on(2)
     assert_signals_override_clear(1)
     set_sections_occupied(12)
+    set_signals_off(1)
     assert_signals_override_set(1)
     set_sections_clear(12)
+    set_signals_on(1)
     assert_signals_override_clear(1)
     set_fpls_off(2)
     set_points_normal(2)
@@ -261,8 +267,10 @@ def run_signal_override_tests():
     # Signal 3
     assert_signals_override_clear(3)
     set_sections_occupied(4)
+    set_signals_off(3)
     assert_signals_override_set(3)
     set_sections_clear(4)
+    set_signals_on(3)
     assert_signals_override_clear(3)
     # Signal 2
     set_fpls_off(3)
@@ -270,8 +278,10 @@ def run_signal_override_tests():
     set_fpls_on(3)
     assert_signals_override_clear(2)
     set_sections_occupied(4)
+    set_signals_off(2)
     assert_signals_override_set(2)
     set_sections_clear(4)
+    set_signals_on(2)
     assert_signals_override_clear(2)
     set_fpls_off(3)
     set_points_normal(3)
@@ -281,10 +291,12 @@ def run_signal_override_tests():
     assert_signals_override_set(9)
     set_sections_clear(7)
     # Signal 12
+    set_signals_off(12)
     assert_signals_override_clear(12)
     set_sections_occupied(8)
     assert_signals_override_set(12)
     set_sections_clear(8)
+    set_signals_on(12)
     assert_signals_override_clear(12)
     # Signal 10
     set_sections_occupied(9)
