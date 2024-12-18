@@ -729,8 +729,8 @@ def set_all(new_objects):
                 if "textfonttuple" not in new_objects[object_id].keys() and "font" in new_objects[object_id].keys():
                     # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
                     fonttuple = (new_objects[object_id]["font"], new_objects[object_id]["fontsize"] ,new_objects[object_id]["fontstyle"])
-                    objects_common.schematic_objects[object_id]["textfonttuple"] = fonttuple
-                    new_objects[object_id]["textfonttuple"] = fonttuple
+                    objects_common.schematic_objects[object_id]["textfonttuple"] = tuple(fonttuple)
+                    new_objects[object_id]["textfonttuple"] = tuple(fonttuple)
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: "
                             +"'textfonttuple' - Asigning value from legacy parameters' : "+str(fonttuple))
             #################################################################################################
@@ -755,6 +755,17 @@ def set_all(new_objects):
                     new_objects[object_id]["justification"] = new_objects[object_id]["justify"]
             #################################################################################################
             ## End of Handle breaking changes related to how text box parameters are stored  #################
+            #################################################################################################
+
+            #################################################################################################
+            ## There was a bug in the code to handle the change in how fonts are stored (above) #############
+            ## This has now been fixed but we need to correct any files saved whilst the bug was there ######
+            #################################################################################################
+            if ("textfonttuple" in objects_common.schematic_objects[object_id].keys() and
+                     type(objects_common.schematic_objects[object_id]["textfonttuple"]) == list):
+                objects_common.schematic_objects[object_id]["textfonttuple"] = tuple(new_objects[object_id]["textfonttuple"])
+            #################################################################################################
+            ## End of code to handle the textfonttuple not being stored as a tuple ##########################
             #################################################################################################
 
             # Now report any elements missing from the new object - intended to provide a
