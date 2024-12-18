@@ -499,6 +499,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         if not editing_enabled and hide_buttons:
             if point_button_window is not None: canvas.itemconfig(point_button_window, state="hidden")
             if fpl_button_window is not None: canvas.itemconfig(fpl_button_window, state="hidden")
+        else:
+            if point_button_window is not None: canvas.itemconfig(point_button_window, state="normal")
+            if fpl_button_window is not None: canvas.itemconfig(fpl_button_window, state="normal")
         # Disable the change button if the point has FPL (default state = FPL active)
         if fpl: point_button.config(state="disabled")
         # Hide the line for the switched route (display it later when we need it)
