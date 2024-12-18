@@ -29,6 +29,11 @@ def close_window(ok:bool=False, cancel:bool=False, apply:bool=False, reset:bool=
     elif cancel: menubar_class_instance.close_window()
     elif reset: menubar_class_instance.load_state()
     
+def close_styles_window(ok:bool=False, apply_selected:bool=False, apply_all:bool=False):
+    if ok: menubar_class_instance.close_window()
+    elif apply_all: menubar_class_instance.apply_all()
+    elif apply_selected: menubar_class_instance.apply_selected()
+    
 def test_sprog_connectivity(): menubar_class_instance.test_connectivity()
 
 def test_mqtt_connectivity(): menubar_class_instance.config.test_connectivity()
@@ -253,6 +258,121 @@ def test_menubar_utilities_windows(delay:float=0.0):
     system_test_harness.sleep(delay)
     return()
 
+#-----------------------------------------------------------------------------------
+# Open and then close all Menubar Styles windows - to excersise the code and check that
+# an apply straight after opening the window doesnt screw up the config
+#-----------------------------------------------------------------------------------
+
+def test_menubar_styles_windows(delay:float=0.0):
+    # Select everything to give us something to apply with "apply_selected"
+    system_test_harness.select_all_objects()
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - ROUTE BUTTONS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_route_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - DCC SWITCH BUTTONS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_switch_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - TRACK SECTIONS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_section_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - ROUTE LINES")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_route_line_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - POINT BUTTONS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_point_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - SIGNAL BUTTONS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_signal_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - TEXT BOXES")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar_styles.edit_textbox_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    return()
+
 ######################################################################################################
 
 def run_all_menubar_window_tests():
@@ -263,6 +383,9 @@ def run_all_menubar_window_tests():
     test_menubar_help_windows(delay)
     test_menubar_settings_windows(delay)
     test_menubar_utilities_windows(delay)
+    # Load a layout to test the style changes
+    system_test_harness.initialise_test_harness(filename="../configuration_examples/my_layout_changed_styles.sig")
+    test_menubar_styles_windows(delay)
     system_test_harness.report_results()
     
 if __name__ == "__main__":
