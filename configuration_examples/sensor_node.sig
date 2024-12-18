@@ -5,39 +5,43 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 10758,
-            "border": 2,
-            "colour": "#0000ff",
-            "font": "Courier",
-            "fontsize": 10,
-            "fontstyle": "bold ",
+            "bbox": 13878,
+            "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
             "itemid": 1,
-            "justify": 1,
+            "justification": 1,
             "posx": 500.0,
             "posy": 250.0,
-            "tags": "textbox1",
-            "text": "This is the default layout file loaded on start-up and is configured\nto publish all GPIO sensor inputs via the MQTT network. \n\nTo complete the configuration:\n- Select Settings => MQTT\n  - Under Broker Configuration:\n    - Specify the IP address of your main signalling node\n  - Under Network Configuration:\n    - Specify the name you have assigned to your signalling network\n    - Specify a unique name (on the network) for this signallling node. \n\nIf you want to run this node 'headless' (without a monitor, keyboard or \nmouse connected), then you will also need to:\n  - On this node - under Network Configuration:\n    - Select 'Connect to broker on layout load'\n    - Select 'Quit application on reciept of shutdown'\n  - On your main signalling node - under Network Configuration:\n    - Select 'Publish shutdown on application exit'\n\nThis will cause this signalling node to initiate a shutdown when the\napplication instance running on your main signalling node is closed.\nThe Raspberry Pi will perform an orderly shutdown 10 seconds after \nthe application exits.\n\nIf required, you can also run a full layout file on this node\n(simulating another signal box on the layout for example) but\nnote that the Raspberry Pi-zero is not as powerful as the Pi-4B\nand so this will really only be suitable for simple layouts."
+            "tags": "textwidget1",
+            "text": "This is the default layout file loaded on start-up and is configured\nto publish all GPIO sensor inputs via the MQTT network. \n\nTo complete the configuration:\n- Select Settings => MQTT\n  - Under Broker Configuration:\n    - Specify the IP address of your main signalling node\n  - Under Network Configuration:\n    - Specify the name you have assigned to your signalling network\n    - Specify a unique name (on the network) for this signallling node. \n\nIf you want to run this node 'headless' (without a monitor, keyboard or \nmouse connected), then you will also need to:\n  - On this node - under Network Configuration:\n    - Select 'Connect to broker on layout load'\n    - Select 'Quit application on reciept of shutdown'\n  - On your main signalling node - under Network Configuration:\n    - Select 'Publish shutdown on application exit'\n\nThis will cause this signalling node to initiate a shutdown when the\napplication instance running on your main signalling node is closed.\nThe Raspberry Pi will perform an orderly shutdown 10 seconds after \nthe application exits.\n\nIf required, you can also run a full layout file on this node\n(simulating another signal box on the layout for example) but\nnote that the Raspberry Pi-zero is not as powerful as the Pi-4B\nand so this will really only be suitable for simple layouts.",
+            "textcolour": "#0000ff",
+            "textfonttuple": [
+                "Courier",
+                10,
+                "bold "
+            ]
         }
     },
     "points": {},
     "sections": {},
     "settings": {
         "canvas": {
+            "canvascolour": "grey85",
+            "displaygrid": true,
             "grid": 25,
+            "gridcolour": "#999",
             "height": 500,
             "snaptogrid": true,
             "width": 1000
         },
         "general": {
             "automation": true,
-            "buttonsize": 8,
             "editmode": true,
             "filename": "/home/john/model-railway-signalling/configuration_examples/sensor_node.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.8.0"
+            "version": "Version 4.9.0"
         },
         "gpio": {
             "portmappings": [
@@ -177,6 +181,72 @@
             "port": "/dev/serial0",
             "power": false,
             "startup": false
+        },
+        "styles": {
+            "dccswitches": {
+                "buttoncolour": "SkyBlue2",
+                "buttonwidth": 12,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    9,
+                    ""
+                ]
+            },
+            "points": {
+                "buttoncolour": "Grey85",
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    8,
+                    ""
+                ]
+            },
+            "routebuttons": {
+                "buttoncolour": "SeaGreen3",
+                "buttonwidth": 15,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    9,
+                    ""
+                ]
+            },
+            "routelines": {
+                "colour": "Black",
+                "linewidth": 3
+            },
+            "signals": {
+                "buttoncolour": "Grey85",
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    8,
+                    ""
+                ]
+            },
+            "textboxes": {
+                "background": "",
+                "borderwidth": 0,
+                "justification": 2,
+                "textcolour": "Black",
+                "textfonttuple": [
+                    "Courier",
+                    10,
+                    ""
+                ]
+            },
+            "tracksections": {
+                "buttoncolour": "Black",
+                "buttonwidth": 5,
+                "defaultlabel": "XXXXX",
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    9,
+                    "bold"
+                ]
+            }
         }
     },
     "signals": {}
