@@ -66,9 +66,6 @@ To overcome this, add the '--break-system-packages' argument to the command - e.
 <pre>
 $ pip install --break-system-packages model-railway-signals 
 </pre>
-<pre>
-$ sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
-</pre>
 To upgrade to the latest version use:
 <pre>
 $ pip install --upgrade model-railway-signals            <== This should work for most python installations
