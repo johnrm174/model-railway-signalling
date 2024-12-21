@@ -162,127 +162,75 @@ def signals_behind_and_overridden(object_id):
     return(list_of_signals_behind, list_of_overridden_signals)
 
 #####################################################################################
-# Classes for the Track Section Configuration Tab
-#####################################################################################
-
-#------------------------------------------------------------------------------------
-# Class for the Mirror Section Entry Box - builds on the common str_int_item_id_entry_box. 
-# Class instance methods inherited/used from the parent classes are:
-#    "set_value" - set the initial value of the entry_box (str) - Also sets the
-#                  current track sensor item ID (int) for validation purposes
-#    "get_value" - will return the last "valid" value of the entry box (str)
-#    "validate" - validate the section exists and not the same as the current item ID
-#------------------------------------------------------------------------------------
-
-class mirrored_section(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame):
-        # Create the Label Frame for the "mirrored section" entry box
-        self.frame = Tk.LabelFrame(parent_frame, text="Link to other track section")
-        # Create a frame for the "Section to mirror" elements
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack()
-        # Call the common base class init function to create the EB
-        self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
-        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - "+
-                         "This can be a local section ID or a remote section ID (in the form 'Node-ID') "+
-                         "which has been subscribed to via MQTT networking",
-                          exists_function = track_sections.section_exists)
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
-
-#------------------------------------------------------------------------------------
-# Class for the Default lable entry box - builds on the common entry_box class
-# Inherited class methods are:
-#    "set_value" - set the initial value of the entry box (string) 
-#    "get_value" - get the last "validated" value of the entry box (string)
-# Overriden class methods are
-#    "validate" - Validates the length of the entered text (between 2-10 chars)
-#------------------------------------------------------------------------------------
-
-class default_label_entry(common.entry_box):
-    def __init__(self, parent_frame):
-        # Create the Label Frame for the "mirrored section" entry box
-        self.frame = Tk.LabelFrame(parent_frame, text="Default section label")
-        self.packing1 = Tk.Label(self.frame, width=6)
-        self.packing1.pack(side=Tk.LEFT)
-        super().__init__(self.frame, width=16, tool_tip = "Enter the default label to "+
-                         "display when the section is occupied (this defines the default "+
-                         "width of the Track Section object on the schematic). The default "+
-                         "label should be between 4 and 10 characters")
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.packing2 = Tk.Label(self.frame, width=6)
-        self.packing2.pack(side=Tk.LEFT)
-
-    def validate(self):
-        label = self.entry.get()
-        if len(label) >= 4 and len(label) <=10:
-            valid = True
-        else:
-            valid = False
-            self.TT.text = ("The default label should be between 4 and 10 characters")
-            # If invalid and the entry is empty or spaces we need to show the error
-            if len(label.strip())== 0: self.entry.set("#")
-        self.set_validation_status(valid)
-        return(valid)
-
-#------------------------------------------------------------------------------------
 # Class for the main Track Section configuration tab
-#------------------------------------------------------------------------------------
+#####################################################################################
 
 class section_configuration_tab():
     def __init__(self, parent_tab):
-        # Create a Frame to hold the Section ID and General Settings
+        #----------------------------------------------------------------------------------
+        # Create a Frame to hold the Section ID, General Settings and section width (Frame1)
+        #----------------------------------------------------------------------------------
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(fill='x')
-        # Create the UI Element for Section ID selection
+        # Create the section ID entry (the first label frame)
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
                                 exists_function = track_sections.section_exists) 
         self.sectionid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
-        # Create a labelframe for the General settings
-        self.subframe1 = Tk.LabelFrame(self.frame1, text="General Settings")
-        self.subframe1.pack(padx=2, pady=2, fill='x')
-        self.readonly = common.check_box(self.subframe1, width=12, label="Read only",
+        # Create the General settings in a second label frame
+        self.frame1subframe2 = Tk.LabelFrame(self.frame1, text="General Settings")
+        self.frame1subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+        self.readonly = common.check_box(self.frame1subframe2, label="Read only",
                      tool_tip= "Select to make the Track Section non-editable")
-        self.readonly.pack(padx=2)
-        self.hidden = common.check_box(self.subframe1, width=12, label="Hidden",
+        self.readonly.pack(padx=2, side=Tk.LEFT, fill="y")
+        self.hidden = common.check_box(self.frame1subframe2, label="Hidden",
                      tool_tip= "Select to hide the Track Section in Run Mode")
-        self.hidden.pack(padx=2)
-        # Create a Label Frame to hold the "Mirror" section. Note that this needs a
-        # reference to the parent object to access the current value of Section ID
-        self.mirror = mirrored_section(parent_tab)
-        self.mirror.frame.pack(padx=2, pady=2, fill='x')
-        self.label = default_label_entry(parent_tab)
-        self.label.frame.pack(padx=2, pady=2, fill='x')
+        self.hidden.pack(padx=2, side=Tk.LEFT, fill="y")
+        #----------------------------------------------------------------------------------
+        # Create a Label Frame to hold the Link to aother track section elements (Frame2)
+        #----------------------------------------------------------------------------------
+        self.frame2 = Tk.LabelFrame(parent_tab, text="Link to other track section")
+        self.frame2.pack(fill='x', padx=2, pady=2)
+        # Create a subframe to center all UI elements in
+        self.frame2subframe1 = Tk.Frame(self.frame2)
+        self.frame2subframe1.pack()
+        # Call the common base class init function to create the EB
+        self.frame2subframe1label1 = Tk.Label(self.frame2subframe1,text="Section to mirror:")
+        self.frame2subframe1label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.mirror = common.str_int_item_id_entry_box(self.frame2subframe1, tool_tip = "Enter the ID of "+
+                    "the track section to mirror - This can be a local section ID or a remote section ID "+
+                    "(in the form 'Node-ID') which has been subscribed to via MQTT networking",
+                    exists_function = track_sections.section_exists)
+        self.mirror.pack(side=Tk.LEFT, padx=2, pady=2)
 
-#------------------------------------------------------------------------------------
-# Top level Class for the Track Section Interlocking Tab
-#------------------------------------------------------------------------------------
+#####################################################################################
+# Class for the Track Section Interlocking Tab
+#####################################################################################
 
 class section_interlocking_tab():
     def __init__(self, parent_tab):
-        self.signals = common.signal_route_frame (parent_tab, label="Signals locked when section occupied",
+        self.signals = common.signal_route_frame(parent_tab, label="Signals locked when section occupied",
                                     tool_tip="Edit the appropriate signals to configure interlocking")
         self.signals.frame.pack(padx=2, pady=2, fill='x')
 
-#------------------------------------------------------------------------------------
+#####################################################################################
 # Class for the main Track Section automation tab
-#------------------------------------------------------------------------------------
+#####################################################################################
 
 class section_automation_tab():
     def __init__(self, parent_tab):
-        self.behind = common.signal_route_frame (parent_tab, label="Signals controlling access into section",
+        self.behind = common.signal_route_frame(parent_tab, label="Signals controlling access into section",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.behind.frame.pack(padx=2, pady=2, fill='x')
-        self.ahead = common.signal_route_frame (parent_tab, label="Signals controlling access out of section",
+        self.ahead = common.signal_route_frame(parent_tab, label="Signals controlling access out of section",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.ahead.frame.pack(padx=2, pady=2, fill='x')
-        self.sensors1 = common.signal_route_frame (parent_tab, label="Sensors controlling access into section",
+        self.sensors1 = common.signal_route_frame(parent_tab, label="Sensors controlling access into section",
                                 tool_tip="Edit the appropriate track sensors to configure automation")
         self.sensors1.frame.pack(padx=2, pady=2, fill='x')
-        self.sensors2 = common.signal_route_frame (parent_tab, label="Sensors controlling access out of section",
+        self.sensors2 = common.signal_route_frame(parent_tab, label="Sensors controlling access out of section",
                                 tool_tip="Edit the appropriate track sensors to configure automation")
         self.sensors2.frame.pack(padx=2, pady=2, fill='x')
-        self.override = common.signal_route_frame (parent_tab, label="Sigs overridden when section occupied",
+        self.override = common.signal_route_frame(parent_tab, label="Sigs overridden when section occupied",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.override.frame.pack(padx=2, pady=2, fill='x')
         
@@ -349,7 +297,6 @@ class edit_section():
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
             self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
-            self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.automation.ahead.set_values(signals_ahead(self.object_id))
             signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
@@ -368,9 +315,8 @@ class edit_section():
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
-        # been validated on entry, but changes to other objects may have been made since then
-        elif ( self.config.sectionid.validate() and self.config.mirror.validate() and
-                  self.config.label.validate() ):
+        # been validated on entry, but changes to other objects may have been made since then.
+        elif self.config.sectionid.validate() and self.config.mirror.validate() :
             # Copy the original section Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the section coniguration elements from the current user selections
@@ -378,7 +324,6 @@ class edit_section():
             new_object_configuration["editable"] = not self.config.readonly.get_value()
             new_object_configuration["hidden"] = self.config.hidden.get_value()
             new_object_configuration["mirror"] = self.config.mirror.get_value()
-            new_object_configuration["defaultlabel"] = self.config.label.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

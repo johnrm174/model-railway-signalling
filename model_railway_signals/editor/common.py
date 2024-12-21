@@ -31,6 +31,7 @@
 #    selection_buttons() - combines multiple RadioButtons  in a LabelFrame
 #    selection_check_boxes() - combines multiple check_boxes in a LabelFrame
 #    colour_selection() - Colour plus colour chooser button in a LabelFrame
+#    button_configuration() - Hidden button plus x and y offsets in a LabelFrame
 #    window_controls() - Frame containing the 'apply/ok/reset/cancel' buttons
 #------------------------------------------------------------------------------------
 
@@ -57,8 +58,11 @@ class CreateToolTip():
         self.widget.bind("<Enter>", self.enter)
         self.widget.bind("<Leave>", self.leave)
         self.widget.bind("<ButtonPress>", self.leave)
-        self.id = None
-        self.tw = None
+        self.tool_tip_scheduled = None
+        self.tool_tip_window = None
+        # Note we make the available screen area slightly smaller
+        self.screen_width = self.widget.winfo_screenwidth() - 25
+        self.screen_height = self.widget.winfo_screenheight() - 25
         
     def enter(self, event=None):
         self.schedule()
@@ -69,33 +73,53 @@ class CreateToolTip():
         
     def schedule(self):
         self.unschedule()
-        self.id = self.widget.after(self.waittime, self.showtip)
+        self.tool_tip_scheduled = self.widget.after(self.waittime, self.showtip)
         
     def unschedule(self):
-        id = self.id
-        self.id = None
-        if id: self.widget.after_cancel(id)
+        tool_tip_scheduled = self.tool_tip_scheduled
+        self.tool_tip_scheduled = None
+        if tool_tip_scheduled: self.widget.after_cancel(tool_tip_scheduled)
         
     def showtip(self, event=None):
-        x = y = 0
-        x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 20
-        # creates a toplevel window
-        self.tw = Tk.Toplevel(self.widget)
-        self.tw.attributes('-topmost',True)
-        # Leaves only the label and removes the app window
-        self.tw.wm_overrideredirect(True)
-        self.tw.wm_geometry("+%d+%d" % (x, y))
-        label = Tk.Label(self.tw, text=self.text, justify='left',
-                       background="#ffffff", relief='solid', borderwidth=1,
-                       wraplength = self.wraplength)
-        label.pack(ipadx=1)
+        # The winfo_rootx/y calls return the position of the top left corner of the
+        # widget relative to the top-left corner of the screen (not the root window)
+        tool_tip_x1 = self.widget.winfo_rootx()
+        tool_tip_y1 = self.widget.winfo_rooty()
+        # Create a toplevel window for the tooltip at the appropriate screen position
+        # and use the wm_overrideredirect method to remove the window titlebar etc
+        # Note the offsets applied to the window (created slightly below and to the
+        # right of the top-left corner of the widget)
+        self.tool_tip_window = Tk.Toplevel(self.widget)
+        self.tool_tip_window.attributes('-topmost',True)
+        self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1+25))
+        self.tool_tip_window.wm_overrideredirect(True)
+        # Create a label for displaying the tooltip and pack it in the window (internal padding)
+        tool_tip_label = Tk.Label(self.tool_tip_window, text=self.text, justify='left',
+                background="#ffffff", relief='solid', borderwidth=1, wraplength = self.wraplength)
+        tool_tip_label.pack(ipadx=1)
+        # Update idletasks and then query the width/height to get the displayed coords
+        self.widget.update_idletasks()
+        tool_tip_window_width = self.tool_tip_window.winfo_width()
+        tool_tip_window_height = self.tool_tip_window.winfo_height()
+        tool_tip_x2 = tool_tip_x1 + tool_tip_window_width
+        tool_tip_y2 = tool_tip_y1 + tool_tip_window_height
+        # Now move the tooltip window if it is going off-screen. Note the slightly different
+        # offsets applied to 'optimise' the position
+        if tool_tip_x2 > self.screen_width and tool_tip_y2 > self.screen_height:
+            tool_tip_x1 = tool_tip_x1 - tool_tip_window_width
+            tool_tip_y1 = tool_tip_y1 - tool_tip_window_height
+            self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1))
+        elif tool_tip_x2 > self.screen_width:
+            tool_tip_x1 = tool_tip_x1 - tool_tip_window_width
+            self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1+25))
+        elif tool_tip_y2 > self.screen_height:
+            tool_tip_y1 = tool_tip_y1 - tool_tip_window_height
+            self.tool_tip_window.wm_geometry("+%d+%d" % (tool_tip_x1+25, tool_tip_y1))
         
     def hidetip(self):
-        tw = self.tw
-        self.tw= None
-        if tw: tw.destroy()
+        tool_tip_window = self.tool_tip_window
+        self.tool_tip_window= None
+        if tool_tip_window: tool_tip_window.destroy()
 
 #####################################################################################
 ########################### COMMON BASIC UI ELEMENTS ################################
@@ -1556,16 +1580,20 @@ class colour_selection(Tk.LabelFrame):
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
         # Create the checkbox for "transparent (only pack it if specified at creation time)
-        self.transparent = check_box(self,label="Transparent ",callback=self.transparent_updated,
-                     tool_tip= "Select to make transparent (no fill)")
-        if transparent_option: self.transparent.pack()
+        self.transparent = check_box(self.subframe1, label="Transparent ", callback=self.transparent_updated,
+                                     tool_tip= "Select to make transparent (no fill)")
+        if transparent_option: self.transparent.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
 
     def colour_updated(self):
         self.colour_chooser_open = True
         colour_code = colorchooser.askcolor(self.colour, parent=self, title ="Select Colour")
         # If the colour chooser is cancelled it will return None - so we don't update
-        if colour_code[1] is not None: self.colour = colour_code[1]
-        self.label1.config(bg=self.colour)
+        # If the user has selected a colour then we de-select the transparent option
+        if colour_code[1] is not None:
+            self.colour = colour_code[1]
+            self.transparent.set_value(False)
+        # Update the current colour selection accordingly
+        self.transparent_updated()
         self.colour_chooser_open = False
 
     def transparent_updated(self):
@@ -1602,8 +1630,8 @@ class colour_selection(Tk.LabelFrame):
 #------------------------------------------------------------------------------------
 
 class font_selection(selection_buttons):
-    def __init__(self, parent_frame, callback=None):
-        super().__init__(parent_frame, label="Font", callback=callback,tool_tip="Select the font style",
+    def __init__(self, parent_frame, label:str, callback=None):
+        super().__init__(parent_frame, label=label, callback=callback,tool_tip="Select the font style",
                             button_labels=("Courier", "Times", "Helvetica", "TkFixedFont"))
 
     def get_value(self):
@@ -1635,7 +1663,7 @@ class font_selection(selection_buttons):
 #------------------------------------------------------------------------------------
 
 class font_style_selection(selection_check_boxes):
-    def __init__(self, parent_frame, callback=None):
+    def __init__(self, parent_frame, label:str, callback=None):
         super().__init__(parent_frame, label="Font style", callback=callback,
                 tool_tip="Select the font style", button_labels=("Bold", "Itallic", "Underline"))
 
@@ -1650,6 +1678,47 @@ class font_style_selection(selection_check_boxes):
     def set_value(self, font_style:str):
         super().set_values(["bold" in font_style, "italic" in font_style, "underline" in font_style])
 
+#------------------------------------------------------------------------------------
+# Class for the Point/Signal Button Offset settings UI element (based on a Tk.LabelFrame)
+# Class instance functions to use externally are:
+#    "set_values" - will set the entry box values (hidden:bool, xoff:int, yoff:int)
+#    "get_values" - will return the entry box values (hidden:bool, xoff:int, yoff:int]
+#    "validate" - Ensure the Entry boxes are valid
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class button_configuration(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        # Create the Label frame to hold the Offset entry boxes
+        super().__init__(parent_frame, text="Control buttons")
+        # Create the UI Elements in a seperate subframe so they are centered in the LabelFrame
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack()
+        self.CB1 = check_box(self.subframe, label="Hidden", tool_tip="Select to hide the control buttons in Run Mode "+
+                             "(to declutter the schematic if only controlling via set up / clear down of routes)")
+        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        tooltip=("Specify any offsets (pixels -100 to +100) for the control buttons "+
+                    "(note that for rotated objects the offsets will will be applied in the opposite direction)")
+        self.L1 =Tk.Label(self.subframe, text="   Button X offset:")
+        self.L1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB1 = integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
+        self.EB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.L2 =Tk.Label(self.subframe, text="  Button Y offset:")
+        self.L2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB2 = integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
+        self.EB2.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def validate(self):
+        return(self.EB1.validate() and self.EB2.validate())
+
+    def set_values(self, hide_buttons:bool, xoffset:int, yoffset:int):
+        self.CB1.set_value(hide_buttons)
+        self.EB1.set_value(xoffset)
+        self.EB2.set_value(yoffset)
+
+    def get_values(self):
+        return (self.CB1.get_value(), self.EB1.get_value(), self.EB2.get_value())
+    
 #------------------------------------------------------------------------------------
 # Stand Alone UI element for a Tk.Frame containing the Apply/OK/Reset/Cancel Buttons.
 # Will make callbacks to the specified "load_callback" and "save_callback" functions

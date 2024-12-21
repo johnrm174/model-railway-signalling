@@ -15,7 +15,8 @@
                 false,
                 ""
             ],
-            "bbox": 1469,
+            "bbox": 3351,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -68,6 +69,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 50,
@@ -207,6 +209,12 @@
                 0
             ],
             "tags": "signal50",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -296,7 +304,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "0ada4f32-22e8-467e-ad64-e060c5129ee8": {
             "approachcontrol": [
@@ -310,7 +320,8 @@
                 false,
                 ""
             ],
-            "bbox": 1486,
+            "bbox": 3368,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -363,6 +374,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 5,
@@ -502,6 +514,12 @@
                 0
             ],
             "tags": "signal5",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -591,7 +609,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "0fe62d80-bcaf-4df3-8cb0-af152e43e154": {
             "approachcontrol": [
@@ -605,7 +625,8 @@
                 false,
                 ""
             ],
-            "bbox": 1503,
+            "bbox": 3385,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -658,6 +679,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 28,
@@ -797,6 +819,12 @@
                 0
             ],
             "tags": "signal28",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -886,7 +914,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "10400eb3-ce8a-45fa-bb2c-aedd0a242bcb": {
             "approachcontrol": [
@@ -900,7 +930,8 @@
                 false,
                 ""
             ],
-            "bbox": 1520,
+            "bbox": 3402,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -953,6 +984,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 2,
@@ -1092,6 +1124,12 @@
                 0
             ],
             "tags": "signal2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -1181,7 +1219,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "18349e23-24bb-4b23-8f37-0c8e5130616a": {
             "approachcontrol": [
@@ -1195,7 +1235,8 @@
                 false,
                 ""
             ],
-            "bbox": 1538,
+            "bbox": 3420,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -1248,6 +1289,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 22,
@@ -1387,6 +1429,12 @@
                 0
             ],
             "tags": "signal22",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -1476,7 +1524,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "2a7eafc6-73cc-41cc-b980-9531818784ec": {
             "approachcontrol": [
@@ -1490,7 +1540,8 @@
                 false,
                 ""
             ],
-            "bbox": 1549,
+            "bbox": 3431,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -1543,6 +1594,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 31,
@@ -1682,6 +1734,12 @@
                 0
             ],
             "tags": "signal31",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -1771,7 +1829,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "30a17f7c-df6c-4281-9198-0468a155dcae": {
             "approachcontrol": [
@@ -1785,7 +1845,8 @@
                 false,
                 ""
             ],
-            "bbox": 1560,
+            "bbox": 3442,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -1838,6 +1899,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 32,
@@ -1977,6 +2039,12 @@
                 0
             ],
             "tags": "signal32",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -2066,7 +2134,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "3531bc5e-a31d-4dbb-8b1f-321980f8955d": {
             "approachcontrol": [
@@ -2080,7 +2150,8 @@
                 false,
                 ""
             ],
-            "bbox": 1577,
+            "bbox": 3459,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -2133,6 +2204,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 27,
@@ -2272,6 +2344,12 @@
                 0
             ],
             "tags": "signal27",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -2361,7 +2439,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "389c3448-ed66-4dfb-97ca-518721d33fd2": {
             "approachcontrol": [
@@ -2375,7 +2455,8 @@
                 false,
                 ""
             ],
-            "bbox": 1594,
+            "bbox": 3476,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -2428,6 +2509,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 19,
@@ -2567,6 +2649,12 @@
                 0
             ],
             "tags": "signal19",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -2656,7 +2744,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "3d326926-be2c-4a2f-afc8-4b77150831a8": {
             "approachcontrol": [
@@ -2670,7 +2760,8 @@
                 false,
                 ""
             ],
-            "bbox": 1611,
+            "bbox": 3493,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -2723,6 +2814,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 13,
@@ -2862,6 +2954,12 @@
                 0
             ],
             "tags": "signal13",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -2951,7 +3049,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "3e0e21fc-27df-4f90-9538-90c9e4d1e369": {
             "approachcontrol": [
@@ -2965,7 +3065,8 @@
                 false,
                 ""
             ],
-            "bbox": 1631,
+            "bbox": 3513,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -3018,6 +3119,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 68,
@@ -3157,6 +3259,12 @@
                 0
             ],
             "tags": "signal68",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -3246,7 +3354,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "441e5723-1e4a-4ee1-b731-f747e56771de": {
             "approachcontrol": [
@@ -3260,7 +3370,8 @@
                 false,
                 ""
             ],
-            "bbox": 1648,
+            "bbox": 3530,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -3313,6 +3424,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 12,
@@ -3452,6 +3564,12 @@
                 0
             ],
             "tags": "signal12",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -3541,7 +3659,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "48b9bf1b-fe6d-40da-b86e-2689c2c9b0e1": {
             "approachcontrol": [
@@ -3555,7 +3675,8 @@
                 false,
                 ""
             ],
-            "bbox": 1659,
+            "bbox": 3541,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -3608,6 +3729,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 29,
@@ -3747,6 +3869,12 @@
                 0
             ],
             "tags": "signal29",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -3836,7 +3964,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "526589fc-4e99-4eba-9026-7c4fb5e24925": {
             "approachcontrol": [
@@ -3850,7 +3980,8 @@
                 false,
                 ""
             ],
-            "bbox": 1676,
+            "bbox": 3558,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -3903,6 +4034,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 9,
@@ -4042,6 +4174,12 @@
                 0
             ],
             "tags": "signal9",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -4131,7 +4269,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "535e77af-e5f2-4e65-a9d4-4babeee0ca4d": {
             "approachcontrol": [
@@ -4145,7 +4285,8 @@
                 false,
                 ""
             ],
-            "bbox": 1693,
+            "bbox": 3575,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -4198,6 +4339,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 46,
@@ -4337,6 +4479,12 @@
                 0
             ],
             "tags": "signal46",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -4426,7 +4574,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "54258725-5e62-49ec-8a7f-532a6e9703db": {
             "approachcontrol": [
@@ -4440,7 +4590,8 @@
                 false,
                 ""
             ],
-            "bbox": 1710,
+            "bbox": 3592,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -4493,6 +4644,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 11,
@@ -4632,6 +4784,12 @@
                 0
             ],
             "tags": "signal11",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -4721,7 +4879,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "5d2db188-3943-4817-8f05-bd22a6660252": {
             "approachcontrol": [
@@ -4735,7 +4895,8 @@
                 false,
                 ""
             ],
-            "bbox": 1727,
+            "bbox": 3609,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -4788,6 +4949,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 41,
@@ -4927,6 +5089,12 @@
                 0
             ],
             "tags": "signal41",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -5016,7 +5184,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "6794f19b-1da8-4238-a6d6-83e1051d20c3": {
             "approachcontrol": [
@@ -5030,7 +5200,8 @@
                 false,
                 ""
             ],
-            "bbox": 1744,
+            "bbox": 3626,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -5083,6 +5254,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 33,
@@ -5222,6 +5394,12 @@
                 0
             ],
             "tags": "signal33",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -5311,7 +5489,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "6fa91960-1da4-4b3f-9059-ea76a559013d": {
             "approachcontrol": [
@@ -5325,7 +5505,8 @@
                 false,
                 ""
             ],
-            "bbox": 1761,
+            "bbox": 3643,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -5378,6 +5559,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 34,
@@ -5517,6 +5699,12 @@
                 0
             ],
             "tags": "signal34",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -5606,7 +5794,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "72905390-ee66-4797-8b2a-10c70198fea7": {
             "approachcontrol": [
@@ -5620,7 +5810,8 @@
                 false,
                 ""
             ],
-            "bbox": 1779,
+            "bbox": 3661,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -5673,6 +5864,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 23,
@@ -5812,6 +6004,12 @@
                 0
             ],
             "tags": "signal23",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -5901,7 +6099,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "7454ff78-079a-45f3-b1e2-d8003fed4c53": {
             "approachcontrol": [
@@ -5915,7 +6115,8 @@
                 false,
                 ""
             ],
-            "bbox": 1796,
+            "bbox": 3678,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -5968,6 +6169,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 53,
@@ -6107,6 +6309,12 @@
                 0
             ],
             "tags": "signal53",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -6196,7 +6404,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "75f9e40b-eb69-4b38-a331-a2ca767099fe": {
             "approachcontrol": [
@@ -6210,7 +6420,8 @@
                 false,
                 ""
             ],
-            "bbox": 1813,
+            "bbox": 3695,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -6263,6 +6474,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 48,
@@ -6402,6 +6614,12 @@
                 0
             ],
             "tags": "signal48",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -6491,7 +6709,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "76b03f9a-b449-413f-a4d7-6c439db9aa33": {
             "approachcontrol": [
@@ -6505,7 +6725,8 @@
                 false,
                 ""
             ],
-            "bbox": 1831,
+            "bbox": 3713,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -6558,6 +6779,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 25,
@@ -6697,6 +6919,12 @@
                 0
             ],
             "tags": "signal25",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -6786,7 +7014,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "775cd74b-6969-4d2c-a1f8-5d07b010e4ab": {
             "approachcontrol": [
@@ -6800,7 +7030,8 @@
                 false,
                 ""
             ],
-            "bbox": 1849,
+            "bbox": 3731,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -6853,6 +7084,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 8,
@@ -6992,6 +7224,12 @@
                 0
             ],
             "tags": "signal8",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -7081,7 +7319,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "79be344f-97d6-4d52-8fa3-a9383769cd71": {
             "approachcontrol": [
@@ -7095,7 +7335,8 @@
                 false,
                 ""
             ],
-            "bbox": 1867,
+            "bbox": 3749,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -7148,6 +7389,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 24,
@@ -7287,6 +7529,12 @@
                 0
             ],
             "tags": "signal24",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -7376,7 +7624,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "7d401c6a-290c-4148-81e6-0b7459f8f29b": {
             "approachcontrol": [
@@ -7390,7 +7640,8 @@
                 false,
                 ""
             ],
-            "bbox": 1884,
+            "bbox": 3766,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -7443,6 +7694,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 58,
@@ -7582,6 +7834,12 @@
                 0
             ],
             "tags": "signal58",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -7671,7 +7929,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "81356f24-2b42-46e4-ac0b-27e945a90d70": {
             "approachcontrol": [
@@ -7685,7 +7945,8 @@
                 false,
                 ""
             ],
-            "bbox": 1901,
+            "bbox": 3783,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -7738,6 +7999,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 36,
@@ -7877,6 +8139,12 @@
                 0
             ],
             "tags": "signal36",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -7966,7 +8234,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "85b2463e-ea08-431c-8363-5d8b86586acf": {
             "approachcontrol": [
@@ -7980,7 +8250,8 @@
                 false,
                 ""
             ],
-            "bbox": 1919,
+            "bbox": 3801,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -8033,6 +8304,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 7,
@@ -8172,6 +8444,12 @@
                 0
             ],
             "tags": "signal7",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -8261,7 +8539,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "860dbc9e-64ec-42d9-b030-cfe20b5c6d9e": {
             "approachcontrol": [
@@ -8275,7 +8555,8 @@
                 false,
                 ""
             ],
-            "bbox": 1936,
+            "bbox": 3818,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -8328,6 +8609,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 57,
@@ -8467,6 +8749,12 @@
                 0
             ],
             "tags": "signal57",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -8556,7 +8844,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "86d9a919-d18c-4ad0-8cc7-9e57654b64ca": {
             "approachcontrol": [
@@ -8570,7 +8860,8 @@
                 false,
                 ""
             ],
-            "bbox": 1947,
+            "bbox": 3829,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -8623,6 +8914,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 14,
@@ -8762,6 +9054,12 @@
                 0
             ],
             "tags": "signal14",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -8851,7 +9149,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "8815509f-1097-4b9c-8bca-406af59f260b": {
             "approachcontrol": [
@@ -8865,7 +9165,8 @@
                 false,
                 ""
             ],
-            "bbox": 1964,
+            "bbox": 3846,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -8918,6 +9219,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 3,
@@ -9057,6 +9359,12 @@
                 0
             ],
             "tags": "signal3",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -9146,7 +9454,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "8cf488e0-a72b-4069-84d3-0defae7820a6": {
             "approachcontrol": [
@@ -9160,7 +9470,8 @@
                 false,
                 ""
             ],
-            "bbox": 1975,
+            "bbox": 3857,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -9213,6 +9524,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 15,
@@ -9352,6 +9664,12 @@
                 0
             ],
             "tags": "signal15",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -9441,7 +9759,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "8e41a8e2-4e48-4540-93c0-6acc0b83ae1e": {
             "approachcontrol": [
@@ -9455,7 +9775,8 @@
                 false,
                 ""
             ],
-            "bbox": 1992,
+            "bbox": 3874,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -9508,6 +9829,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 39,
@@ -9647,6 +9969,12 @@
                 0
             ],
             "tags": "signal39",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -9736,7 +10064,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "8e93d519-bc98-4406-9927-712d70484f09": {
             "approachcontrol": [
@@ -9750,7 +10080,8 @@
                 false,
                 ""
             ],
-            "bbox": 2003,
+            "bbox": 3885,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -9803,6 +10134,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 30,
@@ -9942,6 +10274,12 @@
                 0
             ],
             "tags": "signal30",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -10031,7 +10369,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "8ef48981-5ce5-480d-9b8c-8652773617ff": {
             "approachcontrol": [
@@ -10045,7 +10385,8 @@
                 false,
                 ""
             ],
-            "bbox": 2014,
+            "bbox": 3896,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -10098,6 +10439,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 17,
@@ -10237,6 +10579,12 @@
                 0
             ],
             "tags": "signal17",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -10326,7 +10674,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "9751a63e-b2ea-45b1-b007-8b7246280bf0": {
             "approachcontrol": [
@@ -10340,7 +10690,8 @@
                 false,
                 ""
             ],
-            "bbox": 2031,
+            "bbox": 3913,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -10393,6 +10744,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 45,
@@ -10532,6 +10884,12 @@
                 0
             ],
             "tags": "signal45",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -10621,7 +10979,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "99230944-029f-42b4-bf3e-6b05cda36120": {
             "approachcontrol": [
@@ -10635,7 +10995,8 @@
                 false,
                 ""
             ],
-            "bbox": 2050,
+            "bbox": 3932,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -10688,6 +11049,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 67,
@@ -10827,6 +11189,12 @@
                 0
             ],
             "tags": "signal67",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -10916,7 +11284,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "99286cf0-5fd3-4441-86f5-6a59ece92736": {
             "approachcontrol": [
@@ -10930,7 +11300,8 @@
                 false,
                 ""
             ],
-            "bbox": 2068,
+            "bbox": 3950,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -10983,6 +11354,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 35,
@@ -11122,6 +11494,12 @@
                 0
             ],
             "tags": "signal35",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -11211,7 +11589,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "a2122cdc-5722-4e41-8e92-60341e9dcfb0": {
             "approachcontrol": [
@@ -11225,7 +11605,8 @@
                 false,
                 ""
             ],
-            "bbox": 2085,
+            "bbox": 3967,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -11278,6 +11659,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 44,
@@ -11417,6 +11799,12 @@
                 0
             ],
             "tags": "signal44",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -11506,7 +11894,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "a69ec2d3-3ee4-4a29-b250-06a0508c88ac": {
             "approachcontrol": [
@@ -11520,7 +11910,8 @@
                 false,
                 ""
             ],
-            "bbox": 2102,
+            "bbox": 3984,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -11573,6 +11964,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 47,
@@ -11712,6 +12104,12 @@
                 0
             ],
             "tags": "signal47",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -11801,7 +12199,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "aaad086b-35b8-4bbf-bc16-dc7ac06f0bb3": {
             "approachcontrol": [
@@ -11815,7 +12215,8 @@
                 false,
                 ""
             ],
-            "bbox": 2119,
+            "bbox": 4001,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -11868,6 +12269,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 18,
@@ -12007,6 +12409,12 @@
                 0
             ],
             "tags": "signal18",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -12096,7 +12504,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b2882fd0-7c95-4118-bc07-a28ae783198f": {
             "approachcontrol": [
@@ -12110,7 +12520,8 @@
                 false,
                 ""
             ],
-            "bbox": 2138,
+            "bbox": 4020,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -12163,6 +12574,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 55,
@@ -12302,6 +12714,12 @@
                 0
             ],
             "tags": "signal55",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -12391,7 +12809,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b654be08-1b1d-40f3-8e2d-5a03b8cc803d": {
             "approachcontrol": [
@@ -12405,7 +12825,8 @@
                 false,
                 ""
             ],
-            "bbox": 2149,
+            "bbox": 4031,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -12458,6 +12879,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 16,
@@ -12597,6 +13019,12 @@
                 0
             ],
             "tags": "signal16",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -12686,7 +13114,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "bd1fb580-6373-4633-b284-608545777ee0": {
             "approachcontrol": [
@@ -12700,7 +13130,8 @@
                 false,
                 ""
             ],
-            "bbox": 2166,
+            "bbox": 4048,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -12753,6 +13184,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 4,
@@ -12892,6 +13324,12 @@
                 0
             ],
             "tags": "signal4",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -12981,7 +13419,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c127d998-fecb-4f4d-9501-866d2d5f8eab": {
             "approachcontrol": [
@@ -12995,7 +13435,8 @@
                 false,
                 ""
             ],
-            "bbox": 2183,
+            "bbox": 4065,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -13048,6 +13489,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 20,
@@ -13187,6 +13629,12 @@
                 0
             ],
             "tags": "signal20",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -13276,7 +13724,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c1c30a29-0e26-4b2d-9263-229c32773b2e": {
             "approachcontrol": [
@@ -13290,7 +13740,8 @@
                 false,
                 ""
             ],
-            "bbox": 2200,
+            "bbox": 4082,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -13343,6 +13794,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 52,
@@ -13482,6 +13934,12 @@
                 0
             ],
             "tags": "signal52",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -13571,7 +14029,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c2d9abba-d7f8-4c45-a9fe-cc7674e54acb": {
             "approachcontrol": [
@@ -13585,7 +14045,8 @@
                 false,
                 ""
             ],
-            "bbox": 2217,
+            "bbox": 4099,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -13638,6 +14099,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 1,
@@ -13777,6 +14239,12 @@
                 0
             ],
             "tags": "signal1",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -13866,7 +14334,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c65443a0-7ae4-4dee-a81b-7136e0c239b4": {
             "approachcontrol": [
@@ -13880,7 +14350,8 @@
                 false,
                 ""
             ],
-            "bbox": 2235,
+            "bbox": 4117,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -13933,6 +14404,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 6,
@@ -14072,6 +14544,12 @@
                 0
             ],
             "tags": "signal6",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -14161,7 +14639,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "cada8d25-8ea8-4974-a5ad-7b6308e1ac68": {
             "approachcontrol": [
@@ -14175,7 +14655,8 @@
                 false,
                 ""
             ],
-            "bbox": 2252,
+            "bbox": 4134,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -14228,6 +14709,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 51,
@@ -14367,6 +14849,12 @@
                 0
             ],
             "tags": "signal51",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -14456,7 +14944,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "d547f79e-bf55-4e8a-8d37-4604ea59430f": {
             "approachcontrol": [
@@ -14470,7 +14960,8 @@
                 false,
                 ""
             ],
-            "bbox": 2272,
+            "bbox": 4154,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -14523,6 +15014,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 56,
@@ -14662,6 +15154,12 @@
                 0
             ],
             "tags": "signal56",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": true,
             "timedsequences": [
                 [
@@ -14751,7 +15249,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "d7f16ff2-2a3e-4e70-bb8a-b46809efd0ca": {
             "approachcontrol": [
@@ -14765,7 +15265,8 @@
                 false,
                 ""
             ],
-            "bbox": 2289,
+            "bbox": 4171,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -14818,6 +15319,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 10,
@@ -14957,6 +15459,12 @@
                 0
             ],
             "tags": "signal10",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -15046,7 +15554,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "e07cd35c-b0ad-4023-8ea8-ae9e8b2da94a": {
             "approachcontrol": [
@@ -15060,7 +15570,8 @@
                 false,
                 ""
             ],
-            "bbox": 2306,
+            "bbox": 4188,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -15113,6 +15624,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 54,
@@ -15252,6 +15764,12 @@
                 0
             ],
             "tags": "signal54",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -15341,7 +15859,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "e6022fa4-9dbe-4e18-a8ee-df0d1335d0b8": {
             "approachcontrol": [
@@ -15355,7 +15875,8 @@
                 false,
                 ""
             ],
-            "bbox": 2323,
+            "bbox": 4205,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -15408,6 +15929,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 42,
@@ -15547,6 +16069,12 @@
                 0
             ],
             "tags": "signal42",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -15636,7 +16164,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "e77b45ee-246b-401a-8057-9be3e1655a96": {
             "approachcontrol": [
@@ -15650,7 +16180,8 @@
                 false,
                 ""
             ],
-            "bbox": 2340,
+            "bbox": 4222,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -15703,6 +16234,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 43,
@@ -15842,6 +16374,12 @@
                 0
             ],
             "tags": "signal43",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -15931,7 +16469,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "eb843182-eeee-41a2-8505-9839ce9d908c": {
             "approachcontrol": [
@@ -15945,7 +16485,8 @@
                 false,
                 ""
             ],
-            "bbox": 2357,
+            "bbox": 4239,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -15998,6 +16539,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 37,
@@ -16137,6 +16679,12 @@
                 0
             ],
             "tags": "signal37",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -16226,7 +16774,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "ec09d690-ffde-42ab-83ed-30c140908715": {
             "approachcontrol": [
@@ -16240,7 +16790,8 @@
                 false,
                 ""
             ],
-            "bbox": 2374,
+            "bbox": 4256,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -16293,6 +16844,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 38,
@@ -16432,6 +16984,12 @@
                 0
             ],
             "tags": "signal38",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -16521,7 +17079,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "ecb0247d-2bb6-433e-b55d-e2047262e6af": {
             "approachcontrol": [
@@ -16535,7 +17095,8 @@
                 false,
                 ""
             ],
-            "bbox": 2391,
+            "bbox": 4273,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -16588,6 +17149,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 26,
@@ -16727,6 +17289,12 @@
                 0
             ],
             "tags": "signal26",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -16816,7 +17384,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "f4350761-bd97-4c40-a0d6-c1d8a49f7158": {
             "approachcontrol": [
@@ -16830,7 +17400,8 @@
                 false,
                 ""
             ],
-            "bbox": 2408,
+            "bbox": 4290,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -16883,6 +17454,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 21,
@@ -17022,6 +17594,12 @@
                 0
             ],
             "tags": "signal21",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -17111,7 +17689,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "f7474105-458a-4725-9c75-413093694f81": {
             "approachcontrol": [
@@ -17125,7 +17705,8 @@
                 false,
                 ""
             ],
-            "bbox": 2425,
+            "bbox": 4307,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -17178,6 +17759,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 40,
@@ -17317,6 +17899,12 @@
                 0
             ],
             "tags": "signal40",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -17406,7 +17994,9 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "fe93340d-e1b6-471e-a3a9-32d81957e104": {
             "approachcontrol": [
@@ -17420,7 +18010,8 @@
                 false,
                 ""
             ],
-            "bbox": 2442,
+            "bbox": 4324,
+            "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
                 [],
@@ -17473,6 +18064,7 @@
                 true
             ],
             "fullyautomatic": false,
+            "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 49,
@@ -17612,6 +18204,12 @@
                 0
             ],
             "tags": "signal49",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -17701,26 +18299,30 @@
                         0
                     ]
                 ]
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         }
     },
     "points": {},
     "sections": {},
     "settings": {
         "canvas": {
+            "canvascolour": "grey85",
+            "displaygrid": true,
             "grid": 25,
+            "gridcolour": "#999",
             "height": 600,
             "snaptogrid": true,
             "width": 1600
         },
         "general": {
             "automation": true,
-            "buttonsize": 8,
             "editmode": true,
             "filename": "/home/john/model-railway-signalling/configuration_examples/colour_light_signals.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.8.0"
+            "version": "Version 4.9.0"
         },
         "gpio": {
             "portmappings": [],
@@ -17758,6 +18360,72 @@
             "port": "/dev/serial0",
             "power": false,
             "startup": false
+        },
+        "styles": {
+            "dccswitches": {
+                "buttoncolour": "SkyBlue2",
+                "buttonwidth": 12,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    9,
+                    ""
+                ]
+            },
+            "points": {
+                "buttoncolour": "Grey85",
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    8,
+                    ""
+                ]
+            },
+            "routebuttons": {
+                "buttoncolour": "SeaGreen3",
+                "buttonwidth": 15,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    9,
+                    ""
+                ]
+            },
+            "routelines": {
+                "colour": "Black",
+                "linewidth": 3
+            },
+            "signals": {
+                "buttoncolour": "Grey85",
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    8,
+                    ""
+                ]
+            },
+            "textboxes": {
+                "background": "",
+                "borderwidth": 0,
+                "justification": 2,
+                "textcolour": "Black",
+                "textfonttuple": [
+                    "Courier",
+                    10,
+                    ""
+                ]
+            },
+            "tracksections": {
+                "buttoncolour": "Black",
+                "buttonwidth": 5,
+                "defaultlabel": "XXXXX",
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "Courier",
+                    9,
+                    "bold"
+                ]
+            }
         }
     },
     "signals": {

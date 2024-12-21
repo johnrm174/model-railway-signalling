@@ -391,20 +391,33 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_dcc_point(6, 2048, False)   # Fail - Invalid address 
     assert len(dcc_control.dcc_point_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 22
+    
+    print("Library Tests - map_dcc_switch - Two Debug messages - 7 error messages should be generated")
+    assert len(dcc_control.dcc_switch_mappings) == 0
+    dcc_control.map_dcc_switch(1, on_commands = [[40,True], [41,True]], off_commands = [[40,False], [41,False]])
+    dcc_control.map_dcc_switch(2, on_commands = [[42,True], [43,True]], off_commands = [[42,False], [43,False]])
+    dcc_control.map_dcc_switch(0, on_commands = [[44,True], [45,True]], off_commands = [[44,False], [45,False]])     # Fail - Invalid ID
+    dcc_control.map_dcc_switch(1, on_commands = [[44,True], [45,True]], off_commands = [[44,False], [45,False]])     # Fail - Duplicate ID
+    dcc_control.map_dcc_switch("3", on_commands = [[44,True], [45,True]], off_commands = [[44,False], [45,False]])   # Fail - ID not an int 
+    dcc_control.map_dcc_switch(4, on_commands = [[40,True], ["abc",True]], off_commands = [[2048,False]])            # Fail - already in use + 2 invalid addresses
+    assert len(dcc_control.dcc_switch_mappings) == 2
+    assert len(dcc_control.dcc_address_mappings) == 26
     print("Library Tests - get_dcc_address_mappings (no errors or warnings should be generated)")
     mappings = dcc_control.get_dcc_address_mappings()
+    print(mappings)
     assert mappings == {1: ['Signal', 1], 2: ['Signal', 1], 3: ['Signal', 1], 4: ['Signal', 1],
                         5: ['Signal', 1], 6: ['Signal', 1], 7: ['Signal', 1], 10: ['Signal', 2],
                         15: ['Signal', 2], 11: ['Signal', 2], 16: ['Signal', 2], 13: ['Signal', 2],
                         18: ['Signal', 2], 12: ['Signal', 2], 17: ['Signal', 2], 14: ['Signal', 2],
                         19: ['Signal', 2], 20: ['Signal', 2], 21: ['Signal', 2], 22: ['Signal', 2],
-                        30: ['Point', 1], 31: ['Point', 2]}
+                        30: ['Point', 1], 31: ['Point', 2], 40: ["Switch", 1], 41: ["Switch", 1],
+                        42: ["Switch", 2], 43: ["Switch", 2]}
     print("Library Tests - dcc_address_mapping - 2 Errors should be generated)")
     assert dcc_control.dcc_address_mapping(1) == ['Signal', 1]
     assert dcc_control.dcc_address_mapping(10) == ['Signal', 2]
     assert dcc_control.dcc_address_mapping(30) == ['Point', 1]
     assert dcc_control.dcc_address_mapping(31) == ['Point', 2]
-    assert dcc_control.dcc_address_mapping(40) is None
+    assert dcc_control.dcc_address_mapping(50) is None
     assert dcc_control.dcc_address_mapping("40") is None  # Error - not an int
     assert dcc_control.dcc_address_mapping(2048) is None  # Error - out of range
     print("Library Tests - update_dcc_point (no errors or warnings - but DCC commands should be sent)")
@@ -461,6 +474,11 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_theatre(1,"1", False, True)
     dcc_control.update_dcc_signal_theatre(1,"1", False, False)
     dcc_control.update_dcc_signal_theatre(3,"1", False, False)
+    print("Library Tests - update_dcc_switch (no errors or warnings - but DCC commands should be sent)")
+    dcc_control.update_dcc_switch(1, True)
+    dcc_control.update_dcc_switch(1, False)
+    dcc_control.update_dcc_switch(2, True)
+    dcc_control.update_dcc_switch(2, False)
     print("Library Tests - set_node_to_publish_dcc_commands - 1 Error will be generated ")
     dcc_control.set_node_to_publish_dcc_commands("True") # Error
     dcc_control.set_node_to_publish_dcc_commands(True) 
@@ -478,6 +496,16 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000, "dccstate": True}) # Valid
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000, "dccstate": False}) # Valid
     logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
+    print("Library Tests - delete_switch_mapping - 2 Errors should be generated")
+    assert len(dcc_control.dcc_switch_mappings) == 2
+    assert len(dcc_control.dcc_address_mappings) == 26
+    dcc_control.delete_switch_mapping("100") # Error
+    dcc_control.delete_switch_mapping(5) # Error (does not exist)
+    dcc_control.delete_switch_mapping(1) 
+    assert len(dcc_control.dcc_switch_mappings) == 1
+    assert len(dcc_control.dcc_address_mappings) == 24
+    dcc_control.delete_switch_mapping(2) 
+    assert len(dcc_control.dcc_switch_mappings) == 0
     print("Library Tests - delete_point_mapping - 2 Errors should be generated")
     assert len(dcc_control.dcc_point_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 22
@@ -561,8 +589,6 @@ def run_mqtt_interface_tests():
     time.sleep(0.2)
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
-    print("Library Tests - mqtt_shutdown")
-    mqtt_interface.mqtt_shutdown()
     time.sleep(0.2)
     print("----------------------------------------------------------------------------------------")
     print("")

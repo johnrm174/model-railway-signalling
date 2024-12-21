@@ -77,27 +77,18 @@ class edit_textbox():
                     min_height=2, min_width=30, editable=True, auto_resize=True)
             self.text.pack(padx=2, pady=2, fill='both', expand=True)
             #----------------------------------------------------------------------------------
-            # Create a Frame for the Text colour, background colour and other elements (Frame 2)
+            # Create a Frame for the Text colour and background colour (Frame 2)
             #----------------------------------------------------------------------------------
             self.frame2 = Tk.Frame(self.main_frame)
             self.frame2.pack(fill='x')
             self.textcolour = common.colour_selection(self.frame2, label="Text colour")
             self.textcolour.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
-            self.background = common.colour_selection(self.frame2, label="Background", transparent_option=True)
+            self.background = common.colour_selection(self.frame2, label="Background Colour", transparent_option=True)
             self.background.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
-            # Create a Frame for the other general settings
-            self.frame2subframe1 = Tk.LabelFrame(self.frame2, text="General Settings")
-            self.frame2subframe1.pack(padx=2, pady=2, fill='both', expand=True)
-            self.frame2subframe2 = Tk.Frame(self.frame2subframe1)
-            self.frame2subframe2.pack(fill="y", expand=True)
-            # Create a subframe to center the UI elements in
-            self.hidden = common.check_box(self.frame2subframe2, label="Hidden",
-                     tool_tip= "Select to hide the Text Box in Run Mode")
-            self.hidden.pack(padx=2, pady=2, fill="y", expand=True)
             #----------------------------------------------------------------------------------
             # Create a Frame for the font selection
             #----------------------------------------------------------------------------------
-            self.font = common.font_selection(self.main_frame, callback=self.font_style_updated)
+            self.font = common.font_selection(self.main_frame, label="Text font", callback=self.font_style_updated)
             self.font.pack(padx=2, pady=2, fill="x")
             #----------------------------------------------------------------------------------
             # Create a Frame for the font size, text style and border width elements (Frame 3)
@@ -120,7 +111,7 @@ class edit_textbox():
                                             tool_tip="Select the border width (between 8 and 20 pixels)")
             self.fontsize.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create a Label Frame for the Text Style selection (grid 1,0)
-            self.fontstyle = common.font_style_selection(self.frame3, callback=self.font_style_updated)
+            self.fontstyle = common.font_style_selection(self.frame3, label="Font style", callback=self.font_style_updated)
             self.fontstyle.grid(row=0, column=1, padx=2, pady=2, sticky='NSWE')
             # Create a Label Frame for the Border Width selection (grid 0,1)
             self.frame3subframe3 = Tk.LabelFrame(self.frame3, text="Border width")
@@ -137,7 +128,16 @@ class edit_textbox():
             self.textjustify = common.selection_buttons(self.frame3, label="Text justification",
                         tool_tip="Select text justification", callback=self.justification_updated,
                             button_labels = ("Left", "Centre", "Right"))
-            self.textjustify.grid(row=1, column=1, padx=2, pady=2, sticky='NSWE')            
+            self.textjustify.grid(row=1, column=1, padx=2, pady=2, sticky='NSWE')
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the General Settings (Frame 4)
+            #----------------------------------------------------------------------------------
+            self.frame4 =  Tk.LabelFrame(self.main_frame, text="General Settings")
+            self.frame4.pack(fill='x')
+            self.hidden = common.check_box(self.frame4, label="Hidden",
+                     tool_tip= "Select to hide the Text Box in Run Mode")
+            self.hidden.pack(padx=2, pady=2)
+
             # load the initial UI state
             self.load_state()
         
@@ -157,14 +157,15 @@ class edit_textbox():
             self.window.title("Textbox")
             # Set the Initial UI state from the current object settings
             self.text.set_value(objects.schematic_objects[self.object_id]["text"])
-            self.textcolour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            self.textcolour.set_value(objects.schematic_objects[self.object_id]["textcolour"])
             self.background.set_value(objects.schematic_objects[self.object_id]["background"])
             self.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
-            self.font.set_value(objects.schematic_objects[self.object_id]["font"])
-            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["fontstyle"])
-            self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
-            self.textjustify.set_value(objects.schematic_objects[self.object_id]["justify"])
-            self.borderwidth.set_value(objects.schematic_objects[self.object_id]["border"])
+            self.textjustify.set_value(objects.schematic_objects[self.object_id]["justification"])
+            self.borderwidth.set_value(objects.schematic_objects[self.object_id]["borderwidth"])
+            font, font_size, font_style = objects.schematic_objects[self.object_id]["textfonttuple"]
+            self.font.set_value(font)
+            self.fontsize.set_value(font_size)
+            self.fontstyle.set_value(font_style)
             # Justify the text and set/resize the font/style to match the initial selection
             self.justification_updated()
             self.font_style_updated()
@@ -182,15 +183,14 @@ class edit_textbox():
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             # Note that we do not change the actual 'font' setting via the UI at present
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            new_object_configuration["textfonttuple"] = font_tuple
             new_object_configuration["text"] = self.text.get_value()
-            new_object_configuration["colour"] = self.textcolour.get_value()
+            new_object_configuration["textcolour"] = self.textcolour.get_value()
             new_object_configuration["background"] = self.background.get_value()
+            new_object_configuration["justification"] = self.textjustify.get_value()
+            new_object_configuration["borderwidth"] = self.borderwidth.get_value()
             new_object_configuration["hidden"] = self.hidden.get_value()
-            new_object_configuration["font"] = self.font.get_value()
-            new_object_configuration["fontsize"] = self.fontsize.get_value()
-            new_object_configuration["fontstyle"] = self.fontstyle.get_value()
-            new_object_configuration["justify"] = self.textjustify.get_value()
-            new_object_configuration["border"] = self.borderwidth.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

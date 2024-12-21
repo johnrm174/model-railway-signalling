@@ -33,6 +33,7 @@
 #    move_objects([object_IDs]) - Finalises the move of selected objects
 #    copy_objects([object_IDs]) - Copy the selected objects (returns list of new IDs)
 #    update_object(object_ID, new_object) - update the config of an existing object
+#    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
 #    undo() / redo() - Undo and re-do functions as you would expect
 #
 # Objects intended to be accessed directly by other editor modules:
@@ -45,6 +46,7 @@
 #    track_sensor_index - for iterating through all the track_sensor objects
 #    route_index - for iterating through all the route objects
 #    switch_index - for iterating through all the switch objects
+#    textbox_index - for iterating through all the textbox objects
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -62,6 +64,7 @@ from .objects import rotate_objects
 from .objects import move_objects
 from .objects import copy_objects
 from .objects import update_object
+from .objects import update_styles
 from .objects import save_schematic_state
 from .objects import reset_objects
 
@@ -87,6 +90,7 @@ from .objects_common import line_index
 from .objects_common import track_sensor_index
 from .objects_common import route_index
 from .objects_common import switch_index
+from .objects_common import textbox_index
 
 from .objects_gpio import create_gpio_sensors
 from .objects_gpio import configure_remote_gpio_sensor_event_mappings
@@ -111,6 +115,7 @@ __all__ = [
     'move_objects',
     'copy_objects',
     'update_object',
+    'update_styles',
     'reset_objects',
     # Helper functions to get the obj ID of an item ID
     'signal',
@@ -133,6 +138,7 @@ __all__ = [
     'track_sensor_index',
     'route_index',
     'switch_index',
+    'textbox_index',
     # GPIO Event configuration functions
     'create_gpio_sensors',
     'configure_remote_gpio_sensor_event_mappings',

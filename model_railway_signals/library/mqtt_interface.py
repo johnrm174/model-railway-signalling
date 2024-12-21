@@ -76,7 +76,7 @@
 #         retain:bool - Whether the message should be 'retained' by the broker- default False
 #         subtopic:str - The optional subtopic to send the message - default None
 #
-#   mqtt_shutdown() - Perform an orderly disconnection and shutdown (on application exit)
+#   mqtt_publish_shutdown_message() - Publish a shutdown message to other nodes (on application exit)
 #
 #-----------------------------------------------------------------------------------------------
 
@@ -235,7 +235,6 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 
 def on_disconnect(mqtt_client, userdata, rc):
     global node_config
-    node_config["connected_to_broker"] = False
     if rc==0: logging.info("MQTT-Client - Broker connection successfully terminated")
     else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
     node_config["connected_to_broker"] = False
@@ -481,12 +480,10 @@ def mqtt_broker_disconnect():
     return(not node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
-# Externally called function to perform a graceful shutdown of MQTT networking on Application
-# Exit in terms of clearing out the publish topic queues (by sending null messages). If configured
-# The function also sends out a 'shutdown' message to other network nodes for them to act on.
+# Externally called function to publish a 'shutdown' message to other network nodes.
 #-----------------------------------------------------------------------------------------------
 
-def mqtt_shutdown():
+def mqtt_publish_shutdown_message():
     global node_config
     if node_config["connected_to_broker"]:
         # Publish a shutdown command to other nodes if configured  to do so
@@ -498,8 +495,6 @@ def mqtt_shutdown():
             payload = json.dumps(shutdown_message)
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+str(payload))
             mqtt_client.publish(topic,payload,retain=False,qos=1)
-            time.sleep(0.1)
-        mqtt_broker_disconnect()
     return()
 
 #-----------------------------------------------------------------------------------------------

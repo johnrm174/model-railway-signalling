@@ -20,6 +20,7 @@
 #    move_objects(list of obj IDs) - Finalises the move of selected objects
 #    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
+#    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
 #    reset_objects() - resets all points, signals, instruments and sections to default state
 #
 # Makes the following external API calls to other editor modules:
@@ -56,6 +57,7 @@
 #    objects_sections.create_section(type) - Create a default object on the schematic
 #    objects_sections.delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_sections.update_section(obj_id,new_obj) - Update the configuration of an existing section object
+#    objects_sections.update_section_styles(obj_id, params) - Update the styles of an existing object
 #    objects_sections.paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_sections.delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_sections.redraw_section_object(object_id) - Redraw the object on the canvas following an update
@@ -70,6 +72,7 @@
 #    objects_routes.create_route() - Create a default object on the schematic
 #    objects_routes.delete_route(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_routes.update_route(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_routes.update_route_styles(obj_id, params) - Update the styles of an existing object
 #    objects_routes.paste_route(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_routes.delete_route_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_routes.redraw_route_object(object_id) - Redraw the object on the canvas following an update
@@ -77,6 +80,7 @@
 #    objects_switches.create_switch() - Create a default object on the schematic
 #    objects_switches.delete_switch(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_switches.update_switch(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_switches.update_switch_styles(obj_id, params) - Update the styles of an existing object
 #    objects_switches.paste_switch(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_switches.delete_switch_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_switches.redraw_switch_object(object_id) - Redraw the object on the canvas following an update
@@ -173,6 +177,8 @@ def reset_all_schematic_indexes():
             objects_common.route_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.switch:
             objects_common.switch_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.textbox:
+            objects_common.textbox_index[str(this_object_item_id)] = object_id
         # Note that textboxes don't have an index as we don't track their IDs
     return()
 
@@ -376,7 +382,7 @@ def delete_object(object_id):
 # Called from the Schematic Module when selected objects are deleted
 #------------------------------------------------------------------------------------
 
-def delete_objects(list_of_object_ids, initialise_layout_after_delete:bool=True):
+def delete_objects(list_of_object_ids:list, initialise_layout_after_delete:bool=True):
     for object_id in list_of_object_ids:
         delete_object(object_id)
     # save the current state (for undo/redo)
@@ -392,7 +398,7 @@ def delete_objects(list_of_object_ids, initialise_layout_after_delete:bool=True)
 # Only Points and Signals can be rotated - all other objects are unchanged
 #------------------------------------------------------------------------------------
 
-def rotate_objects(list_of_object_ids):
+def rotate_objects(list_of_object_ids:list):
     # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
     # processing a load of intermixed deletes/creates when it returns to the main loop
     for object_id in list_of_object_ids:
@@ -424,7 +430,7 @@ def rotate_objects(list_of_object_ids):
 # passed to signify which end of the line needs to be updated
 #------------------------------------------------------------------------------------
 
-def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
+def move_objects(list_of_object_ids:list, xdiff1:int=None, ydiff1:int=None,
                  xdiff2:int=None, ydiff2:int=None, update_schematic_state:bool=True):
     # Only bother processing the update if there has been a change
     if ( (xdiff1 is not None and xdiff1 !=0) or (ydiff1 is not None and ydiff1 !=0) or
@@ -460,7 +466,7 @@ def move_objects(list_of_object_ids, xdiff1:int=None, ydiff1:int=None,
 # Called from the Schematic Module when selected objects are copied.
 #------------------------------------------------------------------------------------
 
-def copy_objects(list_of_object_ids, deltax:int, deltay:int):
+def copy_objects(list_of_object_ids:list, deltax:int, deltay:int):
     # New objects are "pasted" at a slightly offset position on the canvas so
     # its clear that new objects have been created (to move/place on the canvas)
     # We need to return a list of new object IDs
@@ -496,6 +502,36 @@ def copy_objects(list_of_object_ids, deltax:int, deltay:int):
     # exist, they have yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
     # Also - as we are just copying 'new' objects we don't need to process layout changes
     return(list_of_new_object_ids)
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of one or more objects on the schematic
+#------------------------------------------------------------------------------------
+
+def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
+    for object_id in list_of_object_ids:
+        # Call the object-specific function to perform the update
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
+        if type_of_object == objects_common.object_type.line:
+            objects_lines.update_line_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.signal:
+            objects_signals.update_signal_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.point:
+            objects_points.update_point_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.section:
+            objects_sections.update_section_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.route:
+            objects_routes.update_route_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.switch:
+            objects_switches.update_switch_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.textbox:
+            objects_textboxes.update_textbox_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.instrument:
+            pass
+        elif type_of_object == objects_common.object_type.track_sensor:
+            pass
+    # save the current state (for undo/redo)
+    save_schematic_state()
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to set (re-create) all schematic objects (following a file load)
@@ -668,6 +704,69 @@ def set_all(new_objects):
 
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
+
+            #################################################################################################
+            ## Handle non-breaking change of Track Section width being a parameter in its own right #########
+            # (rather than determined by the default section label) from Release 4.9.0 onwards ##############
+            #################################################################################################
+            if ( new_object_type == objects_common.object_type.section and "buttonwidth" not in new_objects[object_id].keys() ):
+                # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                section_width = len(objects_common.schematic_objects[object_id]["defaultlabel"])
+                objects_common.schematic_objects[object_id]["buttonwidth"] = section_width
+                new_objects[object_id]["buttonwidth"] = section_width
+                logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: "
+                        +"'buttonwidth' - Asigning value to match the default label : "+str(section_width))
+            #################################################################################################
+            ## End of Handle non-breaking change for Track Sections #########################################
+            #################################################################################################
+
+            #################################################################################################
+            ## Handle breaking changes related to how fonts are stored from Release 4.9.0 onwards ###########
+            ## This applies to route buttons, DCC Switch Buttons and Text Boxes #############################
+            #################################################################################################
+            if ( new_object_type == objects_common.object_type.route or new_object_type == objects_common.object_type.switch
+                or new_object_type == objects_common.object_type.textbox):
+                if "textfonttuple" not in new_objects[object_id].keys() and "font" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    fonttuple = (new_objects[object_id]["font"], new_objects[object_id]["fontsize"] ,new_objects[object_id]["fontstyle"])
+                    objects_common.schematic_objects[object_id]["textfonttuple"] = tuple(fonttuple)
+                    new_objects[object_id]["textfonttuple"] = tuple(fonttuple)
+                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: "
+                            +"'textfonttuple' - Asigning value from legacy parameters' : "+str(fonttuple))
+            #################################################################################################
+            ## End of Handle breaking changes related to how fonts are stored ###############################
+            #################################################################################################
+
+            #################################################################################################
+            ## Handle breaking changes as to how textbox parameters are stored (Release 4.9.0 onwards) ######
+            #################################################################################################
+            if new_object_type == objects_common.object_type.textbox:
+                if "textcolour" not in new_objects[object_id].keys() and "colour" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    objects_common.schematic_objects[object_id]["textcolour"] = new_objects[object_id]["colour"]
+                    new_objects[object_id]["textcolour"] = new_objects[object_id]["colour"]
+                if "borderwidth" not in new_objects[object_id].keys() and "border" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    objects_common.schematic_objects[object_id]["borderwidth"] = new_objects[object_id]["border"]
+                    new_objects[object_id]["borderwidth"] = new_objects[object_id]["border"]
+                if "justification" not in new_objects[object_id].keys() and "justify" in new_objects[object_id].keys():
+                    # Add to the main dict and also the new object dict so it doesn't get reported as 'missing' later
+                    objects_common.schematic_objects[object_id]["justification"] = new_objects[object_id]["justify"]
+                    new_objects[object_id]["justification"] = new_objects[object_id]["justify"]
+            #################################################################################################
+            ## End of Handle breaking changes related to how text box parameters are stored  #################
+            #################################################################################################
+
+            #################################################################################################
+            ## There was a bug in the code to handle the change in how fonts are stored (above) #############
+            ## This has now been fixed but we need to correct any files saved whilst the bug was there ######
+            #################################################################################################
+            if ("textfonttuple" in objects_common.schematic_objects[object_id].keys() and
+                     type(objects_common.schematic_objects[object_id]["textfonttuple"]) == list):
+                objects_common.schematic_objects[object_id]["textfonttuple"] = tuple(new_objects[object_id]["textfonttuple"])
+            #################################################################################################
+            ## End of code to handle the textfonttuple not being stored as a tuple ##########################
+            #################################################################################################
 
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)

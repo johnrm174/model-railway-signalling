@@ -447,7 +447,9 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
                 # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
                 # Each element represents the approach control mode that has been set
                 # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
-                if signal_object["approachcontrol"][signal_route.value-1] == 1:
+                if not signals.signal_clear(int_signal_id):
+                    signals.clear_approach_control(int_signal_id)
+                elif signal_object["approachcontrol"][signal_route.value-1] == 1:
                     signals.set_approach_control(int_signal_id, release_on_yellow=False, force_set=force_set)
                 elif signal_object["approachcontrol"][signal_route.value-1] == 2:
                     signals.set_approach_control(int_signal_id, release_on_yellow=True, force_set=force_set)
@@ -805,7 +807,7 @@ def override_signals_based_on_track_sections_ahead():
                        and signal_object["sigroutes"][signal_route.value-1] ):
                     override_signal = True
                     break
-            if override_signal: set_signal_override(int_signal_id)
+            if signals.signal_clear(int_signal_id) and override_signal: set_signal_override(int_signal_id)
             else: clear_signal_override(int_signal_id)
         else:
             clear_signal_override(int_signal_id)
@@ -988,6 +990,7 @@ def signal_updated_callback(signal_id:Union[int,str]):
 def signal_switched_callback(signal_id:int, route_id:int=0):
     if enhanced_debugging: print("########## signal_switched_callback "+str(signal_id))
     if run_mode and automation_enabled:
+        override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals(signal_id)    
         override_distant_signals_based_on_signals_ahead()
     else:

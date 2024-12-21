@@ -8,6 +8,7 @@
 #    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #    update_canvas(width,height,grid,snap) - Call following a size update (or layout load/canvas resize)
 #    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
+#    get_selected_objects(object_type=None) - return a list of selected object IDs (filtered on type)
 #
 # Makes the following external API calls to other editor modules:
 #    objects.initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
@@ -121,6 +122,18 @@ button_images = []
 edit_mode_active = True
 
 #------------------------------------------------------------------------------------
+# Function to return a list of currently selected Object Ids - Filtered on the object
+# type if one is specified (if not then the liust will contain all selected objects)
+#------------------------------------------------------------------------------------
+
+def get_selected_objects(object_type=None):
+    list_of_object_ids_to_return = []
+    for selected_object_id in schematic_state["selectedobjects"]:
+        if object_type is None or object_type == objects.schematic_objects[selected_object_id]["item"]:
+            list_of_object_ids_to_return.append(selected_object_id)
+    return(list_of_object_ids_to_return)
+
+#------------------------------------------------------------------------------------
 # Internal Function to return the absolute canvas coordinates for an event
 # (which take into account any canvas scroll bar offsets)
 #------------------------------------------------------------------------------------
@@ -153,7 +166,7 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
     # Set keyboard focus for the canvas (so that any key bindings will work)
     # and unbind keypresses (apart from 'esc') until the object is 'placed'
     canvas.focus_set()
-    disable_all_keypress_events_during_move()
+    disable_events_during_move()
     canvas.bind('<Escape>',cancel_place_object_in_progress)
     return()
 
@@ -197,7 +210,7 @@ def copy_selected_objects(event):
         # Set keyboard focus for the canvas (so that any key bindings will work)
         # and unbind keypresses (apart from 'esc') until the object is 'placed'
         canvas.focus_set()
-        disable_all_keypress_events_during_move()
+        disable_events_during_move()
         canvas.bind('<Escape>',cancel_copy_object_in_progress)
     return()
 
@@ -206,7 +219,7 @@ def cancel_copy_object_in_progress(event=None):
     #delete the copied objects (all selected objects)
     delete_selected_objects()
     # Re-bind all canvas keypresses events and revert the cursor style to normal
-    enable_all_keypress_events_after_completion_of_move()
+    enable_events_after_completion_of_move()
     root.config(cursor="arrow")
 
 #------------------------------------------------------------------------------------
@@ -375,20 +388,6 @@ def nudge_selected_objects(event=None):
         move_selected_objects(xdiff,ydiff)
         objects.move_objects(schematic_state["selectedobjects"],xdiff1=xdiff, ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff)
     canvas.after(50,enable_arrow_keypress_events)
-    return()
-
-def enable_arrow_keypress_events(event=None):
-    canvas.bind('<KeyPress-Left>',nudge_selected_objects)
-    canvas.bind('<KeyPress-Right>',nudge_selected_objects)
-    canvas.bind('<KeyPress-Up>',nudge_selected_objects)
-    canvas.bind('<KeyPress-Down>',nudge_selected_objects)
-    return()
-
-def disable_arrow_keypress_events(event=None):
-    canvas.unbind('<KeyPress-Left>')
-    canvas.unbind('<KeyPress-Right>')
-    canvas.unbind('<KeyPress-Up>')
-    canvas.unbind('<KeyPress-Down>')
     return()
 
 #------------------------------------------------------------------------------------
@@ -587,7 +586,7 @@ def left_button_click(event):
                     # Make the 'selectareabox' visible. This will create the box on first use
                     # or after a 'delete_all_objects (when the box is set to 'None')
                     if schematic_state["selectareabox"] is None:
-                        schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
+                        schematic_state["selectareabox"] = canvas.create_rectangle(0, 0, 0, 0, outline="orange", width=2)
                     canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
                     canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
                     # Change the cursor style
@@ -601,7 +600,7 @@ def left_button_click(event):
     # set keyboard focus for the canvas (so that any key bindings will work) but unbind keypress
     # events (apart from 'esc') until left button release to prevent udesirable editor behavior
     canvas.focus_set()
-    disable_all_keypress_events_during_move()
+    disable_events_during_move()
     canvas.bind('<Escape>',cancel_move_in_progress)
     return()
 
@@ -763,7 +762,7 @@ def left_button_release(event):
         # Clear the scroll canvas mode
         schematic_state["movewindow"] = False
     # Re-bind all canvas keypresses events and revert the cursor style to normal
-    enable_all_keypress_events_after_completion_of_move()
+    enable_events_after_completion_of_move()
     root.config(cursor="arrow")
     return()
 
@@ -801,7 +800,7 @@ def cancel_move_in_progress(event=None):
         canvas.itemconfigure(schematic_state["selectareabox"],state="hidden")
         schematic_state["selectarea"] = False
     # Re-bind the canvas keypresses on completion of area selection or Move Objects
-    enable_all_keypress_events_after_completion_of_move()
+    enable_events_after_completion_of_move()
     return()
 
 #------------------------------------------------------------------------------------
@@ -860,53 +859,79 @@ def schematic_redo(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal Functions to enable/disable all canvas keypress events during an object
-# move, line edit or area selection function (to ensure deterministic behavior).
-# Note that on disable (when a move or area selection has been initiated) then we
-# re-bind the escape key to the function for canceling the move / area selection.
-# on enable (at completion or cancel of the move/area seclection) then the Escape
-# key will be re-bound to 'deselect_all_objects' in 'enable_edit_keypress_events'
+# Internal Functions to enable/disable canvas keypress events during an object move,
+# line edit or area selection (edit mode) or a canvas scroll operation (run mode) to
+# ensure deterministic behavior. Note that when an object move, line edit or area selection
+# has been initiated, the escape key is bound to the appropriate function for canceling
+# the operation. At completion or cancel of the operation then the Escape key will be
+# re-bound to 'deselect_all_objects' function.
 #------------------------------------------------------------------------------------
 
-def enable_all_keypress_events_after_completion_of_move():
-    enable_edit_keypress_events()
+def enable_events_after_completion_of_move():
+    if edit_mode_active: enable_edit_mode_event_bindings()
     enable_arrow_keypress_events()
     canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
-    canvas.bind('<Control-Key-r>', reset_window_size)
-    # Re-bind the other mouse buttons to re-enable right clicks
-    canvas.bind('<Button-2>', right_button_click)
-    canvas.bind('<Button-3>', right_button_click)
+    canvas.bind('<Control-Key-r>', reset_window_size)            # Revert Canvas Size
     return()
 
-def disable_all_keypress_events_during_move():
-    disable_edit_keypress_events()
+def disable_events_during_move():
+    disable_edit_mode_event_bindings()
     disable_arrow_keypress_events()
     # Unbind the  Toggle mode and revert canvas size buttons (or this will screw up the move)
     canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
     canvas.unbind('<Control-Key-r>')                             # Revert Canvas Size
-    # Unbind the other mouse buttons to prevent inadvertant clicks
-    canvas.unbind('<Button-2>')
-    canvas.unbind('<Button-3>')
     return()
 
 #------------------------------------------------------------------------------------
-# Internal Functions to enable/disable all edit-mode specific keypress events on
-# edit enable / edit disable) - all keypress events apart from the mode toggle event
+# Internal Functions to enable/disable enable_arrow_keypress_events events. These are
+# normally active in both Run and Edit modes - only disabled during an object move,
+# line edit or area selection (edit mode) or a canvas scroll operation(run mode).
+# They are also temoorarily disabled during a "nudge" operation to 'throttle' the
+# number of keypress events that are generated if the arrow keys are held down.
 #------------------------------------------------------------------------------------
 
-def enable_edit_keypress_events():
+def enable_arrow_keypress_events(event=None):
+    canvas.bind('<KeyPress-Left>',nudge_selected_objects)
+    canvas.bind('<KeyPress-Right>',nudge_selected_objects)
+    canvas.bind('<KeyPress-Up>',nudge_selected_objects)
+    canvas.bind('<KeyPress-Down>',nudge_selected_objects)
+    return()
+
+def disable_arrow_keypress_events(event=None):
+    canvas.unbind('<KeyPress-Left>')
+    canvas.unbind('<KeyPress-Right>')
+    canvas.unbind('<KeyPress-Up>')
+    canvas.unbind('<KeyPress-Down>')
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal Functions to enable/disable all edit-mode specific tkinter events. Note that
+# when an object move, line edit or area selection is in progress then the escape key
+# will be re-bound to the appropriate function for cancelling the operation. 
+#------------------------------------------------------------------------------------
+
+def enable_edit_mode_event_bindings():
+    # Edit-mode-specific keypress event bindings
     canvas.bind('<BackSpace>', delete_selected_objects)
     canvas.bind('<Delete>', delete_selected_objects)
     canvas.bind('<Escape>', deselect_all_objects)
     canvas.bind('<Control-Key-c>', copy_selected_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
-    canvas.bind('<Control-Key-s>', canvas_event_callback)    # Toggle Snap to Grid Mode
+    canvas.bind('<Control-Key-s>', canvas_event_callback)
     canvas.bind('r', rotate_selected_objects)
     canvas.bind('s', snap_selected_objects_to_grid)      
+    # Edit-mode-specific cursor event bindings
+    canvas.bind('<Button-2>', right_button_click)
+    canvas.bind('<Button-3>', right_button_click)
+    canvas.bind('<Shift-Button-1>', left_shift_click)
+    canvas.bind('<Double-Button-1>', left_double_click)
+    # Layout Automation toggle is disabled in Edit Mode (only enabled in Run Mode)
+    canvas.unbind('<Control-Key-a>')
     return()
 
-def disable_edit_keypress_events():
+def disable_edit_mode_event_bindings():
+    # Edit-mode-specific keypress event bindings
     canvas.unbind('<BackSpace>')
     canvas.unbind('<Delete>')
     canvas.unbind('<Escape>')
@@ -916,6 +941,29 @@ def disable_edit_keypress_events():
     canvas.unbind('<Control-Key-s>')
     canvas.unbind('r')
     canvas.unbind('s')
+    # Edit-mode-specific cursor event bindings
+    canvas.unbind('<Button-2>')
+    canvas.unbind('<Button-3>')
+    canvas.unbind('<Shift-Button-1>')
+    canvas.unbind('<Double-Button-1>')
+    # Layout Automation toggle is only enabled in Run Mode (disabled in Edit Mode)
+    canvas.bind('<Control-Key-a>', canvas_event_callback)        
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal Function to create all common event bindings (active in Edit and Run modes)
+#------------------------------------------------------------------------------------
+
+def create_common_event_bindings():
+    # Bind the Toggle Mode, arrow key and window re-size keypress events. These
+    # are only disabled during object moves, line edits, area selections (edit mode)
+    # and canvas scroll operations (Run Mode)
+    canvas.bind('<Control-Key-r>', reset_window_size)
+    canvas.bind('<Control-Key-m>', canvas_event_callback)
+    # Cursor Events enabled in all modes at all times
+    canvas.bind("<Motion>", track_cursor)
+    canvas.bind('<Button-1>', left_button_click)
+    canvas.bind('<ButtonRelease-1>', left_button_release)
     return()
 
 #------------------------------------------------------------------------------------
@@ -930,7 +978,7 @@ def configure_edit_mode(edit_mode:bool):
     edit_mode_active = edit_mode
     if edit_mode:
         # Display the Edit Mode Grid (if enabled)
-        if edit_mode_active and canvas_display_grid:
+        if canvas_display_grid:
             canvas.itemconfig("grid",state="normal")
         else:
             canvas.itemconfig("grid",state="hidden")
@@ -940,23 +988,8 @@ def configure_edit_mode(edit_mode:bool):
         canvas_frame.forget()
         button_frame.pack(side=Tk.LEFT, expand=False, fill=Tk.BOTH)
         canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
-        # Bind the Canvas mouse and button events to the various callback functions
-        canvas.bind("<Motion>", track_cursor)
-        canvas.bind('<Button-1>', left_button_click)
-        canvas.bind('<Button-2>', right_button_click)
-        canvas.bind('<Button-3>', right_button_click)
-        canvas.bind('<Shift-Button-1>', left_shift_click)
-        canvas.bind('<ButtonRelease-1>', left_button_release)
-        canvas.bind('<Double-Button-1>', left_double_click)
-        # Bind the canvas keypresses to the associated functions
-        enable_edit_keypress_events()
-        # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
-        # and Run Modes - only disabled during Edit Mode object moves and area selections)
-        canvas.bind('<Control-Key-r>', reset_window_size)
-        canvas.bind('<Control-Key-m>', canvas_event_callback)
-        enable_arrow_keypress_events()
-        # Layout Automation toggle is disabled in Edit Mode (only enabled in Run Mode)
-        canvas.unbind('<Control-Key-a>')
+        # Bind the edit mode specific keypress and cursor events to the associated functions
+        enable_edit_mode_event_bindings()
     else:
         # Hide the Edit Mode Grid
         canvas.itemconfig("grid",state="hidden")
@@ -964,21 +997,8 @@ def configure_edit_mode(edit_mode:bool):
         deselect_all_objects()
         # Forget the subframe containing the "add object" buttons to hide it
         button_frame.forget()
-        # Unbind the the button 2 and button 3 events in Run Mode - the motion event and
-        # single button 1 events remain bound to enable scroll of the canvas in Run mode
-        canvas.unbind('<Button-2>')
-        canvas.unbind('<Button-3>')
-        canvas.unbind('<Shift-Button-1>')
-        canvas.unbind('<Double-Button-1>')
-        # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
-        disable_edit_keypress_events()
-        # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
-        # and Run Modes - only disabled during Edit Mode object moves and area selections)
-        canvas.bind('<Control-Key-r>', reset_window_size)
-        canvas.bind('<Control-Key-m>', canvas_event_callback)
-        enable_arrow_keypress_events()
-        # Layout Automation toggle is only enabled in Run Mode (disabled in Edit Mode)
-        canvas.bind('<Control-Key-a>', canvas_event_callback)        
+        # Unbind the edit mode specific keypress and cursor events
+        disable_edit_mode_event_bindings()
     return()
 
 #------------------------------------------------------------------------------------
@@ -1079,6 +1099,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     objects.initialise(root_window, canvas)
     run_layout.initialise(root_window, canvas)
     run_routes.initialise(root_window, canvas)
+    # Create the common tkinter event bindings (applicable to all modes)
+    create_common_event_bindings()
     return()
 
 # The following shutdown function is to overcome what seems to be a bug in TkInter where

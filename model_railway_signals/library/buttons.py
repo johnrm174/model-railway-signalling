@@ -27,6 +27,17 @@
 #       text_colour:str - the colour to use for the button text (default='black')
 #       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "normal")
 #
+#   update_button_styles - Updates the style of a button object
+#     Mandatory Parameters:
+#       button_id:int - The ID to be used for the button
+#     Optional parameters:
+#       button_width:int - The default width of the button (chars) - default = 10
+#       button_colour:str - the colour to use for the button when 'normal' (default='SeaGreen3')
+#       active_colour:str - the colour to use for the button when 'active' (default='SeaGreen2')
+#       selected_colour:str - the colour to use for the button when 'selected' (default='SeaGreen1')
+#       text_colour:str - the colour to use for the button text (default='White')
+#       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "")
+#
 #   button_exists(button_id:int) - returns true if the Button object 'exists' on the schematic
 #
 #   delete_button(button_id:int) - Delete the library object from the schematic
@@ -250,22 +261,24 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
         # Create the Button and its canvas window (for Run Mode operation). Note the Window is created
         # as 'hidden' - assuming we are in edit mode - but changed later if we are in Run Mode
-        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, foreground="grey40",
-                        font=font, bg=button_colour, activebackground=active_colour, padx=2, pady=2,
-                        activeforeground=text_colour, fg=text_colour,  command=lambda:button_event(button_id))
+        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, highlightthickness=0,
+                        font=font, background=button_colour, activebackground=active_colour, padx=2, pady=2,
+                        activeforeground=text_colour, foreground=text_colour, command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag, state="hidden")
         # Create and store a tool-tip for the button
         tooltip_object = CreateToolTip(button, text=tooltip)
         tooltip_object.waittime = 200     # miliseconds
         tooltip_object.wraplength = 400   # pixels
-        # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
-        # Note that the 'width' parameter is the maximum width in pixels before the text starts to wrap. To set the
-        # minimum width we need to specify an initial 'text' value that contains the required number of characters.
-        # The font size is the  2nd parameter of the 'font' tuple
-        placeholder1 = canvas.create_text(x, y, text="".zfill(width), font=font, fill=text_colour, tags=canvas_tag)
+        # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved).
+        # Note that the 'width' parameter for the canvas.create_text function is the maximum width in pixels
+        # before the text starts to wrap so we can't use this to set the minimum width of the placeholded object.
+        # Instead, we need to specify an initial 'text' value that contains the required number of characters
+        # (using zfill) and change this later.
+        placeholder1 = canvas.create_text(x, y, text="".zfill(width), font=font,
+                                        fill=text_colour, tags=canvas_tag, state='normal')
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-4, bbox[2]+4, bbox[3]+2,
-                                            tags=canvas_tag, fill=button_colour, width=1)
+                                    tags=canvas_tag, fill=button_colour, width=1, state='normal')
         canvas.tag_raise(placeholder1, placeholder2)
         # Now we have created the textbox at the right width, update it to display the 'proper' label
         canvas.itemconfig(placeholder1, text=label)
@@ -293,6 +306,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
         buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
+        buttons[str(button_id)]["buttonlabel"] = label                        # The label for the button (string)
         buttons[str(button_id)]["tooltiptext"] = tooltip                      # The default tooltip text to display
         buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
         buttons[str(button_id)]["deselectedcolour"] = button_colour           # button colour in its normal/unselected state
@@ -308,6 +322,51 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         # Note that commands will only be sent out if a mapping exists
         dcc_control.update_dcc_switch(button_id, buttons[str(button_id)]["selected"])
     return(canvas_tag)
+
+#---------------------------------------------------------------------------------------------
+# Public API function to Update the Button Styles
+#---------------------------------------------------------------------------------------------
+
+def update_button_styles(button_id:int, width:int=10, button_colour:str="SeaGreen3",
+                         active_colour:str="SeaGreen2", selected_colour:str="SeaGreen1",
+                         text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
+    global buttons
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) or button_id < 1 or button_id > 999:
+        logging.error("Button "+str(button_id)+": update_button_styles - Button ID must be an int (1-999)")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": update_button_styles - Button ID does not exist")
+    else:
+        logging.debug("Button "+str(button_id)+": Updating Button Styles")
+        button = buttons[str(button_id)]
+        # Update the Button Styles depending on the state of the button
+        if button["selected"]: button["button"].config(background=selected_colour)
+        else: button["button"].config(background=button_colour)
+        button["button"].config(width=width)
+        button["button"].config(font=font)
+        button["button"].config(activebackground=active_colour)
+        button["button"].config(activeforeground=text_colour)
+        button["button"].config(foreground=text_colour)
+        # Update the Placeholder Styles. This is relatively complex operation as we first
+        # need to ensure the text isn't "hidden" otherwise we will not be able to use the
+        # 'bbox' method to get the new boundary coordinates (after we have updated the font).
+        if not editing_enabled: button["canvas"].itemconfig(button["placeholder1"], state='normal')
+        button["canvas"].itemconfigure(button["placeholder1"], font=font)
+        button["canvas"].itemconfigure(button["placeholder1"], fill=text_colour)
+        button["canvas"].itemconfigure(button["placeholder1"], text="".zfill(width))
+        bbox = button["canvas"].bbox(button["placeholder1"])
+        # Now we have the boundary coordinates we can re-hide the placeholder if we are in run mode
+        if not editing_enabled: button["canvas"].itemconfig(button["placeholder1"], state='hidden')
+        # The second placeholder (the background rectangle) can now be updated as required
+        button["canvas"].coords(button["placeholder2"], bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1)
+        # Finally we can change the placeholder text to the appropriate string
+        button["canvas"].itemconfigure(button["placeholder1"], text=button["buttonlabel"])
+        # Only update the background colour if we are in edit mode (to make it visible)
+        if editing_enabled: button["canvas"].itemconfig(button["placeholder2"], fill=button_colour)
+        # Store the parameters we need to track
+        buttons[str(button_id)]["selectedcolour"] = selected_colour
+        buttons[str(button_id)]["deselectedcolour"] = button_colour
+    return()
 
 #---------------------------------------------------------------------------------------------
 # API function to delete a Button library object (including all the drawing objects)

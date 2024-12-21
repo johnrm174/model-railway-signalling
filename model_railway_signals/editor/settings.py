@@ -50,11 +50,10 @@ default_settings = {}
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
 default_settings["general"]["editmode"] = True
-default_settings["general"]["version"] = "Version 4.8.0"
+default_settings["general"]["version"] = "Version 4.9.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
-default_settings["general"]["buttonsize"] = 8
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
@@ -96,20 +95,55 @@ default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
 default_settings["gpio"]["portmappings"] = []
+# The following settings define the default application styles (object appearance)
+default_settings["styles"] = {}
+default_settings["styles"]["routebuttons"] = {}
+default_settings["styles"]["routebuttons"]["buttonwidth"] = 15
+default_settings["styles"]["routebuttons"]["buttoncolour"] = "SeaGreen3"
+default_settings["styles"]["routebuttons"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["routebuttons"]["textfonttuple"] = ("Courier", 9, "")
+default_settings["styles"]["dccswitches"] = {}
+default_settings["styles"]["dccswitches"]["buttonwidth"] = 12
+default_settings["styles"]["dccswitches"]["buttoncolour"] = "SkyBlue2"
+default_settings["styles"]["dccswitches"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["dccswitches"]["textfonttuple"] = ("Courier", 9, "")
+default_settings["styles"]["tracksections"] = {}
+default_settings["styles"]["tracksections"]["buttonwidth"] = 5
+default_settings["styles"]["tracksections"]["buttoncolour"] = "Black"
+default_settings["styles"]["tracksections"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["tracksections"]["textfonttuple"] = ("Courier", 9, "bold")
+default_settings["styles"]["tracksections"]["defaultlabel"] = "XXXXX"
+default_settings["styles"]["routelines"] = {}
+default_settings["styles"]["routelines"]["colour"] = "Black"
+default_settings["styles"]["routelines"]["linewidth"] = 3
+default_settings["styles"]["points"] = {}
+default_settings["styles"]["points"]["buttoncolour"] = "Grey85"
+default_settings["styles"]["points"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["points"]["textfonttuple"] = ("Courier", 8, "")
+default_settings["styles"]["signals"] = {}
+default_settings["styles"]["signals"]["buttoncolour"] = "Grey85"
+default_settings["styles"]["signals"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
+default_settings["styles"]["signals"]["textfonttuple"] = ("Courier", 8, "")
+default_settings["styles"]["textboxes"] = {}
+default_settings["styles"]["textboxes"]["textcolour"] = "Black"
+default_settings["styles"]["textboxes"]["background"] = ""     # Empty String = Transparent
+default_settings["styles"]["textboxes"]["textfonttuple"] = ("Courier", 10, "")
+default_settings["styles"]["textboxes"]["justification"] = 2   # 1=Left, 2=Center, 3=right
+default_settings["styles"]["textboxes"]["borderwidth"] = 0     # border width
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
 #------------------------------------------------------------------------------------
 
-settings = copy.deepcopy (default_settings)
+settings = copy.deepcopy(default_settings)
 
 #------------------------------------------------------------------------------------
 # Function to restore the default settings
 #------------------------------------------------------------------------------------
 
 def restore_defaults():
-    global filename, settings
-    settings = copy.deepcopy (default_settings)
+    global settings
+    settings = copy.deepcopy(default_settings)
     return()
 
 #------------------------------------------------------------------------------------
@@ -154,7 +188,21 @@ def set_all(new_settings):
     # Maintain the logging level across re-loads (use case - set debugging to see load warnings)
     settings["logging"]["level"] = current_logging_level
     return()
-    
+
+#------------------------------------------------------------------------------------
+# Functions to set/get the default and current application styles
+#------------------------------------------------------------------------------------
+
+def get_default_style(object_type:str, parameter:str):
+    return(default_settings["styles"][object_type][parameter])
+
+def get_style(object_type:str, parameter:str):
+    return(settings["styles"][object_type][parameter])
+
+def set_style(object_type:str, parameter:str, value):
+    settings["styles"][object_type][parameter] = value
+    return()
+
 #------------------------------------------------------------------------------------
 # Functions to set/get the general settings
 #------------------------------------------------------------------------------------
@@ -166,17 +214,15 @@ def get_general(param=None):
     info = settings["general"]["info"]
     automation = settings["general"]["automation"]
     spad = settings["general"]["spadpopups"]
-    buttonsize = settings["general"]["buttonsize"]
-    return(filename, editmode, version, info, automation, spad, buttonsize)
+    return(filename, editmode, version, info, automation, spad)
 
-def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None, automation:bool=None, spad:bool=None, buttonsize:int=None):
+def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None, automation:bool=None, spad:bool=None):
     if filename is not None: settings["general"]["filename"] = filename
     if editmode is not None: settings["general"]["editmode"] = editmode
     if version is not None: settings["general"]["version"] = version
     if info is not None: settings["general"]["info"] = info
     if automation is not None: settings["general"]["automation"] = automation
     if spad is not None: settings["general"]["spadpopups"] = spad
-    if buttonsize is not None: settings["general"]["buttonsize"] = buttonsize
     return()
 
 #------------------------------------------------------------------------------------

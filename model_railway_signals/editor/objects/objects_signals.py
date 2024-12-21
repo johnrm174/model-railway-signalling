@@ -7,6 +7,7 @@
 #    create_signal(type,subtype) - Create a default signal object on the schematic
 #    delete_signal(object_id) - Hard Delete an object when deleted from the schematic
 #    update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
+#    update_signal_style(obj_id, params) - Update the styles of an existing signal object
 #    paste_signal(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
@@ -19,6 +20,7 @@
 #    update_references_to_instrument(old_id, new_id) - update inst_id in the interlocking tables
 #
 # Makes the following external API calls to other editor modules:
+#    settings.get_style - To retrieve the default application styles for the object
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.signal - To get The Object_ID for a given Item_ID
@@ -55,6 +57,7 @@
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
 #    signals.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals.delete_signal(id) - delete library drawing object (part of soft delete)
+#    signals.update_signal_button_styles(id,styles) - to change the styles of an existing signal
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
@@ -77,6 +80,7 @@ from . import objects_common
 from . import objects_points
 from . import objects_routes
 from .. import run_layout
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Default Signal Objects (i.e. state at creation)
@@ -87,7 +91,15 @@ default_signal_object = copy.deepcopy(objects_common.default_object)
 default_signal_object["item"] = objects_common.object_type.signal
 default_signal_object["itemtype"] = signals.signal_type.colour_light.value
 default_signal_object["itemsubtype"] = signals.signal_subtype.four_aspect.value
+# Styles are initially set to the default styles (defensive programming)
+default_signal_object["buttoncolour"] = settings.get_style("signals", "buttoncolour")
+default_signal_object["textcolourtype"] = settings.get_style("signals", "textcolourtype")
+default_signal_object["textfonttuple"] = settings.get_style("signals", "textfonttuple")
+# Other object-specific parameters
 default_signal_object["orientation"] = 0 
+default_signal_object["xbuttonoffset"] = 0
+default_signal_object["ybuttonoffset"] = 0
+default_signal_object["hidebuttons"] = False
 default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
 default_signal_object["feathers"] = [False,False,False,False,False]  # [MAIN,LH1,LH2,RH1,RH2]
@@ -426,6 +438,14 @@ def update_signal(object_id, new_object_configuration):
 def redraw_signal_object(object_id):
     # Turn the signal type value back into the required enumeration type
     sig_type = signals.signal_type(objects_common.schematic_objects[object_id]["itemtype"])
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
     # Update the sensor mapping callbacks for the signal (if any have been specified)
     if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
         gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
@@ -494,7 +514,6 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     has_subsidary = objects_common.schematic_objects[object_id]["subsidary"][0],
                     mainfeather = objects_common.schematic_objects[object_id]["feathers"][0],
@@ -503,7 +522,15 @@ def redraw_signal_object(object_id):
                     rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][3],
                     rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
-                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"])
+                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    button_colour = button_colour,
+                    active_colour = active_colour,
+                    selected_colour = selected_colour,
+                    text_colour = text_colour)
         # set the initial theatre route indication (for MAIN) for the signal if appropriate
         if objects_common.schematic_objects[object_id]["theatreroute"]:
             signals.set_route(sig_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -527,7 +554,6 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     main_signal = True,
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][0][0],
@@ -540,7 +566,15 @@ def redraw_signal_object(object_id):
                     rh1_subsidary = objects_common.schematic_objects[object_id]["sigarms"][3][1][0],
                     rh2_subsidary = objects_common.schematic_objects[object_id]["sigarms"][4][1][0],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
-                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"])
+                    fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    button_colour = button_colour,
+                    active_colour = active_colour,
+                    selected_colour = selected_colour,
+                    text_colour = text_colour)
         # Create the associated distant signal
         # From Release 4.5.1 the Signal_ID for the Secondary Distant is Home Signal ID + 1000
         if has_associated_distant(object_id):
@@ -563,7 +597,15 @@ def redraw_signal_object(object_id):
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][2][0],
                     rh1_signal = objects_common.schematic_objects[object_id]["sigarms"][3][2][0],
                     rh2_signal = objects_common.schematic_objects[object_id]["sigarms"][4][2][0],
-                    fully_automatic = objects_common.schematic_objects[object_id]["distautomatic"])
+                    fully_automatic = objects_common.schematic_objects[object_id]["distautomatic"],
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    button_colour = button_colour,
+                    active_colour = active_colour,
+                    selected_colour = selected_colour,
+                    text_colour = text_colour)
     elif sig_type == signals.signal_type.ground_position:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals.ground_pos_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
@@ -577,7 +619,14 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0])
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    button_colour = button_colour,
+                    active_colour = active_colour,
+                    selected_colour = selected_colour,
+                    text_colour = text_colour)
     elif sig_type == signals.signal_type.ground_disc:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals.ground_disc_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
@@ -591,7 +640,14 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
-                    sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
+                    button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                    button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
+                    hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    button_colour = button_colour,
+                    active_colour = active_colour,
+                    selected_colour = selected_colour,
+                    text_colour = text_colour)
     # Create/update the canvas "tags" and selection rectangle for the signal
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox (object_id, objects_common.schematic_objects[object_id]["tags"])
@@ -607,6 +663,10 @@ def create_signal(xpos:int, ypos:int, item_type, item_subtype):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_signal_object)
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=signals.signal_exists)
+    # Styles for the new object are set to the current default styles
+    objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("signals", "buttoncolour")
+    objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("signals", "textcolourtype")
+    objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("signals", "textfonttuple")
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -674,6 +734,42 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
     # created without any interlocking configuration - so nothing has changed
     return(new_object_id)            
 
+#------------------------------------------------------------------------------------
+# Function to update the styles of a Signal object
+#------------------------------------------------------------------------------------
+
+def update_signal_styles(object_id, dict_of_new_styles:dict):
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+    # Update the styles of the library object
+    signals.update_signal_button_styles(
+            signal_id = objects_common.schematic_objects[object_id]["itemid"],
+            font = objects_common.schematic_objects[object_id]["textfonttuple"],
+            button_colour = button_colour,
+            active_colour = active_colour,
+            selected_colour = selected_colour,
+            text_colour = text_colour)
+    # Update the associated distant signal buttons as well
+    if has_associated_distant(object_id):
+        signals.update_signal_button_styles(
+                signal_id = objects_common.schematic_objects[object_id]["itemid"] + 1000,
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour)
+    # Create/update the selection rectangle for the button
+    objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    return()
 #------------------------------------------------------------------------------------
 # Function to "soft delete" the signal object from the canvas together with all
 # associated dcc mappings and track sensor mappings. Primarily used to delete the

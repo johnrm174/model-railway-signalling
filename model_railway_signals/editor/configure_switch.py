@@ -122,7 +122,7 @@ class edit_switch():
             #----------------------------------------------------------------------------------
             # Create the Font selection element
             #----------------------------------------------------------------------------------
-            self.font=common.font_selection(self.main_frame)
+            self.font=common.font_selection(self.main_frame, label="Button font")
             self.font.pack(padx=2, pady=2, fill="x")
             #----------------------------------------------------------------------------------
             # Create a Frame for the font size and text style elements (Frame 4)
@@ -141,7 +141,7 @@ class edit_switch():
                    tool_tip="Select the font size (between 8 and 20 pixels)", allow_empty=False)
             self.fontsize.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
             # The final subframe is for the text style selection
-            self.fontstyle = common.font_style_selection(self.frame4)
+            self.fontstyle = common.font_style_selection(self.frame4, label="Font style")
             self.fontstyle.pack(padx=2, pady=2, side=Tk.LEFT, fill='x', expand=True)
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the switch type and general settings UI element (frame 5)
@@ -215,12 +215,12 @@ class edit_switch():
             self.oncommands.set_values(objects.schematic_objects[self.object_id]["dcconcommands"], item_id=item_id)
             self.offcommands.set_values(objects.schematic_objects[self.object_id]["dccoffcommands"], item_id=item_id)
             # Set the button appearance elements
-            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
-            self.font.set_value(objects.schematic_objects[self.object_id]["font"])
-            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["fontstyle"])
-            self.fontsize.set_value(objects.schematic_objects[self.object_id]["fontsize"])
+            self.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
             self.textcolourtype.set_value(objects.schematic_objects[self.object_id]["textcolourtype"])
+            self.font.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][0])
+            self.fontsize.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][1])
+            self.fontstyle.set_value(objects.schematic_objects[self.object_id]["textfonttuple"][2])
             # Enable/disable the 'off' UI elements depending on switch type
             self.switch_type_updated()
             # Hide the validation error message
@@ -247,12 +247,11 @@ class edit_switch():
             new_object_configuration["dcconcommands"] = self.oncommands.get_values()
             new_object_configuration["dccoffcommands"] = self.offcommands.get_values()
             # Get the button appearance elements
-            new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
+            text_font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
-            new_object_configuration["font"] = self.font.get_value()
-            new_object_configuration["fontstyle"] = self.fontstyle.get_value()
-            new_object_configuration["fontsize"] = self.fontsize.get_value()
+            new_object_configuration["buttoncolour"] = self.buttoncolour.get_value()
             new_object_configuration["textcolourtype"] = self.textcolourtype.get_value()
+            new_object_configuration["textfonttuple"] = text_font_tuple
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

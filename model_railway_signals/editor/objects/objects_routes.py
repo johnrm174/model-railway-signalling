@@ -7,6 +7,7 @@
 #    create_route() - Create a default route object on the schematic
 #    delete_route(object_id) - Hard Delete an object when deleted from the schematic
 #    update_route(obj_id,new_obj) - Update the configuration of an existing object
+#    update_route_style(obj_id, params) - Update the styles of an existing route button object
 #    paste_route_(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_route_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_route_object(object_id) - Redraw the object on the canvas following an update
@@ -23,6 +24,7 @@
 #    update_references_to_switch(old_id, new_id) - update switch_id references in the route's configuration
 #
 # Makes the following external API calls to other editor modules:
+#    settings.get_style - To retrieve the default application styles for the object
 #    run_routes.set_schematic_route_callback - setting the object callbacks when created/recreated
 #    run_routes.clear_schematic_route_callback - setting the object callbacks when created/recreated
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
@@ -40,6 +42,7 @@
 #
 # Makes the following external API calls to library modules:
 #    buttons.create_button(id) - Create the library object
+#    buttons.update_button_styles(id,styles) - Update the styles of the library object
 #    buttons.delete_button(id) - Delete the library object
 #    buttons.button_exists - to find out if the specified Item ID already exists
 #
@@ -53,6 +56,7 @@ import copy
 
 from ...library import buttons
 from .. import run_routes
+from .. import settings
 from . import objects_common
 
 #------------------------------------------------------------------------------------
@@ -63,18 +67,21 @@ default_route_object = copy.deepcopy(objects_common.default_object)
 default_route_object["item"] = objects_common.object_type.route
 default_route_object["routename"] = "Route"
 default_route_object["routedescription"] = "Route description (Run Mode tooltip)"
-default_route_object["buttonwidth"] = 15
-default_route_object["buttoncolour"] = "SeaGreen3"
-default_route_object["textcolourtype"] = 1    # 1=Auto, 2=Black, 3=White
-default_route_object["font"] = "Courier"
-default_route_object["fontsize"] = 9
-default_route_object["fontstyle"] = ""
+# Styles are initially set to the default styles (defensive programming)
+default_route_object["buttonwidth"] = settings.get_style("routebuttons", "buttonwidth")
+default_route_object["buttoncolour"] = settings.get_style("routebuttons", "buttoncolour")
+default_route_object["textcolourtype"] = settings.get_style("routebuttons", "textcolourtype")
+default_route_object["textfonttuple"] = settings.get_style("routebuttons", "textfonttuple")
+# Signals and subsidaries on route comprise variable length lists of Item IDs
 default_route_object["signalsonroute"] = []
 default_route_object["subsidariesonroute"] = []
+# Signals and subsidaries on route comprise a dictionary {"item_id" : required_state}
 default_route_object["pointsonroute"] = {}
 default_route_object["switchesonroute"] = {}
+# lines and points to highlight comprise variable length lists of Item IDs
 default_route_object["linestohighlight"] = []
 default_route_object["pointstohighlight"] = []
+# Other object-specific parameters
 default_route_object["routecolour"] = "black"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
@@ -273,10 +280,6 @@ def update_route(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
         
 def redraw_route_object(object_id):
-    # Create the Tkinter Font tuple
-    tkinter_font_tuple = (objects_common.schematic_objects[object_id]["font"],
-                          objects_common.schematic_objects[object_id]["fontsize"],
-                          objects_common.schematic_objects[object_id]["fontstyle"])
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
@@ -284,9 +287,7 @@ def redraw_route_object(object_id):
     # Work out what the text colour should be (auto uses lightest of the three for max contrast)
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-    if  text_colour_type == 2 : text_colour = "Black"
-    elif text_colour_type == 3 : text_colour = "White"
-    else: text_colour = objects_common.get_text_colour(selected_colour)
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
     # Create the associated library object
     canvas_tags = buttons.create_button(objects_common.canvas,
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -298,12 +299,11 @@ def redraw_route_object(object_id):
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
                 tooltip = objects_common.schematic_objects[object_id]["routedescription"],
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
                 button_colour = button_colour,
                 active_colour = active_colour,
                 selected_colour = selected_colour,
-                text_colour = text_colour,
-                font = tkinter_font_tuple)
-
+                text_colour = text_colour)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
@@ -324,6 +324,11 @@ def create_route(xpos:int, ypos:int):
     objects_common.schematic_objects[object_id]["routename"] = "Route "+str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
+    # Styles for the new object are set to the current default styles
+    objects_common.schematic_objects[object_id]["buttonwidth"] = settings.get_style("routebuttons", "buttonwidth")
+    objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("routebuttons", "buttoncolour")
+    objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("routebuttons", "textcolourtype")
+    objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("routebuttons", "textfonttuple")
     # Add the new object to the type-specific index
     objects_common.route_index[str(item_id)] = object_id
     # Draw the Route Object on the canvas
@@ -362,6 +367,35 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     # Create the associated library objects
     redraw_route_object(new_object_id)
     return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of a Route Button object
+#------------------------------------------------------------------------------------
+
+def update_route_styles(object_id, dict_of_new_styles:dict):
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+    # Update the styles of the library object
+    buttons.update_button_styles(
+            button_id = objects_common.schematic_objects[object_id]["itemid"],
+            width = objects_common.schematic_objects[object_id]["buttonwidth"],
+            font = objects_common.schematic_objects[object_id]["textfonttuple"],
+            button_colour = button_colour,
+            active_colour = active_colour,
+            selected_colour = selected_colour,
+            text_colour = text_colour)
+    # Create/update the selection rectangle for the button
+    objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to "soft delete" the Route object from the canvas - Primarily used to

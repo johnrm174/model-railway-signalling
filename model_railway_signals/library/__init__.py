@@ -34,6 +34,7 @@ from .signals import update_colour_light_signal
 from .signals import reset_signals_mqtt_configuration
 from .signals import subscribe_to_remote_signals
 from .signals import set_signals_to_publish_state
+from .signals import update_signal_button_styles
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
@@ -41,6 +42,8 @@ from .signals_ground_disc import create_ground_disc_signal
 
 from .points import point_type
 from .points import create_point
+from .points import update_point_styles
+from .points import update_point_button_styles
 from .points import delete_point
 from .points import update_autoswitch
 from .points import point_exists
@@ -59,6 +62,7 @@ from .track_sections import section_exists
 from .track_sections import delete_section
 from .track_sections import section_occupied
 from .track_sections import section_label
+from .track_sections import update_section_styles
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
 from .track_sections import reset_sections_mqtt_configuration
@@ -80,9 +84,17 @@ from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
 from .track_sensors import delete_track_sensor
 
+from .lines import create_line
+from .lines import update_line_styles
+from .lines import line_exists
+from .lines import delete_line
+from .lines import set_line_colour
+from .lines import reset_line_colour
+
 from .text_boxes import create_text_box
 from .text_boxes import text_box_exists
 from .text_boxes import delete_text_box
+from .text_boxes import update_text_box_styles
 
 from .pi_sprog_interface import sprog_connect
 from .pi_sprog_interface import sprog_disconnect
@@ -117,6 +129,7 @@ from .block_instruments import set_instruments_to_publish_state
 from .block_instruments import subscribe_to_remote_instruments
 
 from .buttons import create_button
+from .buttons import update_button_styles
 from .buttons import button_exists
 from .buttons import delete_button
 from .buttons import toggle_button
@@ -131,19 +144,21 @@ from .file_interface import purge_loaded_state_information
 from .file_interface import save_schematic
 
 from .common import set_root_window
-from .common import shutdown
+from .common import orderly_shutdown
+from .common import instant_shutdown
 from .common import configure_edit_mode
-from .common import configure_button_size
 
 __all__ = [
       # Public common functions
         'set_root_window',
-        'shutdown',
+        'orderly_shutdown',
+        'instant_shutdown',
         'configure_edit_mode',
-        'configure_button_size',
       # Public point types/functions
         'point_type',
         'create_point',
+        'update_point_styles',
+        'update_point_button_styles',
         'delete_point',
         'update_autoswitch',
         'point_exists',
@@ -156,12 +171,20 @@ __all__ = [
         'toggle_fpl',
         'set_point_colour',
         'reset_point_colour',
+      # Public line types/functions
+        'create_line',
+        'update_line_styles',
+        'line_exists',
+        'delete_line',
+        'set_line_colour',
+        'reset_line_colour',
       # public track sensor types/functions
         'create_track_sensor',
         'delete_track_sensor',
         'track_sensor_exists',
       # public text box types/functions
         'create_text_box',
+        'update_text_box_styles',
         'delete_text_box',
         'text_box_exists',
       # Public signal types/functions
@@ -201,12 +224,14 @@ __all__ = [
         'create_semaphore_signal',
         'create_ground_position_signal',
         'create_ground_disc_signal',
+        'update_signal_button_styles',
       # Public track section types/functions
         'create_section',
         'section_exists',
         'delete_section',
         'section_occupied',
         'section_label',
+        'update_section_styles',
         'set_section_occupied',
         'clear_section_occupied',
         'reset_sections_mqtt_configuration',
@@ -257,6 +282,7 @@ __all__ = [
         'set_instruments_to_publish_state',
       # public Button types/functions
         'create_button',
+        'update_button_styles',
         'button_exists',
         'delete_button',
         'toggle_button',

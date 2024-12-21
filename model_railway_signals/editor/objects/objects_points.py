@@ -6,6 +6,7 @@
 #    create_point(type) - Create a default point object on the schematic
 #    delete_point(obj_id) - Hard Delete an object when deleted from the schematic
 #    update_point(obj_id,new_obj) - Update the configuration of an existing point object
+#    update_point_style(obj_id, params) - Update the styles of an existing point object
 #    paste_point(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_point_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_point_object(object_id) - Redraw the object on the canvas following an update
@@ -13,6 +14,7 @@
 #    reset_point_interlocking_tables() - recalculates interlocking tables from scratch
 #
 # Makes the following external API calls to other editor modules:
+#    settings.get_style - To retrieve the default application styles for the object
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.point - To get The Object_ID for a given Item_ID
@@ -43,6 +45,8 @@
 #    points.delete_point(id) - delete library drawing object (part of soft delete)
 #    points.create_point(id) -  To create the library object (create or redraw)
 #    points.update_autoswitch(id,autoswitch_id) - to change the config of an existing point
+#    points.update_point_styles(id,styles) - to change the styles of an existing point
+#    points.update_point_button_styles(id,styles) - to change the styles of an existing point
 #    dcc_control.delete_point_mapping - delete mappings when deleting point / prior to recreating
 #    dcc_control.map_dcc_point - to create the new DCC mapping (creation or updating)
 #
@@ -59,6 +63,7 @@ from . import objects_signals
 from . import objects_sensors
 from . import objects_routes
 from .. import run_layout
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Default Point Objects (i.e. state at creation)
@@ -68,13 +73,21 @@ default_point_object = copy.deepcopy(objects_common.default_object)
 default_point_object["item"] = objects_common.object_type.point
 default_point_object["itemtype"] = points.point_type.LH.value
 default_point_object["itemsubtype"] = points.point_subtype.normal.value
+# Styles are initially set to the default styles (defensive programming)
+default_point_object["colour"] = settings.get_style("routelines", "colour")
+default_point_object["linewidth"] = settings.get_style("routelines", "linewidth")
+default_point_object["buttoncolour"] = settings.get_style("points", "buttoncolour")
+default_point_object["textcolourtype"] = settings.get_style("points", "textcolourtype")
+default_point_object["textfonttuple"] = settings.get_style("points", "textfonttuple")
+# Other object-specific parameters
 default_point_object["orientation"] = 0
 default_point_object["xbuttonoffset"] = 0
 default_point_object["ybuttonoffset"] = 0
-default_point_object["colour"] = "black"
+default_point_object["linewidth"] = 3
 default_point_object["alsoswitch"] = 0
 default_point_object["reverse"] = False
 default_point_object["automatic"] = False
+default_point_object["hidebuttons"] = False
 default_point_object["hasfpl"] = False
 default_point_object["dccaddress"] = 0
 default_point_object["dccreversed"] = False
@@ -194,6 +207,14 @@ def redraw_point_object(object_id):
     # Turn the point type and subtype values back into the required enumeration type
     point_type = points.point_type(objects_common.schematic_objects[object_id]["itemtype"])
     point_subtype = points.point_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
+    # Work out what the active and selected colours for the button should be
+    button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+    active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+    selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
     # Create the new point object
     canvas_tags = points.create_point (
                 canvas = objects_common.canvas,
@@ -210,8 +231,15 @@ def redraw_point_object(object_id):
                 orientation = objects_common.schematic_objects[object_id]["orientation"],
                 also_switch = objects_common.schematic_objects[object_id]["alsoswitch"],
                 reverse = objects_common.schematic_objects[object_id]["reverse"],
-                auto = objects_common.schematic_objects[object_id]["automatic"],
-                fpl = objects_common.schematic_objects[object_id]["hasfpl"])
+                switched_with = objects_common.schematic_objects[object_id]["automatic"],
+                hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                fpl = objects_common.schematic_objects[object_id]["hasfpl"],
+                line_width = objects_common.schematic_objects[object_id]["linewidth"],
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour)
     # Create/update the canvas "tags" and selection rectangle for the point
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)        
@@ -227,6 +255,12 @@ def create_point(xpos:int, ypos:int, item_type, item_subtype):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_point_object)
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=points.point_exists)
+    # Styles for the new object are set to the current default styles
+    objects_common.schematic_objects[object_id]["colour"] = settings.get_style("routelines", "colour")
+    objects_common.schematic_objects[object_id]["linewidth"] = settings.get_style("routelines", "linewidth")
+    objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("points", "buttoncolour")
+    objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("points", "textcolourtype")
+    objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("points", "textfonttuple")
     # Add the specific elements for this particular instance of the point
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -267,6 +301,42 @@ def paste_point(object_to_paste, deltax:int, deltay:int):
     # Create/draw the new object on the canvas
     redraw_point_object(new_object_id)
     return(new_object_id)            
+
+#------------------------------------------------------------------------------------
+# Function to update the styles of a Point object
+#------------------------------------------------------------------------------------
+
+def update_point_styles(object_id, dict_of_new_styles:dict):
+    # Update the appropriate elements in the object configuration
+    for element_to_change in dict_of_new_styles.keys():
+        objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
+    # This function will either get called when applying changes to the route lines (in which case the
+    # "colour" element will be present) or for changes to the point button styles ("colour" not present)
+    if "colour" in dict_of_new_styles.keys():
+        points.update_point_styles(
+                point_id = objects_common.schematic_objects[object_id]["itemid"],
+                colour = objects_common.schematic_objects[object_id]["colour"],
+                line_width = objects_common.schematic_objects[object_id]["linewidth"])
+    else:
+        # Work out what the active and selected colours for the button should be
+        button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
+        active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
+        selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
+        # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+        # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
+        text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+        text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+        # Update the styles of the library object
+        points.update_point_button_styles(
+                point_id = objects_common.schematic_objects[object_id]["itemid"],
+                font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_colour = button_colour,
+                active_colour = active_colour,
+                selected_colour = selected_colour,
+                text_colour = text_colour)
+        # Create/update the selection rectangle for the button
+        objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to "soft delete" the point object from the canvas together with any accociated

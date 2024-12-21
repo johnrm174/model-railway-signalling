@@ -179,6 +179,8 @@
 #
 #   send_mqtt_signal_updated_event(sig_id:int) - called on changes to the displayed aspect (all signal types)
 #
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#
 #---------------------------------------------------------------------------------------------
 
 # NOTE - MORE IMPORTS ARE DECLARED BELOW THE GLOBAL API CLASS DEFINITIONS
@@ -266,6 +268,31 @@ signals:dict = {}
 
 list_of_signals_to_publish=[]
 
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+# Signal buttons will be hidden in Run mode if they are configured to be 'hidden'
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    # Update all existing LOCAL library objects (signal_id is an int) according to the current mode
+    for signal_id in signals:
+        if signal_id.isdigit():
+            signal = signals[signal_id]
+            if not editing_enabled and signal["hidebuttons"]:
+                # In Run Mode - Signal button windows are hidden if configured to be so
+                if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='hidden')
+                if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='hidden')
+            else:
+                # In Edit Mode (or buttons not hidden) - Signal button windows are always displayed
+                if signal["buttonwindow1"] is not None: signal["canvas"].itemconfig(signal["buttonwindow1"], state='normal')
+                if signal["buttonwindow2"] is not None: signal["canvas"].itemconfig(signal["buttonwindow2"], state='normal')
+    return()
+
 # -------------------------------------------------------------------------
 # Library API Function to check if a Signal exists in the dictionary of Signals.
 # Used by most externally-called functions to validate the Signal ID.
@@ -349,28 +376,21 @@ def approach_release_button_event(sig_id:int):
 # -------------------------------------------------------------------------
 
 def reset_sig_passed_button(sig_id:int):
-    if signal_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
+    if signal_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg="grey85")
 
 def reset_sig_released_button(sig_id:int):
-    if signal_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
+    if signal_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg="grey85")
 
 # -------------------------------------------------------------------------
 # Internal Function to create all the mandatory signal elements that will apply
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 
-def create_common_signal_elements(canvas, sig_id:int,
-                                  signal_type:signal_type,
-                                  x:int, y:int,
-                                  orientation:int,
-                                  sig_switched_callback,
-                                  sig_passed_callback,
-                                  sig_updated_callback = None,
-                                  sub_switched_callback = None,
-                                  has_subsidary:bool=False,
-                                  sig_passed_button:bool=False,
-                                  sig_automatic:bool=False,
-                                  associated_home:int=0):
+def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int,
+            button_xoffset:int, button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback,
+            sig_passed_callback, sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False,
+            sig_automatic:bool=False, associated_home:int=0, button_colour:str="Grey85", active_colour:str="Grey95",
+            selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
     global signals
     # Define the "Tags" for all drawing objects for this signal instance.  If it is an associated distant
     # signal then we assign 2 tags - the tag associated with the signal itself (this is stored in the 
@@ -387,14 +407,16 @@ def create_common_signal_elements(canvas, sig_id:int,
     if associated_home > 0: main_button_text = "D"
     else: main_button_text = format(sig_id,'02d')
     # Create the Signal and Subsidary Button objects and their callbacks
-    sig_button = Tk.Button (canvas, text=main_button_text, padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised, command=lambda:signal_button_event(sig_id))
-    sub_button = Tk.Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised, command=lambda:subsidary_button_event(sig_id))
+    sig_button = Tk.Button (canvas, text=main_button_text, state="normal", relief="raised",
+                            font=font, highlightthickness=0, padx=2, pady=0, background=button_colour,
+                            activebackground=active_colour, activeforeground=text_colour,
+                            foreground=text_colour, command=lambda:signal_button_event(sig_id))
+    sub_button = Tk.Button (canvas, text="S",  state="normal", relief="raised", font=font,
+                            highlightthickness=0, padx=2, pady=0, background=button_colour,
+                            activebackground=active_colour, activeforeground=text_colour,
+                            foreground=text_colour, command=lambda:subsidary_button_event(sig_id))
     # Signal Passed Button - We only want a small button - hence a small font size
-    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
+    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"), highlightthickness=0,
                 command=lambda:sig_passed_button_event(sig_id))
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
     # created if the signal has a subsidary, but the Button positions are adjusted so they always
@@ -402,30 +424,57 @@ def create_common_signal_elements(canvas, sig_id:int,
     # special case of a semaphore distant signal being created on the same "post" as a home signal.
     # In this case we apply an additional offset to deconflict with the home signal buttons.
     # Note the code also applies offsets to take into account the default font size in 'common'
-    yoffset = -9-common.fontsize/2
     if associated_home > 0:
-        if signals[str(associated_home)]["hassubsidary"]:
-            if orientation == 0: xoffset = -common.fontsize/2*7-24
-            else: xoffset = -common.fontsize*4-20
+        if sig_automatic:
+            button_window1 = None
+            button_window2 = None
+        elif signals[str(associated_home)]["hassubsidary"]:
+            if orientation == 180:
+                anchor=Tk.NW
+            else:
+                anchor=Tk.SE
+            button_position = common.rotate_point(x, y, button_xoffset - 52, button_yoffset - 6, orientation) 
+            button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+            button_window2 = None            
         else:
-            if orientation == 0: xoffset = -common.fontsize/2*5-18
-            else: xoffset = -common.fontsize*3-14
-        button_position = common.rotate_point(x, y, xoffset, yoffset, orientation)
-        if not sig_automatic: canvas.create_window(button_position, window=sig_button, tags=canvas_tag)
+            if orientation == 180:
+                anchor=Tk.NW
+            else:
+                anchor=Tk.SE
+            button_position = common.rotate_point(x, y, button_xoffset - 32, button_yoffset - 6, orientation)
+            button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+            button_window2 = None
     elif has_subsidary:
-        if orientation == 0: xoffset = -common.fontsize-14
-        else: xoffset = -common.fontsize*2-12
-        button_position = common.rotate_point(x, y, xoffset, yoffset, orientation) 
-        canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=canvas_tag)
-        canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=canvas_tag)          
+        if orientation == 180:
+            anchor1=Tk.NW
+            anchor2=Tk.NE
+        else:
+            anchor1=Tk.SE
+            anchor2=Tk.SW
+        button_position = common.rotate_point(x, y, button_xoffset - 23, button_yoffset - 6, orientation) 
+        button_window1 = canvas.create_window(button_position, anchor=anchor1, window=sig_button, tags=canvas_tag)
+        button_window2 = canvas.create_window(button_position, anchor=anchor2, window=sub_button, tags=canvas_tag)
     else:
-        xoffset = -14-common.fontsize/2
-        button_position = common.rotate_point (x, y, xoffset, yoffset, orientation) 
-        canvas.create_window(button_position,window=sig_button,tags=canvas_tag)
+        if orientation == 180:
+            anchor=Tk.NW
+        else:
+            anchor=Tk.SE
+        button_position = common.rotate_point (x, y, button_xoffset - 3, button_yoffset - 6, orientation) 
+        button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+        button_window2 = None
     # Signal passed button is created on the track at the base of the signal
-    if sig_passed_button: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
+    # Note we only create this if the signal IS NOT an 'associated distant' signal
+    if associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
     # Disable the main signal button if the signal is fully automatic
-    if sig_automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
+    canvas_colour = canvas.cget("background")
+    if sig_automatic: sig_button.config(state="disabled",relief="sunken", background=canvas_colour, border=0)
+    # Hide the buttons if we are in run mode and the buttons are configured as 'hidden'
+    if not editing_enabled and hide_buttons:
+        if button_window1 is not None: canvas.itemconfig(button_window1, state='hidden')
+        if button_window2 is not None: canvas.itemconfig(button_window2, state='hidden')
+    else:
+        if button_window1 is not None: canvas.itemconfig(button_window1, state='normal')
+        if button_window2 is not None: canvas.itemconfig(button_window2, state='normal')
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]              = canvas                 # MANDATORY - canvas object
@@ -447,9 +496,53 @@ def create_common_signal_elements(canvas, sig_id:int,
     signals[str(sig_id)]["sigbutton"]           = sig_button             # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]           = sub_button             # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"]        = passed_button          # MANDATORY - Button drawing object (subsidary signal)
+    signals[str(sig_id)]["buttonwindow1"]       = button_window1         # MANDATORY - Button window object (main signal)
+    signals[str(sig_id)]["buttonwindow2"]       = button_window2         # MANDATORY - Button window object (subsidary signal)
+    signals[str(sig_id)]["hidebuttons"]         = hide_buttons           # MANDATORY - Flag to hide buttons in Run Mode
+    signals[str(sig_id)]["buttonfont"]          = font                   # MANDATORY - The Tkinter button font tuple
+    signals[str(sig_id)]["selectedcolour"]      = selected_colour        # MANDATORY - The Tkinter button colours to use
+    signals[str(sig_id)]["deselectedcolour"]    = button_colour          # MANDATORY - The Tkinter button colours to use
+    signals[str(sig_id)]["textcolour"]          = text_colour          # MANDATORY - The Tkinter button colours to use
     signals[str(sig_id)]["tags"]                = main_canvas_tag        # MANDATORY - Canvas Tags for all drawing objects
     return(canvas_tag)
 
+# -------------------------------------------------------------------------
+# Public API function to Update the Point Styles
+# -------------------------------------------------------------------------
+
+def update_signal_button_styles(signal_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
+                     selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
+    global signals
+    if not isinstance(signal_id, int):
+        logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID must be an int")
+    elif not signal_exists(signal_id):
+        logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID does not exist")
+    else:
+        logging.debug("Signal "+str(signal_id)+": Updating Signal Button Styles")
+        # Update the Subsidary Change Button Styles according to the current state
+        if signals[str(signal_id)]["subclear"]: signals[str(signal_id)]["subbutton"].config(background=selected_colour)
+        else: signals[str(signal_id)]["subbutton"].config(background=button_colour)
+        signals[str(signal_id)]["subbutton"].config(font=font)
+        signals[str(signal_id)]["subbutton"].config(activebackground=active_colour)
+        signals[str(signal_id)]["subbutton"].config(activeforeground=text_colour)
+        signals[str(signal_id)]["subbutton"].config(foreground=text_colour)
+        # Update the Signal Change Button Styles. Note that if the signal is subject to approach control the
+        # main signal button text will be underlined. We don't bother to preserve this when re-applying styles
+        canvas_colour = signals[str(signal_id)]["canvas"].cget("background")
+        if signals[str(signal_id)]["automatic"]: signals[str(signal_id)]["sigbutton"].config(background=canvas_colour)
+        elif signals[str(signal_id)]["sigclear"]: signals[str(signal_id)]["sigbutton"].config(background=selected_colour)
+        else: signals[str(signal_id)]["sigbutton"].config(background=button_colour)
+        signals[str(signal_id)]["sigbutton"].config(font=font)
+        signals[str(signal_id)]["sigbutton"].config(activebackground=active_colour)
+        signals[str(signal_id)]["sigbutton"].config(activeforeground=text_colour)
+        signals[str(signal_id)]["sigbutton"].config(foreground=text_colour)
+        # Store the new values we need to track
+        signals[str(signal_id)]["buttonfont"] = font
+        signals[str(signal_id)]["selectedcolour"] = selected_colour
+        signals[str(signal_id)]["deselectedcolour"] = button_colour
+        signals[str(signal_id)]["textcolour"] = text_colour
+        return()
+    
 # -------------------------------------------------------------------------
 # Internal Function to create all the common signal elements to support
 # Approach Control (shared by Colour Light and semaphore signal types)
@@ -594,15 +687,15 @@ def toggle_signal(sig_id:int):
             logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
             signals[str(sig_id)]["sigclear"] = False
             if not signals[str(sig_id)]["automatic"]:
-                signals[str(sig_id)]["sigbutton"].config(bg=common.bgraised)
                 signals[str(sig_id)]["sigbutton"].config(relief="raised")
+                signals[str(sig_id)]["sigbutton"].config(background=signals[str(sig_id)]["deselectedcolour"])
                 update_signal_aspect(sig_id)
         else:
             logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
             signals[str(sig_id)]["sigclear"] = True
             if not signals[str(sig_id)]["automatic"]:
                 signals[str(sig_id)]["sigbutton"].config(relief="sunken")
-                signals[str(sig_id)]["sigbutton"].config(bg=common.bgsunken)
+                signals[str(sig_id)]["sigbutton"].config(background=signals[str(sig_id)]["selectedcolour"])
                 update_signal_aspect(sig_id)
     return()
 
@@ -628,12 +721,14 @@ def toggle_subsidary(sig_id:int):
         if signals[str(sig_id)]["subclear"]:
             logging.info ("Signal "+str(sig_id)+": Toggling subsidary to ON")
             signals[str(sig_id)]["subclear"] = False
-            signals[str(sig_id)]["subbutton"].config(relief="raised",bg=common.bgraised)
+            signals[str(sig_id)]["subbutton"].config(relief="raised")
+            signals[str(sig_id)]["subbutton"].config(background=signals[str(sig_id)]["deselectedcolour"])
             update_subsidary_aspect(sig_id)
         else:
             logging.info ("Signal "+str(sig_id)+": Toggling subsidary to OFF")
             signals[str(sig_id)]["subclear"] = True
-            signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
+            signals[str(sig_id)]["subbutton"].config(relief="sunken")
+            signals[str(sig_id)]["subbutton"].config(background=signals[str(sig_id)]["selectedcolour"])
             update_subsidary_aspect(sig_id)
     return ()
 
@@ -684,8 +779,10 @@ def set_approach_control(sig_id:int, release_on_yellow:bool=False, force_set:boo
             signals[str(sig_id)]["releaseonred"] = True
             signals[str(sig_id)]["releaseonyel"] = False
             update_signal_aspect(sig_id)
-        # Give an indication that the approach control has been set
-        signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"underline"))
+        # Give an indication that the approach control has been set by underlining the button text
+        # We do this by adding " underline" to the style element of the current font tuple
+        font, size, style = signals[str(sig_id)]["buttonfont"]
+        signals[str(sig_id)]["sigbutton"].config(font=(font, size, style+" underline italic"))
         # Reset the signal into it's 'not released' state
         signals[str(sig_id)]["released"] = False
     return()
@@ -710,8 +807,10 @@ def clear_approach_control(sig_id:int):
         signals[str(sig_id)]["releaseonyel"] = False
         signals[str(sig_id)]["releaseonred"] = False
         update_signal_aspect(sig_id)
-        # Give an indication that the approach control has been cleared
-        signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
+        # Give an indication that the approach control has been cleared by removing the underline from the
+        # button text - we do this by re-applying the current font tuple (with the default style element)
+        font, size, style = signals[str(sig_id)]["buttonfont"]
+        signals[str(sig_id)]["sigbutton"].config(font=signals[str(sig_id)]["buttonfont"])
     return()
 
 # -------------------------------------------------------------------------
@@ -731,7 +830,7 @@ def set_signal_override(sig_id:int):
         signals[str(sig_id)]["override"] = True
         update_signal_aspect(sig_id)
         # Provide an indication that the override has been set
-        signals[str(sig_id)]["sigbutton"].config(fg="red", disabledforeground="red")
+        signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
     return()
 
 # -------------------------------------------------------------------------
@@ -750,8 +849,10 @@ def clear_signal_override(sig_id:int):
         logging.info("Signal "+str(sig_id)+": Clearing override")
         signals[str(sig_id)]["override"] = False
         update_signal_aspect(sig_id)
-        # Provide an indication that the override has been cleared
-        signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
+        # Provide an indication that the override has been cleared by reverting the
+        # button text colour back to the standard button text colour
+        text_colour = signals[str(sig_id)]["textcolour"]
+        signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
 
 # -------------------------------------------------------------------------

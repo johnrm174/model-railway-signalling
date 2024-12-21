@@ -39,6 +39,7 @@
 #    track_sensor_index - for iterating through all the sensor objects
 #    route_index - for iterating through all the route objects
 #    switch_index - for iterating through all the switch objects
+#    textbox_index - for iterating through all the textbox objects
 #
 #------------------------------------------------------------------------------------
 
@@ -79,6 +80,7 @@ line_index:dict={}
 track_sensor_index:dict={}
 route_index:dict={}
 switch_index:dict={}
+textbox_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id
@@ -149,7 +151,7 @@ def set_bbox(object_id:str, canvas_tags:str):
     if schematic_objects[object_id]["bbox"]:
         canvas.coords(schematic_objects[object_id]["bbox"],x1,y1,x2,y2)
     else:
-        schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')
+        schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden', outline="orange", width=2)
     return()
 
 #------------------------------------------------------------------------------------
@@ -186,15 +188,21 @@ def get_offset_colour(colour:str, brightness_offset:int):
     return(active_colour)
 
 #------------------------------------------------------------------------------------
-# Common Function to set the text colour to black or white depending on the overall
+# Common Function to set the text colour depending the user selections and the overall
 # intensities of the background RGB elements - Full acknowledgement to stack overflow
+# The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
 #------------------------------------------------------------------------------------
 
-def get_text_colour(colour:str):
-    rgb = root.winfo_rgb(colour)
-    r,g,b = [x>>8 for x in rgb]
-    if (r*0.299 + g*0.587 + b*0.114) > 186: text_colour = "#000000"
-    else: text_colour = "#FFFFFF"
+def get_text_colour(text_colour_type:int, background_colour:str):
+    if text_colour_type == 1:
+        rgb = root.winfo_rgb(background_colour)
+        r,g,b = [x>>8 for x in rgb]
+        if (r*0.299 + g*0.587 + b*0.114) > 186: text_colour = "#000000"
+        else: text_colour = "#FFFFFF"
+    elif text_colour_type == 2:
+        text_colour = "#000000"
+    else:
+        text_colour = "#FFFFFF"
     return(text_colour)
 
 ####################################################################################
