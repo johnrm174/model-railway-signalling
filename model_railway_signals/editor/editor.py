@@ -8,7 +8,6 @@
 #    run_editor() - Start the application
 #
 # Makes the following external API calls to other editor modules:
-#    objects.reset_objects() - Reset the schematic back to its default state
 #    objects.save_schematic_state(reset_pointer) - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
@@ -20,7 +19,8 @@
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
-#    run_layout.run_layout.signal_updated_callback()
+#    run_layout.signal_updated_callback() - When applying the new pub/sub configuration
+#    run_layout.reset_layout() - Reset the schematic back to its default state
 #    run_routes.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    settings.get_all() - Get all settings (for save)
@@ -46,7 +46,10 @@
 #    menubar_styles.edit_switch_styles(root)
 #    menubar_styles.edit_route_styles(root)
 #    menubar_styles.edit_section_styles(root)
-#    ###################### MORE TO COME ########################################
+#    menubar_styles.edit_route_line_styles(root)
+#    menubar_styles.edit_point_styles(root)
+#    menubar_styles.edit_signal_styles(root)
+#    menubar_styles.edit_textbox_styles(root)
 #
 # Makes the following external API calls to library modules:
 #    library_common.set_root_window(widget) - To set the root window
@@ -440,11 +443,11 @@ class main_menubar:
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
             if Tk.messagebox.askokcancel(parent=self.root, title="Reset Schematic",
-                    message="Are you sure you want to reset all signals, points and "
-                            +"track occupancy sections back to their default state"):
-                objects.reset_objects()
+                    message="Are you sure you want to reset all signals, points, switches and "
+                    +"instruments back to their default states (Note that track occupancy will be retained)"):
+                run_layout.reset_layout()
         else:
-            objects.reset_objects()
+            run_layout.reset_layout()
             
     #------------------------------------------------------------------------------------------
     # SPROG menubar functions

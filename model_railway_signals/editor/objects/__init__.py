@@ -21,7 +21,6 @@
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
 #
-#    reset_objects() - resets all points, signals, instruments and sections to default state
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
 #    save_schematic_state(reset_pointer:bool) - save a snapshot of the schematic objects
@@ -66,7 +65,6 @@ from .objects import copy_objects
 from .objects import update_object
 from .objects import update_styles
 from .objects import save_schematic_state
-from .objects import reset_objects
 
 from .objects_common import initialise
 from .objects_common import signal 
@@ -116,7 +114,6 @@ __all__ = [
     'copy_objects',
     'update_object',
     'update_styles',
-    'reset_objects',
     # Helper functions to get the obj ID of an item ID
     'signal',
     'point',

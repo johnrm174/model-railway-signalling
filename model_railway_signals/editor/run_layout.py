@@ -17,6 +17,7 @@
 #    configure_edit_mode(edit_mode) - Set the mode - True for Edit Mode, False for Run Mode
 #    configure_automation(auto_enabled) - Call to set automation mode (from Editor Module)
 #    configure_spad_popups(spad_enabled) - Call to set SPAD popup warnings (from Editor Module)
+#    reset_layout(delay=0) - Reset the layout to the default state with a delay between each change
 #
 # Makes the following external API calls to other editor modules:
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
@@ -29,6 +30,11 @@
 #    run_routes.check_routes_valid_after_point_change(point_id, route_id)
 #    run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
 #    run_routes.trigger_routes_after_sensor_passed(sensor_id)
+#    run_routes.schedule_tasks_to_reset_signals(args) - For Layout Reset
+#    run_routes.schedule_tasks_to_reset_subsidaries(args) - For Layout Reset
+#    run_routes.schedule_tasks_to_reset_points(args) - For Layout Reset
+#    run_routes.schedule_tasks_to_reset_switches(args) - For Layout Reset
+#    run_routes.schedule_tasks_to_reset_remaining_routes(args) - For Layout Reset
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -65,6 +71,7 @@
 #    points.lock_point(point_id) - Lock a point (for interlocking)
 #    points.unlock_point(point_id) - Unlock a point (for interlocking)
 #    block_instruments.block_section_ahead_clear(inst_id) - Get the state (for interlocking)
+#    block_instruments.set_section_blocked(inst_id) -For Layout Reset
 #    track_sections.set_section_occupied (section_id) - Set Track Section to "Occupied"
 #    track_sections.clear_section_occupied (section_id) - Set Track Section to "Clear"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
@@ -947,7 +954,33 @@ def initialise_layout():
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
-        
+
+##################################################################################################
+# Function to "reset" the layout - Called on Layout Reset (Mode menubar dropdown)
+# This function sets all Signals, Points and DCC switches back to their default states:
+# (Signals/subsidaries ON, Points UNSWITCHED with FPL ACTIVE and DCC SWITCHES OFF).
+# It also clears down all active Routes - this will happen for most of the Routes when they
+# are invalidated by the Points, Signals and DCC Switches being changed back to their default
+# states, but we also clear down any remaining routes at the end (e.g. a route definition
+# that does not contain any signals, points or switches - just route highlighting)
+# Note we leave Track Sections unchanged - so the layout doesn't lose the current state
+##################################################################################################
+
+def reset_layout(switch_delay:int=0):
+    # Block Instruments don't send out any DCC commands so we can clear them down straight away without a delay
+    for instrument_id in objects.instrument_index.keys():
+        block_instruments.set_section_blocked(int(instrument_id))
+    # Everything else needs to be scheduled with the specified delay so for large layouts with lots
+    # of points, signals and DCC accessories we don't overload the bus by changing everything at once.
+    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index.keys(), switch_delay, route_id=0, delay=0)
+    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index.keys(), switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index.keys(), switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index.keys(), switch_delay, route_id=0, delay=delay)
+    # Finally, we schedule the task to clear down any routes that do not get automatically cleared down
+    # as they are invalidated by the reset of the points, signals and switches in the route configuration
+    run_routes.schedule_tasks_to_reset_remaining_routes(switch_delay, delay=delay)
+    return()
+
 ##################################################################################################
 # These are the run-layout callbacks (set up when creating the library objects on the schematic)
 # Note that the returned item_id could be a remote ID (str) or local_id (int) for SIGNAL UPDATED

@@ -21,7 +21,6 @@
 #    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
-#    reset_objects() - resets all points, signals, instruments and sections to default state
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -245,44 +244,6 @@ def restore_schematic_state():
     # Recalculate instrument interlocking tables as a 'belt and braces' measure (on the 
     # basis they would have successfully been restored with the rest of the snapshot)
     objects_points.reset_point_interlocking_tables()
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to reset the schematic back to its default state with all signals 'on',
-# all points 'unswitched', all track sections 'unoccupied' and all block instruments
-# showing 'line blocked' (by soft deleting all objects and redrawing them)
-#------------------------------------------------------------------------------------
-
-def reset_objects():
-    # Soft delete all point, section, instrument and signal objects (keeping the bbox)
-    for object_id in objects_common.schematic_objects:
-        type_of_object = objects_common.schematic_objects[object_id]["item"]
-        if type_of_object == objects_common.object_type.line:
-            objects_lines.delete_line_object(object_id)
-        elif type_of_object == objects_common.object_type.textbox:
-            objects_textboxes.delete_textbox_object(object_id)
-        elif type_of_object == objects_common.object_type.signal:
-            objects_signals.delete_signal_object(object_id)
-        elif type_of_object == objects_common.object_type.point:
-             objects_points.delete_point_object(object_id)
-        elif type_of_object == objects_common.object_type.section:
-            objects_sections.delete_section_object(object_id)
-        elif type_of_object == objects_common.object_type.instrument:
-            objects_instruments.delete_instrument_object(object_id)
-        elif type_of_object == objects_common.object_type.track_sensor:
-            objects_sensors.delete_track_sensor_object(object_id)
-        elif type_of_object == objects_common.object_type.route:
-            objects_routes.delete_route_object(object_id)
-        elif type_of_object == objects_common.object_type.switch:
-            objects_switches.delete_switch_object(object_id)
-    # Redraw all point, section, instrument and signal objects in their default state
-    # We don't need to create a new bbox as soft_delete keeps the tkinter object
-    redraw_all_objects(create_new_bbox=False, reset_state=True)
-    # Ensure all track sections are brought forward on the schematic (in front of any lines)
-    bring_track_sections_to_the_front()
-    # Process any layout changes (interlocking, signal ahead etc)
-    # that might be dependent on the object configuration change
-    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
