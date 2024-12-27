@@ -2,6 +2,7 @@
 # System tests to check the basic display and function of all library object permutations
 #-----------------------------------------------------------------------------------
 
+import copy
 import system_test_harness
 from model_railway_signals.editor import menubar_help
 from model_railway_signals.editor import menubar_styles
@@ -61,7 +62,7 @@ def test_menubar_help_windows(delay:float=2.0):
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - INFO")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_general()
+    initial_settings = copy.deepcopy(settings.settings["general"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_help.edit_layout_info))
     system_test_harness.sleep(delay*2)
@@ -75,7 +76,7 @@ def test_menubar_help_windows(delay:float=2.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert settings.get_general() == initial_settings
+    assert settings.settings["general"] == initial_settings
     return()
 
 #-----------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ def test_menubar_settings_windows(delay:float=1.0):
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - CANVAS - will generate 2 updated callbacks")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_canvas()
+    initial_settings = copy.deepcopy(settings.settings["canvas"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_settings.edit_canvas_settings, callback_function))
     system_test_harness.sleep(delay*2)
@@ -107,11 +108,11 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert settings.get_canvas() == initial_settings
+    assert settings.settings["canvas"] == initial_settings
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - GENERAL - will generate 2 updated callbacks")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_general()
+    initial_settings = copy.deepcopy(settings.settings["general"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_settings.edit_general_settings, callback_function))
     system_test_harness.sleep(delay*2)
@@ -125,11 +126,11 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert settings.get_general() == initial_settings
+    assert settings.settings["general"] == initial_settings
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - GPIO - will generate 2 updated callbacks")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_gpio()
+    initial_settings = copy.deepcopy(settings.settings["gpio"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_settings.edit_gpio_settings, callback_function))
     system_test_harness.sleep(delay*2)
@@ -143,11 +144,11 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert settings.get_gpio() == initial_settings
+    assert settings.settings["gpio"] == initial_settings
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - LOGGING - will generate 2 updated callbacks")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_logging()
+    initial_settings = copy.deepcopy(settings.settings["logging"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_settings.edit_logging_settings, callback_function))
     system_test_harness.sleep(delay*2)
@@ -161,21 +162,11 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert settings.get_logging() == initial_settings
+    assert settings.settings["logging"] == initial_settings
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - MQTT - will generate 2 callbacks and one connect callback")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_mqtt()
-    settings1 = settings.get_sub_dcc_nodes()
-    settings2 = settings.get_sub_signals()
-    settings3 = settings.get_sub_sections()
-    settings4 = settings.get_sub_instruments()
-    settings5 = settings.get_sub_sensors()
-    settings6 = settings.get_pub_dcc()
-    settings7 = settings.get_pub_signals()
-    settings8 = settings.get_pub_sections()
-    settings9 = settings.get_pub_instruments()
-    settings10 = settings.get_pub_sensors()
+    initial_settings = copy.deepcopy(settings.settings["mqtt"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_settings.edit_mqtt_settings,
                                                         connect_function, callback_function))
@@ -193,21 +184,11 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert initial_settings == settings.get_mqtt()
-    assert settings1 == settings.get_sub_dcc_nodes()
-    assert settings2 == settings.get_sub_signals()
-    assert settings3 == settings.get_sub_sections()
-    assert settings4 == settings.get_sub_instruments()
-    assert settings5 == settings.get_sub_sensors()
-    assert settings6 == settings.get_pub_dcc()
-    assert settings7 == settings.get_pub_signals()
-    assert settings8 == settings.get_pub_sections()
-    assert settings9 == settings.get_pub_instruments()
-    assert settings10 == settings.get_pub_sensors()
+    assert settings.settings["mqtt"] == initial_settings
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - SPROG - will generate 2 updated callbacks and one connect callback")
     # we need to check the config remains unchanged
-    initial_settings = settings.get_sprog()
+    initial_settings = copy.deepcopy(settings.settings["sprog"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(delay, menubar_settings.edit_sprog_settings,
                                                         connect_function, callback_function))
@@ -225,7 +206,7 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     # Check the settings remain unchanged
-    assert initial_settings == settings.get_sprog()
+    assert settings.settings["sprog"] == initial_settings
     return()
 
 #-----------------------------------------------------------------------------------
