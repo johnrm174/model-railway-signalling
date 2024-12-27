@@ -1131,7 +1131,8 @@ def run_sensor_config_update_on_change_of_id_tests(delay:float=0.0):
 
 #-----------------------------------------------------------------------------------
 # These test the reset objects functions, specifically:
-# All points, sections, instruments signals and buttons are returned to their default states
+# All points, instruments, signals and buttons are returned to their default states
+# Track Sections will remain unchanged
 #-----------------------------------------------------------------------------------
 
 def run_reset_objects_tests(delay:float=0.0):
@@ -1169,14 +1170,13 @@ def run_reset_objects_tests(delay:float=0.0):
     reset_layout()
     assert_signals_DANGER(1)
     assert_points_normal(1)
-    assert_sections_clear(1)
+    assert_sections_occupied(1)   # Sections remain unchanged
     assert_block_section_ahead_not_clear(1,2)
     assert_buttons_deselected(1)
     assert_buttons_deselected(2)
     # Now set to non default states again
     set_signals_off(1)
     set_points_switched(1)
-    set_sections_occupied(1)
     set_instrument_occupied(1)
     simulate_buttons_clicked(1)
     simulate_buttons_clicked(2)
@@ -1192,7 +1192,7 @@ def run_reset_objects_tests(delay:float=0.0):
     set_run_mode()
     assert_signals_DANGER(1)
     assert_points_normal(1)
-    assert_sections_clear(1)
+    assert_sections_occupied(1)     # Sections remain unchanged
     assert_block_section_ahead_not_clear(1,2)
     assert_buttons_deselected(1)
     assert_buttons_deselected(2)
