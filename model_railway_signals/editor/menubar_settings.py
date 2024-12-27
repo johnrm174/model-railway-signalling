@@ -331,7 +331,7 @@ class edit_logging_settings():
         self.log_level.set_value(settings.get_logging("level"))
         
     def save_state(self, close_window:bool):
-        settings.set_logging("loglevel", self.log_level.get_value())
+        settings.set_logging("level", self.log_level.get_value())
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK )
