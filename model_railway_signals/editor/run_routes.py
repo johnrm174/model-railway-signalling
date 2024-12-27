@@ -603,7 +603,9 @@ def set_schematic_route_callback(route_id:int):
 
 def schedule_tasks_to_reset_signals(list_of_signals:list, switch_delay:int, route_id:int, delay:int):
     for signal_id in list_of_signals:
-        if signals.signal_clear(int(signal_id)):
+        # Note we only reset the signal to ON if not an automatic signal
+        automatic_signal = objects.schematic_objects[objects.signal(signal_id)]["fullyautomatic"]
+        if signals.signal_clear(int(signal_id)) and not automatic_signal:
             schedule_task(delay, set_signal_state, route_id, int(signal_id), False)
             delay = delay + switch_delay
     return(delay)
