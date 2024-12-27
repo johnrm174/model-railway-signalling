@@ -47,13 +47,16 @@ import logging
 #------------------------------------------------------------------------------------
 
 default_settings = {}
+
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["editmode"] = True
 default_settings["general"]["version"] = "Version 4.9.0"
 default_settings["general"]["info"] = "Document your layout here"
+default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
+default_settings["general"]["resetdelay"] = 0
+
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
@@ -62,14 +65,17 @@ default_settings["canvas"]["snaptogrid"] = True
 default_settings["canvas"]["displaygrid"] = True
 default_settings["canvas"]["canvascolour"] = "grey85"
 default_settings["canvas"]["gridcolour"] = "#999"
+
 default_settings["logging"] = {}
 default_settings["logging"]["level"] = 2   # Warning
+
 default_settings["sprog"] = {}
 default_settings["sprog"]["port"] = "/dev/serial0"
 default_settings["sprog"]["baud"] = 460800
 default_settings["sprog"]["debug"] = False
 default_settings["sprog"]["startup"] = False
 default_settings["sprog"]["power"] = False
+
 default_settings["mqtt"] = {}
 default_settings["mqtt"]["url"] = "127.0.0.1"
 default_settings["mqtt"]["port"] = 1883
@@ -91,10 +97,12 @@ default_settings["mqtt"]["pubsignals"] = []
 default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
 default_settings["mqtt"]["pubsensors"] = []
+
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
 default_settings["gpio"]["portmappings"] = []
+
 # The following settings define the default application styles (object appearance)
 default_settings["styles"] = {}
 default_settings["styles"]["routebuttons"] = {}
@@ -207,150 +215,68 @@ def set_style(object_type:str, parameter:str, value):
 # Functions to set/get the general settings
 #------------------------------------------------------------------------------------
 
-def get_general(param=None):
-    filename = settings["general"]["filename"]
-    editmode = settings["general"]["editmode"]
-    version = settings["general"]["version"]
-    info = settings["general"]["info"]
-    automation = settings["general"]["automation"]
-    spad = settings["general"]["spadpopups"]
-    return(filename, editmode, version, info, automation, spad)
+def get_general(parameter:str):
+    return(settings["general"][parameter])
 
-def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None, automation:bool=None, spad:bool=None):
-    if filename is not None: settings["general"]["filename"] = filename
-    if editmode is not None: settings["general"]["editmode"] = editmode
-    if version is not None: settings["general"]["version"] = version
-    if info is not None: settings["general"]["info"] = info
-    if automation is not None: settings["general"]["automation"] = automation
-    if spad is not None: settings["general"]["spadpopups"] = spad
+def set_general(parameter:str, value):
+    settings["general"][parameter] = value
     return()
 
 #------------------------------------------------------------------------------------
 # Functions to set/get the canvas settings
 #------------------------------------------------------------------------------------
 
-def get_canvas():
-    width = settings["canvas"]["width"]
-    height = settings["canvas"]["height"]
-    grid = settings["canvas"]["grid"]
-    snap_to_grid = settings["canvas"]["snaptogrid"]
-    display_grid = settings["canvas"]["displaygrid"]
-    canvas_colour = settings["canvas"]["canvascolour"]
-    grid_colour = settings["canvas"]["gridcolour"]
-    return (width, height, grid, snap_to_grid,display_grid, canvas_colour, grid_colour)
+def get_canvas(parameter:str):
+    return(settings["canvas"][parameter])
 
-def set_canvas(width:int=None, height:int=None, grid:int=None, snap_to_grid:bool=None,
-               display_grid:bool=None, canvas_colour:str=None, grid_colour:str=None):
-    if width is not None: settings["canvas"]["width"] = width
-    if height is not None: settings["canvas"]["height"] = height
-    if grid is not None: settings["canvas"]["grid"] = grid
-    if snap_to_grid is not None: settings["canvas"]["snaptogrid"] = snap_to_grid
-    if display_grid is not None: settings["canvas"]["displaygrid"] = display_grid
-    if canvas_colour is not None: settings["canvas"]["canvascolour"] = canvas_colour
-    if grid_colour is not None: settings["canvas"]["gridcolour"] = grid_colour
+def set_canvas(parameter:str, value):
+    settings["canvas"][parameter] = value
     return()
 
 #------------------------------------------------------------------------------------
-# Functions to set/get the canvas settings
+# Functions to set/get the logging settings
 #------------------------------------------------------------------------------------
 
-def get_logging():
-    level = settings["logging"]["level"] 
-    return (level)
+def get_logging(parameter:str):
+    return(settings["logging"][parameter])
 
-def set_logging(level:int=None):
-    if level is not None: settings["logging"]["level"] = level
+def set_logging(parameter:str, value):
+    settings["logging"][parameter] = value
     return()
 
 #------------------------------------------------------------------------------------
 # Functions to set/get the SPROG settings
 #------------------------------------------------------------------------------------
 
-def get_sprog():
-    port = settings["sprog"]["port"]
-    baud = settings["sprog"]["baud"]
-    debug = settings["sprog"]["debug"]
-    startup = settings["sprog"]["startup"]
-    power = settings["sprog"]["power"]
-    return (port, baud, debug, startup, power)
+def get_sprog(parameter:str):
+    return(settings["sprog"][parameter])
 
-def set_sprog(port:str=None, baud:int=None, debug:bool=None, startup:bool=None, power:bool=None):
-    if port is not None: settings["sprog"]["port"] = port
-    if baud is not None: settings["sprog"]["baud"] = baud
-    if debug is not None: settings["sprog"]["debug"] = debug
-    if startup is not None: settings["sprog"]["startup"] = startup
-    if power is not None: settings["sprog"]["power"] = power
+def set_sprog(parameter:str, value):
+    settings["sprog"][parameter] = value
     return()
 
 #------------------------------------------------------------------------------------
 # Functions to set/get the GPIO settings
 #------------------------------------------------------------------------------------
 
-def get_gpio():
-    trigger = settings["gpio"]["triggerdelay"]
-    timeout = settings["gpio"]["timeoutperiod"]
-    mappings = settings["gpio"]["portmappings"]
-    return (trigger, timeout, mappings)
+def get_gpio(parameter:str):
+    return(settings["gpio"][parameter])
 
-def set_gpio(trigger:float=None, timeout:float=None, mappings:list=None):
-    if trigger is not None: settings["gpio"]["triggerdelay"] = trigger
-    if timeout is not None: settings["gpio"]["timeoutperiod"] = timeout
-    if mappings is not None: settings["gpio"]["portmappings"] = mappings
+def set_gpio(parameter:str, value):
+    settings["gpio"][parameter] = value
     return()
 
 #------------------------------------------------------------------------------------
 # Functions to set/get the MQTT settings
 #------------------------------------------------------------------------------------
 
-def get_mqtt():
-    url = settings["mqtt"]["url"]
-    port = settings["mqtt"]["port"]
-    network = settings["mqtt"]["network"]
-    node = settings["mqtt"]["node"]
-    username = settings["mqtt"]["username"]
-    password = settings["mqtt"]["password"]
-    debug = settings["mqtt"]["debug"]
-    startup = settings["mqtt"]["startup"]
-    pubshutdown = settings["mqtt"]["pubshutdown"]
-    subshutdown = settings["mqtt"]["subshutdown"]
-    return (url, port, network, node, username, password, debug, startup, pubshutdown, subshutdown)
+def get_mqtt(parameter:str):
+    return(settings["mqtt"][parameter])
 
-def set_mqtt(url:str=None, port:int=None, network:str=None, node:str=None,
-        username:str=None, password:str=None, debug:bool=None, startup:bool=None,
-        publish_shutdown:bool=None, subscribe_shutdown:bool=None ):
-    if url is not None: settings["mqtt"]["url"] = url
-    if port is not None: settings["mqtt"]["port"] = port
-    if network is not None: settings["mqtt"]["network"] = network
-    if node is not None: settings["mqtt"]["node"] = node
-    if username is not None: settings["mqtt"]["username"] = username
-    if password is not None: settings["mqtt"]["password"] = password
-    if debug is not None: settings["mqtt"]["debug"] = debug
-    if startup is not None: settings["mqtt"]["startup"] = startup
-    if publish_shutdown is not None: settings["mqtt"]["pubshutdown"] = publish_shutdown
-    if subscribe_shutdown is not None: settings["mqtt"]["subshutdown"] = subscribe_shutdown
+def set_mqtt(parameter:str, value):
+    settings["mqtt"][parameter] = value
     return()
 
-def get_pub_dcc(): return (settings["mqtt"]["pubdcc"])
-def get_pub_signals(): return (settings["mqtt"]["pubsignals"])
-def get_pub_sections(): return (settings["mqtt"]["pubsections"])
-def get_pub_instruments(): return (settings["mqtt"]["pubinstruments"])
-def get_pub_sensors(): return (settings["mqtt"]["pubsensors"])
-def get_sub_dcc_nodes(): return (settings["mqtt"]["subdccnodes"])
-def get_sub_signals(): return (settings["mqtt"]["subsignals"])
-def get_sub_sections(): return (settings["mqtt"]["subsections"])
-def get_sub_instruments(): return (settings["mqtt"]["subinstruments"])
-def get_sub_sensors(): return (settings["mqtt"]["subsensors"])
-
-def set_pub_dcc(value:bool): settings["mqtt"]["pubdcc"] = value
-def set_pub_signals(values:list): settings["mqtt"]["pubsignals"] = values
-def set_pub_sections(values:list): settings["mqtt"]["pubsections"] = values
-def set_pub_instruments(values:list): settings["mqtt"]["pubinstruments"] = values
-def set_pub_sensors(values:list): settings["mqtt"]["pubsensors"] = values
-def set_sub_dcc_nodes(values:list): settings["mqtt"]["subdccnodes"] = values
-def set_sub_signals(values:list): settings["mqtt"]["subsignals"] = values
-def set_sub_sections(values:list): settings["mqtt"]["subsections"] = values
-def set_sub_instruments(values:list): settings["mqtt"]["subinstruments"] = values
-def set_sub_sensors(values:list): settings["mqtt"]["subsensors"] = values
 
 ######################################################################################
     

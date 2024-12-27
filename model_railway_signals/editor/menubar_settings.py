@@ -13,35 +13,15 @@
 #    settings.get_canvas() - Get the current canvas settings (for editing)
 #    settings.set_canvas() - Save the new canvas settings (as specified)
 #    settings.get_logging() - Get the current log level (for editing)
-#    settings.set_logging(level) - Save the new log level (as specified)
-#    settings.get_general() - Get the current settings (for editing)
-#    settings.set_general() - Save the new settings (as specified)
+#    settings.set_logging() - Save the new log level (as specified)
+#    settings.get_general() - Get the current general settings (for editing)
+#    settings.set_general() - Save the new general settings (as specified)
 #    settings.get_sprog() - Get the current SPROG settings (for editing)
 #    settings.set_sprog() - Save the new SPROG settings (as specified)
 #    settings.get_mqtt() - Get the current MQTT settings (for editing)
 #    settings.set_mqtt() - Save the new MQTT settings (as specified)
 #    settings.get_gpio() - Get the current GPIO settings (for editing)
 #    settings.set_gpio() - Save the new GPIO settings (as specified)
-#    settings.get_sub_dcc_nodes() - get the list of subscribed dccc command feeds
-#    settings.get_sub_signals() - get the list of subscribed items
-#    settings.get_sub_sections() - get the list of subscribed items
-#    settings.get_sub_instruments() - get the list of subscribed items
-#    settings.get_sub_sensors() - get the list of subscribed items
-#    settings.get_pub_dcc() - get the publish dcc command feed flag
-#    settings.get_pub_signals() - get the list of items to publish
-#    settings.get_pub_sections() - get the list of items to publish
-#    settings.get_pub_instruments() - get the list of items to publish
-#    settings.get_pub_sensors() - get the list of items to publish
-#    settings.set_sub_dcc_nodes() - set the list of subscribed nodes
-#    settings.set_sub_signals() - set the list of subscribed items
-#    settings.set_sub_sections() - set the list of subscribed items
-#    settings.set_sub_instruments() - set the list of subscribed items
-#    settings.set_sub_sensors() - set the list of subscribed items
-#    settings.set_pub_dcc() - set the publish dcc command feed flag
-#    settings.set_pub_signals() - set the list of items to publish
-#    settings.set_pub_sections() - set the list of items to publish
-#    settings.set_pub_instruments() - set the list of items to publish
-#    settings.set_pub_sensors() - set the list of items to publish
 #
 # Uses the following common editor UI elements:
 #    common.selection_buttons
@@ -143,35 +123,32 @@ class edit_canvas_settings():
 
     def load_state(self):
         self.validation_error.pack_forget()
-        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
-        self.width.set_value(width)
-        self.height.set_value(height)
-        self.gridsize.set_value(grid)
-        self.snaptogrid.set_value(snap_to_grid)
-        self.displaygrid.set_value(display_grid)
-        self.canvascolour.set_value(canvas_colour)
-        self.gridcolour.set_value(grid_colour)
+        self.width.set_value(settings.get_canvas("width"))
+        self.height.set_value(settings.get_canvas("height"))
+        self.gridsize.set_value(settings.get_canvas("grid"))
+        self.snaptogrid.set_value(settings.get_canvas("snaptogrid"))
+        self.displaygrid.set_value(settings.get_canvas("displaygrid"))
+        self.canvascolour.set_value(settings.get_canvas("canvascolour"))
+        self.gridcolour.set_value(settings.get_canvas("gridcolour"))
         
     def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
         if self.width.validate() and self.height.validate() and self.gridsize.validate():
             self.validation_error.pack_forget()
-            width = self.width.get_value()
-            height = self.height.get_value()
-            grid = self.gridsize.get_value()
-            snap_to_grid = self.snaptogrid.get_value()
-            display_grid = self.displaygrid.get_value()
-            canvas_colour = self.canvascolour.get_value()
-            grid_colour = self.gridcolour.get_value()
-            settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid,
-                    display_grid=display_grid, canvas_colour=canvas_colour, grid_colour=grid_colour)
+            settings.set_canvas("width", self.width.get_value())
+            settings.set_canvas("height", self.height.get_value())
+            settings.set_canvas("grid", self.gridsize.get_value())
+            settings.set_canvas("snaptogrid", self.snaptogrid.get_value())
+            settings.set_canvas("displaygrid", self.displaygrid.get_value())
+            settings.set_canvas("canvascolour", self.canvascolour.get_value())
+            settings.set_canvas("gridcolour", self.gridcolour.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
             if close_window: self.close_window()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
             
     def close_window(self):
         global canvas_settings_window
@@ -260,14 +237,17 @@ class edit_sprog_settings():
         self.port.validate()
         self.B1.focus()
         # Save the existing settings (as they haven't been "applied" yet)
-        s1, s2, s3, s4, s5 = settings.get_sprog()
+        current_port = settings.get_sprog("port")
+        current_baud = settings.get_sprog("baud")
+        current_debug = settings.get_sprog("debug")
+        current_startup = settings.get_sprog("startup")
+        current_power = settings.get_sprog("power")
         # Apply the current settings (as thery currently appear in the UI)
-        baud = int(self.baud_selection.get())
-        port = self.port.get_value()
-        debug = self.debug.get_value()
-        startup = self.startup.get_value()
-        power = self.power.get_value()
-        settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
+        settings.set_sprog("port", self.port.get_value())
+        settings.set_sprog("baud", int(self.baud_selection.get()))
+        settings.set_sprog("debug", self.debug.get_value())
+        settings.set_sprog("startup", self.startup.get_value())
+        settings.set_sprog("power", self.power.get_value())
         # The Sprog Connect function will return True if successful
         # It will also update the Menubar to reflect the SPROG connection status
         if self.connect_function(show_popup=False):
@@ -275,29 +255,33 @@ class edit_sprog_settings():
         else:
             self.status.config(text="SPROG connection failure", fg="red")
         # Now restore the existing settings (as they haven't been "applied" yet)
-        settings.set_sprog(s1, s2, s3, s4, s5)
+        settings.set_sprog("port", current_port)
+        settings.set_sprog("baud", current_baud)
+        settings.set_sprog("debug", current_debug)
+        settings.set_sprog("startup", current_startup)
+        settings.set_sprog("power", current_power)
         
     def load_state(self):
         # Reset the Test connectivity message
         self.status.config(text="")
-        port, baud, debug, startup, power = settings.get_sprog()
-        self.port.set_value(port)
-        self.baud_selection.set(str(baud))
-        self.debug.set_value(debug)
-        self.startup.set_value(startup)
-        self.power.set_value(power)
+        # Load the UI from the settings
+        self.port.set_value(settings.get_sprog("port"))
+        self.baud_selection.set(str(settings.get_sprog("baud")))
+        self.debug.set_value(settings.get_sprog("debug"))
+        self.startup.set_value(settings.get_sprog("startup"))
+        self.power.set_value(settings.get_sprog("power"))
+        # Grey out the power checkbox as required
         self.selection_changed()
         
     def save_state(self, close_window:bool):
         # Validate the port to "accept" the current value
         self.port.validate()
-        baud = int(self.baud_selection.get())
-        port = self.port.get_value()
-        debug = self.debug.get_value()
-        startup = self.startup.get_value()
-        power = self.power.get_value()
-        # Save the updated settings
-        settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
+        # Save the new settings
+        settings.set_sprog("port", self.port.get_value())
+        settings.set_sprog("baud", int(self.baud_selection.get()))
+        settings.set_sprog("debug", self.debug.get_value())
+        settings.set_sprog("startup", self.startup.get_value())
+        settings.set_sprog("power", self.power.get_value())
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK)
@@ -344,11 +328,10 @@ class edit_logging_settings():
             self.load_state()
 
     def load_state(self):
-        self.log_level.set_value(settings.get_logging())
+        self.log_level.set_value(settings.get_logging("level"))
         
     def save_state(self, close_window:bool):
-        log_level = self.log_level.get_value()
-        settings.set_logging(log_level)
+        settings.set_logging("loglevel", self.log_level.get_value())
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK )
@@ -452,18 +435,23 @@ class mqtt_configuration_tab():
         self. accept_all_entries()
         self.B1.focus()
         # Save the existing settings (as they haven't been "applied" yet)
-        current_settings = (settings.get_mqtt())
-        # Apply the current settings (as they currently appear in the UI)
-        url = self.url.get_value()
-        port = self.port.get_value()
-        network = self.network.get_value()
-        node = self.node.get_value()
-        username = self.username.get_value()
-        password = self.password.get_value()
-        debug = self.debug.get_value()
-        startup = self.startup.get_value()
-        settings.set_mqtt(url=url, port=port, network=network, node=node,
-                username=username, password=password, debug=debug, startup=startup)
+        current_url = settings.get_mqtt("url")
+        current_port = settings.get_mqtt("port")
+        current_network = settings.get_mqtt("network")
+        current_node = settings.get_mqtt("node")
+        current_username = settings.get_mqtt("username")
+        current_password = settings.get_mqtt("password")
+        current_debug = settings.get_mqtt("debug")
+        current_startup = settings.get_mqtt("startup")
+        # Apply the new settings (as they currently appear in the UI)
+        settings.set_mqtt("url", self.url.get_value())
+        settings.set_mqtt("port", self.port.get_value())
+        settings.set_mqtt("network", self.network.get_value())
+        settings.set_mqtt("node", self.node.get_value())
+        settings.set_mqtt("username", self.username.get_value())
+        settings.set_mqtt("password", self.password.get_value())
+        settings.set_mqtt("debug", self.debug.get_value())
+        settings.set_mqtt("startup", self.startup.get_value())
         # The MQTT Connect function will return True if successful
         # It will also update the Menubar to reflect the MQTT connection status
         if self.connect_function(show_popup=False):
@@ -471,7 +459,14 @@ class mqtt_configuration_tab():
         else:
             self.status.config(text="MQTT connection failure", fg="red")
         # Now restore the existing settings (as they haven't been "applied" yet)
-        settings.set_mqtt(*current_settings)
+        settings.set_mqtt("url", current_url)
+        settings.set_mqtt("port", current_port)
+        settings.set_mqtt("network", current_network)
+        settings.set_mqtt("node", current_node)
+        settings.set_mqtt("username", current_username)
+        settings.set_mqtt("password", current_password)
+        settings.set_mqtt("debug", current_debug)
+        settings.set_mqtt("startup", current_startup)
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'Subscribe' Tab
@@ -654,29 +649,28 @@ class edit_mqtt_settings():
         self.config.status.config(text="")
         self.validation_error.pack_forget()
         # Populate the network configuration tab
-        url, port, network, node, username, password, debug, startup, pubshut, subshut = settings.get_mqtt()
-        self.config.url.set_value(url)
-        self.config.port.set_value(port)
-        self.config.network.set_value(network)
-        self.config.node.set_value(node)
-        self.config.username.set_value(username)
-        self.config.password.set_value(password)
-        self.config.debug.set_value(debug)
-        self.config.startup.set_value(startup)
-        self.config.pubshutdown.set_value(pubshut)
-        self.config.subshutdown.set_value(subshut)
+        self.config.url.set_value(settings.get_mqtt("url"))
+        self.config.port.set_value(settings.get_mqtt("port"))
+        self.config.network.set_value(settings.get_mqtt("network"))
+        self.config.node.set_value(settings.get_mqtt("node"))
+        self.config.username.set_value(settings.get_mqtt("username"))
+        self.config.password.set_value(settings.get_mqtt("password"))
+        self.config.debug.set_value(settings.get_mqtt("debug"))
+        self.config.startup.set_value(settings.get_mqtt("startup"))
+        self.config.pubshutdown.set_value(settings.get_mqtt("pubshutdown"))
+        self.config.subshutdown.set_value(settings.get_mqtt("subshutdown"))
         # Populate the subscribe tab
-        self.subscribe.dcc.set_values(settings.get_sub_dcc_nodes())
-        self.subscribe.signals.set_values(settings.get_sub_signals())
-        self.subscribe.sections.set_values(settings.get_sub_sections())
-        self.subscribe.instruments.set_values(settings.get_sub_instruments())
-        self.subscribe.sensors.set_values(settings.get_sub_sensors())
+        self.subscribe.dcc.set_values(settings.get_mqtt("subdccnodes"))
+        self.subscribe.signals.set_values(settings.get_mqtt("subsignals"))
+        self.subscribe.sections.set_values(settings.get_mqtt("subsections"))
+        self.subscribe.instruments.set_values(settings.get_mqtt("subinstruments"))
+        self.subscribe.sensors.set_values(settings.get_mqtt("subsensors"))
         # Populate the publish tab
-        self.publish.dcc.set_value(settings.get_pub_dcc())
-        self.publish.signals.set_values(settings.get_pub_signals())
-        self.publish.sections.set_values(settings.get_pub_sections())
-        self.publish.instruments.set_values(settings.get_pub_instruments())
-        self.publish.sensors.set_values(settings.get_pub_sensors())
+        self.publish.dcc.set_value(settings.get_mqtt("pubdcc"))
+        self.publish.signals.set_values(settings.get_mqtt("pubsignals"))
+        self.publish.sections.set_values(settings.get_mqtt("pubsections"))
+        self.publish.instruments.set_values(settings.get_mqtt("pubinstruments"))
+        self.publish.sensors.set_values(settings.get_mqtt("pubsensors"))
         
     def save_state(self, close_window:bool):
         # Validate the entries to "accept" the current values before reading
@@ -684,32 +678,29 @@ class edit_mqtt_settings():
         # Only allow close if valid
         if self.subscribe.validate() and self.publish.validate():
             self.validation_error.pack_forget()
-            url = self.config.url.get_value()
-            port = self.config.port.get_value()
-            network = self.config.network.get_value()
-            node = self.config.node.get_value()
-            username = self.config.username.get_value()
-            password = self.config.password.get_value()
-            debug = self.config.debug.get_value()
-            startup = self.config.startup.get_value()
-            pubshut = self.config.pubshutdown.get_value()
-            subshut = self.config.subshutdown.get_value()
-            # Save the updated settings
-            settings.set_mqtt(url=url, port=port, network=network, node=node,
-                    username=username, password=password, debug=debug, startup=startup,
-                    publish_shutdown=pubshut, subscribe_shutdown=subshut)
+            # Save the general configuration settings
+            settings.set_mqtt("url", self.config.url.get_value())
+            settings.set_mqtt("port", self.config.port.get_value())
+            settings.set_mqtt("network", self.config.network.get_value())
+            settings.set_mqtt("node", self.config.node.get_value())
+            settings.set_mqtt("username", self.config.username.get_value())
+            settings.set_mqtt("password", self.config.password.get_value())
+            settings.set_mqtt("debug", self.config.debug.get_value())
+            settings.set_mqtt("startup", self.config.startup.get_value())
+            settings.set_mqtt("pubshutdown", self.config.pubshutdown.get_value())
+            settings.set_mqtt("subshutdown", self.config.subshutdown.get_value())
             # Save the Subscribe settings
-            settings.set_sub_dcc_nodes(self.subscribe.dcc.get_values())
-            settings.set_sub_signals(self.subscribe.signals.get_values())
-            settings.set_sub_sections(self.subscribe.sections.get_values())
-            settings.set_sub_instruments(self.subscribe.instruments.get_values())
-            settings.set_sub_sensors(self.subscribe.sensors.get_values())
+            settings.set_mqtt("subdccnodes", self.subscribe.dcc.get_values())
+            settings.set_mqtt("subsignals", self.subscribe.signals.get_values())
+            settings.set_mqtt("subsections", self.subscribe.sections.get_values())
+            settings.set_mqtt("subinstruments", self.subscribe.instruments.get_values())
+            settings.set_mqtt("subsensors", self.subscribe.sensors.get_values())
             # Save the publish settings
-            settings.set_pub_dcc(self.publish.dcc.get_value())
-            settings.set_pub_signals(self.publish.signals.get_values())
-            settings.set_pub_sections(self.publish.sections.get_values())
-            settings.set_pub_instruments(self.publish.instruments.get_values())
-            settings.set_pub_sensors(self.publish.sensors.get_values())
+            settings.set_mqtt("pubdcc", self.publish.dcc.get_value())
+            settings.set_mqtt("pubsignals", self.publish.signals.get_values())
+            settings.set_mqtt("pubsections", self.publish.sections.get_values())
+            settings.set_mqtt("pubinstruments", self.publish.instruments.get_values())
+            settings.set_mqtt("pubsensors", self.publish.sensors.get_values())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
@@ -717,7 +708,7 @@ class edit_mqtt_settings():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
 
     def close_window(self):
         global edit_mqtt_settings_window
@@ -858,7 +849,9 @@ class edit_gpio_settings():
             
     def load_state(self):
         self.validation_error.pack_forget()
-        trigger, timeout, mappings = settings.get_gpio()
+        trigger = settings.get_gpio("triggerdelay")
+        timeout = settings.get_gpio("timeoutperiod")
+        mappings = settings.get_gpio("portmappings")
         self.gpio.set_values(mappings)
         self.trigger.set_value(int(trigger*1000))
         self.timeout.set_value(int(timeout*1000))
@@ -870,7 +863,9 @@ class edit_gpio_settings():
             mappings = self.gpio.get_values()
             trigger = float(self.trigger.get_value())/1000
             timeout = float(self.timeout.get_value())/1000
-            settings.set_gpio(trigger, timeout, mappings)
+            settings.set_gpio("triggerdelay", trigger)
+            settings.set_gpio("timeoutperiod", timeout)
+            settings.set_gpio("portmappings", mappings)
             # Make the callback to apply the updated settings
             self.update_function()
             # Close the window (on OK) or refresh the display (on APPLY)
@@ -878,7 +873,7 @@ class edit_gpio_settings():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
 
     def close_window(self):
         global edit_gpio_settings_window
@@ -931,21 +926,19 @@ class edit_general_settings():
 
     def load_state(self):
         self.validation_error.pack_forget()
-        # Spad Popups flag is the 6th parameter returned from get_general
-        # fontsize is the 7th parameter returned from get_general
-        self.enablespadpopups.set_value(settings.get_general()[5])
+        self.enablespadpopups.set_value(settings.get_general("spadpopups"))
 
     def save_state(self, close_window:bool):
         if True:   ### We would normally validate any entries here ######
             self.validation_error.pack_forget()
-            settings.set_general(spad=self.enablespadpopups.get_value())
+            settings.set_general("spadpopups", self.enablespadpopups.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )
             if close_window: self.close_window()
         else:
             # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
 
     def close_window(self):
         global edit_general_settings_window

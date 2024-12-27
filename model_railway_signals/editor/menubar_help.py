@@ -128,9 +128,8 @@ class display_help():
 # Note that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
 
-# The version is the third parameter provided by 'get_general'
 about_text = """
-Model Railway Signals ("""+settings.get_general()[2]+""")
+Model Railway Signals ("""+settings.get_general("version")+""")
 
 An application for designing and developing fully interlocked and automated model railway
 signalling systems with DCC control of signals and points via the SPROG Command Station.
@@ -214,11 +213,10 @@ class edit_layout_info():
             self.load_state()
         
     def load_state(self):
-        # The version is the forth parameter provided by 'get_general'
-        self.text.set_value(settings.get_general()[3])
+        self.text.set_value(settings.get_general("info"))
         
     def save_state(self, close_window:bool):
-        settings.set_general(info=self.text.get_value())
+        settings.set_general("info", self.text.get_value())
         # close the window (on OK)
         if close_window: self.close_window()
             

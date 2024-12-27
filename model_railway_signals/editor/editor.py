@@ -26,9 +26,8 @@
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
-#    settings.get_version() - Get the Application version (for the Arg Parser)
-#    settings.get_general() - Get the current filename and editor mode
-#    settings.set_general() - Set the filename and editor mode
+#    settings.get_general() - Get the current general settings
+#    settings.set_general() - Set the new general settings
 #    settings.get_logging() - Set the default log level
 #    settings.get_sprog() - to get the current SPROG settings
 #    settings.get_gpio() - to get the current track sensor GPIO mappings
@@ -235,14 +234,17 @@ class main_menubar:
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
-        # Initialise the schematic - the Edit Mode flag is the 2nd param in the returned tuple from get_general
-        # Note the schematic module will then initialise the objects and run_layout modules with the canvas
-        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
-        edit_mode = settings.get_general()[1]
-        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid,
-                                snap_to_grid, display_grid, canvas_colour, edit_mode)
+        # Initialise the schematic module - this will initialise the objects and run_layout modules
+        schematic.initialise(self.root, self.handle_canvas_event,
+                             width=settings.get_canvas("width"),
+                             height=settings.get_canvas("height"),
+                             grid=settings.get_canvas("grid"),
+                             snap_to_grid=settings.get_canvas("snaptogrid"),
+                             display_grid=settings.get_canvas("displaygrid"),
+                             background_colour=settings.get_canvas("canvascolour"),
+                             edit_mode=settings.get_general("editmode"))
         # Parse the command line arguments
-        parser = argparse.ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2],
+        parser = argparse.ArgumentParser(description = "Model railway signalling "+settings.get_general("version"),
                             formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=27))
         parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
         parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
@@ -250,10 +252,10 @@ class main_menubar:
                 help="log level (DEBUG, INFO, WARNING, ERROR)")
         args = parser.parse_args()
         # Set the log level (default unless one has been specified as a command line argument)
-        if args.log_level == "ERROR": settings.set_logging(1)
-        elif args.log_level == "WARNING": settings.set_logging(2)
-        elif args.log_level == "INFO": settings.set_logging(3)
-        elif args.log_level == "DEBUG": settings.set_logging(4)
+        if args.log_level == "ERROR": settings.set_logging("level", 1)
+        elif args.log_level == "WARNING": settings.set_logging("level", 2)
+        elif args.log_level == "INFO": settings.set_logging("level", 3)
+        elif args.log_level == "DEBUG": settings.set_logging("level", 4)
         self.logging_update()
         # Initialise the editor configuration at startup (using the default settings)
         self.initialise_editor()
@@ -321,8 +323,8 @@ class main_menubar:
     
     def initialise_editor(self):
         # Set the root window label to the name of the current file (split from the dir path)
-        # The fully qualified filename is the first parameter provided by 'get_general'
-        path, name = os.path.split(settings.get_general()[0])
+        # The filename returned from get_settings is the fully qualified filename
+        path, name = os.path.split(settings.get_general("filename"))
         self.root.title(name)
         # Re-size the canvas to reflect the new schematic size
         self.canvas_update()
@@ -334,25 +336,22 @@ class main_menubar:
         if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
-        # The "connect" and "power" flags are the 4th and 5th parameter returned
-        if settings.get_sprog()[3]:
+        if settings.get_sprog("startup"):
             sprog_connected = self.sprog_connect()
-            if sprog_connected and settings.get_sprog()[4]:
+            if sprog_connected and settings.get_sprog("power"):
                 self.dcc_power_on()
         # Initialise the MQTT networking (if configured). Note that we use the menubar
         # functionfor connection so the state is correctly reflected in the UI.
         # The "connect on startup" flag is the 8th parameter returned.
         self.reset_mqtt_pub_sub_configuration()
         self.mqtt_reconfigure_client()
-        if settings.get_mqtt()[7]: self.mqtt_connect()
+        if settings.get_mqtt("startup"): self.mqtt_connect()
         self.apply_new_mqtt_pub_sub_configuration()
-        # Set the Automation Mode (5th param in the returned tuple)
-        # Either of these calls will update 'run_layout'
-        if settings.get_general()[4]: self.automation_enable()
+        # Both the automation_enable and automation_disable calls will update the 'run_layout' module
+        if settings.get_general("automation"): self.automation_enable()
         else: self.automation_disable()
-        # Set the edit mode (2nd param in the returned tuple)
-        # Either of these calls will update run layout
-        if settings.get_general()[1]: self.edit_mode()
+        # Both the "edit_mode" and "run_mode" calls will update the 'run_layout' module
+        if settings.get_general("editmode"): self.edit_mode()
         else: self.run_mode()
         # Create all the track sensor objects that have been defined
         self.gpio_update()
@@ -366,18 +365,16 @@ class main_menubar:
     def handle_canvas_event(self, event=None):
         # Note that event.keysym returns the character (event.state would be 'Control')
         if event.keysym == 'm':
-            # the Edit mode flag is the second parameter returned
-            if settings.get_general()[1]: self.run_mode()
+            if settings.get_general("editmode"): self.run_mode()
             else: self.edit_mode()
         elif event.keysym == 's':
             # the Snap to Grid flag is the fourth parameter returned
-            if settings.get_canvas()[3]: settings.set_canvas(snap_to_grid=False)
-            else: settings.set_canvas(snap_to_grid=True)
+            if settings.get_canvas("snaptogrid"): settings.set_canvas("snaptogrid", False)
+            else: settings.set_canvas("snaptogrid", True)
             # Apply the new canvas settings
             self.canvas_update()
         elif event.keysym == 'a':
-            # the Automation flag is the fifth parameter returned
-            if settings.get_general()[4]: self.automation_disable()
+            if settings.get_general("automation"): self.automation_disable()
             else: self.automation_enable()
             
     #------------------------------------------------------------------------------------------
@@ -388,7 +385,7 @@ class main_menubar:
         new_label = "Automation:On"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
-        settings.set_general(automation=True)
+        settings.set_general("automation", True)
         run_layout.configure_automation(True)
         run_routes.configure_automation(True)
         run_layout.initialise_layout()
@@ -397,7 +394,7 @@ class main_menubar:
         new_label = "Automation:Off"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
-        settings.set_general(automation=False)
+        settings.set_general("automation", False)
         run_layout.configure_automation(False)
         run_routes.configure_automation(False)
         run_layout.initialise_layout()
@@ -407,7 +404,7 @@ class main_menubar:
             new_label = "Mode:Edit"
             self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
             self.mode_label = new_label
-            settings.set_general(editmode=True)
+            settings.set_general("editmode", True)
             schematic.configure_edit_mode(True)
             library_common.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
@@ -425,16 +422,15 @@ class main_menubar:
             new_label = "Mode:Run"
             self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
             self.mode_label = new_label
-            settings.set_general(editmode=False)
+            settings.set_general("editmode", False)
             schematic.configure_edit_mode(False)
             library_common.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
             run_routes.configure_edit_mode(False)
             run_layout.initialise_layout()
         # Enable the the automation menubar selection and update to reflect the current setting
-        # Note that automation is only enbled in Run mode so we just need to update the indication
-        # no need to update 'run_layout'. Note the Automation flag is the fifth parameter returned
-        if settings.get_general()[4]: new_label1 = "Automation:On"
+        # (This will be enabled or disabled according to the current setting)
+        if settings.get_general("automation"): new_label1 = "Automation:On"
         else: new_label1 = "Automation:Off"
         self.mainmenubar.entryconfigure(self.auto_label, state="normal")
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
@@ -485,7 +481,9 @@ class main_menubar:
 
     def sprog_connect(self, show_popup:bool=True):
         # The connect request returns True if successful
-        port, baud, debug, startup, power = settings.get_sprog()
+        port = settings.get_sprog("port")
+        baud = settings.get_sprog("baud")
+        debug = settings.get_sprog("debug")
         connected = pi_sprog_interface.sprog_connect(port, baud, debug)
         self.update_sprog_menubar_controls(True, connected, show_popup)
         return(connected)
@@ -532,10 +530,10 @@ class main_menubar:
         self.mqtt_label = new_label
 
     def mqtt_connect(self, show_popup:bool=True):
-        url = settings.get_mqtt()[0]
-        port = settings.get_mqtt()[1]
-        username = settings.get_mqtt()[4]
-        password = settings.get_mqtt()[5]
+        url = settings.get_mqtt("url")
+        port = settings.get_mqtt("port")
+        username = settings.get_mqtt("username")
+        password = settings.get_mqtt("password")
         # The connect request returns True if successful
         connected = mqtt_interface.mqtt_broker_connect(url, port, username, password)
         self.update_mqtt_menubar_controls(True, connected, show_popup)
@@ -558,11 +556,11 @@ class main_menubar:
         self.apply_new_mqtt_pub_sub_configuration()
         
     def mqtt_reconfigure_client(self):
-        network = settings.get_mqtt()[2]
-        node = settings.get_mqtt()[3]
-        debug = settings.get_mqtt()[6]
-        publish_shutdown = settings.get_mqtt()[8]
-        act_on_shutdown = settings.get_mqtt()[9]
+        network = settings.get_mqtt("network")
+        node = settings.get_mqtt("node")
+        debug = settings.get_mqtt("debug")
+        publish_shutdown = settings.get_mqtt("pubshutdown")
+        act_on_shutdown = settings.get_mqtt("subshutdown")
         mqtt_interface.configure_mqtt_client(network, node, debug, publish_shutdown, act_on_shutdown,
                         shutdown_callback = lambda:self.quit_schematic(ask_for_confirm=False))
         
@@ -574,16 +572,16 @@ class main_menubar:
         block_instruments.reset_instruments_mqtt_configuration()
         
     def apply_new_mqtt_pub_sub_configuration(self):
-        dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
-        dcc_control.subscribe_to_dcc_command_feed(*settings.get_sub_dcc_nodes())
-        gpio_sensors.set_gpio_sensors_to_publish_state(*settings.get_pub_sensors())
-        gpio_sensors.subscribe_to_remote_gpio_sensors(*settings.get_sub_sensors())
-        signals.set_signals_to_publish_state(*settings.get_pub_signals())
-        signals.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_sub_signals())
-        track_sections.set_sections_to_publish_state(*settings.get_pub_sections())
-        track_sections.subscribe_to_remote_sections(*settings.get_sub_sections())
-        block_instruments.set_instruments_to_publish_state(*settings.get_pub_instruments())
-        block_instruments.subscribe_to_remote_instruments(*settings.get_sub_instruments())
+        dcc_control.set_node_to_publish_dcc_commands(settings.get_mqtt("pubdcc"))
+        dcc_control.subscribe_to_dcc_command_feed(*settings.get_mqtt("subdccnodes"))
+        gpio_sensors.set_gpio_sensors_to_publish_state(*settings.get_mqtt("pubsensors"))
+        gpio_sensors.subscribe_to_remote_gpio_sensors(*settings.get_mqtt("subsensors"))
+        signals.set_signals_to_publish_state(*settings.get_mqtt("pubsignals"))
+        signals.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_mqtt("subsignals"))
+        track_sections.set_sections_to_publish_state(*settings.get_mqtt("pubsections"))
+        track_sections.subscribe_to_remote_sections(*settings.get_mqtt("subsections"))
+        block_instruments.set_instruments_to_publish_state(*settings.get_mqtt("pubinstruments"))
+        block_instruments.subscribe_to_remote_instruments(*settings.get_mqtt("subinstruments"))
         objects.configure_remote_gpio_sensor_event_mappings()
 
     #------------------------------------------------------------------------------------------
@@ -591,18 +589,25 @@ class main_menubar:
     #------------------------------------------------------------------------------------------
 
     def canvas_update(self):
-        width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour = settings.get_canvas()
-        schematic.update_canvas(width, height, grid, snap_to_grid, display_grid, canvas_colour, grid_colour)
+        schematic.update_canvas(width=settings.get_canvas("width"),
+                                height=settings.get_canvas("height"),
+                                grid=settings.get_canvas("grid"),
+                                snap_to_grid=settings.get_canvas("snaptogrid"),
+                                display_grid=settings.get_canvas("displaygrid"),
+                                canvas_colour=settings.get_canvas("canvascolour"),
+                                grid_colour=settings.get_canvas("gridcolour"))
         
     def logging_update(self):
-        log_level = settings.get_logging()
+        log_level = settings.get_logging("level")
         if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
         elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
         elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
         elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
 
     def gpio_update(self):
-        trigger, timeout, mappings = settings.get_gpio()
+        trigger = settings.get_gpio("triggerdelay")
+        timeout = settings.get_gpio("timeoutperiod")
+        mappings = settings.get_gpio("portmappings")
         # Generate a pop-up warning if mappings have been defined but we are not running on a Pi
         if len(mappings)>0 and not gpio_sensors.gpio_interface_enabled():
             Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
@@ -614,8 +619,7 @@ class main_menubar:
         objects.configure_local_gpio_sensor_event_mappings()
         
     def general_settings_update(self):
-        # The spad popups enabled flag is the 6th parameter returned
-        run_layout.configure_spad_popups(settings.get_general()[5])
+        run_layout.configure_spad_popups(settings.get_general("spadpopups"))
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
@@ -653,8 +657,7 @@ class main_menubar:
     def save_schematic(self, save_as:bool=False):
         settings_to_save = settings.get_all()
         objects_to_save = objects.get_all()
-        # Filename is the first parameter returned from settings.get_general
-        filename_to_save = settings.get_general()[0]
+        filename_to_save = settings.get_general("filename")
         # If the filename is the default "new_schematic.sig" then we force a 'save as'
         if not self.file_has_been_saved:
             save_as = True
@@ -664,7 +667,7 @@ class main_menubar:
                                                  filename_to_save, save_as=save_as)
         # Reset the filename / root window title to the name of the file we have saved
         if saved_filename is not None:
-            settings.set_general(filename=saved_filename)
+            settings.set_general("filename", saved_filename)
             path, name = os.path.split(saved_filename)
             self.root.title(name)
             self.file_has_been_saved = True
@@ -688,7 +691,7 @@ class main_menubar:
             if "settings" in layout_state.keys() and "objects" in layout_state.keys():
                 # Compare the version of the application to the version the file was saved under
                 sig_file_version = layout_state["settings"]["general"]["version"]
-                application_version = settings.get_general()[2]
+                application_version = settings.get_general("version")
                 if self.tuple_version(sig_file_version) > self.tuple_version(application_version):
                     # We don't provide forward compatibility (too difficult) - so fail fast
                     logging.error("Load File - File was saved by "+sig_file_version)
@@ -717,7 +720,7 @@ class main_menubar:
                     schematic.delete_all_objects()
                     settings.set_all(layout_state["settings"])
                     # Set the filename to reflect that actual name of the loaded file
-                    settings.set_general(filename=file_loaded)
+                    settings.set_general("filename", file_loaded)
                     # Re-initialise the editor for the new settings to take effect
                     self.initialise_editor()
                     # Create the loaded layout objects then purge the loaded state information
