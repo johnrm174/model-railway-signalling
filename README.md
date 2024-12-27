@@ -6,10 +6,14 @@ application is primarily intended for the Raspberry Pi, but will also run on oth
 without some of the Raspberry-Pi specific interfacing functions). 
 
 * Enables layout schematics to be created with signals, points, track sections and block instruments.
+* Supports automation of signals based on track occupancy and state of signals on the route ahead.
+* Supports "one touch" configuration of routes (signals and points) with route highlighting.
+* Supports virtual DCC switches on the schematic for the control of other DCC layout accessories.
 * Supports most types of UK colour light signals, semaphore signals, and ground signals.
 * Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout.
 * Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation.
 * Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts.
+* Supports virtual Block Instruments (with networking)for coordinating movements between signal boxes
 * Provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) 
 to support custom layout control interfaces.
 
@@ -22,20 +26,13 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.9.0:
+## What's new for Release x.x.x:
 
-* New feature to drag and drop train designators between track sections (for cassette fiddle yards)
-* New option to offset the position of signal buttons (useful for busy schematics to deconflict)
-* New option to hide point buttons in Run Mode (if controlling only via setup/cleardown of routes)
-* New option to hide signal buttons in Run Mode (if controlling only via setup/cleardown of routes)
-* New menubar 'styles' feature to set (and apply) default styles for Route buttons, DCC Switches,
-signal buttons, point buttons, Track Sections, Route Lines (including points) and Text boxes
-* Width of track sections is now specified independently to the default label (4 to 30 characters)
-* Improved appearance of buttons and track sections when displayed on different colour backgrounds
-* Dynamic positioning of tooltips to ensure they always remain within the displayed area of the screen
-* Signal buttons will now only show "overridden" or "approach control set" if they are "OFF"
-* Bugfix to prevent schematic items being selected in Run Mode after scrolling the displayed area
-* Bugfix to route line highlighting (colour of the end-stops are now updated to show the route)
+* The 'Reset Layout' function now preserves track occupancy and incorporates a user-configurable switching 
+delay so point and signal changes can now be sequenced (to avoid overloading the DCC accessory bus on larger
+layouts which may require a large number of points and/or signals to be reset back to their default states)
+* Bugfix to the display of validation messages in the 'settings' windows on Apply/OK
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
