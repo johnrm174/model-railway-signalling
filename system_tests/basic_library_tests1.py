@@ -404,7 +404,6 @@ def run_dcc_control_tests(baud_rate):
     assert len(dcc_control.dcc_address_mappings) == 26
     print("Library Tests - get_dcc_address_mappings (no errors or warnings should be generated)")
     mappings = dcc_control.get_dcc_address_mappings()
-    print(mappings)
     assert mappings == {1: ['Signal', 1], 2: ['Signal', 1], 3: ['Signal', 1], 4: ['Signal', 1],
                         5: ['Signal', 1], 6: ['Signal', 1], 7: ['Signal', 1], 10: ['Signal', 2],
                         15: ['Signal', 2], 11: ['Signal', 2], 16: ['Signal', 2], 13: ['Signal', 2],
