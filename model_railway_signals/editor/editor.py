@@ -441,9 +441,9 @@ class main_menubar:
             if Tk.messagebox.askokcancel(parent=self.root, title="Reset Schematic",
                     message="Are you sure you want to reset all signals, points, switches and "
                     +"instruments back to their default states (Note that track occupancy will be retained)"):
-                run_layout.reset_layout()
+                run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
         else:
-            run_layout.reset_layout()
+            run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
             
     #------------------------------------------------------------------------------------------
     # SPROG menubar functions

@@ -908,12 +908,21 @@ class edit_general_settings():
             # Create a Label Frame for the Run Layout settings
             #----------------------------------------------------------------------------------
             # Create a labelframe for the run Layout Settings
-            self.labelframe1 = Tk.LabelFrame(self.window, text = "Run Layout settings")
-            self.labelframe1.pack(padx=2, pady=2, fill=Tk.BOTH)
+            self.frame1 = Tk.LabelFrame(self.window, text = "Run Layout settings")
+            self.frame1.pack(padx=2, pady=2, fill=Tk.BOTH)
             # Create the "SPAD Popups" selection element
-            self.enablespadpopups = common.check_box(self.labelframe1, label="Enable popup SPAD warnings",
+            self.enablespadpopups = common.check_box(self.frame1, label="Enable popup SPAD warnings",
                     tool_tip="Select to Enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.enablespadpopups.pack(padx=2, pady=2)
+            # Create the reset delay settings elements
+            self.frame1subframe1 = Tk.Frame(self.frame1)
+            self.frame1subframe1.pack()
+            self.label1 = Tk.Label(self.frame1subframe1, text="Reset switching delay:")
+            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.resetdelay = common.integer_entry_box(self.frame1subframe1, width=5, min_value=0, max_value= 5000,
+                        allow_empty=False, tool_tip="Specify the time delay between signal and/or point "+
+                        "switching events when resetting the layout back to its default state (0-5000ms)")
+            self.resetdelay.pack(padx=2, pady=2)
             #----------------------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             #----------------------------------------------------------------------------------
@@ -927,11 +936,13 @@ class edit_general_settings():
     def load_state(self):
         self.validation_error.pack_forget()
         self.enablespadpopups.set_value(settings.get_general("spadpopups"))
+        self.resetdelay.set_value(settings.get_general("resetdelay"))
 
     def save_state(self, close_window:bool):
-        if True:   ### We would normally validate any entries here ######
+        if self.resetdelay.validate():
             self.validation_error.pack_forget()
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
+            settings.set_general("resetdelay", self.resetdelay.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )
