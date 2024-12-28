@@ -80,6 +80,8 @@ def run_text_box_library_tests():
     text_boxes.delete_text_box(2)
     text_boxes.delete_text_box(3) 
     text_boxes.delete_text_box(4)
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(text_boxes.text_boxes) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -138,7 +140,11 @@ def run_track_sensor_library_tests():
     track_sensors.configure_edit_mode(edit_mode=False)
     # Clean up
     track_sensors.delete_track_sensor(10)     # success
+    track_sensors.delete_track_sensor(11)     # success
     track_sensors.delete_track_sensor(20)     # success
+    track_sensors.delete_track_sensor(21)     # success
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(track_sensors.track_sensors) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -425,6 +431,8 @@ def run_track_section_library_tests():
     track_sections.delete_section(2)
     track_sections.delete_section(3)
     track_sections.delete_section(4)
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(track_sections.sections) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -795,6 +803,8 @@ def run_point_library_tests():
     points.delete_point(2)
     points.delete_point(3)
     points.delete_point(4)
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(points.points) == 0
     # Check the creation of all supported point types
     system_test_harness.initialise_test_harness(filename="../configuration_examples/complex_trackwork.sig")
     # Now clear down the layout for the next series of tests
@@ -1101,6 +1111,8 @@ def run_instrument_library_tests():
     block_instruments.occup_button_event(1)
     block_instruments.occup_button_event(1)
     block_instruments.delete_instrument(1)
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(block_instruments.instruments) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1191,6 +1203,8 @@ def run_line_library_tests():
     assert canvas.itemcget(lines.lines[str(1)]["line"],"width") == "5.0"
     # Clean up
     lines.delete_line(1)
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(lines.lines) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1421,6 +1435,8 @@ def run_button_library_tests():
     buttons.delete_button(2)
     buttons.delete_button(3)
     buttons.delete_button(4)
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(buttons.buttons) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()

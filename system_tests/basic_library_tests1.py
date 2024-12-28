@@ -530,6 +530,9 @@ def run_dcc_control_tests(baud_rate):
     time.sleep(1.0) # Give the SPROG a chance to send all DCC commands
     assert pi_sprog_interface.request_dcc_power_off()
     assert pi_sprog_interface.sprog_disconnect()
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(dcc_control.dcc_signal_mappings) == 0
+    assert len(dcc_control.dcc_address_mappings) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -569,14 +572,16 @@ def run_mqtt_interface_tests():
     assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", 100) # Fail
     assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
     time.sleep(0.2)
-    print("Library Tests - mqtt_broker_disconnect (and then re-connect")
+    print("Library Tests - mqtt_broker_disconnect (and then re-connect)")
     assert mqtt_interface.mqtt_broker_disconnect()
     assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
     time.sleep(0.2)
     print("Library Tests - subscribe_to_mqtt_messages")
+    assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 0
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_1", "node1", 1, message_callback)
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_2", "node1", 1, message_callback, subtopics=True)
     time.sleep(0.2)
+    assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 2
     print("Library Tests - send_mqtt_message")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
@@ -586,9 +591,14 @@ def run_mqtt_interface_tests():
     print("Library Tests - unsubscribe_from_message_type")
     mqtt_interface.unsubscribe_from_message_type("test_messages_1")
     time.sleep(0.2)
+    assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 1
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
     time.sleep(0.2)
+    # Clean up
+    mqtt_interface.unsubscribe_from_message_type("test_messages_2")
+    time.sleep(0.2)
+    assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
