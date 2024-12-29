@@ -14,6 +14,8 @@
 #    sensor_passed_callback(item_id) - the callback for a change in library object state
 #    section_updated_callback(item_id) - the callback for a change in library object state
 #    instrument_updated_callback(item_id) - the callback for a change in library object state
+#    switch_updated_callback(item_id) - the callback for a change in library object state
+#    lever_switched_callback(item_id) - the callback for a change in library object state
 #    configure_edit_mode(edit_mode) - Set the mode - True for Edit Mode, False for Run Mode
 #    configure_automation(auto_enabled) - Call to set automation mode (from Editor Module)
 #    configure_spad_popups(spad_enabled) - Call to set SPAD popup warnings (from Editor Module)
@@ -87,6 +89,8 @@ from . import run_routes
 
 from ..library import signals
 from ..library import points
+from ..library import levers
+from ..library import buttons
 from ..library import block_instruments
 from ..library import track_sections
 
@@ -753,6 +757,17 @@ def process_all_signal_interlocking():
         if has_distant_arms(int_signal_id):
             if distant_arms_can_be_unlocked: signals.unlock_signal(int_associated_distant_id)
             else: signals.lock_signal(int_associated_distant_id)
+        # lock any Signalbox levers that are linked to the signal
+        for str_lever_id in objects.lever_index:
+            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedsignal"] == int_signal_id:
+                if signal_can_be_unlocked: levers.unlock_lever(int(str_lever_id))
+                else: levers.lock_lever(int(str_lever_id))
+            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedsubsidary"] == int_signal_id:
+                if subsidary_can_be_unlocked: levers.unlock_lever(int(str_lever_id))
+                else: levers.lock_lever(int(str_lever_id))
+            if objects.schematic_objects[objects.lever(str_lever_id)]["linkeddistant"] == int_signal_id:
+                if distant_arms_can_be_unlocked: levers.unlock_lever(int(str_lever_id))
+                else: levers.lock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -778,6 +793,11 @@ def process_all_point_interlocking():
                         break
         if point_locked: points.lock_point(int_point_id)
         else: points.unlock_point(int_point_id)
+        # Lock any Signalbox levers that are linked to the point (point, fpl or both)
+        for str_lever_id in objects.lever_index:
+            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedpoint"] == int(str_point_id):
+                if point_locked: levers.lock_lever(int(str_lever_id))
+                else: levers.unlock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -918,6 +938,31 @@ def update_all_displayed_signal_aspects():
         process_signal_aspect_update(int(str_signal_id))
     return()
 
+#------------------------------------------------------------------------------------
+# Function to Update all Signalbox Levers (based on the signal and point states)
+#------------------------------------------------------------------------------------
+
+def update_all_signalbox_levers():
+    for str_lever_id in objects.lever_index:
+        lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
+        lever_switched = levers.lever_switched(int(str_lever_id))
+        if lever_object["linkedsignal"] > 0:
+            if lever_switched != signals.signal_clear(lever_object["linkedsignal"]):
+                levers.toggle_lever(int(str_lever_id))
+        elif lever_object["linkedsubsidary"] > 0:
+            if lever_switched != signals.subsidary_clear(lever_object["linkedsubsidary"]):
+                levers.toggle_lever(int(str_lever_id))
+        elif lever_object["linkeddistant"] > 0:
+            if lever_switched != signals.signal_clear(lever_object["linkeddistant"]):
+                levers.toggle_lever(int(str_lever_id))
+        elif lever_object["linkedpoint"] > 0:
+            point_object = objects.schematic_objects[objects.point(lever_object["linkedpoint"])]
+            if lever_object["switchpoint"] and lever_switched != points.point_switched(lever_object["linkedpoint"]):
+                levers.toggle_lever(int(str_lever_id))
+            elif lever_object["switchfpl"] and lever_switched != points.fpl_active(lever_object["linkedpoint"]):
+                levers.toggle_lever(int(str_lever_id))
+    return()
+
 ##################################################################################################
 # Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
 # Enable/Disable, layout reset, layout load, object deletion (from the schematic) or
@@ -951,6 +996,8 @@ def initialise_layout():
     # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
     run_routes.enable_disable_schematic_routes()
     run_routes.initialise_all_schematic_routes()
+    # Finally, update all signalbox levers to reflect the current state of points and signals
+    update_all_signalbox_levers()
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
@@ -968,14 +1015,14 @@ def initialise_layout():
 
 def reset_layout(switch_delay:int=0):
     # Block Instruments don't send out any DCC commands so we can clear them down straight away without a delay
-    for instrument_id in objects.instrument_index.keys():
+    for instrument_id in objects.instrument_index:
         block_instruments.set_section_blocked(int(instrument_id))
     # Everything else needs to be scheduled with the specified delay so for large layouts with lots
     # of points, signals and DCC accessories we don't overload the bus by changing everything at once.
-    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index.keys(), switch_delay, route_id=0, delay=0)
-    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index.keys(), switch_delay, route_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index.keys(), switch_delay, route_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index.keys(), switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_id=0, delay=0)
+    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index, switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index, switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index, switch_delay, route_id=0, delay=delay)
     # Finally, we schedule the task to clear down any routes that do not get automatically cleared down
     # as they are invalidated by the reset of the points, signals and switches in the route configuration
     run_routes.schedule_tasks_to_reset_remaining_routes(switch_delay, delay=delay)
@@ -1001,12 +1048,14 @@ def point_switched_callback(point_id:int, route_id:int=0):
         override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
+    update_all_signalbox_levers()
     return()
 
 def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
+    update_all_signalbox_levers()
     return()
 
 def signal_updated_callback(signal_id:Union[int,str]):
@@ -1032,6 +1081,7 @@ def signal_switched_callback(signal_id:int, route_id:int=0):
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
+    update_all_signalbox_levers()
     return()
 
 def subsidary_switched_callback(signal_id:int, route_id:int=0):
@@ -1040,6 +1090,7 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
+    update_all_signalbox_levers()
     return()
 
 def signal_passed_callback(signal_id:int):
@@ -1098,6 +1149,38 @@ def instrument_updated_callback(instrument_id:int):
 def switch_updated_callback(switch_id:int, route_id:int=0):
     if enhanced_debugging: print("########## switch_updated_callback "+str(switch_id))
     run_routes.check_routes_valid_after_switch_change(switch_id, route_id)
+    update_all_signalbox_levers()
+    return()
+
+def lever_switched_callback(lever_id:int):
+    if enhanced_debugging: print("########## lever_switched_callback "+str(lever_id))
+    lever_object = objects.schematic_objects[objects.lever(lever_id)]
+    lever_switched = levers.lever_switched(lever_id)
+    # Update the associated signal or point to reflect the state of the lever
+    if lever_object["linkedsignal"] > 0:
+        if lever_switched != signals.signal_clear(lever_object["linkedsignal"]):
+            signals.toggle_signal(lever_object["linkedsignal"])
+    elif lever_object["linkedsubsidary"] > 0:
+        if lever_switched != signals.subsidary_clear(lever_object["linkedsubsidary"]):
+            signals.toggle_subsidary(lever_object["linkedsubsidary"])
+    elif lever_object["linkeddistant"] > 0:
+        int_associated_distant_id = lever_object["linkeddistant"] + 1000
+        if lever_switched != signals.signal_clear(int_associated_distant_id):
+            signals.toggle_signal(int_associated_distant_id)
+    elif lever_object["linkedpoint"] > 0:
+        if lever_object["switchpoint"] and lever_object["switchfpl"]:
+            if lever_switched != points.point_switched(lever_object["linkedpoint"]):
+                if points.fpl_active(lever_object["linkedpoint"]):
+                    points.toggle_fpl(lever_object["linkedpoint"])
+                points.toggle_point(lever_object["linkedpoint"])
+            if not points.fpl_active(lever_object["linkedpoint"]):
+                points.toggle_fpl(lever_object["linkedpoint"])
+        elif lever_object["switchpoint"]:
+            if lever_switched != points.point_switched(lever_object["linkedpoint"]):
+                points.toggle_point(lever_object["linkedpoint"])
+        elif lever_object["switchfpl"]:
+            if lever_switched != points.fpl_active(lever_object["linkedpoint"]):
+                points.toggle_fpl(lever_object["linkedpoint"])
     return()
 
 ##################################################################################################

@@ -14,6 +14,7 @@
 #    line(item_id:int) - helper function to find the object Id by Item ID
 #    route(item_id:int) - helper function to find the object Id by Item ID
 #    switch(item_id:int) - helper function to find the object Id by Item ID
+#    lever(item_id:int) - helper function to find the object Id by Item ID
 #
 #    switch_exists(item_id:int) - helper function to find if a DCC Switch Exists
 #
@@ -46,6 +47,7 @@
 #    route_index - for iterating through all the route objects
 #    switch_index - for iterating through all the switch objects
 #    textbox_index - for iterating through all the textbox objects
+#    lever_index - for iterating through all the signalbox lever objects
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -75,6 +77,7 @@ from .objects_common import line
 from .objects_common import track_sensor
 from .objects_common import route
 from .objects_common import switch
+from .objects_common import lever
 
 from .objects_common import switch_exists
 
@@ -89,6 +92,7 @@ from .objects_common import track_sensor_index
 from .objects_common import route_index
 from .objects_common import switch_index
 from .objects_common import textbox_index
+from .objects_common import lever_index
 
 from .objects_gpio import create_gpio_sensors
 from .objects_gpio import configure_remote_gpio_sensor_event_mappings
@@ -123,6 +127,7 @@ __all__ = [
     'track_sensor',
     'route',
     'switch',
+    'lever',
     # Helper functions to See if a DCC switch of a given ID exists
     'switch_exists',
     # Main schematic object dict and the type-specific indexes
@@ -136,6 +141,7 @@ __all__ = [
     'route_index',
     'switch_index',
     'textbox_index',
+    'lever_index',
     # GPIO Event configuration functions
     'create_gpio_sensors',
     'configure_remote_gpio_sensor_event_mappings',

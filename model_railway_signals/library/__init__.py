@@ -57,6 +57,16 @@ from .points import fpl_active
 from .points import set_point_colour
 from .points import reset_point_colour
 
+from .levers import lever_type
+from .levers import create_lever
+from .levers import update_lever_button_styles
+from .levers import delete_lever
+from .levers import lever_exists
+from .levers import lock_lever
+from .levers import unlock_lever
+from .levers import toggle_lever
+from .levers import lever_switched
+
 from .track_sections import create_section
 from .track_sections import section_exists
 from .track_sections import delete_section
@@ -171,6 +181,16 @@ __all__ = [
         'toggle_fpl',
         'set_point_colour',
         'reset_point_colour',
+      # Public lever types/functions
+        'lever_type',
+        'create_lever',
+        'update_lever_button_styles',
+        'delete_lever',
+        'lever_exists',
+        'lock_lever',
+        'unlock_lever',
+        'lever_switched',
+        'toggle_lever',
       # Public line types/functions
         'create_line',
         'update_line_styles',

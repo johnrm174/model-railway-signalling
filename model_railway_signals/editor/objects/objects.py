@@ -84,7 +84,15 @@
 #    objects_switches.delete_switch_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_switches.redraw_switch_object(object_id) - Redraw the object on the canvas following an update
 #    objects_switches.default_switch_object - The dictionary of default values for the object
-
+#    objects_levers.create_lever() - Create a default object on the schematic
+#    objects_levers.delete_lever(object_id) - Hard Delete an object when deleted from the schematic
+#    objects_levers.update_lever(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_levers.update_lever_styles(obj_id, params) - Update the styles of an existing object
+#    objects_levers.paste_lever(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    objects_levers.delete_lever_object(object_id) - soft delete the drawing object (prior to recreating)
+#    objects_levers.redraw_lever_object(object_id) - Redraw the object on the canvas following an update
+#    objects_levers.default_lever_object - The dictionary of default values for the object
+#
 #------------------------------------------------------------------------------------
 
 import copy 
@@ -100,6 +108,7 @@ from . import objects_sensors
 from . import objects_points
 from . import objects_routes
 from . import objects_switches
+from . import objects_levers
 
 from .. import run_layout
 
@@ -145,8 +154,12 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
             objects_routes.redraw_route_object(object_id)
         elif this_object_type == objects_common.object_type.switch:
             objects_switches.redraw_switch_object(object_id)
+        elif this_object_type == objects_common.object_type.lever:
+            objects_levers.redraw_lever_object(object_id)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
+    # Initialise the layout (interlocking changes, signal aspects etc)
+    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -178,6 +191,8 @@ def reset_all_schematic_indexes():
             objects_common.switch_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.textbox:
             objects_common.textbox_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.lever:
+            objects_common.lever_index[str(this_object_item_id)] = object_id
         # Note that textboxes don't have an index as we don't track their IDs
     return()
 
@@ -270,6 +285,8 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
         object_id = objects_routes.create_route(xpos, ypos)
     elif new_object_type == objects_common.object_type.switch:
         object_id = objects_switches.create_switch(xpos, ypos)
+    elif new_object_type == objects_common.object_type.lever:
+        object_id = objects_levers.create_lever(xpos, ypos)
     else:
         object_id = None
     # Note that we do not save the schematic state after the 'create' as, although the item now
@@ -302,6 +319,8 @@ def update_object(object_id, new_object):
         objects_routes.update_route(object_id, new_object)
     elif type_of_object == objects_common.object_type.switch:
         objects_switches.update_switch(object_id, new_object)
+    elif type_of_object == objects_common.object_type.lever:
+        objects_switches.update_lever(object_id, new_object)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # save the current state (for undo/redo)
@@ -336,6 +355,8 @@ def delete_object(object_id):
         objects_routes.delete_route(object_id)
     elif type_of_object == objects_common.object_type.switch:
         objects_switches.delete_switch(object_id)
+    elif type_of_object == objects_common.object_type.lever:
+        objects_levers.delete_lever(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -454,6 +475,8 @@ def copy_objects(list_of_object_ids:list, deltax:int, deltay:int):
             new_object_id = objects_routes.paste_route(object_to_copy, deltax, deltay)
         elif type_of_object == objects_common.object_type.switch:
             new_object_id = objects_switches.paste_switch(object_to_copy, deltax, deltay)
+        elif type_of_object == objects_common.object_type.lever:
+            new_object_id = objects_levers.paste_lever(object_to_copy, deltax, deltay)
         # Add the new object to the list of clipboard objects
         # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
@@ -486,6 +509,8 @@ def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
             objects_switches.update_switch_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.textbox:
             objects_textboxes.update_textbox_styles(object_id, dict_of_new_styles)
+        elif type_of_object == objects_common.object_type.lever:
+            objects_levers.update_lever_styles(object_id, dict_of_new_styles)
         elif type_of_object == objects_common.object_type.instrument:
             pass
         elif type_of_object == objects_common.object_type.track_sensor:
@@ -536,6 +561,8 @@ def set_all(new_objects):
             default_object = objects_routes.default_route_object
         elif new_object_type == objects_common.object_type.switch:
             default_object = objects_switches.default_switch_object
+        elif new_object_type == objects_common.object_type.lever:
+            default_object = objects_levers.default_lever_object
         else:
             default_object = {}
             logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
@@ -745,8 +772,6 @@ def set_all(new_objects):
     # Recalculate point interlocking tables as a 'belt and braces' measure (on the 
     # basis they would have successfully been loaded with the rest of the configuration)
     objects_points.reset_point_interlocking_tables()
-    # Initialise the layout (interlocking changes, signal aspects etc)
-    run_layout.initialise_layout()    
     # save the current state (for undo/redo) - deleting all previous history
     save_schematic_state(reset_pointer=True)
     return()

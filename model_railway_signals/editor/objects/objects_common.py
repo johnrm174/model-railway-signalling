@@ -19,6 +19,7 @@
 #    track_sensor(item_id:int) - helper function to find the object Id by Item ID
 #    route(item_id:int) - helper function to find the object Id by Item ID
 #    switch(item_id:int) - helper function to find the object Id by Item ID
+#    lever(item_id:int) - helper function to find the object Id by Item ID
 #
 #    switch_exists(item_id:int) - helper function to see if a Switch of a given ID exists
 #
@@ -40,6 +41,7 @@
 #    route_index - for iterating through all the route objects
 #    switch_index - for iterating through all the switch objects
 #    textbox_index - for iterating through all the textbox objects
+#    lever_index - for iterating through all the signalbox lever objects
 #
 #------------------------------------------------------------------------------------
 
@@ -59,6 +61,7 @@ class object_type():
     track_sensor:str = "tracksensor"
     route:str = "route"
     switch:str = "switch"
+    lever:str = "lever"
 
 #------------------------------------------------------------------------------------
 # All Objects we create (and their configuration) are stored in a global dictionary
@@ -81,6 +84,7 @@ track_sensor_index:dict={}
 route_index:dict={}
 switch_index:dict={}
 textbox_index:dict={}
+lever_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id
@@ -94,6 +98,7 @@ def line(ID:int): return (line_index[str(ID)])
 def track_sensor(ID:int): return (track_sensor_index[str(ID)])
 def route(ID:int): return (route_index[str(ID)])
 def switch(ID:int): return (switch_index[str(ID)])
+def lever(ID:int): return (lever_index[str(ID)])
 
 #------------------------------------------------------------------------------------
 # Externally used functions to see if a DCC Switch exists. We need to have a specific

@@ -51,6 +51,7 @@ from . import track_sections
 from . import block_instruments
 from . import points
 from . import buttons
+from . import levers
 from . import common
 
 #-------------------------------------------------------------------------------------------------
@@ -82,12 +83,14 @@ def get_sig_file_config(get_sig_file_data:bool = False):
     section_elements = ( ("occupied","bool"),("labeltext","str") )
     instrument_elements = ( ("sectionstate","bool"),("repeaterstate","bool") )
     button_elements = ( ("selected","bool"), )
+    lever_elements = ( ("switched","bool"),("locked","bool"))
 
     layout_elements = { "signals"    : {"elements" : signal_elements},
                         "points"     : {"elements" : point_elements},
                         "sections"   : {"elements" : section_elements},
                         "instruments": {"elements" : instrument_elements},
-                        "buttons"    : {"elements" : button_elements}}
+                        "buttons"    : {"elements" : button_elements},
+                        "levers"     : {"elements" : lever_elements}}
     
     if get_sig_file_data:
         layout_elements["points"]["source"] = points.points
@@ -95,6 +98,7 @@ def get_sig_file_config(get_sig_file_data:bool = False):
         layout_elements["sections"]["source"] = track_sections.sections
         layout_elements["instruments"]["source"] = block_instruments.instruments
         layout_elements["buttons"]["source"] = buttons.buttons
+        layout_elements["levers"]["source"] = levers.levers
         
     return(layout_elements)
 
