@@ -7,10 +7,9 @@
 #      lever_type.spare             - Unused (white)
 #      lever_type.stopsignal        - Home/stop signal (red)
 #      lever_type.distantsignal     - Distant signal (yellow)
-#      lever_type.pointswitch       - Points (black)
+#      lever_type.point             - Points (black)
 #      lever_type.pointfpl          - Facing point lock (blue)
 #      lever_type.pointwithfpl      - Combined point/fpl
-#      lever_type.barriers          - Barriers, stops and locks etc
 #
 #   lever_exists(lever_id:int) - returns true if the lever object 'exists' 
 # 
@@ -66,12 +65,12 @@ from . import file_interface
 # -------------------------------------------------------------------------
 
 class lever_type(enum.Enum):
-    spare = 0             # Unused (white)
-    stopsignal = 1        # Home/stop signal (red)
-    distantsignal = 2     # Distant signal (yellow)
-    pointswitch = 3       # Points (black)
-    pointfpl = 4          # Facing point lock (blue)
-    pointwithfpl = 5      # Combined point/fpl
+    spare = 1             # Unused (white)
+    stopsignal = 2        # Home/stop signal (red)
+    distantsignal = 3     # Distant signal (yellow)
+    point = 4             # Points (black)
+    pointfpl = 5          # Facing point lock (blue)
+    pointwithfpl = 6      # Combined point/fpl
 
 #---------------------------------------------------------------------------------------------
 # Levers are to be added to a global dictionary when created
@@ -172,7 +171,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
             colour1, colour2 = "Red", "Red"
         elif levertype == lever_type.distantsignal:
             colour1, colour2 = "Yellow", "Yellow"
-        elif levertype == lever_type.pointswitch:
+        elif levertype == lever_type.point:
             colour1, colour2 = "Black", "Black"
         elif levertype == lever_type.pointfpl:
             colour1, colour2 = "DodgerBlue", "DodgerBlue"

@@ -286,7 +286,7 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
     elif new_object_type == objects_common.object_type.switch:
         object_id = objects_switches.create_switch(xpos, ypos)
     elif new_object_type == objects_common.object_type.lever:
-        object_id = objects_levers.create_lever(xpos, ypos)
+        object_id = objects_levers.create_lever(xpos, ypos, item_type)
     else:
         object_id = None
     # Note that we do not save the schematic state after the 'create' as, although the item now
@@ -320,7 +320,7 @@ def update_object(object_id, new_object):
     elif type_of_object == objects_common.object_type.switch:
         objects_switches.update_switch(object_id, new_object)
     elif type_of_object == objects_common.object_type.lever:
-        objects_switches.update_lever(object_id, new_object)
+        objects_levers.update_lever(object_id, new_object)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # save the current state (for undo/redo)

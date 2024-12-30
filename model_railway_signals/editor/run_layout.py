@@ -759,15 +759,16 @@ def process_all_signal_interlocking():
             else: signals.lock_signal(int_associated_distant_id)
         # lock any Signalbox levers that are linked to the signal
         for str_lever_id in objects.lever_index:
-            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedsignal"] == int_signal_id:
-                if signal_can_be_unlocked: levers.unlock_lever(int(str_lever_id))
-                else: levers.lock_lever(int(str_lever_id))
-            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedsubsidary"] == int_signal_id:
-                if subsidary_can_be_unlocked: levers.unlock_lever(int(str_lever_id))
-                else: levers.lock_lever(int(str_lever_id))
-            if objects.schematic_objects[objects.lever(str_lever_id)]["linkeddistant"] == int_signal_id:
-                if distant_arms_can_be_unlocked: levers.unlock_lever(int(str_lever_id))
-                else: levers.lock_lever(int(str_lever_id))
+            lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
+            if lever_object["linkedsignal"] == int_signal_id:
+                if lever_object["switchsignal"] and signal_can_be_unlocked:
+                    levers.unlock_lever(int(str_lever_id))
+                elif lever_object["switchsubsidary"] and subsidary_can_be_unlocked:
+                    levers.unlock_lever(int(str_lever_id))
+                elif lever_object["switchdistant"] and distant_arms_can_be_unlocked:
+                    levers.unlock_lever(int(str_lever_id))
+                else:
+                    levers.lock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -794,10 +795,14 @@ def process_all_point_interlocking():
         if point_locked: points.lock_point(int_point_id)
         else: points.unlock_point(int_point_id)
         # Lock any Signalbox levers that are linked to the point (point, fpl or both)
+        fpl_active = point_object["hasfpl"] and points.fpl_active(int_point_id)
         for str_lever_id in objects.lever_index:
-            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedpoint"] == int(str_point_id):
-                if point_locked: levers.lock_lever(int(str_lever_id))
-                else: levers.unlock_lever(int(str_lever_id))
+            lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
+            if lever_object["linkedpoint"] == int_point_id:
+                if point_locked or (lever_object["switchpoint"] and fpl_active):
+                    levers.lock_lever(int(str_lever_id))
+                else:
+                    levers.unlock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -946,20 +951,24 @@ def update_all_signalbox_levers():
     for str_lever_id in objects.lever_index:
         lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
         lever_switched = levers.lever_switched(int(str_lever_id))
-        if lever_object["linkedsignal"] > 0:
-            if lever_switched != signals.signal_clear(lever_object["linkedsignal"]):
+        linked_signal = lever_object["linkedsignal"]
+        linked_point = lever_object["linkedpoint"]
+        #########################################################################################################
+        ### TO DO - add some protection as the signal config may have changed (no subsidary or dist arms) #######
+        #########################################################################################################
+        if linked_signal > 0:
+            if lever_object["switchsignal"] and lever_switched != signals.signal_clear(linked_signal):
                 levers.toggle_lever(int(str_lever_id))
-        elif lever_object["linkedsubsidary"] > 0:
-            if lever_switched != signals.subsidary_clear(lever_object["linkedsubsidary"]):
+            elif lever_object["switchsubsidary"] and lever_switched != signals.subsidary_clear(linked_signal):
                 levers.toggle_lever(int(str_lever_id))
-        elif lever_object["linkeddistant"] > 0:
-            if lever_switched != signals.signal_clear(lever_object["linkeddistant"]):
+            elif lever_object["switchdistant"] and lever_switched != signals.signal_clear(linked_signal + 1000):
                 levers.toggle_lever(int(str_lever_id))
-        elif lever_object["linkedpoint"] > 0:
-            point_object = objects.schematic_objects[objects.point(lever_object["linkedpoint"])]
-            if lever_object["switchpoint"] and lever_switched != points.point_switched(lever_object["linkedpoint"]):
+        elif linked_point > 0:
+            if lever_object["switchpoint"] and lever_switched != points.point_switched(linked_point):
                 levers.toggle_lever(int(str_lever_id))
-            elif lever_object["switchfpl"] and lever_switched != points.fpl_active(lever_object["linkedpoint"]):
+            elif lever_object["switchfpl"] and lever_switched != points.fpl_active(linked_point):
+                levers.toggle_lever(int(str_lever_id))
+            elif lever_object["switchpointandfpl"] and lever_switched != points.point_switched(linked_point):
                 levers.toggle_lever(int(str_lever_id))
     return()
 
@@ -1156,31 +1165,40 @@ def lever_switched_callback(lever_id:int):
     if enhanced_debugging: print("########## lever_switched_callback "+str(lever_id))
     lever_object = objects.schematic_objects[objects.lever(lever_id)]
     lever_switched = levers.lever_switched(lever_id)
+    linked_signal = lever_object["linkedsignal"]
+    linked_point = lever_object["linkedpoint"]
     # Update the associated signal or point to reflect the state of the lever
-    if lever_object["linkedsignal"] > 0:
-        if lever_switched != signals.signal_clear(lever_object["linkedsignal"]):
-            signals.toggle_signal(lever_object["linkedsignal"])
-    elif lever_object["linkedsubsidary"] > 0:
-        if lever_switched != signals.subsidary_clear(lever_object["linkedsubsidary"]):
-            signals.toggle_subsidary(lever_object["linkedsubsidary"])
-    elif lever_object["linkeddistant"] > 0:
-        int_associated_distant_id = lever_object["linkeddistant"] + 1000
-        if lever_switched != signals.signal_clear(int_associated_distant_id):
-            signals.toggle_signal(int_associated_distant_id)
-    elif lever_object["linkedpoint"] > 0:
-        if lever_object["switchpoint"] and lever_object["switchfpl"]:
-            if lever_switched != points.point_switched(lever_object["linkedpoint"]):
-                if points.fpl_active(lever_object["linkedpoint"]):
-                    points.toggle_fpl(lever_object["linkedpoint"])
-                points.toggle_point(lever_object["linkedpoint"])
-            if not points.fpl_active(lever_object["linkedpoint"]):
-                points.toggle_fpl(lever_object["linkedpoint"])
-        elif lever_object["switchpoint"]:
-            if lever_switched != points.point_switched(lever_object["linkedpoint"]):
-                points.toggle_point(lever_object["linkedpoint"])
-        elif lever_object["switchfpl"]:
-            if lever_switched != points.fpl_active(lever_object["linkedpoint"]):
-                points.toggle_fpl(lever_object["linkedpoint"])
+    #########################################################################################################
+    ### TO DO - add some protection as the signal config may have changed (no subsidary or dist arms) #######
+    #########################################################################################################
+    if linked_signal > 0:
+        if lever_object["switchsignal"] and lever_switched != signals.signal_clear(linked_signal):
+            signals.toggle_signal(linked_signal)
+            signal_switched_callback(linked_signal)
+        elif lever_object["switchsubsidary"] and lever_switched != signals.subsidary_clear(linked_signal):
+            signals.toggle_subsidary(linked_signal)
+            subsidary_switched_callback(linked_signal)
+        elif lever_object["switchdistant"] and lever_switched != signals.signal_clear(linked_signal + 1000):
+            signals.toggle_signal(linked_signal + 1000)
+            signal_switched_callback(linked_signal)
+    elif linked_point > 0:
+        if lever_object["switchpointandfpl"] and lever_switched != points.point_switched(linked_point):
+            if points.fpl_active(linked_point):
+                points.toggle_fpl(linked_point)
+            points.toggle_point(linked_point)
+            if not points.fpl_active(linked_point):
+                points.toggle_fpl(linked_point)
+            process_all_point_interlocking()
+            point_switched_callback(linked_point)
+        elif lever_object["switchpoint"] and lever_switched != points.point_switched(linked_point):
+            points.toggle_point(lever_object["linkedpoint"])
+            point_switched_callback(linked_point)
+        elif lever_object["switchfpl"] and lever_switched != points.fpl_active(linked_point):
+            points.toggle_fpl(lever_object["linkedpoint"])
+            # This is the case of a seperate lever controlling the Facing point Lock of a point
+            # We need to process the point interlocking to lock/unlock the associated switching lever
+            process_all_point_interlocking()
+            point_switched_callback(linked_point)
     return()
 
 ##################################################################################################

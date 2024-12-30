@@ -29,6 +29,7 @@
 #    configure_track_sensor.edit_track_sensor(root,object_id) - Open the edit window (on double click)
 #    configure_route.edit_route(root,object_id) - Open the edit window (on double click)
 #    configure_switch.edit_switch(root,object_id) - Open the edit window (on double click)
+#    configure_lever.edit_lever(root,object_id) - Open the edit window (on double click)
 #    run_layout.initialise(root_window, canvas) - Initialise the run_layout module with the root and canvas
 #    run_routes.initialise(root_window, canvas) - Initialise the run_routes module with the root and canvas 
 #
@@ -45,6 +46,7 @@
 #    block_instruments.instrument_type - Used to access the block_instrument type
 #    points.point_type - Used to access the point type
 #    points.point_subtype - Used to access the point subtype
+#    levers.lever_type - Used to access the lever type
 #    lines.move_line_end1 - Used for schematic editing of a line
 #    lines.move_line_end2 - Used for schematic editing of a line
 #
@@ -56,6 +58,7 @@ from ..library import signals
 from ..library import block_instruments
 from ..library import points
 from ..library import lines
+from ..library import levers
 
 from . import objects
 from . import run_layout
@@ -69,6 +72,7 @@ from . import configure_textbox
 from . import configure_track_sensor
 from . import configure_route
 from . import configure_switch
+from . import configure_lever
 
 import importlib.resources
 import math
@@ -319,6 +323,8 @@ def edit_selected_object():
         edit_popup = configure_route.edit_route(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.switch:
         edit_popup = configure_switch.edit_switch(root,object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.lever:
+        edit_popup = configure_lever.edit_lever(root,object_id)
     return()
 
 # The following function is for test purposes only - to close the windows opened above by the system tests
@@ -1078,7 +1084,9 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["instrument", lambda:create_object(objects.object_type.instrument,
                                         block_instruments.instrument_type.single_line.value) ],
                    ["route", lambda:create_object(objects.object_type.route)],
-                   ["switch", lambda:create_object(objects.object_type.switch)] ]
+                   ["switch", lambda:create_object(objects.object_type.switch)],
+                   ["lever", lambda:create_object(objects.object_type.lever,
+                                        levers.lever_type.spare.value)] ]
     # Create the buttons we need (Note that the button images are added to a global
     # list so they remain in scope (otherwise the buttons won't work)
     resource_folder = 'model_railway_signals.editor.resources'

@@ -54,11 +54,12 @@ default_lever_object["textcolourtype"] = settings.get_style("levers", "textcolou
 default_lever_object["textfonttuple"] = settings.get_style("levers", "textfonttuple")
 # Other object-specific parameters
 default_lever_object["itemtype"] = levers.lever_type.spare.value
-default_lever_object["linkedsignal"] = 10
-default_lever_object["linkedsubsidary"] = 0
-default_lever_object["linkeddistant"] = 0
-default_lever_object["linkedswitch"] = 0
+default_lever_object["linkedsignal"] = 0
 default_lever_object["linkedpoint"] = 0
+default_lever_object["switchsignal"] = False
+default_lever_object["switchsubsidary"] = False
+default_lever_object["switchdistant"] = False
+default_lever_object["switchpointandfpl"] = False
 default_lever_object["switchpoint"] = False
 default_lever_object["switchfpl"] = False
 default_lever_object["onkeypress"] = "q"
@@ -123,21 +124,22 @@ def redraw_lever_object(object_id, create_selected:bool=False):
 # Function to Create a new default lever (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_lever(xpos:int, ypos:int):
+def create_lever(xpos:int, ypos:int, item_type):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_lever_object)
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=levers.lever_exists)
+    # Add the specific elements for this particular instance of the object
+    objects_common.schematic_objects[object_id]["itemid"] = item_id
+    objects_common.schematic_objects[object_id]["itemtype"] = item_type
+    objects_common.schematic_objects[object_id]["posx"] = xpos
+    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
     objects_common.schematic_objects[object_id]["framecolour"] = settings.get_style("levers", "framecolour")
     objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("levers", "buttoncolour")
     objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("levers", "textcolourtype")
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("levers", "textfonttuple")
-    # Add the specific elements for this particular instance of the object
-    objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["posx"] = xpos
-    objects_common.schematic_objects[object_id]["posy"] = ypos
     # Add the new object to the index of levers
     objects_common.lever_index[str(item_id)] = object_id 
     # Draw the lever on the canvas
@@ -156,9 +158,20 @@ def paste_lever(object_to_paste, deltax:int, deltay:int):
     new_id = objects_common.new_item_id(exists_function=levers.lever_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.lever_index[str(new_id)] = new_object_id
-    # Set the position for the "pasted" object (offset from the original position)
+    # Set the position for the "pasted" object
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
+    # Now set the default values for all elements we don't want to copy
+    objects_common.schematic_objects[new_object_id]["linkedsignal"] = default_lever_object["linkedsignal"]
+    objects_common.schematic_objects[new_object_id]["linkedpoint"] = default_lever_object["linkedpoint"]
+    objects_common.schematic_objects[new_object_id]["switchsignal"] = default_lever_object["switchsignal"]
+    objects_common.schematic_objects[new_object_id]["switchsubsidary"] = default_lever_object["switchsubsidary"]
+    objects_common.schematic_objects[new_object_id]["switchdistant"] = default_lever_object["switchdistant"]
+    objects_common.schematic_objects[new_object_id]["switchpointandfpl"] = default_lever_object["switchpointandfpl"]
+    objects_common.schematic_objects[new_object_id]["switchpoint"] = default_lever_object["switchpoint"]
+    objects_common.schematic_objects[new_object_id]["switchfpl"] = default_lever_object["switchfpl"]
+    objects_common.schematic_objects[new_object_id]["onkeypress"] = default_lever_object["onkeypress"]
+    objects_common.schematic_objects[new_object_id]["offkeypress"] = default_lever_object["offkeypress"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object
