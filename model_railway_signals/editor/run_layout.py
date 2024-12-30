@@ -993,7 +993,6 @@ def interlock_point_lever_with_fpl_lever(linked_point:int):
     for str_lever_id in objects.lever_index:
         lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
         if lever_object["linkedpoint"] == linked_point and lever_object["switchpoint"]:
-            print(str_lever_id)
             if points.fpl_active(linked_point) or points.point_locked(linked_point):
                 levers.lock_lever(int(str_lever_id))
             else:
