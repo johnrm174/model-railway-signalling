@@ -24,6 +24,7 @@
 # Makes the following external API calls to other editor modules:
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
 #    objects.point(point_id) - To get the object_id for a given point_id
+#    objects.lever(lever_id) - To get the object_id for a given lever_id
 #    objects.section(section_id) - To get the object_id for a given section_id
 #    objects.track_sensor(sensor_id) - To get the object_id for a given sensor_id
 #    run_routes.enable_disable_schematic_routes()
@@ -43,6 +44,7 @@
 #    objects.object_type - used to establish the type of the schematic objects
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.point_index - To iterate through all the point objects
+#    objects.lever_index - To iterate through all the lever objects
 #
 # Accesses the following external library objects directly:
 #    signals.route_type - for accessing the enum value
@@ -52,6 +54,7 @@
 #    signals.semaphore_subtype - for accessing the enum value
 #
 # Makes the following external API calls to library modules:
+#    signals.toggle_signal(signal_id) - Change the state of a signal (to match a lever state)
 #    signals.signal_state(sig_id) - For testing the current displayed aspect
 #    signals.update_colour_light_signal(sig_id, sig_ahead_id) - To update the signal aspect
 #    signals.signal_clear(sig_id, sig_route) - To test if a signal is clear
@@ -68,10 +71,16 @@
 #    signals.clear_signal_override - Clear the Signal override DANGER mode
 #    signals.set_signal_override_caution - Override the signal to CAUTION
 #    signals.clear_signal_override_caution - Clear the Signal override CAUTION mode
+#    points.toggle_point(point_id) - Change the state of a point (to match the lever state)
+#    points.toggle_fpl(point_id) - Change the state of a point FPL (to match a lever state)
 #    points.fpl_active(point_id) - Test if the FPL is active (for interlocking)
 #    points.point_switched(point_id) - Test if the point is switched (for interlocking)
 #    points.lock_point(point_id) - Lock a point (for interlocking)
 #    points.unlock_point(point_id) - Unlock a point (for interlocking)
+#    levers.toggle_lever(lever_id) - Change the state of a lever (to match a point/signal state)
+#    levers.lever_switched(lever_id) - Test the state (interlocking / switch the signals/points)
+#    levers.lock_lever(point_id) - Lock a lever (for interlocking)
+#    levers.unlock_lever(point_id) - Unlock a lever (for interlocking)
 #    block_instruments.block_section_ahead_clear(inst_id) - Get the state (for interlocking)
 #    block_instruments.set_section_blocked(inst_id) -For Layout Reset
 #    track_sections.set_section_occupied (section_id) - Set Track Section to "Occupied"
@@ -795,14 +804,10 @@ def process_all_point_interlocking():
         if point_locked: points.lock_point(int_point_id)
         else: points.unlock_point(int_point_id)
         # Lock any Signalbox levers that are linked to the point (point, fpl or both)
-        fpl_active = point_object["hasfpl"] and points.fpl_active(int_point_id)
         for str_lever_id in objects.lever_index:
-            lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-            if lever_object["linkedpoint"] == int_point_id:
-                if point_locked or (lever_object["switchpoint"] and fpl_active):
-                    levers.lock_lever(int(str_lever_id))
-                else:
-                    levers.unlock_lever(int(str_lever_id))
+            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedpoint"] == int_point_id:
+                if point_locked: levers.lock_lever(int(str_lever_id))
+                else: levers.unlock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -944,7 +949,8 @@ def update_all_displayed_signal_aspects():
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Update all Signalbox Levers (based on the signal and point states)
+# Function to Update all Signalbox Levers (based on the 'new' signal and point states)
+# Called from the signal_switched, point_switched or fpl_switched callback functions
 #------------------------------------------------------------------------------------
 
 def update_all_signalbox_levers():
@@ -953,23 +959,56 @@ def update_all_signalbox_levers():
         lever_switched = levers.lever_switched(int(str_lever_id))
         linked_signal = lever_object["linkedsignal"]
         linked_point = lever_object["linkedpoint"]
-        #########################################################################################################
-        ### TO DO - add some protection as the signal config may have changed (no subsidary or dist arms) #######
-        #########################################################################################################
         if linked_signal > 0:
+            # We always check if the point has a subsidary or associated distant to cover the case of a
+            # signal configuration being changed (to remove these) after the lever was configured.
+            subsidary = has_subsidary(linked_signal)
+            dist_arms = has_distant_arms(linked_signal)
             if lever_object["switchsignal"] and lever_switched != signals.signal_clear(linked_signal):
                 levers.toggle_lever(int(str_lever_id))
-            elif lever_object["switchsubsidary"] and lever_switched != signals.subsidary_clear(linked_signal):
+            elif lever_object["switchsubsidary"] and subsidary and lever_switched != signals.subsidary_clear(linked_signal):
                 levers.toggle_lever(int(str_lever_id))
-            elif lever_object["switchdistant"] and lever_switched != signals.signal_clear(linked_signal + 1000):
+            elif lever_object["switchdistant"] and dist_arms and lever_switched != signals.signal_clear(linked_signal + 1000):
                 levers.toggle_lever(int(str_lever_id))
         elif linked_point > 0:
+            # We always check if the point has a FPL (before switching the FPL) to cover the case of a
+            # point configuration being changed (to no FPL) after the lever was configured.
+            has_fpl = objects.schematic_objects[objects.point(linked_point)]["hasfpl"]
             if lever_object["switchpoint"] and lever_switched != points.point_switched(linked_point):
-                levers.toggle_lever(int(str_lever_id))
-            elif lever_object["switchfpl"] and lever_switched != points.fpl_active(linked_point):
                 levers.toggle_lever(int(str_lever_id))
             elif lever_object["switchpointandfpl"] and lever_switched != points.point_switched(linked_point):
                 levers.toggle_lever(int(str_lever_id))
+            elif lever_object["switchfpl"] and has_fpl and lever_switched != points.fpl_active(linked_point):
+                levers.toggle_lever(int(str_lever_id))
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to interlock a point lever based on the state of an associated FPL lever
+# We need to lock/unlock the 'switching' lever based on the state of the 'FPL' lever
+# Called from the fpl_switched_callback and lever_switched_callback functions
+# The point ID is the ID of the linked_point that has been subject to a FPL change
+#------------------------------------------------------------------------------------
+
+def interlock_point_lever_with_fpl_lever(linked_point:int):
+    for str_lever_id in objects.lever_index:
+        lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
+        if lever_object["linkedpoint"] == linked_point and lever_object["switchpoint"]:
+            print(str_lever_id)
+            if points.fpl_active(linked_point) or points.point_locked(linked_point):
+                levers.lock_lever(int(str_lever_id))
+            else:
+                levers.unlock_lever(int(str_lever_id))
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to interlock all point levers based on the state of associated FPL levers
+# Called from the initialise_layout function to set the initial interlocking state
+#------------------------------------------------------------------------------------
+
+def interlock_all_point_levers_with_fpl_levers():
+    for str_point_id in objects.point_index:
+        if objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]:
+            interlock_point_lever_with_fpl_lever(int(str_point_id))
     return()
 
 ##################################################################################################
@@ -1007,6 +1046,7 @@ def initialise_layout():
     run_routes.initialise_all_schematic_routes()
     # Finally, update all signalbox levers to reflect the current state of points and signals
     update_all_signalbox_levers()
+    interlock_all_point_levers_with_fpl_levers()
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
@@ -1064,6 +1104,7 @@ def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
+    interlock_point_lever_with_fpl_lever(point_id)
     update_all_signalbox_levers()
     return()
 
@@ -1168,37 +1209,39 @@ def lever_switched_callback(lever_id:int):
     linked_signal = lever_object["linkedsignal"]
     linked_point = lever_object["linkedpoint"]
     # Update the associated signal or point to reflect the state of the lever
-    #########################################################################################################
-    ### TO DO - add some protection as the signal config may have changed (no subsidary or dist arms) #######
-    #########################################################################################################
     if linked_signal > 0:
+        # Change the signal as required and call the signal_switched_callback to process any changes.
+        # We always check if the point has a subsidary or associated distant to cover the case of a
+        # signal configuration being changed (to remove these) after the lever was configured.
+        subsidary = has_subsidary(linked_signal)
+        dist_arms = has_distant_arms(linked_signal)
         if lever_object["switchsignal"] and lever_switched != signals.signal_clear(linked_signal):
             signals.toggle_signal(linked_signal)
             signal_switched_callback(linked_signal)
-        elif lever_object["switchsubsidary"] and lever_switched != signals.subsidary_clear(linked_signal):
+        elif (lever_object["switchsubsidary"] and subsidary and lever_switched != signals.subsidary_clear(linked_signal)):
             signals.toggle_subsidary(linked_signal)
             subsidary_switched_callback(linked_signal)
-        elif lever_object["switchdistant"] and lever_switched != signals.signal_clear(linked_signal + 1000):
+        elif (lever_object["switchdistant"] and dist_arms and lever_switched != signals.signal_clear(linked_signal + 1000)):
             signals.toggle_signal(linked_signal + 1000)
             signal_switched_callback(linked_signal)
     elif linked_point > 0:
+        # Change the point as required and call the point_switched_callback to process any changes.
+        # We always check if the point has a FPL (before switching the FPL) to cover the case of a
+        # point configuration being changed (to no FPL) after the lever was configured.
+        has_fpl = objects.schematic_objects[objects.point(linked_point)]["hasfpl"]
         if lever_object["switchpointandfpl"] and lever_switched != points.point_switched(linked_point):
-            if points.fpl_active(linked_point):
+            if has_fpl and points.fpl_active(linked_point):
                 points.toggle_fpl(linked_point)
             points.toggle_point(linked_point)
-            if not points.fpl_active(linked_point):
+            if has_fpl and not points.fpl_active(linked_point):
                 points.toggle_fpl(linked_point)
-            process_all_point_interlocking()
             point_switched_callback(linked_point)
         elif lever_object["switchpoint"] and lever_switched != points.point_switched(linked_point):
-            points.toggle_point(lever_object["linkedpoint"])
+            points.toggle_point(linked_point)
             point_switched_callback(linked_point)
-        elif lever_object["switchfpl"] and lever_switched != points.fpl_active(linked_point):
-            points.toggle_fpl(lever_object["linkedpoint"])
-            # This is the case of a seperate lever controlling the Facing point Lock of a point
-            # We need to process the point interlocking to lock/unlock the associated switching lever
-            process_all_point_interlocking()
-            point_switched_callback(linked_point)
+        elif lever_object["switchfpl"] and has_fpl and lever_switched != points.fpl_active(linked_point):
+            points.toggle_fpl(linked_point)
+            fpl_switched_callback(linked_point)
     return()
 
 ##################################################################################################

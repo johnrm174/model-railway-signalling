@@ -277,7 +277,7 @@ class edit_lever():
             self.signal.set_values(linked_signal, signal_lever_subtype)
             self.point.set_values(linked_point, point_lever_subtype)
             # Hide the validation error message
-            self.validation_error.pack_forget()        
+            self.validation_error.pack_forget()
         return()
      
     def save_state(self, close_window:bool):
