@@ -244,7 +244,14 @@ class edit_lever():
             self.point.enable()
 
 #------------------------------------------------------------------------------------
-# Functions for load, save and close window
+# Functions for load, save and close window. Lever types are defined in
+# levers.py (library module) - included here for reference:
+#    spare = 1             # Unused (white)
+#    stopsignal = 2        # Home/stop signal (red)
+#    distantsignal = 3     # Distant signal (yellow)
+#    point = 4             # Points (black)
+#    pointfpl = 5          # Facing point lock (blue)
+#    pointwithfpl = 6      # Combined point/fpl
 #------------------------------------------------------------------------------------
  
     def load_state(self):
@@ -258,10 +265,11 @@ class edit_lever():
             self.window.title("Signalbox Lever "+str(item_id))
             linked_signal = objects.schematic_objects[self.object_id]["linkedsignal"]
             linked_point = objects.schematic_objects[self.object_id]["linkedpoint"] 
-            # Work out the lever type (signal, point or spare) and subtype
-            if  linked_signal > 0: lever_type = 2
-            elif linked_point > 0: lever_type = 3
-            else: lever_type = 1
+            # Work out the lever type selection to set(signal, point or spare)
+            lever_type = objects.schematic_objects[self.object_id]["itemtype"]
+            if  lever_type in (1, 2): lever_selection = 2
+            elif lever_type in (3, 4, 5): lever_selection = 3
+            else: lever_selection = 1
             # Work out the signal lever subtype 
             if objects.schematic_objects[self.object_id]["switchsignal"]: signal_lever_subtype = 1
             elif objects.schematic_objects[self.object_id]["switchsubsidary"]: signal_lever_subtype = 2
@@ -273,7 +281,7 @@ class edit_lever():
             elif objects.schematic_objects[self.object_id]["switchpointandfpl"]: point_lever_subtype = 3
             else: point_lever_subtype = 0
             # Set the Initial UI state from the current object settings
-            self.levertype.set_value(lever_type)
+            self.levertype.set_value(lever_selection)
             self.signal.set_values(linked_signal, signal_lever_subtype)
             self.point.set_values(linked_point, point_lever_subtype)
             # Hide the validation error message
