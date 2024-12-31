@@ -185,12 +185,15 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:change_button_event(lever_id) )
         # Create the Tkinter drawing objects for the schematic object
-        rectangle = canvas.create_rectangle(x-12,y,x+12,y+25 ,fill=frame_colour, tags=canvas_tag)
-        canvas.create_window(x, y+28, window=button, anchor=Tk.N, tags=canvas_tag)
+        rectangle = canvas.create_rectangle(x-12,y,x+12,y+30 ,fill=frame_colour, width=1, tags=canvas_tag)
+        canvas.create_window(x, y+33, window=button, anchor=Tk.N, tags=canvas_tag)
         lever1a = canvas.create_line(x, y-12, x, y-25, fill=colour1, width=4, state="normal", tags=canvas_tag)
         lever1b = canvas.create_line(x, y, x, y-12, fill=colour2, width=4, state="normal", tags=canvas_tag)
-        lever2a = canvas.create_line(x, y+3, x, y-10, fill=colour1, width=4, state="hidden", tags=canvas_tag)
-        lever2b = canvas.create_line(x, y+3, x, y+15, fill=colour2, width=4, state="hidden", tags=canvas_tag)
+        lever2a = canvas.create_line(x, y, x, y-10, fill=colour1, width=4, state="hidden", tags=canvas_tag)
+        lever2b = canvas.create_line(x, y, x, y+10, fill=colour2, width=4, state="hidden", tags=canvas_tag)
+        locked = canvas.create_text(x, y+20, text="L", fill="White", font=("TkFixedFont",12,"bold"), tags=canvas_tag)
+        # The 'Locked' Indication is initially hidden (as the lever is created "Unlocked"
+        canvas.itemconfig(locked, state="hidden")
         # Bind the canvas keypress events (if specified)
         if len(on_keypress) > 0:
             canvas.bind(on_keypress, lambda event:lever_on_keypress_event(event, lever_id))
@@ -205,6 +208,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         levers[str(lever_id)]["lever1b"] = lever1b                 # Tkinter drawing object
         levers[str(lever_id)]["lever2a"] = lever2a                 # Tkinter drawing object
         levers[str(lever_id)]["lever2b"] = lever2b                 # Tkinter drawing object
+        levers[str(lever_id)]["locktext"] = locked                 # Tkinter drawing object
         levers[str(lever_id)]["callback"] = lever_callback         # The callback to make on a change event
         levers[str(lever_id)]["switched"] = False                  # Initial "switched" state of the lever
         levers[str(lever_id)]["locked"] = False                    # Initial "interlocking" state of the lever
@@ -262,6 +266,7 @@ def lock_lever(lever_id:int):
         logging.error("Lever "+str(lever_id)+": lock_lever - Lever ID does not exist")
     elif not levers[str(lever_id)]["locked"]:
         logging.info ("Lever "+str(lever_id)+": Locking lever")
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], state="normal")
         levers[str(lever_id)]["button"].config(state="disabled")
         levers[str(lever_id)]["locked"] = True
     return()
@@ -278,6 +283,7 @@ def unlock_lever(lever_id:int):
         logging.error("Lever "+str(lever_id)+": unlock_lever - Lever ID does not exist")
     elif levers[str(lever_id)]["locked"]:
         logging.info("Lever "+str(lever_id)+": Unlocking lever")
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], state="hidden")
         levers[str(lever_id)]["button"].config(state="normal") 
         levers[str(lever_id)]["locked"] = False
     return()
