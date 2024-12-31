@@ -267,8 +267,8 @@ class edit_lever():
             linked_point = objects.schematic_objects[self.object_id]["linkedpoint"] 
             # Work out the lever type selection to set(signal, point or spare)
             lever_type = objects.schematic_objects[self.object_id]["itemtype"]
-            if  lever_type in (1, 2): lever_selection = 2
-            elif lever_type in (3, 4, 5): lever_selection = 3
+            if  lever_type in (2, 3): lever_selection = 2
+            elif lever_type in (4, 5, 6): lever_selection = 3
             else: lever_selection = 1
             # Work out the signal lever subtype 
             if objects.schematic_objects[self.object_id]["switchsignal"]: signal_lever_subtype = 1
