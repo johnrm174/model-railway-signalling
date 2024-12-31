@@ -977,37 +977,21 @@ def update_all_signalbox_levers():
                 levers.toggle_lever(int(str_lever_id))
             elif lever_object["switchpointandfpl"] and lever_switched != points.point_switched(linked_point):
                 levers.toggle_lever(int(str_lever_id))
-            elif lever_object["switchfpl"] and has_fpl and lever_switched != points.fpl_active(linked_point):
-                levers.toggle_lever(int(str_lever_id))
+            elif lever_object["switchfpl"] and has_fpl:
+                if lever_switched != points.fpl_active(linked_point):
+                    levers.toggle_lever(int(str_lever_id))
+                # If we have a lever connected only to the FPL of a point then we need to find the
+                # associated lever (connected to the point switch) and lock/unlock it as required
+                # according to the state of the point interlocking and the state of the FPL
+                for str_other_lever_id in objects.lever_index:
+                    other_lever_object = objects.schematic_objects[objects.lever(str_other_lever_id)]
+                    if other_lever_object["linkedpoint"] == linked_point and other_lever_object["switchpoint"]:
+                        if points.fpl_active(linked_point) or points.point_locked(linked_point):
+                            levers.lock_lever(int(str_other_lever_id))
+                        else:
+                            levers.unlock_lever(int(str_other_lever_id))
     return()
 
-#------------------------------------------------------------------------------------
-# Function to interlock a point lever based on the state of an associated FPL lever
-# We need to lock/unlock the 'switching' lever based on the state of the 'FPL' lever
-# Called from the fpl_switched_callback and lever_switched_callback functions
-# The point ID is the ID of the linked_point that has been subject to a FPL change
-#------------------------------------------------------------------------------------
-
-def interlock_point_lever_with_fpl_lever(linked_point:int):
-    for str_lever_id in objects.lever_index:
-        lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-        if lever_object["linkedpoint"] == linked_point and lever_object["switchpoint"]:
-            if points.fpl_active(linked_point) or points.point_locked(linked_point):
-                levers.lock_lever(int(str_lever_id))
-            else:
-                levers.unlock_lever(int(str_lever_id))
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to interlock all point levers based on the state of associated FPL levers
-# Called from the initialise_layout function to set the initial interlocking state
-#------------------------------------------------------------------------------------
-
-def interlock_all_point_levers_with_fpl_levers():
-    for str_point_id in objects.point_index:
-        if objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]:
-            interlock_point_lever_with_fpl_lever(int(str_point_id))
-    return()
 
 ##################################################################################################
 # Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
@@ -1044,7 +1028,6 @@ def initialise_layout():
     run_routes.initialise_all_schematic_routes()
     # Finally, update all signalbox levers to reflect the current state of points and signals
     update_all_signalbox_levers()
-    interlock_all_point_levers_with_fpl_levers()
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
@@ -1102,7 +1085,6 @@ def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    interlock_point_lever_with_fpl_lever(point_id)
     update_all_signalbox_levers()
     return()
 
@@ -1197,7 +1179,6 @@ def instrument_updated_callback(instrument_id:int):
 def switch_updated_callback(switch_id:int, route_id:int=0):
     if enhanced_debugging: print("########## switch_updated_callback "+str(switch_id))
     run_routes.check_routes_valid_after_switch_change(switch_id, route_id)
-    update_all_signalbox_levers()
     return()
 
 def lever_switched_callback(lever_id:int):
