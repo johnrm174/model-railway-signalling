@@ -155,8 +155,9 @@ def toggle_lever(lever_id:int):
 def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                  lever_callback, on_keypress:str="", off_keypress:str="",
                  button_colour:str="Grey85", active_colour:str="Grey95",
-                 selected_colour:str="White", text_colour:str="black",
-                 frame_colour:str="Grey40", font=("TkFixedFont", 8 ,"bold")):
+                 selected_colour:str="White", text_colour:str="Black",
+                 frame_colour:str="Grey40", lock_text_colour:str="White",
+                 font=("TkFixedFont", 8 ,"bold")):
     global levers
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "lever"+str(lever_id)
@@ -191,7 +192,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         lever1b = canvas.create_line(x, y, x, y-12, fill=colour2, width=4, state="normal", tags=canvas_tag)
         lever2a = canvas.create_line(x, y, x, y-10, fill=colour1, width=4, state="hidden", tags=canvas_tag)
         lever2b = canvas.create_line(x, y, x, y+10, fill=colour2, width=4, state="hidden", tags=canvas_tag)
-        locked = canvas.create_text(x, y+20, text="L", fill="White", font=("TkFixedFont",12,"bold"), tags=canvas_tag)
+        locked = canvas.create_text(x, y+20, text="L", fill=lock_text_colour, font=("TkFixedFont",12,"bold"), tags=canvas_tag)
         # The 'Locked' Indication is initially hidden (as the lever is created "Unlocked"
         canvas.itemconfig(locked, state="hidden")
         # Bind the canvas keypress events (if specified)
@@ -232,8 +233,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
 #---------------------------------------------------------------------------------------------
 
 def update_lever_button_styles(lever_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
-                                    selected_colour:str="White", text_colour:str="Black",
-                                    frame_colour="Grey40",font=("TkFixedFont", 8 ,"normal")):
+                    selected_colour:str="White", text_colour:str="Black", frame_colour:str="Grey40",
+                    lock_text_colour:str="White", font=("TkFixedFont",8,"bold")):
     global levers
     if not isinstance(lever_id, int):
         logging.error("Lever "+str(lever_id)+": update_lever_button_styles - Lever ID must be an int")
@@ -249,6 +250,7 @@ def update_lever_button_styles(lever_id:int, button_colour:str="Grey85", active_
         levers[str(lever_id)]["button"].config(activeforeground=text_colour)
         levers[str(lever_id)]["button"].config(foreground=text_colour)
         levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["rectangle"], fill=frame_colour)
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], fill=lock_text_colour)
         # Store the parameters we need to track
         levers[str(lever_id)]["selectedcolour"] = selected_colour
         levers[str(lever_id)]["deselectedcolour"] = button_colour

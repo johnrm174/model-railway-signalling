@@ -36,7 +36,6 @@ import uuid
 import copy
 
 from . import objects_common
-from . import objects_routes
 from ...library import levers
 from .. import run_layout
 from .. import settings
@@ -49,6 +48,7 @@ default_lever_object = copy.deepcopy(objects_common.default_object)
 default_lever_object["item"] = objects_common.object_type.lever
 # Styles are initially set to the default styles (defensive programming)
 default_lever_object["framecolour"] = settings.get_style("levers", "framecolour")
+default_lever_object["lockcolourtype"] = settings.get_style("levers", "lockcolourtype")
 default_lever_object["buttoncolour"] = settings.get_style("levers", "buttoncolour")
 default_lever_object["textcolourtype"] = settings.get_style("levers", "textcolourtype")
 default_lever_object["textfonttuple"] = settings.get_style("levers", "textfonttuple")
@@ -98,8 +98,12 @@ def redraw_lever_object(object_id, create_selected:bool=False):
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
     # Work out what the text colour should be (auto uses lightest of the three for max contrast)
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
-    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+    button_text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    button_text_colour = objects_common.get_text_colour(button_text_colour_type, selected_colour)
+    # Work out what the locked indication (on the frame) text colour should be
+    frame_colour = objects_common.schematic_objects[object_id]["framecolour"]
+    lock_text_colour_type = objects_common.schematic_objects[object_id]["lockcolourtype"]
+    lock_text_colour = objects_common.get_text_colour(lock_text_colour_type, frame_colour)
     # Create the lever library object on the canvas
     canvas_tags = levers.create_lever(objects_common.canvas,
                 lever_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -110,11 +114,12 @@ def redraw_lever_object(object_id, create_selected:bool=False):
                 on_keypress = objects_common.schematic_objects[object_id]["onkeypress"],
                 off_keypress = objects_common.schematic_objects[object_id]["offkeypress"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
-                frame_colour = objects_common.schematic_objects[object_id]["framecolour"],
+                frame_colour = frame_colour,
+                lock_text_colour = lock_text_colour,
                 button_colour = button_colour,
                 active_colour = active_colour,
                 selected_colour = selected_colour,
-                text_colour = text_colour)
+                text_colour = button_text_colour)
     # Set the canvas "tags" reference and selection rectangle for the point
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
@@ -137,6 +142,7 @@ def create_lever(xpos:int, ypos:int, item_type):
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
     objects_common.schematic_objects[object_id]["framecolour"] = settings.get_style("levers", "framecolour")
+    objects_common.schematic_objects[object_id]["lockcolourtype"] = settings.get_style("levers", "lockcolourtype")
     objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("levers", "buttoncolour")
     objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("levers", "textcolourtype")
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("levers", "textfonttuple")
@@ -190,19 +196,24 @@ def update_lever_styles(object_id, dict_of_new_styles:dict):
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     active_colour = objects_common.get_offset_colour(button_colour, brightness_offset=25)
     selected_colour = objects_common.get_offset_colour(button_colour, brightness_offset=50)
-    # Work out what the text colour should be (auto uses lightest of the three for max contrast)
+    # Work out what the button text colour should be (auto uses lightest of the three for max contrast)
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
-    text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
-    text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+    button_text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
+    button_text_colour = objects_common.get_text_colour(button_text_colour_type, selected_colour)
+    # Work out what the locked indication (on the frame) text colour should be
+    frame_colour = objects_common.schematic_objects[object_id]["framecolour"]
+    lock_text_colour_type = objects_common.schematic_objects[object_id]["lockcolourtype"]
+    lock_text_colour = objects_common.get_text_colour(lock_text_colour_type, frame_colour)
     # Update the styles of the library object
     levers.update_lever_styles(
             lever_id = objects_common.schematic_objects[object_id]["itemid"],
             font = objects_common.schematic_objects[object_id]["textfonttuple"],
-            frame_colour = objects_common.schematic_objects[object_id]["framecolour"],
+            frame_colour = frame_colour,
+            lock_text_colour = lock_text_colour,
             button_colour = button_colour,
             active_colour = active_colour,
             selected_colour = selected_colour,
-            text_colour = text_colour)
+            text_colour = button_text_colour)
     return()
 
 #------------------------------------------------------------------------------------
