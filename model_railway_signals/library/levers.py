@@ -188,10 +188,10 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         # Create the Tkinter drawing objects for the schematic object
         rectangle = canvas.create_rectangle(x-12,y,x+12,y+30 ,fill=frame_colour, width=1, tags=canvas_tag)
         canvas.create_window(x, y+33, window=button, anchor=Tk.N, tags=canvas_tag)
-        lever1a = canvas.create_line(x, y-12, x, y-25, fill=colour1, width=4, state="normal", tags=canvas_tag)
-        lever1b = canvas.create_line(x, y, x, y-12, fill=colour2, width=4, state="normal", tags=canvas_tag)
-        lever2a = canvas.create_line(x, y, x, y-10, fill=colour1, width=4, state="hidden", tags=canvas_tag)
-        lever2b = canvas.create_line(x, y, x, y+10, fill=colour2, width=4, state="hidden", tags=canvas_tag)
+        lever1a = canvas.create_line(x, y-12, x, y-25, fill=colour1, width=5, state="normal", tags=canvas_tag)
+        lever1b = canvas.create_line(x, y+5, x, y-12, fill=colour2, width=5, state="normal", tags=canvas_tag)
+        lever2a = canvas.create_line(x, y, x, y-10, fill=colour1, width=5, state="hidden", tags=canvas_tag)
+        lever2b = canvas.create_line(x, y, x, y+10, fill=colour2, width=5, state="hidden", tags=canvas_tag)
         locked = canvas.create_text(x, y+20, text="L", fill=lock_text_colour, font=("TkFixedFont",12,"bold"), tags=canvas_tag)
         # The 'Locked' Indication is initially hidden (as the lever is created "Unlocked"
         canvas.itemconfig(locked, state="hidden")
