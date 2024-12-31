@@ -134,6 +134,7 @@ default_settings["styles"]["signals"]["textcolourtype"] = 1   # 1=Auto, 2=Black,
 default_settings["styles"]["signals"]["textfonttuple"] = ("Courier", 8, "")
 default_settings["styles"]["levers"] = {}
 default_settings["styles"]["levers"]["framecolour"] = "Grey40"
+default_settings["styles"]["levers"]["lockcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["levers"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["levers"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["levers"]["textfonttuple"] = ("TkFixedFont", 8, "bold")
@@ -181,8 +182,13 @@ def set_all(new_settings):
                 if element not in settings[group].keys():
                     logging.debug("LOAD LAYOUT - Unexpected settings element '"+group+":"+element+"' - DISCARDED")
                 else:
-                    
-                    settings[group][element] = new_settings[group][element]
+                    # Following the introduction of 'styles' we now have sub elements that need
+                    # pulling across - if we just copy the element then we'll lose settings
+                    if type(settings[group][element]) == dict:
+                        for sub_element in new_settings[group][element]:
+                            settings[group][element][sub_element] = new_settings[group][element][sub_element]
+                    else:
+                        settings[group][element] = new_settings[group][element]
     # Now report any elements missing from the new configuration - intended to provide a
     # level of backward capability (able to load old config files into an extended config
     for group in settings:
@@ -196,6 +202,14 @@ def set_all(new_settings):
                 if element not in new_settings[group].keys():
                     logging.debug("LOAD LAYOUT - Missing settings element '"+group+":"+element+
                             "' - Assigning Default Value '"+ str(default_settings[group][element])+"'")
+                # Following the introduction of 'styles' we now have sub elements that need
+                # pulling across - if we just copy the element then we'll lose settinga
+                elif type(settings[group][element]) == dict:
+                    for sub_element in settings[group][element]:
+                        if sub_element not in new_settings[group][element].keys():
+                            logging.debug("LOAD LAYOUT - Missing settings sub-element '"+group+":"+
+                                        element+":"+sub_element+"' - Assigning Default Value '"+
+                                          str(default_settings[group][element][sub_element])+"'")
     # We always maintain the current version of the application
     settings["general"]["version"] = default_settings["general"]["version"]
     # Maintain the logging level across re-loads (use case - set debugging to see load warnings)
