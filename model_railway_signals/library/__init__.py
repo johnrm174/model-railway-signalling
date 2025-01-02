@@ -102,6 +102,8 @@ from .lines import line_exists
 from .lines import delete_line
 from .lines import set_line_colour
 from .lines import reset_line_colour
+from .lines import move_line_end_1
+from .lines import move_line_end_2
 
 from .text_boxes import create_text_box
 from .text_boxes import text_box_exists
@@ -131,6 +133,7 @@ from .dcc_control import subscribe_to_dcc_command_feed
 from .mqtt_interface import configure_mqtt_client
 from .mqtt_interface import mqtt_broker_connect
 from .mqtt_interface import mqtt_broker_disconnect
+from .mqtt_interface import get_node_status
 
 from .block_instruments import instrument_type
 from .block_instruments import create_instrument
@@ -204,6 +207,8 @@ __all__ = [
         'delete_line',
         'set_line_colour',
         'reset_line_colour',
+        'move_line_end_1',
+        'move_line_end_2',
       # public track sensor types/functions
         'create_track_sensor',
         'delete_track_sensor',
@@ -299,6 +304,7 @@ __all__ = [
         'configure_mqtt_client',
         'mqtt_broker_connect',
         'mqtt_broker_disconnect',
+        'get_node_status',
       # public block instrument types/functions
         'instrument_type',
         'create_instrument',
