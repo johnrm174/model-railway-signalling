@@ -159,7 +159,7 @@ class sound_file_element(common.entry_box):
         self.child_windows_open = True
         # Use the library resources folder for the initial path for the file dialog
         # But the user can navigate away and use another sound file from somewhere else
-        with importlib.resources.path ('model_railway_signals.library', 'resources') as initial_path:
+        with importlib.resources.files('model_railway_signals.library') / 'resources' as initial_path:
             filename = Tk.filedialog.askopenfilename(title='Select Audio File', initialdir = initial_path,
                     filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self.frame)
             # Try loading/playing the selected file - with an error popup if it fails
