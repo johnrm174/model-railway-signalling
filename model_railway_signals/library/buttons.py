@@ -64,7 +64,7 @@ import logging
 import enum
 import tkinter as Tk
 
-from ..editor.common import CreateToolTip
+from ..common import CreateToolTip
 
 from . import file_interface
 from . import dcc_control

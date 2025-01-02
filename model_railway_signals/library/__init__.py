@@ -41,6 +41,7 @@ from .signals_ground_position import create_ground_position_signal
 from .signals_ground_disc import create_ground_disc_signal
 
 from .points import point_type
+from .points import point_subtype
 from .points import create_point
 from .points import update_point_styles
 from .points import update_point_button_styles
@@ -72,6 +73,7 @@ from .track_sections import section_exists
 from .track_sections import delete_section
 from .track_sections import section_occupied
 from .track_sections import section_label
+from .track_sections import update_mirrored_section
 from .track_sections import update_section_styles
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
@@ -118,8 +120,10 @@ from .dcc_control import dcc_address_mapping
 from .dcc_control import map_dcc_signal
 from .dcc_control import map_semaphore_signal
 from .dcc_control import map_dcc_point
+from .dcc_control import map_dcc_switch
 from .dcc_control import delete_point_mapping
 from .dcc_control import delete_signal_mapping
+from .dcc_control import delete_switch_mapping
 from .dcc_control import reset_dcc_mqtt_configuration
 from .dcc_control import set_node_to_publish_dcc_commands
 from .dcc_control import subscribe_to_dcc_command_feed
@@ -138,6 +142,7 @@ from .block_instruments import reset_instruments_mqtt_configuration
 from .block_instruments import set_instruments_to_publish_state
 from .block_instruments import subscribe_to_remote_instruments
 
+from .buttons import button_type
 from .buttons import create_button
 from .buttons import update_button_styles
 from .buttons import button_exists
@@ -166,6 +171,7 @@ __all__ = [
         'configure_edit_mode',
       # Public point types/functions
         'point_type',
+        'point_subtype',
         'create_point',
         'update_point_styles',
         'update_point_button_styles',
@@ -251,6 +257,7 @@ __all__ = [
         'delete_section',
         'section_occupied',
         'section_label',
+        'update_mirrored_section',
         'update_section_styles',
         'set_section_occupied',
         'clear_section_occupied',
@@ -281,8 +288,10 @@ __all__ = [
         'map_dcc_signal',
         'map_semaphore_signal',
         'map_dcc_point',
+        'map_dcc_switch',
         'delete_point_mapping',
         'delete_signal_mapping',
+        'delete_switch_mapping',
         'reset_dcc_mqtt_configuration',
         'subscribe_to_dcc_command_feed',
         'set_node_to_publish_dcc_commands',
@@ -301,6 +310,7 @@ __all__ = [
         'subscribe_to_remote_instruments',
         'set_instruments_to_publish_state',
       # public Button types/functions
+        'button_type',
         'create_button',
         'update_button_styles',
         'button_exists',

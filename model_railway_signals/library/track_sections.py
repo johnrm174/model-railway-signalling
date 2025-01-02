@@ -600,7 +600,7 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
 # Public API function to Update the "Mirrored Section" Reference
 #---------------------------------------------------------------------------------------------
 
-def update_mirrored(section_id:int, mirror_id:str):
+def update_mirrored_section(section_id:int, mirror_id:str):
     global sections
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(section_id, int):
