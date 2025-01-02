@@ -32,6 +32,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 delay so point and signal changes can now be sequenced (to avoid overloading the DCC accessory bus on larger
 layouts which may require a large number of points and/or signals to be reset back to their default states)
 * Bugfix to the display of validation messages in the 'settings' windows on Apply/OK
+* Bugfix to Block Instruments sound file selection (due to breaking change in 'importlib' package)
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
