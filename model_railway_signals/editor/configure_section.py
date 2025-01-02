@@ -210,7 +210,7 @@ class section_interlocking_tab():
     def __init__(self, parent_tab):
         self.signals = common.signal_route_frame(parent_tab, label="Signals locked when section occupied",
                                     tool_tip="Edit the appropriate signals to configure interlocking")
-        self.signals.frame.pack(padx=2, pady=2, fill='x')
+        self.signals.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Class for the main Track Section automation tab
@@ -220,19 +220,19 @@ class section_automation_tab():
     def __init__(self, parent_tab):
         self.behind = common.signal_route_frame(parent_tab, label="Signals controlling access into section",
                                 tool_tip="Edit the appropriate signals to configure automation")
-        self.behind.frame.pack(padx=2, pady=2, fill='x')
+        self.behind.pack(padx=2, pady=2, fill='x')
         self.ahead = common.signal_route_frame(parent_tab, label="Signals controlling access out of section",
                                 tool_tip="Edit the appropriate signals to configure automation")
-        self.ahead.frame.pack(padx=2, pady=2, fill='x')
+        self.ahead.pack(padx=2, pady=2, fill='x')
         self.sensors1 = common.signal_route_frame(parent_tab, label="Sensors controlling access into section",
                                 tool_tip="Edit the appropriate track sensors to configure automation")
-        self.sensors1.frame.pack(padx=2, pady=2, fill='x')
+        self.sensors1.pack(padx=2, pady=2, fill='x')
         self.sensors2 = common.signal_route_frame(parent_tab, label="Sensors controlling access out of section",
                                 tool_tip="Edit the appropriate track sensors to configure automation")
-        self.sensors2.frame.pack(padx=2, pady=2, fill='x')
+        self.sensors2.pack(padx=2, pady=2, fill='x')
         self.override = common.signal_route_frame(parent_tab, label="Sigs overridden when section occupied",
                                 tool_tip="Edit the appropriate signals to configure automation")
-        self.override.frame.pack(padx=2, pady=2, fill='x')
+        self.override.pack(padx=2, pady=2, fill='x')
         
 #####################################################################################
 # Top level Class for the Edit Section window

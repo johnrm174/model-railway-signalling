@@ -17,8 +17,12 @@
 # Provides the following 'compound' UI elements for the application
 #    validated_dcc_command_entry() - combines int_entry_box and state_box
 #    point_interlocking_entry() - combines int_item_id_entry_box and state_box
-#    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes ################ TO REVIEW #########
-#    signal_route_frame() - read only list of signal_route_selections()  ######################### TO REVIEW #########
+#    route_selections() - A fixed row of FIVE state_boxes representing possible signal routes
+#    signal_route_selections() - combines int_item_id_entry_box and route selections (above)
+#
+# Provides the following 'extensible' UI elements for the application
+#
+#    signal_route_frame() - read only list of signal_route_selections
 #    row_of_widgets() - Pass in the base class to create a fixed length row of the base class
 #    row_of_validated_dcc_commands() - Similar to above but 'get_values' removes blanks 
 #    row_of_point_settings() - Similar to above but 'get_values' removes duplicates and blanks
@@ -40,6 +44,10 @@ from tkinter import colorchooser
 
 from ..library import dcc_control
 from ..library import points
+
+#####################################################################################
+############################ PRIMITIVE UI ELEMENTS ##################################
+#####################################################################################
 
 #------------------------------------------------------------------------------------
 # Class to create a tooltip for a tkinter widget - Acknowledgements to Stack Overflow
@@ -120,10 +128,6 @@ class CreateToolTip():
         tool_tip_window = self.tool_tip_window
         self.tool_tip_window= None
         if tool_tip_window: tool_tip_window.destroy()
-
-#####################################################################################
-########################### COMMON BASIC UI ELEMENTS ################################
-#####################################################################################
 
 #------------------------------------------------------------------------------------
 # Common class for a generic 'check_box' - Builds on the tkinter checkbutton class.
@@ -826,6 +830,10 @@ class scrollable_text_frame(Tk.Frame):
     def set_font(self, font:str, font_size:int, font_style:str):
         self.text_box.configure(font=(font, font_size, font_style))
 
+#####################################################################################
+############################ COMPOUND UI ELEMENTS ###################################
+#####################################################################################
+
 #------------------------------------------------------------------------------------
 # Compound UI element for a validated_dcc_command_entry [address:int, state:bool].
 # Uses the validated_dcc_entry_box and state_box classes, with the state_box only
@@ -934,6 +942,7 @@ class point_settings_entry(Tk.Frame):
     def disable(self):
         self.EB.disable()
         self.eb_updated()
+
     def set_value(self, point:[int, bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
         self.EB.set_value(point[0])
@@ -950,16 +959,74 @@ class point_settings_entry(Tk.Frame):
         self.set_value(point=[0, False])
 
 #------------------------------------------------------------------------------------
-# Class for a signal route selection element (Sig ID EB and route selection CBs)
-# Note the responsibility of the instantiating func/class to 'pack' the UI element
-#
+# Compound UI element for Route selection (route selection CBs) - Based on a Tk Frame
+# Public class instance methods provided are:
+#    "set_value" - will set the current selections [route_selections]
+#    "get_value" - will return the current selections [route_selections]
+#    "disable" - disables/blanks the entry box (and associated state buttons)
+#    "enable"  enables/loads the entry box (and associated state buttons)
+#    "pack"  for packing the compound UI element
+#------------------------------------------------------------------------------------
+
+class route_selections(Tk.Frame):
+    def __init__(self, parent_frame, tool_tip:str, read_only:bool=False):
+        # Create the Frame to hold all the elements
+        super().__init__(parent_frame)
+        # Create the UI Elements for each of the possible route selections
+        self.main = state_box(self, label_off="MAIN", label_on="MAIN",
+                width=5, tool_tip=tool_tip, read_only=read_only)
+        self.main.pack(side=Tk.LEFT)
+        self.lh1 = state_box(self, label_off="LH1", label_on="LH1",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.lh1.pack(side=Tk.LEFT)
+        self.lh2 = state_box(self, label_off="LH2", label_on="LH2",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.lh2.pack(side=Tk.LEFT)
+        self.rh1 = state_box(self, label_off="RH1", label_on="RH1",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.rh1.pack(side=Tk.LEFT)
+        self.rh2 = state_box(self, label_off="RH2", label_on="RH2",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.rh2.pack(side=Tk.LEFT)
+
+    def set_value(self, route_selections:[bool, bool, bool, bool, bool]):
+        # route_selections comprises a list of signal routes [main, lh1, lh2, rh1, rh2]
+        # Each element of the signal route a boolean (True/selected or False/deselected)
+        self.main.set_value(route_selections[0])
+        self.lh1.set_value(route_selections[1])
+        self.lh2.set_value(route_selections[2])
+        self.rh1.set_value(route_selections[3])
+        self.rh2.set_value(route_selections[4])
+
+    def get_value(self):
+        # route_selections comprises a list of signal routes [main, lh1, lh2, rh1, rh2]
+        # Each element of the signal route a boolean (True/selected or False/deselected)
+        return ( [self.main.get_value(), self.lh1.get_value(),self.lh2.get_value(),
+                            self.rh1.get_value(), self.rh2.get_value()] )
+
+    def disable(self):
+        self.main.disable()
+        self.lh1.disable()
+        self.lh2.disable()
+        self.rh1.disable()
+        self.rh2.disable()
+
+    def enable(self):
+        self.main.enable()
+        self.lh1.enable()
+        self.lh2.enable()
+        self.rh1.enable()
+        self.rh2.enable()
+
+#------------------------------------------------------------------------------------
+# Compoind UI element for signal and route selection (signal_id EB and route_selections)
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value [signal_routes_entry, current_sig_id]
 #    "get_value" - will return the last "valid" value [signal_routes_entry]
 #    "disable" - disables/blanks the entry box (and associated state buttons)
 #    "enable"  enables/loads the entry box (and associated state buttons)
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
+#    "pack"  for packing the compound UI element
 #------------------------------------------------------------------------------------
 
 class signal_route_selections(Tk.Frame):
@@ -979,43 +1046,20 @@ class signal_route_selections(Tk.Frame):
         self.EB.pack(side=Tk.LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value)
         if self.read_only: self.EB.configure(state="disabled")
-        # Create the UI Elements for each of the possible route selections
-        self.main = state_box(self, label_off="MAIN", label_on="MAIN",
-                width=5, tool_tip=tool_tip, read_only=read_only)
-        self.main.pack(side=Tk.LEFT)
-        self.lh1 = state_box(self, label_off="LH1", label_on="LH1",
-                width=4, tool_tip=tool_tip, read_only=read_only)
-        self.lh1.pack(side=Tk.LEFT)
-        self.lh2 = state_box(self, label_off="LH2", label_on="LH2",
-                width=4, tool_tip=tool_tip, read_only=read_only)
-        self.lh2.pack(side=Tk.LEFT)
-        self.rh1 = state_box(self, label_off="RH1", label_on="RH1",
-                width=4, tool_tip=tool_tip, read_only=read_only)
-        self.rh1.pack(side=Tk.LEFT)
-        self.rh2 = state_box(self, label_off="RH2", label_on="RH2",
-                width=4, tool_tip=tool_tip, read_only=read_only)
-        self.rh2.pack(side=Tk.LEFT)
+        self.routes = route_selections(self, tool_tip, read_only)
+        self.routes.pack(side=Tk.LEFT)
         # Add a spacer to improve the UI appearnace when used in a grid
         self.label2 = Tk.Label(self, width=1)
         self.label2.pack(side=Tk.LEFT)
+        # Set the initial state of the widget
         self.eb_updated()
 
     def eb_updated(self):
         # Enable/disable the checkboxes depending on the EB state
         if not self.read_only:
-            if self.EB.entry.get() == "":
-                self.main.disable()
-                self.lh1.disable()
-                self.lh2.disable()
-                self.rh1.disable()
-                self.rh2.disable()
-            else:
-                self.main.enable()
-                self.lh1.enable()
-                self.lh2.enable()
-                self.rh1.enable()
-                self.rh2.enable()
-    
+            if self.EB.entry.get() == "": self.routes.disable()
+            else: self.routes.enable()
+
     def validate(self):
         self.eb_updated()
         return(self.EB.validate())
@@ -1030,42 +1074,36 @@ class signal_route_selections(Tk.Frame):
 
     def set_value(self, signal_route):
         # The signal_route comprises [signal_route_entry, current_signal_id]
-        signal_route_entry = signal_route[0]
-        current_signal_id = signal_route[1]
-        # The signal_route_entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # The sig_id is an int and each route element is a boolean (True or False)
-        self.EB.set_value(signal_route_entry[0], current_signal_id)
-        self.main.set_value(signal_route_entry[1][0])
-        self.lh1.set_value(signal_route_entry[1][1])
-        self.lh2.set_value(signal_route_entry[1][2])
-        self.rh1.set_value(signal_route_entry[1][3])
-        self.rh2.set_value(signal_route_entry[1][4])
+        # The signal_route_entry comprises [signal_id, route_selections]
+        # route_selections comprises a list of routes [main, lh1, lh2, rh1, rh2]
+        # Each element of route_selections is a boolean (True/selected or False/deselected)
+        self.EB.set_value(signal_route[0][0], signal_route[1])
+        self.routes.set_value(signal_route[0][1])
         self.eb_updated()
 
     def get_value(self):
-        # The signal_route_entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # The sig_id is an int and each route element is a boolean (True or False)
-        return ( [ self.EB.get_value(), [ self.main.get_value(),
-                                          self.lh1.get_value(),
-                                          self.lh2.get_value(),
-                                          self.rh1.get_value(),
-                                          self.rh2.get_value() ] ])
+        # The returned value comprises [signal_id, route_selections]
+        # route_selections comprises a list of routes [main, lh1, lh2, rh1, rh2]
+        # Each element of route_selections is a boolean (True/selected or False/deselected)
+        return ( [ self.EB.get_value(), [ self.routes.get_value()] ])
+
+#####################################################################################
+############################ EXTENSIBLE UI ELEMENTS #################################
+#####################################################################################
 
 #------------------------------------------------------------------------------------
 # Compound UI Element for a "read only" signal_route_frame (LabelFrame) - creates a 
 # variable number of instances of the signal_route_selection_element when "set_values" 
-# is called (according to the length of the supplied list). Note the responsibility of
-# the instantiating func/class to 'pack' the Frame of the UI element.
+# is called (according to the length of the supplied list).
 #
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of  signals and their routes
-######################## TO REVIEW AND POSSIBLY REFACTOR ############################
 #------------------------------------------------------------------------------------
 
-class signal_route_frame():
-    def __init__(self, parent_frame, label:str, tool_tip:str):
+class signal_route_frame(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str, tool_tip:str, border_width=2):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = Tk.LabelFrame(parent_frame, text=label)
+        super().__init__(parent_frame, text=label, borderwidth=border_width)
         # These are the lists that hold the references to the subframes and subclasses
         self.tooltip = tool_tip
         self.sigelements = []
@@ -1075,7 +1113,7 @@ class signal_route_frame():
         # If the lists are not empty (case of "reloading" the config) then destroy
         # all the UI elements and create them again (the list may have changed)
         if self.subframe: self.subframe.destroy()
-        self.subframe = Tk.Frame(self.frame)
+        self.subframe = Tk.Frame(self)
         self.subframe.pack()
         self.sigelements = []
         # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
@@ -1094,7 +1132,7 @@ class signal_route_frame():
             self.label.pack()
 
 #------------------------------------------------------------------------------------
-# Base Class for a fixed length row_of_widgets of the specified base class.
+# Base Class for a (fixed length) row_of_widgets of the specified base class.
 # All of the kwargs are passed through to the specified base class on creation.
 # If the list provided to 'set_values' contains less values than the number of widgets in the
 # row then the remaining widgets will be reset to their default state. If the list contains
@@ -1159,7 +1197,7 @@ class row_of_widgets(Tk.Frame):
             widget.disable()
 
 #------------------------------------------------------------------------------------
-# Class for a fixed row_of_validated_dcc_commands - builds on the row_of_widgets class
+# Class for a (fixed length) row_of_validated_dcc_commands - builds on the row_of_widgets
 # The set_values function is overridden as we need to provide the current item_id to
 # all validated_dcc_command_entry elements for validation purposes, even if we aren't
 # setting values for them. The get_values function is overridden to remove any blank
@@ -1205,7 +1243,7 @@ class row_of_validated_dcc_commands(row_of_widgets):
         return(values_to_return)
 
 #------------------------------------------------------------------------------------
-# Class for a fixed row_of_point_settings - builds on the row_of_widgets class
+# Class for a (fixed length) row_of_point_settings - builds on the row_of_widgets class
 # The get_values function is overridden to remove blanks (id=0) and duplicates
 #
 # Main class methods used by the editor are:
@@ -1335,7 +1373,7 @@ class grid_of_widgets(Tk.Frame):
                 widget.disable()
 
 #------------------------------------------------------------------------------------
-# Class for a variable grid_of_generic_entry boxes - builds on the grid_of_widgets class
+# Class for a grid_of_generic_entry boxes - builds on the grid_of_widgets class
 # The get_values function is overridden to remove blanks and/or duplicates
 #
 # Main class methods used by the editor are:
@@ -1461,9 +1499,9 @@ class object_id_selection(integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class selection_buttons(Tk.LabelFrame):
-    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, border_width=2, button_labels=("None")):
         # Create the labelframe to hold the buttons
-        super().__init__(parent_frame, text=label)
+        super().__init__(parent_frame, text=label, borderwidth=border_width)
         self.value = Tk.IntVar(self, 0)
         self.callback = callback
         # Create a subframe to center the buttons in the label frame
@@ -1511,9 +1549,9 @@ class selection_buttons(Tk.LabelFrame):
 #------------------------------------------------------------------------------------
 
 class selection_check_boxes(Tk.LabelFrame):
-    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, button_labels=("None")):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, border_width=2, button_labels=("None")):
         # Create the labelframe to hold the buttons
-        super().__init__(parent_frame, text=label)
+        super().__init__(parent_frame, text=label, borderwidth=border_width)
         self.callback = callback
         # Create a subframe to center the buttons in the label frame
         self.subframe=Tk.Frame(self)

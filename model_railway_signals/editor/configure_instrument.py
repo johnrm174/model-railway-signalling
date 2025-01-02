@@ -246,7 +246,7 @@ class instrument_interlocking_tab():
     def __init__(self, parent_tab):
         self.signals = common.signal_route_frame(parent_tab, label="Signals interlocked with instrument",
                                 tool_tip="Edit the appropriate signals to configure interlocking")
-        self.signals.frame.pack(padx=2, pady=2, fill='x')
+        self.signals.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Top level Class for the Edit Block Instrument window
