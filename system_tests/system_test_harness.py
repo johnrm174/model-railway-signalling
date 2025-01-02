@@ -153,9 +153,9 @@ import threading
 
 import sys
 sys.path.append("..")
-from model_railway_signals.editor import editor
-from model_railway_signals.editor import schematic
-from model_railway_signals.editor import objects
+from model_railway_signals import editor
+from model_railway_signals import schematic
+from model_railway_signals import objects
 from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals

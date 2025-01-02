@@ -282,27 +282,27 @@ def run_track_section_library_tests():
     track_sections.section_state_toggled(2)
     assert not track_sections.section_occupied(2)
     assert not track_sections.section_occupied(7)
-    print("Library Tests - update_mirrored - 9 errors will be generated")
+    print("Library Tests - update_mirrored_section - 9 errors will be generated")
     # Set up the sections to be mirrored with a known state
     track_sections.update_identifier(3,"Train60")
     track_sections.clear_section_occupied(3)
     track_sections.update_identifier(4,"Train61")
     track_sections.set_section_occupied (3)
     # update the mirrored id references (note we do 5 and 6 twice to exersise the "do we update or not" code)
-    track_sections.update_mirrored(5,"3")           # success
-    track_sections.update_mirrored(6,"4")           # success
-    track_sections.update_mirrored(5,"3")           # success
-    track_sections.update_mirrored(6,"4")           # success
-    track_sections.update_mirrored(6,"box1-1")      # success
-    track_sections.update_mirrored("1","5")         # Fail - Section ID not an int
-    track_sections.update_mirrored(8,"5")           # Fail - Section ID does not exist
-    track_sections.update_mirrored(1,8)             # Fail - Mirrored ID not a str
-    track_sections.update_mirrored(1,"1")           # Fail - Mirrored ID Same as Section ID
-    track_sections.update_mirrored(1,"0")           # Fail - Local Mirrored ID out of range
-    track_sections.update_mirrored(1,"1000")        # Fail - Local Mirrored ID out of range
-    track_sections.update_mirrored(1,"box1")        # Fail - Remote Mirrored ID invalid
-    track_sections.update_mirrored(1,"box1-0")      # Fail - Remote Mirrored ID invalid
-    track_sections.update_mirrored(1,"box1-1000")   # Fail - Remote Mirrored ID invalid
+    track_sections.update_mirrored_section(5,"3")           # success
+    track_sections.update_mirrored_section(6,"4")           # success
+    track_sections.update_mirrored_section(5,"3")           # success
+    track_sections.update_mirrored_section(6,"4")           # success
+    track_sections.update_mirrored_section(6,"box1-1")      # success
+    track_sections.update_mirrored_section("1","5")         # Fail - Section ID not an int
+    track_sections.update_mirrored_section(8,"5")           # Fail - Section ID does not exist
+    track_sections.update_mirrored_section(1,8)             # Fail - Mirrored ID not a str
+    track_sections.update_mirrored_section(1,"1")           # Fail - Mirrored ID Same as Section ID
+    track_sections.update_mirrored_section(1,"0")           # Fail - Local Mirrored ID out of range
+    track_sections.update_mirrored_section(1,"1000")        # Fail - Local Mirrored ID out of range
+    track_sections.update_mirrored_section(1,"box1")        # Fail - Remote Mirrored ID invalid
+    track_sections.update_mirrored_section(1,"box1-0")      # Fail - Remote Mirrored ID invalid
+    track_sections.update_mirrored_section(1,"box1-1000")   # Fail - Remote Mirrored ID invalid
     print("Library Tests - set_sections_to_publish_state - 4 Errors and 2 warnings will be generated")    
     assert len(track_sections.list_of_sections_to_publish) == 0
     track_sections.set_sections_to_publish_state(1,2,20)    # Valid
