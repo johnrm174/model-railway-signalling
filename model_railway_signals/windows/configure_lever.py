@@ -70,28 +70,35 @@ def has_associated_distant(signal_object):
 class signal_configuration(Tk.LabelFrame):
     def __init__(self, parent_window):
         super().__init__(parent_window, text="Signal to switch")
-        # Create a frame to center everything in
-        self.frame = Tk.Frame(self)
-        self.frame.pack()
+        # Create a sub frame to center the signal ID and main selection elements in
+        self.frame1 = Tk.Frame(self)
+        self.frame1.pack()
         # Create the signal ID element
-        self.label1 = Tk.Label(self.frame, text="Signal ID:")
+        self.label1 = Tk.Label(self.frame1, text="Signal ID:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.signalid = common.int_item_id_entry_box(self.frame, tool_tip="Enter the ID of the signal to switch",
-                                    callback=self.signal_id_updated, exists_function=library.signal_exists)
+        self.signalid = common.int_item_id_entry_box(self.frame1, tool_tip="Enter the ID of the signal to control "+
+                            "with the lever", callback=self.signal_id_updated, exists_function=library.signal_exists)
         self.signalid.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create the Selection radio buttons
         self.signal_selection = Tk.IntVar(self, 0)
-        self.button1 = Tk.Radiobutton(self.frame, text="Signal", variable=self.signal_selection, value=1)
+        self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.button2 = Tk.Radiobutton(self.frame, text="Subsidary", variable=self.signal_selection, value=2)
+        self.button1TT = common.CreateToolTip(self.button1, text="Select to control the main signal aspect/am")
+        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.button3 = Tk.Radiobutton(self.frame, text="Dist arm", variable=self.signal_selection, value=3)
+        self.button2TT = common.CreateToolTip(self.button2, text="Select to control the subsidary signal aspect/arm")
+        self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3)
         self.button3.pack(padx=2, pady=2, side=Tk.LEFT)
-        # Create the route selection elements
-        self.routes = common.selection_buttons(self, label="", border_width=0,
-                    tool_tip="Select the text colour (auto to select 'best' contrast with background)",
-                    button_labels=("ALL", "MAIN", "LH1", "LH2", "RH1", "RH2"))
+        self.button3TT = common.CreateToolTip(self.button3, text="Select to control the distant signal arm "+
+                                              "(semaphore home signals with secondary distant arms only)")
+        # Create the route selection elements (in another subframe to center everything)
+        self.frame2 = Tk.Frame(self)
+        self.frame2.pack()
+        self.label2 = Tk.Label(self.frame2, text="Signal Routes:")
+        self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.routes = common.route_selections(self.frame2, tool_tip="Select the signal route(s) to control with the lever")
         self.routes.pack(padx=2, pady=2, fill='x')
+        
     def signal_id_updated(self):
         if self.signalid.get_value() > 0:
             self.button1.configure(state="normal")
@@ -112,13 +119,18 @@ class signal_configuration(Tk.LabelFrame):
             self.button2.configure(state="disabled")
             self.button3.configure(state="disabled")
 
-    def set_values(self, signal_id:int, signal_selection:int):
+    def set_values(self, signal_id:int, signal_selection:int, signal_routes:list):
+        # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        # Where each element is a bool (TRUE/FALSE)
         self.signalid.set_value(signal_id)
         self.signal_selection.set(signal_selection)
+        self.routes.set_value(signal_routes)
         self.signal_id_updated()
 
     def get_values(self):
-        return(self.signalid.get_value(), self.signal_selection.get())
+         # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        # Where each element is a bool (TRUE/FALSE)
+       return(self.signalid.get_value(), self.signal_selection.get(), self.routes.get_value())
     
     def validate(self):
         valid = self.signalid.validate()
@@ -127,10 +139,12 @@ class signal_configuration(Tk.LabelFrame):
     
     def enable(self):
         self.signalid.enable()
+        self.routes.enable()
         self.signal_id_updated()
     
     def disable(self):
         self.signalid.disable()
+        self.routes.disable()
         self.signal_id_updated()
 
 #------------------------------------------------------------------------------------
@@ -140,7 +154,7 @@ class signal_configuration(Tk.LabelFrame):
 class point_configuration(Tk.LabelFrame):
     def __init__(self, parent_window):
         super().__init__(parent_window, text="Point to switch")
-        # Create a frame to center everything in
+        # Create a subframe to center everything in
         self.frame = Tk.Frame(self)
         self.frame.pack()
         # Create the signal ID element
@@ -153,10 +167,15 @@ class point_configuration(Tk.LabelFrame):
         self.point_selection = Tk.IntVar(self, 0)
         self.button1 = Tk.Radiobutton(self.frame, text="Point", variable=self.point_selection, value=1)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.button1TT = common.CreateToolTip(self.button1, text="Select to control the switching of the point")
         self.button2 = Tk.Radiobutton(self.frame, text="FPL", variable=self.point_selection, value=2)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.button2TT = common.CreateToolTip(self.button2, text="Select to control the Facing Point Lock "+
+                                                    "(if the FPL is to be controlled seperately to the point)")
         self.button3 = Tk.Radiobutton(self.frame, text="Point/FPL", variable=self.point_selection, value=3)
         self.button3.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.button3TT = common.CreateToolTip(self.button3, text="Select to control the point switching and "+
+                                             "Facing Point Lock together (points with Facing Point Locks only)")
                                                      
     def point_id_updated(self):
         if self.pointid.get_value() > 0:
@@ -194,7 +213,65 @@ class point_configuration(Tk.LabelFrame):
     def disable(self):
         self.pointid.disable()
         self.point_id_updated()
+
+#------------------------------------------------------------------------------------
+# Classes for the keycode configuration class (used twice)
+#------------------------------------------------------------------------------------
+
+class character_entry(common.entry_box):
+    def __init__(self, parent_window, callback, tool_tip):
+        super().__init__(parent_window, width=2, callback=callback, tool_tip=tool_tip)
         
+    def validate(self, update_validation_status=True):
+        if len(self.entry.get()) > 1:
+            self.TT.text = ("Can only specify a single character (or leave blank)")
+            valid = False
+        else:
+            valid = True
+        if update_validation_status: self.set_validation_status(valid)            
+        return(valid)
+
+class keycode_configuration(Tk.LabelFrame):
+    def __init__(self, parent_window, label:str):
+        super().__init__(parent_window, text=label)
+        # Create a subframe to center everything in
+        self.frame = Tk.Frame(self)
+        self.frame.pack(padx=2, pady=2)
+        self.label1=Tk.Label(self.frame, text="Character:")
+        self.label1.pack(side=Tk.LEFT)
+        tool_tip = "Specify the keyboard character OR the Unicode value of the keyboard character"
+        self.character=character_entry(self.frame, callback=self.character_updated,
+                                    tool_tip="Enter the required keyboard character")
+        self.character.pack(side=Tk.LEFT)
+        self.label2=Tk.Label(self.frame, text="   Unicode value:")
+        self.label2.pack(side=Tk.LEFT)
+        self.unicode=common.integer_entry_box(self.frame, width=4, min_value=0, max_value=1023,
+                callback=self.unicode_updated, tool_tip="Specify the unicode value of the required keyboard character")
+        self.unicode.pack(side=Tk.LEFT)
+
+    def character_updated(self):
+        if self.character.validate() and len(self.character.get_value()) == 1:
+            self.unicode.set_value(ord(self.character.get_value()))
+        else:
+            self.unicode.set_value(0)
+        
+    def unicode_updated(self):
+        if self.unicode.validate() and self.unicode.get_value() > 0:
+            self.character.set_value(chr(self.unicode.get_value()))
+        else:
+            self.character.set_value("")
+    
+    def validate(self):
+        return (self.character.validate() and self.unicode.validate())
+    
+    def set_value(self, character:str):
+        self.character.set_value(character)
+        self.character_updated()
+
+    def get_value(self):
+        return (self.character.get_value())
+
+
 #####################################################################################
 # Top level Class for the Edit Signalbox Lever window
 # This window doesn't have any tabs (unlike other object configuration windows)
@@ -220,16 +297,26 @@ class edit_lever():
             # to provide consistent behavior with the other configure object popup windows)
             self.main_frame = Tk.Frame(self.window)
             self.main_frame.pack(padx=2, pady=2)
-            # Create the UI element for the lever type selection
-            self.levertype = common.selection_buttons(self.main_frame, "Signalbox lever type", tool_tip =
+            # Create the UI element for the Lever ID and lever type selection
+            self.frame1 = Tk.Frame(self.main_frame)
+            self.frame1.pack(fill='x')
+            self.leverid = common.object_id_selection(self.frame1, "Lever ID",
+                                    exists_function = library.lever_exists) 
+            self.leverid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            self.levertype = common.selection_buttons(self.frame1, "Signalbox lever type", tool_tip =
                                         "Select the type of signalbox lever", callback=self.lever_type_changed,
-                                     button_labels=("Spare (unused)", "Signal lever", "Point lever"))
+                                     button_labels=("Spare", "Signal", "Point"))
             self.levertype.pack(padx=2, pady=2, fill='x')
             # Create the signal and point selection elements
             self.signal = signal_configuration(self.main_frame)
             self.signal.pack(padx=2, pady=2, fill='x')
             self.point = point_configuration(self.main_frame)
             self.point.pack(padx=2, pady=2, fill='x')
+            # Create the keypress event mappings
+            self.offkeypress = keycode_configuration(self.main_frame, label="Keypress event to 'pull' lever")
+            self.offkeypress.pack(padx=2, pady=2, fill='x')
+            self.onkeypress = keycode_configuration(self.main_frame, label="Keypress event to 'reset' lever")
+            self.onkeypress.pack(padx=2, pady=2, fill='x')
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
@@ -288,10 +375,14 @@ class edit_lever():
             elif objects.schematic_objects[self.object_id]["switchfpl"]: point_lever_subtype = 2
             elif objects.schematic_objects[self.object_id]["switchpointandfpl"]: point_lever_subtype = 3
             else: point_lever_subtype = 0
+            signal_routes = objects.schematic_objects[self.object_id]["signalroutes"]
             # Set the Initial UI state from the current object settings
+            self.leverid.set_value(item_id)
             self.levertype.set_value(lever_selection)
-            self.signal.set_values(linked_signal, signal_lever_subtype)
+            self.signal.set_values(linked_signal, signal_lever_subtype, signal_routes)
             self.point.set_values(linked_point, point_lever_subtype)
+            self.onkeypress.set_value(objects.schematic_objects[self.object_id]["onkeypress"])
+            self.offkeypress.set_value(objects.schematic_objects[self.object_id]["offkeypress"])
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
@@ -303,20 +394,25 @@ class edit_lever():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
-        elif self.point.validate() and self.signal.validate():
+        elif ( self.leverid.validate() and self.point.validate() and self.signal.validate() and
+               self.onkeypress.validate() and self.offkeypress.validate() ):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
+            new_object_configuration["itemid"] = self.leverid.get_value()
+            new_object_configuration["onkeypress"] = self.onkeypress.get_value()
+            new_object_configuration["offkeypress"] = self.offkeypress.get_value()
             point_id, point_lever_subtype = self.point.get_values()
             new_object_configuration["linkedpoint"] = point_id
             new_object_configuration["switchpoint"] = (point_lever_subtype == 1)
             new_object_configuration["switchfpl"] = (point_lever_subtype == 2)
             new_object_configuration["switchpointandfpl"] = (point_lever_subtype == 3)
-            signal_id, signal_lever_subtype = self.signal.get_values()
+            signal_id, signal_lever_subtype, signal_routes = self.signal.get_values()
             new_object_configuration["linkedsignal"] = signal_id
             new_object_configuration["switchsignal"] = (signal_lever_subtype == 1)
             new_object_configuration["switchsubsidary"] = (signal_lever_subtype == 2)
             new_object_configuration["switchdistant"] = (signal_lever_subtype == 3)
+            new_object_configuration["signalroutes"] = signal_routes
             # Work out the lever type (signal, point or spare) and subtype
             lever_type = library.lever_type.spare.value
             if point_id > 0:

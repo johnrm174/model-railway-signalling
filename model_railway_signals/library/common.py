@@ -7,6 +7,10 @@
 #
 #   set_root_window(root) - initialise the library with the root window reference
 #
+#   get_keyboard_mapping(char) - To test if a keyboard character has been mapped to an object event
+#                        If mapped the return will be a tupl containing the mapping_type(str) and the
+#                        mapped item_id (int). If not mapped, the returned value will be 'None'
+#
 #   orderly_shutdown() - perform an orderly shutdown of the library functions by scheduling
 #                        a sequence of shutdown tasks in the root.main_loop to try and avoid
 #                        any exceptions caused by subsequent MQTT and GPIO events.
@@ -56,6 +60,37 @@ shutdown_initiated = False
 event_queue = queue.Queue()
 
 #-------------------------------------------------------------------------
+# Functions to configure, manage and handle callbacks for keyboard events
+# The keyboard mappings dict contains a list of all mapped event callbacks
+# The 'key' is the character, the data is a tuple of (item, id, function)
+# We use this 'global' bind method rather than binding individual keypresses
+# as it will support all Unicode characters (the other just supports ASCII)
+#-------------------------------------------------------------------------
+
+keyboard_mappings= {}
+
+def keyboard_handler(event):
+    if len(event.char) == 1 and event.char in keyboard_mappings:
+        keyboard_mappings[event.char][2] (keyboard_mappings[event.char][1])
+
+def add_keyboard_event(character:str, item:str, item_id:int, function):
+    global keyboard_mappings
+    keyboard_mappings[character] = (item, item_id, function)
+
+def delete_keyboard_event(character:str):
+    global keyboard_mappings
+    del(keyboard_mappings[character])
+    return()
+
+def get_keyboard_mapping(character:str):
+    keyboard_mapping = None
+    if not isinstance(character, str) or not len(character) == 1:
+        logging.error("library.common.keyboard_mapping_exists - invalid character specified: "+str(character))
+    elif character in keyboard_mappings.keys():
+        keyboard_mapping = (keyboard_mappings[character][0], keyboard_mappings[character][1])
+    return(keyboard_mapping)
+
+#-------------------------------------------------------------------------
 # Function to set the tkinter "root" window reference as this is used to
 # schedule callback events in the main tkinter event loop using the 'after'
 # method and also for feeding custom callback functions into the main tkinter
@@ -69,6 +104,10 @@ def set_root_window(root):
     root_window = root
     # bind the tkinter event for handling events raised in external threads
     root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
+    # Bind a handler for any keypress events used to trigger library events such
+    # as switching signalbox levers or Sensor Triggered events. Note that any
+    # specific tkinter event bindings elsewhere in the code will still work.
+    root.bind("<Key>", keyboard_handler)
     return()
 
 #-------------------------------------------------------------------------

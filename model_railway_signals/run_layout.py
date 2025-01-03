@@ -763,11 +763,19 @@ def process_all_signal_interlocking():
         for str_lever_id in objects.lever_index:
             lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
             if lever_object["linkedsignal"] == int_signal_id:
-                if lever_object["switchsignal"] and signal_can_be_unlocked:
+                # Find the current 'route' for the signal and see if the lever is configured to switch
+                # the current signal route - This allows different levers to switch different signal arms
+                signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
+                if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
+                    lever_valid_for_route = True
+                else:
+                    lever_valid_for_route = False
+                # Lock or unlock the signal lever as appropriate
+                if lever_object["switchsignal"] and lever_valid_for_route and signal_can_be_unlocked:
                     library.unlock_lever(int(str_lever_id))
-                elif lever_object["switchsubsidary"] and subsidary_can_be_unlocked:
+                elif lever_object["switchsubsidary"] and lever_valid_for_route and subsidary_can_be_unlocked:
                     library.unlock_lever(int(str_lever_id))
-                elif lever_object["switchdistant"] and distant_arms_can_be_unlocked:
+                elif lever_object["switchdistant"] and lever_valid_for_route and distant_arms_can_be_unlocked:
                     library.unlock_lever(int(str_lever_id))
                 else:
                     library.lock_lever(int(str_lever_id))
@@ -957,11 +965,22 @@ def update_all_signalbox_levers():
             # signal configuration being changed (to remove these) after the lever was configured.
             subsidary = has_subsidary(linked_signal)
             dist_arms = has_distant_arms(linked_signal)
-            if lever_object["switchsignal"] and lever_switched != library.signal_clear(linked_signal):
+            # Find the current 'route' for the signal and see if the lever is configured to switch
+            # the current signal route - This allows different levers to switch different signal arms
+            signal_route = find_valid_route(objects.signal(linked_signal),"pointinterlock")
+            if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
+                lever_valid_for_route = True
+            else:
+                lever_valid_for_route = False
+            # Switch the lever according to the state of the signal
+            if (lever_object["switchsignal"] and lever_valid_for_route and
+                                    lever_switched != library.signal_clear(linked_signal)):
                 library.toggle_lever(int(str_lever_id))
-            elif lever_object["switchsubsidary"] and subsidary and lever_switched != library.subsidary_clear(linked_signal):
+            elif (lever_object["switchsubsidary"] and subsidary and lever_valid_for_route and
+                                    lever_switched != library.subsidary_clear(linked_signal)):
                 library.toggle_lever(int(str_lever_id))
-            elif lever_object["switchdistant"] and dist_arms and lever_switched != library.signal_clear(linked_signal + 1000):
+            elif (lever_object["switchdistant"] and dist_arms and lever_valid_for_route and
+                                    lever_switched != library.signal_clear(linked_signal + 1000)):
                 library.toggle_lever(int(str_lever_id))
         elif linked_point > 0:
             # We always check if the point has a FPL (before switching the FPL) to cover the case of a
@@ -1188,13 +1207,23 @@ def lever_switched_callback(lever_id:int):
         # signal configuration being changed (to remove these) after the lever was configured.
         subsidary = has_subsidary(linked_signal)
         dist_arms = has_distant_arms(linked_signal)
-        if lever_object["switchsignal"] and lever_switched != library.signal_clear(linked_signal):
+        # Find the current 'route' for the signal and see if the lever is configured to switch
+        # the current signal route - This allows different levers to switch different signal arms
+        signal_route = find_valid_route(objects.signal(linked_signal),"pointinterlock")
+        if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
+            lever_valid_for_route = True
+        else:
+            lever_valid_for_route = False
+        # Switch the signal, subsidary and/or distant arm as required
+        if lever_object["switchsignal"] and lever_valid_for_route and lever_switched != library.signal_clear(linked_signal):
             library.toggle_signal(linked_signal)
             signal_switched_callback(linked_signal)
-        elif (lever_object["switchsubsidary"] and subsidary and lever_switched != library.subsidary_clear(linked_signal)):
+        elif (lever_object["switchsubsidary"] and subsidary and lever_valid_for_route and
+                            lever_switched != library.subsidary_clear(linked_signal)):
             library.toggle_subsidary(linked_signal)
             subsidary_switched_callback(linked_signal)
-        elif (lever_object["switchdistant"] and dist_arms and lever_switched != library.signal_clear(linked_signal + 1000)):
+        elif (lever_object["switchdistant"] and dist_arms and lever_valid_for_route and
+                            lever_switched != library.signal_clear(linked_signal + 1000)):
             library.toggle_signal(linked_signal + 1000)
             signal_switched_callback(linked_signal)
     elif linked_point > 0:

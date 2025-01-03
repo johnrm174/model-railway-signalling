@@ -11,6 +11,10 @@
 #    delete_lever_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_lever_object(object_id) - Redraw the object on the canvas following an update
 #    default_lever_object - The dictionary of default values for the object
+#    remove_references_to_signal(signal_id) - remove signal_id references from the lever's configuration
+#    update_references_to_signal(old_id, new_id) - update signal_id references in the lever's configuration
+#    remove_references_to_point(point_id) - remove point_id references from the lever's configuration
+#    update_references_to_point(old_id, new_id) - update point_id references in the lever's configuration
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default application styles for the object
@@ -59,11 +63,56 @@ default_lever_object["linkedpoint"] = 0
 default_lever_object["switchsignal"] = False
 default_lever_object["switchsubsidary"] = False
 default_lever_object["switchdistant"] = False
+default_lever_object["signalroutes"] = [True, True, True, True, True]
 default_lever_object["switchpointandfpl"] = False
 default_lever_object["switchpoint"] = False
 default_lever_object["switchfpl"] = False
-default_lever_object["onkeypress"] = "q"
-default_lever_object["offkeypress"] = "w"
+default_lever_object["onkeypress"] = ""
+default_lever_object["offkeypress"] = ""
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Point from the Lever's configuration.
+#------------------------------------------------------------------------------------
+
+def remove_references_to_point(point_id:int):
+    for lever_id in objects_common.lever_index:
+        current_point_id = objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedpoint"]
+        if current_point_id == point_id:
+            objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedpoint"] = 0
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Point in the Lever's configuration
+#------------------------------------------------------------------------------------
+
+def update_references_to_point(old_point_id:int, new_point_id:int):
+    for lever_id in objects_common.lever_index:
+        current_point_id = objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedpoint"]
+        if current_point_id == old_point_id:
+            objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedpoint"] = new_point_id
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Signal from the Lever's configuration.
+#------------------------------------------------------------------------------------
+
+def remove_references_to_signal(signal_id:int):
+    for lever_id in objects_common.lever_index:
+        current_signal_id = objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedsignal"]
+        if current_signal_id == signal_id:
+            objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedsignal"] = 0
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Signal in the Lever's configuration
+#------------------------------------------------------------------------------------
+
+def update_references_to_signal(old_signal_id:int, new_signal_id:int):
+    for lever_id in objects_common.lever_index:
+        current_signal_id = objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedsignal"]
+        if current_signal_id == old_signal_id:
+            objects_common.schematic_objects[objects_common.lever(lever_id)]["linkedsignal"] = new_signal_id
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to to update a lever object following a configuration change
@@ -178,6 +227,7 @@ def paste_lever(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["switchfpl"] = default_lever_object["switchfpl"]
     objects_common.schematic_objects[new_object_id]["onkeypress"] = default_lever_object["onkeypress"]
     objects_common.schematic_objects[new_object_id]["offkeypress"] = default_lever_object["offkeypress"]
+    objects_common.schematic_objects[new_object_id]["signalroutes"] = default_lever_object["signalroutes"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object

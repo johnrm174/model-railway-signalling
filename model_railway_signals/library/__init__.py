@@ -11,6 +11,7 @@ from .common import set_root_window
 from .common import orderly_shutdown
 from .common import instant_shutdown
 from .common import configure_edit_mode
+from .common import get_keyboard_mapping
 
 from .signals import signal_type
 from .signals import signal_subtype

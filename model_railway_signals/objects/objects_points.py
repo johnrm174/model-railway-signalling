@@ -25,6 +25,8 @@
 #    objects_sensors.remove_references_to_point - called when the point is deleted
 #    objects_routes.update_references_to_point - called when the point ID is changed
 #    objects_routes.remove_references_to_point - called when the point is deleted
+#    objects_levers.update_references_to_point - called when the point ID is changed
+#    objects_levers.remove_references_to_point - called when the point is deleted
 #
 # Accesses the following external editor objects directly:
 #    run_layout.point_switched_callback - to set the callbacks when creating/recreating
@@ -59,6 +61,7 @@ from . import objects_common
 from . import objects_signals
 from . import objects_sensors
 from . import objects_routes
+from . import objects_levers
 from .. import run_layout
 from .. import settings
 from .. import library
@@ -190,6 +193,7 @@ def update_point(object_id, new_object_configuration):
         objects_signals.update_references_to_point(old_item_id, new_item_id)
         objects_sensors.update_references_to_point(old_item_id, new_item_id)
         objects_routes.update_references_to_point(old_item_id, new_item_id)
+        objects_levers.update_references_to_point(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -362,6 +366,7 @@ def delete_point(object_id):
     objects_signals.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
     objects_sensors.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
     objects_routes.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
+    objects_levers.remove_references_to_point(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

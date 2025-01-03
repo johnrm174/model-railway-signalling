@@ -27,6 +27,8 @@
 #    objects_points.reset_point_interlocking_tables() - recalculate interlocking tables 
 #    objects_routes.update_references_to_signal - called when the signal ID is changed
 #    objects_routes.remove_references_to_signal - called when the signal is deleted
+#    objects_levers.update_references_to_signal - called when the signal ID is changed
+#    objects_levers.remove_references_to_signal - called when the signal is deleted
 #
 # Accesses the following external editor objects directly:
 #    run_layout.signal_switched_callback - setting the object callbacks when created/recreated
@@ -71,6 +73,7 @@ import copy
 from . import objects_common
 from . import objects_points
 from . import objects_routes
+from . import objects_levers
 from .. import run_layout
 from .. import settings
 from .. import library
@@ -419,6 +422,7 @@ def update_signal(object_id, new_object_configuration):
         update_references_to_signal(old_item_id, new_item_id)
         # Update any references to the signal in the route tables
         objects_routes.update_references_to_signal(old_item_id, new_item_id)
+        objects_levers.update_references_to_signal(old_item_id, new_item_id)
     # Recalculate point interlocking tables in case they are affected
     objects_points.reset_point_interlocking_tables()
     return()
@@ -797,6 +801,7 @@ def delete_signal(object_id):
     remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
     # Remove any references to the signal from the schematic route tables
     objects_routes.remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
+    objects_levers.remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])
