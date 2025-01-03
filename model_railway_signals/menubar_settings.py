@@ -34,7 +34,7 @@
 #
 # Uses the following library functions:
 #    library.get_list_of_available_gpio_ports() - to get a list of supported ports
-#    library.get_node_status() - to get a list of connected nodes and timestamps
+#    library.get_mqtt_node_status() - to get a list of connected nodes and timestamps
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -559,7 +559,7 @@ class mqtt_status_tab():
 
     def refresh(self):
         # Get the list of currently connected nodes
-        node_status = library.get_node_status()
+        node_status = library.get_mqtt_node_status()
         # Destroy the current frame (with all the entries) and re-create
         if self.frame2 is not None: self.frame2.destroy()
         self.frame2 = Tk.Frame(self.frame1)

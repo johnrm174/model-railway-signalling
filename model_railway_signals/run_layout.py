@@ -1040,7 +1040,7 @@ def initialise_layout():
 def reset_layout(switch_delay:int=0):
     # Block Instruments don't send out any DCC commands so we can clear them down straight away without a delay
     for instrument_id in objects.instrument_index:
-        library.set_section_blocked(int(instrument_id))
+        library.set_instrument_blocked(int(instrument_id))
     # Everything else needs to be scheduled with the specified delay so for large layouts with lots
     # of points, signals and DCC accessories we don't overload the bus by changing everything at once.
     delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_id=0, delay=0)
