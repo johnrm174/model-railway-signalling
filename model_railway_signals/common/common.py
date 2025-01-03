@@ -21,7 +21,6 @@
 #    signal_route_selections(Tk.Frame) - combines int_item_id_entry_box and route selections (above)
 #
 # Provides the following 'extensible' UI elements for the application
-#
 #    signal_route_frame(Tk.LabelFrame) - read only list of signal_route_selections
 #    row_of_widgets(Tk.Frame) - Pass in the base class to create a fixed length row of the base class
 #    row_of_validated_dcc_commands(row_of_widgets) - Similar to above but 'get_values' removes blanks 
@@ -1080,18 +1079,20 @@ class signal_route_selections(Tk.Frame):
 
     def set_value(self, signal_route):
         # The signal_route comprises [signal_route_entry, current_signal_id]
+        signal_route_entry = signal_route[0]
+        current_signal_id = signal_route[1]
         # The signal_route_entry comprises [signal_id, route_selections]
         # route_selections comprises a list of routes [main, lh1, lh2, rh1, rh2]
         # Each element of route_selections is a boolean (True/selected or False/deselected)
-        self.EB.set_value(signal_route[0][0], signal_route[1])
-        self.routes.set_value(signal_route[0][1])
+        self.EB.set_value(signal_route_entry[0], current_signal_id)
+        self.routes.set_value(signal_route_entry[1])
         self.eb_updated()
 
     def get_value(self):
         # The returned value comprises [signal_id, route_selections]
         # route_selections comprises a list of routes [main, lh1, lh2, rh1, rh2]
         # Each element of route_selections is a boolean (True/selected or False/deselected)
-        return ( [ self.EB.get_value(), [ self.routes.get_value()] ])
+        return ( [ self.EB.get_value(), self.routes.get_value() ])
 
 #####################################################################################
 ############################ EXTENSIBLE UI ELEMENTS #################################
