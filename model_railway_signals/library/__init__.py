@@ -1,6 +1,16 @@
 #------------------------------------------------------------------------------------
-# These are the Public API functions for the library
+# These are the Public API functions for the library sub-package
+# Refer to the comments in the individual modules for details
+#
+# The library sub-package is completely self contained apart from
+# a dependency on the CreateToolTip class in the 'common' sub package
+# Which is used in the buttons module for creating button tooltips.
 #------------------------------------------------------------------------------------
+
+from .common import set_root_window
+from .common import orderly_shutdown
+from .common import instant_shutdown
+from .common import configure_edit_mode
 
 from .signals import signal_type
 from .signals import signal_subtype
@@ -43,8 +53,6 @@ from .signals_ground_disc import create_ground_disc_signal
 from .points import point_type
 from .points import point_subtype
 from .points import create_point
-from .points import update_point_styles
-from .points import update_point_button_styles
 from .points import delete_point
 from .points import update_autoswitch
 from .points import point_exists
@@ -57,16 +65,18 @@ from .points import point_switched
 from .points import fpl_active
 from .points import set_point_colour
 from .points import reset_point_colour
+from .points import update_point_styles
+from .points import update_point_button_styles
 
 from .levers import lever_type
 from .levers import create_lever
-from .levers import update_lever_button_styles
 from .levers import delete_lever
 from .levers import lever_exists
 from .levers import lock_lever
 from .levers import unlock_lever
 from .levers import toggle_lever
 from .levers import lever_switched
+from .levers import update_lever_button_styles
 
 from .track_sections import create_section
 from .track_sections import section_exists
@@ -74,48 +84,53 @@ from .track_sections import delete_section
 from .track_sections import section_occupied
 from .track_sections import section_label
 from .track_sections import update_mirrored_section
-from .track_sections import update_section_styles
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
 from .track_sections import reset_sections_mqtt_configuration
 from .track_sections import set_sections_to_publish_state
 from .track_sections import subscribe_to_remote_sections
-
-from .gpio_sensors import gpio_interface_enabled
-from .gpio_sensors import get_list_of_available_gpio_ports
-from .gpio_sensors import gpio_sensor_exists
-from .gpio_sensors import delete_all_local_gpio_sensors
-from .gpio_sensors import create_gpio_sensor
-from .gpio_sensors import get_gpio_sensor_callback
-from .gpio_sensors import update_gpio_sensor_callback
-from .gpio_sensors import reset_gpio_mqtt_configuration
-from .gpio_sensors import set_gpio_sensors_to_publish_state
-from .gpio_sensors import subscribe_to_remote_gpio_sensors
+from .track_sections import update_section_styles
 
 from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
 from .track_sensors import delete_track_sensor
 
 from .lines import create_line
-from .lines import update_line_styles
 from .lines import line_exists
 from .lines import delete_line
-from .lines import set_line_colour
-from .lines import reset_line_colour
 from .lines import move_line_end_1
 from .lines import move_line_end_2
+from .lines import set_line_colour
+from .lines import reset_line_colour
+from .lines import update_line_styles
 
 from .text_boxes import create_text_box
 from .text_boxes import text_box_exists
 from .text_boxes import delete_text_box
 from .text_boxes import update_text_box_styles
 
-from .pi_sprog_interface import sprog_connect
-from .pi_sprog_interface import sprog_disconnect
-from .pi_sprog_interface import service_mode_read_cv
-from .pi_sprog_interface import service_mode_write_cv
-from .pi_sprog_interface import request_dcc_power_on
-from .pi_sprog_interface import request_dcc_power_off
+from .block_instruments import instrument_type
+from .block_instruments import create_instrument
+from .block_instruments import instrument_exists
+from .block_instruments import delete_instrument
+from .block_instruments import update_linked_instrument
+from .block_instruments import set_instrument_blocked
+from .block_instruments import block_section_ahead_clear
+from .block_instruments import reset_instruments_mqtt_configuration
+from .block_instruments import set_instruments_to_publish_state
+from .block_instruments import subscribe_to_remote_instruments
+
+from .buttons import button_type
+from .buttons import create_button
+from .buttons import button_exists
+from .buttons import delete_button
+from .buttons import toggle_button
+from .buttons import enable_button
+from .buttons import disable_button
+from .buttons import lock_button
+from .buttons import unlock_button
+from .buttons import button_state
+from .buttons import update_button_styles
 
 from .dcc_control import get_dcc_address_mappings
 from .dcc_control import dcc_address_mapping
@@ -130,41 +145,32 @@ from .dcc_control import reset_dcc_mqtt_configuration
 from .dcc_control import set_node_to_publish_dcc_commands
 from .dcc_control import subscribe_to_dcc_command_feed
 
-from .mqtt_interface import configure_mqtt_client
-from .mqtt_interface import mqtt_broker_connect
-from .mqtt_interface import mqtt_broker_disconnect
-from .mqtt_interface import get_node_status
-
-from .block_instruments import instrument_type
-from .block_instruments import create_instrument
-from .block_instruments import instrument_exists
-from .block_instruments import update_linked_instrument
-from .block_instruments import delete_instrument
-from .block_instruments import block_section_ahead_clear
-from .block_instruments import reset_instruments_mqtt_configuration
-from .block_instruments import set_instruments_to_publish_state
-from .block_instruments import subscribe_to_remote_instruments
-
-from .buttons import button_type
-from .buttons import create_button
-from .buttons import update_button_styles
-from .buttons import button_exists
-from .buttons import delete_button
-from .buttons import toggle_button
-from .buttons import enable_button
-from .buttons import lock_button
-from .buttons import unlock_button
-from .buttons import disable_button
-from .buttons import button_state
+from .gpio_sensors import gpio_interface_enabled
+from .gpio_sensors import get_list_of_available_gpio_ports
+from .gpio_sensors import gpio_sensor_exists
+from .gpio_sensors import delete_all_local_gpio_sensors
+from .gpio_sensors import create_gpio_sensor
+from .gpio_sensors import get_gpio_sensor_callback
+from .gpio_sensors import update_gpio_sensor_callback
+from .gpio_sensors import reset_gpio_mqtt_configuration
+from .gpio_sensors import set_gpio_sensors_to_publish_state
+from .gpio_sensors import subscribe_to_remote_gpio_sensors
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
 from .file_interface import save_schematic
 
-from .common import set_root_window
-from .common import orderly_shutdown
-from .common import instant_shutdown
-from .common import configure_edit_mode
+from .mqtt_interface import configure_mqtt_client
+from .mqtt_interface import mqtt_broker_connect
+from .mqtt_interface import mqtt_broker_disconnect
+from .mqtt_interface import get_mqtt_node_status
+
+from .pi_sprog_interface import sprog_connect
+from .pi_sprog_interface import sprog_disconnect
+from .pi_sprog_interface import service_mode_read_cv
+from .pi_sprog_interface import service_mode_write_cv
+from .pi_sprog_interface import request_dcc_power_on
+from .pi_sprog_interface import request_dcc_power_off
 
 __all__ = [
       # Public common functions
@@ -304,7 +310,7 @@ __all__ = [
         'configure_mqtt_client',
         'mqtt_broker_connect',
         'mqtt_broker_disconnect',
-        'get_node_status',
+        'get_mqtt_node_status',
       # public block instrument types/functions
         'instrument_type',
         'create_instrument',
@@ -312,6 +318,7 @@ __all__ = [
         'update_linked_instrument',
         'delete_instrument',
         'block_section_ahead_clear',
+        'set_instrument_blocked',
         'reset_instruments_mqtt_configuration',
         'subscribe_to_remote_instruments',
         'set_instruments_to_publish_state',

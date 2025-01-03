@@ -150,7 +150,17 @@
 #   trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int) - Trigger a timed signal sequence
 #
 #   update_colour_light_signal(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
-#                 into account the internal state of the signal and displayed aspect of the signal ahead#
+#                 into account the internal state of the signal and displayed aspect of the signal ahead
+#
+#   update_signal_button_styles - Update the styles of the signal buttons
+#     Mandatory Parameters:
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#     Optional Parameters:
+#       button_colour:str - Fill colour for the button when unselected and un-active - default = "Grey85"
+#       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
+#       selected_colour:str - Fill colour for the button when selected - default = "White"
+#       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # The following API functions are for configuring the pub/sub of Signal events. The functions are called by
 # the editor on 'Apply' of the MQTT settings. First, 'reset_signals_mqtt_configuration' is called to clear down

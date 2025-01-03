@@ -38,6 +38,8 @@
 #   section_occupied(section_id:int)- Returns the section state (True=Occupied, False=Clear)
 # 
 #   section_label(section_id:int)- Returns the 'label' of the section (as a string)
+#
+#   update_mirrored_section(section_id:int, mirrored_section_id:int) - update the section to mirror
 # 
 #   set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' if required)
 #     Mandatory Parameters:

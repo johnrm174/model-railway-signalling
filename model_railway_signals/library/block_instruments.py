@@ -39,6 +39,9 @@
 #   block_section_ahead_clear(inst_id:int) - Returns the state of the ASSOCIATED block instrument
 #                       (i.e. the linked instrument controlling the state of the block section ahead)
 #
+#   set_instrument_blocked(inst_id:int) - Returns the block instrument to its default state (BLOCKED)
+#                              Will also update the repeater display of any linked Block Instrument
+#
 # The following API functions are for configuring the pub/sub of Block Instrument events. The functions are called by
 # the editor on 'Apply' of the MQTT settings. First, 'reset_instruments_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_instruments_to_publish_state' (with the list of LOCAL Block
@@ -772,12 +775,27 @@ def block_section_ahead_clear(inst_id:int):
     if not isinstance(inst_id, int) :
         logging.error("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID must be an int")
         section_ahead_clear = False
-    if not instrument_exists(inst_id):
+    elif not instrument_exists(inst_id):
         logging.error ("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID does not exist")
         section_ahead_clear = False
     else:
         section_ahead_clear = instruments[str(inst_id)]["repeaterstate"]
     return(section_ahead_clear)
+
+# --------------------------------------------------------------------------------
+# Public API function to Reset the Instrument to its default state (BLOCKED).
+# This is represented by the current status of the REPEATER Indicator
+# --------------------------------------------------------------------------------
+
+def set_instrument_blocked(inst_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int) :
+        logging.error("Instrument "+str(inst_id)+": set_section_blocked - Instrument ID must be an int")
+    elif not instrument_exists(inst_id):
+        logging.error ("Instrument "+str(inst_id)+": set_section_blocked - Instrument ID does not exist")
+    else:
+        set_section_blocked(inst_id)
+    return()
 
 # ------------------------------------------------------------------------------------------
 # API function for deleting an instrument library object (including all the drawing objects)

@@ -31,7 +31,11 @@
 #   set_line_colour(line_id:int, colour:str) - change the colour of a line
 #
 #   reset_line_colour(line_id:int) - reset the colour of a line back to default
-# 
+#
+#   move_line_end_1(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
+#
+#   move_line_end_2(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
+#
 #---------------------------------------------------------------------------------------------
 
 import logging

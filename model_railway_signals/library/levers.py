@@ -40,7 +40,8 @@
 #       selected_colour:str - the colour to use for the button when 'selected' (default='White')
 #       text_colour:str - the colour to use for the button text (default='black')
 #       frame_colour:str - the colour to use for the lever body colour (default='Grey40')
-#       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "bold")
+#       lock_text_colour:str -  - the colour to use for the 'Locked' indication (default='White')
+#       font:(str,int,str) - the font to apply for the button text - default=("TkFixedFont", 8, "bold")
 #
 #   delete_lever(lever_id:int) - To delete the specified lever from the schematic
 #
