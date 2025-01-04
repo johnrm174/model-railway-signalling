@@ -47,40 +47,40 @@
 #
 #------------------------------------------------------------------------------------
 
-from .common import CreateToolTip
+from .common_simple import CreateToolTip
 
-from .common import check_box
-from .common import state_box
-from .common import entry_box
-from .common import integer_entry_box
-from .common import dcc_entry_box
-from .common import validated_dcc_entry_box
-from .common import int_item_id_entry_box
-from .common import str_item_id_entry_box
-from .common import str_int_item_id_entry_box
-from .common import scrollable_text_frame
+from .common_simple import check_box
+from .common_simple import state_box
+from .common_simple import entry_box
+from .common_simple import integer_entry_box
+from .common_simple import dcc_entry_box
+from .common_simple import validated_dcc_entry_box
+from .common_simple import int_item_id_entry_box
+from .common_simple import str_item_id_entry_box
+from .common_simple import str_int_item_id_entry_box
+from .common_simple import scrollable_text_frame
 
-from .common import validated_dcc_command_entry
-from .common import point_settings_entry
-from .common import route_selections
-from .common import signal_route_selections
+from .common_compound import validated_dcc_command_entry
+from .common_compound import point_settings_entry
+from .common_compound import route_selections
+from .common_compound import signal_route_selections
 
-from .common import signal_route_frame
-from .common import row_of_widgets
-from .common import row_of_validated_dcc_commands
-from .common import row_of_point_settings
-from .common import grid_of_widgets
-from .common import grid_of_generic_entry_boxes
-from .common import grid_of_point_settings
+from .common_extensible import signal_route_frame
+from .common_extensible import row_of_widgets
+from .common_extensible import row_of_validated_dcc_commands
+from .common_extensible import row_of_point_settings
+from .common_extensible import grid_of_widgets
+from .common_extensible import grid_of_generic_entry_boxes
+from .common_extensible import grid_of_point_settings
 
-from .common import object_id_selection
-from .common import selection_buttons
-from .common import selection_check_boxes
-from .common import colour_selection
-from .common import font_selection
-from .common import font_style_selection
-from .common import button_configuration
-from .common import window_controls
+from .common_complete import object_id_selection
+from .common_complete import selection_buttons
+from .common_complete import selection_check_boxes
+from .common_complete import colour_selection
+from .common_complete import font_selection
+from .common_complete import font_style_selection
+from .common_complete import button_configuration
+from .common_complete import window_controls
 
 __all__ = [
     # Primitive UI Elements
