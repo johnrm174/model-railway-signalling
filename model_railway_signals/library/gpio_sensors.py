@@ -169,13 +169,25 @@ def gpio_sensor_exists(sensor_id:Union[int,str]):
         sensor_exists = mapped_gpio_port(sensor_id) != "None"
     return(sensor_exists)
 
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+# GPIO Events are only processed in Run Mode
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    editing_enabled = edit_mode
+    
 #---------------------------------------------------------------------------------------------------
 # The 'gpio_triggered_callback' function is called whenever a "Button Held" event is detected for
 # an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
 #---------------------------------------------------------------------------------------------------
 
 def gpio_triggered_callback(*args):
-    common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(*args))
+    if not editing_enabled:
+        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(*args))
 
 #---------------------------------------------------------------------------------------------------
 # Internal function executed in the main Tkinter thread whenever a "Button Held" event is detected
