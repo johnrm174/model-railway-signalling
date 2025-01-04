@@ -17,6 +17,7 @@
 #    scrollable_text_frame(Tk.Frame)
 #
 # Provides the following 'compound' UI elements for the application
+#    validated_keypress_entry(Tk.Frame) - validated character or unicode entry
 #    validated_dcc_command_entry(Tk.Frame) - combines int_entry_box and state_box
 #    point_settings_entry(Tk.Frame) - combines int_item_id_entry_box and state_box
 #    route_selections(Tk.Frame) - A fixed row of FIVE state_boxes representing possible signal routes
@@ -62,6 +63,7 @@ from .common_simple import str_item_id_entry_box
 from .common_simple import str_int_item_id_entry_box
 from .common_simple import scrollable_text_frame
 
+from .common_compound import validated_keypress_entry
 from .common_compound import validated_dcc_command_entry
 from .common_compound import point_settings_entry
 from .common_compound import route_selections

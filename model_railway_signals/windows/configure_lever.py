@@ -214,64 +214,6 @@ class point_configuration(Tk.LabelFrame):
         self.pointid.disable()
         self.point_id_updated()
 
-#------------------------------------------------------------------------------------
-# Classes for the keycode configuration class (used twice)
-#------------------------------------------------------------------------------------
-
-class character_entry(common.entry_box):
-    def __init__(self, parent_window, callback, tool_tip):
-        super().__init__(parent_window, width=2, callback=callback, tool_tip=tool_tip)
-        
-    def validate(self, update_validation_status=True):
-        if len(self.entry.get()) > 1:
-            self.TT.text = ("Can only specify a single character (or leave blank)")
-            valid = False
-        else:
-            valid = True
-        if update_validation_status: self.set_validation_status(valid)            
-        return(valid)
-
-class keycode_configuration(Tk.LabelFrame):
-    def __init__(self, parent_window, label:str):
-        super().__init__(parent_window, text=label)
-        # Create a subframe to center everything in
-        self.frame = Tk.Frame(self)
-        self.frame.pack(padx=2, pady=2)
-        self.label1=Tk.Label(self.frame, text="Character:")
-        self.label1.pack(side=Tk.LEFT)
-        tool_tip = "Specify the keyboard character OR the Unicode value of the keyboard character"
-        self.character=character_entry(self.frame, callback=self.character_updated,
-                                    tool_tip="Enter the required keyboard character")
-        self.character.pack(side=Tk.LEFT)
-        self.label2=Tk.Label(self.frame, text="   Unicode value:")
-        self.label2.pack(side=Tk.LEFT)
-        self.unicode=common.integer_entry_box(self.frame, width=4, min_value=0, max_value=1023,
-                callback=self.unicode_updated, tool_tip="Specify the unicode value of the required keyboard character")
-        self.unicode.pack(side=Tk.LEFT)
-
-    def character_updated(self):
-        if self.character.validate() and len(self.character.get_value()) == 1:
-            self.unicode.set_value(ord(self.character.get_value()))
-        else:
-            self.unicode.set_value(0)
-        
-    def unicode_updated(self):
-        if self.unicode.validate() and self.unicode.get_value() > 0:
-            self.character.set_value(chr(self.unicode.get_value()))
-        else:
-            self.character.set_value("")
-    
-    def validate(self):
-        return (self.character.validate() and self.unicode.validate())
-    
-    def set_value(self, character:str):
-        self.character.set_value(character)
-        self.character_updated()
-
-    def get_value(self):
-        return (self.character.get_value())
-
-
 #####################################################################################
 # Top level Class for the Edit Signalbox Lever window
 # This window doesn't have any tabs (unlike other object configuration windows)
@@ -313,9 +255,9 @@ class edit_lever():
             self.point = point_configuration(self.main_frame)
             self.point.pack(padx=2, pady=2, fill='x')
             # Create the keypress event mappings
-            self.offkeypress = keycode_configuration(self.main_frame, label="Keypress event to 'pull' lever")
+            self.offkeypress = common.validated_keypress_entry(self.main_frame, label="Keypress event to 'pull' lever")
             self.offkeypress.pack(padx=2, pady=2, fill='x')
-            self.onkeypress = keycode_configuration(self.main_frame, label="Keypress event to 'reset' lever")
+            self.onkeypress = common.validated_keypress_entry(self.main_frame, label="Keypress event to 'reset' lever")
             self.onkeypress.pack(padx=2, pady=2, fill='x')
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -381,8 +323,9 @@ class edit_lever():
             self.levertype.set_value(lever_selection)
             self.signal.set_values(linked_signal, signal_lever_subtype, signal_routes)
             self.point.set_values(linked_point, point_lever_subtype)
-            self.onkeypress.set_value(objects.schematic_objects[self.object_id]["onkeypress"])
-            self.offkeypress.set_value(objects.schematic_objects[self.object_id]["offkeypress"])
+            # The keypress event entries need the current item ID for validation
+            self.onkeypress.set_value(objects.schematic_objects[self.object_id]["onkeypress"],item_id)
+            self.offkeypress.set_value(objects.schematic_objects[self.object_id]["offkeypress"],item_id)
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()

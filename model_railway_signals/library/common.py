@@ -39,6 +39,7 @@ import logging
 import time
 import queue
 
+from . import gpio_sensors
 from . import mqtt_interface
 from . import pi_sprog_interface
 from . import track_sensors
@@ -58,6 +59,8 @@ root_window = None
 shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
+# Global flag to trck the mode (set via the configure_edit_mode function)
+run_mode = False
 
 #-------------------------------------------------------------------------
 # Functions to configure, manage and handle callbacks for keyboard events
@@ -70,8 +73,10 @@ event_queue = queue.Queue()
 keyboard_mappings= {}
 
 def keyboard_handler(event):
-    if len(event.char) == 1 and event.char in keyboard_mappings:
-        keyboard_mappings[event.char][2] (keyboard_mappings[event.char][1])
+    if run_mode and len(event.char) == 1 :
+        logging.debug(repr("Schematic Keypress event: '"+str(event.char)+"' - Unicode: " +str(ord(event.char))))
+        if event.char in keyboard_mappings:
+            keyboard_mappings[event.char][2] (keyboard_mappings[event.char][1])
 
 def add_keyboard_event(character:str, item:str, item_id:int, function):
     global keyboard_mappings
@@ -83,11 +88,10 @@ def delete_keyboard_event(character:str):
     return()
 
 def get_keyboard_mapping(character:str):
-    keyboard_mapping = None
-    if not isinstance(character, str) or not len(character) == 1:
-        logging.error("library.common.keyboard_mapping_exists - invalid character specified: "+str(character))
-    elif character in keyboard_mappings.keys():
+    if isinstance(character, str) and len(character) == 1 and character in keyboard_mappings.keys():
         keyboard_mapping = (keyboard_mappings[character][0], keyboard_mappings[character][1])
+    else:
+        keyboard_mapping = None
     return(keyboard_mapping)
 
 #-------------------------------------------------------------------------
@@ -192,6 +196,9 @@ def shutdown_step5():
 #------------------------------------------------------------------------------------
 
 def configure_edit_mode(edit_mode:bool):
+    global run_mode
+    run_mode = not edit_mode
+    gpio_sensors.configure_edit_mode(edit_mode)
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)
