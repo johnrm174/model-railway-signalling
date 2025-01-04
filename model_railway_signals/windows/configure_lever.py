@@ -7,19 +7,28 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
+#    objects.signal(signal_id) - Get the object ID for a given Item ID
+#    objects.point(point_id) - Get the object ID for a given Item ID
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Uses the following external API calls / classes from library modules:
+#    library.signal_exists(signal_id) - To see if a signal exists
+#    library.point_exists(point_id) - To see if a point exists
+#    library.lever_exists(lever_id) - To see if a lever exists
 #    library.lever_type - To get/set the lever_type
 #    library.signal_subtype - To get the signal_subtype
-#    library.point_exists(point_id) - To see if a point exists
-#    library.signal_exists(signal_id) - To see if a signal exists
 #
 #
 # Inherits the following common editor base classes (from common):
-#    ########################TO DO ###########################
+#    common.int_item_id_entry_box
+#    common.CreateToolTip
+#    common.route_selections
+#    common.object_id_selection
+#    common.selection_buttons
+#    common.validated_keypress_entry
+#    common.window_controls
 #
 #------------------------------------------------------------------------------------
 
@@ -160,8 +169,8 @@ class point_configuration(Tk.LabelFrame):
         # Create the signal ID element
         self.label1 = Tk.Label(self.frame, text="Point ID:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.pointid = common.int_item_id_entry_box(self.frame, tool_tip="Enter the ID of the point to switch",
-                                    callback=self.point_id_updated, exists_function=library.point_exists)
+        self.pointid = common.int_item_id_entry_box(self.frame, tool_tip="Enter the ID of the point to control "+
+                        "with this lever", callback=self.point_id_updated, exists_function=library.point_exists)
         self.pointid.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create the Selection radio buttons
         self.point_selection = Tk.IntVar(self, 0)

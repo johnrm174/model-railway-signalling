@@ -110,7 +110,7 @@ def set_root_window(root):
     root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
     # Bind a handler for any keypress events used to trigger library events such
     # as switching signalbox levers or Sensor Triggered events. Note that any
-    # specific tkinter event bindings elsewhere in the code will still work.
+    # specific canvas event bindings elsewhere in the code will still work.
     root.bind("<Key>", keyboard_handler)
     return()
 

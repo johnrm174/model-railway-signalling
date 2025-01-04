@@ -44,7 +44,6 @@ class validated_keypress_entry(Tk.LabelFrame):
         self.frame.pack(padx=2, pady=2)
         self.label1=Tk.Label(self.frame, text="Character:")
         self.label1.pack(side=Tk.LEFT)
-        tool_tip = "Specify the keyboard character OR the Unicode value of the keyboard character"
         self.character=common_simple.character_entry_box(self.frame, callback=self.character_updated,
                                             tool_tip="Enter the required keyboard character")
         self.character.pack(side=Tk.LEFT)

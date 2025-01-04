@@ -179,6 +179,7 @@ __all__ = [
         'orderly_shutdown',
         'instant_shutdown',
         'configure_edit_mode',
+        'get_keyboard_mapping',
       # Public point types/functions
         'point_type',
         'point_subtype',

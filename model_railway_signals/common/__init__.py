@@ -92,6 +92,7 @@ __all__ = [
     'check_box',
     'state_box',
     'entry_box',
+    'character_entry_box',
     'integer_entry_box',
     'dcc_entry_box',
     'validated_dcc_entry_box',
@@ -100,6 +101,7 @@ __all__ = [
     'str_int_item_id_entry_box',
     'scrollable_text_frame',
     # Compoind UI Elements
+    'validated_keypress_entry',
     'validated_dcc_command_entry',
     'point_settings_entry',
     'route_selections',
