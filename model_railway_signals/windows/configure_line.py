@@ -68,7 +68,7 @@ class line_attributes():
         self.tooltips = []
         self.images = []
         tooltip = " Select the style to apply to one or both line ends"
-        resource_folder = 'model_railway_signals.editor.resources'
+        resource_folder = 'model_railway_signals.resources'
         for index, button in enumerate (self.selections):
             file_name = button[0]
             try:
