@@ -53,6 +53,7 @@
 # Makes the following external API calls to library modules:
 #    library.set_root_window(widget) - To set the root window
 #    library.configure_edit_mode(edit_mode) - Configure the library for Edit or Run Mode
+#    library.set_lever_switching_behaviour(locking,popups) - Configure Lever behavior
 #    library.shutdown() - To shutdown the library module gracefully
 #
 #    library.load_schematic(filename) - To load all settings and objects
@@ -612,6 +613,9 @@ class main_menubar:
         
     def general_settings_update(self):
         run_layout.configure_spad_popups(settings.get_general("spadpopups"))
+        ignore_interlocking = settings.get_general("leverinterlocking")
+        lever_warnings = settings.get_general("leverpopupwarnings")
+        library.set_lever_switching_behaviour(ignore_interlocking, lever_warnings)
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions

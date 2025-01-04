@@ -5,38 +5,18 @@
 #    restore_defaults() - Restores all defaults
 #    get_all() - returns dictionary of settings
 #    set_all(new_settings) - pass in dictionary of new settings
-#    get_canvas() - Get the current canvas settings (for editing)
+#    get_canvas() - Get the current canvas settings (as specified)
 #    set_canvas() - Save the new canvas settings (as specified)
-#    get_logging() - Get the current log level (for editing)
-#    set_logging(level) - Save the new log level (as specified)
-#    get_general() - Get the current settings (layout info, version for info/editing)
-#    set_general() - Save the new settings (only layout info can be edited/saved)
-#    get_sprog() - Get the current SPROG settings (for editing)
+#    get_logging() - Get the current log level (as specified)
+#    set_logging() - Save the new log level (as specified)
+#    get_general() - Get the current settings (as specified)
+#    set_general() - Save the new settings (as specified)
+#    get_sprog() - Get the current SPROG settings (as specified)
 #    set_sprog() - Save the new SPROG settings (as specified)
-#    get_mqtt() - Get the current MQTT settings (for editing)
+#    get_mqtt() - Get the current MQTT settings (as specified)
 #    set_mqtt() - Save the new MQTT settings (as specified)
-#    get_gpio() - Get the current GPIO settings (for editing)
+#    get_gpio() - Get the current GPIO settings (as specified)
 #    set_gpio() - Save the new GPIO settings (as specified)
-#    get_sub_dcc_nodes() - get the list of subscribed dccc command feeds
-#    get_sub_signals() - get the list of subscribed items
-#    get_sub_sections() - get the list of subscribed items
-#    get_sub_instruments() - get the list of subscribed items
-#    get_sub_sensors() - get the list of subscribed items
-#    get_pub_dcc() - get the publish dcc command feed flag
-#    get_pub_signals() - get the list of items to publish
-#    get_pub_sections() - get the list of items to publish
-#    get_pub_instruments() - get the list of items to publish
-#    get_pub_sensors() - get the list of items to publish
-#    set_sub_dcc_nodes() - set the list of subscribed nodes
-#    set_sub_signals() - set the list of subscribed items
-#    set_sub_sections() - set the list of subscribed items
-#    set_sub_instruments() - set the list of subscribed items
-#    set_sub_sensors() - set the list of subscribed items
-#    set_pub_dcc() - set the publish dcc command feed flag
-#    set_pub_signals() - set the list of items to publish
-#    set_pub_sections() - set the list of items to publish
-#    set_pub_instruments() - set the list of items to publish
-#    set_pub_sensors() - set the list of items to publish
 #------------------------------------------------------------------------------------
 
 import copy
@@ -56,6 +36,8 @@ default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
 default_settings["general"]["resetdelay"] = 0
+default_settings["general"]["leverinterlocking"] = False
+default_settings["general"]["leverpopupwarnings"] = False
 
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000

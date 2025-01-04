@@ -78,6 +78,7 @@ from .levers import unlock_lever
 from .levers import toggle_lever
 from .levers import lever_switched
 from .levers import update_lever_button_styles
+from .levers import set_lever_switching_behaviour
 
 from .track_sections import create_section
 from .track_sections import section_exists
@@ -202,6 +203,7 @@ __all__ = [
         'lever_type',
         'create_lever',
         'update_lever_button_styles',
+        'set_lever_switching_behaviour',
         'delete_lever',
         'lever_exists',
         'lock_lever',
@@ -276,7 +278,7 @@ __all__ = [
         'clear_section_occupied',
         'reset_sections_mqtt_configuration',
         'subscribe_to_remote_sections',
-        'set_sections_to_publish_state', 
+        'set_sections_to_publish_state',
       # public gpio sensor functions
         'gpio_interface_enabled',
         'get_list_of_available_gpio_ports',

@@ -59,12 +59,14 @@ import enum
 import logging
 import tkinter as Tk
 
+from datetime import datetime
+
 from . import common
 from . import file_interface
 
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Public API classes (to be used by external functions)
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 class lever_type(enum.Enum):
     spare = 1             # Unused (white)
@@ -80,9 +82,61 @@ class lever_type(enum.Enum):
 
 levers: dict = {}
 
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+# API Function to configure whether interlocking should be respected or
+# ignored when responding to external lever triggering events
+#-------------------------------------------------------------------------
+
+ignore_interlocking = False
+display_warnings = False
+
+def set_lever_switching_behaviour(ignore_locking:bool, display_popups:bool):
+    global ignore_interlocking
+    global display_warnings
+    ignore_interlocking = ignore_locking
+    display_warnings = display_popups
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Popup Warnings window for displaying Lever Interlocking warnings
+#---------------------------------------------------------------------------------------------
+
+interlocking_warning_window = None
+
+def close_warning_window():
+    global interlocking_warning_window
+    interlocking_warning_window.destroy()
+    interlocking_warning_window = None
+    return()
+
+def display_warning(message:str):
+    global interlocking_warning_window
+    if interlocking_warning_window is not None:
+        # If there is already a window open then make it jump to the top
+        interlocking_warning_window.lift()
+        interlocking_warning_window.state('normal')
+        interlocking_warning_window.focus_force()
+    else:
+        # If there is not already a window open then create a new one
+        interlocking_warning_window = Tk.Toplevel(common.root_window)
+        interlocking_warning_window.attributes('-topmost',True)
+        interlocking_warning_window.title("Interlocking Warnings")
+        interlocking_warning_window.protocol("WM_DELETE_WINDOW", close_warning_window)
+        x, y = common.root_window.winfo_x(), common.root_window.winfo_y()
+        interlocking_warning_window.geometry(f"+{x}+{y}")
+        button = Tk.Button(interlocking_warning_window, text="OK/Close",command = close_warning_window)
+        button.pack(padx=2, pady=2, side=Tk.BOTTOM)
+    # Add the latest warning message
+    current_time = datetime.now().strftime('%H:%M:%S')
+    label = Tk.Label(interlocking_warning_window, text=current_time+" - "+message)
+    label.pack(padx=10, pady=2)
+    # Update Idletasks to display the window
+    common.root_window.update_idletasks()
+    return()
+
+#-------------------------------------------------------------------------
 # API Function to check if a Lever exists in the dictionary of Levers
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 def lever_exists(lever_id:int):
     if not isinstance(lever_id, int):
@@ -92,9 +146,9 @@ def lever_exists(lever_id:int):
         lever_exists = str(lever_id) in levers.keys()
     return(lever_exists)
 
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Callbacks for processing button pushes and keypress events
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 def change_button_event(lever_id:int):
     logging.info("Lever "+str(lever_id)+": Lever Change Button Event *******************************************************")
@@ -116,10 +170,12 @@ def lever_off_keypress_event(lever_id:int):
         levers[str(lever_id)]["callback"] (lever_id)
     return()
 
-# -------------------------------------------------------------------------
-# API Function to flip the state of the Signal Box Lever
-# Also called on Lever button and keypress events 
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+# API Function to flip the state of the Signal Box Lever on Lever button and
+# keypress events. Note that after displaying a popup warning we schedule a
+# task to set the focus back on the canvas immediately after the current event
+# has finished processing otherwise we won't get subsequent keypress events
+#-------------------------------------------------------------------------
 
 def toggle_lever(lever_id:int):
     global levers 
@@ -127,9 +183,15 @@ def toggle_lever(lever_id:int):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID must be an int")
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
+    elif levers[str(lever_id)]["locked"] and not ignore_interlocking:
+        logging.warning("Lever "+str(lever_id)+" is locked - NOT switching")
+        if display_warnings: display_warning("Lever "+str(lever_id)+" is locked - NOT switching")
+        common.root_window.after(0, lambda:levers[str(lever_id)]["canvas"].focus_set())
     else:
         if levers[str(lever_id)]["locked"]:
-            logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is locked - toggling anyway")
+            logging.warning("Lever "+str(lever_id)+" has been switched whilst locked")
+            if display_warnings: display_warning("Lever "+str(lever_id)+" has been switched whilst locked")
+            common.root_window.after(0, lambda:levers[str(lever_id)]["canvas"].focus_set())
         if not levers[str(lever_id)]["switched"]:
             logging.info("Lever "+str(lever_id)+": Toggling Lever to OFF (Pulled)")
             levers[str(lever_id)]["button"].config(relief="sunken",bg=levers[str(lever_id)]["selectedcolour"])
@@ -148,11 +210,11 @@ def toggle_lever(lever_id:int):
             levers[str(lever_id)]["switched"] = False
     return()
 
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Public API function to create a Lever (drawing objects + state). By default
 # the lever is "NOT SWITCHED". Function returns the tkinter tag for all drawing
 # objects, used by the editor to move the drawing objects on the schematic/
-# -------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                  lever_callback, on_keypress:str="", off_keypress:str="",
@@ -317,11 +379,11 @@ def lever_switched(lever_id:int):
         switched = levers[str(lever_id)]["switched"]
     return(switched)
 
-# ------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------
 # API function for deleting a Lever library object (including all the drawing objects).
 # This is used by the schematic editor for deleting and updating levers (update is when
 # the lever is deleted and then subsequently re-created in its new configuration).
-# ------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------
 
 def delete_lever(lever_id:int):
     global levers

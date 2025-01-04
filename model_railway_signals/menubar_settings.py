@@ -910,8 +910,16 @@ class edit_general_settings():
             self.frame1.pack(padx=2, pady=2, fill=Tk.BOTH)
             # Create the "SPAD Popups" selection element
             self.enablespadpopups = common.check_box(self.frame1, label="Enable popup SPAD warnings",
-                    tool_tip="Select to Enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
+                    tool_tip="Select to enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.enablespadpopups.pack(padx=2, pady=2)
+            self.enableleverpopups = common.check_box(self.frame1, label="Enable popup Lever warnings",
+                                tool_tip="Select to enable popup interlocking warnings (when Signalbox Levers "+
+                                     "are switched by external lever frame events events whilst locked)")
+            self.enableleverpopups.pack(padx=2, pady=2)
+            self.leverinterlocking = common.check_box(self.frame1, label="Ignore Lever interlocking",
+                                tool_tip="Select to ignore interlocking when Signalbox Levers are "+
+                                     "switched by external lever frame events events")
+            self.leverinterlocking.pack(padx=2, pady=2)
             # Create the reset delay settings elements
             self.frame1subframe1 = Tk.Frame(self.frame1)
             self.frame1subframe1.pack()
@@ -934,12 +942,16 @@ class edit_general_settings():
     def load_state(self):
         self.validation_error.pack_forget()
         self.enablespadpopups.set_value(settings.get_general("spadpopups"))
+        self.enableleverpopups.set_value(settings.get_general("leverpopupwarnings"))
+        self.leverinterlocking.set_value(settings.get_general("leverinterlocking"))
         self.resetdelay.set_value(settings.get_general("resetdelay"))
 
     def save_state(self, close_window:bool):
         if self.resetdelay.validate():
             self.validation_error.pack_forget()
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
+            settings.set_general("leverpopupwarnings", self.enableleverpopups.get_value())
+            settings.set_general("leverinterlocking", self.leverinterlocking.get_value())
             settings.set_general("resetdelay", self.resetdelay.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
