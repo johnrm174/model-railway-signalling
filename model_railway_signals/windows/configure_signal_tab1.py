@@ -9,7 +9,7 @@
 #    common.row_of_validated_dcc_commands
 #    common.state_box
 #    common.check_box
-#    common.entry_box
+#    common.character_entry_box
 #    common.object_id_selection
 #    common.selection_buttons
 #    common.button_configuration
@@ -468,33 +468,6 @@ class colour_light_aspects():
         self.dylw.disable()
         self.fylw.disable()
         self.fdylw.disable()
-
-#------------------------------------------------------------------------------------
-# Class for a Theatre Route character entry Box - uses base common.entry_box class
-# Public class instance methods inherited from the base Entry Box class are:
-#    "disable" - disables/blanks the entry box
-#    "enable"  enables/loads the entry box (with the last value)
-#    "set_value" - set the initial value of the entry box (string) 
-#    "get_value" - get the last "validated" value of the entry box (string) 
-# Public class instance methods overridden by this class are
-#    "validate" - Validates either blank or a single character
-#------------------------------------------------------------------------------------
-
-class theatre_route_entry_box(common.entry_box):
-    def __init__(self, parent_frame, callback=None):
-        # Call the parent class init function to create the EB
-        super().__init__(parent_frame, width=2, callback=callback,
-                tool_tip =  "Specify the character to be displayed for this route")
-            
-    def validate(self):
-        # Ensure only one character has been entered
-        if len(self.entry.get()) <= 1:
-            valid = True
-        else:
-            self.TT.text = "More than one theatre character has been entered"
-            valid = False
-        self.set_validation_status(valid)
-        return (valid)
     
 #------------------------------------------------------------------------------------
 # Class to create a Theatre route element with an entry box for the displayed character
@@ -527,7 +500,8 @@ class theatre_route_element(common.row_of_validated_dcc_commands):
         # Create the label and entry box for the theatre character
         self.label = Tk.Label(self.frame, width=width, text=label, anchor='w')
         self.label.pack(side=Tk.LEFT)
-        self.EB = theatre_route_entry_box(self.frame, callback=self.selection_updated)
+        self.EB = common.character_entry_box(self.frame, callback=self.selection_updated,
+                    tool_tip="Select the character to be displayed for the route")
         self.EB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class

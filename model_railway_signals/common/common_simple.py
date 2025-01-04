@@ -6,6 +6,7 @@
 #    check_box(Tk.Checkbutton)
 #    state_box(check_box)
 #    entry_box(Tk.Entry)
+#    character_entry_box(entry_box)
 #    integer_entry_box(entry_box)
 #    dcc_entry_box(integer_entry_box)
 #    validated_dcc_entry_box(dcc_entry_box)
@@ -371,6 +372,38 @@ class entry_box(Tk.Entry):
 
     def reset(self):
         self.set_value("")
+
+#------------------------------------------------------------------------------------
+# Common Class for a character_entry_box - Builds on the tkinter Entry class.
+# This will only accept a single character to be entered (or blank).
+#
+# Main class methods used by the editor are:
+#    "set_value" - set the initial value of the entry_box (string) 
+#    "get_value" - get the current value of the entry_box (string) 
+#    "validate" - This gets overridden by the child class function
+#    "disable/disable1/disable2" - disables/blanks the entry_box
+#    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Empty String)
+#    "pack" - for packing the UI element
+#
+# Class methods/objects for use by child classes:
+#    "set_validation_status" - to be called following external validation
+#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
+#    "entry" - is the current entry_box value (string)
+#------------------------------------------------------------------------------------
+
+class character_entry_box(entry_box):
+    def __init__(self, parent_window, callback, tool_tip):
+        super().__init__(parent_window, width=2, callback=callback, tool_tip=tool_tip)
+        
+    def validate(self, update_validation_status=True):
+        if len(self.entry.get()) > 1:
+            self.TT.text = ("Can only specify a single character (or leave blank)")
+            valid = False
+        else:
+            valid = True
+        if update_validation_status: self.set_validation_status(valid)            
+        return(valid)
 
 #------------------------------------------------------------------------------------
 # Common Class for an integer_entry_box - builds on the entry_box class (above).

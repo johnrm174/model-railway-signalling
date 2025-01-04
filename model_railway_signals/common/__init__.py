@@ -7,6 +7,7 @@
 #    check_box(Tk.Checkbutton)
 #    state_box(check_box)
 #    entry_box(Tk.Entry)
+#    character_entry_box(entry_box)
 #    integer_entry_box(entry_box)
 #    dcc_entry_box(integer_entry_box)
 #    validated_dcc_entry_box(dcc_entry_box)
@@ -52,6 +53,7 @@ from .common_simple import CreateToolTip
 from .common_simple import check_box
 from .common_simple import state_box
 from .common_simple import entry_box
+from .common_simple import character_entry_box
 from .common_simple import integer_entry_box
 from .common_simple import dcc_entry_box
 from .common_simple import validated_dcc_entry_box
