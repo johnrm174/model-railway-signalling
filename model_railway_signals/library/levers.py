@@ -145,12 +145,12 @@ def toggle_lever(lever_id:int):
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
     elif levers[str(lever_id)]["locked"] and not ignore_interlocking:
-        message = "Lever "+str(lever_id)+" is locked - NOT switching"
+        message = "External Lever Switching event - Lever "+str(lever_id)+" is locked - NOT switching"
         logging.warning(message)
         if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
     else:
         if levers[str(lever_id)]["locked"]:
-            message = "Lever "+str(lever_id)+" has been switched whilst locked"
+            message = "External Lever Switching event - Lever "+str(lever_id)+" has been switched whilst locked"
             logging.warning(message)
             if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
         if not levers[str(lever_id)]["switched"]:

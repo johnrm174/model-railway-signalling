@@ -125,8 +125,8 @@ def display_warning(canvas, message:str):
         button2.pack(padx=2, pady=2, side=Tk.LEFT)
     # Add the latest warning message
     current_time = datetime.now().strftime('%H:%M:%S')
-    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message))
-    list_of_warning_labels[-1].pack(padx=10)
+    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w"))
+    list_of_warning_labels[-1].pack(padx=10, fill='x', expand=True)
     # Update Idletasks to display the window and schedule an immediate event to return
     # the focus to the canvas (to allow subsequent keypress events to be processed)
     root_window.update_idletasks()
