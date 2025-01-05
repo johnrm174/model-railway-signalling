@@ -59,8 +59,6 @@ import enum
 import logging
 import tkinter as Tk
 
-from datetime import datetime
-
 from . import common
 from . import file_interface
 
@@ -95,43 +93,6 @@ def set_lever_switching_behaviour(ignore_locking:bool, display_popups:bool):
     global display_warnings
     ignore_interlocking = ignore_locking
     display_warnings = display_popups
-    return()
-
-#---------------------------------------------------------------------------------------------
-# Popup Warnings window for displaying Lever Interlocking warnings
-#---------------------------------------------------------------------------------------------
-
-interlocking_warning_window = None
-
-def close_warning_window():
-    global interlocking_warning_window
-    interlocking_warning_window.destroy()
-    interlocking_warning_window = None
-    return()
-
-def display_warning(message:str):
-    global interlocking_warning_window
-    if interlocking_warning_window is not None:
-        # If there is already a window open then make it jump to the top
-        interlocking_warning_window.lift()
-        interlocking_warning_window.state('normal')
-        interlocking_warning_window.focus_force()
-    else:
-        # If there is not already a window open then create a new one
-        interlocking_warning_window = Tk.Toplevel(common.root_window)
-        interlocking_warning_window.attributes('-topmost',True)
-        interlocking_warning_window.title("Interlocking Warnings")
-        interlocking_warning_window.protocol("WM_DELETE_WINDOW", close_warning_window)
-        x, y = common.root_window.winfo_x(), common.root_window.winfo_y()
-        interlocking_warning_window.geometry(f"+{x}+{y}")
-        button = Tk.Button(interlocking_warning_window, text="OK/Close",command = close_warning_window)
-        button.pack(padx=2, pady=2, side=Tk.BOTTOM)
-    # Add the latest warning message
-    current_time = datetime.now().strftime('%H:%M:%S')
-    label = Tk.Label(interlocking_warning_window, text=current_time+" - "+message)
-    label.pack(padx=10, pady=2)
-    # Update Idletasks to display the window
-    common.root_window.update_idletasks()
     return()
 
 #-------------------------------------------------------------------------
@@ -184,14 +145,14 @@ def toggle_lever(lever_id:int):
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
     elif levers[str(lever_id)]["locked"] and not ignore_interlocking:
-        logging.warning("Lever "+str(lever_id)+" is locked - NOT switching")
-        if display_warnings: display_warning("Lever "+str(lever_id)+" is locked - NOT switching")
-        common.root_window.after(0, lambda:levers[str(lever_id)]["canvas"].focus_set())
+        message = "Lever "+str(lever_id)+" is locked - NOT switching"
+        logging.warning(message)
+        if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
     else:
         if levers[str(lever_id)]["locked"]:
-            logging.warning("Lever "+str(lever_id)+" has been switched whilst locked")
-            if display_warnings: display_warning("Lever "+str(lever_id)+" has been switched whilst locked")
-            common.root_window.after(0, lambda:levers[str(lever_id)]["canvas"].focus_set())
+            message = "Lever "+str(lever_id)+" has been switched whilst locked"
+            logging.warning(message)
+            if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
         if not levers[str(lever_id)]["switched"]:
             logging.info("Lever "+str(lever_id)+": Toggling Lever to OFF (Pulled)")
             levers[str(lever_id)]["button"].config(relief="sunken",bg=levers[str(lever_id)]["selectedcolour"])

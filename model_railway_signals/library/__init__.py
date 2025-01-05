@@ -12,6 +12,7 @@ from .common import orderly_shutdown
 from .common import instant_shutdown
 from .common import configure_edit_mode
 from .common import get_keyboard_mapping
+from .common import display_warning
 
 from .signals import signal_type
 from .signals import signal_subtype
@@ -181,6 +182,7 @@ __all__ = [
         'instant_shutdown',
         'configure_edit_mode',
         'get_keyboard_mapping',
+        'display_warning',
       # Public point types/functions
         'point_type',
         'point_subtype',

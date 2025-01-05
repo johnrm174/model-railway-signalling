@@ -7,6 +7,9 @@
 #
 #   set_root_window(root) - initialise the library with the root window reference
 #
+#   display_warning(canvas, message) - Display a warning message in the pop-up warnings window
+#             The Canvas reference is needed to schedule a re-focus (for subsequent keypresses to work)
+#
 #   get_keyboard_mapping(char) - To test if a keyboard character has been mapped to an object event
 #                        If mapped the return will be a tupl containing the mapping_type(str) and the
 #                        mapped item_id (int). If not mapped, the returned value will be 'None'
@@ -38,6 +41,9 @@ import math
 import logging
 import time
 import queue
+import tkinter as Tk
+
+from datetime import datetime
 
 from . import gpio_sensors
 from . import mqtt_interface
@@ -61,6 +67,71 @@ shutdown_initiated = False
 event_queue = queue.Queue()
 # Global flag to trck the mode (set via the configure_edit_mode function)
 run_mode = False
+
+#---------------------------------------------------------------------------------------------
+# Popup window for displaying Run Layout Warnings. Used by the Levers library module to
+# display interlocking warnings (when triggered from external keypress events) and also
+# from the Run Layout module for SPAD (and other signal passed) warnings. Note that the
+# Canvas reference is required so we can re-set the focus (for subsequent keypress events)
+#---------------------------------------------------------------------------------------------
+
+interlocking_warning_window = None
+list_of_warning_labels = []
+
+def close_warning_window():
+    global interlocking_warning_window
+    interlocking_warning_window.destroy()
+    interlocking_warning_window = None
+
+def clear_warning_window():
+    global list_of_warning_labels
+    # Clear out everything but the last entry (to maintain the width of the window)
+    for warning_label in list_of_warning_labels[:-1]: warning_label.destroy()
+    list_of_warning_labels = [list_of_warning_labels[-1]]
+
+def user_dragging_window(event, canvas):
+    global warning_window_defocus
+    # Update Idletasks to update the window and schedule an immediate event to return
+    # the focus to the canvas (to allow subsequent keypress events to be processed)
+    root_window.update_idletasks()
+    root_window.after(0, lambda:canvas.focus_set())
+
+def display_warning(canvas, message:str):
+    global interlocking_warning_window
+    global list_of_warning_labels
+    if interlocking_warning_window is not None:
+        # If there is already a  window open then we just bring it to the front
+        interlocking_warning_window.lift()
+        interlocking_warning_window.state('normal')
+    else:
+        # If there is not already a window open then create a new one. Note that we do
+        # not want to take focus from the main application window (otherwise subsequent
+        # keypress events won't be processed by the main application window). I've tried
+        # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
+        # is to schedule tasks to re-focus back on the canvas after the window has been
+        # updated with a new message or after any user interaction is complete
+        interlocking_warning_window = Tk.Toplevel(root_window, takefocus=0)
+        interlocking_warning_window.title("Layout Warnings")
+        interlocking_warning_window.protocol("WM_DELETE_WINDOW", close_warning_window)
+        interlocking_warning_window.bind('<Configure>', lambda event, arg=canvas: user_dragging_window(event, arg))
+        interlocking_warning_window.bind('<FocusIn>', lambda event, arg=canvas: user_dragging_window(event, arg))
+        x, y = root_window.winfo_x(), root_window.winfo_y()
+        interlocking_warning_window.geometry(f"+{x}+{y}")
+        buttonframe = Tk.Frame(interlocking_warning_window)
+        buttonframe.pack(side=Tk.BOTTOM)
+        button1 = Tk.Button(buttonframe, text="OK/Close", command=close_warning_window)
+        button1.pack(padx=2, pady=2, side=Tk.LEFT)
+        button2 = Tk.Button(buttonframe, text="Clear", command=clear_warning_window)
+        button2.pack(padx=2, pady=2, side=Tk.LEFT)
+    # Add the latest warning message
+    current_time = datetime.now().strftime('%H:%M:%S')
+    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message))
+    list_of_warning_labels[-1].pack(padx=10)
+    # Update Idletasks to display the window and schedule an immediate event to return
+    # the focus to the canvas (to allow subsequent keypress events to be processed)
+    root_window.update_idletasks()
+    root_window.after(0, lambda:canvas.focus_set())
+    return()
 
 #-------------------------------------------------------------------------
 # Functions to configure, manage and handle callbacks for keyboard events
@@ -111,7 +182,7 @@ def set_root_window(root):
     # Bind a handler for any keypress events used to trigger library events such
     # as switching signalbox levers or Sensor Triggered events. Note that any
     # specific canvas event bindings elsewhere in the code will still work.
-    root.bind("<Key>", keyboard_handler)
+    root_window.bind("<Key>", keyboard_handler)
     return()
 
 #-------------------------------------------------------------------------
