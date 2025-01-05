@@ -28,19 +28,22 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release x.x.x:
 
-* New 'Signalbox Levers' feature - Levers can be added to the schematic and connected to the signals and
-points on the layout. For added realism, seperate levers can be used to switch a point and lock/release the
-Facing Point Lock (FPL). Similarly, seperate levers can be used for each 'route' from a signal so you are
-able to allocate a lever to each semaphore signal arm (or colour light signal route). Full interlocking is
-preserved, with a clear indication on the Signalbox lever as to the state of the interlocking.
-* Ability to map keyboard events to Signalbox Levers - this enables you to connect in external physical
-switches (such as the DCC concepts S lever) via a keyboard encoder to achieve a prototypical simulation
-of a signalbox. Options are provide to display pop-up warnings if an external lever is switched whilst
-the lever is locked. Alternatively, Lever interlocking can be disabled if you always want the state of
-the points and signals on the layout to reflect the setting of the physical levers.
+* New 'Signalbox Levers' feature - enables you to achieve a fully prototypical simulation of a signalbox. 
+** Levers can be added to the schematic and 'connected' to the signals and oints they control. Seperate levers 
+can be assigned to a point's blades and the Facing Point Lock (FPL). Seperate levers can also be used to control
+each 'route' from a signal (i.e. semaphore signal arm or colour light signal route). Full interlocking is preserved,
+with a clear indication on the Signalbox lever as to the state of the interlocking.
+** Keyboard events can be mapped to Signalbox Levers. This enables control of the Lever from external physical
+switches (such as the DCC concepts S lever) via readily available keyboard encoders. Options are provide to 
+display pop-up warnings if an external lever is switched whilst the lever is locked. Alternatively, Lever 
+interlocking can be disabled (not recommended) if you always want the state of the points and signals on the
+layout to reflect the setting of the physical levers.
 * The 'Reset Layout' function now preserves track occupancy and incorporates a user-configurable switching 
 delay so point and signal changes can now be sequenced (to avoid overloading the DCC accessory bus on larger
 layouts which may require a large number of points and/or signals to be reset back to their default states).
+* Improved display of Signal Passed at Danger (SPAD warnings) - subsequent warnings are now added to the
+existing pop-up window (rather than appearing in a new pop-up). This can now be left open without affecting
+the normal operation of the application.
 * GPIO sensor events (e.g. 'signal passed', 'sensor passed' etc) are now only processed in Run Mode.
 * Bugfix to Block Instruments sound file selection (due to breaking change in 'importlib' package).
 * Bugfix to the display of validation messages in the 'settings' windows on Apply/OK.
