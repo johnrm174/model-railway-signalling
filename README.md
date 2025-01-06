@@ -28,12 +28,12 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release x.x.x:
 
-* New 'Signalbox Levers' feature - enables you to achieve a fully prototypical simulation of a signalbox. 
-** Levers can be added to the schematic and 'connected' to the signals and oints they control. Seperate levers 
+* New 'Signalbox Levers' feature - enables you to achieve a fully prototypical simulation of a signalbox:
+    * Levers can be added to the schematic and 'connected' to the signals and oints they control. Seperate levers 
 can be assigned to a point's blades and the Facing Point Lock (FPL). Seperate levers can also be used to control
 each 'route' from a signal (i.e. semaphore signal arm or colour light signal route). Full interlocking is preserved,
 with a clear indication on the Signalbox lever as to the state of the interlocking.
-** Keyboard events can be mapped to Signalbox Levers. This enables control of the Lever from external physical
+    * Keyboard events can be mapped to Signalbox Levers. This enables control of the Lever from external physical
 switches (such as the DCC concepts S lever) via readily available keyboard encoders. Options are provide to 
 display pop-up warnings if an external lever is switched whilst the lever is locked. Alternatively, Lever 
 interlocking can be disabled (not recommended) if you always want the state of the points and signals on the
