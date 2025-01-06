@@ -503,13 +503,14 @@ class dcc_entry_box(integer_entry_box):
                             tool_tip=tool_tip, callback=callback)
 
 #------------------------------------------------------------------------------------
-# Common class for a validated_dcc_entry_box - builds on the common DCC Entry Box
-# class and adds validation to ensure the DCC address is not used by anything else
-# The function needs knowledge of the current item type (provided at initialisation
-# time) and the current item ID (provided when the value is set).
+# Common class for a validated_dcc_entry_box - builds on the common DCC Entry Box with added
+# validation to ensure the DCC address is not used by anything else. The validation function
+# needs knowledge of the current item type (provided at initialisation time) and the current
+# item ID (provided either via the set_value function or the set_item_id function).
 #
 # Main class methods used by the editor are:
 #    "set_value" - set the initial value of the entry_box (int) 
+#    "set_item_id" - To set the current ID independently to the set_value function
 #    "get_value" - get the current value of the entry_box (int) 
 #    "validate" - Validates entry is a DCC address and not assigned to anything else
 #    "disable/disable1/disable2" - disables/blanks the entry_box
@@ -549,20 +550,24 @@ class validated_dcc_entry_box(dcc_entry_box):
         self.set_validation_status(valid)
         return(valid)
     
-    def set_value(self, value:int, item_id:int):
+    def set_value(self, value:int, item_id:int=0):
         self.current_item_id = item_id
         super().set_value(value)
-    
+
+    def set_item_id(self, item_id:int):
+        self.current_item_id = item_id
+
 #------------------------------------------------------------------------------------
-# Common class for an int_item_id_entry_box - builds on the integer_entry_box
-# These classes are for entering local signal/point/instrument/section IDs (integers)
-# They do not accept remote Signal or Instrument IDs (where the ID can be an int or str)
-# The class uses the 'exists_function' to check that the item exists on the schematic
-# If the the current item ID is specified (via the set_item_id function) then the class
-# also validates the entered value is not the same as the current item ID.
+# Common class for an int_item_id_entry_box - builds on the integer_entry_box. This class
+# is for entering local signal/point/instrument/section IDs (integers). It does not accept
+#  remote IDs (where the ID can be an int or str). The class uses the 'exists_function' to
+# check that the entered ID exists on the schematic. If the current item ID is specified
+# (either via the set_value function or the set_item_id function) then the class also
+# validates the entered value is not the same as the current item ID.
 #
 # Main class methods used by the editor are:
 #    "set_value" - set the initial value of the entry_box (int) and the current ID
+#    "set_item_id" - To set the current ID independently to the set_value function
 #    "get_value" - get the current value of the entry_box (int)
 #    "validate" - validates entry in range (1-999) - also see comments above
 #    "disable/disable1/disable2" - disables/blanks the entry_box
@@ -607,7 +612,10 @@ class int_item_id_entry_box(integer_entry_box):
     def set_value(self, value:int, item_id:int=0):
         self.current_item_id = item_id
         super().set_value(value)
-        
+
+    def set_item_id(self, item_id:int):
+        self.current_item_id = item_id
+
 #------------------------------------------------------------------------------------
 # Common class for a str_item_id_entry_box - builds on the common entry_box class.
 # This class is for REMOTE item IDs (subscribed to via MQTT networking) where the ID
@@ -668,13 +676,14 @@ class str_item_id_entry_box(entry_box):
 # Common class for an str_int_item_id_entry_box - builds on the str_item_id_entry_box class.
 # This class is for LOCAL IDs (on the current schematic) where the entered ID is a number
 # between 1 and 999), or REMOTE item IDs (subscribed to via MQTT networking) where the ID
-# is a str in the format 'NODE-ID'. If the 'exists_function' is specified then the 
-# validation function checks that the item exists (i.e. has been subscribed to).
-# If the the current item ID is specified (via the set_item_id function) then the class
-# also validates the entered value is not the same as the current item ID.
+# is a str in the format 'NODE-ID'. If the 'exists_function' is specified then the validation
+# function checks that the item exists (i.e. has been subscribed to). If the the current
+# item ID is specified (either via the set_value function or the set_item_id function) then
+# the class also validates the entered value is not the same as the current item ID.
 #
 # Main class methods used by the editor are:
 #    "set_value" - set the initial value of the entry_box (str) and the current ID
+#    "set_item_id" - To set the current ID independently to the set_value function
 #    "get_value" - get the current value of the entry_box (str) 
 #    "validate" - Validation described in comments above
 #    "disable/disable1/disable2" - disables/blanks the entry_box
@@ -735,6 +744,9 @@ class str_int_item_id_entry_box(entry_box):
     def set_value(self, value:str, item_id:int=0):
         self.current_item_id = item_id
         super().set_value(value)
+
+    def set_item_id(self, item_id:int):
+        self.current_item_id = item_id
 
 #------------------------------------------------------------------------------------
 # Class for a scrollable_text_frame - can be editable (e.g. entering layout info)

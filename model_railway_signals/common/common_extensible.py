@@ -22,6 +22,10 @@ from . import common_compound
 # variable number of instances of the signal_route_selection_element when "set_values" 
 # is called (according to the length of the supplied list).
 #
+# Each element in the list comprises [signal_id, list_of_route_selections]
+# The list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+# Each element is a boolean (True/selected or False/deselected)
+#
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of  signals and their routes
 #------------------------------------------------------------------------------------
@@ -36,7 +40,7 @@ class signal_route_frame(Tk.LabelFrame):
 
     def set_values(self, sig_interlocking_frame:[[int,[bool,bool,bool,bool,bool]],]):
         # If the lists are not empty (case of "reloading" the config) then destroy
-        # all the UI elements and create them again (the list may have changed)
+        # all the UI elements and create them again (asthe list may have changed)
         if self.subframe: self.subframe.destroy()
         self.subframe = Tk.Frame(self)
         self.subframe.pack()
@@ -46,7 +50,7 @@ class signal_route_frame(Tk.LabelFrame):
             for sig_interlocking_routes in sig_interlocking_frame:
                 # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
                 # Where each route element is a boolean value (True or False)            
-                self.sigelements.append(common_simple.signal_route_selections(self.subframe,
+                self.sigelements.append(common_compound.signal_route_selections(self.subframe,
                                                     read_only=True, tool_tip=self.tooltip))
                 self.sigelements[-1].pack()
                 # For populating the base class, we also need to pass in the current signal_id
@@ -63,6 +67,8 @@ class signal_route_frame(Tk.LabelFrame):
 # If the list provided to 'set_values' contains less values than the number of widgets in the
 # row then the remaining widgets will be reset to their default state. If the list contains
 # more values than the number of widgets then values beyond the number of widgets are ignored
+#
+# This class supports creating rows of widgets that need the current item_id for validation
 #
 # Main class methods used by the editor are:
 #    "set_values" - will set the intial values from the provided list
@@ -83,20 +89,18 @@ class row_of_widgets(Tk.Frame):
             self.list_of_widgets.append(base_class(self, **kwargs))
             self.list_of_widgets[-1].pack(side=Tk.LEFT)
 
-    def set_values(self, list_of_values_to_set:list):
+    def set_values(self, list_of_values_to_set:list, item_id:int=0):
         for index, widget_to_set in enumerate(self.list_of_widgets):
             # Only set the value if we haven't reached the end of the list of values_to_set
             # Otherwise we 'reset' the widget to its default state (to blank the widget)
-            # Note if there are multiple parameters in the list entry (detected by testing
-            # if the list entry is a tuple) then we unpack them before passing to the widget
+            # If an Item ID is specified (for validation) then we pass through to the widgets
             if index < len(list_of_values_to_set):
                 params_to_pass = list_of_values_to_set[index]
-                if type(params_to_pass) is tuple:
-                    widget_to_set.set_value(*params_to_pass)
-                else:
-                    widget_to_set.set_value(params_to_pass)
+                widget_to_set.set_value(params_to_pass) #################
+                if item_id > 0: widget_to_set.set_item_id(item_id)
             else:
                 widget_to_set.reset()
+                if item_id > 0: widget_to_set.set_item_id(item_id)
         
     def get_values(self):
         # Validate all the entries to accept the current (as entered) values
@@ -123,10 +127,7 @@ class row_of_widgets(Tk.Frame):
 
 #------------------------------------------------------------------------------------
 # Class for a (fixed length) row_of_validated_dcc_commands - builds on the row_of_widgets
-# The set_values function is overridden as we need to provide the current item_id to
-# all validated_dcc_command_entry elements for validation purposes, even if we aren't
-# setting values for them. The get_values function is overridden to remove any blank
-# entries from the list (dcc_address=0).
+# The get_values function is overridden to remove blank entries from the list (dcc_address=0).
 #
 # Main class methods used by the editor are:
 #    "set_values" - will set the intial values from the provided list
@@ -143,17 +144,6 @@ class row_of_validated_dcc_commands(row_of_widgets):
         # validated_dcc_command_entry will need the current item id for validation purposes
         self.number_of_columns = columns
         super().__init__(parent_frame, common_compound.validated_dcc_command_entry, columns, **kwargs)
-
-    def set_values(self, list_of_dcc_commands:list, item_id:int):
-        list_of_values_to_set = []
-        # The validated_dcc_command_entry class needs the current item_id to perform
-        # validation - so we need to provide this even for currently empty entry boxes
-        for index in range(self.number_of_columns):
-            if index < len(list_of_dcc_commands):
-                list_of_values_to_set.append((list_of_dcc_commands[index], item_id))
-            else:
-                list_of_values_to_set.append(([0, False], item_id))
-        super().set_values(list_of_values_to_set)
         
     def get_values(self):
         # Get a list of currently entered values
@@ -202,6 +192,8 @@ class row_of_point_settings(row_of_widgets):
 # widgets in the row are created in their default state (usually enablled but blankk)
 # All of the kwargs are passed through to the specified base class on creation
 #
+# This class supports creating rows of widgets that need the current item_id for validation
+#
 # Class instance functions to use externally are:
 #    "set_values" - will set the intial values from the provided list
 #    "get_values" - will return the last "valid" values in a list
@@ -223,7 +215,7 @@ class grid_of_widgets(Tk.Frame):
         self.list_of_widgets = []
         self.list_of_buttons = []
 
-    def create_row(self, pack_after=None):
+    def create_row(self, item_id:int, pack_after=None):
         # Create a new Frame for the row and pack it
         self.list_of_subframes.append(Tk.Frame(self))
         self.list_of_subframes[-1].pack(after=pack_after, fill='x')
@@ -231,17 +223,16 @@ class grid_of_widgets(Tk.Frame):
         for value in range (self.columns):
             self.list_of_widgets.append(self.base_class(self.list_of_subframes[-1], **self.kwargs))
             self.list_of_widgets[-1].pack(side=Tk.LEFT)
-            # Only set the value if we haven't reached the end of the values_to_setlist
+            # Only set the value if we haven't reached the end of the values_to_set list
             if len(self.list_of_widgets) <= len(self.values_to_set):
                 params_to_pass = self.values_to_set[len(self.list_of_widgets)-1]
-                if type(params_to_pass) is tuple:
-                    self.list_of_widgets[-1].set_value(*params_to_pass)
-                else:
-                    self.list_of_widgets[-1].set_value(params_to_pass)
+                self.list_of_widgets[-1].set_value(params_to_pass)
+            # Set the Item ID (if one is specified)
+            if item_id > 0: self.list_of_widgets[-1].set_item_id(item_id)
         # Create the button for inserting rows
         this_subframe = self.list_of_subframes[-1]
         self.list_of_buttons.append(Tk.Button(this_subframe, text="+", height= 1, width=1, padx=2, pady=0,
-                                font=('Courier',8,"normal"), command=lambda:self.create_row(this_subframe)))
+                font=('Courier',8,"normal"), command=lambda:self.create_row(item_id, pack_after=this_subframe)))
         self.list_of_buttons[-1].pack(side=Tk.LEFT, padx=5)
         common_simple.CreateToolTip(self.list_of_buttons[-1], "Insert new row (below)")
         # Create the button for deleting rows (apart from the first row)
@@ -254,7 +245,7 @@ class grid_of_widgets(Tk.Frame):
     def delete_row(self, this_subframe):
         this_subframe.destroy()
 
-    def set_values(self, values_to_set:list):
+    def set_values(self, values_to_set:list, item_id:int=0):
         # Destroy and re-create the all the subframes - this should also destroy all child widgets
         for subframe in self.list_of_subframes:
             if subframe.winfo_exists():
@@ -266,8 +257,8 @@ class grid_of_widgets(Tk.Frame):
         # Ensure at least one row is created - even if the list of values_to_set is empty
         self.values_to_set = values_to_set
         while len(self.list_of_widgets) < len(values_to_set) or self.list_of_subframes == []:
-            self.create_row()
-                        
+            self.create_row(item_id)
+
     def get_values(self):
         # Validate all the entries to accept the current (as entered) values
         self.validate()

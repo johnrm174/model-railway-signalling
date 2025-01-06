@@ -28,9 +28,11 @@ from .. import library
 # Main class methods used by the editor are:
 #    "validate" - validate the current selection and return True/false
 #    "set_value" - will set the current value (string of length 0 or 1)
+#    "set_item_id" - To set the current ID independently to the set_value function
 #    "get_value" - will return the last "valid" value (string of length 0 or 1)
 #    "disable" - disables/blanks the entry_box (and associated state button)
 #    "enable"  enables/loads the entry_box (and associated state button)
+#    "reset" - resets the UI Element to its default value (blank)
 #    "pack"  for packing the compound UI element
 #------------------------------------------------------------------------------------
 
@@ -89,11 +91,14 @@ class validated_keypress_entry(Tk.LabelFrame):
                 self.unicode.set_validation_status(False)
         return(valid)
 
-    def set_value(self, character:str, item_id:int):
+    def set_value(self, character:str, item_id:int=0):
         # We need to know the current ID for validation
         self.current_item_id = item_id
         self.character.set_value(character)
         self.character_updated()
+
+    def set_item_id(self, item_id:int):
+        self.current_item_id = item_id
 
     def get_value(self):
         # Handle the case of the user entering the Unicode value and going to OK/APPLY
@@ -101,6 +106,9 @@ class validated_keypress_entry(Tk.LabelFrame):
         if len(character_to_return) == 0 and self.unicode.get_value() > 0:
             character_to_return = chr(self.unicode.get_value())
         return(character_to_return)
+
+    def reset(self):
+        self.set_value("")
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a validated_dcc_command_entry [address:int, state:bool].
@@ -110,6 +118,7 @@ class validated_keypress_entry(Tk.LabelFrame):
 # Main class methods used by the editor are:
 #    "validate" - validate the current entry_box value and return True/false
 #    "set_value" - will set the current value [add:int, state:bool] and item ID (int)
+#    "set_item_id" - To set the current ID independently to the set_value function
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
 #    "disable" - disables/blanks the entry_box (and associated state button)
 #    "enable"  enables/loads the entry_box (and associated state button)
@@ -151,11 +160,14 @@ class validated_dcc_command_entry(Tk.Frame):
         self.EB.disable()
         self.eb_updated()
         
-    def set_value(self, dcc_command:list[int,bool], item_id:int):
+    def set_value(self, dcc_command:list[int,bool], item_id:int=0):
         # The dcc_command comprises a 2 element list of [DCC_Address, DCC_State]
         self.EB.set_value(dcc_command[0], item_id)
         self.CB.set_value(dcc_command[1])
         self.eb_updated()
+
+    def set_item_id(self, item_id:int):
+        self.EB.set_item_id(item_id)
 
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
@@ -164,11 +176,13 @@ class validated_dcc_command_entry(Tk.Frame):
         return([self.EB.get_value(), self.CB.get_value()])
     
     def reset(self):
-        self.set_value(dcc_command=[0, False], item_id=0)
+        self.set_value([0, False])
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a point_settings_entry [point_id:int, point_state:bool].
 # This is broadly similar to the validated_dcc_command_entry class (above).
+#
+# NOTE - NO VALIDATION PROVIDED FOR CURRENT ITEM ID FOR THIS CLASS (NO REQUIREMENT)
 #
 # Main class methods used by the editor are:
 #    "validate" - validate the current entry box value and return True/false
@@ -224,7 +238,7 @@ class point_settings_entry(Tk.Frame):
         return([self.EB.get_value(), self.CB.get_value()])
 
     def reset(self):
-        self.set_value(point=[0, False])
+        self.set_value([0, False])
 
 #------------------------------------------------------------------------------------
 # Compound UI element for Route selection (route selection CBs) - Based on a Tk Frame
@@ -233,6 +247,7 @@ class point_settings_entry(Tk.Frame):
 #    "get_value" - will return the current selections [route_selections]
 #    "disable" - disables/blanks the entry box (and associated state buttons)
 #    "enable"  enables/loads the entry box (and associated state buttons)
+#    "reset" - resets the UI Element to its default value (All false)
 #    "pack"  for packing the compound UI element
 #------------------------------------------------------------------------------------
 
@@ -286,15 +301,23 @@ class route_selections(Tk.Frame):
         self.rh1.enable()
         self.rh2.enable()
 
+    def reset(self):
+        self.set_value([False, False, False, False, False])
+
 #------------------------------------------------------------------------------------
 # Compoind UI element for signal and route selection (signal_id EB and route_selections)
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value [signal_routes_entry, current_sig_id]
+#    "set_item_id" - To set the current ID independently to the set_value function
 #    "get_value" - will return the last "valid" value [signal_routes_entry]
 #    "disable" - disables/blanks the entry box (and associated state buttons)
 #    "enable"  enables/loads the entry box (and associated state buttons)
+#    "reset" - resets the UI Element to its default value (All false)
 #    "pack"  for packing the compound UI element
+#
+# Note the Entry box needs the current Item ID for validation purposes. this can be
+# set either via the set_value function or the set_item_id function
 #------------------------------------------------------------------------------------
 
 class signal_route_selections(Tk.Frame):
@@ -340,21 +363,24 @@ class signal_route_selections(Tk.Frame):
         self.EB.disable()
         self.eb_updated()
 
-    def set_value(self, signal_route):
-        # The signal_route comprises [signal_route_entry, current_signal_id]
-        signal_route_entry = signal_route[0]
-        current_signal_id = signal_route[1]
-        # The signal_route_entry comprises [signal_id, route_selections]
-        # route_selections comprises a list of routes [main, lh1, lh2, rh1, rh2]
-        # Each element of route_selections is a boolean (True/selected or False/deselected)
-        self.EB.set_value(signal_route_entry[0], current_signal_id)
-        self.routes.set_value(signal_route_entry[1])
+    def set_value(self, signal_route:[int,[bool,bool,bool,bool,bool]], item_id:int=0):
+        # The signal_route comprises [signal_id, list_of_route_selections]
+        # the list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+        # Each element is a boolean (True/selected or False/deselected)
+        self.EB.set_value(signal_route[0], item_id)
+        self.routes.set_value(signal_route[1])
         self.eb_updated()
 
+    def set_item_id(self, item_id:int):
+        self.EB.set_item_id(item_id)
+
     def get_value(self):
-        # The returned value comprises [signal_id, route_selections]
-        # route_selections comprises a list of routes [main, lh1, lh2, rh1, rh2]
-        # Each element of route_selections is a boolean (True/selected or False/deselected)
+        # The returned value comprises [signal_id, list_of_route_selections]
+        # the list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+        # Each element is a boolean (True/selected or False/deselected)
         return ( [ self.EB.get_value(), self.routes.get_value() ])
+
+    def reset(self):
+        self.set_value([0,[False, False, False, False, False]])
 
 ###########################################################################################

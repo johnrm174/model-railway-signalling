@@ -250,24 +250,16 @@ class conflicting_signals_frame():
         if not self.rh2.validate(): valid = False
         return(valid)
 
-    def create_list(self, sig_interlocking_route:[[int,[bool,bool,bool,bool,bool]],], item_id:int):
-        # To populate each signal_route_selections element via the entry_box_grid class, we need
-        # to compile a list of parameters for each element [[sig_interlocking_route, item_id], ]
-        class_set_values_list = []
-        for entry in sig_interlocking_route:
-            class_set_values_list.append([entry, item_id])
-        return(class_set_values_list)
-
     def set_values(self, sig_interlocking_routes:[[[int,[bool,bool,bool,bool,bool]],],], item_id:int):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
         # each sig_route comprises a variable length list of interlocked signal entries
         # each interlocked signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # sig_id is the interlocked signal and the interlocked routes are True/False
-        self.main.set_values(self.create_list(sig_interlocking_routes[0], item_id))
-        self.lh1.set_values(self.create_list(sig_interlocking_routes[1], item_id))
-        self.lh2.set_values(self.create_list(sig_interlocking_routes[2], item_id))
-        self.rh1.set_values(self.create_list(sig_interlocking_routes[3], item_id))
-        self.rh2.set_values(self.create_list(sig_interlocking_routes[4], item_id))
+        self.main.set_values(sig_interlocking_routes[0], item_id)
+        self.lh1.set_values(sig_interlocking_routes[1], item_id)
+        self.lh2.set_values(sig_interlocking_routes[2], item_id)
+        self.rh1.set_values(sig_interlocking_routes[3], item_id)
+        self.rh2.set_values(sig_interlocking_routes[4], item_id)
 
     def get_values(self):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
