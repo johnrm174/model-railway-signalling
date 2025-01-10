@@ -27,7 +27,7 @@
 #    common.route_selections
 #    common.object_id_selection
 #    common.selection_buttons
-#    common.validated_keypress_entry
+#    common.validated_keycode_entry_box
 #    common.window_controls
 #
 #------------------------------------------------------------------------------------
@@ -223,6 +223,44 @@ class point_configuration(Tk.LabelFrame):
         self.pointid.disable()
         self.point_id_updated()
 
+#------------------------------------------------------------------------------------
+# Class for the Keycode configuration subframe
+#------------------------------------------------------------------------------------
+
+class keycode_configuration(Tk.LabelFrame):
+    def __init__(self, parent_window):
+        super().__init__(parent_window, text="Keyboard event codes (for external lever inputs)")
+        # Create a subframe to center everything in
+        self.frame = Tk.Frame(self)
+        self.frame.pack()
+        self.label1 = Tk.Label(self.frame, text="'OFF' keycode:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.offkeycode = common.validated_keycode_entry_box(self.frame, callback=self.entry_updated,
+                tool_tip="Specify the 'keycode' to 'pull' the lever (set logging to 'debug' and "+
+                    "trigger the required keypress event in Run Mode to find the associated keycode)")
+        self.offkeycode.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label2 = Tk.Label(self.frame, text="   'ON' keycode:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.onkeycode = common.validated_keycode_entry_box(self.frame, callback=self.entry_updated,
+                tool_tip="Specify the 'keycode' to 'reset' the lever (set logging to 'debug' and "+
+                    "trigger the required keypress event in Run Mode to find the associated keycode)")
+        self.onkeycode.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def entry_updated(self):
+        self.validate()
+
+    def validate(self):
+        # validate the individual entry boxes first
+        valid = self.onkeycode.validate() and self.offkeycode.validate()
+        # validate the entries are not the same
+        if valid and self.onkeycode.get_value() > 0 and self.onkeycode.get_value() == self.offkeycode.get_value():
+            self.offkeycode.TT.text="The same keycode has been specified for both 'OFF' and 'ON' events"
+            self.onkeycode.TT.text="The same keycode has been specified for both 'OFF' and 'ON' events"
+            self.offkeycode.set_validation_status(False)
+            self.onkeycode.set_validation_status(False)
+            valid = False
+        return(valid)
+
 #####################################################################################
 # Top level Class for the Edit Signalbox Lever window
 # This window doesn't have any tabs (unlike other object configuration windows)
@@ -263,11 +301,9 @@ class edit_lever():
             self.signal.pack(padx=2, pady=2, fill='x')
             self.point = point_configuration(self.main_frame)
             self.point.pack(padx=2, pady=2, fill='x')
-            # Create the keypress event mappings
-            self.offkeypress = common.validated_keypress_entry(self.main_frame, label="Keypress event to 'pull' lever")
-            self.offkeypress.pack(padx=2, pady=2, fill='x')
-            self.onkeypress = common.validated_keypress_entry(self.main_frame, label="Keypress event to 'reset' lever")
-            self.onkeypress.pack(padx=2, pady=2, fill='x')
+            # Create the keycode event mappings
+            self.keycodes = keycode_configuration(self.main_frame)
+            self.keycodes.pack(padx=2, pady=2, fill='x')
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
@@ -332,9 +368,9 @@ class edit_lever():
             self.levertype.set_value(lever_selection)
             self.signal.set_values(linked_signal, signal_lever_subtype, signal_routes)
             self.point.set_values(linked_point, point_lever_subtype)
-            # The keypress event entries need the current item ID for validation
-            self.onkeypress.set_value(objects.schematic_objects[self.object_id]["onkeypress"],item_id)
-            self.offkeypress.set_value(objects.schematic_objects[self.object_id]["offkeypress"],item_id)
+            # The keycode event entries need the current item ID for validation
+            self.keycodes.onkeycode.set_value(objects.schematic_objects[self.object_id]["onkeycode"],item_id)
+            self.keycodes.offkeycode.set_value(objects.schematic_objects[self.object_id]["offkeycode"],item_id)
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
@@ -347,13 +383,13 @@ class edit_lever():
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
         elif ( self.leverid.validate() and self.point.validate() and self.signal.validate() and
-               self.onkeypress.validate() and self.offkeypress.validate() ):
+               self.keycodes.validate() ):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.leverid.get_value()
-            new_object_configuration["onkeypress"] = self.onkeypress.get_value()
-            new_object_configuration["offkeypress"] = self.offkeypress.get_value()
+            new_object_configuration["onkeycode"] = self.keycodes.onkeycode.get_value()
+            new_object_configuration["offkeycode"] = self.keycodes.offkeycode.get_value()
             point_id, point_lever_subtype = self.point.get_values()
             new_object_configuration["linkedpoint"] = point_id
             new_object_configuration["switchpoint"] = (point_lever_subtype == 1)

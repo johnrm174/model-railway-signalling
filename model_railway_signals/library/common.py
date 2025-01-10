@@ -144,23 +144,25 @@ def display_warning(canvas, message:str):
 keyboard_mappings= {}
 
 def keyboard_handler(event):
-    if run_mode and len(event.char) == 1 :
-        logging.debug(repr("Schematic Keypress event: '"+str(event.char)+"' - Unicode: " +str(ord(event.char))))
-        if event.char in keyboard_mappings:
-            keyboard_mappings[event.char][2] (keyboard_mappings[event.char][1])
+    if run_mode:
+        debug_string = "Schematic Keypress event: Keycode="+str(event.keycode)
+        if len(event.char) == 1: debug_string = debug_string + " - Character="+repr(event.char)
+        logging.debug(debug_string)
+        if str(event.keycode) in keyboard_mappings:
+            keyboard_mappings[str(event.keycode)][2] (keyboard_mappings[str((event.keycode))][1])
 
-def add_keyboard_event(character:str, item:str, item_id:int, function):
+def add_keyboard_event(keycode:int, item:str, item_id:int, function):
     global keyboard_mappings
-    keyboard_mappings[character] = (item, item_id, function)
+    keyboard_mappings[str(keycode)] = (item, item_id, function)
 
-def delete_keyboard_event(character:str):
+def delete_keyboard_event(keycode:int):
     global keyboard_mappings
-    del(keyboard_mappings[character])
+    if str(keycode) in keyboard_mappings.keys(): del(keyboard_mappings[str(keycode)])
     return()
 
-def get_keyboard_mapping(character:str):
-    if isinstance(character, str) and len(character) == 1 and character in keyboard_mappings.keys():
-        keyboard_mapping = (keyboard_mappings[character][0], keyboard_mappings[character][1])
+def get_keyboard_mapping(keycode:int):
+    if isinstance(keycode, int) and str(keycode) in keyboard_mappings.keys():
+        keyboard_mapping = (keyboard_mappings[str(keycode)][0], keyboard_mappings[str(keycode)][1])
     else:
         keyboard_mapping = None
     return(keyboard_mapping)

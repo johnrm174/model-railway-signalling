@@ -67,8 +67,8 @@ default_lever_object["signalroutes"] = [True, True, True, True, True]
 default_lever_object["switchpointandfpl"] = False
 default_lever_object["switchpoint"] = False
 default_lever_object["switchfpl"] = False
-default_lever_object["onkeypress"] = ""
-default_lever_object["offkeypress"] = ""
+default_lever_object["onkeycode"] = 0
+default_lever_object["offkeycode"] = 0
 
 #------------------------------------------------------------------------------------
 # Function to remove references to a Point from the Lever's configuration.
@@ -160,8 +160,8 @@ def redraw_lever_object(object_id, create_selected:bool=False):
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
                 lever_callback = run_layout.lever_switched_callback,
-                on_keypress = objects_common.schematic_objects[object_id]["onkeypress"],
-                off_keypress = objects_common.schematic_objects[object_id]["offkeypress"],
+                on_keycode = objects_common.schematic_objects[object_id]["onkeycode"],
+                off_keycode = objects_common.schematic_objects[object_id]["offkeycode"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
                 frame_colour = frame_colour,
                 lock_text_colour = lock_text_colour,

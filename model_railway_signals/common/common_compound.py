@@ -2,7 +2,6 @@
 # These are common classes used across multiple UI Elements
 #
 # Provides the following 'compound' UI elements for the application
-#    validated_keypress_entry(Tk.Frame) - validated character or unicode entry
 #    validated_dcc_command_entry(Tk.Frame) - combines int_entry_box and state_box
 #    point_settings_entry(Tk.Frame) - combines int_item_id_entry_box and state_box
 #    route_selections(Tk.Frame) - A fixed row of FIVE state_boxes representing possible signal routes
@@ -18,97 +17,6 @@ import tkinter as Tk
 from . import common_simple
 from . import common_compound
 from .. import library
-
-#------------------------------------------------------------------------------------
-# Compound UI element for a validated_keypress_entry (for mapping keypress events).
-# Allows either the character to be entered or the unicode value for the character
-# Validated to ensure the key_character is not on the reserved character list and
-# has not already been mapped to another library object
-#
-# Main class methods used by the editor are:
-#    "validate" - validate the current selection and return True/false
-#    "set_value" - will set the current value (string of length 0 or 1)
-#    "set_item_id" - To set the current ID independently to the set_value function
-#    "get_value" - will return the last "valid" value (string of length 0 or 1)
-#    "disable" - disables/blanks the entry_box (and associated state button)
-#    "enable"  enables/loads the entry_box (and associated state button)
-#    "reset" - resets the UI Element to its default value (blank)
-#    "pack"  for packing the compound UI element
-#------------------------------------------------------------------------------------
-
-class validated_keypress_entry(Tk.LabelFrame):
-    def __init__(self, parent_window, label:str):
-        super().__init__(parent_window, text=label)
-        # we need to know the current item ID for validation
-        self.current_item_id = 0
-        # Create a subframe to center everything in
-        self.frame = Tk.Frame(self)
-        self.frame.pack(padx=2, pady=2)
-        self.label1=Tk.Label(self.frame, text="Character:")
-        self.label1.pack(side=Tk.LEFT)
-        self.character=common_simple.character_entry_box(self.frame, callback=self.character_updated,
-                                            tool_tip="Enter the required keyboard character")
-        self.character.pack(side=Tk.LEFT)
-        self.label2=Tk.Label(self.frame, text="   Unicode value:")
-        self.label2.pack(side=Tk.LEFT)
-        self.unicode=common_simple.integer_entry_box(self.frame, width=4, min_value=0, max_value=1023,
-                callback=self.unicode_updated, tool_tip="Specify the unicode value of the required keyboard character")
-        self.unicode.pack(side=Tk.LEFT)
-
-    def character_updated(self):
-        if self.character.validate() and len(self.character.get_value()) == 1:
-            self.unicode.set_value(ord(self.character.get_value()))
-            self.validate()
-        else:
-            self.unicode.set_value(0)
-
-    def unicode_updated(self):
-        if self.unicode.validate() and self.unicode.get_value() > 0:
-            self.character.set_value(chr(self.unicode.get_value()))
-            self.validate()
-        else:
-            self.character.set_value("")
-
-    def validate(self):
-        # Reserved characters (mapped to editor controls in Run Mode are): <cntl-a> (unicode 1),
-        # <cntl-r> (unicode 18), <cntl-m> (unicode 13) - (arrow keys don't generate events)
-        reserved_unicode_characters = (1, 18, 13)
-        # Validate the basic entry values first (we do both to accept the current entries):
-        valid = self.unicode.validate() and self.character.validate()
-        if valid and len(self.character.get()) > 0:
-            mapping = library.get_keyboard_mapping(self.character.get())
-            mapping_valid = mapping is None or (mapping[0] == "Lever" and mapping[1] == self.current_item_id)
-            if ord(self.character.get()) in reserved_unicode_characters:
-                error_message = "Keypress events <cntl-a>, <cntl-r> and <cntl-m> are reserved or the editor application in Run Mode"
-                valid = False
-            elif not mapping_valid:
-                error_message = "Keypress event is already mapped to "+mapping[0]+" "+str(mapping[1])
-                valid = False
-            if not valid:
-                self.character.TT.text = error_message
-                self.unicode.TT.text = error_message
-                self.character.set_validation_status(False)
-                self.unicode.set_validation_status(False)
-        return(valid)
-
-    def set_value(self, character:str, item_id:int=0):
-        # We need to know the current ID for validation
-        self.current_item_id = item_id
-        self.character.set_value(character)
-        self.character_updated()
-
-    def set_item_id(self, item_id:int):
-        self.current_item_id = item_id
-
-    def get_value(self):
-        # Handle the case of the user entering the Unicode value and going to OK/APPLY
-        character_to_return = self.character.get_value()
-        if len(character_to_return) == 0 and self.unicode.get_value() > 0:
-            character_to_return = chr(self.unicode.get_value())
-        return(character_to_return)
-
-    def reset(self):
-        self.set_value("")
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a validated_dcc_command_entry [address:int, state:bool].

@@ -21,8 +21,8 @@
 #       x:int, y:int - Position of the point on the canvas (in pixels)
 #       lever_callback - the function to call on lever switched events (returns item_id)
 #     Optional Parameters:
-#       on_keypress:str - The keypress to use for resetting the lever to ON  
-#       off_keypress:str - The keypress to use for setting the lever to OFF,
+#       on_keycode:int - The keycode to use for resetting the lever to ON (default=0 - no keycode)
+#       off_keycode:int - The keycode to use for setting the lever to OFF (default=0 - no keycode)
 #       button_colour:str - the colour to use for the button when 'normal' (default='Grey85')
 #       active_colour:str - the colour to use for the button when 'active' (default='Grey50')
 #       selected_colour:str - the colour to use for the button when 'selected' (default='White')
@@ -178,7 +178,7 @@ def toggle_lever(lever_id:int):
 #-------------------------------------------------------------------------
 
 def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
-                 lever_callback, on_keypress:str="", off_keypress:str="",
+                 lever_callback, on_keycode:int=0, off_keycode:int=0,
                  button_colour:str="Grey85", active_colour:str="Grey95",
                  selected_colour:str="White", text_colour:str="Black",
                  frame_colour:str="Grey40", lock_text_colour:str="White",
@@ -190,18 +190,18 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         logging.error("Lever "+str(lever_id)+": create_lever - Lever ID must be an int (1-999)")
     elif lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": create_lever - Lever ID already exists")
-    elif not isinstance(on_keypress, str) or len(on_keypress) > 1:
-        logging.error("Lever "+str(lever_id)+": create_lever - Invalid on_keypress value specified")
-    elif not isinstance(off_keypress, str) or len(off_keypress) > 1:
-        logging.error("Lever "+str(lever_id)+": create_lever - Invalid off_keypress value specified")
-    elif len(on_keypress) == 1 and common.get_keyboard_mapping(on_keypress) is not None:
-        logging.error("Lever "+str(lever_id)+": create_lever - 'on' keypress is already mapped to "+
-                    common.get_keyboard_mapping(on_keypress)[0]+" "+str(common.get_keyboard_mapping(on_keypress)[1]))
-    elif len(off_keypress) == 1 and common.get_keyboard_mapping(off_keypress) is not None:
-        logging.error("Lever "+str(lever_id)+": create_lever - 'off' keypress is already mapped to "+
-                    common.get_keyboard_mapping(off_keypress)[0]+" "+str(common.get_keyboard_mapping(off_keypress)[1]))
-    elif len(on_keypress) == 1 and on_keypress == off_keypress:
-        logging.error("Lever "+str(lever_id)+": create_lever - Same keypress specified for 'on' and 'off' events")
+    elif not isinstance(on_keycode, int) or on_keycode < 0 or on_keycode > 255:
+        logging.error("Lever "+str(lever_id)+": create_lever - Invalid 'on' keycode value specified")
+    elif not isinstance(off_keycode, int) or off_keycode < 0 or off_keycode > 255:
+        logging.error("Lever "+str(lever_id)+": create_lever - Invalid 'off' keycode value specified")
+    elif on_keycode > 0 and common.get_keyboard_mapping(on_keycode) is not None:
+        logging.error("Lever "+str(lever_id)+": create_lever - 'on' keycode is already mapped to "+
+                    common.get_keyboard_mapping(on_keypress)[0]+" "+str(common.get_keyboard_mapping(on_keycode)[1]))
+    elif off_keycode > 0 and common.get_keyboard_mapping(off_keycode) is not None:
+        logging.error("Lever "+str(lever_id)+": create_lever - 'off' keycode is already mapped to "+
+                    common.get_keyboard_mapping(off_keypress)[0]+" "+str(common.get_keyboard_mapping(off_keycode)[1]))
+    elif on_keycode > 0 and on_keycode == off_keycode:
+        logging.error("Lever "+str(lever_id)+": create_lever - Same keycode specified for 'on' and 'off' events")
     else:
         logging.debug("Lever "+str(lever_id)+": Creating library object on the schematic")
         # Assign the lever colours depending on lever type 
@@ -233,8 +233,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         # The 'Locked' Indication is initially hidden (as the lever is created "Unlocked"
         canvas.itemconfig(locked, state="hidden")
         # Bind the canvas keypress events (if specified)
-        if len(on_keypress) == 1: common.add_keyboard_event(on_keypress, "Lever", lever_id, lever_on_keypress_event)
-        if len(off_keypress) == 1: common.add_keyboard_event(off_keypress, "Lever", lever_id, lever_off_keypress_event)
+        if on_keycode > 0: common.add_keyboard_event(on_keycode, "Lever", lever_id, lever_on_keypress_event)
+        if off_keycode >0: common.add_keyboard_event(off_keycode, "Lever", lever_id, lever_off_keypress_event)
         # Compile a dictionary of everything we need to track
         levers[str(lever_id)] = {}
         levers[str(lever_id)]["canvas"] = canvas                   # Tkinter canvas object
@@ -248,8 +248,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         levers[str(lever_id)]["callback"] = lever_callback         # The callback to make on a change event
         levers[str(lever_id)]["switched"] = False                  # Initial "switched" state of the lever
         levers[str(lever_id)]["locked"] = False                    # Initial "interlocking" state of the lever
-        levers[str(lever_id)]["onkeypress"] = on_keypress          # Keypress for setting the lever ON
-        levers[str(lever_id)]["offkeypress"] = off_keypress        # Keypress for setting the lever OFF
+        levers[str(lever_id)]["onkeycode"] = on_keycode            # Keycode for setting the lever ON
+        levers[str(lever_id)]["offkeycode"] = off_keycode          # Keycode for setting the lever OFF
         levers[str(lever_id)]["selectedcolour"] = selected_colour  # the default colour for the change button
         levers[str(lever_id)]["deselectedcolour"] = button_colour  # the default colour for the change button
         levers[str(lever_id)]["tags"] = canvas_tag                 # Canvas Tags for all drawing objects
@@ -355,8 +355,8 @@ def delete_lever(lever_id:int):
     else:
         logging.debug("Lever "+str(lever_id)+": Deleting library object from the schematic")
         # Unbind the canvas keypress events (if specified)
-        if len(levers[str(lever_id)]["onkeypress"]) == 1: common.delete_keyboard_event(levers[str(lever_id)]["onkeypress"])
-        if len(levers[str(lever_id)]["offkeypress"]) == 1: common.delete_keyboard_event(levers[str(lever_id)]["offkeypress"])
+        if levers[str(lever_id)]["onkeycode"] > 0: common.delete_keyboard_event(levers[str(lever_id)]["onkeycode"])
+        if levers[str(lever_id)]["offkeycode"] > 0: common.delete_keyboard_event(levers[str(lever_id)]["offkeycode"])
         # Delete all the tkinter drawing objects associated with the lever
         levers[str(lever_id)]["canvas"].delete(levers[str(lever_id)]["tags"])
         levers[str(lever_id)]["button"].destroy()

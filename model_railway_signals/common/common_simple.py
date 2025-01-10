@@ -14,6 +14,7 @@
 #    str_item_id_entry_box(entry_box)
 #    str_int_item_id_entry_box(entry_box)
 #    scrollable_text_frame(Tk.Frame)
+#    validated_keycode_entry_box(integer_entry_box)
 #
 # Makes the following external API calls to the library package
 #    library.dcc_address_mapping(dcc_address)
@@ -848,5 +849,63 @@ class scrollable_text_frame(Tk.Frame):
 
     def set_font(self, font:str, font_size:int, font_style:str):
         self.text_box.configure(font=(font, font_size, font_style))
+
+#------------------------------------------------------------------------------------
+# Class for a validated_keypress_entry (for mapping keypress events).
+# Validated to ensure the keycode is not on the reserved list and
+# has not already been mapped to another library object
+#
+# Main class methods used by the editor are:
+#    "validate" - validate the current selection and return True/false
+#    "set_value" - will set the current value (integer)
+#    "set_item_id" - To set the current ID independently to the set_value function
+#    "get_value" - will return the last "valid" value (integer)
+#    "disable" - disables/blanks the entry_box
+#    "enable"  enables/loads the entry_box
+#    "reset" - resets the UI Element to its default value (blank)
+#    "pack"  for packing the compound UI element
+#------------------------------------------------------------------------------------
+
+class validated_keycode_entry_box(integer_entry_box):
+    def __init__(self, parent_window, callback, tool_tip:str):
+        # we need to know the current item ID for validation
+        self.current_item_id = 0
+        # Create the parent class integer entry box
+        super().__init__(parent_window, width=4, min_value=0, max_value=255,
+                         callback=callback, tool_tip=tool_tip)
+
+    def validate(self):
+        # Reserved keycodes (mapped to editor controls in Run Mode are):
+        # keycode 37 - <cntl> - used for mode change, automation on/off and 'revert' screen size
+        # keycode 38 -'A' - Used (with cntl) for toggling automation on/off
+        # keycode 58 -'M' - Used (with cntl) for toggling between Edit and Run Modes
+        # keycode 27 -'R' - Used (with cntl) for 'Reverting' the window size to match the canvas
+        # keycode 111 - Up arrow key - for moving the canvas in the window
+        # keycode 113 - Left arrow key - for moving the canvas in the window
+        # keycode 114 - Right arrow key - for moving the canvas in the window
+        # keycode 116 - Down arrow key - for moving the canvas in the window
+        reserved_keycodes = (37, 38, 58, 27, 111, 113, 114, 116)
+        # Validate the basic entry values first (we do both to accept the current entries):
+        valid = super().validate()
+        if valid and self.get_value() > 0:
+            mapping = library.get_keyboard_mapping(self.get_value())
+            mapping_valid = mapping is None or (mapping[0] == "Lever" and mapping[1] == self.current_item_id)
+            if self.get_value() in reserved_keycodes:
+                self.TT.text = "Keycodes 37, 38, 58, 27, 111, 113, 114, 116 are reserved for the application"
+                valid = False
+            elif not mapping_valid:
+                self.TT.text = "Keycode is already mapped to "+mapping[0]+" "+str(mapping[1])
+                valid = False
+            if not valid:
+                self.set_validation_status(False)
+        return(valid)
+
+    def set_value(self, keycode:int, item_id:int=0):
+        # We need to know the current ID for validation
+        self.current_item_id = item_id
+        super().set_value(keycode)
+
+    def set_item_id(self, item_id:int):
+        self.current_item_id = item_id
 
 ###########################################################################################
