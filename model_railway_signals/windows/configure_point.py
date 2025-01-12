@@ -161,7 +161,6 @@ class automation(Tk.LabelFrame):
                         valid = False       
         self.EB1.set_validation_status(valid)
         return(valid)
-
         
     def validate_switched_with_checkbox(self):
         # 'Switched With' checkbox validation - if the point is not "automatic" then the Point ID  
