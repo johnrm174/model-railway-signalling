@@ -30,7 +30,7 @@
 #       frame_colour:str - the colour to use for the lever body colour (default='Grey40')
 #       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "bold")
 #
-#   update_lever_button_styles - updates the styles of a lever object 
+#   update_lever_styles - updates the styles of a lever object 
 #     Mandatory Parameters:
 #       lever_id:int - The ID for the lever
 #     Optional Parameters:
@@ -267,7 +267,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
 # Public API function to Update the Lever button styles
 #---------------------------------------------------------------------------------------------
 
-def update_lever_button_styles(lever_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
+def update_lever_styles(lever_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
                     selected_colour:str="White", text_colour:str="Black", frame_colour:str="Grey40",
                     lock_text_colour:str="White", font=("TkFixedFont",8,"bold")):
     global levers

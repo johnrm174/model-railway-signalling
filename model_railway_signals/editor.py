@@ -212,6 +212,8 @@ class main_menubar:
                 command=lambda:menubar.edit_point_styles(self.root))
         self.styles_menu.add_command(label =" Signal buttons...",
                 command=lambda:menubar.edit_signal_styles(self.root))
+        self.styles_menu.add_command(label =" Signalbox levers...",
+                command=lambda:menubar.edit_lever_styles(self.root))
         self.styles_menu.add_command(label =" Text boxes...",
                 command=lambda:menubar.edit_textbox_styles(self.root))
         self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)

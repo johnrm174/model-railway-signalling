@@ -8,6 +8,7 @@
 #    edit_route_line_styles
 #    edit_point_styles
 #    edit_signal_styles
+#    edit_lever_styles
 #    edit_textbox_styles
 #
 # Makes the following external API calls to other editor modules:
@@ -682,6 +683,139 @@ class edit_textbox_styles():
         global edit_textbox_styles_window
         if not self.textcolour.is_open() and not self.background.is_open():
             edit_textbox_styles_window = None
+            self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Class for the Textbox Style Settings toolbar window.
+#------------------------------------------------------------------------------------
+
+edit_lever_styles_window = None
+
+class edit_lever_styles():
+    def __init__(self, root_window):
+        global edit_lever_styles_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_lever_styles_window is not None:
+            edit_lever_styles_window.lift()
+            edit_lever_styles_window.state('normal')
+            edit_lever_styles_window.focus_force()
+        else:
+            # Create the (non resizable) top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Signalbox Lever Styles")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_lever_styles_window = self.window
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the frame colour and locking text colour type
+            #----------------------------------------------------------------------------------
+            self.frame1 = Tk.Frame(self.window)
+            self.frame1.pack(fill='x')
+            self.framecolour = common.colour_selection(self.frame1, label="Frame colour")
+            self.framecolour.pack(padx=2, pady=2, fill='both', side=Tk.LEFT, expand=1)
+            self.frametextcolour = common.selection_buttons(self.frame1, label="Text colour",
+                    tool_tip="Select the text colour (auto to select 'best' contrast with background)",
+                    button_labels=("Auto", "Black", "White"))
+            self.frametextcolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the button colour and button text colour type
+            #----------------------------------------------------------------------------------
+            self.frame2 = Tk.Frame(self.window)
+            self.frame2.pack(fill='x')
+            self.buttoncolour = common.colour_selection(self.frame2, label="Button Colour")
+            self.buttoncolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
+            self.buttontextcolour = common.selection_buttons(self.frame2, label="Text colour",
+                    tool_tip="Select the text colour (auto to select 'best' contrast with background)",
+                    button_labels=("Auto", "Black", "White"))
+            self.buttontextcolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the font selection
+            #----------------------------------------------------------------------------------
+            self.font = common.font_selection(self.window, label="Button font")
+            self.font.pack(padx=2, pady=2, fill="x")
+            #----------------------------------------------------------------------------------
+            # Create a Frame for the font size, text style and border width elements (Frame 3)
+            # Pack the elements as a grid to get an aligned layout
+            #----------------------------------------------------------------------------------
+            self.frame3 = Tk.Frame(self.window)
+            self.frame3.pack(fill='x')
+            self.frame3.grid_columnconfigure(0, weight=1)
+            self.frame3.grid_columnconfigure(1, weight=1)
+            # Create a Label Frame for the Font Size Entry components (grid 0,0)
+            self.frame3subframe1 = Tk.LabelFrame(self.frame3, text="Font size")
+            self.frame3subframe1.grid(row=0, column=0, padx=2, pady=2, sticky='NSWE')
+            # Create a subframe to center the label and entrybox
+            self.frame3subframe2 = Tk.Frame(self.frame3subframe1)
+            self.frame3subframe2.pack()
+            self.frame3label1 = Tk.Label(self.frame3subframe2, text="Pixels:")
+            self.frame3label1.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
+            self.fontsize = common.integer_entry_box(self.frame3subframe2, width=3, min_value=8, max_value=20,
+                            allow_empty=False, tool_tip="Select the border width (between 8 and 20 pixels)")
+            self.fontsize.pack(padx=2, pady=2, side=Tk.LEFT)
+            # Create a Label Frame for the Text Style selection (grid 1,0)
+            self.fontstyle = common.font_style_selection(self.frame3, label="Font style")
+            self.fontstyle.grid(row=0, column=1, padx=2, pady=2, sticky='NSWE')
+            #----------------------------------------------------------------------------------
+            # Create the common buttons and Load the initial UI state
+            #----------------------------------------------------------------------------------
+            self.buttons = common_buttons(self.window, self.load_app_defaults, self.load_layout_defaults,
+                            self.apply_all, self.apply_selected, self.set_layout_defaults, self.close_window)
+            self.buttons.pack(padx=5, pady=5, side=Tk.BOTTOM, fill='x', expand=True)
+            self.load_layout_defaults()
+
+    def load_app_defaults(self):
+        self.framecolour.set_value(settings.get_default_style("levers", "framecolour"))
+        self.frametextcolour.set_value(settings.get_default_style("levers", "lockcolourtype"))
+        self.buttoncolour.set_value(settings.get_default_style("levers", "buttoncolour"))
+        self.buttontextcolour.set_value(settings.get_default_style("levers", "textcolourtype"))
+        self.font.set_value(settings.get_default_style("levers", "textfonttuple")[0])
+        self.fontsize.set_value(settings.get_default_style("levers", "textfonttuple")[1])
+        self.fontstyle.set_value(settings.get_default_style("levers", "textfonttuple")[2])
+
+    def load_layout_defaults(self):
+        self.framecolour.set_value(settings.get_style("levers", "framecolour"))
+        self.frametextcolour.set_value(settings.get_style("levers", "lockcolourtype"))
+        self.buttoncolour.set_value(settings.get_style("levers", "buttoncolour"))
+        self.buttontextcolour.set_value(settings.get_style("levers", "textcolourtype"))
+        self.font.set_value(settings.get_style("levers", "textfonttuple")[0])
+        self.fontsize.set_value(settings.get_style("levers", "textfonttuple")[1])
+        self.fontstyle.set_value(settings.get_style("levers", "textfonttuple")[2])
+
+    def set_layout_defaults(self):
+        if self.fontsize.validate():
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            settings.set_style("levers","textfonttuple", font_tuple)
+            settings.set_style("levers","framecolour", self.framecolour.get_value())
+            settings.set_style("levers","lockcolourtype", self.frametextcolour.get_value())
+            settings.set_style("levers","buttoncolour", self.buttoncolour.get_value())
+            settings.set_style("levers","textcolourtype", self.buttontextcolour.get_value())
+
+    def apply_all(self):
+        if self.fontsize.validate():
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            styles_to_apply = {"textfonttuple": font_tuple,
+                               "framecolour": self.framecolour.get_value(),
+                               "lockcolourtype": self.frametextcolour.get_value(),
+                               "buttoncolour": self.buttoncolour.get_value(),
+                               "textcolourtype": self.buttontextcolour.get_value() }
+            objects_to_update = list(objects.lever_index.values())
+            objects.update_styles(objects_to_update, styles_to_apply)
+
+    def apply_selected(self):
+        if self.fontsize.validate():
+            font_tuple = (self.font.get_value(), self.fontsize.get_value(), self.fontstyle.get_value())
+            styles_to_apply = {"textfonttuple": font_tuple,
+                               "framecolour": self.framecolour.get_value(),
+                               "lockcolourtype": self.frametextcolour.get_value(),
+                               "buttoncolour": self.buttoncolour.get_value(),
+                               "textcolourtype": self.buttontextcolour.get_value() }
+            objects_to_update = schematic.get_selected_objects(object_type=objects.object_type.lever)
+            objects.update_styles(objects_to_update, styles_to_apply)
+
+    def close_window(self):
+        global edit_lever_styles_window
+        if not self.framecolour.is_open() and not self.buttoncolour.is_open():
+            edit_lever_styles_window = None
             self.window.destroy()
 
 #############################################################################################

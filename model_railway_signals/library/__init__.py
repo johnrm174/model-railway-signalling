@@ -78,7 +78,7 @@ from .levers import lock_lever
 from .levers import unlock_lever
 from .levers import toggle_lever
 from .levers import lever_switched
-from .levers import update_lever_button_styles
+from .levers import update_lever_styles
 from .levers import set_lever_switching_behaviour
 
 from .track_sections import create_section
@@ -204,7 +204,7 @@ __all__ = [
       # Public lever types/functions
         'lever_type',
         'create_lever',
-        'update_lever_button_styles',
+        'update_lever_styles',
         'set_lever_switching_behaviour',
         'delete_lever',
         'lever_exists',

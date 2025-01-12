@@ -18,6 +18,7 @@
 #    edit_route_line_styles(root)
 #    edit_point_styles(root)
 #    edit_signal_styles(root)
+#    edit_lever_styles(root)
 #    edit_textbox_styles(root)
 #    dcc_programming(root, dcc_prog_enabled_function, dcc_power_on_function, dcc_power_off_function)
 #    dcc_mappings(root)
@@ -41,6 +42,7 @@ from .menubar_styles import edit_switch_styles
 from .menubar_styles import edit_route_line_styles
 from .menubar_styles import edit_point_styles
 from .menubar_styles import edit_signal_styles
+from .menubar_styles import edit_lever_styles
 from .menubar_styles import edit_textbox_styles
 
 from .menubar_utilities import dcc_programming
@@ -62,6 +64,7 @@ __all__ = [
     'edit_route_line_styles',
     'edit_point_styles',
     'edit_signal_styles',
+    'edit_lever_styles',
     'edit_textbox_styles',
     'dcc_programming',
     'dcc_mappings' ]
