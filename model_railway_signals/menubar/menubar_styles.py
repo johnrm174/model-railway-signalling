@@ -40,10 +40,10 @@
 
 import tkinter as Tk
 
-from . import common
-from . import objects
-from . import schematic
-from . import settings
+from .. import common
+from .. import objects
+from .. import schematic
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Class for the common_buttons UI Element

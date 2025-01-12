@@ -32,23 +32,23 @@
 #    settings.get_sprog() - to get the current SPROG settings
 #    settings.get_gpio() - to get the current track sensor GPIO mappings
 #    settings.restore_defaults() - Following user selection of "new"
-#    menubar_settings.edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
-#    menubar_settings.edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
-#    menubar_settings.edit_logging_settings(root, logging_update_callback)
-#    menubar_settings.edit_canvas_settings(root, canvas_update_callback)
-#    menubar_settings.edit_gpio_settings(root, gpio_update_callback)
-#    menubar_help.display_help(parent_window) - opens the config window
-#    menubar_help.display_about(parent_window) - opens the config window
-#    menubar_help.edit_layout_info(parent_window) - opens the config window
-#    menubar_utilities.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
-#    menubar_utilities.dcc_mappings(root)
-#    menubar_styles.edit_switch_styles(root)
-#    menubar_styles.edit_route_styles(root)
-#    menubar_styles.edit_section_styles(root)
-#    menubar_styles.edit_route_line_styles(root)
-#    menubar_styles.edit_point_styles(root)
-#    menubar_styles.edit_signal_styles(root)
-#    menubar_styles.edit_textbox_styles(root)
+#    menubar.edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
+#    menubar.edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
+#    menubar.edit_logging_settings(root, logging_update_callback)
+#    menubar.edit_canvas_settings(root, canvas_update_callback)
+#    menubar.edit_gpio_settings(root, gpio_update_callback)
+#    menubar.display_help(parent_window) - opens the config window
+#    menubar.display_about(parent_window) - opens the config window
+#    menubar.edit_layout_info(parent_window) - opens the config window
+#    menubar.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
+#    menubar.dcc_mappings(root)
+#    menubar.edit_switch_styles(root)
+#    menubar.edit_route_styles(root)
+#    menubar.edit_section_styles(root)
+#    menubar.edit_route_line_styles(root)
+#    menubar.edit_point_styles(root)
+#    menubar.edit_signal_styles(root)
+#    menubar.edit_textbox_styles(root)
 #
 # Makes the following external API calls to library modules:
 #    library.set_root_window(widget) - To set the root window
@@ -103,10 +103,7 @@ from . import settings
 from . import schematic
 from . import run_layout
 from . import run_routes
-from . import menubar_help
-from . import menubar_settings
-from . import menubar_utilities
-from . import menubar_styles
+from . import menubar
 from . import library
 
 # The following imports are only used for the advanced debugging functions
@@ -181,48 +178,48 @@ class main_menubar:
         # Create the various menubar items for the Utilities Dropdown
         self.utilities_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.utilities_menu.add_command(label =" DCC Programming...",
-                command=lambda:menubar_utilities.dcc_programming(self.root, self.dcc_programming_enabled,
+                command=lambda:menubar.dcc_programming(self.root, self.dcc_programming_enabled,
                                                          self.dcc_power_off, self.dcc_power_on))
         self.utilities_menu.add_command(label =" DCC Mappings...",
-                command=lambda:menubar_utilities.dcc_mappings(self.root))
+                command=lambda:menubar.dcc_mappings(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.settings_menu.add_command(label =" Canvas...",
-                command=lambda:menubar_settings.edit_canvas_settings(self.root, self.canvas_update))
+                command=lambda:menubar.edit_canvas_settings(self.root, self.canvas_update))
         self.settings_menu.add_command(label =" General...",
-                command=lambda:menubar_settings.edit_general_settings(self.root, self.general_settings_update))
+                command=lambda:menubar.edit_general_settings(self.root, self.general_settings_update))
         self.settings_menu.add_command(label =" GPIO...",
-                command=lambda:menubar_settings.edit_gpio_settings(self.root, self.gpio_update))
+                command=lambda:menubar.edit_gpio_settings(self.root, self.gpio_update))
         self.settings_menu.add_command(label =" Logging...",
-                command=lambda:menubar_settings.edit_logging_settings(self.root, self.logging_update))
+                command=lambda:menubar.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
-                command=lambda:menubar_settings.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
+                command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
         self.settings_menu.add_command(label =" SPROG...",
-                command=lambda:menubar_settings.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
+                command=lambda:menubar.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
         # Create the various menubar items for the Styles Dropdown
         self.styles_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.styles_menu.add_command(label =" Route buttons...",
-                command=lambda:menubar_styles.edit_route_styles(self.root))
+                command=lambda:menubar.edit_route_styles(self.root))
         self.styles_menu.add_command(label =" DCC switches...",
-                command=lambda:menubar_styles.edit_switch_styles(self.root))
+                command=lambda:menubar.edit_switch_styles(self.root))
         self.styles_menu.add_command(label =" Track sections...",
-                command=lambda:menubar_styles.edit_section_styles(self.root))
+                command=lambda:menubar.edit_section_styles(self.root))
         self.styles_menu.add_command(label =" Route lines...",
-                command=lambda:menubar_styles.edit_route_line_styles(self.root))
+                command=lambda:menubar.edit_route_line_styles(self.root))
         self.styles_menu.add_command(label =" Point buttons...",
-                command=lambda:menubar_styles.edit_point_styles(self.root))
+                command=lambda:menubar.edit_point_styles(self.root))
         self.styles_menu.add_command(label =" Signal buttons...",
-                command=lambda:menubar_styles.edit_signal_styles(self.root))
+                command=lambda:menubar.edit_signal_styles(self.root))
         self.styles_menu.add_command(label =" Text boxes...",
-                command=lambda:menubar_styles.edit_textbox_styles(self.root))
+                command=lambda:menubar.edit_textbox_styles(self.root))
         self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.help_menu.add_command(label =" Help...", command=lambda:menubar_help.display_help(self.root))
-        self.help_menu.add_command(label =" About...", command=lambda:menubar_help.display_about(self.root))
-        self.help_menu.add_command(label =" Info...", command=lambda:menubar_help.edit_layout_info(self.root))
+        self.help_menu.add_command(label =" Help...", command=lambda:menubar.display_help(self.root))
+        self.help_menu.add_command(label =" About...", command=lambda:menubar.display_about(self.root))
+        self.help_menu.add_command(label =" Info...", command=lambda:menubar.edit_layout_info(self.root))
         self.mainmenubar.add_cascade(label = "Help", menu=self.help_menu)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout

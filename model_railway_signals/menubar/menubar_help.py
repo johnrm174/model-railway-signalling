@@ -20,8 +20,8 @@
 import tkinter as Tk
 import webbrowser
 
-from . import common
-from . import settings
+from .. import common
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Class for the "Help" window - Uses the common.scrollable_text_frame.

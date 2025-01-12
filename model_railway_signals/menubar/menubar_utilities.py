@@ -25,8 +25,8 @@ import tkinter as Tk
 import json
 import os
 
-from . import common
-from . import library
+from .. import common
+from .. import library
 
 #------------------------------------------------------------------------------------
 # Class for a CV Programming entry element

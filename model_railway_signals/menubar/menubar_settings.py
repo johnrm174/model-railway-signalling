@@ -43,9 +43,9 @@ from tkinter import ttk
 import time
 import datetime
 
-from . import common
-from . import settings
-from . import library
+from .. import common
+from .. import settings
+from .. import library
 
 #------------------------------------------------------------------------------------
 # Class for the Canvas configuration toolbar window. Note the init function takes
