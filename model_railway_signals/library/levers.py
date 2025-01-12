@@ -196,10 +196,10 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         logging.error("Lever "+str(lever_id)+": create_lever - Invalid 'off' keycode value specified")
     elif on_keycode > 0 and common.get_keyboard_mapping(on_keycode) is not None:
         logging.error("Lever "+str(lever_id)+": create_lever - 'on' keycode is already mapped to "+
-                    common.get_keyboard_mapping(on_keypress)[0]+" "+str(common.get_keyboard_mapping(on_keycode)[1]))
+                    common.get_keyboard_mapping(on_keycode)[0]+" "+str(common.get_keyboard_mapping(on_keycode)[1]))
     elif off_keycode > 0 and common.get_keyboard_mapping(off_keycode) is not None:
         logging.error("Lever "+str(lever_id)+": create_lever - 'off' keycode is already mapped to "+
-                    common.get_keyboard_mapping(off_keypress)[0]+" "+str(common.get_keyboard_mapping(off_keycode)[1]))
+                    common.get_keyboard_mapping(off_keycode)[0]+" "+str(common.get_keyboard_mapping(off_keycode)[1]))
     elif on_keycode > 0 and on_keycode == off_keycode:
         logging.error("Lever "+str(lever_id)+": create_lever - Same keycode specified for 'on' and 'off' events")
     else:
