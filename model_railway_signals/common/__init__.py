@@ -10,12 +10,13 @@
 #    character_entry_box(entry_box)
 #    integer_entry_box(entry_box)
 #    dcc_entry_box(integer_entry_box)
-#    validated_dcc_entry_box(dcc_entry_box)
 #    int_item_id_entry_box (integer_entry_box)
 #    str_item_id_entry_box(entry_box)
 #    str_int_item_id_entry_box(entry_box)
 #    scrollable_text_frame(Tk.Frame)
+#    validated_dcc_entry_box(dcc_entry_box)
 #    validated_keycode_entry_box(integer_entry_box)
+#    validated_gpio_sensor_entry_box(str_int_item_id_entry_box)
 #
 # Provides the following 'compound' UI elements for the application
 #    validated_keypress_entry(Tk.Frame) - validated character or unicode entry
@@ -58,12 +59,13 @@ from .common_simple import entry_box
 from .common_simple import character_entry_box
 from .common_simple import integer_entry_box
 from .common_simple import dcc_entry_box
-from .common_simple import validated_dcc_entry_box
 from .common_simple import int_item_id_entry_box
 from .common_simple import str_item_id_entry_box
 from .common_simple import str_int_item_id_entry_box
 from .common_simple import scrollable_text_frame
+from .common_simple import validated_dcc_entry_box
 from .common_simple import validated_keycode_entry_box
+from .common_simple import validated_gpio_sensor_entry_box
 
 from .common_compound import validated_dcc_command_entry
 from .common_compound import point_settings_entry
@@ -96,12 +98,13 @@ __all__ = [
     'character_entry_box',
     'integer_entry_box',
     'dcc_entry_box',
-    'validated_dcc_entry_box',
     'int_item_id_entry_box',
     'str_item_id_entry_box',
     'str_int_item_id_entry_box',
     'scrollable_text_frame',
+    'validated_dcc_entry_box',
     'validated_keycode_entry_box',
+    'validated_gpio_sensor_entry_box',
     # Compoind UI Elements
     'validated_dcc_command_entry',
     'point_settings_entry',

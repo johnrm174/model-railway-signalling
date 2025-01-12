@@ -43,65 +43,6 @@ from .. import library
 open_windows={}
 
 #------------------------------------------------------------------------------------
-# Class for a gpio_sensor_selection frame - based on the str_int_item_id_entry_box
-# Public Class instance methods (inherited from the str_int_item_id_entry_box) are
-#    "get_value" - will return the last "valid" value (string)
-#    "set_value" - set the initial value of the entry_box (str) - Also sets the
-#                  current track sensor item ID (int) for validation purposes
-# Overridden Public Class instance methods provided by this class:
-#    "validate" - Must 'exist' (or subscribed to) and not already mapped
-# Note that we use the current_item_id variable (from the base class) for validation.
-#------------------------------------------------------------------------------------
-
-class gpio_sensor_selection(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame):
-        # We need to hold the current track_sensor_id for validation purposes but we don't pass this 
-        # into the parent class as the entered ID for the gpio sensor can be the same as the current
-        # item_id (for the track sensor object) - so we don't want the parent class to validate this.
-        self.track_sensor_id = 0
-        # Create a labelframe to hold the various UI elements
-        self.frame = Tk.LabelFrame(parent_frame, text="GPIO sensor events")
-        # Create a subframe to centre the UI elements
-        self.subframe=Tk.Frame(self.frame)
-        self.subframe.pack()
-        self.label = Tk.Label(self.subframe, text="  Sensor 'passed' sensor:")
-        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        # The 'exists' function will return true if the GPIO sensor exists
-        exists_function = library.gpio_sensor_exists
-        tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This "+
-                    "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
-                    "which has been subscribed to via MQTT networking")
-        super().__init__(self.subframe, tool_tip=tool_tip, exists_function=exists_function)
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
-            
-    def validate(self, update_validation_status=True):
-        # Do the basic validation first - ID is valid and 'exists'
-        valid = super().validate(update_validation_status=False)
-        # Validate it isn't already mapped to another Signal or Track Sensor event. Note that we use the
-        # current_item_id variable (from the base str_int_item_id_entry_box class) for validation.
-        if valid and self.entry.get() != "":
-            gpio_sensor_id = self.entry.get()
-            event_mappings = library.get_gpio_sensor_callback(gpio_sensor_id)
-            if event_mappings[0] > 0:
-                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
-                valid = False
-            elif event_mappings[1] > 0:
-                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
-                valid = False
-            elif event_mappings[2] > 0 and event_mappings[2] != self.track_sensor_id:
-                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
-                valid = False
-        if update_validation_status: self.set_validation_status(valid)
-        return(valid)
-    
-    # We need to hold the current track_sensor_id for validation purposes but we don't pass this 
-    # into the parent class as the entered ID for the gpio sensor can be the same as the current
-    # item_id (for the track sensor object) - so we don't want the parent class to validate this.
-    def set_value(self, value:str, track_sensor_id:int):
-        self.track_sensor_id = track_sensor_id
-        super().set_value(value)
-    
-#------------------------------------------------------------------------------------
 # Class for a track_sensor_route_group (comprising 6 points, and a track section)
 # Uses the common row_of_point_settings class for the point entries
 # Public class instance methods provided are:
@@ -218,28 +159,41 @@ class edit_track_sensor():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             open_windows[object_id] = self.window
+            #---------------------------------------------------------------------
             # Create a Frame to hold the Item ID and GPIO Sensor UI elements
+            #---------------------------------------------------------------------
             self.frame = Tk.Frame(self.window)
             self.frame.pack(fill='x')
-            # Create the UI Element for Item ID selection
+            # Create the Label Frame UI Element for Item ID
             self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
                                 exists_function = library.track_sensor_exists)
-            self.sensorid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
-            # Create the UI Element for the GPIO Sensor selection.
-            self.gpiosensor = gpio_sensor_selection(self.frame)
-            self.gpiosensor.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.sensorid.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            # Create the GPIO Sensor selection in a labelframe
+            self.subframe1=Tk.LabelFrame(self.frame, text="GPIO sensor events")
+            self.subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+            # Create a Frame to center everything in
+            self.subframe1a = Tk.Frame(self.subframe1)
+            self.subframe1a.pack()
+            self.label = Tk.Label(self.subframe1a, text="Sensor 'passed' sensor:")
+            self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1a, item_type="Sensor")
+            self.gpiosensor.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the UI Element for the general settings
-            self.subframe1 = Tk.LabelFrame(self.frame, text="General Settings")
-            self.subframe1.pack(padx=2, pady=2, fill='x')
-            self.hidden = common.check_box(self.subframe1, label="Hidden",
+            self.subframe2 = Tk.LabelFrame(self.frame, text="General Settings")
+            self.subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.hidden = common.check_box(self.subframe2, label="Hidden",
                      tool_tip= "Select to hide the Track Sensor in Run Mode")
             self.hidden.pack(padx=2, pady=2)
+            #---------------------------------------------------------------------
             # Create the UI Elements for the track sensor route elements
+            #---------------------------------------------------------------------
             self.behind = track_sensor_route_frame(self.window,label="Routes / Track Sections 'behind' Track Sensor")
             self.behind.frame.pack(padx=2, pady=2, fill='x')
             self.ahead = track_sensor_route_frame(self.window,label="Routes/ Track Sections 'ahead of' Track Sensor")
             self.ahead.frame.pack(padx=2, pady=2, fill='x')
+            #---------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #---------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)

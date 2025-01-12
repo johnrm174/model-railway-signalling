@@ -9,12 +9,13 @@
 #    character_entry_box(entry_box)
 #    integer_entry_box(entry_box)
 #    dcc_entry_box(integer_entry_box)
-#    validated_dcc_entry_box(dcc_entry_box)
 #    int_item_id_entry_box (integer_entry_box)
 #    str_item_id_entry_box(entry_box)
 #    str_int_item_id_entry_box(entry_box)
 #    scrollable_text_frame(Tk.Frame)
+#    validated_dcc_entry_box(dcc_entry_box)
 #    validated_keycode_entry_box(integer_entry_box)
+#    validated_gpio_sensor_entry_box(str_int_item_id_entry_box)
 #
 # Makes the following external API calls to the library package
 #    library.dcc_address_mapping(dcc_address)
@@ -504,61 +505,6 @@ class dcc_entry_box(integer_entry_box):
                             tool_tip=tool_tip, callback=callback)
 
 #------------------------------------------------------------------------------------
-# Common class for a validated_dcc_entry_box - builds on the common DCC Entry Box with added
-# validation to ensure the DCC address is not used by anything else. The validation function
-# needs knowledge of the current item type (provided at initialisation time) and the current
-# item ID (provided either via the set_value function or the set_item_id function).
-#
-# Main class methods used by the editor are:
-#    "set_value" - set the initial value of the entry_box (int) 
-#    "set_item_id" - To set the current ID independently to the set_value function
-#    "get_value" - get the current value of the entry_box (int) 
-#    "validate" - Validates entry is a DCC address and not assigned to anything else
-#    "disable/disable1/disable2" - disables/blanks the entry_box
-#    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
-#    "reset" - resets the entry box to its default value (Zero)
-#    "pack" - for packing the UI element
-#
-# Class methods/objects for use by child classes:
-#    "set_validation_status" - to be called following external validation
-#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
-#    "entry" - is the current entry_box value (string)
-#------------------------------------------------------------------------------------
-
-class validated_dcc_entry_box(dcc_entry_box):
-    def __init__(self, parent_frame, item_type:str, callback=None):
-        # We need the current Item ID and Item Type to validate the DCC Address entry. The 
-        # Item Type ("Signal", "Point" or "Switch" is supplied at class initialisation time.
-        # The item ID is supplied when the 'set_value' function is called (as this may change)
-        self.current_item_id = 0
-        self.current_item_type = item_type
-        super().__init__(parent_frame, callback=callback)
-        
-    def validate(self):
-        # Do the basic item validation first (exists and not current item ID)
-        valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            # Ensure the address is not mapped to another signal or point. Note that to cater for Semaphore
-            # Signals with secondary distant arms we also need to check for Signal IDs + 1000
-            dcc_address = int(self.entry.get())
-            dcc_mapping = library.dcc_address_mapping(dcc_address)
-            if dcc_mapping is not None and (dcc_mapping[0] != self.current_item_type or
-                    (dcc_mapping[1] != self.current_item_id and dcc_mapping[1] != self.current_item_id + 1000)):
-                # We need to correct the mapped signal ID for secondary distants
-                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
-                self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
-                valid = False
-        self.set_validation_status(valid)
-        return(valid)
-    
-    def set_value(self, value:int, item_id:int=0):
-        self.current_item_id = item_id
-        super().set_value(value)
-
-    def set_item_id(self, item_id:int):
-        self.current_item_id = item_id
-
-#------------------------------------------------------------------------------------
 # Common class for an int_item_id_entry_box - builds on the integer_entry_box. This class
 # is for entering local signal/point/instrument/section IDs (integers). It does not accept
 #  remote IDs (where the ID can be an int or str). The class uses the 'exists_function' to
@@ -851,6 +797,61 @@ class scrollable_text_frame(Tk.Frame):
         self.text_box.configure(font=(font, font_size, font_style))
 
 #------------------------------------------------------------------------------------
+# Common class for a validated_dcc_entry_box - builds on the common DCC Entry Box with added
+# validation to ensure the DCC address is not used by anything else. The validation function
+# needs knowledge of the current item type (provided at initialisation time) and the current
+# item ID (provided either via the set_value function or the set_item_id function).
+#
+# Main class methods used by the editor are:
+#    "set_value" - set the initial value of the entry_box (int)
+#    "set_item_id" - To set the current ID independently to the set_value function
+#    "get_value" - get the current value of the entry_box (int)
+#    "validate" - Validates entry is a DCC address and not assigned to anything else
+#    "disable/disable1/disable2" - disables/blanks the entry_box
+#    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Zero)
+#    "pack" - for packing the UI element
+#
+# Class methods/objects for use by child classes:
+#    "set_validation_status" - to be called following external validation
+#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
+#    "entry" - is the current entry_box value (string)
+#------------------------------------------------------------------------------------
+
+class validated_dcc_entry_box(dcc_entry_box):
+    def __init__(self, parent_frame, item_type:str, callback=None):
+        # We need the current Item ID and Item Type to validate the DCC Address entry. The
+        # Item Type ("Signal", "Point" or "Switch" is supplied at class initialisation time.
+        # The item ID is supplied when the 'set_value' function is called (as this may change)
+        self.current_item_id = 0
+        self.current_item_type = item_type
+        super().__init__(parent_frame, callback=callback)
+
+    def validate(self):
+        # Do the basic item validation first (exists and not current item ID)
+        valid = super().validate(update_validation_status=False)
+        if valid and self.entry.get() != "":
+            # Ensure the address is not mapped to another signal or point. Note that to cater for Semaphore
+            # Signals with secondary distant arms we also need to check for Signal IDs + 1000
+            dcc_address = int(self.entry.get())
+            dcc_mapping = library.dcc_address_mapping(dcc_address)
+            if dcc_mapping is not None and (dcc_mapping[0] != self.current_item_type or
+                    (dcc_mapping[1] != self.current_item_id and dcc_mapping[1] != self.current_item_id + 1000)):
+                # We need to correct the mapped signal ID for secondary distants
+                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
+                self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+
+    def set_value(self, value:int, item_id:int=0):
+        self.current_item_id = item_id
+        super().set_value(value)
+
+    def set_item_id(self, item_id:int):
+        self.current_item_id = item_id
+
+#------------------------------------------------------------------------------------
 # Class for a validated_keypress_entry (for mapping keypress events).
 # Validated to ensure the keycode is not on the reserved list and
 # has not already been mapped to another library object
@@ -886,7 +887,7 @@ class validated_keycode_entry_box(integer_entry_box):
         # keycode 116 - Down arrow key - for moving the canvas in the window
         reserved_keycodes = (37, 38, 58, 27, 111, 113, 114, 116)
         # Validate the basic entry values first (we do both to accept the current entries):
-        valid = super().validate()
+        valid = super().validate(update_validation_status=False)
         if valid and self.get_value() > 0:
             mapping = library.get_keyboard_mapping(self.get_value())
             mapping_valid = mapping is None or (mapping[0] == "Lever" and mapping[1] == self.current_item_id)
@@ -896,16 +897,71 @@ class validated_keycode_entry_box(integer_entry_box):
             elif not mapping_valid:
                 self.TT.text = "Keycode is already mapped to "+mapping[0]+" "+str(mapping[1])
                 valid = False
-            if not valid:
-                self.set_validation_status(False)
+        self.set_validation_status(valid)
         return(valid)
 
     def set_value(self, keycode:int, item_id:int=0):
-        # We need to know the current ID for validation
         self.current_item_id = item_id
         super().set_value(keycode)
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
+
+#------------------------------------------------------------------------------------
+# Class for a validated_gpio_sensor_entry_box (for mapping gpio sensors to signals/sensors).
+# Note that it will accept both local (integer) and remote (string) gpio sensor IDs.
+# Validated to ensure the Sensor ID is not mapped to another signal/sensor.
+#
+# Main class methods used by the editor are:
+#    "validate" - validate the current selection and return True/false
+#    "set_value" - will set the current value (integer)
+#    "set_item_id" - To set the current ID independently to the set_value function
+#    "get_value" - will return the last "valid" value (integer)
+#    "disable" - disables/blanks the entry_box
+#    "enable"  enables/loads the entry_box
+#    "reset" - resets the UI Element to its default value (blank)
+#    "pack"  for packing the compound UI element
+#------------------------------------------------------------------------------------
+
+class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
+    def __init__(self, parent_frame, item_type:str, callback=None):
+        # We need to know the current item ID for validation, but we want to hold it
+        # locally rather than pass into the parent class (which already has a local
+        # 'current_item_id' parameter used for local validation so we can't use that
+        # name here). We also need the Item Type to validate the GPIO Sensor Entry.
+        # The Item Type ("Sensor" or "Signal" is supplied at initialisation time.
+        # The item ID is supplied via the 'set_value' or 'set_item_id' functions.
+        self.local_item_id = 0
+        self.current_item_type = item_type
+        tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This can be "+
+                    "a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
+                    "which has been subscribed to via MQTT networking")
+        super().__init__(parent_frame, tool_tip=tool_tip, exists_function=library.gpio_sensor_exists, callback=callback)
+
+    def validate(self):
+        # Do the basic validation first - ID is valid and 'exists'
+        valid = super().validate(update_validation_status=False)
+        # Validate it isn't already mapped to another Signal or Track Sensor
+        if valid and self.entry.get() != "":
+            gpio_sensor_id = self.entry.get()
+            event_mappings = library.get_gpio_sensor_callback(gpio_sensor_id)
+            if event_mappings[0] > 0 and (self.current_item_type != "Signal" or event_mappings[2] != self.local_item_id):
+                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
+                valid = False
+            elif event_mappings[1] > 0 and (self.current_item_type != "Signal" or event_mappings[2] != self.local_item_id):
+                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
+                valid = False
+            elif event_mappings[2] > 0 and (self.current_item_type != "Sensor" or event_mappings[2] != self.local_item_id):
+                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+
+    def set_value(self, value:str, item_id:int=0):
+        self.local_item_id = item_id
+        super().set_value(value)
+
+    def set_item_id(self, item_id:int):
+        self.local_item_id = item_id
 
 ###########################################################################################
