@@ -34,6 +34,7 @@
 #    grid_of_widgets(Tk.Frame) - an expandable grid of widgets (pass in the base class)
 #    grid_of_generic_entry_boxes(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks 
 #    grid_of_point_settings(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks
+#    list_of_widgets(Tk.Frame) - A variable length list of (read only) widgets
 #
 # Provides the following "Stand Alone" UI Elements:
 #    object_id_selection(integer_entry_box) - Object ID integer entry box in a LabelFrame
@@ -79,6 +80,7 @@ from .common_extensible import row_of_point_settings
 from .common_extensible import grid_of_widgets
 from .common_extensible import grid_of_generic_entry_boxes
 from .common_extensible import grid_of_point_settings
+from .common_extensible import list_of_widgets
 
 from .common_complete import object_id_selection
 from .common_complete import selection_buttons
@@ -118,6 +120,7 @@ __all__ = [
     'grid_of_widgets',
     'grid_of_generic_entry_boxes',
     'grid_of_point_settings',
+    'list_of_widgets',
     # Stand Alone UI Elements
     'object_id_selection',
     'selection_buttons',

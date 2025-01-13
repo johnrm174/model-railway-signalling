@@ -19,6 +19,7 @@
 #    common.scrollable_text_frame
 #    common.CreateToolTip
 #    common.dcc_entry_box
+#    common.list_of_widgets
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -273,7 +274,6 @@ class cv_programming_element():
                         self.loaded_file = filename_to_save
                         self.name.config(text="Configuration file: "+os.path.split(self.loaded_file)[1])
 
-            
     def load_config(self):
         self.B4.focus_set()
         self.root_window.update()
@@ -324,8 +324,9 @@ class one_touch_programming_element():
         self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = common.CreateToolTip(self.B2, "Send an OFF command to the selected DCC address")
          # Create the Status Label
-        self.status = Tk.Label(parent_frame, text="")
-        self.status.pack(padx=2, pady=2)
+        self.status = Tk.Label(self.subframe, width=45, borderwidth=1,  relief="solid", text="")
+        self.status.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.statusTT = common.CreateToolTip(self.status, "Displays any programming error messages")
     
     def send_command(self, command):
         self.subframe.focus_set()
@@ -400,13 +401,16 @@ class dcc_mappings():
         else:
             # Create the top level window 
             self.window = Tk.Toplevel(root_window)
-            self.window.title("DCC Mappings")
+            self.window.title("DCC Address Mappings")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             dcc_mappings_window = self.window
             # Create the ok/close and refresh buttons - pack first so they remain visible on re-sizing
             self.frame1 = Tk.Frame(self.window)
             self.frame1.pack(fill='x', expand=True, side=Tk.BOTTOM)
+            # Create the list of widgets (to populate later)
+            self.widgets=common.list_of_widgets(self.frame1, base_class=self.my_label_class, rows=20)
+            self.widgets.pack(padx=2, pady=2)
             # Create a subframe to center the buttons in
             self.subframe = Tk.Frame(self.frame1)
             self.subframe.pack()
@@ -419,6 +423,12 @@ class dcc_mappings():
             # Create an overall frame to pack everything else in
             self.mappings_frame = None
             self.load_state()
+
+    class my_label_class(Tk.Label):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+        def set_value(self,value):
+            self.configure(text=value, justify="left")
         
     def close_window(self):
         global dcc_mappings_window
@@ -426,35 +436,14 @@ class dcc_mappings():
         self.window.destroy()
     
     def load_state(self):
-        # Create a frame to hold the mappings (destroy the old one first if needed)
-        if self.mappings_frame is not None:
-            self.mappings_frame.destroy()
-        self.mappings_frame = Tk.Frame(self.window)
-        self.mappings_frame.pack(fill='both', expand=True)
-        #create a subframe 
         # Retrieve the sorted dictionary of DCC address mappings
         dcc_address_mappings = library.get_dcc_address_mappings()
-        # If there are no mappings then just display a warning
-        if len(dcc_address_mappings) == 0:
-            label = Tk.Label(self.mappings_frame, text="No DCC address mappings defined")
-            label.pack(padx=20, pady=20)
-        else:
-            # Build the table of DCC mappings
-            row_index = 0
-            for dcc_address in dict(sorted(dcc_address_mappings.items())):
-                if row_index == 0:
-                    column_frame = Tk.LabelFrame(self.mappings_frame, text="DCC addresses")
-                    column_frame.pack(side=Tk.LEFT, pady=2, padx=2, fill='both', expand=True, anchor='n')
-                # Create a subframe for the row (pack in the column frame)
-                row_frame = Tk.Frame(column_frame)
-                row_frame.pack(fill='x')
-                # Create the labels with the DCC mapping text (pack in the row subframe)
-                mapping_text = u"\u2192"+" "+dcc_address_mappings[dcc_address][0]+" "+str(dcc_address_mappings[dcc_address][1])
-                label1 = Tk.Label(row_frame, width=5, text=dcc_address, anchor="e")
-                label1.pack(side=Tk.LEFT)
-                label2 = Tk.Label(row_frame, width=10, text=mapping_text, anchor="w")
-                label2.pack(side=Tk.LEFT)
-                row_index = row_index + 1
-                if row_index >= 20: row_index = 0
+        # Compile the list of entries (Dcc address and what the address is mapped to
+        list_of_entries = []
+        for dcc_address in dict(sorted(dcc_address_mappings.items())):
+            mapping_text = u"\u2192"+" "+dcc_address_mappings[dcc_address][0]+" "+str(dcc_address_mappings[dcc_address][1])
+            list_of_entries.append("     "+format(dcc_address,'04d')+mapping_text+"     ")
+        # Set the values
+        self.widgets.set_values(list_of_entries)
 
 #############################################################################################

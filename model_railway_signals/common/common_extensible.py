@@ -9,7 +9,7 @@
 #    grid_of_widgets(Tk.Frame) - an expandable grid of widgets (pass in the base class)
 #    grid_of_generic_entry_boxes(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks 
 #    grid_of_point_settings(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks
-#
+#    list_of_widgets(Tk.Frame) - Cretae a list of (read only) widgets - max rows can be specified
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -96,7 +96,7 @@ class row_of_widgets(Tk.Frame):
             # If an Item ID is specified (for validation) then we pass through to the widgets
             if index < len(list_of_values_to_set):
                 params_to_pass = list_of_values_to_set[index]
-                widget_to_set.set_value(params_to_pass) #################
+                widget_to_set.set_value(params_to_pass)
                 if item_id > 0: widget_to_set.set_item_id(item_id)
             else:
                 widget_to_set.reset()
@@ -341,5 +341,57 @@ class grid_of_point_settings(grid_of_widgets):
             if entered_value[0] > 0 and entered_value not in values_to_return:
                 values_to_return.append(entered_value)
         return(values_to_return)
+
+#------------------------------------------------------------------------------------
+# Base Class for a  list_of_widgets of the specified base class. Will create as many
+# rows/columns of widgets as are needed to accommodate the list of values provided to the
+# the 'set_values' function. If there are not enough values provided to populate an entire
+# column, then the remainder of widgets in the row are created in their default state
+# All of the kwargs are passed through to the specified base class on creation
+#
+# Class instance functions to use externally are:
+#    "set_values" - will set the intial values from the provided list
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class list_of_widgets(Tk.Frame):
+    def __init__(self, parent_frame, base_class, rows:int, **kwargs):
+        self.parent_frame = parent_frame
+        self.base_class = base_class
+        self.maximum_rows_to_create = rows
+        self.kwargs = kwargs
+        super().__init__(parent_frame)
+        # Maintain a list of subframes and widgets (to keep everything in scope)
+        self.list_of_subframes = []
+        self.list_of_widgets = []
+
+    def set_values(self, values_to_set:list, item_id:int=0):
+        # Destroy and re-create the all the subframes - this should also destroy all child widgets
+        for subframe in self.list_of_subframes:
+            if subframe.winfo_exists():
+                subframe.destroy()
+        # Start afresh and create what we need to hold the provided values
+        self.list_of_subframes = []
+        self.list_of_widgets = []
+        # Create the frame for the first column and pack it
+        self.list_of_subframes.append(Tk.Frame(self))
+        self.list_of_subframes[-1].pack(side=Tk.LEFT)
+        current_row = 0
+        # Create the list of widgets
+        if len(values_to_set) > 0:
+            for value_to_set in values_to_set:
+                # Create the widget and set the value
+                self.list_of_widgets.append(self.base_class(self.list_of_subframes[-1], **self.kwargs))
+                self.list_of_widgets[-1].pack(side=Tk.TOP, anchor="w")
+                self.list_of_widgets[-1].set_value(value_to_set)
+                current_row = current_row +1
+                # Crete a new column if we need to
+                if current_row == self.maximum_rows_to_create:
+                    self.list_of_subframes.append(Tk.Frame(self))
+                    self.list_of_subframes[-1].pack(side=Tk.LEFT, fill="y")
+                    current_row = 0
+        else:
+            self.empty_label = Tk.Label(self.list_of_subframes[-1], text="No entries to display")
+            self.empty_label.pack(padx=5, pady=5)
 
 ###########################################################################################
