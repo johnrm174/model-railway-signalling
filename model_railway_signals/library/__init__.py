@@ -172,6 +172,7 @@ from .pi_sprog_interface import sprog_connect
 from .pi_sprog_interface import sprog_disconnect
 from .pi_sprog_interface import service_mode_read_cv
 from .pi_sprog_interface import service_mode_write_cv
+from .pi_sprog_interface import send_accessory_short_event
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
 
@@ -297,6 +298,7 @@ __all__ = [
         'sprog_disconnect',
         'service_mode_read_cv',
         'service_mode_write_cv',
+        'send_accessory_short_event',
         'request_dcc_power_on',
         'request_dcc_power_off',
       # Public DCC control functions
