@@ -750,7 +750,7 @@ class edit_lever_styles():
             self.frame3label1 = Tk.Label(self.frame3subframe2, text="Pixels:")
             self.frame3label1.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
             self.fontsize = common.integer_entry_box(self.frame3subframe2, width=3, min_value=8, max_value=20,
-                            allow_empty=False, tool_tip="Select the border width (between 8 and 20 pixels)")
+                            allow_empty=False, tool_tip="Select the font size (between 8 and 20 pixels)")
             self.fontsize.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create a Label Frame for the Text Style selection (grid 1,0)
             self.fontstyle = common.font_style_selection(self.frame3, label="Font style")
