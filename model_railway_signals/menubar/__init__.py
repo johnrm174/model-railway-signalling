@@ -22,6 +22,7 @@
 #    edit_textbox_styles(root)
 #    dcc_programming(root, dcc_prog_enabled_function, dcc_power_on_function, dcc_power_off_function)
 #    dcc_mappings(root)
+#    bulk_renumbering(root)
 #
 #------------------------------------------------------------------------------------
 
@@ -47,6 +48,7 @@ from .menubar_styles import edit_textbox_styles
 
 from .menubar_utilities import dcc_programming
 from .menubar_utilities import dcc_mappings
+from .menubar_utilities import bulk_renumbering
 
 __all__ = [
     'display_help',
@@ -67,6 +69,7 @@ __all__ = [
     'edit_lever_styles',
     'edit_textbox_styles',
     'dcc_programming',
-    'dcc_mappings' ]
+    'dcc_mappings',
+    'bulk_renumbering' ]
 
 ##############################################################################################################

@@ -42,6 +42,7 @@
 #    menubar.edit_layout_info(parent_window) - opens the config window
 #    menubar.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
 #    menubar.dcc_mappings(root)
+#    menubar.bulk_renumbering(root)
 #    menubar.edit_switch_styles(root)
 #    menubar.edit_route_styles(root)
 #    menubar.edit_section_styles(root)
@@ -182,6 +183,8 @@ class main_menubar:
                                                          self.dcc_power_off, self.dcc_power_on))
         self.utilities_menu.add_command(label =" DCC Mappings...",
                 command=lambda:menubar.dcc_mappings(self.root))
+        self.utilities_menu.add_command(label =" Item Renumbering...",
+                command=lambda:menubar.bulk_renumbering(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)

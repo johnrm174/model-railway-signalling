@@ -28,6 +28,7 @@ import os
 
 from .. import common
 from .. import library
+from .. import objects
 
 #------------------------------------------------------------------------------------
 # Class for a CV Programming entry element
@@ -341,7 +342,6 @@ class one_touch_programming_element():
  
 #------------------------------------------------------------------------------------
 # Class for the "DCC Programming" window - Uses the classes above
-# Note that if a window is already open then we just raise it and exit
 #------------------------------------------------------------------------------------
 
 dcc_programming_window = None
@@ -361,31 +361,29 @@ class dcc_programming():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             dcc_programming_window = self.window
-            # Create the ok/close button and tooltip - pack first so it remains visible on re-sizing
-            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.close_window)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
-            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
-            # Create an overall frame to pack everything  else in
-            self.frame = Tk.Frame(self.window)
-            self.frame.pack(fill='both', expand=True)
-            # Create the labelframe for "one Touch" DCC Programming (this gets packed later)
-            self.labelframe1 = Tk.LabelFrame(self.frame, text="DCC One Touch Programming")
+            # Create the labelframe for "one Touch" DCC Programming
+            self.labelframe1 = Tk.LabelFrame(self.window, text="DCC One Touch Programming")
             self.labelframe1.pack(padx=2, pady=2, fill='x')
             self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_programming_enabled_function)
-            # Create the labelframe for CV Programming (this gets packed later)
-            self.labelframe2 = Tk.LabelFrame(self.frame, text="DCC Configuration Variable (CV) Programming")
+            # Create the labelframe for CV Programming
+            self.labelframe2 = Tk.LabelFrame(self.window, text="DCC Configuration Variable (CV) Programming")
             self.labelframe2.pack(padx=2, pady=2, fill='both', expand=True)
             self.cv_programming = cv_programming_element(root_window, self.window, self.labelframe2,
                     dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function)        
-        
+            # Create the ok/close button and tooltip
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.close_window)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            self.B1.pack(padx=5, pady=5)
+
     def close_window(self):
         global dcc_programming_window
         dcc_programming_window = None
         self.window.destroy()
-        
+
+#############################################################################################
+
 #------------------------------------------------------------------------------------
-# Class for the "DCC Mappings" window 
-# Note that if a window is already open then we just raise it and exit
+# Class for the self contained "DCC Mappings" window
 #------------------------------------------------------------------------------------
 
 dcc_mappings_window = None
@@ -401,18 +399,18 @@ class dcc_mappings():
         else:
             # Create the top level window 
             self.window = Tk.Toplevel(root_window)
-            self.window.title("DCC Address Mappings")
+            self.window.title("DCC Mappings")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             dcc_mappings_window = self.window
-            # Create the ok/close and refresh buttons - pack first so they remain visible on re-sizing
-            self.frame1 = Tk.Frame(self.window)
-            self.frame1.pack(fill='x', expand=True, side=Tk.BOTTOM)
+            # Create a Frame to make everything look a bit prettier
+            self.frame = Tk.LabelFrame(self.window, text="DCC address mapppings")
+            self.frame.pack(padx=5, pady=5)
             # Create the list of widgets (to populate later)
-            self.widgets=common.list_of_widgets(self.frame1, base_class=self.my_label_class, rows=20)
+            self.widgets=common.list_of_widgets(self.frame, base_class=self.my_label_class, rows=20)
             self.widgets.pack(padx=2, pady=2)
-            # Create a subframe to center the buttons in
-            self.subframe = Tk.Frame(self.frame1)
+            # Create a subframe to center the OK/Close and Refresh buttons in
+            self.subframe = Tk.Frame(self.window)
             self.subframe.pack()
             self.B1 = Tk.Button (self.subframe, text = "Ok / Close",command=self.close_window)
             self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
@@ -420,8 +418,7 @@ class dcc_mappings():
             self.B2 = Tk.Button (self.subframe, text = "Refresh",command=self.load_state)
             self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
             self.TT1 = common.CreateToolTip(self.B2, "Reload the current DCC address mappings")
-            # Create an overall frame to pack everything else in
-            self.mappings_frame = None
+            # Load the initial state
             self.load_state()
 
     class my_label_class(Tk.Label):
@@ -438,12 +435,157 @@ class dcc_mappings():
     def load_state(self):
         # Retrieve the sorted dictionary of DCC address mappings
         dcc_address_mappings = library.get_dcc_address_mappings()
-        # Compile the list of entries (Dcc address and what the address is mapped to
+        # Compile the list of entries (DCC address and what the addresses are mapped to)
         list_of_entries = []
         for dcc_address in dict(sorted(dcc_address_mappings.items())):
             mapping_text = u"\u2192"+" "+dcc_address_mappings[dcc_address][0]+" "+str(dcc_address_mappings[dcc_address][1])
-            list_of_entries.append("     "+format(dcc_address,'04d')+mapping_text+"     ")
-        # Set the values
+            list_of_entries.append("  "+format(dcc_address,'04d')+mapping_text+"  ")
+        # Set the values to display
         self.widgets.set_values(list_of_entries)
+
+#############################################################################################
+
+#------------------------------------------------------------------------------------
+# Class for a renumbering_entry UI Element
+#------------------------------------------------------------------------------------
+
+class renumbering_entry(Tk.Frame):
+    def __init__(self, parent_window, callback=None):
+        super().__init__(parent_window)
+        self.current_id = 0
+        self.label1 = Tk.Label(self,text=" ID:")
+        self.label1.pack(side=Tk.LEFT, padx=2)
+        self.currentid = Tk.Label(self, width=3, bg="Grey95")
+        self.currentid.pack(side=Tk.LEFT, padx=2)
+        self.TT = common.CreateToolTip(self.currentid, text="Current ID (read only)")
+        self.label2 = Tk.Label(self,text=u"\u2192")
+        self.label2.pack(side=Tk.LEFT, padx=2)
+        self.newid = common.int_item_id_entry_box(self, tool_tip="Enter the required ID", callback=callback)
+        self.newid.pack(side=Tk.LEFT, padx=2)
+        self.label3 = Tk.Label(self,text=" ")
+        self.label3.pack(side=Tk.LEFT, padx=2)
+
+    def validate(self):
+        return(self.newid.validate())
+
+    def set_entry_invalid(self, error_message:str):
+        self.newid.TT.text = error_message
+        self.newid.set_validation_status(False)
+
+    def get_value(self):
+        return( [self.current_id, self.newid.get_value()] )
+
+    def set_value(self, current_and_new_ids:list[int,int]):
+        self.current_id = current_and_new_ids[0]
+        self.currentid.config(text=str(self.current_id))
+        self.newid.set_value(current_and_new_ids[1])
+        return()
+
+#------------------------------------------------------------------------------------
+# Class for the main "Bulk Renumbering" utility window (uses the classes above)
+#------------------------------------------------------------------------------------
+
+renumbering_utility_window = None
+
+class bulk_renumbering():
+    def __init__(self, root_window):
+        global renumbering_utility_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if renumbering_utility_window is not None:
+            renumbering_utility_window.lift()
+            renumbering_utility_window.state('normal')
+            renumbering_utility_window.focus_force()
+        else:
+            # Create the top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Object Renumbering")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            renumbering_utility_window = self.window
+            # Create a Frame to hold everything
+            self.frame = Tk.Frame(self.window)
+            self.frame.pack(padx=5, pady=5)
+            # Create the list of signals
+            self.subframe1 = Tk.LabelFrame(self.frame, text="Signals")
+            self.subframe1.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.signals=common.list_of_widgets(self.subframe1, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.signals.pack(padx=2, pady=2, fill='y')
+            # Create the list of points
+            self.subframe2 = Tk.LabelFrame(self.frame, text="Points")
+            self.subframe2.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.points=common.list_of_widgets(self.subframe2, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.points.pack(padx=2, pady=2, fill='y')
+            # Create the list of Levers
+            self.subframe3 = Tk.LabelFrame(self.frame, text="Levers")
+            self.subframe3.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.levers=common.list_of_widgets(self.subframe3, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.levers.pack(padx=2, pady=2, fill='y')
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # Load the initial values
+            self.load_state()
+
+    def validate_entries(self, class_to_validate):
+        # Validate the basic elements first
+        valid = class_to_validate.validate()
+        if valid:
+            # Validate the list for duplicates
+            entries = class_to_validate.get_values()
+            # Identify any duplicate entries for the new item ID
+            duplicate_entries, seen_entries = [] , []
+            for entry in entries:
+                if entry[1] in seen_entries:
+                    duplicate_entries.append(entry[1])
+                seen_entries.append(entry[1])
+            if len(duplicate_entries) > 0: valid = False
+            # Highlight any duplicates in the base classes
+            for duplicate_entry in duplicate_entries:
+                for widget in class_to_validate.list_of_widgets:
+                    if widget.winfo_exists() and widget.get_value()[1] == duplicate_entry :
+                        widget.set_entry_invalid("Duplicate IDs entered")
+        return(valid)
+
+    def validate(self):
+        valid1 = self.validate_entries(class_to_validate=self.signals)
+        valid2 = self.validate_entries(class_to_validate=self.points)
+        valid3 = self.validate_entries(class_to_validate=self.levers)
+        return(valid1 and valid2 and valid3)
+
+    def load_state(self):
+        # Signals
+        list_of_values_to_set=[]
+        for entry in sorted(objects.signal_index.items(), key=lambda dictkey: int(dictkey[0])):
+            list_of_values_to_set.append([int(entry[0]), int(entry[0])])
+        self.signals.set_values(list_of_values_to_set)
+        # Points
+        list_of_values_to_set=[]
+        for entry in sorted(objects.point_index.items(), key=lambda dictkey: int(dictkey[0])):
+            list_of_values_to_set.append([int(entry[0]), int(entry[0])])
+        self.points.set_values(list_of_values_to_set)
+        # Levers
+        list_of_values_to_set=[]
+        for entry in sorted(objects.lever_index.items(), key=lambda dictkey: int(dictkey[0])):
+            list_of_values_to_set.append([int(entry[0]), int(entry[0])])
+        self.levers.set_values(list_of_values_to_set)
+
+    def save_state(self, close_window:bool):
+        # Validate all entries
+        if self.validate():
+            self.validation_error.pack_forget()
+            ######################### Do Stuff ########################
+            # close the window (on OK)
+            if close_window: self.close_window()
+            else: self.load_state()
+        else:
+            # Display the validation error message
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
+
+    def close_window(self):
+        global renumbering_utility_window
+        renumbering_utility_window = None
+        self.window.destroy()
 
 #############################################################################################
