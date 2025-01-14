@@ -351,6 +351,8 @@ class grid_of_point_settings(grid_of_widgets):
 #
 # Class instance functions to use externally are:
 #    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "validate" - Will validate all entries
 #    "pack" - for packing the UI element
 #------------------------------------------------------------------------------------
 
@@ -393,5 +395,22 @@ class list_of_widgets(Tk.Frame):
         else:
             self.empty_label = Tk.Label(self.list_of_subframes[-1], text="No entries to display")
             self.empty_label.pack(padx=5, pady=5)
+
+    def get_values(self):
+        # Validate all the entries to accept the current (as entered) values
+        self.validate()
+        # Compile a list of values to return (we don't remove any blanks here)
+        entered_values = []
+        for widget in self.list_of_widgets:
+            if widget.winfo_exists():
+                entered_values.append(widget.get_value())
+        return(entered_values)
+
+    def validate(self):
+        valid = True
+        for widget in self.list_of_widgets:
+            if widget.winfo_exists():
+                if not widget.validate(): valid = False
+        return(valid)
 
 ###########################################################################################
