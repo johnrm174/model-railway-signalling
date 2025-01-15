@@ -274,8 +274,8 @@ def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
 def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, trigger_period:float):
     global gpio_port_mappings
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(sensor_id,int) or sensor_id < 1 or sensor_id > 999:
-        logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an int (1-999)")
+    if not isinstance(sensor_id,int) or sensor_id < 1:
+        logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be a positive integer")
     elif gpio_sensor_exists(sensor_id):
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID already exists")
     elif not isinstance(sensor_timeout,float) or sensor_timeout < 0.0:
@@ -371,12 +371,12 @@ def update_gpio_sensor_callback (sensor_id:Union[int,str], signal_passed:int=0,
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Sensor ID must be an int or str")
     elif not gpio_sensor_exists(sensor_id):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Sensor ID does not exist")
-    elif not isinstance(signal_passed,int) or signal_passed < 0 or signal_passed > 999:
-        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be an int (0-999)")
-    elif not isinstance(signal_approach,int) or signal_approach < 0 or signal_approach > 999:
-        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be an int (0-999)")
-    elif not isinstance(sensor_passed,int) or sensor_passed < 0 or sensor_passed > 999:
-        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Sensor ID must be an int (0-999)")
+    elif not isinstance(signal_passed,int) or signal_passed < 0:
+        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be a positive int")
+    elif not isinstance(signal_approach,int) or signal_approach < 0:
+        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be a positive int")
+    elif not isinstance(sensor_passed,int) or sensor_passed < 0:
+        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Sensor ID must be a positive int")
     elif ( (signal_passed > 0 and signal_approach > 0) or (signal_passed > 0 and sensor_passed > 0)
                        or (signal_approach > 0 and sensor_passed > 0) ):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - More than one event specified")
@@ -431,8 +431,8 @@ def set_gpio_sensors_to_publish_state(*sensor_ids:int):
     global list_of_track_sensors_to_publish
     for sensor_id in sensor_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(sensor_id,int) or sensor_id < 1 or sensor_id > 999:
-            logging.error("GPIO Sensor "+str(sensor_id)+": set_gpio_sensors_to_publish_state - ID must be an int (1-999)")
+        if not isinstance(sensor_id,int) or sensor_id < 1:
+            logging.error("GPIO Sensor "+str(sensor_id)+": set_gpio_sensors_to_publish_state - ID must be a positive integer")
         elif sensor_id in list_of_track_sensors_to_publish:
             logging.warning("GPIO Sensor "+str(sensor_id)+": set_gpio_sensors_to_publish_state -"
                                         +" Sensor is already configured to publish state to MQTT broker")

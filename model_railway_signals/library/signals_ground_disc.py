@@ -62,8 +62,8 @@ def create_ground_disc_signal (canvas, sig_id:int,
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Common validation (common to all signal types) 
-    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 999:
-        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-999)")
+    if not isinstance(sig_id, int) or sig_id < 1:
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be a positive integer")
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation

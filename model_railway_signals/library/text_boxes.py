@@ -102,8 +102,8 @@ def create_text_box(canvas, textbox_id:int, x:int, y:int, text:str, colour:str="
     global text_boxes
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = 'textwidget'+str(textbox_id)
-    if not isinstance(textbox_id, int) or textbox_id < 1 or textbox_id > 999:
-        logging.error("Text Box "+str(textbox_id)+": create_text_box - Textbox ID must be an int (1-999)")
+    if not isinstance(textbox_id, int) or textbox_id < 1:
+        logging.error("Text Box "+str(textbox_id)+": create_text_box - Textbox ID must be a positive integer")
     elif text_box_exists(textbox_id):
         logging.error("Text Box "+str(textbox_id)+": create_text_box - Textbox ID already exists")
     else:
@@ -145,8 +145,8 @@ def create_text_box(canvas, textbox_id:int, x:int, y:int, text:str, colour:str="
 def update_text_box_styles(textbox_id:int, colour:str="black", background:str="grey85",
             justify=Tk.CENTER, borderwidth:int=0, font=("Courier",8,"normal"), hidden:bool=False):
     global text_boxes
-    if not isinstance(textbox_id, int) or textbox_id < 1 or textbox_id > 999:
-        logging.error("Text Box "+str(textbox_id)+": update_text_box_styles - Textbox ID must be an int (1-999)")
+    if not isinstance(textbox_id, int) :
+        logging.error("Text Box "+str(textbox_id)+": create_text_box - Textbox ID must be a an int")
     elif not text_box_exists(textbox_id):
         logging.error("Text Box "+str(textbox_id)+": update_text_box_styles - Textbox ID does not exist")
     else:

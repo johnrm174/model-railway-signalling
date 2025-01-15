@@ -427,16 +427,16 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "section"+str(section_id)
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(section_id, int) or section_id < 1 or section_id > 999:
-        logging.error("Section "+str(section_id)+": create_section - Section ID must be an int (1-999)")
+    if not isinstance(section_id, int) or section_id < 1:
+        logging.error("Section "+str(section_id)+": create_section - Section ID must be a positive integer")
     elif section_exists(section_id):
         logging.error("Section "+str(section_id)+": create_section - Section ID already exists")
     elif not isinstance(mirror_id, str):
         logging.error("Section "+str(section_id)+": create_section - Mirror Section ID must be a str")
     elif mirror_id == str(section_id):
         logging.error("Section "+str(section_id)+": create_section - Mirror Section ID is the same as the Section ID")
-    elif mirror_id != "" and mirror_id.isdigit() and (int(mirror_id) < 1 or int(mirror_id) > 999):
-        logging.error("Section "+str(section_id)+": create_section - (Local) Mirrored Section ID is out of range (1-999)")
+    elif mirror_id != "" and mirror_id.isdigit() and int(mirror_id) < 1:
+        logging.error("Section "+str(section_id)+": create_section - (Local) Mirrored Section ID must be a positive integer")
     elif mirror_id != "" and not mirror_id.isdigit() and mqtt_interface.split_remote_item_identifier(mirror_id) is None:
         logging.error("Section "+str(section_id)+": create_section - (Remote) Mirrored Section ID is invalid format")        
     else:
@@ -543,8 +543,8 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
                 button_colour:str="Black", text_colour:str="White", font=("TkFixedFont",8,"")):
     global sections
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(section_id, int) or section_id < 1 or section_id > 999:
-        logging.error("Section "+str(section_id)+": update_section_styles - Section ID must be an int (1-999)")
+    if not isinstance(section_id, int) :
+        logging.error("Section "+str(section_id)+": update_section_styles - Section ID must be an int")
     elif not section_exists(section_id):
         logging.error("Section "+str(section_id)+": update_section_styles - Section ID does not exist")
     else:
@@ -606,15 +606,15 @@ def update_mirrored_section(section_id:int, mirror_id:str):
     global sections
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(section_id, int):
-        logging.error("Section "+str(section_id)+": update_mirrored - Section ID must be an integer")
+        logging.error("Section "+str(section_id)+": update_mirrored - Section ID must be an int")
     elif not section_exists(section_id):
         logging.error("Section "+str(section_id)+": update_mirrored - Section ID does not exist")
     elif not isinstance(mirror_id, str):
         logging.error("Section "+str(section_id)+": update_mirrored - Mirrored Section ID must be a str")
     elif mirror_id == str(section_id):
         logging.error("Section "+str(section_id)+": update_mirrored - Mirrored Section ID is the same as the Section ID")
-    elif mirror_id != "" and mirror_id.isdigit() and (int(mirror_id) < 1 or int(mirror_id) > 999):
-        logging.error("Section "+str(section_id)+": update_mirrored - (Local) Mirrored Section ID is out of range (1-999)")
+    elif mirror_id != "" and mirror_id.isdigit() and int(mirror_id) < 1:
+        logging.error("Section "+str(section_id)+": update_mirrored - (Local) Mirrored Section ID must be a positive integer")
     elif mirror_id != "" and not mirror_id.isdigit() and mqtt_interface.split_remote_item_identifier(mirror_id) is None:
         logging.error("Section "+str(section_id)+": update_mirrored - (Remote) Mirrored Section ID is invalid format")        
     else:
@@ -778,8 +778,8 @@ def set_sections_to_publish_state(*sec_ids:int):
     global list_of_sections_to_publish
     for sec_id in sec_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(sec_id,int) or sec_id < 1 or sec_id > 999:
-            logging.error("Section "+str(sec_id)+": set_sections_to_publish_state - ID must be an int (1-999)")
+        if not isinstance(sec_id,int) or sec_id < 1:
+            logging.error("Section "+str(sec_id)+": set_sections_to_publish_state - ID must be a positive integer")
         elif sec_id in list_of_sections_to_publish:
             logging.warning("Section "+str(sec_id)+": set_sections_to_publish_state -"
                                 +" Section is already configured to publish state to MQTT broker")

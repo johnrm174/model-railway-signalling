@@ -91,8 +91,8 @@ def create_colour_light_signal (canvas, sig_id:int,
     # Get some info about the signal to help validation of the parameters we have been given
     signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
     # Common validation (common to all signal types)
-    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 999:
-        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-999)")
+    if not isinstance(sig_id, int) or sig_id < 1:
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be a positive integer")
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation

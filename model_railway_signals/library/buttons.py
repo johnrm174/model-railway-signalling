@@ -251,8 +251,8 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "button"+str(button_id)
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) or button_id < 1 or button_id > 999:
-        logging.error("Button "+str(button_id)+": create_button - Button ID must be an int (1-999)")
+    if not isinstance(button_id, int) or button_id < 1:
+        logging.error("Button "+str(button_id)+": create_button - Button ID must be a positive integer")
     elif button_exists(button_id):
         logging.error("Button "+str(button_id)+": create_button - Button ID already exists")
     elif buttontype != button_type.switched and buttontype != button_type.momentary:
@@ -332,8 +332,8 @@ def update_button_styles(button_id:int, width:int=10, button_colour:str="SeaGree
                          text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
     global buttons
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) or button_id < 1 or button_id > 999:
-        logging.error("Button "+str(button_id)+": update_button_styles - Button ID must be an int (1-999)")
+    if not isinstance(button_id, int):
+        logging.error("Button "+str(button_id)+": update_button_styles - Button ID must be an int")
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": update_button_styles - Button ID does not exist")
     else:

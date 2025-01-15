@@ -186,8 +186,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
     global levers
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "lever"+str(lever_id)
-    if not isinstance(lever_id, int) or lever_id < 1 or lever_id > 999:
-        logging.error("Lever "+str(lever_id)+": create_lever - Lever ID must be an int (1-999)")
+    if not isinstance(lever_id, int) or lever_id < 1:
+        logging.error("Lever "+str(lever_id)+": create_lever - Lever ID must be a positive integer")
     elif lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": create_lever - Lever ID already exists")
     elif not isinstance(on_keycode, int) or on_keycode < 0 or on_keycode > 255:
