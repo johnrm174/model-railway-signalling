@@ -156,10 +156,6 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
             objects_switches.redraw_switch_object(object_id)
         elif this_object_type == objects_common.object_type.lever:
             objects_levers.redraw_lever_object(object_id)
-    # Ensure all track sections are brought forward on the schematic (in front of any lines)
-    bring_track_sections_to_the_front()
-    # Initialise the layout (interlocking changes, signal aspects etc)
-    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -197,9 +193,11 @@ def reset_all_schematic_indexes():
     return()
 
 #------------------------------------------------------------------------------------
-# Undo and redo functions - the 'save_schematic_state' function should be called after
-# every change the schematic or a change to any object on the schematic to take a snapshot
-# and add this to the undo buffer. 'undo' and 'redo' then work as you'd expect
+# Undo and redo functions (called from the undo/redo functions in the Schematic Module.
+# The 'save_schematic_state' function is primarily an internal function, which takes a
+# 'snapshot' of the current schematic objects after a change in their configurations.
+# It is also an API function, called from the Schematic module after 'place object' and
+# 'snap to grid' operations (which may have involved several interim object moves).
 # 'restore_schematic_state' is the internal function used by 'undo' and 'redo'
 #------------------------------------------------------------------------------------
 
@@ -254,11 +252,12 @@ def restore_schematic_state():
         objects_common.schematic_objects[object_id] = copy.deepcopy(snapshot_objects[object_id])
     # Set the seperate schematic dictionary indexes from the restored schematic objects dict
     reset_all_schematic_indexes()
-    # Re-draw all objects, ensuring a new bbox is created for each object
+    # Re-draw all objects, ensuring a new bbox is created for each object. This function
     redraw_all_objects(create_new_bbox=True, reset_state=False)
-    # Recalculate instrument interlocking tables as a 'belt and braces' measure (on the 
-    # basis they would have successfully been restored with the rest of the snapshot)
-    objects_points.reset_point_interlocking_tables()
+    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    bring_track_sections_to_the_front()
+    # Initialise the layout (interlocking changes, signal aspects etc)
+    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -296,10 +295,12 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
 
 #------------------------------------------------------------------------------------
 # Function to update the configuration of an existing schematic object and re-draw it
-# in its new configuration (delete the drawing objects then re-draw in the new configuration)
+# in its new configuration (delete the object then re-create in the new configuration)
+# For each individual change, the schematic state is normally updated, but this can be
+# suppressed for 'bulk updates' where we are changing multiple objects at a time
 #------------------------------------------------------------------------------------
 
-def update_object(object_id, new_object):
+def update_object(object_id, new_object, update_schematic_state:bool=True):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
         objects_lines.update_line(object_id, new_object)
@@ -321,17 +322,20 @@ def update_object(object_id, new_object):
         objects_switches.update_switch(object_id, new_object)
     elif type_of_object == objects_common.object_type.lever:
         objects_levers.update_lever(object_id, new_object)
-    # Ensure all track sections are brought forward on the schematic (in front of any lines)
-    bring_track_sections_to_the_front()
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # Process any layout changes (interlocking, signal ahead etc)
-    # that might be dependent on the object configuration change
-    run_layout.initialise_layout()
+    # We normally process layout changes after each object update but for the bulk renumbering
+    # use case we postpone this processing until all the renumbering has been completed
+    if update_schematic_state:
+        # Ensure all track sections are brought forward on the schematic (in front of any lines)
+        bring_track_sections_to_the_front()
+        # save the current state (for undo/redo)
+        save_schematic_state()
+        # Process any layout changes (interlocking, signal ahead etc)
+        # that might be dependent on the object configuration change
+        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
-# Common Function to permanently Delete an objects from the schematic
+# Common Internal Function to permanently Delete an objects from the schematic
 # Called from the delete_objects and also the undo/redo functions
 #------------------------------------------------------------------------------------
 
@@ -769,9 +773,11 @@ def set_all(new_objects):
     redraw_all_objects(create_new_bbox=True, reset_state=False)
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
-    # Recalculate point interlocking tables as a 'belt and braces' measure (on the 
-    # basis they would have successfully been loaded with the rest of the configuration)
+    # Recalculate point interlocking tables as a 'belt and braces' measure (they should
+    # have been loaded with the rest of the configuration but we do this just in case)
     objects_points.reset_point_interlocking_tables()
+    # Initialise the layout (interlocking changes, signal aspects etc)
+    run_layout.initialise_layout()
     # save the current state (for undo/redo) - deleting all previous history
     save_schematic_state(reset_pointer=True)
     return()
