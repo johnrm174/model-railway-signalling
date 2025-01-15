@@ -23,6 +23,7 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
+import copy
 import json
 import os
 
@@ -452,6 +453,7 @@ class dcc_mappings():
 class renumbering_entry(Tk.Frame):
     def __init__(self, parent_window, callback=None):
         super().__init__(parent_window)
+        self.object_id = ""
         self.current_id = 0
         self.label1 = Tk.Label(self,text=" ID:")
         self.label1.pack(side=Tk.LEFT, padx=2)
@@ -473,12 +475,15 @@ class renumbering_entry(Tk.Frame):
         self.newid.set_validation_status(False)
 
     def get_value(self):
-        return( [self.current_id, self.newid.get_value()] )
+        # The returned list comprises [object_id, current_item_id, new_item_id]
+        return( [self.object_id, self.current_id, self.newid.get_value()] )
 
-    def set_value(self, current_and_new_ids:list[int,int]):
-        self.current_id = current_and_new_ids[0]
+    def set_value(self, values_to_set:list[str, int]):
+        # The values_to_set list comprises [object_id, current_item_id]
+        self.object_id = values_to_set[0]
+        self.current_id = values_to_set[1]
         self.currentid.config(text=str(self.current_id))
-        self.newid.set_value(current_and_new_ids[1])
+        self.newid.set_value(self.current_id)
         return()
 
 #------------------------------------------------------------------------------------
@@ -496,6 +501,8 @@ class bulk_renumbering():
             renumbering_utility_window.state('normal')
             renumbering_utility_window.focus_force()
         else:
+            # We need the root reference to update idletasks on apply
+            self.root_window = root_window
             # Create the top level window
             self.window = Tk.Toplevel(root_window)
             self.window.title("Object Renumbering")
@@ -532,19 +539,20 @@ class bulk_renumbering():
         # Validate the basic elements first
         valid = class_to_validate.validate()
         if valid:
-            # Validate the list for duplicates
+            # get_values returns a variable length list of entries
             entries = class_to_validate.get_values()
             # Identify any duplicate entries for the new item ID
             duplicate_entries, seen_entries = [] , []
             for entry in entries:
-                if entry[1] in seen_entries:
-                    duplicate_entries.append(entry[1])
-                seen_entries.append(entry[1])
+                # Each entry is a list comprising [object_id, current_item_id, new_item_id]
+                if entry[2] in seen_entries:
+                    duplicate_entries.append(entry[2])
+                seen_entries.append(entry[2])
             if len(duplicate_entries) > 0: valid = False
             # Highlight any duplicates in the base classes
             for duplicate_entry in duplicate_entries:
                 for widget in class_to_validate.list_of_widgets:
-                    if widget.winfo_exists() and widget.get_value()[1] == duplicate_entry :
+                    if widget.winfo_exists() and widget.get_value()[2] == duplicate_entry:
                         widget.set_entry_invalid("Duplicate IDs entered")
         return(valid)
 
@@ -555,27 +563,58 @@ class bulk_renumbering():
         return(valid1 and valid2 and valid3)
 
     def load_state(self):
-        # Signals
+        # Populate the Signals list
         list_of_values_to_set=[]
         for entry in sorted(objects.signal_index.items(), key=lambda dictkey: int(dictkey[0])):
-            list_of_values_to_set.append([int(entry[0]), int(entry[0])])
+            current_item_id = int(entry[0])
+            object_id = objects.signal(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
         self.signals.set_values(list_of_values_to_set)
-        # Points
+        # Populate the Points list
         list_of_values_to_set=[]
         for entry in sorted(objects.point_index.items(), key=lambda dictkey: int(dictkey[0])):
-            list_of_values_to_set.append([int(entry[0]), int(entry[0])])
+            current_item_id = int(entry[0])
+            object_id = objects.point(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
         self.points.set_values(list_of_values_to_set)
-        # Levers
+        # Populate the Signalbox Levers list
         list_of_values_to_set=[]
         for entry in sorted(objects.lever_index.items(), key=lambda dictkey: int(dictkey[0])):
-            list_of_values_to_set.append([int(entry[0]), int(entry[0])])
+            current_item_id = int(entry[0])
+            object_id = objects.lever(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
         self.levers.set_values(list_of_values_to_set)
 
     def save_state(self, close_window:bool):
         # Validate all entries
         if self.validate():
             self.validation_error.pack_forget()
-            ######################### Do Stuff ########################
+            # Compile a single list for all item id changes
+            list_of_all_values = self.signals.get_values()
+            list_of_all_values.extend(self.points.get_values())
+            list_of_all_values.extend(self.levers.get_values())
+            # Renumber the objects into an unused range so we don't screw up the indexing
+            # We update idletasks to process each individual change as tkinter doesn't seem to
+            # handle large numbers of delete and create operations outside of the main loop
+            # Each entry in the list comprises [object_id, current_item_id, new_item_id]
+            for value in list_of_all_values:
+                if value[1] != value[2]:
+                    new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
+                    new_object_configuration["itemid"] = value[1]+1000
+                    objects.update_object(value[0], new_object_configuration, update_schematic_state=False)
+                    self.root_window.update_idletasks()
+            # Renumber the objects to their required IDs. Note that we only update the schematic state
+            # (take a snapshot and process the layout changes) after the last object has been renumbered
+            # We update idletasks to process each individual change as tkinter doesn't seem to
+            # handle large numbers of delete and create operations outside of the main loop
+            # Each entry in the list comprises [object_id, current_item_id, new_item_id]
+            for value in list_of_all_values:
+                if value[1] != value[2]:
+                    new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
+                    new_object_configuration["itemid"] = value[2]
+                    update_schematic_state = (list_of_all_values[-1][0] == value[0])
+                    objects.update_object(value[0], new_object_configuration, update_schematic_state=update_schematic_state)
+                    self.root_window.update_idletasks()
             # close the window (on OK)
             if close_window: self.close_window()
             else: self.load_state()
