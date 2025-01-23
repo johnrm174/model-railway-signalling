@@ -296,14 +296,20 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
 #------------------------------------------------------------------------------------
 # Function to update the configuration of an existing schematic object and re-draw it
 # in its new configuration (delete the object then re-create in the new configuration)
-# For each individual change, the schematic state is normally updated, but this can be
-# suppressed for 'bulk updates' where we are changing multiple objects at a time
+# For individual changes (e.g. after editing the configuration of a schematic object),
+# the schematic state is normally updated (for undo/redo) and the layout re-initialised.
+# This can be suppressed for 'bulk update' use cases where changes to multiple objects
+# are being made one after the other (e.g. bulk renumbering). In this case, the calling
+# code should only set update_schematic_state to True on the final object update call.
+# Note that line objects have their own 'selected' indication (selection circles at
+# each end of the line) and for individual changes we create the line as 'selected'.
+# For the 'bulk update' use cases we suppress this (and leave the lines unselected).
 #------------------------------------------------------------------------------------
 
-def update_object(object_id, new_object, update_schematic_state:bool=True):
+def update_object(object_id, new_object, update_schematic_state:bool=True, create_selected:bool=True):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
-        objects_lines.update_line(object_id, new_object)
+        objects_lines.update_line(object_id, new_object, create_selected=create_selected)
     elif type_of_object == objects_common.object_type.textbox:
         objects_textboxes.update_textbox(object_id, new_object)
     elif type_of_object == objects_common.object_type.signal:

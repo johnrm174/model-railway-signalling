@@ -23,6 +23,7 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
+from tkinter import ttk
 import copy
 import json
 import os
@@ -175,6 +176,7 @@ class cv_programming_element():
             self.status.config(text="Reading CVs", fg="black")
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_entry_element.current_value.set_value("")
+            # Update idletasks to update the display (we're not returning to the main loop yet)
             self.root_window.update_idletasks()
             read_errors = False
             for cv_entry_element in self.cv_grid.list_of_entries:
@@ -186,6 +188,7 @@ class cv_programming_element():
                     else:
                         cv_entry_element.current_value.set_value("---")
                         read_errors = True
+                    # Update idletasks to update the display (we're not returning to the main loop yet)
                     self.root_window.update_idletasks()
             if read_errors:
                 self.status.config(text="One or more CVs could not be read", fg="red")
@@ -210,6 +213,7 @@ class cv_programming_element():
             self.status.config(text="Writing CVs", fg="black")
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_entry_element.value_to_set.config(fg="black")
+            # Update idletasks to update the display (we're not returning to the main loop yet)
             self.root_window.update_idletasks()
             write_errors = False
             for cv_entry_element in self.cv_grid.list_of_entries:
@@ -222,6 +226,7 @@ class cv_programming_element():
                     else:
                         cv_entry_element.value_to_set.config(fg="red")
                         write_errors = True
+                    # Update idletasks to update the display (we're not returning to the main loop yet)
                     self.root_window.update_idletasks()
             if write_errors:
                 self.status.config(text="One or more CVs could not be written", fg="red")
@@ -462,7 +467,7 @@ class renumbering_entry(Tk.Frame):
         self.TT = common.CreateToolTip(self.currentid, text="Current ID (read only)")
         self.label2 = Tk.Label(self,text=u"\u2192")
         self.label2.pack(side=Tk.LEFT, padx=2)
-        self.newid = common.int_item_id_entry_box(self, tool_tip="Enter the required ID", callback=callback)
+        self.newid = common.int_item_id_entry_box(self, tool_tip="Enter the required ID", callback=callback, allow_empty=False)
         self.newid.pack(side=Tk.LEFT, padx=2)
         self.label3 = Tk.Label(self,text=" ")
         self.label3.pack(side=Tk.LEFT, padx=2)
@@ -505,28 +510,60 @@ class bulk_renumbering():
             self.root_window = root_window
             # Create the top level window
             self.window = Tk.Toplevel(root_window)
-            self.window.title("Object Renumbering")
+            self.window.title("Schematic Object Renumbering")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             renumbering_utility_window = self.window
-            # Create a Frame to hold everything
-            self.frame = Tk.Frame(self.window)
-            self.frame.pack(padx=5, pady=5)
+            # Create the Notebook (for the tabs)
+            self.tabs = ttk.Notebook(self.window)
+            # Create the Window tabs
+            self.tab1 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab1, text="Signals, Points, Levers, Switches")
+            self.tab2 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab2, text="Routes, Sections, Track Sensors")
+            self.tab3 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab3, text="Route Lines")
+            self.tabs.pack()
             # Create the list of signals
-            self.subframe1 = Tk.LabelFrame(self.frame, text="Signals")
+            self.subframe1 = Tk.LabelFrame(self.tab1, text="Signals")
             self.subframe1.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
             self.signals=common.list_of_widgets(self.subframe1, base_class=renumbering_entry, rows=20, callback=self.validate)
             self.signals.pack(padx=2, pady=2, fill='y')
             # Create the list of points
-            self.subframe2 = Tk.LabelFrame(self.frame, text="Points")
+            self.subframe2 = Tk.LabelFrame(self.tab1, text="Points")
             self.subframe2.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
             self.points=common.list_of_widgets(self.subframe2, base_class=renumbering_entry, rows=20, callback=self.validate)
             self.points.pack(padx=2, pady=2, fill='y')
             # Create the list of Levers
-            self.subframe3 = Tk.LabelFrame(self.frame, text="Levers")
+            self.subframe3 = Tk.LabelFrame(self.tab1, text="Levers")
             self.subframe3.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
             self.levers=common.list_of_widgets(self.subframe3, base_class=renumbering_entry, rows=20, callback=self.validate)
             self.levers.pack(padx=2, pady=2, fill='y')
+            # Create the list of DCC Switches
+            self.subframe4 = Tk.LabelFrame(self.tab1, text="DCC Switches")
+            self.subframe4.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.switches=common.list_of_widgets(self.subframe4, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.switches.pack(padx=2, pady=2, fill='y')
+            # Create the list of Route buttons
+            self.subframe5 = Tk.LabelFrame(self.tab2, text="Route Buttons")
+            self.subframe5.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.routes=common.list_of_widgets(self.subframe5, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.routes.pack(padx=2, pady=2, fill='y')
+            # Create the list of Track Sections
+            self.subframe6 = Tk.LabelFrame(self.tab2, text="Track Sections")
+            self.subframe6.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.sections=common.list_of_widgets(self.subframe6, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.sections.pack(padx=2, pady=2, fill='y')
+            # Create the list of Track Sensors
+            self.subframe7 = Tk.LabelFrame(self.tab2, text="Track Sensors")
+            self.subframe7.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.sensors=common.list_of_widgets(self.subframe7, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.sensors.pack(padx=2, pady=2, fill='y')
+            # Create the list of Route Lines
+            self.subframe8 = Tk.LabelFrame(self.tab3, text="Route Lines")
+            self.subframe8.pack(padx=2, pady=2, side=Tk.LEFT, fill='y')
+            self.lines=common.list_of_widgets(self.subframe8, base_class=renumbering_entry, rows=20, callback=self.validate)
+            self.lines.pack(padx=2, pady=2, fill='y')
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
@@ -560,7 +597,12 @@ class bulk_renumbering():
         valid1 = self.validate_entries(class_to_validate=self.signals)
         valid2 = self.validate_entries(class_to_validate=self.points)
         valid3 = self.validate_entries(class_to_validate=self.levers)
-        return(valid1 and valid2 and valid3)
+        valid4 = self.validate_entries(class_to_validate=self.routes)
+        valid5 = self.validate_entries(class_to_validate=self.switches)
+        valid6 = self.validate_entries(class_to_validate=self.sections)
+        valid7 = self.validate_entries(class_to_validate=self.sensors)
+        valid8 = self.validate_entries(class_to_validate=self.lines)
+        return(valid1 and valid2 and valid3 and valid4 and valid5 and valid6 and valid7 and valid8)
 
     def load_state(self):
         # Populate the Signals list
@@ -584,6 +626,41 @@ class bulk_renumbering():
             object_id = objects.lever(current_item_id)
             list_of_values_to_set.append([object_id, current_item_id])
         self.levers.set_values(list_of_values_to_set)
+        # Populate the Route Buttons list
+        list_of_values_to_set=[]
+        for entry in sorted(objects.route_index.items(), key=lambda dictkey: int(dictkey[0])):
+            current_item_id = int(entry[0])
+            object_id = objects.route(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
+        self.routes.set_values(list_of_values_to_set)
+        # Populate the DCC Switches list
+        list_of_values_to_set=[]
+        for entry in sorted(objects.switch_index.items(), key=lambda dictkey: int(dictkey[0])):
+            current_item_id = int(entry[0])
+            object_id = objects.switch(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
+        self.switches.set_values(list_of_values_to_set)
+        # Populate the Track Sections list
+        list_of_values_to_set=[]
+        for entry in sorted(objects.section_index.items(), key=lambda dictkey: int(dictkey[0])):
+            current_item_id = int(entry[0])
+            object_id = objects.section(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
+        self.sections.set_values(list_of_values_to_set)
+        # Populate the Track Sensors list
+        list_of_values_to_set=[]
+        for entry in sorted(objects.track_sensor_index.items(), key=lambda dictkey: int(dictkey[0])):
+            current_item_id = int(entry[0])
+            object_id = objects.track_sensor(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
+        self.sensors.set_values(list_of_values_to_set)
+        # Populate the Route Lines list
+        list_of_values_to_set=[]
+        for entry in sorted(objects.line_index.items(), key=lambda dictkey: int(dictkey[0])):
+            current_item_id = int(entry[0])
+            object_id = objects.line(current_item_id)
+            list_of_values_to_set.append([object_id, current_item_id])
+        self.lines.set_values(list_of_values_to_set)
 
     def save_state(self, close_window:bool):
         # Validate all entries
@@ -593,27 +670,34 @@ class bulk_renumbering():
             list_of_all_values = self.signals.get_values()
             list_of_all_values.extend(self.points.get_values())
             list_of_all_values.extend(self.levers.get_values())
+            list_of_all_values.extend(self.routes.get_values())
+            list_of_all_values.extend(self.switches.get_values())
+            list_of_all_values.extend(self.sections.get_values())
+            list_of_all_values.extend(self.sensors.get_values())
+            list_of_all_values.extend(self.lines.get_values())
             # Renumber the objects into an unused range so we don't screw up the indexing
+            # Each entry in the list comprises [object_id, current_item_id, new_item_id]
             # We update idletasks to process each individual change as tkinter doesn't seem to
             # handle large numbers of delete and create operations outside of the main loop
-            # Each entry in the list comprises [object_id, current_item_id, new_item_id]
             for value in list_of_all_values:
-                if value[1] != value[2]:
+                if value[0] in objects.schematic_objects.keys() and value[1] != value[2]:
                     new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
                     new_object_configuration["itemid"] = value[1]+1000
-                    objects.update_object(value[0], new_object_configuration, update_schematic_state=False)
+                    objects.update_object(value[0], new_object_configuration,
+                                update_schematic_state=False, create_selected=False)
                     self.root_window.update_idletasks()
             # Renumber the objects to their required IDs. Note that we only update the schematic state
             # (take a snapshot and process the layout changes) after the last object has been renumbered
+            # Each entry in the list comprises [object_id, current_item_id, new_item_id]
             # We update idletasks to process each individual change as tkinter doesn't seem to
             # handle large numbers of delete and create operations outside of the main loop
-            # Each entry in the list comprises [object_id, current_item_id, new_item_id]
             for value in list_of_all_values:
-                if value[1] != value[2]:
+                if value[0] in objects.schematic_objects.keys() and value[1] != value[2]:
                     new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
                     new_object_configuration["itemid"] = value[2]
                     update_schematic_state = (list_of_all_values[-1][0] == value[0])
-                    objects.update_object(value[0], new_object_configuration, update_schematic_state=update_schematic_state)
+                    objects.update_object(value[0], new_object_configuration,
+                            update_schematic_state=update_schematic_state, create_selected=False)
                     self.root_window.update_idletasks()
             # close the window (on OK)
             if close_window: self.close_window()

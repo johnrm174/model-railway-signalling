@@ -59,10 +59,13 @@ default_line_object["arrowends"] = 0         # 0=none, 1=start, 2=end, 3=both
 default_line_object["selection"] = None      # Tkinter tags for the "selection" circles
 
 #------------------------------------------------------------------------------------
-# Function to to update a line object following a configuration change
+# Function to to update a line object following a configuration change.
+# Note that line objects have their own 'selected' indication (selection circles at
+# each end of the line. Normally when we create an object we want to leave it selected
+# but in certain use cases (e.g. bulk renumbering) we need to supress this.
 #------------------------------------------------------------------------------------
 
-def update_line(object_id, new_object_configuration):
+def update_line(object_id, new_object_configuration, create_selected:bool=True):
     # We need to track whether the Item ID has changed
     old_item_id = objects_common.schematic_objects[object_id]["itemid"]
     new_item_id = new_object_configuration["itemid"]
@@ -71,7 +74,7 @@ def update_line(object_id, new_object_configuration):
     objects_common.schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
     # The line remains selected after a configuration, so we need to re-draw
     # the selection circles at each end by passing in state='normal'
-    redraw_line_object(object_id, create_selected=True)
+    redraw_line_object(object_id, create_selected=create_selected)
     # Check to see if the Type-specific ID has been changed
     if old_item_id != new_item_id:
         # Update the type-specific index
