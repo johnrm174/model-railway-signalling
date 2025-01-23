@@ -82,7 +82,8 @@ class CreateToolTip():
         tool_tip_label = Tk.Label(self.tool_tip_window, text=self.text, justify='left',
                 background="#ffffff", relief='solid', borderwidth=1, wraplength = self.wraplength)
         tool_tip_label.pack(ipadx=1)
-        # Update idletasks and then query the width/height to get the displayed coords
+        # Update idletasks to let tkinter draw the tooltip and then query the width/height to get the
+        # displayed coords. If we don't Update idletasks first then we won't get the correct width/height
         self.widget.update_idletasks()
         tool_tip_window_width = self.tool_tip_window.winfo_width()
         tool_tip_window_height = self.tool_tip_window.winfo_height()
