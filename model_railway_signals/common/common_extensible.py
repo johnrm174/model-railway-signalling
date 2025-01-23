@@ -53,10 +53,7 @@ class signal_route_frame(Tk.LabelFrame):
                 self.sigelements.append(common_compound.signal_route_selections(self.subframe,
                                                     read_only=True, tool_tip=self.tooltip))
                 self.sigelements[-1].pack()
-                # For populating the base class, we also need to pass in the current signal_id
-                # as zero - note this is not used in the read-only version of this class
-                signal_route = [sig_interlocking_routes, 0]
-                self.sigelements[-1].set_value(signal_route)
+                self.sigelements[-1].set_value(sig_interlocking_routes)
         else:
             self.label = Tk.Label(self.subframe, text="Nothing configured")
             self.label.pack()
