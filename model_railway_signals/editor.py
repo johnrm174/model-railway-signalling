@@ -478,8 +478,9 @@ class main_menubar:
         # The connect request returns True if successful
         port = settings.get_sprog("port")
         baud = settings.get_sprog("baud")
+        address_mode = settings.get_sprog("addressmode")
         debug = settings.get_sprog("debug")
-        connected = library.sprog_connect(port, baud, debug)
+        connected = library.sprog_connect(port, baud, address_mode, debug)
         self.update_sprog_menubar_controls(True, connected, show_popup)
         return(connected)
     

@@ -57,6 +57,7 @@ default_settings["sprog"]["baud"] = 460800
 default_settings["sprog"]["debug"] = False
 default_settings["sprog"]["startup"] = False
 default_settings["sprog"]["power"] = False
+default_settings["sprog"]["addressmode"] = 1
 
 default_settings["mqtt"] = {}
 default_settings["mqtt"]["url"] = "127.0.0.1"

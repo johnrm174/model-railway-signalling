@@ -157,6 +157,63 @@ class edit_canvas_settings():
             self.window.destroy()
 
 #------------------------------------------------------------------------------------
+# Class for the SPROG settings 'Learn More' window.
+#------------------------------------------------------------------------------------
+
+sprog_settings_learn_more_window = None
+
+learn_more_text = """
+Unfortunately, different DCC equipment manufacturers have interpreted the NMRA DCC Specification
+in slightly different ways - specifically how DCC addresses are encoded into the DCC packet.
+
+When transitioning from other DCC systems to this application (or swapping between the two) you
+may find that the DCC commands sent out to the accessory bus (by this system) don't align with the
+DCC addresses you have previously programmed for your accessories (with your other system).
+
+If all works as expected then the default setting (No Offset) can be left selected. If there is a
+discrepancy then this will appear as an address offset of '+4' or '-4' depending on the varient
+of the SPROG DCC Programmer/Controller you are using with this application.
+
+If you are seeing an address discrepancy of '+4' transmitted by the system (i.e. sending out a DCC
+command to address 20 is actually commanding an accessory you have previously configured with
+an address of 16, then you should select the 'Minus 4 Offset' to resolve. In this case, DCC
+commands to addresses in the range 1-4 will not be transmitted by the system.
+
+If you are seeing an address discrepancy of '-4' transmitted by the system (i.e. sending out a DCC
+command to address 20 is actually commanding an accessory you have previously configured with
+an address of 24, then you should select the 'Plus 4 Offset' to resolve. In this case, DCC
+commands to addresses in the range 2044-2047 will not be transmitted by the system.
+
+Once selected, the address offset will be applied to all DCC commands sent out by the system
+"""
+class sprog_addressing_information():
+    def __init__(self, parent_window):
+        global sprog_settings_learn_more_window
+        # Only create the window if one doesn't already exist
+        if sprog_settings_learn_more_window is not None:
+            sprog_settings_learn_more_window.lift()
+            sprog_settings_learn_more_window.state('normal')
+            sprog_settings_learn_more_window.focus_force()
+        else:
+            # Create the (non resizable) top level window for the Learn More information
+            sprog_settings_learn_more_window = Tk.Toplevel(parent_window)
+            sprog_settings_learn_more_window.title("DCC Addressing Modes")
+            sprog_settings_learn_more_window.protocol("WM_DELETE_WINDOW", self.close_window)
+            sprog_settings_learn_more_window.resizable(False, False)
+            self.text = common.scrollable_text_frame(sprog_settings_learn_more_window)
+            self.text.pack(padx=2, pady=2)
+            self.text.set_value(learn_more_text)
+            # Create the ok/close button and tooltip
+            self.B1 = Tk.Button (sprog_settings_learn_more_window, text = "Ok / Close", command=self.close_window)
+            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+
+    def close_window(self):
+        global sprog_settings_learn_more_window
+        sprog_settings_learn_more_window.destroy()
+        sprog_settings_learn_more_window = None
+
+#------------------------------------------------------------------------------------
 # Class for the SPROG settings selection toolbar window. Note the init function takes
 # in callbacks for connecting to the SPROG and for applying the updated settings.
 # Note also that if a window is already open then we just raise it and exit.
@@ -181,37 +238,57 @@ class edit_sprog_settings():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             edit_sprog_settings_window = self.window
-            # Create the Serial Port and baud rate UI elements 
-            self.frame1 = Tk.Frame(self.window)
-            self.frame1.pack()
-            self.label1 = Tk.Label(self.frame1, text="Port:")
+            #----------------------------------------------------------------------------
+            # Create a labelframe for the main SPROG Settings
+            #----------------------------------------------------------------------------
+            self.frame1 = Tk.LabelFrame(self.window, text="SPROG Configuration")
+            self.frame1.pack(padx=2, pady=2, fill='x')
+            # Create the Serial Port and baud rate UI elements in a subframe
+            self.subframe1 = Tk.Frame(self.frame1)
+            self.subframe1.pack()
+            self.label1 = Tk.Label(self.subframe1, text="Port:")
             self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
+            self.port = common.entry_box(self.subframe1, width=15,tool_tip="Specify "+
                         "the serial port to use for communicating with the SPROG")
             self.port.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.label2 = Tk.Label(self.frame1, text="Baud:")
+            self.label2 = Tk.Label(self.subframe1, text="Baud:")
             self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
             self.options = ['115200','460800']
             self.baud_selection = Tk.StringVar(self.window, "")
-            self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
+            self.baud = Tk.OptionMenu(self.subframe1, self.baud_selection, *self.options)
             menu_width = len(max(self.options, key=len))
             self.baud.config(width=menu_width)
             common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port "
                                             +"(115200 for Pi-SPROG3 or 460800 for Pi-SPROG3 v2)")
             self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
-            # Create the remaining UI elements
-            self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
+            # Create the remaining remaining SPROG Configuration UI elements
+            self.debug = common.check_box(self.frame1, label="Enhanced SPROG debug logging", width=28,
                 tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
                          "to 'debug')")
             self.debug.pack(padx=2, pady=2)
-            self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
+            self.startup = common.check_box(self.frame1, label="Initialise SPROG on layout load", width=28,
                 tool_tip="Select to configure serial port and initialise SPROG following layout load",
                 callback=self.selection_changed)
             self.startup.pack(padx=2, pady=2)
-            self.power = common.check_box(self.window, label="Enable DCC power on layout load", width=28,
+            self.power = common.check_box(self.frame1, label="Enable DCC power on layout load", width=28,
                 tool_tip="Select to enable DCC accessory bus power following layout load")
             self.power.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------
+            # Create a labelframe for the DPROG Address mode Settings
+            #----------------------------------------------------------------------------
+            self.frame2 = Tk.LabelFrame(self.window, text="DCC Address Offsets")
+            self.frame2.pack(padx=2, pady=2, fill='x')
+            self.addressmode = common.selection_buttons(self.frame2, label="", border_width=0,
+                tool_tip="Select the DCC Addressing Mode (click button below for more information)",
+                button_labels=("No Offset", "Plus 4 Offset", "Minus 4 Offset"))
+            self.addressmode.pack(padx=2, pady=2)
+            self.B2 = Tk.Button (self.frame2, text="Extended help for this setting",
+                                 command=lambda:sprog_addressing_information(self.window))
+            self.B2.pack(padx=2, pady=2)
+            self.TT2 = common.CreateToolTip(self.B2, "Click for more information on DCC Addressing Modes")
+            #----------------------------------------------------------------------------
             # Create the Button to test connectivity
+            #----------------------------------------------------------------------------
             self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
             self.B1.pack(padx=2, pady=2)
             self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
@@ -219,7 +296,9 @@ class edit_sprog_settings():
             # Create the Status Label
             self.status = Tk.Label(self.window, text="")
             self.status.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #----------------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
             # Load the initial UI state
@@ -268,6 +347,7 @@ class edit_sprog_settings():
         self.debug.set_value(settings.get_sprog("debug"))
         self.startup.set_value(settings.get_sprog("startup"))
         self.power.set_value(settings.get_sprog("power"))
+        self.addressmode.set_value(settings.get_sprog("addressmode"))
         # Grey out the power checkbox as required
         self.selection_changed()
         
@@ -280,6 +360,7 @@ class edit_sprog_settings():
         settings.set_sprog("debug", self.debug.get_value())
         settings.set_sprog("startup", self.startup.get_value())
         settings.set_sprog("power", self.power.get_value())
+        settings.set_sprog("addressmode", self.addressmode.get_value())
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK)
@@ -287,7 +368,9 @@ class edit_sprog_settings():
 
     def close_window(self):
         global edit_sprog_settings_window
+        global sprog_settings_learn_more_window
         edit_sprog_settings_window = None
+        sprog_settings_learn_more_window = None
         self.window.destroy()
 
 #------------------------------------------------------------------------------------

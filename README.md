@@ -40,6 +40,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Schematic Object bulk renumbering utility:
     * An easy way to consolidate your Signal, Point and Signalbox Lever numbering
     * Most other schematic object types can also be renumbered as required
+* New SPROG DCC Address Mode settings option - to cater for the 'DCC Address offsets of 4' issue sometimes
+experienced when transitioning from one DCC System to another (where the NMRA specification has been interpreted
+differently by different DCC system manufacturers/suppliers)
 * The 'Reset Layout' function now preserves track occupancy and incorporates a user-configurable switching 
 delay so point and signal changes can now be sequenced (to avoid overloading the DCC accessory bus on larger
 layouts which may require a large number of points and/or signals to be reset back to their default states).
