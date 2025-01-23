@@ -225,8 +225,8 @@ def paste_lever(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["switchpointandfpl"] = default_lever_object["switchpointandfpl"]
     objects_common.schematic_objects[new_object_id]["switchpoint"] = default_lever_object["switchpoint"]
     objects_common.schematic_objects[new_object_id]["switchfpl"] = default_lever_object["switchfpl"]
-    objects_common.schematic_objects[new_object_id]["onkeypress"] = default_lever_object["onkeypress"]
-    objects_common.schematic_objects[new_object_id]["offkeypress"] = default_lever_object["offkeypress"]
+    objects_common.schematic_objects[new_object_id]["onkeycode"] = default_lever_object["onkeycode"]
+    objects_common.schematic_objects[new_object_id]["offkeycode"] = default_lever_object["offkeycode"]
     objects_common.schematic_objects[new_object_id]["signalroutes"] = default_lever_object["signalroutes"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None

@@ -108,7 +108,7 @@ def lever_exists(lever_id:int):
     return(lever_exists)
 
 #-------------------------------------------------------------------------
-# Callbacks for processing button pushes and keypress events
+# Callback for processing button push events (application lever switching events)
 #-------------------------------------------------------------------------
 
 def change_button_event(lever_id:int):
@@ -117,25 +117,48 @@ def change_button_event(lever_id:int):
     levers[str(lever_id)]["callback"] (lever_id)
     return()
 
+#-------------------------------------------------------------------------
+# Callback for processing keycode events (external lever switching events).
+# Note that warnings are generated if the lever is 'locked' (also popup
+# warnings if configured) and the switching of the lever will depend on
+# whether the application is configured to respect or ignore interlocking
+#-------------------------------------------------------------------------
+
 def lever_on_keypress_event(lever_id:int):
     logging.info("Lever "+str(lever_id)+": Lever On Keypress Event *********************************************************")
     if levers[str(lever_id)]["switched"]:
-        toggle_lever(lever_id)
-        levers[str(lever_id)]["callback"] (lever_id)
+        if levers[str(lever_id)]["locked"] and not ignore_interlocking:
+            message = "External Lever Switching event - Lever "+str(lever_id)+" is locked - NOT switching"
+            logging.warning(message)
+            if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
+        else:
+            if levers[str(lever_id)]["locked"]:
+                message = "External Lever Switching event - Lever "+str(lever_id)+" has been switched whilst locked"
+                logging.warning(message)
+                if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
+            toggle_lever(lever_id)
+            levers[str(lever_id)]["callback"] (lever_id)
     return()
 
 def lever_off_keypress_event(lever_id:int):
     logging.info("Lever "+str(lever_id)+": Lever Off Keypress Event ********************************************************")
     if not levers[str(lever_id)]["switched"]:
-        toggle_lever(lever_id)
-        levers[str(lever_id)]["callback"] (lever_id)
+        if levers[str(lever_id)]["locked"] and not ignore_interlocking:
+            message = "External Lever Switching event - Lever "+str(lever_id)+" is locked - NOT switching"
+            logging.warning(message)
+            if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
+        else:
+            if levers[str(lever_id)]["locked"]:
+                message = "External Lever Switching event - Lever "+str(lever_id)+" has been switched whilst locked"
+                logging.warning(message)
+                if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
+            toggle_lever(lever_id)
+            levers[str(lever_id)]["callback"] (lever_id)
     return()
 
 #-------------------------------------------------------------------------
 # API Function to flip the state of the Signal Box Lever on Lever button and
-# keypress events. Note that after displaying a popup warning we schedule a
-# task to set the focus back on the canvas immediately after the current event
-# has finished processing otherwise we won't get subsequent keypress events
+# keypress events. Also called on change button events and keypress events
 #-------------------------------------------------------------------------
 
 def toggle_lever(lever_id:int):
@@ -144,15 +167,7 @@ def toggle_lever(lever_id:int):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID must be an int")
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
-    elif levers[str(lever_id)]["locked"] and not ignore_interlocking:
-        message = "External Lever Switching event - Lever "+str(lever_id)+" is locked - NOT switching"
-        logging.warning(message)
-        if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
     else:
-        if levers[str(lever_id)]["locked"]:
-            message = "External Lever Switching event - Lever "+str(lever_id)+" has been switched whilst locked"
-            logging.warning(message)
-            if display_warnings: common.display_warning(levers[str(lever_id)]["canvas"], message)
         if not levers[str(lever_id)]["switched"]:
             logging.info("Lever "+str(lever_id)+": Toggling Lever to OFF (Pulled)")
             levers[str(lever_id)]["button"].config(relief="sunken",bg=levers[str(lever_id)]["selectedcolour"])
