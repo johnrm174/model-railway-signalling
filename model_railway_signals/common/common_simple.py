@@ -728,7 +728,9 @@ class scrollable_text_frame(Tk.Frame):
         self.subframe = Tk.Frame(self)
         self.subframe.pack(fill=Tk.BOTH, expand=True)
         # Create the text widget and vertical scrollbars in the subframe
-        self.text_box = Tk.Text(self.subframe, wrap=Tk.NONE)
+        # We create it in a Frame to give it some padding (ipadx and ipady don't work)
+        self.text_box_frame = Tk.Frame(self.subframe, background="White")
+        self.text_box = Tk.Text(self.text_box_frame, wrap=Tk.NONE, border=0, highlightthickness=0)
         self.text_box.insert(Tk.END,self.text)
         hbar = Tk.Scrollbar(self.subframe, orient=Tk.HORIZONTAL)
         hbar.pack(side=Tk.BOTTOM, fill=Tk.X)
@@ -737,7 +739,8 @@ class scrollable_text_frame(Tk.Frame):
         vbar.pack(side=Tk.RIGHT, fill=Tk.Y)
         vbar.config(command=self.text_box.yview)
         self.text_box.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
-        self.text_box.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+        self.text_box.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH, padx=5, pady=5)
+        self.text_box_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
         # configure the window for editable or non-editable
         if not self.editable: self.text_box.config(state="disabled")
         # Set up the callback for auto re-size (if specified)
