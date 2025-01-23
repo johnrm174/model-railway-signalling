@@ -13,6 +13,28 @@
 #    library.request_dcc_power_on()
 #    library.get_dcc_address_mappings()
 #
+# Makes the following external API calls to other editor modules:
+#    objects.update_object
+#    objects.signal
+#    objects.point
+#    objects.section
+#    objects.route
+#    objects.switch
+#    objects.line
+#    objects.lever
+#    objects.track_sensor
+#
+# Accesses the following elements directly from other editor modules:
+#    objects.section_index
+#    objects.route_index
+#    objects.switch_index
+#    objects.point_index
+#    objects.line_index
+#    objects.signal_index
+#    objects.lever_index
+#    objects.track_sensor_index
+#    objects.schematic_objects
+#
 # Uses the following common editor UI elements:
 #    common.entry_box
 #    common.integer_entry_box
@@ -20,6 +42,8 @@
 #    common.CreateToolTip
 #    common.dcc_entry_box
 #    common.list_of_widgets
+#    common.int_item_id_entry_box
+#    common.window_controls
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
