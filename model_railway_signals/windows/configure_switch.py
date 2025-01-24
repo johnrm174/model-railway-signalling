@@ -151,12 +151,19 @@ class edit_switch():
                         tool_tip="Select DCC Accessory switch type", callback=self.switch_type_updated,
                         button_labels=("On/off", "Momentary"))
             self.switchtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
-            # Create the general settings in a third label frame
+            # Create the general settings in a second label frame
             self.frame5subframe1 = Tk.LabelFrame(self.frame5, text="General Settings")
             self.frame5subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
             self.buttonhidden = common.check_box(self.frame5subframe1, label="Hidden",
                      tool_tip= "Select to hide the Button in Run Mode")
             self.buttonhidden.pack(padx=2, pady=2)
+            # Create the Release Delay in a third label frame
+            self.frame5subframe2 = Tk.LabelFrame(self.frame5, text="Release Delay")
+            self.frame5subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+            self.releasedelay = common.integer_entry_box(self.frame5subframe2, min_value=0, max_value=60000, width=6,
+                tool_tip= "Specify a time delay for 'releasing' the momentary button in ms (leave blank "+
+                        "or specify a delay of zero to release the button when 'released' by the user)")
+            self.releasedelay.pack(padx=2, pady=2)
             #----------------------------------------------------------------------------------
             # Create a Frame for the DCC command sequences (frame 6)
             #----------------------------------------------------------------------------------
@@ -187,10 +194,10 @@ class edit_switch():
             self.load_state()
 
     def switch_type_updated(self):
-        if self.switchtype.get_value() == library.button_type.momentary.value:
-            self.offcommands.disable()
+        if self.switchtype.get_value() == 2:
+            self.releasedelay.enable()
         else:
-            self.offcommands.enable()
+            self.releasedelay.disable()
 
 #------------------------------------------------------------------------------------
 # Functions for load, save and close window
@@ -211,6 +218,7 @@ class edit_switch():
             self.description.set_value(objects.schematic_objects[self.object_id]["switchdescription"])
             self.switchtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.buttonhidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
+            self.releasedelay.set_value(objects.schematic_objects[self.object_id]["releasedelay"])
             self.oncommands.set_values(objects.schematic_objects[self.object_id]["dcconcommands"], item_id=item_id)
             self.offcommands.set_values(objects.schematic_objects[self.object_id]["dccoffcommands"], item_id=item_id)
             # Set the button appearance elements
@@ -234,7 +242,8 @@ class edit_switch():
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
         elif (self.buttonid.validate() and self.buttonname.validate() and self.buttonwidth.validate() and
-              self.oncommands.validate() and self.offcommands.validate() and self.fontsize.validate()):
+              self.oncommands.validate() and self.offcommands.validate() and self.fontsize.validate() and
+              self.releasedelay.validate() ):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
@@ -243,6 +252,7 @@ class edit_switch():
             new_object_configuration["switchdescription"] = self.description.get_value()
             new_object_configuration["itemtype"] = self.switchtype.get_value()
             new_object_configuration["hidden"] = self.buttonhidden.get_value()
+            new_object_configuration["releasedelay"] = self.releasedelay.get_value()
             new_object_configuration["dcconcommands"] = self.oncommands.get_values()
             new_object_configuration["dccoffcommands"] = self.offcommands.get_values()
             # Get the button appearance elements

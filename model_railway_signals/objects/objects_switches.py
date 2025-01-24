@@ -70,6 +70,7 @@ default_switch_object["dcconcommands"] = []
 default_switch_object["dccoffcommands"] = []
 # Other object-specific parameters:
 default_switch_object["hidden"] = False
+default_switch_object["releasedelay"] = 0
 
 #------------------------------------------------------------------------------------
 # Function to to update a Switch object following a configuration change
@@ -124,6 +125,7 @@ def redraw_switch_object(object_id):
                 label = objects_common.schematic_objects[object_id]["switchname"],
                 tooltip = objects_common.schematic_objects[object_id]["switchdescription"],
                 hidden = objects_common.schematic_objects[object_id]["hidden"],
+                release_delay = objects_common.schematic_objects[object_id]["releasedelay"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
                 button_colour = button_colour,
                 active_colour = active_colour,

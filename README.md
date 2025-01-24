@@ -40,6 +40,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Schematic Object bulk renumbering utility:
     * An easy way to consolidate your Signal, Point and Signalbox Lever numbering
     * Most other schematic object types can also be renumbered as required
+* Improvements to the operation of Momentary DCC Switches:
+    * DCC Commands can now be specified for both the 'press' and 'release' events
+    * A fixed 'release delay' can now be specified to 'hold' the momentary switch on
 * New SPROG DCC Address Mode settings option - to cater for the 'DCC Address offsets of 4' issue sometimes
 experienced when transitioning from one DCC System to another (where the NMRA specification has been interpreted
 differently by different DCC system manufacturers/suppliers)
