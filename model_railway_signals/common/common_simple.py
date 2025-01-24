@@ -563,6 +563,7 @@ class int_item_id_entry_box(integer_entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
+        self.validate()
 
 #------------------------------------------------------------------------------------
 # Common class for a str_item_id_entry_box - builds on the common entry_box class.
@@ -695,6 +696,7 @@ class str_int_item_id_entry_box(entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
+        self.validate()
 
 #------------------------------------------------------------------------------------
 # Class for a scrollable_text_frame - can be editable (e.g. entering layout info)
@@ -854,6 +856,7 @@ class validated_dcc_entry_box(dcc_entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
+        self.validate()
 
 #------------------------------------------------------------------------------------
 # Class for a validated_keypress_entry (for mapping keypress events).
@@ -910,6 +913,7 @@ class validated_keycode_entry_box(integer_entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
+        self.validate()
 
 #------------------------------------------------------------------------------------
 # Class for a validated_gpio_sensor_entry_box (for mapping gpio sensors to signals/sensors).
@@ -967,5 +971,6 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
 
     def set_item_id(self, item_id:int):
         self.local_item_id = item_id
+        self.validate()
 
 ###########################################################################################
