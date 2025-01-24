@@ -430,7 +430,9 @@ class edit_logging_settings():
 class mqtt_configuration_tab():
     def __init__(self, parent_tab, connect_function):
         self.connect_function = connect_function
+        #----------------------------------------------------------------
         # Create a label frame for the Broker configuration
+        #----------------------------------------------------------------
         self.frame1 = Tk.LabelFrame(parent_tab, text="Broker configuration")
         self.frame1.pack(padx=2, pady=2, fill='x')
         # Create the Serial Port and baud rate UI elements 
@@ -463,7 +465,9 @@ class mqtt_configuration_tab():
         self.password = common.entry_box(self.subframe4, width=25,tool_tip="Specify the password (WARNING DO NOT "+
                     "RE-USE AN EXISTING PASSWORD AS THIS IS SENT OVER THE NETWORK UNENCRYPTED)")
         self.password.pack(side=Tk.LEFT, padx=2, pady=2)
-        # Create a label frame for the Broker configuration
+        #----------------------------------------------------------------
+        # Create a label frame for the Network configuration
+        #----------------------------------------------------------------
         self.frame2 = Tk.LabelFrame(parent_tab, text="Network configuration")
         self.frame2.pack(padx=2, pady=2, fill='x')
         # Create the Network name and node name elements 
@@ -493,11 +497,12 @@ class mqtt_configuration_tab():
         self.subshutdown = common.check_box(self.frame2, label="Quit application on reciept of shutdown", width=32, 
             tool_tip="Select to shutdown and exit this application on reciept of a shutdown command published by another node")
         self.subshutdown.pack(padx=2, pady=2)
-        # Create the Button to test connectivity
+        #----------------------------------------------------------------
+        # Create the Button to test connectivity and status lable
+        #----------------------------------------------------------------
         self.B1 = Tk.Button (parent_tab, text="Test Broker connectivity",command=self.test_connectivity)
         self.B1.pack(padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.B1, "Will attempt to establish a connection to the broker")
-        # Create the Status Label
         self.status = Tk.Label(parent_tab, text="")
         self.status.pack(padx=2, pady=2)
 
