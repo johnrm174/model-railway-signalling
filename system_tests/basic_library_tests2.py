@@ -26,12 +26,11 @@ def run_text_box_library_tests():
     print("Library Tests - Text Box Objects")
     canvas = schematic.canvas
     # create_track_sensor
-    print("Library Tests - create_text_box - will generate 4 errors:")
+    print("Library Tests - create_text_box - will generate 3 errors:")
     assert len(track_sensors.track_sensors) == 0    
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # success
     text_boxes.create_text_box(canvas, "2", 200, 100, text="Textbox 1")    # Fail - not an int
     text_boxes.create_text_box(canvas, 0, 200, 100, text="Textbox 1")      # Fail - out of range
-    text_boxes.create_text_box(canvas, 1000, 200, 100, text="Textbox 1")   # Fail - out of range
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # Fail - duplicate
     assert len(text_boxes.text_boxes) == 1
     # track_sensor_exists
@@ -99,11 +98,10 @@ def run_track_sensor_library_tests():
     print("Library Tests - Track Sensor Objects")
     canvas = schematic.canvas
     # create_track_sensor
-    print("Library Tests - create_track_sensor - will generate 4 errors:")
+    print("Library Tests - create_track_sensor - will generate 3 errors:")
     assert len(track_sensors.track_sensors) == 0    
     track_sensors.create_track_sensor(canvas, sensor_id=10, x=100, y=100, callback=track_sensor_callback)    # success
     track_sensors.create_track_sensor(canvas, sensor_id=0, x=100, y=100, callback=track_sensor_callback)     # Fail (<1)
-    track_sensors.create_track_sensor(canvas, sensor_id=1000, x=100, y=100, callback=track_sensor_callback)  # Fail (>999)
     track_sensors.create_track_sensor(canvas, sensor_id="10", x=100, y=100, callback=track_sensor_callback)  # Fail (not int)
     track_sensors.create_track_sensor(canvas, sensor_id=10, x=100, y=100, callback=track_sensor_callback)    # fail (duplicate)
     assert len(track_sensors.track_sensors) == 1
@@ -162,7 +160,7 @@ def run_track_section_library_tests():
     print("Library Tests - Track Section Objects")
     canvas = schematic.canvas
     # create_track_section
-    print("Library Tests - create_section - will generate 11 errors:")
+    print("Library Tests - create_section - will generate 8 errors:")
     assert len(track_sections.sections) == 0
     # Create track sections in Run Mode (default as we haven't changed it) and the n Edit Mode
     track_sections.configure_edit_mode(False)
@@ -174,16 +172,13 @@ def run_track_section_library_tests():
     track_sections.create_section(canvas,5,500,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
     track_sections.create_section(canvas,6,600,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
     track_sections.create_section(canvas,0,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID out of range
-    track_sections.create_section(canvas,1000,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")      # Fail - ID out of range
     track_sections.create_section(canvas,6,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID already exists
     track_sections.create_section(canvas,"7",100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")       # Fail - ID not an int
     track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id=4)           # Fail - Mirror ID not a str
     track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="7")         # Fail - Mirror ID same as ID
     track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="0")         # Fail - Mirror ID invalid
-    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="1000")      # Fail - Mirror ID invalid
     track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="box1")      # Fail - Mirror ID invalid
     track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="box1-0")    # Fail - Mirror ID invalid
-    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="box1-1000") # Fail - Mirror ID invalid
     assert len(track_sections.sections) == 6
     print("Library Tests - section_exists - will generate 1 error:")
     assert track_sections.section_exists(1)
@@ -282,7 +277,7 @@ def run_track_section_library_tests():
     track_sections.section_state_toggled(2)
     assert not track_sections.section_occupied(2)
     assert not track_sections.section_occupied(7)
-    print("Library Tests - update_mirrored_section - 9 errors will be generated")
+    print("Library Tests - update_mirrored_section - 7 errors will be generated")
     # Set up the sections to be mirrored with a known state
     track_sections.update_identifier(3,"Train60")
     track_sections.clear_section_occupied(3)
@@ -299,16 +294,13 @@ def run_track_section_library_tests():
     track_sections.update_mirrored_section(1,8)             # Fail - Mirrored ID not a str
     track_sections.update_mirrored_section(1,"1")           # Fail - Mirrored ID Same as Section ID
     track_sections.update_mirrored_section(1,"0")           # Fail - Local Mirrored ID out of range
-    track_sections.update_mirrored_section(1,"1000")        # Fail - Local Mirrored ID out of range
     track_sections.update_mirrored_section(1,"box1")        # Fail - Remote Mirrored ID invalid
     track_sections.update_mirrored_section(1,"box1-0")      # Fail - Remote Mirrored ID invalid
-    track_sections.update_mirrored_section(1,"box1-1000")   # Fail - Remote Mirrored ID invalid
-    print("Library Tests - set_sections_to_publish_state - 4 Errors and 2 warnings will be generated")    
+    print("Library Tests - set_sections_to_publish_state - 2 Errors and 2 warnings will be generated")    
     assert len(track_sections.list_of_sections_to_publish) == 0
     track_sections.set_sections_to_publish_state(1,2,20)    # Valid
     track_sections.set_sections_to_publish_state(1,2)       # Already set to publish - 2 warnings
     track_sections.set_sections_to_publish_state("1,","2")  # Not integers - 2 Errors
-    track_sections.set_sections_to_publish_state(0, 1000)   # Integer but out of range - 2 errors
     assert len(track_sections.list_of_sections_to_publish) == 3
     # Create a Section already set to publish state on creation
     print("Library Tests - set_sections_to_publish_state - Exercise Publishing of Events code")
@@ -320,11 +312,11 @@ def run_track_section_library_tests():
     track_sections.update_identifier(2,"Train11")
     track_sections.section_state_toggled(2)
     track_sections.section_state_toggled(3)
-    print("Library Tests - subscribe_to_remote_sections - 5 Errors and 2 warnings will be generated")
+    print("Library Tests - subscribe_to_remote_sections - 4 Errors and 2 warnings will be generated")
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # Success
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # 2 Warnings - already subscribed
     track_sections.subscribe_to_remote_sections("box1","51", 3)        # Fail - 3 errors
-    track_sections.subscribe_to_remote_sections("box1-0","box1-1000")  # Fail - 2 errors
+    track_sections.subscribe_to_remote_sections("box1-0")              # Fail - 1 error
     assert len(track_sections.sections) == 10
     assert track_sections.section_exists("box1-50")
     assert track_sections.section_exists("box1-51")
@@ -456,7 +448,7 @@ def run_point_library_tests():
     # create_point
     assert len(points.points) == 0
     # Point ID and point_type combinations
-    print("Library Tests - create_point - will generate 11 errors:")
+    print("Library Tests - create_point - will generate 9 errors:")
     points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red") #  Valid
     points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True)  # Valid
     points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)  # Valid
@@ -465,7 +457,6 @@ def run_point_library_tests():
     points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)  # Valid
     points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
     points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)   # Error (<1)
-    points.create_point(canvas, 1000, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error (>999)
     points.create_point(canvas, "15", points.point_type.RH, points.point_subtype.normal,100, 100, point_callback, fpl_callback)  # Error (not int)
     points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error (duplicate)
     points.create_point(canvas, 17, "random-type", points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error - invalid type
@@ -474,7 +465,6 @@ def run_point_library_tests():
     # Alsoswitch combinations
     points.create_point(canvas, 18, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch="10") # Error (not an int)
     points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=19) # Error (switch itself)
-    points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=1000) # Error (out of range)
     # Automatic and FPL combinations
     points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, switched_with=True, fpl=True) # Error
     assert len(points.points) == 7
@@ -567,8 +557,8 @@ def run_point_library_tests():
     points.lock_point("10") # Invalid
     points.lock_point(20)   # Does not exist
     points.lock_point(10)
-    points.lock_point(14)
-    points.lock_point(14)
+    points.lock_point(14)   # Warning as FPL is not active (see above)
+    points.lock_point(14)   # No warning as FPL got activated the first time we locked it
     assert points.point_locked(10)
     assert points.point_locked(14)
     print("Library Tests - unlock_point / point_locked- will generate 2 errors:")
@@ -613,8 +603,13 @@ def run_point_library_tests():
     print("Library Tests - set_point_colour - will generate 2 errors:")
     assert not points.point_switched(10)
     assert not points.point_switched(14)
+    assert points.fpl_active(14)          # FPL should be active
+    assert not points.point_switched(14)  # Point should be 'unswitched'
+    points.toggle_fpl(14)  
     points.toggle_point(14)
+    points.toggle_fpl(14)
     assert points.point_switched(14)
+    assert points.fpl_active(14)
     assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "red"
@@ -826,7 +821,7 @@ def run_instrument_library_tests():
     print("Library Tests - Instrument Objects")
     canvas = schematic.canvas
     # create_instrument
-    print("Library Tests - create_instrument - 12 Errors and 4 warnings will be generated")
+    print("Library Tests - create_instrument - 9 Errors and 4 warnings will be generated")
     assert len(block_instruments.instruments) == 0
     # Sunny day tests
     block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="2")      # Valid
@@ -843,16 +838,13 @@ def run_instrument_library_tests():
     block_instruments.create_instrument(canvas, 9, block_instruments.instrument_type.single_line, 900, 100, instrument_callback, linked_to="10")     # Warning
     # Rainy day tests:
     block_instruments.create_instrument(canvas, 0, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")     # Fail (int <1)
-    block_instruments.create_instrument(canvas, 1000, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")  # Fail (int >999)
     block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")     # Fail (Exists)
     block_instruments.create_instrument(canvas, "10", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")  # Fail (str)
     block_instruments.create_instrument(canvas, 10, "random_type", 100, 100, instrument_callback, linked_to="2")                                     # Fail (invalid type)
     block_instruments.create_instrument(canvas, 11, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10)         # Fail (linked ID not int)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="0")        # Fail (invalid linked ID)
-    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="1000")     # Fail (invalid linked ID)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1")     # Fail (invalid linked ID)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-0")   # Fail (invalid linked ID)
-    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-1000") # Fail (invalid linked ID)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="12")       # Fail (same ID)
     assert len(block_instruments.instruments) == 9
     print("Library Tests - instrument_exists - 1 Error will be generated")
@@ -950,7 +942,7 @@ def run_instrument_library_tests():
     block_instruments.telegraph_key_button(2)
     block_instruments.telegraph_key_button(3)
     block_instruments.telegraph_key_button(4)
-    print("Library Tests - update_linked_instrument - 10 Errors and 5 warnings will be generated")
+    print("Library Tests - update_linked_instrument - 8 Errors and 5 warnings will be generated")
     # Clear down the spurious linkings
     block_instruments.update_linked_instrument(5,"")
     block_instruments.update_linked_instrument(6,"")
@@ -968,11 +960,9 @@ def run_instrument_library_tests():
     block_instruments.update_linked_instrument(1,2)             # Fail - Linked ID not a str
     block_instruments.update_linked_instrument(1,"box1")        # Fail - linked ID not valid remote ID
     block_instruments.update_linked_instrument(1,"0")           # Fail (invalid linked ID)
-    block_instruments.update_linked_instrument(1,"1000")        # Fail (invalid linked ID)
     block_instruments.update_linked_instrument(1,"box1")        # Fail (invalid linked ID)
     block_instruments.update_linked_instrument(1,"box1-0")      # Fail (invalid linked ID)
-    block_instruments.update_linked_instrument(1,"box1-1000")   # Fail (invalid linked ID)
-    print("Library Tests - set_instruments_to_publish_state - 4 Errors and 3 warnings will be generated")
+    print("Library Tests - set_instruments_to_publish_state - 3 Errors and 3 warnings will be generated")
     # Set instrument 5 to publish state as soon as it set to publish (and reset the other linkings)
     block_instruments.update_linked_instrument(5,"box1-5") # Warning - inst 5 linked from inst 4
     block_instruments.update_linked_instrument(6,"")
@@ -982,9 +972,9 @@ def run_instrument_library_tests():
     block_instruments.set_instruments_to_publish_state(1,2,5,20)  # Valid
     block_instruments.set_instruments_to_publish_state(1, 2)      # Already set to publish - 2 warnings
     block_instruments.set_instruments_to_publish_state("1,","2")  # Not integers - 2 Errors
-    block_instruments.set_instruments_to_publish_state(0, 1000)    # Integer but out of range - 2 errors
+    block_instruments.set_instruments_to_publish_state(0)    # Integer but out of range - 1 error
     assert len(block_instruments.list_of_instruments_to_publish) == 4
-    print("Library Tests - set_instruments_to_publish_state - Exercise  Publishing of Events code")
+    print("Library Tests - set_instruments_to_publish_state - Exercise  Publishing of Events code (no errors or warnings)")
     # Clear down the existing linked instruments first
     block_instruments.update_linked_instrument(5,"Box2-50")
     block_instruments.update_linked_instrument(6,"Box2-60")
@@ -1007,7 +997,7 @@ def run_instrument_library_tests():
     block_instruments.blocked_button_event(6)
     block_instruments.telegraph_key_button(6)
     block_instruments.telegraph_key_button(6)
-    print("Library Tests - subscribe_to_remote_instrument - 5 Errors and 1 Warning will be generated")
+    print("Library Tests - subscribe_to_remote_instrument - 4 Errors and 1 Warning will be generated")
     assert len(block_instruments.instruments) == 10
     block_instruments.subscribe_to_remote_instruments("box2-20")   # Success
     block_instruments.subscribe_to_remote_instruments("box2-20")   # Warning - This is a duplicate
@@ -1015,7 +1005,6 @@ def run_instrument_library_tests():
     block_instruments.subscribe_to_remote_instruments("box2")      # Fail - not valid remote ID
     block_instruments.subscribe_to_remote_instruments("200")       # Fail - not valid remote ID
     block_instruments.subscribe_to_remote_instruments("box2-0")    # Fail - not valid remote ID
-    block_instruments.subscribe_to_remote_instruments("box2-1000")  # Fail - not valid remote ID
     assert len(block_instruments.instruments) == 11
     assert block_instruments.instrument_exists("box2-20")
     print("Library Tests - handle_mqtt_instrument_updated_event - 5 Warnings will be generated")
@@ -1137,7 +1126,6 @@ def run_line_library_tests():
     lines.create_line(canvas, 17, 100, 450, 200, 450, arrow_type=[1,1,1], arrow_ends=3, selected=True)    # success
     lines.create_line(canvas, "18", 100, 100, 200, 100)   # Fail (ID not an int)
     lines.create_line(canvas, 0, 100, 100, 200, 100)      # Fail (ID < 1)
-    lines.create_line(canvas, 1000, 100, 100, 200, 100)   # Fail (ID > 999)
     lines.create_line(canvas, 10, 100, 100, 200, 100)     # Fail (ID already exists)
     assert len(lines.lines) == 8
     print("Library Tests - line_exists - will generate 1 error:")
@@ -1231,7 +1219,6 @@ def run_button_library_tests():
     buttontype = buttons.button_type.switched
     assert len(buttons.buttons) == 0
     buttons.create_button(canvas,0,buttontype,100,100,selected_callback,deselected_callback)      # Error - ID out of range
-    buttons.create_button(canvas,1000,buttontype,100,100,selected_callback,deselected_callback)   # Error - ID out of range
     buttons.create_button(canvas,"1",buttontype,100,100,selected_callback,deselected_callback)    # Error - ID not an int
     buttons.create_button(canvas,1,"buttontype",100,100,selected_callback,deselected_callback)    # Error - invalid buttontype
     buttons.create_button(canvas,1,buttontype,100,100,selected_callback,deselected_callback)      # Success
