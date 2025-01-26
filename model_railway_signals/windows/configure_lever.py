@@ -245,6 +245,9 @@ class keycode_configuration(Tk.LabelFrame):
                 item_type="Lever", tool_tip="Specify the 'keycode' to 'reset' the lever (set logging to 'debug' "+
                     "and trigger the required keypress event in Run Mode to find the associated keycode)")
         self.onkeycode.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label3 = Tk.Label(self, text="Keycode events are only enabled in Run Mode\n"+
+                                          "and are disabled whilst editing Train Identifiers")
+        self.label3.pack(padx=5, pady=5)
 
     def entry_updated(self):
         self.validate()

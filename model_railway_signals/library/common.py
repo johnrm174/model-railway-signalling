@@ -65,8 +65,10 @@ root_window = None
 shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
-# Global flag to trck the mode (set via the configure_edit_mode function)
+# Global flag to track the mode (set via the configure_edit_mode function)
 run_mode = False
+# Global Flag to enable or disable the processing of keypress events
+keypresses_enabled = True
 
 #---------------------------------------------------------------------------------------------
 # Popup window for displaying Run Layout Warnings. Used by the Levers library module to
@@ -144,7 +146,7 @@ def display_warning(canvas, message:str):
 keyboard_mappings= {}
 
 def keyboard_handler(event):
-    if run_mode:
+    if run_mode and keypresses_enabled:
         debug_string = "Schematic Keypress event: Keycode="+str(event.keycode)
         if len(event.char) == 1: debug_string = debug_string + " - Character="+repr(event.char)
         logging.debug(debug_string)
@@ -166,6 +168,16 @@ def get_keyboard_mapping(keycode:int):
     else:
         keyboard_mapping = None
     return(keyboard_mapping)
+
+def enable_keypress_events():
+    global keypresses_enabled
+    keypresses_enabled = True
+    return()
+
+def disable_keypress_events():
+    global keypresses_enabled
+    keypresses_enabled = False
+    return()
 
 #-------------------------------------------------------------------------
 # Function to set the tkinter "root" window reference as this is used to

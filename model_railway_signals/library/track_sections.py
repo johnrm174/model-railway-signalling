@@ -109,6 +109,9 @@ def open_entry_box(section_id):
     if entry_box_window is not None:
         text_entry_box.destroy()
         canvas.delete(entry_box_window)
+    # If the user has opened an entry box to type in a new designator then we
+    # need to inhibit the processing of keypresses for other schematic events
+    common.disable_keypress_events()
     # Set the length for the text entry box
     label_length = sections[str(section_id)]["sectionwidth"]
     text_font = sections[str(section_id)]["textfont"]
@@ -140,6 +143,8 @@ def close_entry_box(section_id:int):
     global entry_box_window
     text_entry_box.destroy()
     sections[str(section_id)]["canvas"].delete(entry_box_window)
+    # Re-enable keypress events
+    common.enable_keypress_events()
     return()
 
 # Internal function to process the manual update of the Section label
