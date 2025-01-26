@@ -165,10 +165,12 @@ def button_released_event(button_id:int):
 def button_event(button_id:int):
     if buttons[str(button_id)]["buttontype"] == button_type.switched:
         toggle_button(button_id)
-    if buttons[str(button_id)]["selected"]:
-        buttons[str(button_id)]["selectedcallback"] (button_id)
+        if buttons[str(button_id)]["selected"]:
+            buttons[str(button_id)]["selectedcallback"] (button_id)
+        else:
+            buttons[str(button_id)]["deselectedcallback"] (button_id)
     else:
-        buttons[str(button_id)]["deselectedcallback"] (button_id)
+        buttons[str(button_id)]["selectedcallback"] (button_id)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -184,6 +186,11 @@ def toggle_button(button_id:int):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID must be an int")
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID does not exist")
+    elif buttons[str(button_id)]["buttontype"] == button_type.momentary:
+        logging.info("Button "+str(button_id)+": Momentary Button has been pressed *****************************************")
+        buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+        dcc_control.update_dcc_switch(button_id, True)
+        common.root_window.after(buttons[str(button_id)]["releasedelay"], lambda:button_released_event(button_id))
     elif buttons[str(button_id)]["selected"]:
         logging.info("Button "+str(button_id)+": Button has been de-selected ***********************************************")
         buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["deselectedcolour"])
