@@ -357,15 +357,18 @@ def check_routes_valid_after_point_change(point_id:int, route_id:int):
     return()
 
 def check_routes_valid_after_switch_change(switch_id:int, route_id:int):
-    for str_route_id in objects.route_index:
-        if int(str_route_id) != route_id and library.button_state(int(str_route_id)):
-            route_object = objects.schematic_objects[objects.route(str_route_id)]
-            if str(switch_id) in route_object["switchesonroute"].keys():
-                required_state = route_object["switchesonroute"][str(switch_id)]
-                if library.button_state(switch_id) != required_state:
-                    reset_route_highlighting(int(str_route_id))
-                    library.toggle_button(int(str_route_id))
-                    complete_route_cleardown(int(str_route_id))
+    # We only really care about latching switches - not momentary switches
+    switch_type = objects.schematic_objects[objects.switch(switch_id)]["itemtype"]
+    if switch_type == library.button_type.switched.value:
+        for str_route_id in objects.route_index:
+            if int(str_route_id) != route_id and library.button_state(int(str_route_id)):
+                route_object = objects.schematic_objects[objects.route(str_route_id)]
+                if str(switch_id) in route_object["switchesonroute"].keys():
+                    required_state = route_object["switchesonroute"][str(switch_id)]
+                    if library.button_state(switch_id) != required_state:
+                        reset_route_highlighting(int(str_route_id))
+                        library.toggle_button(int(str_route_id))
+                        complete_route_cleardown(int(str_route_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -476,9 +479,12 @@ def complete_route_setup(route_id:int):
         if library.point_switched(int(str_point_id)) != required_state or not library.fpl_active(int(str_point_id)):
             route_set_up_and_locked = False
     for str_switch_id in switches_on_route.keys():
-        required_state = switches_on_route[str_switch_id]
-        if library.button_state(int(str_switch_id)) != required_state:
-            route_set_up_and_locked = False
+        # We only care about the state of latching switches
+        switch_type = objects.schematic_objects[objects.switch(str_switch_id)]["itemtype"]
+        if switch_type == library.button_type.switched.value:
+            required_state = switches_on_route[str_switch_id]
+            if library.button_state(int(str_switch_id)) != required_state:
+                route_set_up_and_locked = False
     for int_signal_id in signals_on_route:
         if not library.signal_clear(int_signal_id):
             route_set_up_and_locked = False
