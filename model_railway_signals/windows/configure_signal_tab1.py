@@ -60,7 +60,8 @@ class semaphore_route_element():
         self.CB = common.check_box(parent_frame, label=label,
                         tool_tip=tool_tip, callback=self.cb_updated)
         self.CB.pack(side=Tk.LEFT)
-        self.EB = common.validated_dcc_entry_box(parent_frame, item_type="Signal")
+        self.EB = common.validated_dcc_entry_box(parent_frame, item_type="Signal",
+                    tool_tip="Enter the DCC address for the signal arm")
         self.EB.pack(side=Tk.LEFT)
                 
     def cb_updated(self):
@@ -353,7 +354,8 @@ class colour_light_aspect(common.row_of_validated_dcc_commands):
         self.label = Tk.Label(self.frame, width=12, text=label, anchor='w')
         self.label.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
-        super().__init__(self.frame, columns=6, item_type="Signal")
+        super().__init__(self.frame, columns=6, item_type="Signal",
+                tool_tip="Enter the DCC Address for the command (1-2047)")
         self.pack(side=Tk.LEFT)
 
 #------------------------------------------------------------------------------------
@@ -393,7 +395,8 @@ class colour_light_aspects():
         self.CB = common.check_box(self.subframe, label="Subsidary signal",   
                     tool_tip="Select to add a seperate calling on aspect",callback=self.sub_updated)
         self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.EB = common.validated_dcc_entry_box(self.subframe, item_type="Signal")
+        self.EB = common.validated_dcc_entry_box(self.subframe, item_type="Signal",
+                        tool_tip="Enter the DCC address for the subsidary signal aspect (1-2047)")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
 
     def sub_updated(self):
@@ -505,7 +508,8 @@ class theatre_route_element(common.row_of_validated_dcc_commands):
         self.EB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
-        super().__init__(self.frame, columns=6, item_type="Signal")
+        super().__init__(self.frame, columns=6, item_type="Signal",
+                    tool_tip="Enter the DCC Address for the command (1-2047)")
         self.pack(side=Tk.LEFT)
         
     def selection_updated(self):
@@ -701,7 +705,8 @@ class feather_route_element(common.row_of_validated_dcc_commands):
         self.CB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
-        super().__init__(self.frame, columns=6, item_type="Signal")
+        super().__init__(self.frame, columns=6, item_type="Signal",
+                    tool_tip="Enter the DCC Address for the command (1-2047)")
         self.pack(side=Tk.LEFT)
         
     def selection_updated(self):

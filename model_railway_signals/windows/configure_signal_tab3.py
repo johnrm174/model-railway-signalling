@@ -13,78 +13,17 @@
 #    common.check_box
 #    common.integer_entry_box
 #    common.CreateToolTip
-#
+#    common.validated_gpio_sensor_entry_box
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
 
 from .. import common
 from .. import library
-
-#------------------------------------------------------------------------------------
-# Class for a Signal Sensor Entry Box - based on the str_int_item_id_entry_box class
-# Public Class instance methods (inherited from the integer_entry_box) are
-#    "set_value" - will set the current value for the GPIO Sensor ID (integer)
-#         - Also sets the current item ID (int) for validation purposes
-#    "get_value" - will return the last "valid" value (integer)
-# Overridden Public Class instance methods provided by this class:
-#    "validate" - Must be a valid Sensor ID and not already assigned
-# Note that we use the current_item_id variable (from the base class) for validation.
-#------------------------------------------------------------------------------------
-
-class signal_sensor(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame, callback, label:str, tool_tip:str):
-        # We need to hold the current signal_id for validation purposes but we don't pass this 
-        # into the parent class as the entered ID for the gpio sensor can be the same as the current
-        # item_id (for the signal object) - so we don't want the parent class to validate this.
-        self.signal_id = 0
-        # The this function will return true if the GPIO sensor exists
-        exists_function = library.gpio_sensor_exists
-        # Create the label and entry box UI elements
-        self.label = Tk.Label(parent_frame, text=label)
-        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(parent_frame, callback = callback, tool_tip=tool_tip, exists_function=exists_function)
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
-            
-    def validate(self, update_validation_status=True):
-        # Do the basic integer validation first (is it a valid ID and does it exist (or has been subscribed to)
-        valid = super().validate(update_validation_status=False)
-        # Next we need to validate it isn't already assigned to another signal appropach or passed event
-        if valid and self.entry.get() != "":
-            sensor_id = self.entry.get()
-            event_mappings = library.get_gpio_sensor_callback(sensor_id)
-            if event_mappings[0] > 0 and event_mappings[0] != self.signal_id:
-                self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
-                valid = False
-            elif event_mappings[1] > 0 and event_mappings[1] != self.signal_id:
-                self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
-                valid = False
-            elif event_mappings[2] > 0:
-                self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
-                valid = False
-        if update_validation_status: self.set_validation_status(valid)
-        return(valid)
-    
-    # We need to hold the current signal_id for validation purposes but we don't pass this 
-    # into the parent class as the entered ID for the gpio sensor can be the same as the current
-    # item_id (for the signal object) - so we don't want the parent class to validate this.
-    def set_value(self, value:str, signal_id:int):
-        self.signal_id = signal_id
-        super().set_value(value)
         
 #------------------------------------------------------------------------------------
-# Class for the Signal Passed Sensor Frame - uses the Signal Sensor Entry Box class
-# Public Class instance methods used from the base classes are
-#    "approach.enable" - disables/blanks the checkbox and entry box 
-#    "approach.disable" - enables/loads the checkbox and entry box
-#    "approach.set_value" - will set the current value (int)
-#         - Also sets the current item ID (int) for validation purposes
-#    "approach.get_value" - returns the last "valid" value (int)
-#    "passed.set_value" - will set the current value (int)
-#         - Also sets the current item ID (int) for validation purposes
-#    "passed.get_value" - returns the last "valid" value (int)
-# Public Class instance methods provided by this class:
-#    "validate" - validate both entry box values and return True/false
+# Class for the Signal Passed Sensor Frame - uses the validated_gpio_sensor_entry_box
+# Class with additional validation to ensure the same Sensor ID isn't entered
 #------------------------------------------------------------------------------------
 
 class signal_passed_sensor_frame:
@@ -98,25 +37,28 @@ class signal_passed_sensor_frame:
         tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This "+
                     "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
                     "which has been subscribed to via MQTT networking")
-        self.passed = signal_sensor(self.subframe, callback=self.validate,
-                label="  Signal 'passed' sensor:", tool_tip = tool_tip)
-        self.approach = signal_sensor(self.subframe, callback=self.validate,
-                label="  Signal 'approached' sensor:", tool_tip = tool_tip)
+        self.label1 = Tk.Label(self.subframe, text="Signal 'passed' sensor:")
+        self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.passed = common.validated_gpio_sensor_entry_box(self.subframe, item_type="Signal",
+                                                    callback=self.validate, tool_tip=tool_tip)
+        self.passed.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.label2 = Tk.Label(self.subframe, text="Signal 'approached' sensor:")
+        self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.approach = common.validated_gpio_sensor_entry_box(self.subframe, item_type="Signal",
+                                                    callback=self.validate, tool_tip=tool_tip)
+        self.approach.pack(padx=2, pady=2, side=Tk.LEFT)
         
     def validate(self):
-        if self.passed.entry.get() != "" and self.passed.entry.get() == self.approach.entry.get():
-            error_text = "Cannot assign the same GPIO sensor for both signal 'passed' and signal 'approached' events"
-            self.passed.TT.text = error_text
-            self.approach.TT.text = error_text
+        # validate the individual entry boxes first
+        valid = self.passed.validate() and self.approach.validate()
+        # validate the entries are not the same
+        if valid and self.passed.get_value() !="" and self.approach.get_value() == self.passed.get_value():
+            self.passed.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
+            self.approach.TT.text="The same keycode has been specified for both 'passed' and 'approach' events"
             self.passed.set_validation_status(False)
             self.approach.set_validation_status(False)
-            return(False)
-        else:
-            # As both validation calls are made before the return statement
-            # all UI eelements will be updated to show their validation status
-            self.passed.set_validation_status(self.passed.validate())
-            self.approach.set_validation_status(self.approach.validate())
-            return(self.passed.validate() and self.approach.validate())
+            valid = False
+        return(valid)
             
 #------------------------------------------------------------------------------------
 # Sub Classes for the Track Occupancy automation subframe

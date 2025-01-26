@@ -346,7 +346,7 @@ class one_touch_programming_element():
         self.subframe.pack()
         self.label = Tk.Label(self.subframe, text="Address to program")
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.entry = common.dcc_entry_box(self.subframe)
+        self.entry = common.dcc_entry_box(self.subframe, tool_tip="Enter the DCC address to program (1-2047)")
         self.entry.pack(side=Tk.LEFT, padx=2, pady=2)
         self.B1 = Tk.Button (self.subframe, text = "On (fwd)",command=lambda:self.send_command(True))
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)

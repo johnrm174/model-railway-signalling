@@ -335,7 +335,6 @@ class entry_box(Tk.Entry):
         if self.enabled0 and self.enabled1 and self.enabled2:
             self.configure(state="normal")
             self.entry.set(self.value)
-            self.validate()
         else:
             self.configure(state="disabled")
             self.entry.set("")
@@ -367,7 +366,6 @@ class entry_box(Tk.Entry):
     def set_value(self, value:str):
         self.value = value
         self.entry.set(value)
-        self.validate()
 
     def get_value(self):
         if self.enabled0 and self.enabled1 and self.enabled2: return(self.value)
@@ -396,10 +394,10 @@ class entry_box(Tk.Entry):
 #------------------------------------------------------------------------------------
 
 class character_entry_box(entry_box):
-    def __init__(self, parent_window, callback, tool_tip):
+    def __init__(self, parent_window, tool_tip:str, callback=None):
         super().__init__(parent_window, width=2, callback=callback, tool_tip=tool_tip)
         
-    def validate(self, update_validation_status=True):
+    def validate(self, update_validation_status:bool=True):
         if len(self.entry.get()) > 1:
             self.TT.text = ("Can only specify a single character (or leave blank)")
             valid = False
@@ -438,7 +436,7 @@ class integer_entry_box(entry_box):
         # Create the entry box, event bindings and associated default tooltip
         super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
                 
-    def validate(self, update_validation_status=True):
+    def validate(self, update_validation_status:bool=True):
         entered_value = self.entry.get()        
         if entered_value == "" or entered_value == "#":
             # The EB value can be blank if the entry box is inhibited (get_value will return zero)
@@ -480,35 +478,9 @@ class integer_entry_box(entry_box):
         else: super().set_value(str(0))
 
 #------------------------------------------------------------------------------------
-# Common class for a DCC address entry box - builds on the integer_entry_box class
-# Adds additional validation to ensure the entry is within the DCC address range.
-#
-# Main class methods used by the editor are:
-#    "set_value" - set the initial value of the entry_box (int) 
-#    "get_value" - get the current value of the entry_box (int) 
-#    "validate" - Validates the entry is an integer between 1 and 2047 (or blank)
-#    "disable/disable1/disable2" - disables/blanks the entry_box
-#    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
-#    "reset" - resets the entry box to its default value (Zero)
-#    "pack" - for packing the UI element
-#
-# Class methods/objects for use by child classes:
-#    "set_validation_status" - to be called following external validation
-#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
-#    "entry" - is the current entry_box value (string)
-#------------------------------------------------------------------------------------
-
-class dcc_entry_box(integer_entry_box):
-    def __init__(self, parent_frame, callback=None,
-            tool_tip:str="Enter a DCC address (1-2047) or leave blank"):
-        # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=4 , min_value=1, max_value=2047,
-                            tool_tip=tool_tip, callback=callback)
-
-#------------------------------------------------------------------------------------
 # Common class for an int_item_id_entry_box - builds on the integer_entry_box. This class
 # is for entering local signal/point/instrument/section IDs (integers). It does not accept
-#  remote IDs (where the ID can be an int or str). The class uses the 'exists_function' to
+# remote IDs (where the ID can be an int or str). The class uses the 'exists_function' to
 # check that the entered ID exists on the schematic. If the current item ID is specified
 # (either via the set_value function or the set_item_id function) then the class also
 # validates the entered value is not the same as the current item ID.
@@ -541,7 +513,7 @@ class int_item_id_entry_box(integer_entry_box):
         super().__init__(parent_frame, width=width , min_value=1, max_value=999,
                 allow_empty=allow_empty, tool_tip=tool_tip, callback=callback)
 
-    def validate(self, update_validation_status=True):
+    def validate(self, update_validation_status:bool=True):
         # Do the basic integer validation (integer, in range)
         valid = super().validate(update_validation_status=False)
         # Now do the additional validation
@@ -563,7 +535,6 @@ class int_item_id_entry_box(integer_entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
-        self.validate()
 
 #------------------------------------------------------------------------------------
 # Common class for a str_item_id_entry_box - builds on the common entry_box class.
@@ -593,7 +564,7 @@ class str_item_id_entry_box(entry_box):
         # Call the common base class init function to create the EB
         super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
 
-    def validate(self, update_validation_status=True):
+    def validate(self, update_validation_status:bool=True):
         # Validate that the entry is in the correct format for a remote Item (<NODE>-<ID>)
         # where the NODE element can be any non-on zero length string but the ID element
         # must be a valid integer between 1 and 999
@@ -656,7 +627,7 @@ class str_int_item_id_entry_box(entry_box):
         # Call the common base class init function to create the EB
         super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
 
-    def validate(self, update_validation_status=True):
+    def validate(self, update_validation_status:bool=True):
         # Validate that the entry is in the correct format for a local item id (integer range 1-999)
         # or a remote item id (string in the form 'NODE-ID' where the NODE element can be any 
         # non-zero length string but the ID element must be a valid integer between 1 and 999)
@@ -696,7 +667,6 @@ class str_int_item_id_entry_box(entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
-        self.validate()
 
 #------------------------------------------------------------------------------------
 # Class for a scrollable_text_frame - can be editable (e.g. entering layout info)
@@ -803,6 +773,31 @@ class scrollable_text_frame(Tk.Frame):
         self.text_box.configure(font=(font, font_size, font_style))
 
 #------------------------------------------------------------------------------------
+# Common class for a DCC address entry box - builds on the integer_entry_box class
+# Adds additional validation to ensure the entry is within the DCC address range.
+#
+# Main class methods used by the editor are:
+#    "set_value" - set the initial value of the entry_box (int)
+#    "get_value" - get the current value of the entry_box (int)
+#    "validate" - Validates the entry is an integer between 1 and 2047 (or blank)
+#    "disable/disable1/disable2" - disables/blanks the entry_box
+#    "enable/enable1/enable2"  enables/loads the entry_box (with the last value)
+#    "reset" - resets the entry box to its default value (Zero)
+#    "pack" - for packing the UI element
+#
+# Class methods/objects for use by child classes:
+#    "set_validation_status" - to be called following external validation
+#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
+#    "entry" - is the current entry_box value (string)
+#------------------------------------------------------------------------------------
+
+class dcc_entry_box(integer_entry_box):
+    def __init__(self, parent_frame, tool_tip:str, callback=None):
+        # Call the common base class init function to create the EB
+        super().__init__(parent_frame, width=4 , min_value=1, max_value=2047,
+                         tool_tip=tool_tip, callback=callback)
+
+#------------------------------------------------------------------------------------
 # Common class for a validated_dcc_entry_box - builds on the common DCC Entry Box with added
 # validation to ensure the DCC address is not used by anything else. The validation function
 # needs knowledge of the current item type (provided at initialisation time) and the current
@@ -825,29 +820,30 @@ class scrollable_text_frame(Tk.Frame):
 #------------------------------------------------------------------------------------
 
 class validated_dcc_entry_box(dcc_entry_box):
-    def __init__(self, parent_frame, item_type:str, callback=None):
+    def __init__(self, parent_frame, item_type:str, tool_tip:str, callback=None):
         # We need the current Item ID and Item Type to validate the DCC Address entry. The
-        # Item Type ("Signal", "Point" or "Switch" is supplied at class initialisation time.
-        # The item ID is supplied when the 'set_value' function is called (as this may change)
+        # Item Type (e.g. "Signal", "Point" etc) is supplied at class initialisation time.
+        # The item ID is supplied via the 'set_value' and 'set_item_id' functions.
         self.current_item_id = 0
         self.current_item_type = item_type
-        super().__init__(parent_frame, callback=callback)
+        super().__init__(parent_frame, tool_tip=tool_tip, callback=callback)
 
-    def validate(self):
+    def validate(self, update_validation_status:bool=True):
         # Do the basic item validation first (exists and not current item ID)
         valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            # Ensure the address is not mapped to another signal or point. Note that to cater for Semaphore
-            # Signals with secondary distant arms we also need to check for Signal IDs + 1000
+        # If an valid address has been entered then validate the address is not mapped to
+        # another library object. We can only do this validation if we know the current ID
+        if valid and self.entry.get() != "" and self.current_item_id > 0:
             dcc_address = int(self.entry.get())
             dcc_mapping = library.dcc_address_mapping(dcc_address)
+            # To cater for Semaphores with secondary distants we also need to check for Signal IDs + 1000
             if dcc_mapping is not None and (dcc_mapping[0] != self.current_item_type or
                     (dcc_mapping[1] != self.current_item_id and dcc_mapping[1] != self.current_item_id + 1000)):
                 # We need to correct the mapped signal ID for secondary distants
                 if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
                 self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
                 valid = False
-        self.set_validation_status(valid)
+        if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
     def set_value(self, value:int, item_id:int=0):
@@ -856,12 +852,23 @@ class validated_dcc_entry_box(dcc_entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
-        self.validate()
 
 #------------------------------------------------------------------------------------
-# Class for a validated_keypress_entry (for mapping keypress events).
-# Validated to ensure the keycode is not on the reserved list and
-# has not already been mapped to another library object
+# Class for a validated_keypress_entry (for mapping keypress events). Validated to
+# ensure the keycode is not on the 'reserved' keycode list and has not already been
+# mapped to another library object. The validation function needs knowledge of the
+# current item type (provided at initialisation time) and the current item ID
+# (provided either via the set_value function or the set_item_id function).
+#
+# Reserved keycodes (mapped to editor controls in Run Mode are):
+#     keycode 37 - <cntl> - used for mode change, automation on/off and 'revert' screen size
+#     keycode 38 -'A' - Used (with cntl) for toggling automation on/off
+#     keycode 58 -'M' - Used (with cntl) for toggling between Edit and Run Modes
+#     keycode 27 -'R' - Used (with cntl) for 'Reverting' the window size to match the canvas
+#     keycode 111 - Up arrow key - for moving the canvas in the window
+#     keycode 113 - Left arrow key - for moving the canvas in the window
+#     keycode 114 - Right arrow key - for moving the canvas in the window
+#     keycode 116 - Down arrow key - for moving the canvas in the window
 #
 # Main class methods used by the editor are:
 #    "validate" - validate the current selection and return True/false
@@ -875,36 +882,34 @@ class validated_dcc_entry_box(dcc_entry_box):
 #------------------------------------------------------------------------------------
 
 class validated_keycode_entry_box(integer_entry_box):
-    def __init__(self, parent_window, callback, tool_tip:str):
-        # we need to know the current item ID for validation
+    def __init__(self, parent_frame, item_type:str, tool_tip:str, callback=None):
+        # We need the current Item ID and Item Type to validate the Keycode entry. The
+        # Item Type (e.g. "Lever", "Sensor" etc) is supplied at class initialisation time.
+        # The item ID is supplied via the 'set_value' and 'set_item_id' functions.
         self.current_item_id = 0
+        self.current_item_type = item_type
         # Create the parent class integer entry box
-        super().__init__(parent_window, width=4, min_value=0, max_value=255,
+        super().__init__(parent_frame, width=4, min_value=0, max_value=255,
                          callback=callback, tool_tip=tool_tip)
 
-    def validate(self):
-        # Reserved keycodes (mapped to editor controls in Run Mode are):
-        # keycode 37 - <cntl> - used for mode change, automation on/off and 'revert' screen size
-        # keycode 38 -'A' - Used (with cntl) for toggling automation on/off
-        # keycode 58 -'M' - Used (with cntl) for toggling between Edit and Run Modes
-        # keycode 27 -'R' - Used (with cntl) for 'Reverting' the window size to match the canvas
-        # keycode 111 - Up arrow key - for moving the canvas in the window
-        # keycode 113 - Left arrow key - for moving the canvas in the window
-        # keycode 114 - Right arrow key - for moving the canvas in the window
-        # keycode 116 - Down arrow key - for moving the canvas in the window
-        reserved_keycodes = (37, 38, 58, 27, 111, 113, 114, 116)
-        # Validate the basic entry values first (we do both to accept the current entries):
+    def validate(self, update_validation_status:bool=True):
+        # Validate the basic entry values first (integer and within range):
         valid = super().validate(update_validation_status=False)
-        if valid and self.get_value() > 0:
-            mapping = library.get_keyboard_mapping(self.get_value())
-            mapping_valid = mapping is None or (mapping[0] == "Lever" and mapping[1] == self.current_item_id)
-            if self.get_value() in reserved_keycodes:
-                self.TT.text = "Keycodes 37, 38, 58, 27, 111, 113, 114, 116 are reserved for the application"
+        # If valid and not blank we can do the rest of the validation
+        if valid and self.entry.get() != "":
+            keycode = int(self.entry.get())
+            # Validate the keycode is not in the list of reserved keycodes:
+            if keycode in (37, 38, 58, 27, 111, 113, 114, 116):
+                self.TT.text = "Keycodes 37 (cntl-key) , 38 (A), 58 (M), 27 (R) and 111/3/4/6 (arrow keys) are reserved for the application"
                 valid = False
-            elif not mapping_valid:
-                self.TT.text = "Keycode is already mapped to "+mapping[0]+" "+str(mapping[1])
-                valid = False
-        self.set_validation_status(valid)
+            # If an valid keycode has been entered, then validate the keycode is not mapped to
+            # another library object. We can only do this validation if we know the current ID
+            elif self.current_item_id > 0:
+                mapping = library.get_keyboard_mapping(keycode)
+                if mapping is not None and (mapping[0] != self.current_item_type or mapping[1] != self.current_item_id):
+                    self.TT.text = "Keycode is already mapped to "+mapping[0]+" "+str(mapping[1])
+                    valid = False
+        if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
     def set_value(self, keycode:int, item_id:int=0):
@@ -913,7 +918,6 @@ class validated_keycode_entry_box(integer_entry_box):
 
     def set_item_id(self, item_id:int):
         self.current_item_id = item_id
-        self.validate()
 
 #------------------------------------------------------------------------------------
 # Class for a validated_gpio_sensor_entry_box (for mapping gpio sensors to signals/sensors).
@@ -932,7 +936,7 @@ class validated_keycode_entry_box(integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
-    def __init__(self, parent_frame, item_type:str, callback=None):
+    def __init__(self, parent_frame, item_type:str, tool_tip:str, callback=None):
         # We need to know the current item ID for validation, but we want to hold it
         # locally rather than pass into the parent class (which already has a local
         # 'current_item_id' parameter used for local validation so we can't use that
@@ -941,28 +945,25 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
         # The item ID is supplied via the 'set_value' or 'set_item_id' functions.
         self.local_item_id = 0
         self.current_item_type = item_type
-        tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This can be "+
-                    "a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
-                    "which has been subscribed to via MQTT networking")
         super().__init__(parent_frame, tool_tip=tool_tip, exists_function=library.gpio_sensor_exists, callback=callback)
 
-    def validate(self):
+    def validate(self, update_validation_status:bool=True):
         # Do the basic validation first - ID is valid and 'exists'
         valid = super().validate(update_validation_status=False)
         # Validate it isn't already mapped to another Signal or Track Sensor
         if valid and self.entry.get() != "":
             gpio_sensor_id = self.entry.get()
             event_mappings = library.get_gpio_sensor_callback(gpio_sensor_id)
-            if event_mappings[0] > 0 and (self.current_item_type != "Signal" or event_mappings[2] != self.local_item_id):
+            if event_mappings[0] > 0 and (self.current_item_type != "Signal" or event_mappings[0] != self.local_item_id):
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
                 valid = False
-            elif event_mappings[1] > 0 and (self.current_item_type != "Signal" or event_mappings[2] != self.local_item_id):
+            elif event_mappings[1] > 0 and (self.current_item_type != "Signal" or event_mappings[1] != self.local_item_id):
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
             elif event_mappings[2] > 0 and (self.current_item_type != "Sensor" or event_mappings[2] != self.local_item_id):
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
-        self.set_validation_status(valid)
+        if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
     def set_value(self, value:str, item_id:int=0):
@@ -971,6 +972,5 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
 
     def set_item_id(self, item_id:int):
         self.local_item_id = item_id
-        self.validate()
 
 ###########################################################################################

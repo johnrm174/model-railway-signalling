@@ -176,7 +176,10 @@ class edit_track_sensor():
             self.subframe1a.pack()
             self.label = Tk.Label(self.subframe1a, text="Sensor 'passed' sensor:")
             self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1a, item_type="Sensor")
+            self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1a, item_type="Sensor",
+                    tool_tip="Specify the ID of a GPIO Sensor to trigger 'passed' events - This "+
+                    "can be a local sensor ID (integer) or a remote sensor ID (in the form 'Node-ID') "+
+                    "which has been subscribed to via MQTT networking")
             self.gpiosensor.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the UI Element for the general settings
             self.subframe2 = Tk.LabelFrame(self.frame, text="General Settings")

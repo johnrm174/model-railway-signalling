@@ -13,7 +13,7 @@
 #    common.int_item_id_entry_box
 #    common.str_int_item_id_entry_box
 #    common.signal_route_selections
-#    common.point_settings_entry
+#    common.row_of_point_settings
 #
 #------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ from .. import library
 
 #------------------------------------------------------------------------------------
 # Class for a route interlocking group (comprising 6 points, a signal and an instrument)
-# Uses the common point_settings_entry class for each point entry
+# Uses the common row_of_point_settings class for the point entries
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set the route elements (points, sig_ahead and inst_ahead)

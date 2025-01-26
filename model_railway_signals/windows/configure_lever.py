@@ -236,14 +236,14 @@ class keycode_configuration(Tk.LabelFrame):
         self.label1 = Tk.Label(self.frame, text="'OFF' keycode:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.offkeycode = common.validated_keycode_entry_box(self.frame, callback=self.entry_updated,
-                tool_tip="Specify the 'keycode' to 'pull' the lever (set logging to 'debug' and "+
-                    "trigger the required keypress event in Run Mode to find the associated keycode)")
+                item_type="Lever", tool_tip="Specify the 'keycode' to 'pull' the lever (set logging to 'debug' "
+                         + "and trigger the required keypress event in Run Mode to find the associated keycode)")
         self.offkeycode.pack(side=Tk.LEFT, padx=2, pady=2)
         self.label2 = Tk.Label(self.frame, text="   'ON' keycode:")
         self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.onkeycode = common.validated_keycode_entry_box(self.frame, callback=self.entry_updated,
-                tool_tip="Specify the 'keycode' to 'reset' the lever (set logging to 'debug' and "+
-                    "trigger the required keypress event in Run Mode to find the associated keycode)")
+                item_type="Lever", tool_tip="Specify the 'keycode' to 'reset' the lever (set logging to 'debug' "+
+                    "and trigger the required keypress event in Run Mode to find the associated keycode)")
         self.onkeycode.pack(side=Tk.LEFT, padx=2, pady=2)
 
     def entry_updated(self):

@@ -39,11 +39,12 @@ from .. import library
 #------------------------------------------------------------------------------------
 
 class validated_dcc_command_entry(Tk.Frame):
-    def __init__(self, parent_frame, item_type:str):
+    def __init__(self, parent_frame, item_type:str, tool_tip:str):
         # Use the parent class frame to pack everything into
         super().__init__(parent_frame)
         # Create the address entry box and the associated dcc state box
-        self.EB = common_simple.validated_dcc_entry_box(self, item_type=item_type, callback=self.eb_updated)
+        self.EB = common_simple.validated_dcc_entry_box(self, item_type=item_type,
+                                        callback=self.eb_updated, tool_tip=tool_tip)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common_simple.state_box(self, label_off="OFF", label_on="ON",
                     width=4, tool_tip="Set the DCC logic for the command")

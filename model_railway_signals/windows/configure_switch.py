@@ -174,14 +174,16 @@ class edit_switch():
             self.frame6subframe1.pack()
             self.frame6subframe1label1 = Tk.Label(self.frame6subframe1, width=14, text= " ON commands:")
             self.frame6subframe1label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.oncommands = common.row_of_validated_dcc_commands(self.frame6subframe1, columns=3, item_type="Switch")
+            self.oncommands = common.row_of_validated_dcc_commands(self.frame6subframe1, columns=3,
+                            item_type="Switch", tool_tip="Enter the DCC Address for the command (1-2047)")
             self.oncommands.pack(side=Tk.LEFT, padx=2, pady=2)                        
             # Create a subframe for the OFF labels and DCC command sequence
             self.frame6subframe2 = Tk.Frame(self.frame6)
             self.frame6subframe2.pack()
             self.frame6subframe2label1 = Tk.Label(self.frame6subframe2, width=14, text= " OFF commands:")
             self.frame6subframe2label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.offcommands = common.row_of_validated_dcc_commands(self.frame6subframe2, columns=3, item_type="Switch")
+            self.offcommands = common.row_of_validated_dcc_commands(self.frame6subframe2, columns=3,
+                            item_type="Switch", tool_tip="Enter the DCC Address for the command (1-2047)")
             self.offcommands.pack(side=Tk.LEFT, padx=2, pady=2)
             #------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window

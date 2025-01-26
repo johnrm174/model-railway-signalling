@@ -206,10 +206,11 @@ class dcc_address_settings(Tk.LabelFrame):
         # These are created in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self)
         self.subframe.pack()
-        self.EB = common.validated_dcc_entry_box(self.subframe, callback=self.entry_updated, item_type="Point")
+        self.EB = common.validated_dcc_entry_box(self.subframe, callback=self.entry_updated, item_type="Point",
+                                                 tool_tip="Enter the DCC address for the point (1-2047)")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB = common.check_box(self.subframe, label="Reversed logic",
-                    tool_tip="Select to reverse the DCC command logic")
+                    tool_tip="Select to reverse the DCC command logic for switching the point")
         self.CB.pack(side=Tk.LEFT, padx=10, pady=2)
         
     def entry_updated(self):
