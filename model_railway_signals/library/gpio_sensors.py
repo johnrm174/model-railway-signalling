@@ -314,8 +314,11 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
                 except:
                     logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+
                                    str(gpio_channel)+" cannot be mapped")
+                    gpio_port_mappings[str(gpio_channel)]["sensor_device"] = None
             # Update/assign the gpiozero Button Object with the new value for the trigger period
-            gpio_port_mappings[str(gpio_channel)]["sensor_device"].hold_time = trigger_period
+            # But only if the gpiozero Button Object has been successfully created
+            if gpio_port_mappings[str(gpio_channel)]["sensor_device"] is not None:
+                gpio_port_mappings[str(gpio_channel)]["sensor_device"].hold_time = trigger_period
     return()
 
 #---------------------------------------------------------------------------------------------------
