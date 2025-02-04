@@ -1,2510 +1,430 @@
 {
-    "buttons": {},
+    "buttons": {
+        "1": {
+            "selected": false
+        },
+        "2": {
+            "selected": false
+        },
+        "3": {
+            "selected": false
+        },
+        "4": {
+            "selected": false
+        }
+    },
     "information": "Model Railway Signalling Configuration File",
     "instruments": {},
+    "levers": {
+        "1": {
+            "locked": true,
+            "switched": false
+        },
+        "10": {
+            "locked": true,
+            "switched": false
+        },
+        "2": {
+            "locked": true,
+            "switched": true
+        },
+        "3": {
+            "locked": false,
+            "switched": true
+        },
+        "4": {
+            "locked": true,
+            "switched": true
+        },
+        "5": {
+            "locked": true,
+            "switched": true
+        },
+        "6": {
+            "locked": true,
+            "switched": false
+        },
+        "7": {
+            "locked": true,
+            "switched": false
+        },
+        "8": {
+            "locked": false,
+            "switched": false
+        },
+        "9": {
+            "locked": true,
+            "switched": false
+        }
+    },
     "objects": {
-        "027167c4-575e-4384-9e79-d97b56ae3e01": {
-            "background": "grey85",
-            "bbox": 15742,
-            "borderwidth": 0,
+        "03f32844-9771-4717-91a8-ef160bada1df": {
+            "bbox": 935,
             "hidden": false,
-            "item": "textbox",
-            "itemid": 1,
-            "justification": 2,
-            "posx": 1146.0,
-            "posy": 62.0,
-            "tags": "textwidget1",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "07cd6ea1-f297-4487-867f-b3d735e1fc41": {
-            "arrowends": 2,
-            "arrowtype": [
-                20,
-                20,
-                5
-            ],
-            "bbox": 15748,
-            "colour": "black",
-            "endx": 1275.0,
-            "endy": 225.0,
-            "item": "line",
-            "itemid": 5,
-            "linewidth": 3,
-            "posx": 825.0,
-            "posy": 225.0,
-            "selection": "line5selected",
-            "tags": "line5"
-        },
-        "07d52e15-c961-4ee9-8227-5c7e7ade9d7c": {
-            "alsoswitch": 0,
-            "automatic": false,
-            "bbox": 15755,
-            "buttoncolour": "Grey85",
-            "colour": "black",
-            "dccaddress": 0,
-            "dccreversed": false,
-            "hasfpl": true,
-            "hidebuttons": false,
-            "item": "point",
-            "itemid": 1,
-            "itemsubtype": 1,
-            "itemtype": 2,
-            "linewidth": 3,
-            "orientation": 0,
-            "posx": 800.0,
-            "posy": 225.0,
-            "reverse": false,
-            "siginterlock": [
-                [
-                    4,
-                    [
-                        true,
-                        true,
-                        false,
-                        false,
-                        false
-                    ]
-                ]
-            ],
-            "tags": "point1",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "092832b9-9016-46ab-add9-a509340a444e": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15772,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        120,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        120,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        121,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        122,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 12,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "12"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "13",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 375.0,
-            "posy": 274.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal12",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                12,
-                [
-                    [
-                        13,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "1cd0d6ee-bf33-4e85-ad10-162a5114e499": {
-            "background": "grey85",
-            "bbox": 15775,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 2,
-            "justification": 2,
-            "posx": 1170.0,
-            "posy": 239.0,
-            "tags": "textwidget2",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "1d324970-3029-401b-8c66-8425a680ff42": {
-            "bbox": 15779,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 13,
-            "mirror": "",
-            "posx": 250.0,
-            "posy": 275.0,
-            "tags": "section13",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "21fcacd0-09b2-4aa9-8bb7-98915570f164": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15796,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        30,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        30,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        31,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        31,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        32,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        32,
-                        false
-                    ]
-                ]
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
+            "item": "tracksensor",
             "itemid": 3,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "3"
-            ],
-            "pointinterlock": [
+            "passedsensor": "8",
+            "posx": 850.0,
+            "posy": 250.0,
+            "routeahead": [
                 [
                     [],
-                    "4",
                     0
                 ],
                 [
                     [],
-                    "",
                     0
                 ],
                 [
                     [],
-                    "",
                     0
                 ],
                 [
                     [],
-                    "",
                     0
                 ],
                 [
                     [],
-                    "",
                     0
                 ]
             ],
-            "posx": 475.0,
-            "posy": 225.0,
-            "sigarms": [
+            "routebehind": [
                 [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal3",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
+                    [],
                     0
                 ],
                 [
-                    false,
-                    0,
-                    0,
+                    [],
                     0
                 ],
                 [
-                    false,
-                    0,
-                    0,
+                    [],
                     0
                 ],
                 [
-                    false,
-                    0,
-                    0,
+                    [],
                     0
                 ],
                 [
-                    false,
-                    0,
-                    0,
+                    [],
                     0
                 ]
             ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                3,
-                [
-                    [
-                        4,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
+            "tags": "sensor3"
         },
-        "22f81342-7494-4b39-bf36-8d80e25790e6": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 15802,
-            "colour": "black",
-            "endx": 900.0,
-            "endy": 100.0,
-            "item": "line",
-            "itemid": 2,
-            "linewidth": 3,
-            "posx": 800.0,
-            "posy": 200.0,
-            "selection": "line2selected",
-            "tags": "line2"
-        },
-        "242be6a5-b50d-4967-b1b3-e0d99ae4039f": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15819,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        100,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        100,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        101,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        101,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 10,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "10"
-            ],
-            "pointinterlock": [
-                [
-                    [
-                        [
-                            2,
-                            false
-                        ]
-                    ],
-                    "11",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 1000.0,
-            "posy": 275.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal10",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                10,
-                [
-                    [
-                        11,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "334f3330-b847-4d50-968a-4d058e682f01": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15836,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        80,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        80,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        81,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        81,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 8,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "8"
-            ],
-            "pointinterlock": [
-                [
-                    [
-                        [
-                            2,
-                            true
-                        ]
-                    ],
-                    "11",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 1000.0,
-            "posy": 150.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [
-                    [
-                        4,
-                        [
-                            true,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal8",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                7,
-                [
-                    [
-                        11,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "33bf5593-6030-4282-a957-c96d2a12548f": {
-            "background": "grey85",
-            "bbox": 15839,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 3,
-            "justification": 2,
-            "posx": 1126.0,
-            "posy": 314.0,
-            "tags": "textwidget3",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "3861465f-82fc-4911-853a-558f4bf91a71": {
+        "1e2616e2-21cc-4c34-8d93-b87e683e0284": {
             "arrowends": 1,
             "arrowtype": [
-                20,
-                20,
-                5
+                1,
+                1,
+                1
             ],
-            "bbox": 15845,
+            "bbox": 941,
             "colour": "black",
-            "endx": 800.0,
-            "endy": 275.0,
+            "endx": 550.0,
+            "endy": 200.0,
             "item": "line",
-            "itemid": 3,
+            "itemid": 4,
             "linewidth": 3,
-            "posx": 25.0,
-            "posy": 275.0,
-            "selection": "line3selected",
-            "tags": "line3"
+            "posx": 325.0,
+            "posy": 200.0,
+            "selection": "line4selected",
+            "tags": "line4"
         },
-        "42dceb78-03de-49ac-898a-6ca5aea4b6db": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15862,
+        "2526cf2f-3172-44b6-93e1-337ed74d3cdf": {
+            "bbox": 949,
             "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        61,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        60,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        62,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        63,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 1,
+            "itemtype": 3,
+            "linkedpoint": 0,
+            "linkedsignal": 5,
+            "lockcolourtype": 1,
+            "offkeycode": 0,
+            "onkeycode": 0,
+            "posx": 425.0,
+            "posy": 375.0,
+            "signalroutes": [
+                true,
                 false,
                 false,
                 false,
                 false
             ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": true,
+            "switchsubsidary": false,
+            "tags": "lever1",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "274e74ce-49a6-4c2a-a718-23fc8a001e54": {
+            "bbox": 957,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 2,
+            "itemtype": 2,
+            "linkedpoint": 0,
+            "linkedsignal": 1,
+            "lockcolourtype": 1,
+            "offkeycode": 25,
+            "onkeycode": 52,
+            "posx": 450.0,
+            "posy": 375.0,
+            "signalroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": true,
+            "switchsubsidary": false,
+            "tags": "lever2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "2e3c2232-cac5-4798-b92f-d5edd5ca5142": {
+            "background": "",
+            "bbox": 960,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
             "itemid": 6,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                "6"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 1100.0,
-            "posy": 100.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal6",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    true,
-                    6,
-                    0,
-                    5
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                6,
-                [
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "54142c69-246a-4721-a1bf-99c05cf9dcbb": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15879,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        130,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        130,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        131,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        131,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 13,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                "13"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 200.0,
+            "justification": 2,
+            "posx": 225.0,
             "posy": 275.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal13",
-            "textcolourtype": 1,
+            "tags": "textwidget6",
+            "text": "Stockbox",
+            "textcolour": "Black",
             "textfonttuple": [
                 "Courier",
-                8,
+                10,
                 ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    true,
-                    13,
-                    0,
-                    5
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                13,
-                [
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
+            ]
         },
-        "55eab425-03d7-40a2-8b77-2c7d23b8e933": {
-            "bbox": 15883,
+        "30bdbf8d-ab42-46a5-b86c-632d3bad5dd2": {
+            "bbox": 964,
+            "hidden": false,
+            "item": "tracksensor",
+            "itemid": 2,
+            "passedsensor": "7",
+            "posx": 850.0,
+            "posy": 200.0,
+            "routeahead": [
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ]
+            ],
+            "routebehind": [
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ]
+            ],
+            "tags": "sensor2"
+        },
+        "338a06f5-049d-454e-9e8f-e032ab9ca9cb": {
+            "bbox": 968,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
             "hidden": false,
             "item": "section",
-            "itemid": 8,
+            "itemid": 4,
             "mirror": "",
-            "posx": 1225.0,
-            "posy": 150.0,
-            "tags": "section8",
+            "posx": 800.0,
+            "posy": 250.0,
+            "tags": "section4",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
-                "bold"
+                "bold "
             ]
         },
-        "5b5c0f7e-d69b-4916-a241-3cf69f44aa7f": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15900,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        110,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        110,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        111,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        112,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 11,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "11"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "12",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 550.0,
-            "posy": 275.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal11",
-            "textcolourtype": 1,
+        "3495a936-bc8d-4393-9abe-3520edcb0d9d": {
+            "background": "#18bbd9",
+            "bbox": 971,
+            "borderwidth": 1,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 1,
+            "justification": 2,
+            "posx": 800.0,
+            "posy": 175.0,
+            "tags": "textwidget1",
+            "text": "     Platform 2     ",
+            "textcolour": "black",
             "textfonttuple": [
                 "Courier",
-                8,
+                10,
                 ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                11,
-                [
-                    [
-                        12,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
+            ]
         },
-        "5d93f889-98ec-4b28-80f1-e77637b274ec": {
+        "353b45c7-5cea-4783-81eb-7fe275398deb": {
+            "bbox": 975,
+            "hidden": false,
+            "item": "tracksensor",
+            "itemid": 1,
+            "passedsensor": "",
+            "posx": 175.0,
+            "posy": 250.0,
+            "routeahead": [
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ]
+            ],
+            "routebehind": [
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ],
+                [
+                    [],
+                    0
+                ]
+            ],
+            "tags": "sensor1"
+        },
+        "40efa244-6879-4bbd-b880-9eeb70373504": {
+            "background": "grey85",
+            "bbox": 978,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 2,
+            "justification": 2,
+            "posx": 100.0,
+            "posy": 250.0,
+            "tags": "textwidget2",
+            "text": "The rest of \nthe world",
+            "textcolour": "black",
+            "textfonttuple": [
+                "Courier",
+                10,
+                ""
+            ]
+        },
+        "43fd9649-cff7-437a-b405-2811fc777a5f": {
+            "background": "grey85",
+            "bbox": 981,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 3,
+            "justification": 2,
+            "posx": 225.0,
+            "posy": 206.0,
+            "tags": "textwidget3",
+            "text": "Fiddle\nYard",
+            "textcolour": "black",
+            "textfonttuple": [
+                "Courier",
+                10,
+                ""
+            ]
+        },
+        "4576da32-1464-4dad-92d8-5e3e06ee59e3": {
+            "background": "#18bbd9",
+            "bbox": 984,
+            "borderwidth": 1,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 4,
+            "justification": 2,
+            "posx": 800.0,
+            "posy": 275.0,
+            "tags": "textwidget4",
+            "text": "     Platform 1     ",
+            "textcolour": "black",
+            "textfonttuple": [
+                "Courier",
+                10,
+                ""
+            ]
+        },
+        "4faab254-a7db-48cb-bcdd-187c9702c92b": {
             "approachcontrol": [
                 0,
                 0,
@@ -2516,33 +436,13 @@
                 false,
                 ""
             ],
-            "bbox": 15917,
+            "bbox": 1010,
             "buttoncolour": "Grey85",
             "dccaspects": [
-                [
-                    [
-                        50,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        50,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        51,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        51,
-                        true
-                    ]
-                ],
+                [],
+                [],
+                [],
+                [],
                 [],
                 []
             ],
@@ -2589,13 +489,13 @@
                 false,
                 false
             ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
+            "fullyautomatic": false,
+            "hidebuttons": true,
             "interlockahead": false,
             "item": "signal",
             "itemid": 5,
-            "itemsubtype": 5,
-            "itemtype": 1,
+            "itemsubtype": 2,
+            "itemtype": 3,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
@@ -2605,7 +505,16 @@
             ],
             "pointinterlock": [
                 [
-                    [],
+                    [
+                        [
+                            1,
+                            false
+                        ],
+                        [
+                            1,
+                            true
+                        ]
+                    ],
                     "",
                     0
                 ],
@@ -2630,8 +539,8 @@
                     0
                 ]
             ],
-            "posx": 1126.0,
-            "posy": 223.0,
+            "posx": 300.0,
+            "posy": 250.0,
             "sigarms": [
                 [
                     [
@@ -2739,2155 +648,6 @@
             "theatreroute": false,
             "timedsequences": [
                 [
-                    true,
-                    5,
-                    0,
-                    5
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                5,
-                [
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "5e9dbc0d-167d-4bfb-b276-7bbb37437d06": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15934,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        90,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        90,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        91,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        91,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 9,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "9"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "10",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 1175.0,
-            "posy": 275.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal9",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                9,
-                [
-                    [
-                        10,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "628c161f-b9f5-46fd-837c-4f36eecd60ab": {
-            "bbox": 15938,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 11,
-            "mirror": "",
-            "posx": 600.0,
-            "posy": 275.0,
-            "tags": "section11",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "65c6b251-6622-4fd2-958f-b28a6778dc76": {
-            "bbox": 15942,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 5,
-            "mirror": "",
-            "posx": 1050.0,
-            "posy": 225.0,
-            "tags": "section5",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "6966a516-b636-4321-ae7b-3a733356e215": {
-            "background": "grey85",
-            "bbox": 15945,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 4,
-            "justification": 2,
-            "posx": 444.0,
-            "posy": 115.0,
-            "tags": "textwidget4",
-            "text": "Approach Control Example (Signals 4, 3 and 2)",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                14,
-                "bold "
-            ]
-        },
-        "6b03065c-be75-450c-8af5-af5dc644b14f": {
-            "background": "grey85",
-            "bbox": 15948,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 5,
-            "justification": 2,
-            "posx": 951.0,
-            "posy": 313.0,
-            "tags": "textwidget5",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "719f6d7b-e39c-4d3a-8b22-f232dff5443e": {
-            "alsoswitch": 0,
-            "automatic": false,
-            "bbox": 15954,
-            "buttoncolour": "Grey85",
-            "colour": "black",
-            "dccaddress": 0,
-            "dccreversed": false,
-            "hasfpl": false,
-            "hidebuttons": false,
-            "item": "point",
-            "itemid": 2,
-            "itemsubtype": 1,
-            "itemtype": 2,
-            "linewidth": 3,
-            "orientation": 0,
-            "posx": 825.0,
-            "posy": 275.0,
-            "reverse": false,
-            "siginterlock": [
-                [
-                    10,
-                    [
-                        true,
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
-                ],
-                [
-                    8,
-                    [
-                        true,
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
-                ]
-            ],
-            "tags": "point2",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "7c1562c4-2d75-46cf-b559-bef25efa2c9e": {
-            "background": "grey85",
-            "bbox": 15957,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 6,
-            "justification": 2,
-            "posx": 325.0,
-            "posy": 314.0,
-            "tags": "textwidget6",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "7d95452f-2bb7-48b8-8418-6d83598356d4": {
-            "bbox": 15961,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 2,
-            "mirror": "",
-            "posx": 250.0,
-            "posy": 225.0,
-            "tags": "section2",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "94fff3ae-cb98-48c1-8e0d-8edd82eea2b3": {
-            "arrowends": 2,
-            "arrowtype": [
-                20,
-                20,
-                5
-            ],
-            "bbox": 15967,
-            "colour": "black",
-            "endx": 1275.0,
-            "endy": 100.0,
-            "item": "line",
-            "itemid": 8,
-            "linewidth": 3,
-            "posx": 900.0,
-            "posy": 100.0,
-            "selection": "line8selected",
-            "tags": "line8"
-        },
-        "a6541a21-387c-4ebc-93dd-3b86a950f45d": {
-            "bbox": 15971,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 1,
-            "mirror": "",
-            "posx": 75.0,
-            "posy": 225.0,
-            "tags": "section1",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "a6d29d1d-43c7-4b82-bca6-0fd6d90d6c89": {
-            "background": "grey85",
-            "bbox": 15974,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 7,
-            "justification": 2,
-            "posx": 175.0,
-            "posy": 187.0,
-            "tags": "textwidget7",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "a6e61479-8736-4f06-b351-c8e99ff870f5": {
-            "bbox": 15978,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 6,
-            "mirror": "",
-            "posx": 1050.0,
-            "posy": 100.0,
-            "tags": "section6",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "a96bd506-67b8-4312-a415-169eae42e657": {
-            "background": "grey85",
-            "bbox": 15981,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 8,
-            "justification": 2,
-            "posx": 1130.0,
-            "posy": 136.0,
-            "tags": "textwidget8",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "aa736f3d-7877-4615-b1e7-bc50b39db7f0": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 15987,
-            "colour": "black",
-            "endx": 1275.0,
-            "endy": 275.0,
-            "item": "line",
-            "itemid": 4,
-            "linewidth": 3,
-            "posx": 850.0,
-            "posy": 275.0,
-            "selection": "line4selected",
-            "tags": "line4"
-        },
-        "b0d82676-b068-4cb5-b1c9-d5ae0ee55b46": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 16004,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        70,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        70,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        71,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        71,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 7,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "7"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "8",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 1175.0,
-            "posy": 150.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal7",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                7,
-                [
-                    [
-                        8,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "b1288a67-ed1d-427f-98d5-f7963edaf7f4": {
-            "bbox": 16008,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 12,
-            "mirror": "",
-            "posx": 425.0,
-            "posy": 275.0,
-            "tags": "section12",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "b4fc26a7-aafc-42b2-b729-ab8a76c6a93e": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 16014,
-            "colour": "black",
-            "endx": 925.0,
-            "endy": 150.0,
-            "item": "line",
-            "itemid": 6,
-            "linewidth": 3,
-            "posx": 825.0,
-            "posy": 250.0,
-            "selection": "line6selected",
-            "tags": "line6"
-        },
-        "b62548e4-2291-454e-9f01-4c3163fb178a": {
-            "bbox": 16018,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 3,
-            "mirror": "",
-            "posx": 425.0,
-            "posy": 225.0,
-            "tags": "section3",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "bc423a55-8a1d-42b1-82ee-24b38662af63": {
-            "bbox": 16022,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 7,
-            "mirror": "",
-            "posx": 1050.0,
-            "posy": 150.0,
-            "tags": "section7",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "c617d76f-2010-4868-afe2-9be1a9a411dc": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 16028,
-            "colour": "black",
-            "endx": 1275.0,
-            "endy": 150.0,
-            "item": "line",
-            "itemid": 7,
-            "linewidth": 3,
-            "posx": 925.0,
-            "posy": 150.0,
-            "selection": "line7selected",
-            "tags": "line7"
-        },
-        "d6a52ed1-1079-413c-ba46-7d8bb9b44dfd": {
-            "background": "grey85",
-            "bbox": 16031,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 9,
-            "justification": 2,
-            "posx": 525.0,
-            "posy": 187.0,
-            "tags": "textwidget9",
-            "text": "TT-DS5HS",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "db5992bd-ce35-492b-9453-b8a860f4a69b": {
-            "background": "grey85",
-            "bbox": 16034,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 10,
-            "justification": 2,
-            "posx": 149.0,
-            "posy": 313.0,
-            "tags": "textwidget10",
-            "text": "TT-DS10",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "e5810a77-a225-4247-acd8-0df551fe4184": {
-            "background": "grey85",
-            "bbox": 16037,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 11,
-            "justification": 2,
-            "posx": 351.0,
-            "posy": 187.0,
-            "tags": "textwidget11",
-            "text": "TT-DS5HS",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "e9341909-f8c6-4799-9f1f-c68dfa243425": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 16054,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        20,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        20,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        21,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        21,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        22,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        22,
-                        true
-                    ]
-                ]
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 2,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "2"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "3",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 300.0,
-            "posy": 225.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal2",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                2,
-                [
-                    [
-                        3,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "ec80f368-a012-4c83-996f-07678edbdf72": {
-            "approachcontrol": [
-                0,
-                2,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                true,
-                "14"
-            ],
-            "bbox": 16072,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        40,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        40,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        41,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        41,
-                        true
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [
-                    [
-                        45,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        45,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        45,
-                        true
-                    ]
-                ],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                true,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 4,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "4"
-            ],
-            "pointinterlock": [
-                [
-                    [
-                        [
-                            1,
-                            false
-                        ]
-                    ],
-                    "5",
-                    0
-                ],
-                [
-                    [
-                        [
-                            1,
-                            true
-                        ]
-                    ],
-                    "6",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 700.0,
-            "posy": 225.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [
-                    [
-                        8,
-                        [
-                            true,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal4",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                4,
-                [
-                    [
-                        5,
-                        0,
-                        0
-                    ],
-                    [
-                        6,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "eca7185e-bfed-4cfb-8430-a3153bc29573": {
-            "bbox": 16076,
-            "buttoncolour": "Black",
-            "buttonwidth": 5,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "hidden": false,
-            "item": "section",
-            "itemid": 10,
-            "mirror": "",
-            "posx": 1050.0,
-            "posy": 275.0,
-            "tags": "section10",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                9,
-                "bold"
-            ]
-        },
-        "edf730b4-253d-4ac9-a473-0a3ba0e72183": {
-            "background": "grey85",
-            "bbox": 16079,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 12,
-            "justification": 2,
-            "posx": 748.0,
-            "posy": 185.0,
-            "tags": "textwidget12",
-            "text": "TT-DS10L",
-            "textcolour": "black",
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ]
-        },
-        "f49fbf77-4587-42fb-b0a8-45d646a96a95": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 16096,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [
-                    [
-                        10,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        10,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        11,
-                        true
-                    ]
-                ],
-                [
-                    [
-                        11,
-                        false
-                    ]
-                ],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": true,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 1,
-            "itemsubtype": 5,
-            "itemtype": 1,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": true,
-            "passedsensor": [
-                true,
-                "1"
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "2",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 125.0,
-            "posy": 225.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal1",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "timedsequences": [
-                [
                     false,
                     0,
                     0,
@@ -4978,115 +738,2273 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "f85047ff-ffac-4342-835a-98803dee39b6": {
-            "bbox": 16100,
+        "57b2b07a-ddc6-4e45-95cf-2e805b2a1180": {
+            "bbox": 1018,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 8,
+            "itemtype": 1,
+            "linkedpoint": 0,
+            "linkedsignal": 0,
+            "lockcolourtype": 1,
+            "offkeycode": 0,
+            "onkeycode": 0,
+            "posx": 600.0,
+            "posy": 375.0,
+            "signalroutes": [
+                true,
+                true,
+                true,
+                true,
+                true
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": false,
+            "switchsubsidary": false,
+            "tags": "lever8",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "5e1d004d-aead-44c5-b51e-c48af4a29575": {
+            "arrowends": 0,
+            "arrowtype": [
+                20,
+                20,
+                5
+            ],
+            "bbox": 1024,
+            "colour": "black",
+            "endx": 550.0,
+            "endy": 250.0,
+            "item": "line",
+            "itemid": 1,
+            "linewidth": 3,
+            "posx": 150.0,
+            "posy": 250.0,
+            "selection": "line1selected",
+            "tags": "line1"
+        },
+        "630e1e31-77cd-4b97-a38f-e8738b1f38b7": {
+            "bbox": 1032,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 6,
+            "itemtype": 2,
+            "linkedpoint": 0,
+            "linkedsignal": 4,
+            "lockcolourtype": 1,
+            "offkeycode": 41,
+            "onkeycode": 31,
+            "posx": 550.0,
+            "posy": 375.0,
+            "signalroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": true,
+            "switchsubsidary": false,
+            "tags": "lever6",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "6400a694-4e24-4f27-b879-864e25a9ef13": {
+            "background": "",
+            "bbox": 1035,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 8,
+            "justification": 2,
+            "posx": 513.0,
+            "posy": 216.0,
+            "tags": "textwidget8",
+            "text": "3",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "6788feaa-a049-4d62-978c-faa6f4dfd967": {
+            "bbox": 1039,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
             "hidden": false,
             "item": "section",
-            "itemid": 4,
+            "itemid": 1,
             "mirror": "",
-            "posx": 600.0,
-            "posy": 225.0,
-            "tags": "section4",
+            "posx": 225.0,
+            "posy": 250.0,
+            "tags": "section1",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
+                "bold "
+            ]
+        },
+        "684c48c9-18bd-4c02-9db2-2e0d76c8ef0b": {
+            "background": "",
+            "bbox": 1042,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 11,
+            "justification": 2,
+            "posx": 538.0,
+            "posy": 168.0,
+            "tags": "textwidget11",
+            "text": "2",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "6b6cc3d3-0ae5-4aa8-b7c0-aa885789493e": {
+            "background": "",
+            "bbox": 1045,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 10,
+            "justification": 2,
+            "posx": 591.0,
+            "posy": 182.0,
+            "tags": "textwidget10",
+            "text": "4/5",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "6ecd452d-d290-408b-9389-e74ddee589fe": {
+            "bbox": 1053,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 3,
+            "itemtype": 2,
+            "linkedpoint": 0,
+            "linkedsignal": 1,
+            "lockcolourtype": 1,
+            "offkeycode": 55,
+            "onkeycode": 29,
+            "posx": 475.0,
+            "posy": 375.0,
+            "signalroutes": [
+                false,
+                true,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": true,
+            "switchsubsidary": false,
+            "tags": "lever3",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
                 "bold"
             ]
         },
-        "fb84aba9-207e-4c8a-b905-29813ab1417c": {
-            "arrowends": 0,
+        "6f705b1a-e264-4bb7-a979-4520901eec1b": {
+            "bbox": 1057,
+            "buttoncolour": "SeaGreen3",
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 4,
+            "linestohighlight": [
+                2,
+                1
+            ],
+            "pointsonroute": {
+                "1": true
+            },
+            "pointstohighlight": [
+                1,
+                2
+            ],
+            "posx": 800.0,
+            "posy": 350.0,
+            "resetpoints": true,
+            "resetswitches": false,
+            "routecolour": "#1bb420",
+            "routedescription": "Platform 2 departure\nto the rest of the world",
+            "routename": "Depart Platform 2",
+            "setupsensor": 0,
+            "signalsonroute": [
+                2
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "switchesonroute": {},
+            "tags": "button4",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                ""
+            ],
+            "tracksensor": 1
+        },
+        "73e31abe-1393-4c79-ba4e-5cc048bed9be": {
+            "bbox": 1065,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 9,
+            "itemtype": 2,
+            "linkedpoint": 0,
+            "linkedsignal": 3,
+            "lockcolourtype": 1,
+            "offkeycode": 0,
+            "onkeycode": 0,
+            "posx": 625.0,
+            "posy": 375.0,
+            "signalroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": true,
+            "switchsubsidary": false,
+            "tags": "lever9",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "80d42e64-565c-4a6e-bed1-27fb78fa443f": {
+            "bbox": 1073,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 7,
+            "itemtype": 2,
+            "linkedpoint": 0,
+            "linkedsignal": 2,
+            "lockcolourtype": 1,
+            "offkeycode": 26,
+            "onkeycode": 44,
+            "posx": 575.0,
+            "posy": 375.0,
+            "signalroutes": [
+                false,
+                false,
+                false,
+                true,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": false,
+            "switchsubsidary": true,
+            "tags": "lever7",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "81a7ae96-8c21-486d-99b7-b8da30ca9d9f": {
+            "bbox": 1081,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 10,
+            "itemtype": 2,
+            "linkedpoint": 0,
+            "linkedsignal": 2,
+            "lockcolourtype": 1,
+            "offkeycode": 0,
+            "onkeycode": 0,
+            "posx": 650.0,
+            "posy": 375.0,
+            "signalroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": true,
+            "switchsubsidary": false,
+            "tags": "lever10",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "87f435df-8da5-4999-b3ef-e7ea67977c03": {
+            "background": "grey85",
+            "bbox": 1084,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 5,
+            "justification": 2,
+            "posx": 375.0,
+            "posy": 175.0,
+            "tags": "textwidget5",
+            "text": "Siding",
+            "textcolour": "black",
+            "textfonttuple": [
+                "Courier",
+                10,
+                ""
+            ]
+        },
+        "93406d3b-2a78-455f-b5cd-3fcd1fcdf640": {
+            "arrowends": 2,
             "arrowtype": [
+                1,
+                1,
+                1
+            ],
+            "bbox": 1090,
+            "colour": "black",
+            "endx": 900.0,
+            "endy": 250.0,
+            "item": "line",
+            "itemid": 3,
+            "linewidth": 3,
+            "posx": 600.0,
+            "posy": 250.0,
+            "selection": "line3selected",
+            "tags": "line3"
+        },
+        "95c7ba00-c76e-4e40-9008-eceac9a5ea23": {
+            "bbox": 1094,
+            "buttoncolour": "Black",
+            "buttonwidth": 5,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "hidden": false,
+            "item": "section",
+            "itemid": 8,
+            "mirror": "",
+            "posx": 175.0,
+            "posy": 300.0,
+            "tags": "section8",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                "bold "
+            ]
+        },
+        "970e8948-a116-4023-847b-2e9269c0fa74": {
+            "bbox": 1098,
+            "buttoncolour": "Black",
+            "buttonwidth": 5,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "hidden": false,
+            "item": "section",
+            "itemid": 2,
+            "mirror": "",
+            "posx": 400.0,
+            "posy": 250.0,
+            "tags": "section2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                "bold "
+            ]
+        },
+        "990769c5-58eb-435b-befb-21b9263321b4": {
+            "alsoswitch": 0,
+            "automatic": true,
+            "bbox": 1103,
+            "buttoncolour": "Grey85",
+            "colour": "black",
+            "dccaddress": 0,
+            "dccreversed": false,
+            "hasfpl": false,
+            "hidebuttons": false,
+            "item": "point",
+            "itemid": 2,
+            "itemsubtype": 1,
+            "itemtype": 2,
+            "linewidth": 3,
+            "orientation": 180,
+            "posx": 575.0,
+            "posy": 200.0,
+            "reverse": false,
+            "siginterlock": [],
+            "tags": "point2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "a9930fb8-8c60-43bd-869a-26f103852c70": {
+            "approachcontrol": [
+                0,
+                0,
                 0,
                 0,
                 0
             ],
-            "bbox": 16106,
-            "colour": "black",
-            "endx": 775.0,
-            "endy": 225.0,
-            "item": "line",
-            "itemid": 1,
-            "linewidth": 3,
-            "posx": 25.0,
-            "posy": 225.0,
-            "selection": "line1selected",
-            "tags": "line1"
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 1111,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "fullyautomatic": false,
+            "hidebuttons": true,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 4,
+            "itemsubtype": 1,
+            "itemtype": 4,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                "4"
+            ],
+            "pointinterlock": [
+                [
+                    [
+                        [
+                            1,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "posx": 525.0,
+            "posy": 200.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        401
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [
+                    [
+                        2,
+                        [
+                            false,
+                            false,
+                            false,
+                            true,
+                            false
+                        ]
+                    ]
+                ],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0
+            ],
+            "tags": "signal4",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    3,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                5,
+                [
+                    [
+                        3,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
-        "fdcafbec-2869-438c-ba72-2a8d5d849f58": {
-            "bbox": 16110,
+        "abc1ad1d-e1b2-4129-a1eb-e33844a0166d": {
+            "bbox": 1115,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
             "hidden": false,
             "item": "section",
-            "itemid": 9,
+            "itemid": 5,
             "mirror": "",
-            "posx": 1225.0,
-            "posy": 275.0,
-            "tags": "section9",
+            "posx": 400.0,
+            "posy": 200.0,
+            "tags": "section5",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
-                "bold"
+                "bold "
             ]
         },
-        "ff002fef-4577-4b37-8b4c-c09a758ae29f": {
-            "background": "grey85",
-            "bbox": 16113,
+        "b0e8d052-3895-4cb5-8737-6f2cf1deb65d": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 1144,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "fullyautomatic": false,
+            "hidebuttons": true,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 2,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": true,
+            "passedsensor": [
+                true,
+                "2"
+            ],
+            "pointinterlock": [
+                [
+                    [
+                        [
+                            1,
+                            true
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            1,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "posx": 675.0,
+            "posy": 201.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        201
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        202
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [
+                    [
+                        1,
+                        [
+                            false,
+                            true,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [],
+                [],
+                [
+                    [
+                        4,
+                        [
+                            true,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subroutes": [
+                false,
+                false,
+                false,
+                true,
+                false
+            ],
+            "subsidary": [
+                false,
+                0
+            ],
+            "tags": "signal2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    2,
+                    1,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    5,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                3,
+                [
+                    [
+                        2,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        5,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "b2ad2cbe-265d-4ece-b3e0-d4aa283dae1f": {
+            "background": "",
+            "bbox": 1147,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 7,
+            "justification": 2,
+            "posx": 343.0,
+            "posy": 221.0,
+            "tags": "textwidget7",
+            "text": "1",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "b3241207-0377-4e6e-aeac-6cb08691c888": {
+            "alsoswitch": 2,
+            "automatic": false,
+            "bbox": 1154,
+            "buttoncolour": "Grey85",
+            "colour": "black",
+            "dccaddress": 1000,
+            "dccreversed": false,
+            "hasfpl": true,
+            "hidebuttons": true,
+            "item": "point",
+            "itemid": 1,
+            "itemsubtype": 1,
+            "itemtype": 2,
+            "linewidth": 3,
+            "orientation": 0,
+            "posx": 575.0,
+            "posy": 250.0,
+            "reverse": false,
+            "siginterlock": [
+                [
+                    5,
+                    [
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    4,
+                    [
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    2,
+                    [
+                        true,
+                        false,
+                        false,
+                        true,
+                        false
+                    ]
+                ],
+                [
+                    1,
+                    [
+                        true,
+                        true,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    3,
+                    [
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                ]
+            ],
+            "tags": "point1",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "bfc58eeb-3b62-4745-a181-1e18c2fccbd9": {
+            "background": "",
+            "bbox": 1157,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
             "itemid": 13,
             "justification": 2,
-            "posx": 501.0,
-            "posy": 313.0,
+            "posx": 628.0,
+            "posy": 209.0,
             "tags": "textwidget13",
-            "text": "TT-DS10",
-            "textcolour": "black",
+            "text": "7",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "c622073d-27c0-4f32-aecb-f95dfebb93a0": {
+            "bbox": 1161,
+            "buttoncolour": "SeaGreen3",
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 2,
+            "linestohighlight": [
+                1,
+                2
+            ],
+            "pointsonroute": {
+                "1": true
+            },
+            "pointstohighlight": [
+                1,
+                2
+            ],
+            "posx": 275.0,
+            "posy": 350.0,
+            "resetpoints": true,
+            "resetswitches": false,
+            "routecolour": "#2916d9",
+            "routedescription": "From the rest of the World\ninto Platform 2",
+            "routename": "Into Platform 2",
+            "setupsensor": 0,
+            "signalsonroute": [
+                1
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "switchesonroute": {},
+            "tags": "button2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                ""
+            ],
+            "tracksensor": 2
+        },
+        "d3a7822b-5865-4e92-bae1-250fe918ad8c": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 1189,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "fullyautomatic": false,
+            "hidebuttons": true,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 1,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": true,
+            "passedsensor": [
+                true,
+                "1"
+            ],
+            "pointinterlock": [
+                [
+                    [
+                        [
+                            1,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            1,
+                            true
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "posx": 475.0,
+            "posy": 250.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        100
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        101
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [
+                    [
+                        3,
+                        [
+                            true,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        2,
+                        [
+                            true,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                true,
+                false,
+                false,
+                false
+            ],
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0
+            ],
+            "tags": "signal1",
+            "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 8,
                 ""
+            ],
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    4,
+                    0,
+                    0
+                ],
+                [
+                    3,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                2,
+                [
+                    [
+                        4,
+                        0,
+                        0
+                    ],
+                    [
+                        3,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "d97425eb-ae7c-4c74-9929-fef42f61b8a0": {
+            "bbox": 1193,
+            "buttoncolour": "Black",
+            "buttonwidth": 5,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "hidden": false,
+            "item": "section",
+            "itemid": 6,
+            "mirror": "",
+            "posx": 275.0,
+            "posy": 300.0,
+            "tags": "section6",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                "bold "
+            ]
+        },
+        "da49f189-a72b-4e08-969a-d222c5609644": {
+            "bbox": 1197,
+            "buttoncolour": "SeaGreen3",
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 3,
+            "linestohighlight": [
+                3,
+                1
+            ],
+            "pointsonroute": {
+                "1": false
+            },
+            "pointstohighlight": [
+                1
+            ],
+            "posx": 800.0,
+            "posy": 375.0,
+            "resetpoints": true,
+            "resetswitches": false,
+            "routecolour": "#1bb420",
+            "routedescription": "Platform 1 departure\nto rest of the world",
+            "routename": "Depart Platform 1",
+            "setupsensor": 0,
+            "signalsonroute": [
+                3
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "switchesonroute": {},
+            "tags": "button3",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                ""
+            ],
+            "tracksensor": 1
+        },
+        "dbe34e26-b8c3-4da6-94a5-731978b098e6": {
+            "background": "",
+            "bbox": 1200,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 14,
+            "justification": 2,
+            "posx": 634.0,
+            "posy": 276.0,
+            "tags": "textwidget14",
+            "text": "9",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "df3dcf3e-6882-4e86-84d9-f07049ac7129": {
+            "bbox": 1204,
+            "buttoncolour": "SeaGreen3",
+            "buttonwidth": 20,
+            "item": "route",
+            "itemid": 1,
+            "linestohighlight": [
+                1,
+                3
+            ],
+            "pointsonroute": {
+                "1": false
+            },
+            "pointstohighlight": [
+                1
+            ],
+            "posx": 275.0,
+            "posy": 375.0,
+            "resetpoints": true,
+            "resetswitches": false,
+            "routecolour": "#2916d9",
+            "routedescription": "From the rest of the world \ninto platform 1",
+            "routename": "Into Platform 1",
+            "setupsensor": 0,
+            "signalsonroute": [
+                1
+            ],
+            "subsidariesonroute": [],
+            "switchdelay": 1000,
+            "switchesonroute": {},
+            "tags": "button1",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                ""
+            ],
+            "tracksensor": 3
+        },
+        "e25a9e32-bd47-4773-8146-24173d6d2f95": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 1230,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "fullyautomatic": false,
+            "hidebuttons": true,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 3,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": true,
+            "passedsensor": [
+                true,
+                "3"
+            ],
+            "pointinterlock": [
+                [
+                    [
+                        [
+                            1,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "posx": 675.0,
+            "posy": 250.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        301
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [
+                    [
+                        1,
+                        [
+                            true,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0
+            ],
+            "tags": "signal3",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    2,
+                    1,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                4,
+                [
+                    [
+                        2,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "e6da3c6b-2f88-48eb-8de4-0f9d73f629fe": {
+            "bbox": 1238,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 4,
+            "itemtype": 5,
+            "linkedpoint": 1,
+            "linkedsignal": 0,
+            "lockcolourtype": 1,
+            "offkeycode": 30,
+            "onkeycode": 53,
+            "posx": 500.0,
+            "posy": 375.0,
+            "signalroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": true,
+            "switchpoint": false,
+            "switchpointandfpl": false,
+            "switchsignal": false,
+            "switchsubsidary": false,
+            "tags": "lever4",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "edeaa287-51fb-4b4c-99f1-d7df71e937ca": {
+            "arrowends": 2,
+            "arrowtype": [
+                1,
+                1,
+                1
+            ],
+            "bbox": 1244,
+            "colour": "black",
+            "endx": 900.0,
+            "endy": 200.0,
+            "item": "line",
+            "itemid": 2,
+            "linewidth": 3,
+            "posx": 600.0,
+            "posy": 200.0,
+            "selection": "line2selected",
+            "tags": "line2"
+        },
+        "f0068a09-f8bf-4adc-8d89-334af9e45ba7": {
+            "bbox": 1252,
+            "buttoncolour": "Grey85",
+            "framecolour": "Grey40",
+            "item": "lever",
+            "itemid": 5,
+            "itemtype": 4,
+            "linkedpoint": 1,
+            "linkedsignal": 0,
+            "lockcolourtype": 1,
+            "offkeycode": 42,
+            "onkeycode": 45,
+            "posx": 525.0,
+            "posy": 375.0,
+            "signalroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "switchdistant": false,
+            "switchfpl": false,
+            "switchpoint": true,
+            "switchpointandfpl": false,
+            "switchsignal": false,
+            "switchsubsidary": false,
+            "tags": "lever5",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "TkFixedFont",
+                8,
+                "bold"
+            ]
+        },
+        "f1a44196-cef8-4b5e-8eb8-5ea83c46d44c": {
+            "background": "",
+            "bbox": 1255,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 12,
+            "justification": 2,
+            "posx": 633.0,
+            "posy": 232.0,
+            "tags": "textwidget12",
+            "text": "10",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "f5e9da64-6aca-4730-a989-dacfed45ff27": {
+            "background": "",
+            "bbox": 1258,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 9,
+            "justification": 2,
+            "posx": 542.0,
+            "posy": 231.0,
+            "tags": "textwidget9",
+            "text": "2",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "f6aaf8c1-2657-430f-8247-fd624b6edcf0": {
+            "bbox": 1262,
+            "buttoncolour": "Black",
+            "buttonwidth": 5,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "hidden": false,
+            "item": "section",
+            "itemid": 7,
+            "mirror": "",
+            "posx": 225.0,
+            "posy": 300.0,
+            "tags": "section7",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                "bold "
+            ]
+        },
+        "fc5c18e4-b05c-4941-9c64-476d0ae651a2": {
+            "bbox": 1266,
+            "buttoncolour": "Black",
+            "buttonwidth": 5,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "hidden": false,
+            "item": "section",
+            "itemid": 3,
+            "mirror": "",
+            "posx": 800.0,
+            "posy": 200.0,
+            "tags": "section3",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                9,
+                "bold "
+            ]
+        },
+        "ff5c59b9-6164-44ab-9776-a6ab679ee96d": {
+            "background": "",
+            "bbox": 1269,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 15,
+            "justification": 2,
+            "posx": 550.0,
+            "posy": 325.0,
+            "tags": "textwidget15",
+            "text": "8 = spare",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
             ]
         }
     },
     "points": {
         "1": {
             "fpllock": true,
-            "locked": false,
-            "switched": false
+            "locked": true,
+            "switched": true
         },
         "2": {
             "fpllock": false,
             "locked": false,
-            "switched": false
+            "switched": true
         }
     },
     "sections": {
         "1": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "10": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "11": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "12": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "13": {
             "labeltext": "XXXXX",
             "occupied": false
         },
@@ -5117,10 +3035,6 @@
         "8": {
             "labeltext": "XXXXX",
             "occupied": false
-        },
-        "9": {
-            "labeltext": "XXXXX",
-            "occupied": false
         }
     },
     "settings": {
@@ -5130,16 +3044,19 @@
             "grid": 25,
             "gridcolour": "#999",
             "height": 500,
-            "snaptogrid": false,
-            "width": 1300
+            "snaptogrid": true,
+            "width": 1000
         },
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/user_guide/quickstart_example3.sig",
+            "filename": "/home/john/Software/model-railway-signalling-develop/user_guide/quickstart_example3.sig",
             "info": "Document your layout here",
+            "leverinterlocking": false,
+            "leverpopupwarnings": true,
+            "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 4.9.0"
+            "version": "Version 4.9.3"
         },
         "gpio": {
             "portmappings": [
@@ -5157,78 +3074,30 @@
                 ],
                 [
                     4,
-                    7
-                ],
-                [
-                    5,
-                    8
-                ],
-                [
-                    6,
-                    9
-                ],
-                [
-                    7,
-                    10
-                ],
-                [
-                    8,
-                    11
-                ],
-                [
-                    9,
                     12
                 ],
                 [
-                    10,
+                    5,
                     13
                 ],
                 [
-                    11,
-                    18
-                ],
-                [
-                    12,
-                    19
-                ],
-                [
-                    13,
+                    6,
                     20
                 ],
                 [
-                    14,
+                    7,
                     21
                 ],
                 [
-                    15,
+                    8,
                     22
-                ],
-                [
-                    16,
-                    23
-                ],
-                [
-                    17,
-                    24
-                ],
-                [
-                    18,
-                    25
-                ],
-                [
-                    19,
-                    26
-                ],
-                [
-                    20,
-                    27
                 ]
             ],
             "timeoutperiod": 1.0,
             "triggerdelay": 0.001
         },
         "logging": {
-            "level": 2
+            "level": 4
         },
         "mqtt": {
             "debug": false,
@@ -5253,6 +3122,7 @@
             "username": ""
         },
         "sprog": {
+            "addressmode": 1,
             "baud": 460800,
             "debug": false,
             "port": "/dev/serial0",
@@ -5268,6 +3138,17 @@
                     "Courier",
                     9,
                     ""
+                ]
+            },
+            "levers": {
+                "buttoncolour": "Grey85",
+                "framecolour": "Grey40",
+                "lockcolourtype": 1,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "TkFixedFont",
+                    8,
+                    "bold"
                 ]
             },
             "points": {
@@ -5331,51 +3212,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "10": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "11": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "12": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "13": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
+            "routeset": 2,
             "sigclear": true,
             "siglocked": false,
             "subclear": false,
@@ -5387,68 +3224,13 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
+            "sigclear": false,
+            "siglocked": true,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "3": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "4": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "5": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "6": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "7": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "8": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -5459,13 +3241,24 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "9": {
+        "4": {
+            "override": false,
+            "releaseonred": null,
+            "releaseonyel": null,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": true,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": null
+        },
+        "5": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
+            "sigclear": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": ""
