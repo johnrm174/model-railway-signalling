@@ -209,7 +209,7 @@ class main_menubar:
                 command=lambda:menubar.edit_switch_styles(self.root))
         self.styles_menu.add_command(label =" Track sections...",
                 command=lambda:menubar.edit_section_styles(self.root))
-        self.styles_menu.add_command(label =" Route lines...",
+        self.styles_menu.add_command(label =" Point/Route lines...",
                 command=lambda:menubar.edit_route_line_styles(self.root))
         self.styles_menu.add_command(label =" Point buttons...",
                 command=lambda:menubar.edit_point_styles(self.root))
