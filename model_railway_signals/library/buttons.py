@@ -187,7 +187,7 @@ def toggle_button(button_id:int):
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID does not exist")
     elif buttons[str(button_id)]["buttontype"] == button_type.momentary:
-        logging.info("Button "+str(button_id)+": Momentary Button has been pressed *****************************************")
+        logging.info("Button "+str(button_id)+": Momentary Button has been activated ***************************************")
         buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
         dcc_control.update_dcc_switch(button_id, True)
         common.root_window.after(buttons[str(button_id)]["releasedelay"], lambda:button_released_event(button_id))
