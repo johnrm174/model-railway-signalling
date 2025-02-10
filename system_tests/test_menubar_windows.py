@@ -4,8 +4,9 @@
 
 import copy
 import system_test_harness
-from model_railway_signals.editor import menubar
-from model_railway_signals.editor import settings
+from model_railway_signals import menubar
+from model_railway_signals import settings
+from model_railway_signals.menubar import menubar_settings
 
 #-----------------------------------------------------------------------------------
 # These functions handle opening and closing of the menubar windows
@@ -190,6 +191,11 @@ def test_menubar_settings_windows(delay:float=1.0):
     system_test_harness.run_function(lambda:open_window(delay, menubar.edit_sprog_settings,
                                                         connect_function, callback_function))
     system_test_harness.sleep(delay*2)
+    # Test the popup help window for the SPROG address offsets
+    help_window1 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
+    help_window2 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
+    system_test_harness.sleep(delay)
+    help_window2.close_window()
     # Check the 'Test SPROG connectivity' function
     system_test_harness.run_function(lambda:test_sprog_connectivity())
     system_test_harness.sleep(delay)
@@ -233,6 +239,19 @@ def test_menubar_utilities_windows(delay:float=0.0):
     system_test_harness.sleep(delay)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.sleep(delay)
+    print("Testing Menubar utilities windows - BULK RENUMBERING")
+    # Open the window (we then sleep twice the delay as it tests open and re-open)
+    system_test_harness.run_function(lambda:open_window(delay, menubar.bulk_renumbering))
+    system_test_harness.sleep(delay*2)
+    # Apply
+    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.sleep(delay)
+    # Revert
+    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(delay)
     return()
 
@@ -339,6 +358,21 @@ def test_menubar_styles_windows(delay:float=0.0):
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
     system_test_harness.run_function(lambda:open_window(delay, menubar.edit_textbox_styles))
+    system_test_harness.sleep(delay*2)
+    # Apply All
+    system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
+    system_test_harness.sleep(delay)
+    # Apply Selected
+    system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
+    system_test_harness.sleep(delay)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_styles_window(ok=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar styles windows - SIGNALBOX LEVERS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_lever_styles))
     system_test_harness.sleep(delay*2)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))

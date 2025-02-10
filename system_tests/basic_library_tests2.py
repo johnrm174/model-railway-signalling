@@ -1502,7 +1502,7 @@ def run_button_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
-# Test Track Sensor Library objects
+# Test Signalbox levers Library objects
 #---------------------------------------------------------------------------------------------------------
 
 def lever_callback(lever_id):
@@ -1580,9 +1580,23 @@ def run_lever_library_tests():
     levers.unlock_lever(4)
     levers.unlock_lever(4)
     print("Library Tests - keypress events (lever unlocked) - No warnings or errors:")
-    common.configure_edit_mode(edit_mode=False)
     off_keypress_event = dummy_event("a", 11)
     on_keypress_event = dummy_event("b", 10)
+    unmapped_keypress_event = dummy_event("c", 12)
+    # Test in Edit Mode with keypresses disabled
+    common.configure_edit_mode(edit_mode=True)
+    common.disable_keypress_events()
+    assert not levers.lever_switched(7)
+    common.keyboard_handler(off_keypress_event)
+    assert not levers.lever_switched(7)
+    # Test in Edit Mode with keypresses enabled
+    common.enable_keypress_events()
+    common.keyboard_handler(off_keypress_event)
+    assert not levers.lever_switched(7)
+    # Test in Run Mode - no Mapping (just to excersise the code)
+    common.configure_edit_mode(edit_mode=False)
+    common.keyboard_handler(unmapped_keypress_event)
+    # Test in Run mode with valid mappings
     assert not levers.lever_switched(7)
     common.keyboard_handler(off_keypress_event)
     common.keyboard_handler(off_keypress_event)
@@ -1640,6 +1654,26 @@ def run_lever_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Library Common tests
+#---------------------------------------------------------------------------------------------------------
+    
+def run_library_common_tests():
+    print("Library Common Tests - interlocking_warning_window")
+    canvas = schematic.canvas
+    canvas.update_idletasks()
+    common.display_warning(canvas, "Test Message 1")
+    canvas.update_idletasks()
+    common.display_warning(canvas, "Test Message 2")
+    canvas.update_idletasks()
+    time.sleep(2.0)
+    common.clear_warning_window()
+    common.display_warning(canvas, "Test Message 3")
+    common.user_dragging_window(event=None, canvas=canvas)
+    time.sleep(2.0)
+    common.close_warning_window()
+    return()
+    
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
@@ -1652,6 +1686,7 @@ def run_all_basic_library_tests():
     run_line_library_tests()
     run_button_library_tests()
     run_lever_library_tests()
+    run_library_common_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
