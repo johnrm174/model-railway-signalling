@@ -52,6 +52,8 @@
 #   toggle_lever(lever_id:int) - Change the state of the lever (e.g. point changed via buttons)
 # 
 #   lever_switched(lever_id:int) - returns the lever state (True/False) - True for 'Pulled'
+#
+#   set_lever_switching_behaviour(ignore_locking:bool, display_popups:bool)
 # 
 #---------------------------------------------------------------------------------------------
 
@@ -168,6 +170,8 @@ def toggle_lever(lever_id:int):
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
     else:
+        if levers[str(lever_id)]["locked"]:
+            logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is externally locked - Toggling anyway")
         if not levers[str(lever_id)]["switched"]:
             logging.info("Lever "+str(lever_id)+": Toggling Lever to OFF (Pulled)")
             levers[str(lever_id)]["button"].config(relief="sunken",bg=levers[str(lever_id)]["selectedcolour"])
@@ -205,6 +209,9 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         logging.error("Lever "+str(lever_id)+": create_lever - Lever ID must be a positive integer")
     elif lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": create_lever - Lever ID already exists")
+    elif ( levertype != lever_type.spare and levertype != lever_type.stopsignal and levertype != lever_type.distantsignal and
+           levertype != lever_type.point and levertype != lever_type.pointfpl and levertype != lever_type.pointwithfpl):
+        logging.error("Lever "+str(lever_id)+": create_lever - Invalid Lever Type specified")
     elif not isinstance(on_keycode, int) or on_keycode < 0 or on_keycode > 255:
         logging.error("Lever "+str(lever_id)+": create_lever - Invalid 'on' keycode value specified")
     elif not isinstance(off_keycode, int) or off_keycode < 0 or off_keycode > 255:
