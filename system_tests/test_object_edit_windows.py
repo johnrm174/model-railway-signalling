@@ -11,19 +11,20 @@ from system_test_harness import *
 
 def test_edit_object_windows(delay:float=0.0):
     # Create new default objects on the schematic
-    create_line(150,50)
-    create_colour_light_signal(300,40)
-    create_semaphore_signal(400,40)
-    create_ground_position_signal(500,40)
-    create_ground_disc_signal(600,40)
-    create_track_section(100,100)
-    create_left_hand_point(200,100)
-    create_right_hand_point(300,100)
-    create_textbox(400,100)
-    create_track_sensor(500,90)
-    create_route(100,200)
-    create_switch(300,200)
-    create_block_instrument(300,400)
+#     create_line(150,50)
+#     create_colour_light_signal(300,40)
+#     create_semaphore_signal(400,40)
+#     create_ground_position_signal(500,40)
+#     create_ground_disc_signal(600,40)
+#     create_track_section(100,100)
+#     create_left_hand_point(200,100)
+#     create_right_hand_point(300,100)
+#     create_textbox(400,100)
+#     create_track_sensor(500,90)
+#     create_route(100,200)
+#     create_switch(300,200)
+#     create_block_instrument(300,400)
+    create_lever(500,400)
     # Test the configuration remains unchanged with Edit/Save
     really_do_test_all_object_edit_windows(test_all_controls=True)
     return()
@@ -38,7 +39,8 @@ def really_do_test_all_object_edit_windows(delay:float=0.0, test_all_controls:bo
     print("Testing all object edit windows")
     object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point,
                     objects.object_type.signal,objects.object_type.section, objects.object_type.instrument,
-                    objects.object_type.track_sensor, objects.object_type.route, objects.object_type.switch)
+                    objects.object_type.track_sensor, objects.object_type.route, objects.object_type.switch,
+                    objects.object_type.lever)
     for object_type in object_types:
         for object_id in objects.schematic_objects.keys():
             if objects.schematic_objects[object_id]["item"] == object_type:

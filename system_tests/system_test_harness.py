@@ -164,6 +164,7 @@ from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
+from model_railway_signals.library import levers
 
 thread_delay_time = 0.150
 tkinter_thread_started = False
@@ -922,6 +923,12 @@ def create_route(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:
 
 def create_switch(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.switch))
+    place_object(xpos, ypos, steps, delay, test_cancel)
+    object_id = list(objects.schematic_objects)[-1]
+    return(object_id)
+
+def create_lever(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+    run_function(lambda:schematic.create_object(objects.object_type.lever, levers.lever_type.spare.value))
     place_object(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
