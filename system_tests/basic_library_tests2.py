@@ -14,6 +14,8 @@ from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import text_boxes
 from model_railway_signals.library import buttons
+from model_railway_signals.library import levers
+from model_railway_signals.library import common
 
 from model_railway_signals.editor import schematic
 
@@ -67,13 +69,29 @@ def run_text_box_library_tests():
     assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"state") == "hidden"
     assert canvas.itemcget(text_boxes.text_boxes[str(3)]["textwidget"],"state") == "normal"
     assert canvas.itemcget(text_boxes.text_boxes[str(4)]["textwidget"],"state") == "hidden"
-    print("Library Tests - update_text_box_styles - will generate 2 errors:")
+    print("Library Tests - update_text_box_styles - Run Mode / Not Hidden - will generate 2 errors:")
     text_boxes.update_text_box_styles("1", colour="Red", background="Blue", borderwidth=2)    # Not an int
     text_boxes.update_text_box_styles(99, colour="Red", background="Blue", borderwidth=2)     # Does not exist
     text_boxes.update_text_box_styles(1, colour="Red", background="Blue", borderwidth=5)
     assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"fill") == "Red"
     assert canvas.itemcget(text_boxes.text_boxes[str(1)]["rectangle"],"fill") == "Blue"
     assert canvas.itemcget(text_boxes.text_boxes[str(1)]["rectangle"],"width") == "5.0"
+    print("Library Tests - update_text_box_styles - Run Mode / Hidden ")
+    text_boxes.update_text_box_styles(2, colour="Red", background="Blue", borderwidth=5)
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"fill") == "Red"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["rectangle"],"fill") == ""
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["rectangle"],"width") == "0.0"
+    print("Library Tests - update_text_box_styles - Edit Mode / Not Hidden ")
+    text_boxes.configure_edit_mode(edit_mode=True)
+    text_boxes.update_text_box_styles(1, colour="Blue", background="Black", borderwidth=2)
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["textwidget"],"fill") == "Blue"
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["rectangle"],"fill") == "Black"
+    assert canvas.itemcget(text_boxes.text_boxes[str(1)]["rectangle"],"width") == "2.0"
+    print("Library Tests - update_text_box_styles - Edit Mode / Hidden ")
+    text_boxes.update_text_box_styles(2, colour="Blue", background="Black", borderwidth=2)
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"fill") == "Blue"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["rectangle"],"fill") == "Black"
+    assert canvas.itemcget(text_boxes.text_boxes[str(2)]["rectangle"],"width") == "2.0"
     # Clean up
     text_boxes.delete_text_box(1) 
     text_boxes.delete_text_box(2)
@@ -151,6 +169,13 @@ def run_track_sensor_library_tests():
 # Test Track Section Library objects
 #---------------------------------------------------------------------------------------------------------
 
+def toggle_section_state(section_id):
+    # sequence of events is: S1_entered => S1_pressed, S1_released
+    track_sections.section_button_entered_event(section_id)
+    track_sections.section_button_pressed_event(section_id)
+    track_sections.section_button_released_event(section_id)
+    track_sections.section_button_left_event(section_id)
+    
 def track_section_callback(section_id):
     logging_string="Track Section Callback from Section "+str(section_id)
     logging.info(logging_string)
@@ -213,10 +238,10 @@ def run_track_section_library_tests():
     assert track_sections.section_occupied(4)
     assert track_sections.section_label(3) == "Train1"
     assert track_sections.section_label(4) == "Train1"
-    track_sections.section_state_toggled(3)
+    toggle_section_state(3)
     assert not track_sections.section_occupied(3)
     assert not track_sections.section_occupied(4)
-    track_sections.section_state_toggled(4)
+    toggle_section_state(4)
     assert track_sections.section_occupied(3)
     assert track_sections.section_occupied(4)
     track_sections.update_identifier(4,"Train2")
@@ -230,10 +255,10 @@ def run_track_section_library_tests():
     assert track_sections.section_occupied(4)
     assert track_sections.section_label(3) == "Train1"
     assert track_sections.section_label(4) == "Train1"
-    track_sections.section_state_toggled(3)
+    toggle_section_state(3)
     assert not track_sections.section_occupied(3)
     assert not track_sections.section_occupied(4)
-    track_sections.section_state_toggled(4)
+    toggle_section_state(4)
     assert track_sections.section_occupied(3)
     assert track_sections.section_occupied(4)
     track_sections.update_identifier(4,"Train2")
@@ -274,7 +299,7 @@ def run_track_section_library_tests():
     assert track_sections.section_occupied(2)
     assert track_sections.section_occupied(7)
     assert track_sections.section_label(7) == "Train4"
-    track_sections.section_state_toggled(2)
+    toggle_section_state(2)
     assert not track_sections.section_occupied(2)
     assert not track_sections.section_occupied(7)
     print("Library Tests - update_mirrored_section - 7 errors will be generated")
@@ -310,8 +335,8 @@ def run_track_section_library_tests():
     track_sections.set_section_occupied(1,"Train10")
     track_sections.clear_section_occupied(1)
     track_sections.update_identifier(2,"Train11")
-    track_sections.section_state_toggled(2)
-    track_sections.section_state_toggled(3)
+    toggle_section_state(2)
+    toggle_section_state(3)
     print("Library Tests - subscribe_to_remote_sections - 4 Errors and 2 warnings will be generated")
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # Success
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # 2 Warnings - already subscribed
@@ -374,7 +399,7 @@ def run_track_section_library_tests():
     track_sections.configure_edit_mode(edit_mode=False)
     track_sections.create_section(canvas, 1, 100, 100, track_section_callback)
     track_sections.create_section(canvas, 2, 300, 100, track_section_callback)
-    track_sections.section_state_toggled(2)
+    toggle_section_state(2)
     # Update the styles and check they have been applied
     track_sections.update_section_styles("1", section_width=10, default_label="12345", button_colour="Blue", text_colour="White")  # Not an Int
     track_sections.update_section_styles(99, section_width=10, default_label="12345", button_colour="Blue", text_colour="White")   # Does not exist
@@ -392,7 +417,7 @@ def run_track_section_library_tests():
     track_sections.configure_edit_mode(edit_mode=True)
     track_sections.create_section(canvas, 3, 100, 100, track_section_callback)
     track_sections.create_section(canvas, 4, 300, 100, track_section_callback)
-    track_sections.section_state_toggled(4)
+    toggle_section_state(4)
     # Update the styles and check they have been applied
     track_sections.update_section_styles(3, section_width=10, default_label="67890", button_colour="Yellow", text_colour="Red") 
     track_sections.update_section_styles(4, section_width=10, default_label="67890", button_colour="Yellow", text_colour="Red")
@@ -423,6 +448,28 @@ def run_track_section_library_tests():
     track_sections.delete_section(2)
     track_sections.delete_section(3)
     track_sections.delete_section(4)
+    print("Library Tests - Drag and drop of train designators between Sections - No errors or warnings")
+    # Sequence of events: S1_entered => S1_pressed, S1_left1, S1_released => S1_left2 => S2_entered => S2_left 
+    # Note that we get two seperate S1_Left events that we have to handle in the sequence 
+    track_sections.create_section(canvas, 1, 100, 100, track_section_callback)
+    track_sections.create_section(canvas, 2, 300, 100, track_section_callback)
+    track_sections.set_section_occupied(1,"Train1")
+    assert track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "Train1"
+    assert not track_sections.section_occupied(2)
+    assert not track_sections.section_label(2) == "Train1"
+    track_sections.section_button_entered_event(1)
+    track_sections.section_button_pressed_event(1)
+    track_sections.section_button_left_event(1)
+    track_sections.section_button_released_event(1)
+    track_sections.section_button_left_event(1)
+    track_sections.section_button_entered_event(2)
+    track_sections.section_button_left_event(2)
+    assert track_sections.section_occupied(2)
+    assert track_sections.section_label(2) == "Train1"
+    assert not track_sections.section_occupied(1)
+    track_sections.delete_section(1)
+    track_sections.delete_section(2)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(track_sections.sections) == 0
     print("----------------------------------------------------------------------------------------")
@@ -1095,10 +1142,18 @@ def run_instrument_library_tests():
     block_instruments.telegraph_key_button(1)
     block_instruments.blocked_button_event(1)
     block_instruments.blocked_button_event(1)
+    assert block_instruments.instruments[str(1)]["sectionstate"] == None 
     block_instruments.clear_button_event(1)
     block_instruments.clear_button_event(1)
+    assert block_instruments.instruments[str(1)]["sectionstate"] == True 
     block_instruments.occup_button_event(1)
     block_instruments.occup_button_event(1)
+    assert block_instruments.instruments[str(1)]["sectionstate"] == False 
+    print("Library Tests - set_instrument_blocked - will generate 2 errors")
+    block_instruments.set_instrument_blocked("10")   # Error
+    block_instruments.set_instrument_blocked(2)      # Error
+    block_instruments.set_instrument_blocked(1)
+    assert  block_instruments.instruments[str(1)]["sectionstate"] == None 
     block_instruments.delete_instrument(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(block_instruments.instruments) == 0
@@ -1319,32 +1374,47 @@ def run_button_library_tests():
     buttons.delete_button(3)
     assert len(buttons.buttons) == 0
     print("Library Tests - momentary_buttons - No errors:")
+    # Create the buttons
     buttontype = buttons.button_type.momentary
-    buttons.create_button(canvas,4,buttontype,300,100,selected_callback,deselected_callback)
-    assert len(buttons.buttons) == 1
-    assert buttons.button_exists(4)           
-    assert not buttons.button_state(4)        
-    assert buttons.buttons["4"]["button"]["state"] == "normal"
-    buttons.disable_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "disabled"
-    buttons.enable_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "normal"
+    buttons.create_button(canvas,4,buttontype,300,100, selected_callback, deselected_callback,
+                    release_delay=0, button_colour="SeaGreen3", selected_colour="SeaGreen1")
+    buttons.create_button(canvas,5,buttontype,400,100, selected_callback, deselected_callback,
+                    release_delay=300, button_colour="SeaGreen3", selected_colour="SeaGreen1")
+    assert len(buttons.buttons) == 2
+    assert buttons.button_exists(4)
+    assert buttons.button_exists(5)
     assert not buttons.button_state(4)
+    assert not buttons.button_state(5)
+    # Test the basic operation - Button 4 is configured to remain active until the button is released
+    # Note the button_released_event followed by the button_event callbacks (on user release)
+    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen3"
+    buttons.button_pressed_event(4)
+    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen1"
+    time.sleep(0.5)
+    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen1"
+    buttons.button_released_event(4)
     buttons.button_event(4)
-    assert not buttons.button_state(4)
-    buttons.lock_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "normal"
-    buttons.disable_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "disabled"
-    buttons.enable_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "disabled"
-    buttons.unlock_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "disabled"
-    buttons.enable_button(4)
-    assert buttons.buttons["4"]["button"]["state"] == "normal"
-    assert not buttons.button_state(4)
-    buttons.toggle_button(4)
-    assert not buttons.button_state(4)
+    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen3"
+    # Test the basic operation - Button 5 is configured with a release timeout
+    # In this case only the button_event callback would be made (on user release)
+    assert buttons.buttons["5"]["button"]["background"] == "SeaGreen3"
+    buttons.button_pressed_event(5)
+    assert buttons.buttons["5"]["button"]["background"] == "SeaGreen1"
+    time.sleep(0.2)
+    buttons.button_event(5)
+    assert buttons.buttons["5"]["button"]["background"] == "SeaGreen1"
+    time.sleep(0.2)
+    assert buttons.buttons["5"]["button"]["background"] == "SeaGreen3"
+    # Test the toggling of a momentary button (via the API call)
+    buttons.toggle_button(5)
+    assert buttons.buttons["5"]["button"]["background"] == "SeaGreen1"
+    time.sleep(0.4)
+    assert buttons.buttons["5"]["button"]["background"] == "SeaGreen3"
+    # Test the activation of a momentary button followed by a delete to exercise the code
+    buttons.button_pressed_event(5)
+    buttons.delete_button(5)
+    time.sleep(0.4)
+    # Clean up
     buttons.delete_button(4)
     assert len(buttons.buttons) == 0    
     print("Library Tests - configure_edit_mode - Toggling between Run and Edit Mode - No errors:")
@@ -1389,20 +1459,27 @@ def run_button_library_tests():
     buttons.update_button_styles(99, width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
     buttons.update_button_styles(1, width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
-                                        text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
+                                        text_colour="White", font=("TkFixedFont", 10, "bold"))
     assert buttons.buttons[str(1)]["button"].cget('foreground') == "White"
-    assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
     assert buttons.buttons[str(1)]["button"].cget('activebackground') == "Green3"
     assert buttons.buttons[str(1)]["button"].cget('width') == 13
     # Check the selected colour gets updated
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
     buttons.toggle_button(1)
     assert buttons.buttons[str(1)]["button"].cget('background') == "Green2"
     buttons.toggle_button(1)
     assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
+    # Update the styles of a selected button
+    buttons.toggle_button(1)
+    buttons.update_button_styles(1, width=13, text_colour="White", button_colour="Blue1",
+                            selected_colour="Blue2", active_colour="Green3")
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Blue2"
+    buttons.toggle_button(1)
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Blue1"
     # Change to Edit mode to ensure the placeholders are updated
     buttons.configure_edit_mode(edit_mode=True)
     assert canvas.itemcget(buttons.buttons[str(1)]["placeholder1"],"fill") == "White"
-    assert canvas.itemcget(buttons.buttons[str(1)]["placeholder2"],"fill") == "Green4"
+    assert canvas.itemcget(buttons.buttons[str(1)]["placeholder2"],"fill") == "Blue1"
     # Update the styles in Edit Mode
     buttons.update_button_styles(2, width=13, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
@@ -1410,13 +1487,9 @@ def run_button_library_tests():
     assert canvas.itemcget(buttons.buttons[str(2)]["placeholder2"],"fill") == "Green4"
     # Change back to Run Mode
     assert buttons.buttons[str(1)]["button"].cget('foreground') == "White"
-    assert buttons.buttons[str(1)]["button"].cget('background') == "Green4"
+    assert buttons.buttons[str(1)]["button"].cget('background') == "Blue1"
     assert buttons.buttons[str(1)]["button"].cget('activebackground') == "Green3"
     assert buttons.buttons[str(1)]["button"].cget('width') == 13
-    assert buttons.buttons[str(2)]["button"].cget('foreground') == "White"
-    assert buttons.buttons[str(2)]["button"].cget('background') == "Green4"
-    assert buttons.buttons[str(2)]["button"].cget('activebackground') == "Green3"
-    assert buttons.buttons[str(2)]["button"].cget('width') == 13
     # Tidy up
     buttons.delete_button(1)
     buttons.delete_button(2)
@@ -1424,6 +1497,144 @@ def run_button_library_tests():
     buttons.delete_button(4)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(buttons.buttons) == 0
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test Track Sensor Library objects
+#---------------------------------------------------------------------------------------------------------
+
+def lever_callback(lever_id):
+    logging_string="Lever Callback from Lever "+str(lever_id)
+    logging.info(logging_string)
+    
+class dummy_event():
+    def __init__(self, char, keycode):
+        self.char = char
+        self.keycode = keycode
+    
+def run_lever_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Lever Objects")
+    canvas = schematic.canvas
+    # create_track_sensor
+    print("Library Tests - create_lever - will generate 4 errors:")
+    assert len(levers.levers) == 0    
+    levers.create_lever(canvas, 1, levers.lever_type.spare, 100, 100, lever_callback)         # success
+    levers.create_lever(canvas, 2, levers.lever_type.stopsignal, 125, 100, lever_callback)    # success
+    levers.create_lever(canvas, 3, levers.lever_type.distantsignal, 150, 100, lever_callback) # success
+    levers.create_lever(canvas, 4, levers.lever_type.point, 175, 100, lever_callback)         # success
+    levers.create_lever(canvas, 5, levers.lever_type.pointfpl, 200, 100, lever_callback)      # success
+    levers.create_lever(canvas, 6, levers.lever_type.pointwithfpl, 225, 100, lever_callback)  # success
+    levers.create_lever(canvas, 0, levers.lever_type.spare, 250, 100, lever_callback)         # Fail (ID<1)
+    levers.create_lever(canvas, "7", levers.lever_type.spare, 250, 100, lever_callback)       # Fail (ID not int)
+    levers.create_lever(canvas, 1, levers.lever_type.spare, 250, 100, lever_callback)         # fail (duplicate ID)
+    levers.create_lever(canvas, 7, "randomlevertype", 250, 100, lever_callback)               # fail (invalid type)
+    print("Library Tests - create_lever (with mapped keycodes)- will generate 7 errors:")
+    levers.create_lever(canvas, 7, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=10, off_keycode=11)    # Success
+    levers.create_lever(canvas, 8, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=-1, off_keycode=12)     # Fail
+    levers.create_lever(canvas, 9, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=256, off_keycode=12)   # Fail
+    levers.create_lever(canvas, 10, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=12, off_keycode=-1)    # Fail
+    levers.create_lever(canvas, 11, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=12, off_keycode=256)  # Fail
+    levers.create_lever(canvas, 12, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=10, off_keycode=12)   # Fail
+    levers.create_lever(canvas, 13, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=12, off_keycode=10)   # Fail
+    levers.create_lever(canvas, 14, levers.lever_type.spare, 250, 100, lever_callback, on_keycode=12, off_keycode=12)   # Fail
+    assert len(levers.levers) == 7
+    # track_sensor_exists
+    print("Library Tests - lever_exists - will generate 1 error:")
+    assert levers.lever_exists(7)        # True (exists)
+    assert not levers.lever_exists("10")  # False - with error message (not int)
+    assert not levers.lever_exists(10)    # False - no error message
+    # track_sensor_triggered (pulse the button and generate callback)
+    print("Library Tests - change_button_event - Will generate 2 callback messages - No Errors:")
+    levers.change_button_event(1)
+    levers.change_button_event(2)
+    print("Library Tests - toggle_lever - Will generate 2 Errors:")
+    levers.toggle_lever("10")    # Error - not an int
+    levers.toggle_lever(20)      # Error - does not exist
+    levers.toggle_lever(2)
+    levers.toggle_lever(2)
+    print("Library Tests - lever_switched - Will generate 2 Errors:")
+    assert not levers.lever_switched("10")   # Error - not an int
+    assert not levers.lever_switched(20)     # Error - does not exist
+    assert not levers.lever_switched(3)
+    levers.toggle_lever(3)
+    assert levers.lever_switched(3)
+    levers.toggle_lever(3)
+    assert not levers.lever_switched(3)
+    print("Library Tests - lock_lever - Will generate 2 Errors:")
+    levers.lock_lever("10")    # Error - not an int
+    levers.lock_lever(20)      # Error - does not exist
+    levers.lock_lever(4)
+    levers.lock_lever(4)
+    print("Library Tests - toggle_lever whilst locked - Will generate 2 Errors:")
+    assert not levers.lever_switched(4)
+    levers.toggle_lever(4)
+    assert levers.lever_switched(4)
+    levers.toggle_lever(4)
+    assert not levers.lever_switched(4)
+    print("Library Tests - unlock_lever - Will generate 2 Errors:")
+    levers.unlock_lever("10")    # Error - not an int
+    levers.unlock_lever(20)      # Error - does not exist
+    levers.unlock_lever(4)
+    levers.unlock_lever(4)
+    print("Library Tests - keypress events (lever unlocked) - No warnings or errors:")
+    common.configure_edit_mode(edit_mode=False)
+    off_keypress_event = dummy_event("a", 11)
+    on_keypress_event = dummy_event("b", 10)
+    assert not levers.lever_switched(7)
+    common.keyboard_handler(off_keypress_event)
+    common.keyboard_handler(off_keypress_event)
+    assert levers.lever_switched(7)
+    common.keyboard_handler(on_keypress_event)
+    common.keyboard_handler(on_keypress_event)
+    assert not levers.lever_switched(7)
+    print("Library Tests - keypress events (lever locked/respect interlocking) - 2 warnings will be generated:")
+    levers.lock_lever(7)
+    common.keyboard_handler(off_keypress_event)
+    assert not levers.lever_switched(7)
+    levers.unlock_lever(7)
+    common.keyboard_handler(off_keypress_event)
+    assert levers.lever_switched(7)
+    levers.lock_lever(7)
+    common.keyboard_handler(on_keypress_event)
+    assert levers.lever_switched(7)
+    levers.unlock_lever(7)
+    common.keyboard_handler(on_keypress_event)
+    assert not levers.lever_switched(7)
+    print("Library Tests - keypress events (lever locked/ignore interlocking) - 4 warnings will be generated:")
+    levers.set_lever_switching_behaviour(ignore_locking=True, display_popups=False)
+    levers.lock_lever(7)
+    common.keyboard_handler(off_keypress_event)
+    common.keyboard_handler(off_keypress_event)
+    assert levers.lever_switched(7)
+    common.keyboard_handler(on_keypress_event)
+    common.keyboard_handler(on_keypress_event)
+    assert not levers.lever_switched(7)
+    levers.set_lever_switching_behaviour(ignore_locking=False, display_popups=False)
+    common.configure_edit_mode(edit_mode=True)
+    print("Library Tests - update_lever_styles - Will generate 2 Errors:")
+    levers.update_lever_styles("10")    # Error - not an int
+    levers.update_lever_styles(20)      # Error - does not exist
+    levers.update_lever_styles(4)
+    levers.toggle_lever(4)
+    levers.update_lever_styles(4)
+    print("Library Tests - delete_lever - Will generate 2 Errors:")
+    assert len(levers.levers) == 7
+    assert levers.lever_exists(7)
+    levers.delete_lever("10")    # Error - not an int
+    levers.delete_lever(20)      # Error - does not exist
+    levers.delete_lever(7)
+    assert len(levers.levers) == 6
+    assert not levers.lever_exists(7)
+    levers.delete_lever(6)
+    levers.delete_lever(5)
+    levers.delete_lever(4)
+    levers.delete_lever(3)
+    levers.delete_lever(2)
+    levers.delete_lever(1)
+    assert len(levers.levers) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1440,6 +1651,7 @@ def run_all_basic_library_tests():
     run_instrument_library_tests()
     run_line_library_tests()
     run_button_library_tests()
+    run_lever_library_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
