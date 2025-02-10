@@ -652,6 +652,8 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     sw2 = create_switch(300,300)
     tb1 = create_textbox(100,350)
     tb2 = create_textbox(300,350)
+    lev1 = create_lever(100,400)
+    lev1 = create_lever(300,400)
     # Test the 'one-up' IDs have been correctly generated
     assert_object_configuration(l1,{"itemid":1})
     assert_object_configuration(l2,{"itemid":2})
@@ -671,9 +673,11 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     assert_object_configuration(sw2,{"itemid":4})
     assert_object_configuration(tb1,{"itemid":1})
     assert_object_configuration(tb2,{"itemid":2})
+    assert_object_configuration(lev1,{"itemid":1})
+    assert_object_configuration(lev2,{"itemid":2})
     # Now delete all the ID=1 and try again
     deselect_all_objects()
-    select_or_deselect_objects(l1,p1,s1,t1,ts1,i1,r1,tb1,sw1)
+    select_or_deselect_objects(l1,p1,s1,t1,ts1,i1,r1,tb1,sw1,lev1)
     delete_selected_objects()
     sleep(delay)
     l3 = create_line(100,50)
@@ -685,6 +689,7 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     r3 = create_route(100,250)
     sw3 = create_switch(100,300)
     tb3 = create_textbox(100,350)
+    lev3 = create_lever(100,400)
     sleep(delay)
     assert_object_configuration(l3,{"itemid":1})
     assert_object_configuration(l2,{"itemid":2})
@@ -704,6 +709,8 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     assert_object_configuration(sw2,{"itemid":4})
     assert_object_configuration(tb3,{"itemid":1})
     assert_object_configuration(tb2,{"itemid":2})
+    assert_object_configuration(lev3,{"itemid":1})
+    assert_object_configuration(lev2,{"itemid":2})
     # clean up
     select_all_objects()
     delete_selected_objects()
@@ -725,6 +732,7 @@ def run_basic_change_of_item_id_tests(delay:float=0.0):
     r1 = create_route(100,250)
     sw1 = create_route(300,250)
     tb1 = create_textbox(400,250)
+    lev1 = create_lever(500,250)
     # Test the 'one-up' IDs have been correctly generated
     assert_object_configuration(l1,{"itemid":1})
     assert_object_configuration(p1,{"itemid":1})
@@ -735,6 +743,7 @@ def run_basic_change_of_item_id_tests(delay:float=0.0):
     assert_object_configuration(r1,{"itemid":1})
     assert_object_configuration(sw1,{"itemid":2})
     assert_object_configuration(tb1,{"itemid":1})
+    assert_object_configuration(lev1,{"itemid":1})
     # Now update all the Item IDs and check they have been updated
     update_object_configuration(l1,{"itemid":10})
     update_object_configuration(p1,{"itemid":20})
@@ -745,6 +754,7 @@ def run_basic_change_of_item_id_tests(delay:float=0.0):
     update_object_configuration(r1,{"itemid":70})
     update_object_configuration(sw1,{"itemid":75})
     update_object_configuration(tb1,{"itemid":80})
+    update_object_configuration(lev1,{"itemid":85})
     assert_object_configuration(l1,{"itemid":10})
     assert_object_configuration(p1,{"itemid":20})
     assert_object_configuration(s1,{"itemid":30})
@@ -754,6 +764,7 @@ def run_basic_change_of_item_id_tests(delay:float=0.0):
     assert_object_configuration(r1,{"itemid":70})
     assert_object_configuration(sw1,{"itemid":75})
     assert_object_configuration(tb1,{"itemid":80})
+    assert_object_configuration(lev1,{"itemid":85})
     # clean up
     select_all_objects()
     delete_selected_objects()
@@ -1130,9 +1141,53 @@ def run_sensor_config_update_on_change_of_id_tests(delay:float=0.0):
     return()
 
 #-----------------------------------------------------------------------------------
+# These test the Item ID update functions for track sensors, specifically:
+#    Update of Track Sensor route tables to reflect change of Point ID
+#    Update of Track Sensor route tables to reflect deletion of Point
+#    Update of Track Sensor route tables to reflect change of section ID
+#    Update of Track Sensor route tables to reflect deletion of section
+#-----------------------------------------------------------------------------------
+
+def run_lever_config_update_on_change_of_id_tests(delay:float=0.0):
+    print("Object configuration updates - Test update of Lever Configuration on change or delete of Item IDs")
+    # Add elements to the layout
+    p1 = create_left_hand_point(100,50)
+    s1 = create_colour_light_signal(200,50)
+    assert_object_configuration(p1, {"itemid":1})
+    assert_object_configuration(s1, {"itemid":1})
+    lev1 = create_lever(300,50)
+    lev2 = create_lever(400,50)
+    # Link Lever 1 to Point 1 and lever 2 to signal 1
+    update_object_configuration(lev1,{"linkedpoint":1})
+    update_object_configuration(lev2,{"linkedsignal":1})
+    assert_object_configuration(lev1,{"linkedpoint":1, "linkedsignal":0})
+    assert_object_configuration(lev2,{"linkedpoint":0, "linkedsignal":1})
+    # update the item IDs
+    update_object_configuration(p1,{"itemid":21})
+    update_object_configuration(s1,{"itemid":22})
+    # Test the linked signals/points have been updated correctly
+    assert_object_configuration(lev1,{"linkedpoint":21, "linkedsignal":0})
+    assert_object_configuration(lev2,{"linkedpoint":0, "linkedsignal":22})
+    # Delete Point 1 and test it has been removed from the lever object
+    select_single_object(p1)
+    delete_selected_objects()
+    assert_object_configuration(lev1,{"linkedpoint":0, "linkedsignal":0})
+    assert_object_configuration(lev2,{"linkedpoint":0, "linkedsignal":22})
+    # Delete signal 1 and test it has been removed from the lever object
+    select_single_object(s1)
+    delete_selected_objects()
+    assert_object_configuration(lev2,{"linkedpoint":0, "linkedsignal":0})
+    # clean up
+    select_all_objects()
+    delete_selected_objects()
+    return()
+
+#-----------------------------------------------------------------------------------
 # These test the reset objects functions, specifically:
 # All points, instruments, signals and buttons are returned to their default states
-# Track Sections will remain unchanged
+# Track Sections will remain unchanged. Any levers linked to signals/points will
+# have been reset to their default states when the signals/points were returned
+# to their default states. Spare levers would have been left unchanged
 #-----------------------------------------------------------------------------------
 
 def run_reset_objects_tests(delay:float=0.0):
@@ -1145,20 +1200,34 @@ def run_reset_objects_tests(delay:float=0.0):
     i2 = create_block_instrument(800,200)
     r1 = create_route(100,100)
     sw1 = create_switch(300,100)
+    lev1 = create_lever(100,200)
+    lev2 = create_lever(125,200)
+    lev3 = create_lever(150,200)
+    lev4 = create_lever(175,200)
+    lev5 = create_lever(200,200)
     # Link the 2 block instruments (so we can test the interlocking)
     # Note the linked instrument is a string (local or remote)
     update_object_configuration(i1,{"linkedto":"2"})
     update_object_configuration(i2,{"linkedto":"1"})
-    # Set up the signal interlocking tables and the automation tables for Signal 1
+    # Configure the signal and point for the levers
+    update_object_configuration(p1,{"hasfpl":True})
+    update_object_configuration(s1,{"subsidary":[True,0],"subroutes":[True,True,True,True,True]})
+    # Link the levers to the signal/point (lever 5 is a spare)
+    update_object_configuration(lev1,{"itemtype":2, "linkedsignal":1, "switchsignal":True, "signalroutes":[True,True,True,True,True]})
+    update_object_configuration(lev2,{"itemtype":2, "linkedsignal":1, "switchsubsidary":True, "signalroutes":[True,True,True,True,True]})
+    update_object_configuration(lev3,{"itemtype":5, "linkedpoint":1, "switchfpl":True})
+    update_object_configuration(lev4,{"itemtype":4, "linkedpoint":1, "switchpoint":True})
     # set run mode to configure state (for sections)
     set_run_mode()
     # set them to their non-default states
     set_signals_off(1)
+    set_fpls_off(1)
     set_points_switched(1)
     set_sections_occupied(1)
     set_instrument_clear(2)
     simulate_buttons_clicked(1)
     simulate_buttons_clicked(2)
+    set_levers_off(5)  # Spare
     # Test reset in Run Mode
     assert_signals_PROCEED(1)
     assert_points_switched(1)
@@ -1167,6 +1236,11 @@ def run_reset_objects_tests(delay:float=0.0):
     assert_block_section_ahead_not_clear(2)
     assert_buttons_selected(1)
     assert_buttons_selected(2)
+    assert_levers_off(1)  # signal
+    assert_levers_on(2)   # subsidary
+    assert_levers_on(3)   # FPL (unlocked)
+    assert_levers_off(4)  # point (switched)
+    assert_levers_off(5)  # spare lever
     reset_layout()
     assert_signals_DANGER(1)
     assert_points_normal(1)
@@ -1174,19 +1248,30 @@ def run_reset_objects_tests(delay:float=0.0):
     assert_block_section_ahead_not_clear(1,2)
     assert_buttons_deselected(1)
     assert_buttons_deselected(2)
+    assert_levers_on(1)   # signal
+    assert_levers_on(2)   # subsidary
+    assert_levers_off(3)  # FPL (locked)
+    assert_levers_on(4)   # point (normal)
+    assert_levers_off(5)  # spare lever (unchanged)
     # Now set to non default states again
-    set_signals_off(1)
+    set_subsidaries_off(1)
+    set_fpls_off(1)
     set_points_switched(1)
+    set_fpls_on(1)
     set_instrument_occupied(1)
     simulate_buttons_clicked(1)
     simulate_buttons_clicked(2)
     # Test Reset in edit mode
-    assert_signals_PROCEED(1)
     assert_points_switched(1)
     assert_sections_occupied(1)
     assert_block_section_ahead_not_clear(1,2)
     assert_buttons_selected(1)
     assert_buttons_selected(2)
+    assert_levers_on(1)   # signal
+    assert_levers_off(2)  # subsidary
+    assert_levers_off(3)  # FPL (locked)
+    assert_levers_off(4)  # point (switched)
+    assert_levers_off(5)  # spare lever
     set_edit_mode()
     reset_layout()
     set_run_mode()
@@ -1196,6 +1281,11 @@ def run_reset_objects_tests(delay:float=0.0):
     assert_block_section_ahead_not_clear(1,2)
     assert_buttons_deselected(1)
     assert_buttons_deselected(2)
+    assert_levers_on(1)   # signal
+    assert_levers_on(2)   # subsidary
+    assert_levers_off(3)  # FPL (locked)
+    assert_levers_on(4)   # point (normal)
+    assert_levers_off(5)  # spare lever (unchanged)
     # clean up
     select_all_objects()
     delete_selected_objects()
@@ -1213,7 +1303,8 @@ def run_all_object_editing_tests(delay:float=0.0):
     run_initial_item_id_allocation_tests()
     run_basic_change_of_item_id_tests()
     run_signal_config_update_on_change_of_id_tests()
-    run_sensor_config_update_on_change_of_id_tests()  
+    run_sensor_config_update_on_change_of_id_tests()
+    run_lever_config_update_on_change_of_id_tests()
     run_reset_objects_tests(delay)
     report_results()
     

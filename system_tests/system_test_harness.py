@@ -15,6 +15,8 @@
 #    sleep(sleep_time)
 #
 # Supported Schematic test invocations:
+#    set_levers_on(*leverids)
+#    set_levers_off(*leverids)
 #    set_signals_on(*sigids)
 #    set_signals_off(*sigids)
 #    set_subsidaries_on(*sigids)
@@ -25,7 +27,7 @@
 #    trigger_signals_released(*sigids)
 #    trigger_sensors_passed(*sigids)
 #    set_points_switched(*pointids)
-#    set_points_normal(*pointids
+#    set_points_normal(*pointids)
 #    set_fpls_on(*pointids)
 #    set_fpls_off(*pointids)
 #    set_sections_occupied(*sectionids)
@@ -39,6 +41,8 @@
 #    simulate_buttons_clicked(*buttonids)
 #
 # Supported Schematic test assertions:
+#    assert_levers_off(*leverids)
+#    assert_levers_on(*leverids)
 #    assert_points_locked(*pointids)
 #    assert_points_unlocked(*pointids)
 #    assert_points_switched(*pointids)
@@ -96,6 +100,7 @@
 #    create_textbox()
 #    create_route()
 #    create_switch()
+#    create_lever()
 #
 # Supported Schematic keypress / right click menu invocations:
 #    toggle_mode()                    - 'Cntl-m'
@@ -285,6 +290,24 @@ def sleep(sleep_time:float): time.sleep(sleep_time)
 # Functions to mimic layout 'events' - in terms of button pushes or other events
 # ------------------------------------------------------------------------------
     
+def set_levers_on(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("set_levers_on - Lever: "+str(leverid)+" does not exist")
+        elif not levers.lever_switched(leverid):
+            raise_test_warning ("set_levers_on - Lever: "+str(leverid)+" is already ON")
+        else:
+            run_function(lambda:levers.change_button_event(leverid))
+
+def set_levers_off(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("set_levers_off - Lever: "+str(leverid)+" does not exist")
+        elif levers.lever_switched(leverid):
+            raise_test_warning ("set_levers_off - Lever: "+str(leverid)+" is already OFF")
+        else:
+            run_function(lambda:levers.change_button_event(leverid))
+            
 def set_signals_on(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals.signals.keys():
@@ -485,6 +508,22 @@ def simulate_buttons_clicked(*buttonids):
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
+
+def assert_levers_off(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_off - Lever: "+str(leverid)+" does not exist")
+        elif not levers.lever_switched(leverid):
+            raise_test_error ("assert_levers_off - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
+    
+def assert_levers_on(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_on - Lever: "+str(leverid)+" does not exist")
+        elif levers.lever_switched(leverid):
+            raise_test_error ("assert_levers_on - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
 
 def assert_points_locked(*pointids):
     for pointid in pointids:
