@@ -7278,7 +7278,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 4.9.3"
+            "version": "Version 5.0.0"
         },
         "gpio": {
             "portmappings": [],

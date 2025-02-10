@@ -5,7 +5,7 @@
     "levers": {},
     "objects": {
         "0069c0e5-ea44-4868-9287-276ad65c1407": {
-            "bbox": 614,
+            "bbox": 10148,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 2,
@@ -14,302 +14,52 @@
             "posy": 75.0,
             "routeahead": [
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     4
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ]
             ],
             "routebehind": [
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     3
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ]
             ],
             "tags": "sensor2"
         },
         "0bfb0559-02cb-4e91-85a7-dd78aeba631a": {
-            "bbox": 635,
+            "bbox": 10152,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -340,7 +90,7 @@
                 false,
                 ""
             ],
-            "bbox": 631,
+            "bbox": 10169,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -409,152 +159,27 @@
             ],
             "pointinterlock": [
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     "",
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     "",
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     "",
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     "",
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     "",
                     0
                 ]
@@ -759,7 +384,7 @@
             "ybuttonoffset": 0
         },
         "25899818-cd4d-4f23-8b7b-3163bc7c2482": {
-            "bbox": 764,
+            "bbox": 10173,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 3,
@@ -833,7 +458,7 @@
             "tags": "sensor3"
         },
         "3caae2e0-a491-4353-a526-5e93054a51e5": {
-            "bbox": 720,
+            "bbox": 10177,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -859,7 +484,7 @@
                 0,
                 0
             ],
-            "bbox": 770,
+            "bbox": 10183,
             "colour": "Black",
             "endx": 475.0,
             "endy": 175.0,
@@ -878,7 +503,7 @@
                 0,
                 0
             ],
-            "bbox": 788,
+            "bbox": 10189,
             "colour": "Black",
             "endx": 625.0,
             "endy": 150.0,
@@ -891,7 +516,7 @@
             "tags": "line5"
         },
         "67ed5620-8f45-46b5-ae65-cd152d4926c7": {
-            "bbox": 610,
+            "bbox": 10193,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -922,7 +547,7 @@
                 false,
                 ""
             ],
-            "bbox": 601,
+            "bbox": 10210,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1222,7 +847,7 @@
                 0,
                 0
             ],
-            "bbox": 782,
+            "bbox": 10216,
             "colour": "Black",
             "endx": 375.0,
             "endy": 200.0,
@@ -1235,7 +860,7 @@
             "tags": "line4"
         },
         "a5f95aa9-b869-4dff-933a-d1d83c7fb44b": {
-            "bbox": 578,
+            "bbox": 10220,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1255,7 +880,7 @@
             ]
         },
         "a732c9a1-625a-4875-a802-706c56273db8": {
-            "bbox": 574,
+            "bbox": 10224,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 1,
@@ -1264,302 +889,52 @@
             "posy": 75.0,
             "routeahead": [
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     3
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ]
             ],
             "routebehind": [
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     2
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ],
                 [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
+                    [],
                     0
                 ]
             ],
             "tags": "sensor1"
         },
         "a9b08221-b11c-4b63-a7ad-124f585c44fb": {
-            "bbox": 728,
+            "bbox": 10228,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1581,7 +956,7 @@
         "b4981c47-bf98-478a-8356-77710753c1fd": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 754,
+            "bbox": 10235,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -1609,7 +984,7 @@
             "ybuttonoffset": 0
         },
         "be998d8b-50f1-40a4-b663-ec5bf1e8ba5c": {
-            "bbox": 606,
+            "bbox": 10239,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1629,7 +1004,7 @@
             ]
         },
         "ced7bc00-e0aa-4bc2-bef3-9fa7da7f92c5": {
-            "bbox": 716,
+            "bbox": 10243,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1649,7 +1024,7 @@
             ]
         },
         "d2f6f51a-0bbf-452b-bd1c-b3b3839329b8": {
-            "bbox": 724,
+            "bbox": 10247,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1675,7 +1050,7 @@
                 0,
                 0
             ],
-            "bbox": 584,
+            "bbox": 10253,
             "colour": "Black",
             "endx": 725.0,
             "endy": 75.0,
@@ -1694,7 +1069,7 @@
                 0,
                 0
             ],
-            "bbox": 776,
+            "bbox": 10259,
             "colour": "Black",
             "endx": 375.0,
             "endy": 150.0,
@@ -1709,7 +1084,7 @@
         "fb9e5b3a-1a61-4b99-866d-03878bed3c10": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 734,
+            "bbox": 10266,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -1743,7 +1118,7 @@
                 0,
                 0
             ],
-            "bbox": 794,
+            "bbox": 10272,
             "colour": "Black",
             "endx": 625.0,
             "endy": 200.0,
@@ -1815,13 +1190,13 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/john/Software/model-railway-signalling-develop/user_guide/quickstart_example5.sig",
+            "filename": "/home/john/model-railway-signalling/configuration_examples/quickstart_example5.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 4.9.3"
+            "version": "Version 5.0.0"
         },
         "gpio": {
             "portmappings": [],

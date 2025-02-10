@@ -11,6 +11,7 @@
             "sectionstate": null
         }
     },
+    "levers": {},
     "objects": {
         "09bfd7fa-96c9-4483-8da8-9091ccf44111": {
             "approachcontrol": [
@@ -24,7 +25,7 @@
                 false,
                 ""
             ],
-            "bbox": 15000,
+            "bbox": 8541,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -324,7 +325,7 @@
                 20,
                 5
             ],
-            "bbox": 15006,
+            "bbox": 8547,
             "colour": "black",
             "endx": 625.0,
             "endy": 300.0,
@@ -338,7 +339,7 @@
         },
         "3992df93-f016-42e7-a710-f0bddf9b1627": {
             "background": "grey85",
-            "bbox": 15009,
+            "bbox": 8550,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -362,7 +363,7 @@
                 20,
                 5
             ],
-            "bbox": 15015,
+            "bbox": 8556,
             "colour": "black",
             "endx": 625.0,
             "endy": 125.0,
@@ -375,7 +376,7 @@
             "tags": "line1"
         },
         "6085fa37-fea7-42cd-a7a9-f15aeb1ec731": {
-            "bbox": 15030,
+            "bbox": 8571,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -387,7 +388,7 @@
             "tags": "instrument2"
         },
         "6e4f0867-155b-4ed8-ae84-38e1cc667131": {
-            "bbox": 15034,
+            "bbox": 8575,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -408,7 +409,7 @@
         },
         "70238cfa-4556-4ed9-9a92-46ac169573de": {
             "background": "grey85",
-            "bbox": 15037,
+            "bbox": 8578,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -432,7 +433,7 @@
                 20,
                 5
             ],
-            "bbox": 15043,
+            "bbox": 8584,
             "colour": "black",
             "endx": 225.0,
             "endy": 125.0,
@@ -456,7 +457,7 @@
                 false,
                 ""
             ],
-            "bbox": 15069,
+            "bbox": 8610,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -762,7 +763,7 @@
         },
         "9ac66673-362c-4529-a451-6dba32782869": {
             "background": "grey85",
-            "bbox": 15072,
+            "bbox": 8613,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -791,7 +792,7 @@
                 false,
                 ""
             ],
-            "bbox": 15089,
+            "bbox": 8630,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1085,7 +1086,7 @@
             "ybuttonoffset": 0
         },
         "e26bc73f-b67e-4fed-ae67-8971af1d7b92": {
-            "bbox": 15093,
+            "bbox": 8634,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1106,7 +1107,7 @@
         },
         "e497d420-ad7a-4cb5-877c-6dbd0d849296": {
             "background": "grey85",
-            "bbox": 15096,
+            "bbox": 8637,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1135,7 +1136,7 @@
                 false,
                 ""
             ],
-            "bbox": 15122,
+            "bbox": 8663,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1451,7 +1452,7 @@
                 false,
                 ""
             ],
-            "bbox": 15148,
+            "bbox": 8689,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1794,10 +1795,13 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/user_guide/networking1-node2.sig",
+            "filename": "/home/john/model-railway-signalling/configuration_examples/networking1-node2.sig",
             "info": "Document your layout here",
+            "leverinterlocking": false,
+            "leverpopupwarnings": false,
+            "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 4.9.0"
+            "version": "Version 5.0.0"
         },
         "gpio": {
             "portmappings": [],
@@ -1843,6 +1847,7 @@
             "username": ""
         },
         "sprog": {
+            "addressmode": 1,
             "baud": 460800,
             "debug": false,
             "port": "/dev/serial0",
@@ -1858,6 +1863,17 @@
                     "Courier",
                     9,
                     ""
+                ]
+            },
+            "levers": {
+                "buttoncolour": "Grey85",
+                "framecolour": "Grey40",
+                "lockcolourtype": 1,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "TkFixedFont",
+                    8,
+                    "bold"
                 ]
             },
             "points": {

@@ -11,6 +11,7 @@
             "sectionstate": null
         }
     },
+    "levers": {},
     "objects": {
         "08d2569e-717c-4af5-bfbc-0e9cafad684d": {
             "arrowends": 2,
@@ -19,7 +20,7 @@
                 20,
                 5
             ],
-            "bbox": 14767,
+            "bbox": 8308,
             "colour": "black",
             "endx": 600.0,
             "endy": 125.0,
@@ -38,7 +39,7 @@
                 20,
                 5
             ],
-            "bbox": 14773,
+            "bbox": 8314,
             "colour": "black",
             "endx": 125.0,
             "endy": 125.0,
@@ -62,7 +63,7 @@
                 false,
                 ""
             ],
-            "bbox": 14799,
+            "bbox": 8340,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -367,7 +368,7 @@
             "ybuttonoffset": 0
         },
         "5119d487-7752-469d-addb-5aa3be1bedb6": {
-            "bbox": 14803,
+            "bbox": 8344,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -398,7 +399,7 @@
                 false,
                 ""
             ],
-            "bbox": 14829,
+            "bbox": 8370,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -714,7 +715,7 @@
         },
         "6408cbee-f763-41ad-8fca-3130f53d2519": {
             "background": "grey85",
-            "bbox": 14832,
+            "bbox": 8373,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -743,7 +744,7 @@
                 false,
                 ""
             ],
-            "bbox": 14849,
+            "bbox": 8390,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1043,7 +1044,7 @@
                 20,
                 5
             ],
-            "bbox": 14855,
+            "bbox": 8396,
             "colour": "black",
             "endx": 475.0,
             "endy": 300.0,
@@ -1056,7 +1057,7 @@
             "tags": "line3"
         },
         "70194f30-ef69-484a-b947-66951acf8a72": {
-            "bbox": 14859,
+            "bbox": 8400,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1087,7 +1088,7 @@
                 false,
                 ""
             ],
-            "bbox": 14876,
+            "bbox": 8417,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1381,7 +1382,7 @@
             "ybuttonoffset": 0
         },
         "73be5b7a-289a-4a48-959b-0f06dc39c0e9": {
-            "bbox": 14880,
+            "bbox": 8421,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1402,7 +1403,7 @@
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
-            "bbox": 14883,
+            "bbox": 8424,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1421,7 +1422,7 @@
         },
         "9a8b2db4-dadb-4a28-bf0f-5ce1baaa363f": {
             "background": "grey85",
-            "bbox": 14886,
+            "bbox": 8427,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1439,7 +1440,7 @@
             ]
         },
         "a271c006-6796-436a-b85f-c805554d8237": {
-            "bbox": 14901,
+            "bbox": 8442,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1452,7 +1453,7 @@
         },
         "aad6451e-e1e2-4a4d-8f93-064d331acafd": {
             "background": "grey85",
-            "bbox": 14904,
+            "bbox": 8445,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1481,7 +1482,7 @@
                 false,
                 ""
             ],
-            "bbox": 14930,
+            "bbox": 8471,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1818,10 +1819,13 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/user_guide/networking1-node1.sig",
+            "filename": "/home/john/model-railway-signalling/configuration_examples/networking1-node1.sig",
             "info": "Document your layout here",
+            "leverinterlocking": false,
+            "leverpopupwarnings": false,
+            "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 4.9.0"
+            "version": "Version 5.0.0"
         },
         "gpio": {
             "portmappings": [
@@ -1886,6 +1890,7 @@
             "username": ""
         },
         "sprog": {
+            "addressmode": 1,
             "baud": 460800,
             "debug": false,
             "port": "/dev/serial0",
@@ -1901,6 +1906,17 @@
                     "Courier",
                     9,
                     ""
+                ]
+            },
+            "levers": {
+                "buttoncolour": "Grey85",
+                "framecolour": "Grey40",
+                "lockcolourtype": 1,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "TkFixedFont",
+                    8,
+                    "bold"
                 ]
             },
             "points": {

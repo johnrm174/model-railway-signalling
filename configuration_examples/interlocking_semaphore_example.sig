@@ -2,6 +2,7 @@
     "buttons": {},
     "information": "Model Railway Signalling Configuration File",
     "instruments": {},
+    "levers": {},
     "objects": {
         "0236fd2e-b21c-4565-ad76-ddf1c7e74ef6": {
             "approachcontrol": [
@@ -15,7 +16,7 @@
                 false,
                 ""
             ],
-            "bbox": 5815,
+            "bbox": 4814,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -320,7 +321,7 @@
                 false,
                 ""
             ],
-            "bbox": 5844,
+            "bbox": 4843,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -666,7 +667,7 @@
                 0,
                 0
             ],
-            "bbox": 5850,
+            "bbox": 4849,
             "colour": "black",
             "endx": 1275,
             "endy": 225,
@@ -690,7 +691,7 @@
                 false,
                 ""
             ],
-            "bbox": 5876,
+            "bbox": 4875,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -995,7 +996,7 @@
                 false,
                 ""
             ],
-            "bbox": 5902,
+            "bbox": 4901,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1305,7 +1306,7 @@
                 false,
                 ""
             ],
-            "bbox": 5928,
+            "bbox": 4927,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1631,7 +1632,7 @@
                 false,
                 ""
             ],
-            "bbox": 5954,
+            "bbox": 4953,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1931,7 +1932,7 @@
                 0,
                 0
             ],
-            "bbox": 5960,
+            "bbox": 4959,
             "colour": "black",
             "endx": 1375,
             "endy": 225,
@@ -1955,7 +1956,7 @@
                 false,
                 ""
             ],
-            "bbox": 5968,
+            "bbox": 4967,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2302,7 +2303,7 @@
                 false,
                 ""
             ],
-            "bbox": 5994,
+            "bbox": 4993,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2607,7 +2608,7 @@
                 false,
                 ""
             ],
-            "bbox": 6021,
+            "bbox": 5020,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2927,7 +2928,7 @@
                 0,
                 0
             ],
-            "bbox": 6027,
+            "bbox": 5026,
             "colour": "black",
             "endx": 1375,
             "endy": 275,
@@ -2951,7 +2952,7 @@
                 false,
                 ""
             ],
-            "bbox": 6075,
+            "bbox": 5074,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3256,7 +3257,7 @@
                 false,
                 ""
             ],
-            "bbox": 6101,
+            "bbox": 5100,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3561,7 +3562,7 @@
                 false,
                 ""
             ],
-            "bbox": 6109,
+            "bbox": 5108,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3883,7 +3884,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 6116,
+            "bbox": 5115,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 101,
@@ -3963,7 +3964,7 @@
                 false,
                 ""
             ],
-            "bbox": 6142,
+            "bbox": 5141,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4263,7 +4264,7 @@
                 0,
                 0
             ],
-            "bbox": 6148,
+            "bbox": 5147,
             "colour": "black",
             "endx": 1275,
             "endy": 175,
@@ -4287,7 +4288,7 @@
                 false,
                 ""
             ],
-            "bbox": 6156,
+            "bbox": 5155,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4603,7 +4604,7 @@
                 0,
                 0
             ],
-            "bbox": 6162,
+            "bbox": 5161,
             "colour": "black",
             "endx": 0,
             "endy": 275,
@@ -4622,7 +4623,7 @@
                 1,
                 1
             ],
-            "bbox": 6168,
+            "bbox": 5167,
             "colour": "black",
             "endx": 1325,
             "endy": 175,
@@ -4637,7 +4638,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 6173,
+            "bbox": 5172,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -4676,7 +4677,7 @@
                 false,
                 ""
             ],
-            "bbox": 6199,
+            "bbox": 5198,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4976,7 +4977,7 @@
                 0,
                 0
             ],
-            "bbox": 6205,
+            "bbox": 5204,
             "colour": "black",
             "endx": 0,
             "endy": 225,
@@ -4991,7 +4992,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 6212,
+            "bbox": 5211,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 100,
@@ -5066,7 +5067,7 @@
                 1,
                 1
             ],
-            "bbox": 6218,
+            "bbox": 5217,
             "colour": "black",
             "endx": 725,
             "endy": 175,
@@ -5090,7 +5091,7 @@
                 false,
                 ""
             ],
-            "bbox": 6226,
+            "bbox": 5225,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5422,7 +5423,7 @@
         "d9840a46-28fd-40dd-a059-df46b9a762e2": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 6232,
+            "bbox": 5231,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -5503,7 +5504,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 6237,
+            "bbox": 5236,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -5542,7 +5543,7 @@
                 false,
                 ""
             ],
-            "bbox": 6245,
+            "bbox": 5244,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5874,7 +5875,7 @@
         "f14ef6e8-7b7b-4568-b0e6-c105889caf10": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 6250,
+            "bbox": 5249,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -5913,7 +5914,7 @@
                 false,
                 ""
             ],
-            "bbox": 6258,
+            "bbox": 5257,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6304,7 +6305,7 @@
                 false,
                 ""
             ],
-            "bbox": 6287,
+            "bbox": 5286,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6708,8 +6709,11 @@
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/configuration_examples/interlocking_semaphore_example.sig",
             "info": "This is a basic example of a layout without track sensors (and the associated signal automation).\n\nThe layout is signalled with a combination of semaphore home and distant signals. Note that\nSignal 16 is a home signal with a secondary distant arm (controled by the 'D' button). \n\nThe signals and points are interlocked together - and the signals interlocked with opposing signals\n(in 'edit' mode, double click on a signal or point and select the 'interlocking' tab to edit/view).\n\nIn this example, signal 1 is interlocked with point 2 so can only be cleared if the facing point \nlock (the 'L' button) is active. When the main signal is cleared, the appropriate route arm will \nbe cleared. Note that the associated subsidary signal (controlled by the 'S' button) is similarly\ninterlocked with point 2. When cleared, the appropriate subsidary arm will be cleared.\n\nSignal 1 is also interlocked with any opposing signals that could allow a train onto the same\nsection of track - in this example, the signal is interlocked with ground signals 15, 13, 7 and 6\n(dependant on whether the route 'cleared' by these signals conflicts with the route for Signal 1).\n\nNote that the distant signals are also configured to be interlocked with all home signals ahead. \nThis means that the signal cannot be cleared unless all home signals (up to the next distant signal)\nhave also been cleared (note that they can be returned to Caution at any time).\n\nAll point interlocking is automatically configured via the signal interlocking so, for example\npoint 2 is locked if signal 1 (main or subsidary) is cleared for a train movement.\n\nNote that not all signals are configured for all possible routes - the only 'valid' shunting\nmovement allowed from signal 14 is via the crossover back onto the other main line. \n\nSome of the signals and points are configured with DCC Addresses, with a single DCC address used\nfor each main or subsidary route arm. \n\nThis level of configuration is ideal if you want to be the signal man/woman for your layout. Other\nexamples add track sensors to allow semi-automation of the signalling scheme so the signals will \nchange automatically as you watch the trains go round.\n",
+            "leverinterlocking": false,
+            "leverpopupwarnings": false,
+            "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 4.9.0"
+            "version": "Version 5.0.0"
         },
         "gpio": {
             "portmappings": [],
@@ -6742,6 +6746,7 @@
             "username": ""
         },
         "sprog": {
+            "addressmode": 1,
             "baud": 460800,
             "debug": false,
             "port": "/dev/serial0",
@@ -6757,6 +6762,17 @@
                     "Courier",
                     9,
                     ""
+                ]
+            },
+            "levers": {
+                "buttoncolour": "Grey85",
+                "framecolour": "Grey40",
+                "lockcolourtype": 1,
+                "textcolourtype": 1,
+                "textfonttuple": [
+                    "TkFixedFont",
+                    8,
+                    "bold"
                 ]
             },
             "points": {
