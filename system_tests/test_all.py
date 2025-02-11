@@ -16,6 +16,7 @@ import test_mqtt_networking
 import test_configuration_updates
 import test_menubar_windows
 import test_schematic_routes
+import test_signalbox_levers
 
 import test_automation_examples
 import test_single_line_examples
@@ -49,6 +50,8 @@ def run_all_tests():
     test_mqtt_networking.run_all_mqtt_networking_tests()
     print("*** Running tests from 'test_schematic_routes.py' ***")
     test_schematic_routes.run_all_schematic_routes_tests()
+    print("*** Running tests from 'test_signalbox_levers.py' ***")
+    test_signalbox_levers.run_all_signalbox_lever_tests()
 
     print("*** Running tests from 'test_automation_examples.py' ***")
     test_automation_examples.run_all_automation_example_tests()

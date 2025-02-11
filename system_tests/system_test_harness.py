@@ -43,6 +43,8 @@
 # Supported Schematic test assertions:
 #    assert_levers_off(*leverids)
 #    assert_levers_on(*leverids)
+#    assert_levers_locked(*leverids)
+#    assert_levers_unlocked(*leverids)
 #    assert_points_locked(*pointids)
 #    assert_points_unlocked(*pointids)
 #    assert_points_switched(*pointids)
@@ -508,6 +510,22 @@ def simulate_buttons_clicked(*buttonids):
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
+
+def assert_levers_locked(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_locked - Lever: "+str(leverid)+" does not exist")
+        elif not levers.levers[str(leverid)]["locked"]:
+            raise_test_error ("assert_levers_locked - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
+    
+def assert_levers_unlocked(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_unlocked - Lever: "+str(leverid)+" does not exist")
+        elif levers.levers[str(leverid)]["locked"]:
+            raise_test_error ("assert_levers_unlocked - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
 
 def assert_levers_off(*leverids):
     for leverid in leverids:
