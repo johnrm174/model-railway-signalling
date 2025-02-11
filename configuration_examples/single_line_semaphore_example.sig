@@ -25,7 +25,7 @@
                 false,
                 ""
             ],
-            "bbox": 16456,
+            "bbox": 5240,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -124,8 +124,8 @@
                     0
                 ]
             ],
-            "posx": 1275,
-            "posy": 150,
+            "posx": 1275.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -356,7 +356,7 @@
                 false,
                 ""
             ],
-            "bbox": 16482,
+            "bbox": 5266,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -455,8 +455,8 @@
                     0
                 ]
             ],
-            "posx": 1275,
-            "posy": 100,
+            "posx": 1275.0,
+            "posy": 150.0,
             "sigarms": [
                 [
                     [
@@ -676,7 +676,7 @@
             "ybuttonoffset": 0
         },
         "0b251a10-3b3a-44be-89e2-f6954d641b29": {
-            "bbox": 16486,
+            "bbox": 5270,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -685,8 +685,8 @@
             "item": "section",
             "itemid": 7,
             "mirror": "",
-            "posx": 1350,
-            "posy": 150,
+            "posx": 1350.0,
+            "posy": 200.0,
             "tags": "section7",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -707,7 +707,7 @@
                 false,
                 ""
             ],
-            "bbox": 16514,
+            "bbox": 5298,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -811,8 +811,8 @@
                     0
                 ]
             ],
-            "posx": 550,
-            "posy": 150,
+            "posx": 550.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -1044,7 +1044,7 @@
                 false,
                 ""
             ],
-            "bbox": 16540,
+            "bbox": 5324,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1143,8 +1143,8 @@
                     0
                 ]
             ],
-            "posx": 125,
-            "posy": 100,
+            "posx": 125.0,
+            "posy": 150.0,
             "sigarms": [
                 [
                     [
@@ -1375,7 +1375,7 @@
                 false,
                 ""
             ],
-            "bbox": 16568,
+            "bbox": 5352,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1479,8 +1479,8 @@
                     0
                 ]
             ],
-            "posx": 850,
-            "posy": 150,
+            "posx": 850.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -1712,7 +1712,7 @@
                 false,
                 ""
             ],
-            "bbox": 16596,
+            "bbox": 5380,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1816,8 +1816,8 @@
                     0
                 ]
             ],
-            "posx": 350,
-            "posy": 150,
+            "posx": 350.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -2049,7 +2049,7 @@
                 false,
                 ""
             ],
-            "bbox": 16622,
+            "bbox": 5406,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2148,8 +2148,8 @@
                     0
                 ]
             ],
-            "posx": 125,
-            "posy": 150,
+            "posx": 125.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -2375,20 +2375,39 @@
                 0,
                 0
             ],
-            "bbox": 16628,
+            "bbox": 5412,
             "colour": "black",
-            "endx": 1400,
-            "endy": 100,
+            "endx": 1400.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 1,
             "linewidth": 3,
-            "posx": 1200,
-            "posy": 100,
+            "posx": 1200.0,
+            "posy": 150.0,
             "selection": "line1selected",
             "tags": "line1"
         },
+        "8728ff9b-3b60-45a9-b3a9-dd148d02f367": {
+            "background": "",
+            "bbox": 5566,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 2,
+            "justification": 2,
+            "posx": 649.0,
+            "posy": 313.0,
+            "tags": "textwidget2",
+            "text": "Linked",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "Courier",
+                10,
+                ""
+            ]
+        },
         "8b2daea0-c49c-4dc2-880e-73ec00bb4a7d": {
-            "bbox": 16632,
+            "bbox": 5416,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2397,8 +2416,8 @@
             "item": "section",
             "itemid": 3,
             "mirror": "",
-            "posx": 425,
-            "posy": 150,
+            "posx": 425.0,
+            "posy": 200.0,
             "tags": "section3",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -2408,15 +2427,15 @@
             ]
         },
         "8cd209c0-9f73-42bd-ac04-e555e25372e5": {
-            "bbox": 16647,
+            "bbox": 5431,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
             "itemtype": 1,
             "keysound": "telegraph-key-01.wav",
             "linkedto": "2",
-            "posx": 325,
-            "posy": 225,
+            "posx": 325.0,
+            "posy": 275.0,
             "tags": "instrument1"
         },
         "992c22ab-c948-4ea6-ba91-448212894ffd": {
@@ -2426,15 +2445,15 @@
                 0,
                 0
             ],
-            "bbox": 16653,
+            "bbox": 5437,
             "colour": "black",
-            "endx": 200,
-            "endy": 150,
+            "endx": 200.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 2,
             "linewidth": 3,
-            "posx": 0,
-            "posy": 150,
+            "posx": 0.0,
+            "posy": 200.0,
             "selection": "line2selected",
             "tags": "line2"
         },
@@ -2450,7 +2469,7 @@
                 false,
                 ""
             ],
-            "bbox": 16681,
+            "bbox": 5465,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2554,8 +2573,8 @@
                     0
                 ]
             ],
-            "posx": 1050,
-            "posy": 150,
+            "posx": 1050.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -2776,19 +2795,19 @@
             "ybuttonoffset": 0
         },
         "9f0084b0-536d-4ba4-8429-d507dfe749f3": {
-            "bbox": 16696,
+            "bbox": 5480,
             "bellsound": "bell-ring-04.wav",
             "item": "instrument",
             "itemid": 2,
             "itemtype": 1,
             "keysound": "telegraph-key-01.wav",
             "linkedto": "1",
-            "posx": 1000,
-            "posy": 225,
+            "posx": 1000.0,
+            "posy": 275.0,
             "tags": "instrument2"
         },
         "a00e5871-328c-4d71-a1df-a464efe5cce4": {
-            "bbox": 16700,
+            "bbox": 5484,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2797,8 +2816,8 @@
             "item": "section",
             "itemid": 4,
             "mirror": "",
-            "posx": 700,
-            "posy": 150,
+            "posx": 700.0,
+            "posy": 200.0,
             "tags": "section4",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -2810,7 +2829,7 @@
         "a26a7440-68cc-4d3a-8186-dda77da27e7a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 16707,
+            "bbox": 5491,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2823,8 +2842,8 @@
             "itemtype": 2,
             "linewidth": 3,
             "orientation": 0,
-            "posx": 1175,
-            "posy": 150,
+            "posx": 1175.0,
+            "posy": 200.0,
             "reverse": true,
             "siginterlock": [
                 [
@@ -2879,7 +2898,7 @@
             "ybuttonoffset": 0
         },
         "a6aaaf9c-ad0e-40dc-adda-60b9daabc3a9": {
-            "bbox": 16711,
+            "bbox": 5495,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2888,8 +2907,8 @@
             "item": "section",
             "itemid": 2,
             "mirror": "",
-            "posx": 50,
-            "posy": 150,
+            "posx": 50.0,
+            "posy": 200.0,
             "tags": "section2",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -2905,20 +2924,20 @@
                 0,
                 0
             ],
-            "bbox": 16717,
+            "bbox": 5501,
             "colour": "black",
-            "endx": 1200,
-            "endy": 100,
+            "endx": 1200.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 3,
             "linewidth": 3,
-            "posx": 1175,
-            "posy": 125,
+            "posx": 1175.0,
+            "posy": 175.0,
             "selection": "line3selected",
             "tags": "line3"
         },
         "b9d8ab0e-cd28-4590-ba49-36393b716aee": {
-            "bbox": 16721,
+            "bbox": 5505,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2927,8 +2946,8 @@
             "item": "section",
             "itemid": 1,
             "mirror": "",
-            "posx": 50,
-            "posy": 100,
+            "posx": 50.0,
+            "posy": 150.0,
             "tags": "section1",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -2944,17 +2963,36 @@
                 0,
                 0
             ],
-            "bbox": 16727,
+            "bbox": 5511,
             "colour": "black",
-            "endx": 200,
-            "endy": 100,
+            "endx": 200.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 4,
             "linewidth": 3,
-            "posx": 0,
-            "posy": 100,
+            "posx": 0.0,
+            "posy": 150.0,
             "selection": "line4selected",
             "tags": "line4"
+        },
+        "bd3c2a4d-7d93-4421-bbc5-e780bc0971ec": {
+            "arrowends": 3,
+            "arrowtype": [
+                20,
+                20,
+                5
+            ],
+            "bbox": 5558,
+            "colour": "#538400",
+            "endx": 925.0,
+            "endy": 325.0,
+            "item": "line",
+            "itemid": 8,
+            "linewidth": 2,
+            "posx": 400.0,
+            "posy": 325.0,
+            "selection": "line8selected",
+            "tags": "line8"
         },
         "c3fc3d01-76e5-4626-a536-ac7e18d5aab1": {
             "arrowends": 0,
@@ -2963,15 +3001,15 @@
                 0,
                 0
             ],
-            "bbox": 16733,
+            "bbox": 5517,
             "colour": "black",
-            "endx": 225,
-            "endy": 125,
+            "endx": 225.0,
+            "endy": 175.0,
             "item": "line",
             "itemid": 5,
             "linewidth": 3,
-            "posx": 200,
-            "posy": 100,
+            "posx": 200.0,
+            "posy": 150.0,
             "selection": "line5selected",
             "tags": "line5"
         },
@@ -2982,20 +3020,39 @@
                 0,
                 0
             ],
-            "bbox": 16739,
+            "bbox": 5523,
             "colour": "black",
-            "endx": 1400,
-            "endy": 150,
+            "endx": 1400.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 6,
             "linewidth": 3,
-            "posx": 1200,
-            "posy": 150,
+            "posx": 1200.0,
+            "posy": 200.0,
             "selection": "line6selected",
             "tags": "line6"
         },
+        "ccc49c0f-679b-4b8f-a906-c50a04d8a488": {
+            "background": "",
+            "bbox": 5547,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 1,
+            "justification": 2,
+            "posx": 700.0,
+            "posy": 75.0,
+            "tags": "textwidget1",
+            "text": "A single line example demonstrating the use of Block Instruments\nto control movements between the two signal boxes",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                14,
+                "bold "
+            ]
+        },
         "cd47274b-172c-4b41-b8be-6c3d73d17084": {
-            "bbox": 16743,
+            "bbox": 5527,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3004,8 +3061,8 @@
             "item": "section",
             "itemid": 6,
             "mirror": "",
-            "posx": 1350,
-            "posy": 100,
+            "posx": 1350.0,
+            "posy": 150.0,
             "tags": "section6",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -3017,7 +3074,7 @@
         "d79d5363-5db2-49c7-bb7a-197d8f798b69": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 16750,
+            "bbox": 5534,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3030,8 +3087,8 @@
             "itemtype": 1,
             "linewidth": 3,
             "orientation": 180,
-            "posx": 225,
-            "posy": 150,
+            "posx": 225.0,
+            "posy": 200.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -3086,7 +3143,7 @@
             "ybuttonoffset": 0
         },
         "e1580065-8556-4f74-924e-9a88db52729d": {
-            "bbox": 16754,
+            "bbox": 5538,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3095,8 +3152,8 @@
             "item": "section",
             "itemid": 5,
             "mirror": "",
-            "posx": 975,
-            "posy": 150,
+            "posx": 975.0,
+            "posy": 200.0,
             "tags": "section5",
             "textcolourtype": 1,
             "textfonttuple": [
@@ -3112,15 +3169,15 @@
                 0,
                 0
             ],
-            "bbox": 16760,
+            "bbox": 5544,
             "colour": "black",
-            "endx": 1150,
-            "endy": 150,
+            "endx": 1150.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 7,
             "linewidth": 3,
-            "posx": 250,
-            "posy": 150,
+            "posx": 250.0,
+            "posy": 200.0,
             "selection": "line7selected",
             "tags": "line7"
         }
