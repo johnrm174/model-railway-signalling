@@ -818,7 +818,7 @@ def run_object_rotation_tests(delay:float=0.0):
 
 def run_copy_and_place_tests(delay):
     global tb1, s1, s2, s3, s4, p1, p2, l1, l2, t1, i1, ts1, rb1, sb1, lev1
-    print("Schematic editor tests - Copy and paste selected objects (Cntl-c and 'place'")
+    print("Schematic editor tests - Copy and place selected objects - cancel object place (esc key)")
     # Test copy and paste and then move (not the block instrument)
     select_all_objects()
     sleep(delay)
@@ -826,12 +826,24 @@ def run_copy_and_place_tests(delay):
     sleep(delay)
     assert_objects_selected(tb1,s1,s2,s3,s4,p1,p2,l1,l2,t1,ts1,rb1,sb1,lev1)
     assert_objects_deselected(i1)
+    # Test cancel copy objects in progress (to excersise the code)
+    new_objects = copy_selected_objects(200,100,delay=delay, test_cancel=True)
+    assert new_objects == []
+    sleep(delay)
+    assert_objects_deselected(tb1,s1,s2,s3,s4,p1,p2,l1,l2,t1,ts1,rb1,sb1,lev1,i1)
+    print("Schematic editor tests - Copy and paste selected objects (Cntl-c and 'place')")
+    select_all_objects()
+    sleep(delay)
+    select_or_deselect_objects(i1)
+    sleep(delay)
+    assert_objects_selected(tb1,s1,s2,s3,s4,p1,p2,l1,l2,t1,ts1,rb1,sb1,lev1)
+    assert_objects_deselected(i1)
+    # Test copy and place of objects
     new_objects = copy_selected_objects(200,100,delay=delay)
     [tb11,s11,s12,s13,s14,p11,p12,l11,l12,t11,ts11,rb11,sb11,lev11] = new_objects
     sleep(delay)
     assert_objects_selected(tb11,s11,s12,s13,s14,p11,p12,l11,l12,t11,ts11,rb11,sb11,lev11)
     assert_objects_deselected(tb1,s1,s2,s3,s4,p1,p2,l1,l2,t1,i1,ts1,rb1,sb1,lev1)
-    print("Schematic editor tests - Copy and paste selected objects (Cntl-c and 'place')")
     # Finally test copy/paste of block instrument
     select_single_object(i1)
     sleep(delay)

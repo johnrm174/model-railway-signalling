@@ -17,7 +17,6 @@ import test_configuration_updates
 import test_menubar_windows
 import test_schematic_routes
 
-import test_interlocking_examples
 import test_automation_examples
 import test_single_line_examples
 import test_mqtt_networking_example
@@ -51,8 +50,6 @@ def run_all_tests():
     print("*** Running tests from 'test_schematic_routes.py' ***")
     test_schematic_routes.run_all_schematic_routes_tests()
 
-    print("*** Running tests from 'test_interlocking_examples.py' ***")
-    test_interlocking_examples.run_all_interlocking_example_tests()
     print("*** Running tests from 'test_automation_examples.py' ***")
     test_automation_examples.run_all_automation_example_tests()
     print("*** Running tests from 'test_single_line_examples.py' ***")

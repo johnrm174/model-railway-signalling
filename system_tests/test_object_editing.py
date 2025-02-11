@@ -653,7 +653,7 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     tb1 = create_textbox(100,350)
     tb2 = create_textbox(300,350)
     lev1 = create_lever(100,400)
-    lev1 = create_lever(300,400)
+    lev2 = create_lever(300,400)
     # Test the 'one-up' IDs have been correctly generated
     assert_object_configuration(l1,{"itemid":1})
     assert_object_configuration(l2,{"itemid":2})

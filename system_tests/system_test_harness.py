@@ -873,19 +873,33 @@ class dummy_event():
 def place_object(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
     move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
     event = dummy_event(x=xpos, y=ypos)
+    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress(), delay=0.2)
+    run_function(lambda:schematic.left_button_click(event))
+    run_function(lambda:schematic.left_button_release(event))
+    
+def place_object_after_create(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
+    move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
+    event = dummy_event(x=xpos, y=ypos)
     if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress())
+    run_function(lambda:schematic.left_button_click(event))
+    run_function(lambda:schematic.left_button_release(event))
+
+def place_object_after_copy(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
+    move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
+    event = dummy_event(x=xpos, y=ypos)
+    if test_cancel: run_function(lambda:schematic.cancel_copy_object_in_progress())
     run_function(lambda:schematic.left_button_click(event))
     run_function(lambda:schematic.left_button_release(event))
 
 def create_line(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.line))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_track_sensor(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.track_sensor))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -893,7 +907,7 @@ def create_colour_light_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                         signals.signal_type.colour_light.value,
                         signals.signal_subtype.four_aspect.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -901,7 +915,7 @@ def create_semaphore_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0, t
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.semaphore.value,
                            signals.semaphore_subtype.home.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -909,7 +923,7 @@ def create_ground_position_signal(xpos:int, ypos:int, steps:int=10, delay:float=
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.ground_position.value,
                            signals.ground_pos_subtype.standard.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -917,58 +931,58 @@ def create_ground_disc_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0,
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.ground_disc.value,
                            signals.ground_disc_subtype.standard.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_track_section(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.section))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_block_instrument(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.instrument,
                     block_instruments.instrument_type.single_line.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_left_hand_point(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.point,
                 points.point_type.LH.value, points.point_subtype.normal.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_right_hand_point(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.point,
                 points.point_type.RH.value, points.point_subtype.normal.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_textbox(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.textbox))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_route(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.route))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_switch(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.switch))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_lever(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.lever, levers.lever_type.spare.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -1215,7 +1229,7 @@ def delete_selected_objects():
 def copy_selected_objects(xdiff:int, ydiff:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     event = dummy_event(x=0, y=0)
     run_function(lambda:schematic.copy_selected_objects(event))
-    place_object(xdiff, ydiff, steps, delay, test_cancel)
+    place_object_after_copy(xdiff, ydiff, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(schematic.schematic_state["selectedobjects"])
 
