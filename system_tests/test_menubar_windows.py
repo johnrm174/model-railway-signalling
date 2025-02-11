@@ -396,7 +396,7 @@ def run_all_menubar_window_tests():
     test_menubar_settings_windows(delay)
     test_menubar_utilities_windows(delay)
     # Load a layout to test the style changes
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/my_layout_changed_styles.sig")
+    system_test_harness.initialise_test_harness(filename="../configuration_examples/absolute_block_example.sig")
     test_menubar_styles_windows(delay)
     system_test_harness.report_results()
     
