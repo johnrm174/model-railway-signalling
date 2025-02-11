@@ -170,9 +170,9 @@ def toggle_lever(lever_id:int):
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
     else:
-        if levers[str(lever_id)]["locked"]:
-            logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is externally locked - Toggling anyway")
         if not levers[str(lever_id)]["switched"]:
+            if levers[str(lever_id)]["locked"]:
+                logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is externally locked - Toggling anyway")
             logging.info("Lever "+str(lever_id)+": Toggling Lever to OFF (Pulled)")
             levers[str(lever_id)]["button"].config(relief="sunken",bg=levers[str(lever_id)]["selectedcolour"])
             levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["lever1a"], state="hidden")
@@ -181,6 +181,14 @@ def toggle_lever(lever_id:int):
             levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["lever2b"], state="normal")
             levers[str(lever_id)]["switched"] = True 
         else:
+            # It should always be valid to revert a signal lever to 'ON' (i.e. back to DANGER or CAUTION)
+            # This is the use case of clearing down a schematic route - as soon as the distant signal is
+            # set back to CAUTION it could be locked on the home signals ahead (at DANGER). The run_layout
+            # code then 'locks' the lever (on the basis the signal is locked) but this happens before the
+            # lever is set back to ON to reflect the state of the signal. We therefore suppress the warning
+            if (levers[str(lever_id)]["locked"] and levers[str(lever_id)]["levertype"]
+                                      not in (lever_type.stopsignal, lever_type.distantsignal)):
+                logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is externally locked - Toggling anyway")
             logging.info("Lever "+str(lever_id)+": Toggling Lever to ON (Reset)")
             levers[str(lever_id)]["button"].config(relief="raised",bg=levers[str(lever_id)]["deselectedcolour"])  
             levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["lever1a"], state="normal")
@@ -268,6 +276,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         levers[str(lever_id)]["lever2b"] = lever2b                 # Tkinter drawing object
         levers[str(lever_id)]["locktext"] = locked                 # Tkinter drawing object
         levers[str(lever_id)]["callback"] = lever_callback         # The callback to make on a change event
+        levers[str(lever_id)]["levertype"] = levertype             # The type of the lever
         levers[str(lever_id)]["switched"] = False                  # Initial "switched" state of the lever
         levers[str(lever_id)]["locked"] = False                    # Initial "interlocking" state of the lever
         levers[str(lever_id)]["onkeycode"] = on_keycode            # Keycode for setting the lever ON
