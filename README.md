@@ -31,7 +31,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > [!IMPORTANT]
 > Release 5.0.0 is the last release that will support layout files created by Release 4.9.x or earlier.
 > It is therefore crucial that all users upgrade to this release and then update (by loading and saving)
-> all layout files to ensure forward capability going forward.
+> all layout files to ensure compatibility going forward - You have been warned!
 
 * New 'Signalbox Levers' feature - enables you to achieve a fully prototypical simulation of a signalbox:
     * Levers can be added to the schematic and 'connected' to the signals and points they control.
