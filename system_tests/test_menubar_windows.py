@@ -58,6 +58,13 @@ def test_menubar_help_windows(delay:float=2.0):
     system_test_harness.run_function(lambda:close_window(cancel=True))
     system_test_harness.sleep(delay)
     # ------------------------------------------------------------------------------------------
+    print("Testing Menubar documentation windows - DOCS")
+    # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
+    system_test_harness.run_function(lambda:open_window(delay, menubar.display_docs))
+    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.sleep(delay)
+    # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - INFO")
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["general"])
