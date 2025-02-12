@@ -502,6 +502,9 @@ def run_signal_lever_route_tests():
     assert_signals_on(1,2,1002)
     assert_signals_route_MAIN(1,2,1002)
     assert_levers_on(1,2,3,4,5,6,7,8,9,10)    
+    # Clean up
+    select_all_objects()
+    delete_selected_objects()
     return()
 
 ##########################################################################################################################
