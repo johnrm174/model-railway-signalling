@@ -54,6 +54,7 @@ from .menubar_utilities import bulk_renumbering
 __all__ = [
     'display_help',
     'display_about',
+    'display_docs',
     'edit_layout_info',
     'edit_general_settings',
     'edit_mqtt_settings',
