@@ -1630,8 +1630,8 @@ def run_all_basic_library_tests():
     assert len(signals.signals) == 0
     # Check the creation of all supported Signal configurations
     print("Library Tests - Test creation of all supported signal configurations - no errors")
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/colour_light_signals.sig")
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/semaphore_signals.sig")
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/colour_light_signals.sig")
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/semaphore_signals.sig")
     system_test_harness.initialise_test_harness()
     print("----------------------------------------------------------------------------------------")
     print("")

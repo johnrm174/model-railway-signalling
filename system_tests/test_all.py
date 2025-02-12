@@ -9,11 +9,11 @@ import basic_library_tests2
 import basic_library_tests3
 
 import test_schematic_editor
-import test_object_editing
+import test_object_updates
 import test_run_layout
-import test_object_edit_windows
+import test_configuration_windows
 import test_mqtt_networking
-import test_configuration_updates
+import test_settings_updates
 import test_menubar_windows
 import test_schematic_routes
 import test_signalbox_levers
@@ -34,16 +34,16 @@ def run_all_tests():
     
     print("*** Running tests from 'test_menubar_windows.py' ***")
     test_menubar_windows.run_all_menubar_window_tests()
-    print("*** Running tests from 'test_object_edit_windows.py' ***")
-    test_object_edit_windows.run_all_configuration_window_tests()
+    print("*** Running tests from 'test_configuration_windows.py' ***")
+    test_configuration_windows.run_all_configuration_window_tests()
     
-    print("*** Running tests from 'test_configuration_updates.py' ***")
-    test_configuration_updates.run_all_configuration_update_tests()
+    print("*** Running tests from 'test_settings_updates.py' ***")
+    test_settings_updates.run_all_settings_update_tests()
 
     print("*** Running tests from 'test_schematic_editor.py' ***")
     test_schematic_editor.run_all_schematic_editor_tests()
-    print("*** Running tests from 'test_object_editing.py' ***")
-    test_object_editing.run_all_object_editing_tests()
+    print("*** Running tests from 'test_object_updates.py' ***")
+    test_object_updates.run_all_object_editing_tests()
     print("*** Running tests from 'test_run_layout.py' ***")
     test_run_layout.run_all_run_layout_tests()
     print("*** Running tests from 'test_mqtt_networking.py' ***")

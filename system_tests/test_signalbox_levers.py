@@ -510,6 +510,7 @@ def run_signal_lever_route_tests():
 ##########################################################################################################################
     
 def run_all_signalbox_lever_tests():
+    initialise_test_harness()
     run_basic_point_lever_tests()
     run_basic_signal_lever_tests()
     run_signal_lever_route_tests()

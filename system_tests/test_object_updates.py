@@ -58,18 +58,13 @@ from system_test_harness import *
 #    Deletion of an item (linked instrument updated to remove the deleted instrument)
 #-----------------------------------------------------------------------------------
 
-def run_instrument_linking_tests(delay:float=0.0):
+def run_instrument_linking_tests():
     print("Object configuration updates - Block Instrument linking tests - 4 warnings will be generated")
     # Add elements to the layout
-    sleep(delay)
     i1 = create_block_instrument(100,400)
-    sleep(delay)
     i2 = create_block_instrument(300,400)
-    sleep(delay)
     i3 = create_block_instrument(100,200)
-    sleep(delay)
     i4 = create_block_instrument(300,200)
-    sleep(delay)
     assert_object_configuration(i1,{"itemid":1})
     assert_object_configuration(i2,{"itemid":2})
     assert_object_configuration(i3,{"itemid":3})
@@ -77,16 +72,12 @@ def run_instrument_linking_tests(delay:float=0.0):
     # Set up linked instruments (1 <=> 2 and 3 <=> 4)
     # Instruments 1 and 2 are single line instruments
     # Note the linked instrument is a string (local or remote)
-    sleep(delay)
     update_object_configuration(i1,{"linkedto":"2"})
     update_object_configuration(i2,{"linkedto":"1"})
-    sleep(delay)
     update_object_configuration(i3,{"itemtype":2,"linkedto":"4"})
-    sleep(delay)
     update_object_configuration(i4,{"itemtype":2,"linkedto":"3"})
     # Test the telegraph key / bell of linked instrument - we can't really
     # make any meaningful assertions other than it doesn't throw an exception
-    sleep(delay)
     sleep(0.3)
     click_telegraph_key(1)
     sleep(0.3)
@@ -98,45 +89,33 @@ def run_instrument_linking_tests(delay:float=0.0):
     sleep(0.3)
     # Test the basic connectivity for single line
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_clear(1)
     assert_block_section_ahead_clear(2)
     assert_block_section_ahead_not_clear(1,3,4)
-    sleep(delay)
     set_instrument_occupied(1)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_blocked(1)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_clear(2)
     assert_block_section_ahead_clear(1)
     assert_block_section_ahead_not_clear(2,3,4)
-    sleep(delay)
     set_instrument_occupied(2)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_blocked(2)
     assert_block_section_ahead_not_clear(1,2,3,4)
     # Test the basic connectivity for double line
-    sleep(delay)
     set_instrument_clear(3)
     assert_block_section_ahead_clear(4)
     assert_block_section_ahead_not_clear(1,2,3)
-    sleep(delay)
     set_instrument_occupied(3)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_blocked(3)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_clear(4)
     assert_block_section_ahead_clear(3)
     assert_block_section_ahead_not_clear(1,2,4)
-    sleep(delay)
     set_instrument_occupied(4)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    sleep(delay)
     set_instrument_blocked(4)
     assert_block_section_ahead_not_clear(1,2,3,4)
     # Change the item IDs - 4 warnings will be generated as we change the IDs
@@ -150,7 +129,6 @@ def run_instrument_linking_tests(delay:float=0.0):
     assert_object_configuration(i4,{"itemid":14,"linkedto":"13"})
     # Test the telegraph key / bell of linked instrument - we can't really
     # make any meaningful assertions other than it doesn't throw an exception
-    sleep(delay)
     sleep(0.3)
     click_telegraph_key(11)
     sleep(0.3)
@@ -162,54 +140,41 @@ def run_instrument_linking_tests(delay:float=0.0):
     sleep(0.3)
     # Test the basic connectivity for single line
     assert_block_section_ahead_not_clear(11,12,13,14)
-    sleep(delay)
     set_instrument_clear(11)
     assert_block_section_ahead_clear(12)
     assert_block_section_ahead_not_clear(11,13,14)
-    sleep(delay)
     set_instrument_occupied(11)
     assert_block_section_ahead_not_clear(11,12,13,14)
-    sleep(delay)
     set_instrument_blocked(11)
     assert_block_section_ahead_not_clear(11,12,13,14)
-    sleep(delay)
     set_instrument_clear(12)
     assert_block_section_ahead_clear(11)
     assert_block_section_ahead_not_clear(12,13,14)
-    sleep(delay)
     set_instrument_blocked(12)
     assert_block_section_ahead_not_clear(11,12,13,14)
     # Test the basic connectivity for double line
     assert_block_section_ahead_not_clear(11,12,13,14)
-    sleep(delay)
     set_instrument_clear(13)
     assert_block_section_ahead_clear(14)
     assert_block_section_ahead_not_clear(11,12,13)
-    sleep(delay)
     set_instrument_blocked(13)
     assert_block_section_ahead_not_clear(11,12,13,14)
-    sleep(delay)
     set_instrument_clear(14)
     assert_block_section_ahead_clear(13)
     assert_block_section_ahead_not_clear(11,12,14)
-    sleep(delay)
     set_instrument_blocked(14)
     assert_block_section_ahead_not_clear(11,12,13,14)
     # Delete the instruments to check linking is removed
-    sleep(delay)
     select_single_object(i1)
     assert_objects_selected(i1)
     delete_selected_objects()
-    sleep(delay)
     select_single_object(i4)
     assert_objects_selected(i4)
     delete_selected_objects()
     assert_object_configuration(i2,{"linkedto":""})
     assert_object_configuration(i3,{"linkedto":""})
     # clean up
-    sleep(delay)
     select_all_objects()
-    sleep(delay)
     delete_selected_objects()   
     return()
 
@@ -220,16 +185,12 @@ def run_instrument_linking_tests(delay:float=0.0):
 #    Deletion of an item (chain is updated to remove the deleted point)
 #-----------------------------------------------------------------------------------
 
-def run_point_chaining_tests(delay:float=0.0):
+def run_point_chaining_tests():
     print("Object configuration updates - Point 'auto-switch' chaining tests")
     # Add elements to the layout
-    sleep(delay)
     p1 = create_left_hand_point(100,50)
-    sleep(delay)
     p2 = create_left_hand_point(200,50)
-    sleep(delay)
     p3 = create_left_hand_point(300,50)
-    sleep(delay)
     p4 = create_left_hand_point(400,50)
     assert_object_configuration(p1,{"itemid":1})
     assert_object_configuration(p2,{"itemid":2})
@@ -241,12 +202,10 @@ def run_point_chaining_tests(delay:float=0.0):
     update_object_configuration(p2,{"alsoswitch":3,"automatic":True})
     update_object_configuration(p1,{"alsoswitch":2})
     # Test the auto switch is working
-    sleep(delay)
     assert_points_normal(1,2,3,4)                            
     set_points_switched(1)
     assert_points_switched(1,2,3,4)
     # Update the ID for P3
-    sleep(delay)
     assert_object_configuration(p2,{"alsoswitch":3})
     update_object_configuration(p3,{"itemid":13})
     assert_object_configuration(p3,{"itemid":13})
@@ -255,21 +214,17 @@ def run_point_chaining_tests(delay:float=0.0):
     # the switched state and therefore all points should remain switched
     assert_points_switched(1,2,13,4)
     # Test the switching chain still works with the changed ID
-    sleep(delay)
     set_points_normal(1)
     assert_points_normal(1,2,13,4)
-    sleep(delay)
     set_points_switched(1)
     assert_points_switched(1,2,13,4)
     # Update the ID for P1
-    sleep(delay)
     update_object_configuration(p1,{"itemid":11})
     assert_object_configuration(p1,{"itemid":11})
     # As P1 is the start of the chain it should be created in its default
     # 'normal' state and P2/P3 should be reverted to their normal state
     assert_points_normal(11,2,13,4)
     # Test that references are correctly removed on point deletion
-    sleep(delay)
     assert_object_configuration(p2,{"itemid":2})
     assert_object_configuration(p1,{"alsoswitch":2})
     select_single_object(p2)
@@ -277,16 +232,13 @@ def run_point_chaining_tests(delay:float=0.0):
     delete_selected_objects()
     assert_object_configuration(p1,{"alsoswitch":0})
     # Now the switching chain has been broken
-    sleep(delay)
     set_points_switched(11)
     assert_points_switched(11)
     assert_points_normal(13,4)
     # Make P3 a manual point and check the P3=>P4 chaining still works
-    sleep(delay)
     update_object_configuration(p3,{"automatic":False})
     set_points_switched(13)
     assert_points_switched(13,4)
-    sleep(delay)
     set_points_normal(13)
     assert_points_normal(13,4)
     # Final test is to delete a point in a chain that is switched
@@ -298,9 +250,7 @@ def run_point_chaining_tests(delay:float=0.0):
     delete_selected_objects()
     assert_points_switched(13)
     # clean up
-    sleep(delay)
     select_all_objects()
-    sleep(delay)
     delete_selected_objects()
     return()
 
@@ -312,14 +262,11 @@ def run_point_chaining_tests(delay:float=0.0):
 #    Use case of two sections mirroring each other - should remain synchronised
 #-----------------------------------------------------------------------------------
 
-def run_mirrored_section_tests(delay:float=0.0):
+def run_mirrored_section_tests():
     print("Object configuration updates - Mirrored Section tests")
     t1 = create_track_section(100,50)
-    sleep(delay)
     t2 = create_track_section(200,50)
-    sleep(delay)
     t3 = create_track_section(300,50)
-    sleep(delay)
     t4 = create_track_section(400,50)
     # Check the default item IDs have been assigned correctly
     assert_object_configuration(t1,{"itemid":1})
@@ -336,87 +283,64 @@ def run_mirrored_section_tests(delay:float=0.0):
     # section then only the 'mirrored' section is updated.
     # Changes are not propogated further if that section is
     # also 'mirrored' by another section
-    sleep(delay)
     set_run_mode()
     assert_sections_clear(1,2,3,4)
-    sleep(delay)
     # Section 1 is mirrored by section 2
     set_sections_occupied(1)
     assert_sections_occupied(1,2,3,4)
-    sleep(delay)
     set_sections_clear(1)
     assert_sections_clear(1,2,3,4)
     # Section 2 is mirrored by section 3
-    sleep(delay)
     set_sections_occupied(2)
     assert_sections_occupied(2,3,4)
     assert_sections_clear(1)
-    sleep(delay)
     set_sections_clear(2)
     assert_sections_clear(1,2,3,4)
     # Section 3 is mirrored by section 2
-    sleep(delay)
     set_sections_occupied(3)
     assert_sections_occupied(3,4)
     assert_sections_clear(1,2)
-    sleep(delay)
     set_sections_clear(3)
     assert_sections_clear(1,2,3,4)
     # Update the ID for T3
-    sleep(delay)
     set_edit_mode()
     update_object_configuration(t3,{"itemid":13})
     assert_object_configuration(t3,{"itemid":13})
     assert_object_configuration(t4,{"mirror":'13'})
-    sleep(delay)
     set_run_mode()
     # Test the mirroring still works
-    sleep(delay)
     set_sections_occupied(1)
     assert_sections_occupied(1,2,13,4)
-    sleep(delay)
     set_sections_clear(1)
     assert_sections_clear(1,2,13,4)
     # Delete T3
-    sleep(delay)
     set_edit_mode()
     select_single_object(t3)
     delete_selected_objects()
     assert_object_configuration(t4,{"mirror":''})
-    sleep(delay)
     set_run_mode()
     # The mirrored chain should be broken
-    sleep(delay)
     set_sections_occupied(1)
     assert_sections_occupied(1,2)
     assert_sections_clear(4)
-    sleep(delay)
     set_sections_clear(1)
     assert_sections_clear(1,2,4)
     # Setup sections 1 and 2 to mirror each other
-    sleep(delay)
     set_edit_mode()
     update_object_configuration(t1,{"mirror":'2'})
-    sleep(delay)
     set_run_mode()
     # Section 1 is mirrored by section 2
-    sleep(delay)
     set_sections_occupied(1)
     assert_sections_occupied(1,2)
-    sleep(delay)
     set_sections_clear(1)
     assert_sections_clear(1,2)
     # Section 2 is mirrored by section 1
-    sleep(delay)
     set_sections_occupied(2)
     assert_sections_occupied(1,2)
-    sleep(delay)
     set_sections_clear(2)
     assert_sections_clear(1,2)
     # clean up
-    sleep(delay)
     set_edit_mode()
-    sleep(delay)
     select_all_objects()
     delete_selected_objects()
     return()
@@ -426,14 +350,11 @@ def run_mirrored_section_tests(delay:float=0.0):
 #    Section state from run mode is 'remembered' during edit mode
 #-----------------------------------------------------------------------------------
 
-def run_mode_change_tests(delay:float=0.0):
+def run_mode_change_tests():
     print("Object configuration updates - Mode Change tests")
     # Add elements to the layout
-    sleep(delay)
     s1 = create_colour_light_signal(100,40)
-    sleep(delay)
     t1 = create_track_section(200,50)
-    sleep(delay)
     assert_object_configuration(s1,{"itemid":1})
     assert_object_configuration(t1,{"itemid":1})
     # Configure Signal 1 to be overridden if Section 1 is occupied
@@ -441,41 +362,32 @@ def run_mode_change_tests(delay:float=0.0):
                 "tracksections":[0,[[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0]]],
                 "overridesignal":True})
     # Test the override works
-    sleep(delay)
     set_run_mode()
     set_signals_off(1)
     assert_signals_override_clear(1)
     assert_signals_PROCEED(1)
-    sleep(delay)
     set_sections_occupied(1)
     assert_signals_override_set(1)
     assert_signals_DANGER(1)
     # Set edit mode - Overrides are not maintained in Edit mode 
-    sleep(delay)
     set_edit_mode()
     assert_signals_override_clear(1)
     assert_signals_PROCEED(1)
     # Return to Run mode - Overrides should be re-instated
-    sleep(delay)
     set_run_mode()
     assert_signals_override_set(1)
     assert_signals_DANGER(1)
     # Clear the section (and the Override)
-    sleep(delay)
     set_sections_clear(1)
     assert_signals_override_clear(1)
     assert_signals_PROCEED(1)
     # Set edit trhen run mode - section remains clear
-    sleep(delay)
     set_edit_mode()
-    sleep(delay)
     set_run_mode()
     assert_signals_override_clear(1)
     assert_signals_PROCEED(1)
     # clean up
-    sleep(delay)
     set_edit_mode()
-    sleep(delay)
     select_all_objects()
     delete_selected_objects()
     return()
@@ -485,9 +397,8 @@ def run_mode_change_tests(delay:float=0.0):
 # before and after the item IDs are changed
 #-----------------------------------------------------------------------------------
 
-def test_interlocking_and_overrides(delay,sig1,sig2,sig3,sig4,point1,point2,block1,block2,sec1,sec2,sec3):
+def test_interlocking_and_overrides(sig1,sig2,sig3,sig4,point1,point2,block1,block2,sec1,sec2,sec3):
     # Test the basic interlocking for signal 1 (in run mode)
-    sleep(delay)
     set_run_mode()
     # Initial (default) configuration
     assert_points_unlocked(point1,point2)
@@ -495,133 +406,96 @@ def test_interlocking_and_overrides(delay,sig1,sig2,sig3,sig4,point1,point2,bloc
     assert_sections_clear(sec1,sec2,sec3)
     assert_signals_locked(sig1)
     # Clear the instrument and switch the points to unlock the signal
-    sleep(delay)
     set_points_switched(point1,point2)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_instrument_clear(block2)
     assert_signals_unlocked(sig1)
     # Test interlocking of signal with points
-    sleep(delay)
     set_points_normal(point1)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_points_switched(point1)
     assert_signals_unlocked(sig1)
-    sleep(delay)
     set_points_normal(point2)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_points_switched(point2)
     assert_signals_unlocked(sig1)
     # Test interlocking of signal with track sections
-    sleep(delay)
     set_sections_occupied(sec1)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_sections_clear(sec1)
     assert_signals_unlocked(sig1)
-    sleep(delay)
     set_sections_occupied(sec2)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_sections_clear(sec2)
     assert_signals_unlocked(sig1)
-    sleep(delay)
     set_sections_occupied(sec3)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_sections_clear(sec3)
     assert_signals_unlocked(sig1)
     # Test interlocking of points with signal
-    sleep(delay)
     set_signals_off(sig1)
     assert_points_locked(point1,point2)
-    sleep(delay)
     set_signals_on(sig1)
     assert_points_unlocked(point1,point2)
     # Test interlocking of signal with conflicting signals
-    sleep(delay)
     set_signals_off(sig2)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_signals_on(sig2)
     assert_signals_unlocked(sig1)
-    sleep(delay)
     set_signals_off(sig3)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_signals_on(sig3)
     assert_signals_unlocked(sig1)
     # Test interlocking of signal with block instrument
-    sleep(delay)
     set_instrument_blocked(block2)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_instrument_clear(block2)
     assert_signals_unlocked(sig1)
-    sleep(delay)
     set_instrument_occupied(block2)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_instrument_clear(block2)
     assert_signals_unlocked(sig1)
     # Test the signal overrides (on track section occupied)
     assert_signals_DANGER(sig1)
-    sleep(delay)
     set_signals_off(sig1)
     assert_signals_override_clear(sig1)    
     assert_signals_CAUTION(sig1)
-    sleep(delay)
     set_sections_occupied(sec1)
     assert_signals_override_set(sig1)    
     assert_signals_DANGER(sig1)
-    sleep(delay)
     set_sections_clear(sec1)
     assert_signals_override_clear(sig1)    
     assert_signals_CAUTION(sig1)
-    sleep(delay)
     set_sections_occupied(sec2)
     assert_signals_override_set(sig1)    
     assert_signals_DANGER(sig1)
-    sleep(delay)
     set_sections_clear(sec2)
     assert_signals_override_clear(sig1)    
     assert_signals_CAUTION(sig1)
-    sleep(delay)
     set_sections_occupied(sec3)
     assert_signals_override_set(sig1)    
     assert_signals_DANGER(sig1)
-    sleep(delay)
     set_sections_clear(sec3)
     assert_signals_override_clear(sig1)    
     assert_signals_CAUTION(sig1)
-    sleep(delay)
     set_signals_on(sig1)
     assert_signals_DANGER(sig1)
     # Test the signal interaction with the signal ahead
-    sleep(delay)
     set_signals_off(sig1)
     assert_signals_CAUTION(sig1)
-    sleep(delay)
     set_signals_off(sig4)
     assert_signals_PROCEED(sig1)
-    sleep(delay)
     set_signals_on(sig4)
     assert_signals_CAUTION(sig1)
-    sleep(delay)
     set_signals_on(sig1)
     assert_signals_DANGER(sig1)
     # Return everything to its default state
-    sleep(delay)
     set_instrument_blocked(block2)
-    sleep(delay)
     set_points_normal(point1,point2)
     assert_points_unlocked(point1,point2)
     assert_block_section_ahead_not_clear(block1)
     assert_sections_clear(sec1,sec2,sec3)
     assert_signals_locked(sig1)
-    sleep(delay)
     set_edit_mode()
     return()
 
@@ -631,7 +505,7 @@ def test_interlocking_and_overrides(delay,sig1,sig2,sig3,sig4,point1,point2,bloc
 # object so both use the one-up button IDs
 #-----------------------------------------------------------------------------------
 
-def run_initial_item_id_allocation_tests(delay:float=0.0):
+def run_initial_item_id_allocation_tests():
     print("Object configuration updates - Test initial allocation of Item ID on Item Creation")
     # Add elements to the layout
     l1 = create_line(100,50)
@@ -679,7 +553,6 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     deselect_all_objects()
     select_or_deselect_objects(l1,p1,s1,t1,ts1,i1,r1,tb1,sw1,lev1)
     delete_selected_objects()
-    sleep(delay)
     l3 = create_line(100,50)
     p3 = create_left_hand_point(350,50)
     s3 = create_colour_light_signal(100,90)
@@ -690,7 +563,6 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
     sw3 = create_switch(100,300)
     tb3 = create_textbox(100,350)
     lev3 = create_lever(100,400)
-    sleep(delay)
     assert_object_configuration(l3,{"itemid":1})
     assert_object_configuration(l2,{"itemid":2})
     assert_object_configuration(p3,{"itemid":1})
@@ -720,7 +592,7 @@ def run_initial_item_id_allocation_tests(delay:float=0.0):
 # These test the 'one-up' allocation of Item IDs for each object
 #-----------------------------------------------------------------------------------
 
-def run_basic_change_of_item_id_tests(delay:float=0.0):
+def run_basic_change_of_item_id_tests():
     print("Object configuration updates - Test basic update of Item IDs for all object types")
     # Add elements to the layout
     l1 = create_line(100,50)
@@ -781,7 +653,7 @@ def run_basic_change_of_item_id_tests(delay:float=0.0):
 #    Update of signal automation (override) when Section ID is changed or deleted
 #-----------------------------------------------------------------------------------
 
-def run_signal_config_update_on_change_of_id_tests(delay:float=0.0):
+def run_signal_config_update_on_change_of_id_tests():
     print("Object configuration updates - Test update of Signal Configuration on change or delete of Item IDs")
     print("Object configuration updates - Note that 2 warnings will be generated for the Block Instruments")
     # Add elements to the layout
@@ -862,7 +734,7 @@ def run_signal_config_update_on_change_of_id_tests(delay:float=0.0):
     assert_object_configuration(p2,{
         "siginterlock":[ [1, [True,True,True,True,True] ] ] } )
     # Test the interlocking and override functionality before changing the item IDs
-    test_interlocking_and_overrides(delay,sig1=1,sig2=2,sig3=3,sig4=4,
+    test_interlocking_and_overrides(sig1=1,sig2=2,sig3=3,sig4=4,
             point1=1,point2=2,block1=1,block2=2,sec1=1,sec2=2,sec3=3)
     # Change the IDs of the signals, points, track sections and instruments
     update_object_configuration(s1,{"itemid":11})
@@ -922,7 +794,7 @@ def run_signal_config_update_on_change_of_id_tests(delay:float=0.0):
     assert_object_configuration(p2,{
         "siginterlock":[ [11, [True,True,True,True,True] ] ] } )
     # Test the interlocking and override functionality after changing the item IDs
-    test_interlocking_and_overrides(delay,sig1=11,sig2=12,sig3=13,sig4=14,
+    test_interlocking_and_overrides(sig1=11,sig2=12,sig3=13,sig4=14,
             point1=21,point2=22,block1=41,block2=42,sec1=31,sec2=32,sec3=33)
     # Delete Point 21 and test all references have been removed from the Signals
     # Note that the point 22 entries will have shuffled down in the list
@@ -1029,7 +901,7 @@ def run_signal_config_update_on_change_of_id_tests(delay:float=0.0):
 #    Update of Track Sensor route tables to reflect deletion of section
 #-----------------------------------------------------------------------------------
 
-def run_sensor_config_update_on_change_of_id_tests(delay:float=0.0):
+def run_sensor_config_update_on_change_of_id_tests():
     print("Object configuration updates - Test update of Track Sensor Configuration on change or delete of Item IDs")
     # Add elements to the layout
     p1 = create_left_hand_point(100,50)
@@ -1148,7 +1020,7 @@ def run_sensor_config_update_on_change_of_id_tests(delay:float=0.0):
 #    Update of Track Sensor route tables to reflect deletion of section
 #-----------------------------------------------------------------------------------
 
-def run_lever_config_update_on_change_of_id_tests(delay:float=0.0):
+def run_lever_config_update_on_change_of_id_tests():
     print("Object configuration updates - Test update of Lever Configuration on change or delete of Item IDs")
     # Add elements to the layout
     p1 = create_left_hand_point(100,50)
@@ -1190,7 +1062,7 @@ def run_lever_config_update_on_change_of_id_tests(delay:float=0.0):
 # to their default states. Spare levers would have been left unchanged
 #-----------------------------------------------------------------------------------
 
-def run_reset_objects_tests(delay:float=0.0):
+def run_reset_objects_tests():
     print("Object configuration updates - Reset objects back to default state tests")
     # Add elements to the layout
     p1 = create_left_hand_point(100,50)
@@ -1293,23 +1165,23 @@ def run_reset_objects_tests(delay:float=0.0):
 
 ######################################################################################################
 
-def run_all_object_editing_tests(delay:float=0.0):
+def run_all_object_editing_tests():
     initialise_test_harness()
     set_edit_mode()
-    run_instrument_linking_tests(delay)
-    run_point_chaining_tests(delay)
-    run_mirrored_section_tests(delay)
-    run_mode_change_tests(delay)
+    run_instrument_linking_tests()
+    run_point_chaining_tests()
+    run_mirrored_section_tests()
+    run_mode_change_tests()
     run_initial_item_id_allocation_tests()
     run_basic_change_of_item_id_tests()
     run_signal_config_update_on_change_of_id_tests()
     run_sensor_config_update_on_change_of_id_tests()
     run_lever_config_update_on_change_of_id_tests()
-    run_reset_objects_tests(delay)
+    run_reset_objects_tests()
     report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_object_editing_tests(delay=0.0))
+    start_application(lambda:run_all_object_editing_tests())
 
 ###############################################################################################################################
     

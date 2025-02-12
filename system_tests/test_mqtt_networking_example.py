@@ -7,7 +7,7 @@
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
-import test_object_edit_windows
+import test_configuration_windows
 
 #-----------------------------------------------------------------------------------
 # Test the end to end layout with block instruments(2 seperate signalling areas)

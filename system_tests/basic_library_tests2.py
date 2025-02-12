@@ -848,7 +848,7 @@ def run_point_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(points.points) == 0
     # Check the creation of all supported point types
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/complex_trackwork.sig")
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/complex_trackwork.sig")
     # Now clear down the layout for the next series of tests
     system_test_harness.initialise_test_harness()
     print("----------------------------------------------------------------------------------------")

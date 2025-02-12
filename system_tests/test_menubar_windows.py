@@ -14,11 +14,11 @@ from model_railway_signals.menubar import menubar_settings
 #-----------------------------------------------------------------------------------
 menubar_class_instance = None
 
-def open_window(delay, menubar_class,*args):
+def open_window(menubar_class,*args):
     global menubar_class_instance
     # Open the specified menubar window
     menubar_class_instance = menubar_class(system_test_harness.root,*args)
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Try to open a second window - this should just focus back on the first one
     menubar_class_instance2 = menubar_class(system_test_harness.root,*args)
     
@@ -42,44 +42,44 @@ def test_mqtt_connectivity(): menubar_class_instance.config.test_connectivity()
 # an apply straight after opening the window doesnt screw up the config
 #-----------------------------------------------------------------------------------
 
-def test_menubar_help_windows(delay:float=2.0):
+def test_menubar_help_windows():
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - HELP")
     # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.display_help))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.display_help))
+    system_test_harness.sleep(4.0)
     system_test_harness.run_function(lambda:close_window(cancel=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - ABOUT")
     # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.display_about))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.display_about))
+    system_test_harness.sleep(4.0)
     system_test_harness.run_function(lambda:close_window(cancel=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar documentation windows - DOCS")
     # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.display_docs))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.display_docs))
+    system_test_harness.sleep(4.0)
     system_test_harness.run_function(lambda:close_window(cancel=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - INFO")
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["general"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_layout_info))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_layout_info))
+    system_test_harness.sleep(4.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["general"] == initial_settings
     return()
@@ -95,23 +95,23 @@ def callback_function():
 def connect_function(show_popup):
     print("Received Connect callback - Show Popup = ",show_popup)
 
-def test_menubar_settings_windows(delay:float=1.0):
+def test_menubar_settings_windows():
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar Settings windows - CANVAS - will generate 2 updated callbacks")
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["canvas"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_canvas_settings, callback_function))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_canvas_settings, callback_function))
+    system_test_harness.sleep(4.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["canvas"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -119,17 +119,17 @@ def test_menubar_settings_windows(delay:float=1.0):
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["general"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_general_settings, callback_function))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_general_settings, callback_function))
+    system_test_harness.sleep(4.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["general"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -137,17 +137,17 @@ def test_menubar_settings_windows(delay:float=1.0):
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["gpio"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_gpio_settings, callback_function))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_gpio_settings, callback_function))
+    system_test_harness.sleep(4.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["gpio"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -155,17 +155,17 @@ def test_menubar_settings_windows(delay:float=1.0):
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["logging"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_logging_settings, callback_function))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_logging_settings, callback_function))
+    system_test_harness.sleep(4.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["logging"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -173,21 +173,21 @@ def test_menubar_settings_windows(delay:float=1.0):
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["mqtt"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_mqtt_settings,
+    system_test_harness.run_function(lambda:open_window(menubar.edit_mqtt_settings,
                                                         connect_function, callback_function))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.sleep(4.0)
     # Check the 'Test broker connectivity' function
     system_test_harness.run_function(lambda:test_mqtt_connectivity())
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["mqtt"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -195,26 +195,26 @@ def test_menubar_settings_windows(delay:float=1.0):
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["sprog"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_sprog_settings,
+    system_test_harness.run_function(lambda:open_window(menubar.edit_sprog_settings,
                                                         connect_function, callback_function))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.sleep(4.0)
     # Test the popup help window for the SPROG address offsets
     help_window1 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
     help_window2 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     help_window2.close_window()
     # Check the 'Test SPROG connectivity' function
     system_test_harness.run_function(lambda:test_sprog_connectivity())
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Check the settings remain unchanged
     assert settings.settings["sprog"] == initial_settings
     return()
@@ -226,40 +226,40 @@ def test_menubar_settings_windows(delay:float=1.0):
 
 def dummy_function(): return()
 
-def test_menubar_utilities_windows(delay:float=0.0):
+def test_menubar_utilities_windows():
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar utilities windows - DCC PROGRAMMING")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.dcc_programming,
+    system_test_harness.run_function(lambda:open_window(menubar.dcc_programming,
                                         dummy_function, dummy_function, dummy_function ))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.sleep(4.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(cancel=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     print("Testing Menubar utilities windows - DCC MAPPINGS")
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.dcc_mappings))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.dcc_mappings))
+    system_test_harness.sleep(4.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(cancel=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     print("Testing Menubar utilities windows - BULK RENUMBERING")
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.bulk_renumbering))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.bulk_renumbering))
+    system_test_harness.sleep(4.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Revert
     system_test_harness.run_function(lambda:close_window(reset=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -267,144 +267,142 @@ def test_menubar_utilities_windows(delay:float=0.0):
 # an apply straight after opening the window doesnt screw up the config
 #-----------------------------------------------------------------------------------
 
-def test_menubar_styles_windows(delay:float=0.0):
+def test_menubar_styles_windows():
     # Select everything to give us something to apply with "apply_selected"
     system_test_harness.select_all_objects()
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - ROUTE BUTTONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_route_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_route_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - DCC SWITCH BUTTONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_switch_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_switch_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - TRACK SECTIONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_section_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_section_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - ROUTE LINES")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_route_line_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_route_line_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - POINT BUTTONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_point_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_point_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - SIGNAL BUTTONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_signal_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_signal_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - TEXT BOXES")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_textbox_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_textbox_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar styles windows - SIGNALBOX LEVERS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(delay, menubar.edit_lever_styles))
-    system_test_harness.sleep(delay*2)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_lever_styles))
+    system_test_harness.sleep(4.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # Apply Selected
     system_test_harness.run_function(lambda:close_styles_window(apply_selected=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_styles_window(ok=True))
-    system_test_harness.sleep(delay)
+    system_test_harness.sleep(2.0)
     return()
 
 ######################################################################################################
 
 def run_all_menubar_window_tests():
-    # The delay is the wait time after opening or closing a window
-    delay = 1.0
     # Load a layout file with plenty of 'active' config for these tests
     system_test_harness.initialise_test_harness(filename="./test_mqtt_networking.sig")
-    test_menubar_help_windows(delay)
-    test_menubar_settings_windows(delay)
-    test_menubar_utilities_windows(delay)
+    test_menubar_help_windows()
+    test_menubar_settings_windows()
+    test_menubar_utilities_windows()
     # Load a layout to test the style changes
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/absolute_block_example.sig")
-    test_menubar_styles_windows(delay)
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
+    test_menubar_styles_windows()
     system_test_harness.report_results()
     
 if __name__ == "__main__":
