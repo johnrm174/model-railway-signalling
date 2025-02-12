@@ -53,6 +53,10 @@
 #    assert_signals_unlocked(*sigids)
 #    assert_subsidaries_locked(*sigids)
 #    assert_subsidaries_unlocked(*sigids)
+#    assert_signals_off(*sigids)
+#    assert_signals_on(*sigids)
+#    assert_subsidaries_off(*sigids)
+#    assert_subsidaries_on(*sigids)
 #    assert_signals_override_set(*sigids)
 #    assert_signals_override_clear(*sigids)
 #    assert_signals_override_caution_set(*sigids)
@@ -573,6 +577,38 @@ def assert_points_normal(*pointids):
             raise_test_warning ("assert_points_normal - Point: "+str(pointid)+" does not exist")
         elif points.points[str(pointid)]["switched"]:
             raise_test_error ("assert_points_normal - Point: "+str(pointid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_signals_off(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_signals_off - Signal: "+str(sigid)+" does not exist")
+        elif not signals.signals[str(sigid)]["sigclear"]:
+            raise_test_error ("assert_signals_off - Signal: "+str(sigid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_signals_on(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_signals_on - Signal: "+str(sigid)+" does not exist")
+        elif signals.signals[str(sigid)]["sigclear"]:
+            raise_test_error ("assert_signals_on - Signal: "+str(sigid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_subsidaries_off(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_subsidaries_off - Signal: "+str(sigid)+" does not exist")
+        elif not signals.signals[str(sigid)]["subclear"]:
+            raise_test_error ("assert_subsidaries_off - Signal: "+str(sigid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_subsidaries_on(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_signals_unlocked - Signal: "+str(sigid)+" does not exist")
+        elif signals.signals[str(sigid)]["subclear"]:
+            raise_test_error ("assert_signals_unlocked - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
 
 def assert_signals_locked(*sigids):
