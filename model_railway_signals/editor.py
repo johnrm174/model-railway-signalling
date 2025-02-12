@@ -141,6 +141,8 @@ class main_menubar:
         self.file_menu.add_command(label=" Save", command=lambda:self.save_schematic(False))
         self.file_menu.add_command(label=" Save as...", command=lambda:self.save_schematic(True))
         self.file_menu.add_separator()
+        self.file_menu.add_command(label=" Examples...", command=lambda:self.load_schematic(examples=True))
+        self.file_menu.add_separator()
         self.file_menu.add_command(label=" Quit",command=lambda:self.quit_schematic())
         self.mainmenubar.add_cascade(label="File", menu=self.file_menu)
         # Create the various menubar items for the Mode Dropdown
@@ -224,6 +226,8 @@ class main_menubar:
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:menubar.display_help(self.root))
         self.help_menu.add_command(label =" About...", command=lambda:menubar.display_about(self.root))
+        self.help_menu.add_command(label =" Docs...", command=lambda:menubar.display_docs(self.root))
+        self.help_menu.add_separator()
         self.help_menu.add_command(label =" Info...", command=lambda:menubar.edit_layout_info(self.root))
         self.mainmenubar.add_cascade(label = "Help", menu=self.help_menu)
         # Flag to track whether the new configuration has been saved or not
@@ -679,11 +683,13 @@ class main_menubar:
         if len(version)==3: version += ".0"
         return tuple(map(int,(version.split("."))))
 
-    def load_schematic(self, filename=None):
+    def load_schematic(self, filename:str=None, examples:bool=False):
         # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the file selection dialog. If
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
-        file_loaded, layout_state = library.load_schematic(filename)
+        # The 'examples' flag tells the load_schematic function to open the file load dialog
+        # in the example layout files folder (which is now part of the package)
+        file_loaded, layout_state = library.load_schematic(filename, examples=examples)
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need

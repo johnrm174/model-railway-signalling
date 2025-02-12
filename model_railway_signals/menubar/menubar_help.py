@@ -17,8 +17,10 @@
 #
 #------------------------------------------------------------------------------------
 
+import importlib.resources
 import tkinter as Tk
 import webbrowser
+import logging
 
 from .. import common
 from .. import settings
@@ -176,6 +178,62 @@ class display_about():
 
     def callback(self,event):
         webbrowser.open_new_tab(self.hyperlink)
+
+
+#------------------------------------------------------------------------------------
+# Class for the "Documentation" window - opens a new browser tab to display the required
+# PDF files. Note that if a window is already open then we just raise it and exit.
+#------------------------------------------------------------------------------------
+
+documentation_window = None
+
+class display_docs():
+    def __init__(self, root_window):
+        global documentation_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if documentation_window is not None:
+            documentation_window.lift()
+            documentation_window.state('normal')
+            documentation_window.focus_force()
+        else:
+            # Create the (non-resizable) top level window for the documentation links
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Documentation")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            documentation_window = self.window
+            # Create the buttons for the documentation links
+            self.label1 = Tk.Label(self.window, text="Click to open documents in a browser tab:")
+            self.label1.pack(padx=5, pady=5)
+            self.B1 = Tk.Button (self.window, width=25, text="System setup guide",
+                                 command=lambda:self.open_doc("setup_guide.pdf"))
+            self.B1.pack(padx=2, pady=2)
+            self.B2 = Tk.Button (self.window, width=25, text="Application quick start guide",
+                                 command=lambda:self.open_doc("quickstart_guide.pdf"))
+            self.B2.pack(padx=2, pady=2)
+            self.B3 = Tk.Button (self.window, width=25, text="Application networking guide",
+                                 command=lambda:self.open_doc("networking_guide.pdf"))
+            self.B3.pack(padx=2, pady=2)
+            self.B3 = Tk.Button (self.window, width=25, text="Remote Sensor node guide",
+                                 command=lambda:self.open_doc("sensor_node_guide.pdf"))
+            self.B3.pack(padx=2, pady=2)
+            # Create the close button and tooltip
+            self.B4 = Tk.Button (self.window, text = "Ok / Close",command=self.close_window)
+            self.B4.pack(padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.B4, "Close window")
+
+    def open_doc(self,file_name:str):
+        try:
+            with importlib.resources.path('model_railway_signals.docs', file_name) as file_path:
+                webbrowser.open_new_tab(str(file_path))
+        except Exception as exception:
+            logging.error("Error opening documentation file '"+file_name+"'")
+            logging.error("Reported exception :"+str(exception))
+
+    def close_window(self):
+        global documentation_window
+        documentation_window = None
+        self.window.destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the Edit Layout Information window - Uses the common.scrollable_text_frame.

@@ -33,6 +33,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > It is therefore crucial that all users upgrade to this release and then update (by loading and saving)
 > all layout files to ensure compatibility going forward - You have been warned!
 
+* Full documentation is now packaged with the application (Menubar => Help => Docs)
+* Example layout files are now packaged with the application (Menubar => File => Examples)
 * New 'Signalbox Levers' feature - enables you to achieve a fully prototypical simulation of a signalbox:
     * Levers can be added to the schematic and 'connected' to the signals and points they control.
     * Seperate levers can be assigned to a point's blades and Facing Point Lock (FPL). 

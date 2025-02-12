@@ -45,6 +45,7 @@ import json
 import logging
 import tkinter.messagebox
 import tkinter.filedialog
+import pathlib
 
 from . import signals
 from . import track_sections
@@ -121,15 +122,20 @@ def purge_loaded_state_information():
 # queried when library objects are created in order to set the initial state.
 #-------------------------------------------------------------------------------------------------
 
-def load_schematic(requested_filename:str=None):
+def load_schematic(requested_filename:str=None, examples:bool=False):
     global last_fully_qualified_file_name     ## Set by 'load_state' and 'save_state' ##
     global layout_state                       ## populated on successful file load ##
     # If the requested filename is 'None' then we always open a file picker dialog. This
     # is pre-populated with the 'last_fully_qualified_file_name' if it exists as a file
-    # Otherwise, we will attempt to load the requested filename (without a dialog)
+    # Otherwise, we will attempt to load the requested filename (without a dialog). If
+    # the 'examples' flag is True, then we open the folder with the example layout files.
     if requested_filename is None:
-        if last_fully_qualified_file_name is not None and os.path.isfile(last_fully_qualified_file_name):
+        if examples:
+            library_sub_package_folder = pathlib.Path(__file__)
+            path, name = library_sub_package_folder.parent.parent / 'examples', ""
+        elif last_fully_qualified_file_name is not None and os.path.isfile(last_fully_qualified_file_name):
             path, name = os.path.split(last_fully_qualified_file_name)
+            path, name = ".", ""
         else:
             path, name = ".", ""
         filename_to_load = tkinter.filedialog.askopenfilename(title='Load Layout State',

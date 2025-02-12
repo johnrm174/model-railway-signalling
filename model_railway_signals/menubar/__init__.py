@@ -28,6 +28,7 @@
 
 from .menubar_help import display_help
 from .menubar_help import display_about
+from .menubar_help import display_docs
 from .menubar_help import edit_layout_info
 
 from .menubar_settings import edit_general_settings
