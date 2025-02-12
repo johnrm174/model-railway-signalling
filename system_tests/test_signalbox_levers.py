@@ -275,11 +275,241 @@ def run_basic_signal_lever_tests():
     delete_selected_objects()
     return()
 
+# -------------------------------------------------------------------------------------
+
+def run_signal_lever_route_tests():
+    print("Signal Lever Route Tests:")
+    # Create the Signals we want to switch
+    s1 = create_colour_light_signal(100, 50)
+    s2 = create_semaphore_signal(300, 50)
+    # Create the points to set the routes
+    p1 = create_left_hand_point(500, 75)
+    p1 = create_left_hand_point(550, 75)
+    # Create the signalbox levers (for signal 1)
+    lev1 = create_lever(75, 150)
+    # Create the signalbox levers (for signal 2)
+    lev11 = create_lever(200, 150)
+    lev12 = create_lever(225, 150)
+    lev13 = create_lever(250, 150)
+    lev14 = create_lever(275, 150)
+    lev15 = create_lever(300, 150)
+    lev16 = create_lever(325, 150)
+    lev17 = create_lever(350, 150)
+    lev18 = create_lever(375, 150)
+    lev19 = create_lever(400, 150)
+    # configure the signals to what we need
+    update_object_configuration(s1,{"pointinterlock":[ [[[1,False],[2,False]],"",0],
+                                                       [[[1,True],[2,False]],"",0],
+                                                       [[],"",0],
+                                                       [[[1,False],[2,True]],"",0],
+                                                       [[],"",0] ],
+                                    "sigroutes": [True, True, False, True, False],
+                                    "feathers": [False, True, False, True, False] } )    
+    update_object_configuration(s2,{"pointinterlock":[ [[[1,False],[2,False]],"",0],
+                                                       [[[1,True],[2,False]],"",0],
+                                                       [[],"",0],
+                                                       [[[1,False],[2,True]],"",0],
+                                                       [[],"",0] ],
+                                    "sigroutes": [True, True, False, True, False],
+                                    "subroutes": [True, True, False, True, False],
+                                    "sigarms":[ [ [True,0],[True,0],[True,0] ],
+                                                [ [True,0],[True,0],[True,0] ],
+                                                [ [False,0],[False,0],[False,0] ],
+                                                [ [True,0],[True,0],[True,0] ],
+                                                [ [False,0],[False,0],[False,0] ] ]} )
+    # configure the signalbox levers for signal 1
+    update_object_configuration(lev1,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":1,
+                                    "switchsignal":True, "signalroutes":[True, True, True, True, True]})    
+    # configure the signalbox levers for signal 2 - main signal
+    update_object_configuration(lev11,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
+                                      "switchsignal":True, "signalroutes":[True, False, False, False, False]})    
+    update_object_configuration(lev12,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
+                                      "switchsignal":True, "signalroutes":[False, True, False, False, False]})    
+    update_object_configuration(lev13,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
+                                      "switchsignal":True, "signalroutes":[False, False, False, True, False]})
+    # configure the signalbox levers for signal 2 - subsidary signal    
+    update_object_configuration(lev14,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
+                                      "switchsubsidary":True, "signalroutes":[True, False, False, False, False]})
+    update_object_configuration(lev15,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
+                                      "switchsubsidary":True, "signalroutes":[False, True, False, False, False]})
+    update_object_configuration(lev16,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
+                                      "switchsubsidary":True, "signalroutes":[False, False, False, True, False]})
+    # configure the signalbox levers for signal 2 - distant signal    
+    update_object_configuration(lev17,{"itemtype":levers.lever_type.distantsignal.value, "linkedsignal":2,
+                                      "switchdistant":True, "signalroutes":[True, False, False, False, False]})
+    update_object_configuration(lev18,{"itemtype":levers.lever_type.distantsignal.value, "linkedsignal":2,
+                                      "switchdistant":True, "signalroutes":[False, True, False, False, False]})
+    update_object_configuration(lev19,{"itemtype":levers.lever_type.distantsignal.value, "linkedsignal":2,
+                                      "switchdistant":True, "signalroutes":[False, False, False, True, False]})
+    print("Test interlocking of levers with their associated signals")
+    # Main Route
+    assert_signals_unlocked(1,2,1002)
+    assert_subsidaries_unlocked(2)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_unlocked(1,2,5,8)
+    assert_levers_locked(3,4,6,7,9,10)
+    # LH1 Route (then back to MAIN)
+    set_points_switched(1)
+    assert_signals_route_LH1(1,2,1002)
+    assert_levers_unlocked(1,3,6,9)
+    assert_levers_locked(2,4,5,7,8,10)
+    set_points_normal(1)
+    assert_signals_unlocked(1,2,1002)
+    assert_subsidaries_unlocked(2)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_unlocked(1,2,5,8)
+    assert_levers_locked(3,4,6,7,9,10)
+    # RH1 Route (then back to MAIN)
+    set_points_switched(2)
+    assert_signals_route_RH1(1,2,1002)
+    assert_levers_unlocked(1,4,7,10)
+    assert_levers_locked(2,3,5,6,8,9)
+    set_points_normal(2)
+    assert_signals_unlocked(1,2,1002)
+    assert_subsidaries_unlocked(2)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_unlocked(1,2,5,8)
+    assert_levers_locked(3,4,6,7,9,10)
+    print("Test switching of the levers from the signals")
+    # MAIN Route
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)
+    set_signals_off(1,2)
+    assert_levers_off(1,2)
+    assert_levers_on(3,4,5,6,7,8,9,10)
+    assert_levers_locked(3,4,5,6,7,9,10)
+    set_signals_off(1002)
+    assert_levers_off(1,2,8)
+    assert_levers_on(3,4,5,6,7,9,10)
+    assert_levers_locked(3,4,5,6,7,9,10)
+    set_signals_on(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)
+    set_subsidaries_off(2)
+    assert_levers_off(5)
+    assert_levers_on(1,2,3,4,6,7,8,9,10)
+    assert_levers_locked(2,3,4,6,7,9,10)
+    set_subsidaries_on(2)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)
+    # LH1 route
+    set_points_switched(1)
+    assert_signals_route_LH1(1,2,1002)
+    set_signals_off(1,2)
+    assert_levers_off(1,3)
+    assert_levers_on(2,4,5,6,7,8,9,10)
+    assert_levers_locked(2,4,5,6,7,8,10)
+    set_signals_off(1002)
+    assert_levers_off(1,3,9)
+    assert_levers_on(2,4,5,6,7,8,10)
+    assert_levers_locked(2,4,5,6,7,8,10)
+    set_signals_on(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)
+    set_subsidaries_off(2)
+    assert_levers_off(6)
+    assert_levers_on(1,2,3,4,5,7,8,9,10)
+    assert_levers_locked(2,3,4,5,7,8,10)
+    set_subsidaries_on(2)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)
+    set_points_normal(1)
+    # RH1 route
+    set_points_switched(2)
+    assert_signals_route_RH1(1,2,1002)
+    set_signals_off(1,2)
+    assert_levers_off(1,4)
+    assert_levers_on(2,3,5,6,7,8,9,10)
+    assert_levers_locked(2,3,5,6,7,8,9)
+    set_signals_off(1002)
+    assert_levers_off(1,4,10)
+    assert_levers_on(2,3,5,6,7,8,9)
+    assert_levers_locked(2,3,5,6,7,8,9)
+    set_signals_on(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)
+    set_subsidaries_off(2)
+    assert_levers_off(7)
+    assert_levers_on(1,2,3,4,5,6,8,9,10)
+    assert_levers_locked(2,3,4,5,6,8,9)
+    set_subsidaries_on(2)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)    
+    set_points_normal(2)
+    print("Test switching of the signals from the levers")
+    # MAIN Route
+    assert_signals_on(1,2,1002)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)    
+    assert_levers_unlocked(1,2,5,8)
+    set_levers_off(1)
+    assert_signals_off(1)
+    assert_signals_route_MAIN(1)
+    set_levers_on(1)
+    set_levers_off(2)
+    assert_signals_off(2)
+    assert_signals_route_MAIN(2)
+    set_levers_on(2)
+    set_levers_off(5)
+    assert_subsidaries_off(2)
+    assert_signals_route_MAIN(2)
+    set_levers_on(5)
+    set_levers_off(8)
+    assert_signals_off(1002)
+    assert_signals_route_MAIN(1002)
+    set_levers_on(8)
+    # LH1 Route
+    assert_signals_on(1,2,1002)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)    
+    set_points_switched(1)
+    assert_signals_route_LH1(1,2,1002)
+    assert_levers_unlocked(1,3,6,9)
+    set_levers_off(1)
+    assert_signals_off(1)
+    assert_signals_route_LH1(1)
+    set_levers_on(1)
+    set_levers_off(3)
+    assert_signals_off(2)
+    assert_signals_route_LH1(2)
+    set_levers_on(3)
+    set_levers_off(6)
+    assert_subsidaries_off(2)
+    assert_signals_route_LH1(2)
+    set_levers_on(6)
+    set_levers_off(9)
+    assert_signals_off(1002)
+    assert_signals_route_LH1(1002)
+    set_levers_on(9)
+    set_points_normal(1)
+    assert_signals_on(1,2,1002)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)    
+    # RH1 Route
+    set_points_switched(2)
+    assert_signals_route_RH1(1,2,1002)
+    assert_levers_unlocked(1,4,7,10)
+    set_levers_off(1)
+    assert_signals_off(1)
+    assert_signals_route_RH1(1)
+    set_levers_on(1)
+    set_levers_off(4)
+    assert_signals_off(2)
+    assert_signals_route_RH1(2)
+    set_levers_on(4)
+    set_levers_off(7)
+    assert_subsidaries_off(2)
+    assert_signals_route_RH1(2)
+    set_levers_on(7)
+    set_levers_off(10)
+    assert_signals_off(1002)
+    assert_signals_route_RH1(1002)
+    set_levers_on(10)
+    set_points_normal(2)
+    assert_signals_on(1,2,1002)
+    assert_signals_route_MAIN(1,2,1002)
+    assert_levers_on(1,2,3,4,5,6,7,8,9,10)    
+    return()
+
 ##########################################################################################################################
     
 def run_all_signalbox_lever_tests():
     run_basic_point_lever_tests()
     run_basic_signal_lever_tests()
+    run_signal_lever_route_tests()
     report_results()
                 
 if __name__ == "__main__":
