@@ -1225,10 +1225,10 @@ def run_shunting_tests(delay=0):
 #-----------------------------------------------------------------------------------
 
 def run_all_automation_example_tests(delay:float=0.0):
-    initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
+    initialise_test_harness(filename="../model_railway_signals/examples/automation_colour_light_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
-    test_object_edit_windows.test_all_object_edit_windows(delay)
+    test_configuration_windows.test_all_object_edit_windows()
     set_run_mode()
     reset_layout()
     run_initial_state_tests(semaphore=False)
@@ -1241,10 +1241,10 @@ def run_all_automation_example_tests(delay:float=0.0):
     run_main_line_tests_2(delay)
     run_loop_line_tests(delay)
     run_shunting_tests(delay)
-    initialise_test_harness(filename="../configuration_examples/automation_semaphore_example.sig")
+    initialise_test_harness(filename="../model_railway_signals/examples/automation_semaphore_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
-    test_object_edit_windows.test_all_object_edit_windows(delay)
+    test_configuration_windows.test_all_object_edit_windows()
     set_run_mode()
     reset_layout()
     run_initial_state_tests(semaphore=True)

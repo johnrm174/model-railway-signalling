@@ -241,10 +241,10 @@ def test_circular_layout(delay=0.0):
 ######################################################################################################
 
 def run_all_mqtt_networking_example_tests(delay:float=0.0):
-    initialise_test_harness(filename="../configuration_examples/mqtt_networked_example.sig")
+    initialise_test_harness(filename="../model_railway_signals/examples/mqtt_networked_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
-    test_object_edit_windows.test_all_object_edit_windows(delay)
+    test_configuration_windows.test_all_object_edit_windows()
     set_run_mode()
     test_circular_layout(delay)
     test_end_to_end_layout(delay)

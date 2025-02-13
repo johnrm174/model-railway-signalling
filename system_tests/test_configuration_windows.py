@@ -69,7 +69,13 @@ def test_all_object_edit_windows():
 
 def run_all_configuration_window_tests():
     initialise_test_harness()
+    # Test the basic object edit windows (at creation)
     test_edit_object_windows()
+    initialise_test_harness()
+    # Load a layout containing all types of configured objects to test the config windows
+    # Dont change the object configuration if the loaded configuration is just re-applied
+    initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
+    really_do_test_all_object_edit_windows()
     report_results()
     
 if __name__ == "__main__":
