@@ -169,7 +169,7 @@
                 true,
                 ""
             ],
-            "bbox": 179,
+            "bbox": 28131,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -499,7 +499,7 @@
             "ybuttonoffset": 0
         },
         "067835eb-56c3-4413-b916-7a5d178dbbf7": {
-            "bbox": 187,
+            "bbox": 28139,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -535,7 +535,7 @@
         },
         "067a93cd-59a3-44e9-bcb9-688f5d9270ac": {
             "background": "",
-            "bbox": 190,
+            "bbox": 28142,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -559,7 +559,7 @@
                 20,
                 5
             ],
-            "bbox": 196,
+            "bbox": 28148,
             "colour": "black",
             "endx": 1450.0,
             "endy": 425.0,
@@ -572,7 +572,7 @@
             "tags": "line18"
         },
         "115b0eee-ac0f-47ef-8529-633617d30f6a": {
-            "bbox": 200,
+            "bbox": 28152,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 16,
             "dccoffcommands": [],
@@ -595,7 +595,7 @@
             ]
         },
         "1182f453-84a2-4ab6-8631-ef442bb98333": {
-            "bbox": 208,
+            "bbox": 28160,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -630,7 +630,7 @@
             ]
         },
         "1186e218-4c43-4526-9c8c-e7168b0ef15d": {
-            "bbox": 212,
+            "bbox": 28164,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -689,7 +689,7 @@
                 0,
                 0
             ],
-            "bbox": 218,
+            "bbox": 28170,
             "colour": "black",
             "endx": 1025.0,
             "endy": 200.0,
@@ -703,7 +703,7 @@
         },
         "15bfff45-07f7-466c-a67d-18b9db7cf519": {
             "background": "#d9f1d9",
-            "bbox": 221,
+            "bbox": 28173,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -721,7 +721,7 @@
             ]
         },
         "1b3f1dca-d687-4ec6-98e3-cc017d9f844a": {
-            "bbox": 225,
+            "bbox": 28177,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -741,7 +741,7 @@
             ]
         },
         "1ddc5fb3-1c2b-4b09-b9a4-27194bce3b9d": {
-            "bbox": 233,
+            "bbox": 28185,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -755,11 +755,11 @@
             "posx": 975.0,
             "posy": 425.0,
             "signalroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false,
+                false
             ],
             "switchdistant": false,
             "switchfpl": false,
@@ -776,7 +776,7 @@
             ]
         },
         "23ef06a2-5597-4aba-920c-ca15828a7733": {
-            "bbox": 237,
+            "bbox": 28189,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -796,7 +796,7 @@
             ]
         },
         "23f65617-9e44-4ff0-9f17-43e9f0a4fc9b": {
-            "bbox": 245,
+            "bbox": 28197,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -842,7 +842,7 @@
                 true,
                 ""
             ],
-            "bbox": 272,
+            "bbox": 28224,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -1152,7 +1152,7 @@
                 true,
                 ""
             ],
-            "bbox": 299,
+            "bbox": 28251,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -1467,7 +1467,7 @@
             "ybuttonoffset": 0
         },
         "2fccffbf-c907-40d5-be3f-00fd5c11c01f": {
-            "bbox": 307,
+            "bbox": 28259,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -1502,7 +1502,7 @@
             ]
         },
         "3231d4c2-06ac-42f0-99fb-59fa82e8f424": {
-            "bbox": 315,
+            "bbox": 28267,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -1543,7 +1543,7 @@
                 20,
                 5
             ],
-            "bbox": 321,
+            "bbox": 28273,
             "colour": "black",
             "endx": 1550.0,
             "endy": 200.0,
@@ -1557,7 +1557,7 @@
         },
         "34dce7e9-8157-401b-9776-579b425316eb": {
             "background": "",
-            "bbox": 324,
+            "bbox": 28276,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1575,7 +1575,7 @@
             ]
         },
         "3a26fe90-04d1-4eba-a21a-342cf9f5c02c": {
-            "bbox": 332,
+            "bbox": 28284,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -1621,7 +1621,7 @@
                 false,
                 ""
             ],
-            "bbox": 358,
+            "bbox": 28310,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -1915,7 +1915,7 @@
             "ybuttonoffset": 0
         },
         "3ba105fa-b566-400c-ad71-0e9f1b75e02a": {
-            "bbox": 362,
+            "bbox": 28314,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 16,
             "dccoffcommands": [],
@@ -1938,7 +1938,7 @@
             ]
         },
         "3ba813b1-8dd6-42bc-87de-b7da7ef33a22": {
-            "bbox": 366,
+            "bbox": 28318,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -1989,7 +1989,7 @@
             "tracksensor": 0
         },
         "3c5565ee-45f3-4298-a7da-5c1c52ebf2d2": {
-            "bbox": 370,
+            "bbox": 28322,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2009,7 +2009,7 @@
             ]
         },
         "3c99eb4f-0824-42a2-b37f-2ba8685a05a8": {
-            "bbox": 378,
+            "bbox": 28330,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -2044,7 +2044,7 @@
             ]
         },
         "3e40ea2b-92de-4ea6-936f-e56ce0e0a25d": {
-            "bbox": 386,
+            "bbox": 28338,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -2085,7 +2085,7 @@
                 0,
                 0
             ],
-            "bbox": 392,
+            "bbox": 28344,
             "colour": "black",
             "endx": 1125.0,
             "endy": 200.0,
@@ -2098,7 +2098,7 @@
             "tags": "line2"
         },
         "40da50ad-40cf-4f2f-a86f-eef794d41ace": {
-            "bbox": 396,
+            "bbox": 28348,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2124,7 +2124,7 @@
                 0,
                 0
             ],
-            "bbox": 402,
+            "bbox": 28354,
             "colour": "black",
             "endx": 175.0,
             "endy": 300.0,
@@ -2143,7 +2143,7 @@
                 20,
                 5
             ],
-            "bbox": 408,
+            "bbox": 28360,
             "colour": "black",
             "endx": 1525.0,
             "endy": 250.0,
@@ -2167,7 +2167,7 @@
                 false,
                 ""
             ],
-            "bbox": 416,
+            "bbox": 28368,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -2503,7 +2503,7 @@
             "ybuttonoffset": 0
         },
         "49436626-93f4-4b47-b9ae-5221c9d27577": {
-            "bbox": 420,
+            "bbox": 28372,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2523,7 +2523,7 @@
             ]
         },
         "4c0bda76-5a3c-4289-b0f4-f45e1e098457": {
-            "bbox": 428,
+            "bbox": 28380,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -2569,7 +2569,7 @@
                 true,
                 ""
             ],
-            "bbox": 456,
+            "bbox": 28408,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -2889,7 +2889,7 @@
                 0,
                 0
             ],
-            "bbox": 462,
+            "bbox": 28414,
             "colour": "black",
             "endx": 1400.0,
             "endy": 300.0,
@@ -2908,7 +2908,7 @@
                 0,
                 0
             ],
-            "bbox": 468,
+            "bbox": 28420,
             "colour": "black",
             "endx": 1125.0,
             "endy": 250.0,
@@ -2921,7 +2921,7 @@
             "tags": "line3"
         },
         "579709a6-de92-4fef-8e57-1ed8a69df3bc": {
-            "bbox": 476,
+            "bbox": 28428,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -2956,7 +2956,7 @@
             ]
         },
         "5894ae1e-2caa-438c-90b0-4972d3d29b8a": {
-            "bbox": 484,
+            "bbox": 28436,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -2991,7 +2991,7 @@
             ]
         },
         "59a81ad0-15f2-4fab-882e-74e8b1d1b0ba": {
-            "bbox": 492,
+            "bbox": 28444,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -3005,11 +3005,11 @@
             "posx": 750.0,
             "posy": 425.0,
             "signalroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false,
+                false
             ],
             "switchdistant": false,
             "switchfpl": false,
@@ -3037,7 +3037,7 @@
                 false,
                 ""
             ],
-            "bbox": 518,
+            "bbox": 28470,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -3337,7 +3337,7 @@
                 20,
                 5
             ],
-            "bbox": 524,
+            "bbox": 28476,
             "colour": "black",
             "endx": 50.0,
             "endy": 200.0,
@@ -3361,7 +3361,7 @@
                 false,
                 ""
             ],
-            "bbox": 532,
+            "bbox": 28484,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -3681,7 +3681,7 @@
             "ybuttonoffset": 0
         },
         "65e34c3b-f928-4e23-baa4-7d18bc12083a": {
-            "bbox": 540,
+            "bbox": 28492,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -3716,7 +3716,7 @@
             ]
         },
         "67af7011-522f-4fd0-99de-ac86c6d10a0a": {
-            "bbox": 548,
+            "bbox": 28500,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -3753,7 +3753,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 25,
             "automatic": false,
-            "bbox": 555,
+            "bbox": 28507,
             "buttoncolour": "#bbe6f6",
             "colour": "black",
             "dccaddress": 101,
@@ -3822,7 +3822,7 @@
             "ybuttonoffset": 0
         },
         "6eeeb1d3-ed2d-4d27-9eef-006f3f36e6c5": {
-            "bbox": 563,
+            "bbox": 28515,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -3868,7 +3868,7 @@
                 false,
                 ""
             ],
-            "bbox": 589,
+            "bbox": 28541,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -4162,7 +4162,7 @@
             "ybuttonoffset": 0
         },
         "7b3025c0-ea07-4217-8ba7-14023b594580": {
-            "bbox": 597,
+            "bbox": 28549,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -4197,7 +4197,7 @@
             ]
         },
         "7d47a785-6818-47d4-a631-e854d6c3d0c8": {
-            "bbox": 601,
+            "bbox": 28553,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 16,
             "dccoffcommands": [],
@@ -4220,7 +4220,7 @@
             ]
         },
         "81c19fb3-84c4-4eb3-9b8a-f144f4a51be6": {
-            "bbox": 625,
+            "bbox": 28577,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 3,
@@ -4232,7 +4232,7 @@
             "tags": "instrument3"
         },
         "85d79875-69a8-4f48-b990-56add64e268d": {
-            "bbox": 629,
+            "bbox": 28581,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4252,7 +4252,7 @@
             ]
         },
         "8816ce82-aedb-4471-ad19-ad8f3fb1a954": {
-            "bbox": 637,
+            "bbox": 28589,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -4293,7 +4293,7 @@
                 0,
                 0
             ],
-            "bbox": 643,
+            "bbox": 28595,
             "colour": "black",
             "endx": 1025.0,
             "endy": 150.0,
@@ -4306,7 +4306,7 @@
             "tags": "line4"
         },
         "8f1b2c93-925b-4d51-bdea-fd3658ca39c2": {
-            "bbox": 667,
+            "bbox": 28619,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 4,
@@ -4329,7 +4329,7 @@
                 false,
                 ""
             ],
-            "bbox": 675,
+            "bbox": 28627,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -4640,7 +4640,7 @@
         },
         "91a529ee-c34b-4bc6-82ce-b30de2ac81b8": {
             "background": "",
-            "bbox": 678,
+            "bbox": 28630,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4658,7 +4658,7 @@
             ]
         },
         "94fd8cf6-a410-4f67-9da5-c985edcbf688": {
-            "bbox": 682,
+            "bbox": 28634,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4684,7 +4684,7 @@
                 20,
                 5
             ],
-            "bbox": 688,
+            "bbox": 28640,
             "colour": "black",
             "endx": 25.0,
             "endy": 250.0,
@@ -4703,7 +4703,7 @@
                 0,
                 0
             ],
-            "bbox": 694,
+            "bbox": 28646,
             "colour": "black",
             "endx": 25.0,
             "endy": 250.0,
@@ -4716,7 +4716,7 @@
             "tags": "line5"
         },
         "9db168ca-b762-4904-a6bb-71567154c31c": {
-            "bbox": 702,
+            "bbox": 28654,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -4751,7 +4751,7 @@
             ]
         },
         "a0d092d0-00d7-4954-af17-39b64ae63552": {
-            "bbox": 706,
+            "bbox": 28658,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -4794,7 +4794,7 @@
             "tracksensor": 0
         },
         "a35da887-2679-4c9f-bb0e-7737873c3a73": {
-            "bbox": 714,
+            "bbox": 28666,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -4808,11 +4808,11 @@
             "posx": 575.0,
             "posy": 425.0,
             "signalroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false,
+                false
             ],
             "switchdistant": false,
             "switchfpl": false,
@@ -4829,7 +4829,7 @@
             ]
         },
         "a6e56e82-869d-4a63-b9fe-649476f59a62": {
-            "bbox": 718,
+            "bbox": 28670,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4855,7 +4855,7 @@
                 1,
                 1
             ],
-            "bbox": 724,
+            "bbox": 28676,
             "colour": "black",
             "endx": 1075.0,
             "endy": 150.0,
@@ -4868,7 +4868,7 @@
             "tags": "line6"
         },
         "af408a69-7a43-4f8e-9453-728ec2747514": {
-            "bbox": 728,
+            "bbox": 28680,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4888,7 +4888,7 @@
             ]
         },
         "b135e81d-836c-45e5-a8d5-12c0e15a4aa9": {
-            "bbox": 736,
+            "bbox": 28688,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -4923,7 +4923,7 @@
             ]
         },
         "b45c33e4-0cb3-42e2-bd83-4d132e151d16": {
-            "bbox": 744,
+            "bbox": 28696,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -4960,7 +4960,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 749,
+            "bbox": 28701,
             "buttoncolour": "#bbe6f6",
             "colour": "black",
             "dccaddress": 0,
@@ -4994,7 +4994,7 @@
                 0,
                 0
             ],
-            "bbox": 755,
+            "bbox": 28707,
             "colour": "black",
             "endx": 1575.0,
             "endy": 300.0,
@@ -5007,7 +5007,7 @@
             "tags": "line16"
         },
         "bd8c0b62-add0-4714-b49a-7bbae0da4124": {
-            "bbox": 759,
+            "bbox": 28711,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5033,7 +5033,7 @@
                 20,
                 5
             ],
-            "bbox": 765,
+            "bbox": 28717,
             "colour": "black",
             "endx": 275.0,
             "endy": 425.0,
@@ -5057,7 +5057,7 @@
                 false,
                 ""
             ],
-            "bbox": 791,
+            "bbox": 28743,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -5357,7 +5357,7 @@
                 0,
                 0
             ],
-            "bbox": 797,
+            "bbox": 28749,
             "colour": "black",
             "endx": 25.0,
             "endy": 200.0,
@@ -5370,7 +5370,7 @@
             "tags": "line7"
         },
         "c2c0ac8e-8f0f-4be5-bede-9f3491ea519a": {
-            "bbox": 805,
+            "bbox": 28757,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -5405,7 +5405,7 @@
             ]
         },
         "c379911c-19c3-456f-9647-3239326e569f": {
-            "bbox": 829,
+            "bbox": 28781,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -5419,7 +5419,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 16,
             "automatic": false,
-            "bbox": 836,
+            "bbox": 28788,
             "buttoncolour": "#bbe6f6",
             "colour": "black",
             "dccaddress": 100,
@@ -5494,7 +5494,7 @@
                 1,
                 1
             ],
-            "bbox": 842,
+            "bbox": 28794,
             "colour": "black",
             "endx": 425.0,
             "endy": 150.0,
@@ -5507,7 +5507,7 @@
             "tags": "line8"
         },
         "c88a11f5-d1b0-4a02-869e-f53d2c930635": {
-            "bbox": 846,
+            "bbox": 28798,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5527,7 +5527,7 @@
             ]
         },
         "c8c1af5b-03d1-4f3d-8ab5-14d2e45f886e": {
-            "bbox": 854,
+            "bbox": 28806,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -5562,7 +5562,7 @@
             ]
         },
         "cda0814a-9bae-4305-85a1-4d79b33af032": {
-            "bbox": 858,
+            "bbox": 28810,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5593,7 +5593,7 @@
                 false,
                 ""
             ],
-            "bbox": 866,
+            "bbox": 28818,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -5923,7 +5923,7 @@
             "ybuttonoffset": 0
         },
         "cefbabc7-0e51-4c17-a267-2d46289f215b": {
-            "bbox": 874,
+            "bbox": 28826,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -5959,7 +5959,7 @@
         },
         "d07563fb-50ce-471d-aea7-f107f6788676": {
             "background": "#d9f1d9",
-            "bbox": 877,
+            "bbox": 28829,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -5979,7 +5979,7 @@
         "d9840a46-28fd-40dd-a059-df46b9a762e2": {
             "alsoswitch": 27,
             "automatic": false,
-            "bbox": 883,
+            "bbox": 28835,
             "buttoncolour": "#bbe6f6",
             "colour": "black",
             "dccaddress": 0,
@@ -6058,7 +6058,7 @@
             "ybuttonoffset": 0
         },
         "df270471-2b9d-4254-a929-402630ab94f6": {
-            "bbox": 907,
+            "bbox": 28859,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -6072,7 +6072,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 912,
+            "bbox": 28864,
             "buttoncolour": "#bbe6f6",
             "colour": "black",
             "dccaddress": 0,
@@ -6100,7 +6100,7 @@
             "ybuttonoffset": 0
         },
         "e0705584-fbf0-47f0-a695-810489e4d5d4": {
-            "bbox": 916,
+            "bbox": 28868,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -6120,7 +6120,7 @@
             ]
         },
         "e93773a5-e424-4170-9f48-cdabe47109ae": {
-            "bbox": 924,
+            "bbox": 28876,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -6166,7 +6166,7 @@
                 false,
                 ""
             ],
-            "bbox": 932,
+            "bbox": 28884,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -6502,7 +6502,7 @@
                 0,
                 0
             ],
-            "bbox": 938,
+            "bbox": 28890,
             "colour": "black",
             "endx": 175.0,
             "endy": 300.0,
@@ -6517,7 +6517,7 @@
         "f14ef6e8-7b7b-4568-b0e6-c105889caf10": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 943,
+            "bbox": 28895,
             "buttoncolour": "#bbe6f6",
             "colour": "black",
             "dccaddress": 0,
@@ -6545,7 +6545,7 @@
             "ybuttonoffset": 0
         },
         "f1827aa7-31cb-4b02-9aed-e3da001610b6": {
-            "bbox": 951,
+            "bbox": 28903,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -6591,7 +6591,7 @@
                 false,
                 ""
             ],
-            "bbox": 959,
+            "bbox": 28911,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -6982,7 +6982,7 @@
                 true,
                 ""
             ],
-            "bbox": 989,
+            "bbox": 28941,
             "buttoncolour": "#e4e4e4",
             "dccaspects": [
                 [],
@@ -7338,7 +7338,7 @@
             "ybuttonoffset": 0
         },
         "f8e4b5b6-18a7-4dae-a46c-08892c5e37a6": {
-            "bbox": 997,
+            "bbox": 28949,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -7373,7 +7373,7 @@
             ]
         },
         "fa9cae5e-ea73-49cb-9f66-c242e2b91825": {
-            "bbox": 1005,
+            "bbox": 28957,
             "buttoncolour": "#e4e4e4",
             "framecolour": "Grey40",
             "item": "lever",
@@ -7506,8 +7506,8 @@
         },
         "general": {
             "automation": false,
-            "editmode": false,
-            "filename": "/home/john/model-railway-signalling/configuration_examples/absolute_block_example.sig",
+            "editmode": true,
+            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/absolute_block_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto-isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration (note that external\nGPIO sensors haven't been configured for this particular example layout). 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to 'off' as soon as the section ahead is cleared. Note that some of the signals in this example \nhave been configured as 'fully automatic' (without a control button). This means that they will be 'off'\nby default and controlled entirely by whether the track section ahead is occupied or not.\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed (when 'off') they are overriden \nto 'on' (as per the other signals on the layout) but then revert to 'off' after the specified delay.\n\nTrack sensors can also be positioned slightly before the signal and mapped to generate 'signal \napproached' events to simulate 'approach control'. In this example, all non-fully-automatic home signals \nare configured for 'release on red based on the signals ahead'. This means that if any home signals ahead\nare showing danger then the home signal will also be overridden to 'on' by default.As the train approaches\nthe signal (at a slow speed as the signal is against it) then the signal will be released to 'off' to\nallow the train to pass and then revert back to the overidden 'on' state when the signal is passed.\nSignal 1 is also configured for 'release on red' for the diverging (low-speed) route. In this case it\nwill be overridden to 'on' even if all home signals ahead are 'off', only released as the train approaches.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. Right click the far left track section and enter a train\ndesignation code of your choice (this sets the section to 'occupied'). Set signals 8, 1 and 3 to 'off' (note\nthat they will remail overridden to 'on' as home signal ahead 4 is still showing 'on'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of each signal if you want to see\napproach control working). When the train reaches signal 4, set the signal to 'off' and trigger the signal\npassed event. The track section before the signal will be cleared and the signal overridden to 'on' as part\nof the timed sequence. After a short delay it will revert to 'off' and when it does, all home signals behind\nwill also revert to 'off' (as they will no longer be overridden on a home signal ahead).\n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n",
             "leverinterlocking": false,
             "leverpopupwarnings": true,
