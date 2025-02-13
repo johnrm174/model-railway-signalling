@@ -159,8 +159,17 @@ def lever_off_keypress_event(lever_id:int):
     return()
 
 #-------------------------------------------------------------------------
-# API Function to flip the state of the Signal Box Lever on Lever button and
-# keypress events. Also called on change button events and keypress events
+# API Function to change the state of a Signal Box Lever. This gets called from
+# 'run_layout' whenever the linked signal or point has been changed (either via
+# their manual control buttons or via set-up/clear-down of schematic routes).
+# It also gets called on signalbox lever button or keypress events.
+#
+# We do not raise any warnings if the lever is toggled whilst locked:
+# 1) For lever button events the button will be disabled if the lever is locked.
+# 2) For keypress events, warnings will already have been raised if the lever is
+#    locked (and for 'ignore_interlocking we want to change the lever anyway).
+# 3) For API calls (from run-layout), the linked signal/point should always be
+#    the source of truth so we always want to change the lever anyway
 #-------------------------------------------------------------------------
 
 def toggle_lever(lever_id:int):
@@ -171,8 +180,6 @@ def toggle_lever(lever_id:int):
         logging.error("Lever "+str(lever_id)+": toggle_lever - Lever ID does not exist")
     else:
         if not levers[str(lever_id)]["switched"]:
-            if levers[str(lever_id)]["locked"]:
-                logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is externally locked - Toggling anyway")
             logging.info("Lever "+str(lever_id)+": Toggling Lever to OFF (Pulled)")
             levers[str(lever_id)]["button"].config(relief="sunken",bg=levers[str(lever_id)]["selectedcolour"])
             levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["lever1a"], state="hidden")
@@ -181,14 +188,6 @@ def toggle_lever(lever_id:int):
             levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["lever2b"], state="normal")
             levers[str(lever_id)]["switched"] = True 
         else:
-            # It should always be valid to revert a signal lever to 'ON' (i.e. back to DANGER or CAUTION)
-            # This is the use case of clearing down a schematic route - as soon as the distant signal is
-            # set back to CAUTION it could be locked on the home signals ahead (at DANGER). The run_layout
-            # code then 'locks' the lever (on the basis the signal is locked) but this happens before the
-            # lever is set back to ON to reflect the state of the signal. We therefore suppress the warning
-            if (levers[str(lever_id)]["locked"] and levers[str(lever_id)]["levertype"]
-                                      not in (lever_type.stopsignal, lever_type.distantsignal)):
-                logging.warning("Lever "+str(lever_id)+": toggle_lever - Lever is externally locked - Toggling anyway")
             logging.info("Lever "+str(lever_id)+": Toggling Lever to ON (Reset)")
             levers[str(lever_id)]["button"].config(relief="raised",bg=levers[str(lever_id)]["deselectedcolour"])  
             levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["lever1a"], state="normal")
