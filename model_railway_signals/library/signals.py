@@ -426,8 +426,8 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:subsidary_button_event(sig_id))
     # Signal Passed Button - We only want a small button - hence a small font size
-    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"), highlightthickness=0,
-                command=lambda:sig_passed_button_event(sig_id))
+    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
+                        highlightthickness=0, command=lambda:sig_passed_button_event(sig_id))
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
     # created if the signal has a subsidary, but the Button positions are adjusted so they always
     # remain in the "right" position relative to the signal. Note we also have to cater for the
@@ -562,8 +562,8 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
                             orientation:int, approach_button:bool, sig_released_callback):
     global signals
     # Create the approach release button - We only want a small button - hence a small font size
-    approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
-                                        command=lambda:approach_release_button_event(sig_id))
+    approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
+                        highlightthickness=0, command=lambda:approach_release_button_event(sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
