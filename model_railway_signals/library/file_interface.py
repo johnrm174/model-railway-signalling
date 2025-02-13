@@ -45,12 +45,14 @@ import json
 import logging
 import tkinter.messagebox
 import tkinter.filedialog
+import pathlib
 
 from . import signals
 from . import track_sections
 from . import block_instruments
 from . import points
 from . import buttons
+from . import levers
 from . import common
 
 #-------------------------------------------------------------------------------------------------
@@ -82,12 +84,14 @@ def get_sig_file_config(get_sig_file_data:bool = False):
     section_elements = ( ("occupied","bool"),("labeltext","str") )
     instrument_elements = ( ("sectionstate","bool"),("repeaterstate","bool") )
     button_elements = ( ("selected","bool"), )
+    lever_elements = ( ("switched","bool"),("locked","bool"))
 
     layout_elements = { "signals"    : {"elements" : signal_elements},
                         "points"     : {"elements" : point_elements},
                         "sections"   : {"elements" : section_elements},
                         "instruments": {"elements" : instrument_elements},
-                        "buttons"    : {"elements" : button_elements}}
+                        "buttons"    : {"elements" : button_elements},
+                        "levers"     : {"elements" : lever_elements}}
     
     if get_sig_file_data:
         layout_elements["points"]["source"] = points.points
@@ -95,6 +99,7 @@ def get_sig_file_config(get_sig_file_data:bool = False):
         layout_elements["sections"]["source"] = track_sections.sections
         layout_elements["instruments"]["source"] = block_instruments.instruments
         layout_elements["buttons"]["source"] = buttons.buttons
+        layout_elements["levers"]["source"] = levers.levers
         
     return(layout_elements)
 
@@ -117,15 +122,20 @@ def purge_loaded_state_information():
 # queried when library objects are created in order to set the initial state.
 #-------------------------------------------------------------------------------------------------
 
-def load_schematic(requested_filename:str=None):
+def load_schematic(requested_filename:str=None, examples:bool=False):
     global last_fully_qualified_file_name     ## Set by 'load_state' and 'save_state' ##
     global layout_state                       ## populated on successful file load ##
     # If the requested filename is 'None' then we always open a file picker dialog. This
     # is pre-populated with the 'last_fully_qualified_file_name' if it exists as a file
-    # Otherwise, we will attempt to load the requested filename (without a dialog)
+    # Otherwise, we will attempt to load the requested filename (without a dialog). If
+    # the 'examples' flag is True, then we open the folder with the example layout files.
     if requested_filename is None:
-        if last_fully_qualified_file_name is not None and os.path.isfile(last_fully_qualified_file_name):
+        if examples:
+            library_sub_package_folder = pathlib.Path(__file__)
+            path, name = library_sub_package_folder.parent.parent / 'examples', ""
+        elif last_fully_qualified_file_name is not None and os.path.isfile(last_fully_qualified_file_name):
             path, name = os.path.split(last_fully_qualified_file_name)
+            path, name = ".", ""
         else:
             path, name = ".", ""
         filename_to_load = tkinter.filedialog.askopenfilename(title='Load Layout State',

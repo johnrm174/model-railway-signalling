@@ -7,6 +7,13 @@
 #
 #   set_root_window(root) - initialise the library with the root window reference
 #
+#   display_warning(canvas, message) - Display a warning message in the pop-up warnings window
+#             The Canvas reference is needed to schedule a re-focus (for subsequent keypresses to work)
+#
+#   get_keyboard_mapping(char) - To test if a keyboard character has been mapped to an object event
+#                        If mapped the return will be a tupl containing the mapping_type(str) and the
+#                        mapped item_id (int). If not mapped, the returned value will be 'None'
+#
 #   orderly_shutdown() - perform an orderly shutdown of the library functions by scheduling
 #                        a sequence of shutdown tasks in the root.main_loop to try and avoid
 #                        any exceptions caused by subsequent MQTT and GPIO events.
@@ -34,7 +41,11 @@ import math
 import logging
 import time
 import queue
+import tkinter as Tk
 
+from datetime import datetime
+
+from . import gpio_sensors
 from . import mqtt_interface
 from . import pi_sprog_interface
 from . import track_sensors
@@ -54,6 +65,119 @@ root_window = None
 shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
+# Global flag to track the mode (set via the configure_edit_mode function)
+run_mode = False
+# Global Flag to enable or disable the processing of keypress events
+keypresses_enabled = True
+
+#---------------------------------------------------------------------------------------------
+# Popup window for displaying Run Layout Warnings. Used by the Levers library module to
+# display interlocking warnings (when triggered from external keypress events) and also
+# from the Run Layout module for SPAD (and other signal passed) warnings. Note that the
+# Canvas reference is required so we can re-set the focus (for subsequent keypress events)
+#---------------------------------------------------------------------------------------------
+
+interlocking_warning_window = None
+list_of_warning_labels = []
+
+def close_warning_window():
+    global interlocking_warning_window
+    interlocking_warning_window.destroy()
+    interlocking_warning_window = None
+
+def clear_warning_window():
+    global list_of_warning_labels
+    # Clear out everything but the last entry (to maintain the width of the window)
+    for warning_label in list_of_warning_labels[:-1]: warning_label.destroy()
+    list_of_warning_labels = [list_of_warning_labels[-1]]
+
+def user_dragging_window(event, canvas):
+    global warning_window_defocus
+    # Update Idletasks to update the window and schedule an immediate event to return
+    # the focus to the canvas (to allow subsequent keypress events to be processed)
+    root_window.update_idletasks()
+    root_window.after(0, lambda:canvas.focus_set())
+
+def display_warning(canvas, message:str):
+    global interlocking_warning_window
+    global list_of_warning_labels
+    if interlocking_warning_window is not None:
+        # If there is already a  window open then we just bring it to the front
+        interlocking_warning_window.lift()
+        interlocking_warning_window.state('normal')
+    else:
+        # If there is not already a window open then create a new one. Note that we do
+        # not want to take focus from the main application window (otherwise subsequent
+        # keypress events won't be processed by the main application window). I've tried
+        # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
+        # is to schedule tasks to re-focus back on the canvas after the window has been
+        # updated with a new message or after any user interaction is complete
+        interlocking_warning_window = Tk.Toplevel(root_window, takefocus=0)
+        interlocking_warning_window.title("Layout Warnings")
+        interlocking_warning_window.protocol("WM_DELETE_WINDOW", close_warning_window)
+        interlocking_warning_window.bind('<Configure>', lambda event, arg=canvas: user_dragging_window(event, arg))
+        interlocking_warning_window.bind('<FocusIn>', lambda event, arg=canvas: user_dragging_window(event, arg))
+        x, y = root_window.winfo_x(), root_window.winfo_y()
+        interlocking_warning_window.geometry(f"+{x}+{y}")
+        buttonframe = Tk.Frame(interlocking_warning_window)
+        buttonframe.pack(side=Tk.BOTTOM)
+        button1 = Tk.Button(buttonframe, text="OK/Close", command=close_warning_window)
+        button1.pack(padx=2, pady=2, side=Tk.LEFT)
+        button2 = Tk.Button(buttonframe, text="Clear", command=clear_warning_window)
+        button2.pack(padx=2, pady=2, side=Tk.LEFT)
+    # Add the latest warning message
+    current_time = datetime.now().strftime('%H:%M:%S')
+    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w"))
+    list_of_warning_labels[-1].pack(padx=10, fill='x', expand=True)
+    # Update Idletasks to display the window and schedule an immediate event to return
+    # the focus to the canvas (to allow subsequent keypress events to be processed)
+    root_window.update_idletasks()
+    root_window.after(0, lambda:canvas.focus_set())
+    return()
+
+#-------------------------------------------------------------------------
+# Functions to configure, manage and handle callbacks for keyboard events
+# The keyboard mappings dict contains a list of all mapped event callbacks
+# The 'key' is the character, the data is a tuple of (item, id, function)
+# We use this 'global' bind method rather than binding individual keypresses
+# as it will support all Unicode characters (the other just supports ASCII)
+#-------------------------------------------------------------------------
+
+keyboard_mappings= {}
+
+def keyboard_handler(event):
+    if run_mode and keypresses_enabled:
+        debug_string = "Schematic Keypress event: Keycode="+str(event.keycode)
+        if len(event.char) == 1: debug_string = debug_string + " - Character="+repr(event.char)
+        logging.debug(debug_string)
+        if str(event.keycode) in keyboard_mappings:
+            keyboard_mappings[str(event.keycode)][2] (keyboard_mappings[str((event.keycode))][1])
+
+def add_keyboard_event(keycode:int, item:str, item_id:int, function):
+    global keyboard_mappings
+    keyboard_mappings[str(keycode)] = (item, item_id, function)
+
+def delete_keyboard_event(keycode:int):
+    global keyboard_mappings
+    if str(keycode) in keyboard_mappings.keys(): del(keyboard_mappings[str(keycode)])
+    return()
+
+def get_keyboard_mapping(keycode:int):
+    if isinstance(keycode, int) and str(keycode) in keyboard_mappings.keys():
+        keyboard_mapping = (keyboard_mappings[str(keycode)][0], keyboard_mappings[str(keycode)][1])
+    else:
+        keyboard_mapping = None
+    return(keyboard_mapping)
+
+def enable_keypress_events():
+    global keypresses_enabled
+    keypresses_enabled = True
+    return()
+
+def disable_keypress_events():
+    global keypresses_enabled
+    keypresses_enabled = False
+    return()
 
 #-------------------------------------------------------------------------
 # Function to set the tkinter "root" window reference as this is used to
@@ -69,6 +193,10 @@ def set_root_window(root):
     root_window = root
     # bind the tkinter event for handling events raised in external threads
     root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
+    # Bind a handler for any keypress events used to trigger library events such
+    # as switching signalbox levers or Sensor Triggered events. Note that any
+    # specific canvas event bindings elsewhere in the code will still work.
+    root_window.bind("<Key>", keyboard_handler)
     return()
 
 #-------------------------------------------------------------------------
@@ -153,6 +281,9 @@ def shutdown_step5():
 #------------------------------------------------------------------------------------
 
 def configure_edit_mode(edit_mode:bool):
+    global run_mode
+    run_mode = not edit_mode
+    gpio_sensors.configure_edit_mode(edit_mode)
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)

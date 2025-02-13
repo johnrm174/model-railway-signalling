@@ -14,6 +14,7 @@
 #      Optional Parameters:
 #         port_name:str - The serial port to use for the Pi-SPROG 3 - Default="/dev/serial0",
 #         baud_rate:int - The baud rate to use for the serial port - Default = 460800,
+#         dcc_address_mode:int - (1 for 'no offset', 2 for '+4', 3 for '-4')
 #         dcc_debug_mode:bool - Set to 'True' for enhanced debug logging
 #
 #   sprog_disconnect() - Performs an ordely shutdown of communications and closes the comms port 
@@ -112,6 +113,10 @@ tx_thread_terminated = True         # Tx thread terminated flag
 # The global output buffer for messages sent from the main thread to the SPROG Tx Thread
 # We use a seperate thread so we can throttle the Tx rate without blocking the main thread
 output_buffer = queue.Queue()
+
+# Global variable to hold the DCC Addressing Mode - address offset applied when sending out
+# short accessory commands (1 = No Offset, 2 = Plus 4 Offset, 3 = minus 4 Offset)
+address_mode = 1
 
 #------------------------------------------------------------------------------
 # Common function used by the main thread to wait for responses in other threads.
@@ -373,20 +378,24 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
 
 def sprog_connect (port_name:str="/dev/serial0",
                    baud_rate:int = 115200,
+                   dcc_address_mode:int=1,
                    dcc_debug_mode:bool = False):
-    global debug
+    global debug, address_mode
     pi_sprog_connected = False
     if not isinstance(port_name, str):
         logging.error("Pi-SPROG: sprog_connect - Port name must be specified as a string")
     elif not isinstance(baud_rate, int):
         logging.error("Pi-SPROG: sprog_connect - Baud rate must be specified as an integer")
+    elif not isinstance(dcc_address_mode, int) or dcc_address_mode < 0 or dcc_address_mode > 3:
+        logging.error("Pi-SPROG: sprog_connect - dcc_address_mode  must be specified as an integer (1-3)")
     elif not isinstance(dcc_debug_mode, bool):
         logging.error("Pi-SPROG: sprog_connect - Enhanced debug flag must be specified as a boolean")
     else:
         # If the serial port is already open then close it before re-configuring
         if serial_port.is_open: sprog_disconnect()
-        # Assign the global "enhanced debugging" flag
+        # Assign the global "enhanced debugging" flag and address_mode parameters
         debug = dcc_debug_mode
+        address_mode = dcc_address_mode
         # Configure the port - note the zero timeout so the Rx thread does not block
         # The Rx thread combines the data read from the port into 'complete' CBUS messages
         serial_port.port = port_name
@@ -546,27 +555,41 @@ def send_accessory_short_event(address:int, active:bool):
         logging.error("Pi-SPROG: send_accessory_short_event - Address must be specified as an integer")
     elif not isinstance(active, bool):
         logging.error("Pi-SPROG: send_accessory_short_event - State must be specified as a boolean")
-    elif (address < 1 or address > 2047):
-        logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address))
-    # Only bother sending commands to the Pi Sprog if the serial port has been opened
-    elif serial_port.is_open:
-        # Encode the message into the required number of bytes
-        byte1 = (pi_cbus_node & 0xff00) >> 8
-        byte2 = (pi_cbus_node & 0x00ff)
-        byte3 = (address & 0xff00) >> 8
-        byte4 = (address & 0x00ff)
-        #  Send a ASON or ASOF Command (Accessoy Short On or Accessory Short Off)
-        if active:
-            logging.debug("Pi-SPROG: Sending DCC command ASON (Accessory Short ON) to DCC address: "+ str(address))
-            send_cbus_command(2, 3, 152, byte1, byte2, byte3, byte4)
-        else:
-            logging.debug("Pi-SPROG: Sending DCC command ASOF (Accessory Short OFF) to DCC address: "+ str(address))
-            send_cbus_command(2, 3, 153, byte1, byte2, byte3, byte4)
-    elif debug:
-        # Note we only log the discard messages in enhanced debugging mode (to reduce the spam in the logs)
-        if active: log_string ="Discarding ASON command to DCC address: "+ str(address)
-        else: log_string = "Discarding ASOF command to DCC address: "+ str(address)
-        logging.debug("Pi-SPROG: "+log_string+" - SPROG is disconnected or DCC power is OFF")
+    else:
+        # Apply any address mode offsets
+        if address_mode == 1:
+            offset_text = ""
+            address_to_send = address
+        elif address_mode == 2:
+            address_to_send = address + 4
+            offset_text = " (Address Offset '+4')"
+        elif address_mode == 3:
+            address_to_send = address - 4
+            offset_text = " (Address Offset '-4')"
+        # Validate the modified address - Log the address we have been given - not the one with offsets applied
+        if (address_to_send < 1 or address_to_send > 2047):
+            logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address)+offset_text)
+        # Only bother sending commands to the Pi Sprog if the serial port has been opened
+        elif serial_port.is_open:
+            # Encode the message into the required number of bytes
+            byte1 = (pi_cbus_node & 0xff00) >> 8
+            byte2 = (pi_cbus_node & 0x00ff)
+            byte3 = (address_to_send & 0xff00) >> 8
+            byte4 = (address_to_send & 0x00ff)
+            # Send a ASON or ASOF Command (Accessoy Short On or Accessory Short Off).
+            # Note we log the address we have been given - not the one with offsets applied
+            if active:
+                logging.debug("Pi-SPROG: Sending DCC command ASON (Accessory Short ON) to DCC address: "+ str(address)+offset_text)
+                send_cbus_command(2, 3, 152, byte1, byte2, byte3, byte4)
+            else:
+                logging.debug("Pi-SPROG: Sending DCC command ASOF (Accessory Short OFF) to DCC address: "+ str(address)+offset_text)
+                send_cbus_command(2, 3, 153, byte1, byte2, byte3, byte4)
+        elif debug:
+            # Note we only log the discard messages in enhanced debugging mode (to reduce the spam in the logs)
+            # Note we log the address we have been given - not the one with offsets applied
+            if active: log_string ="Discarding ASON command to DCC address: "+ str(address)+offset_text
+            else: log_string = "Discarding ASOF command to DCC address: "+ str(address)+offset_text
+            logging.debug("Pi-SPROG: "+log_string+" - SPROG is disconnected")
     return ()
 
 #------------------------------------------------------------------------------

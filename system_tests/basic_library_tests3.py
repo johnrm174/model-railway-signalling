@@ -44,15 +44,13 @@ def run_library_api_tests():
     print("Library API Tests - Signal Objects")
     canvas = schematic.canvas
     # create_signal
-    print("Library Tests - create_colour_light_signal - will generate 10 errors:")
+    print("Library Tests - create_colour_light_signal - will generate 9 errors:")
     assert len(signals.signals) == 0
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, has_subsidary=True)   # Success
     create_colour_light_signal(canvas, "2", signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)  # Error - not an int
     create_colour_light_signal(canvas, 0, signals.signal_subtype.home, 100, 100,
-                               sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - out of range
-    create_colour_light_signal(canvas, 1000, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - out of range
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)   # Error - already exists
@@ -70,15 +68,13 @@ def run_library_api_tests():
     create_colour_light_signal(canvas, 7, signals.signal_subtype.distant, 100, 100,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, sig_release_button=True)  # Error - Dist & App control
     assert len(signals.signals) == 1
-    print("Library Tests - create_semaphore_signal - will generate 10 errors:")
+    print("Library Tests - create_semaphore_signal - will generate 9 errors:")
     create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated, main_subsidary=True)  # Success
     create_semaphore_signal(canvas, "3", signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - not an int
     create_semaphore_signal(canvas, 0, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - out of range
-    create_semaphore_signal(canvas, 2000, signals.semaphore_subtype.home, 250, 100,
-                            sig_switched, sub_switched, sig_released, sig_passed, sig_updated)      # Error - out of range
     create_semaphore_signal(canvas, 1, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)        # Error - already exists
     create_semaphore_signal(canvas, 3, signals.signal_type.colour_light, 250, 100,
@@ -109,19 +105,17 @@ def run_library_api_tests():
     create_semaphore_signal(canvas, 8, signals.semaphore_subtype.home, 250, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated, associated_home=2)        # Error - sig type is a home
     assert len(signals.signals) == 3
-    print("Library Tests - create_ground_disc_signal - will generate 5 errors:")
+    print("Library Tests - create_ground_disc_signal - will generate 4 errors:")
     create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Success
     create_ground_disc_signal(canvas, "5", signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)      # Error - not an int
     create_ground_disc_signal(canvas, 0, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - out of range
-    create_ground_disc_signal(canvas, 1000, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)     # Error - out of range
     create_ground_disc_signal(canvas, 1, signals.ground_disc_subtype.standard, 400, 100, sig_switched, sig_passed)        # Error - already exists
     create_ground_disc_signal(canvas, 6, signals.signal_type.colour_light, 400, 100, sig_switched, sig_passed)            # Error - invalid subtype
     assert len(signals.signals) == 4
-    print("Library Tests - create_ground_position_signal - will generate 5 errors:")
+    print("Library Tests - create_ground_position_signal - will generate 4 errors:")
     create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Success
     create_ground_position_signal(canvas, "6", signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)      # Error - not an int
     create_ground_position_signal(canvas, 0, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - out of range
-    create_ground_position_signal(canvas, 1000, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)     # Error - out of range
     create_ground_position_signal(canvas, 1, signals.ground_pos_subtype.standard, 550, 100, sig_switched, sig_passed)        # Error - already exists
     create_ground_position_signal(canvas, 7, signals.signal_type.colour_light, 550, 100, sig_switched, sig_passed)           # Error - invalid subtype
     assert len(signals.signals) == 5
@@ -265,7 +259,7 @@ def run_library_api_tests():
     assert signals.signal_locked(99) == False       # Error - does not exist
     assert signals.subsidary_locked("1") == False   # Error - not an int
     assert signals.subsidary_locked(99) == False    # Error - does not exist
-    print("Library Tests - lock_subsidary (also tests toggle_subsidary) - will generate 3 errors and 1 warning:")
+    print("Library Tests - lock_subsidary (also tests toggle_subsidary) - will generate 4 errors and 1 warning:")
     assert not signals.subsidary_locked(1)
     signals.lock_subsidary(1)
     signals.lock_subsidary(1)
@@ -273,9 +267,8 @@ def run_library_api_tests():
     signals.lock_subsidary("2")  # Error - not an int
     signals.lock_subsidary(6)    # Error - does not exist
     # Test locking of a signal that does not have a subsidary
-    assert not signals.subsidary_locked(3)
-    signals.lock_subsidary(3)  # Error - signal does not have a subsidary
-    assert not signals.subsidary_locked(3)
+    assert not signals.subsidary_locked(3)  # Error - signal does not have a subsidary
+    signals.lock_subsidary(3)               # Error - signal does not have a subsidary
     # Test locking of a subsidary that is OFF
     signals.unlock_subsidary(1)  # Unlock subsidary first (to reset for the test)
     assert not signals.subsidary_locked(1)
@@ -507,11 +500,10 @@ def run_library_api_tests():
     signals.trigger_timed_signal(3, 1, 1)      # success
     signals.trigger_timed_signal(1, 0, 0)      # success
     signals.trigger_timed_signal(2, 0, 0)      # success
-    print("Library Tests - set_signals_to_publish_state - Exercise Publishing of Events code - will generate 4 errors and 1 warning")
+    print("Library Tests - set_signals_to_publish_state - Exercise Publishing of Events code - will generate 2 errors and 1 warning")
     assert len(signals.list_of_signals_to_publish) == 0
     signals.set_signals_to_publish_state(1,2,10)   # success
     signals.set_signals_to_publish_state("3","4")  # 2 errors - not an int
-    signals.set_signals_to_publish_state(0,1000)    # 2 errors - out of range
     signals.set_signals_to_publish_state(1)        # 1 warning - already set to publish
     assert len(signals.list_of_signals_to_publish) == 3
     # Create a Signal already set to publish state on creation
@@ -523,12 +515,12 @@ def run_library_api_tests():
     signals.toggle_signal(1)
     signals.toggle_signal(2)
     signals.delete_signal(10)
-    print("Library Tests - subscribe_to_remote_signals - 5 Errors and 2 warnings will be generated")
+    print("Library Tests - subscribe_to_remote_signals - 4 Errors and 2 warnings will be generated")
     assert len(signals.signals) == 5
     signals.subscribe_to_remote_signals(sig_updated,"box1-50","box1-51")   # Success
     signals.subscribe_to_remote_signals(sig_updated,"box1-50","box1-51")   # 2 Warnings - already subscribed
     signals.subscribe_to_remote_signals(sig_updated,"box1","51", 3)        # Fail - 3 errors
-    signals.subscribe_to_remote_signals(sig_updated,"box1-0","box1-1000")   # Fail - 2 errors
+    signals.subscribe_to_remote_signals(sig_updated,"box1-0")              # Fail - 1 error
     assert len(signals.signals) == 7
     assert signals.signal_exists("box1-50")
     assert signals.signal_exists("box1-51")
@@ -1634,10 +1626,13 @@ def run_all_basic_library_tests():
     run_approach_control_tests()
     run_mode_change_tests()
     run_style_update_tests()
+    # Double check we have cleaned everything up so as not to impact subsequent tests
+    assert len(signals.signals) == 0
     # Check the creation of all supported Signal configurations
     print("Library Tests - Test creation of all supported signal configurations - no errors")
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/colour_light_signals.sig")
-    system_test_harness.initialise_test_harness(filename="../configuration_examples/semaphore_signals.sig")
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/colour_light_signals.sig")
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/semaphore_signals.sig")
+    system_test_harness.initialise_test_harness()
     print("----------------------------------------------------------------------------------------")
     print("")
     

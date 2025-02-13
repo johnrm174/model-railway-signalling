@@ -119,8 +119,8 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback, hidden:bo
     global track_sensors
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "sensor"+str(sensor_id)
-    if not isinstance(sensor_id, int) or sensor_id < 1 or sensor_id > 999:
-        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an int (1-999)")
+    if not isinstance(sensor_id, int) or sensor_id < 1 :
+        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be a positive integer")
     elif track_sensor_exists(sensor_id):
         logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID already exists")
     else:
@@ -129,8 +129,8 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback, hidden:bo
         # only displayed in Edit mode (to aid identification and selection). These are both initially created
         # assuming we are in Run Mode (Oval has a width of zero to make it invisible and the text is hidden).
         # Similarly the button is created as visible (Changed later if in Run Mode and 'hidden' is selected)
-        sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"), highlightthickness=0)
-        sensor_button.config(command=lambda:track_sensor_triggered(sensor_id))
+        sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',3,"normal"),
+                        highlightthickness=0, command=lambda:track_sensor_triggered(sensor_id))
         button_window = canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
         selection_circle = canvas.create_oval(x-20, y-20, x+20, y+20, outline="grey60", tags=canvas_tag, width=0)
         # Note that the label is offset to take into account the default font size in 'common'

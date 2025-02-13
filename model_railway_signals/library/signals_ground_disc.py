@@ -18,6 +18,11 @@
 #       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
 #       button_yoffset:int - Position offset for the point buttons (from default) - default = 0
 #       hide_buttons:bool - Point is configured to have the control buttons hidden in Run Mode - Default = False
+#       button_colour:str - Fill colour for the button when unselected and un-active - default = "Grey85"
+#       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
+#       selected_colour:str - Fill colour for the button when selected - default = "White"
+#       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # Classes and functions used by the other library modules:
 #
@@ -57,8 +62,8 @@ def create_ground_disc_signal (canvas, sig_id:int,
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Common validation (common to all signal types) 
-    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 999:
-        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-999)")
+    if not isinstance(sig_id, int) or sig_id < 1:
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be a positive integer")
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation

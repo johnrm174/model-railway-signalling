@@ -50,6 +50,9 @@
 #
 #   mqtt_broker_disconnect() - disconnect from the MQTT broker
 #
+#   get_mqtt_node_status() - Returns a dictionary of connected nodes where the dict key is the Node Name
+#                            ant the dict entry is a list containing [ip_address:str, time_seen:time]
+#
 # Classes and functions used by the other library modules:
 #
 #   split_remote_item_identifier(item_identifier:str) - validates and decodes a remote item identifier
@@ -127,7 +130,7 @@ heartbeats = {}
 # API function used by the editor to get the list of connected nodes and when they were last seen
 #-----------------------------------------------------------------------------------------------
 
-def get_node_status():
+def get_mqtt_node_status():
     return (heartbeats)
     
 #-----------------------------------------------------------------------------------------------
@@ -217,7 +220,7 @@ def split_remote_item_identifier(item_identifier:str):
     if isinstance(item_identifier,str) and "-" in item_identifier:
         node_id = item_identifier.rpartition("-")[0]
         item_id = item_identifier.rpartition("-")[2]
-        if node_id != "" and item_id.isdigit() and int(item_id) >= 1 and int(item_id) <= 999:
+        if node_id != "" and item_id.isdigit() and int(item_id) >= 1:
             return_value = [node_id,int(item_id)]                          
     return (return_value)
 

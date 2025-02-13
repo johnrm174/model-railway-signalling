@@ -21,6 +21,7 @@
 #       label:int - The label for the button (default is 'Button')
 #       tooltip:str - the default tooltip to be displayed (default is 'Tooltip')
 #       hidden:bool - Whether the Button should be 'hidden' in Run Mode (default=False)
+#       release_delay:int - The release_delay for momentary buttons in ms (deafult=0 - on user release)
 #       button_colour:str - the colour to use for the button when 'normal' (default='SeaGreen3')
 #       active_colour:str - the colour to use for the button when 'active' (default='SeaGreen2')
 #       selected_colour:str - the colour to use for the button when 'selected' (default='SeaGreen1')
@@ -64,10 +65,11 @@ import logging
 import enum
 import tkinter as Tk
 
-from ..editor.common import CreateToolTip
+from ..common import CreateToolTip
 
 from . import file_interface
 from . import dcc_control
+from . import common
 
 # -------------------------------------------------------------------------
 # Public API classes (to be used by external functions)
@@ -127,41 +129,78 @@ def button_exists(button_id:int):
     return(button_exists)
 
 #---------------------------------------------------------------------------------------------
-# Callback and API functions for processing Button presses. Action will depend on button type:
-# Momentary - Pulse the button and send out send out DCC commands for ON (if configured)
-# Switched - Change the state of the button and send out DCC commands for ON/OFF as required
-# Note that DCC commands will only be sent out if a DCC mapping exists for the switch
+# Callback functions for processing Momentary Button presses/Releases. note that if a
+# Release delay of zero has been specified then the 'button 1 release' event is bound to
+# the button_released_event function (i.e. 'release' is on the user releasing the button)
+#---------------------------------------------------------------------------------------------
+
+def button_pressed_event(button_id:int):
+    # This event is called for Momentary Switches only - on user 'press' of the button
+    logging.info("Button "+str(button_id)+": Momentary Button has been pressed *****************************************")
+    buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+    dcc_control.update_dcc_switch(button_id, True)
+    if buttons[str(button_id)]["releasedelay"] > 0:
+        common.root_window.after(buttons[str(button_id)]["releasedelay"], lambda:button_released_event(button_id))
+    return()
+
+def button_released_event(button_id:int):
+    # This event is called for Momentary Switches only - either on user 'release' of
+    # the button (if a release_delay of zero has been specified) or after the specified
+    # release_delay (if a release_delay greater than zero has been specified). We always
+    # check the button sitll exists just in case its been deleted during the timeout
+    if button_exists(button_id):
+        logging.info("Button "+str(button_id)+": Momentary Button has been released ****************************************")
+        buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["deselectedcolour"])
+        dcc_control.update_dcc_switch(button_id, False)
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Callback functions for processing ALL Button Events (effectively called on release of the
+# button as this is specified as the 'command' at button creation time). We only change the
+# state of the button if its a 'switched' button (processing of momentary buttons is above),
+# but still have to specify this as a 'command' for Tkinter to display the button correctly
+# during the actual pressing and releasing of the momentary button.
 #---------------------------------------------------------------------------------------------
 
 def button_event(button_id:int):
-    toggle_button(button_id)
-    if buttons[str(button_id)]["selected"]:
-        buttons[str(button_id)]["selectedcallback"] (button_id)
+    if buttons[str(button_id)]["buttontype"] == button_type.switched:
+        toggle_button(button_id)
+        if buttons[str(button_id)]["selected"]:
+            buttons[str(button_id)]["selectedcallback"] (button_id)
+        else:
+            buttons[str(button_id)]["deselectedcallback"] (button_id)
     else:
-        buttons[str(button_id)]["deselectedcallback"] (button_id)
+        buttons[str(button_id)]["selectedcallback"] (button_id)
     return()
+
+#---------------------------------------------------------------------------------------------
+# API function for toggling the state of 'Switched' buttons. also called on 'button_events'
+# (see above function). Change the state of the button and send out DCC commands for ON/OFF as
+# required. Note that DCC commands will only be sent out if a DCC mapping exists for the switch
+#---------------------------------------------------------------------------------------------
 
 def toggle_button(button_id:int):
     global buttons
     # Validate the button ID as this is an API function as well as a callback
-    if not isinstance(button_id, int) :
+    if not isinstance(button_id, int):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID must be an int")
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID does not exist")
+    elif buttons[str(button_id)]["buttontype"] == button_type.momentary:
+        logging.info("Button "+str(button_id)+": Momentary Button has been activated ***************************************")
+        buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+        dcc_control.update_dcc_switch(button_id, True)
+        common.root_window.after(buttons[str(button_id)]["releasedelay"], lambda:button_released_event(button_id))
+    elif buttons[str(button_id)]["selected"]:
+        logging.info("Button "+str(button_id)+": Button has been de-selected ***********************************************")
+        buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["deselectedcolour"])
+        buttons[str(button_id)]["selected"] = False
+        dcc_control.update_dcc_switch(button_id, False)
     else:
-        if buttons[str(button_id)]["buttontype"] == button_type.momentary:
-            logging.info("Button "+str(button_id)+": Button has been pressed ***************************************************")
-            dcc_control.update_dcc_switch(button_id, True)
-        elif buttons[str(button_id)]["selected"]:
-            logging.info("Button "+str(button_id)+": Button has been de-selected ***********************************************")
-            buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["deselectedcolour"])
-            buttons[str(button_id)]["selected"] = False
-            dcc_control.update_dcc_switch(button_id, False)
-        else:
-            logging.info("Button "+str(button_id)+": Button has been selected **************************************************")
-            buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
-            buttons[str(button_id)]["selected"] = True
-            dcc_control.update_dcc_switch(button_id, True)
+        logging.info("Button "+str(button_id)+": Button has been selected **************************************************")
+        buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+        buttons[str(button_id)]["selected"] = True
+        dcc_control.update_dcc_switch(button_id, True)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -245,14 +284,14 @@ def button_state(button_id:int):
 
 def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, selected_callback,
                    deselected_callback, width:int=10, label:str="Button", tooltip="Tooltip", hidden:bool=False,
-                   button_colour:str="SeaGreen3", active_colour:str="SeaGreen2", selected_colour:str="SeaGreen1",
-                   text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
+                   release_delay:int=0, button_colour:str="SeaGreen3", active_colour:str="SeaGreen2",
+                   selected_colour:str="SeaGreen1", text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "button"+str(button_id)
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) or button_id < 1 or button_id > 999:
-        logging.error("Button "+str(button_id)+": create_button - Button ID must be an int (1-999)")
+    if not isinstance(button_id, int) or button_id < 1:
+        logging.error("Button "+str(button_id)+": create_button - Button ID must be a positive integer")
     elif button_exists(button_id):
         logging.error("Button "+str(button_id)+": create_button - Button ID already exists")
     elif buttontype != button_type.switched and buttontype != button_type.momentary:
@@ -265,6 +304,13 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
                         font=font, background=button_colour, activebackground=active_colour, padx=2, pady=2,
                         activeforeground=text_colour, foreground=text_colour, command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag, state="hidden")
+        # Bind the Tkinter button events for Momentary switches. If the specified release_delay is
+        # zero the button will be 'released' when released by the user. If a release_delay greater
+        # than zero is specified then the button will be 'released' at the end of the delay period
+        if buttontype == button_type.momentary:
+            button.bind('<Button-1>', lambda event:button_pressed_event(button_id))
+            if release_delay == 0:
+                button.bind('<ButtonRelease-1>', lambda event:button_released_event(button_id))
         # Create and store a tool-tip for the button
         tooltip_object = CreateToolTip(button, text=tooltip)
         tooltip_object.waittime = 200     # miliseconds
@@ -301,6 +347,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["selected"] = False                           # Current state (selected or de-selected)
         buttons[str(button_id)]["locked"] = False                             # The master lock for the button
         buttons[str(button_id)]["hidden"] = hidden                            # True if the button should be hidden in run mode
+        buttons[str(button_id)]["releasedelay"] = release_delay               # Delay in ms before momentary buttons are 'released'
         buttons[str(button_id)]["buttontype"] = buttontype                    # Type of the button (route, switch or button)
         buttons[str(button_id)]["button"] = button                            # Tkinter button object (for run mode)
         buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
@@ -332,8 +379,8 @@ def update_button_styles(button_id:int, width:int=10, button_colour:str="SeaGree
                          text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
     global buttons
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) or button_id < 1 or button_id > 999:
-        logging.error("Button "+str(button_id)+": update_button_styles - Button ID must be an int (1-999)")
+    if not isinstance(button_id, int):
+        logging.error("Button "+str(button_id)+": update_button_styles - Button ID must be an int")
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": update_button_styles - Button ID does not exist")
     else:

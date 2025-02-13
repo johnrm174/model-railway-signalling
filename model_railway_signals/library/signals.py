@@ -150,7 +150,17 @@
 #   trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int) - Trigger a timed signal sequence
 #
 #   update_colour_light_signal(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
-#                 into account the internal state of the signal and displayed aspect of the signal ahead#
+#                 into account the internal state of the signal and displayed aspect of the signal ahead
+#
+#   update_signal_button_styles - Update the styles of the signal buttons
+#     Mandatory Parameters:
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#     Optional Parameters:
+#       button_colour:str - Fill colour for the button when unselected and un-active - default = "Grey85"
+#       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
+#       selected_colour:str - Fill colour for the button when selected - default = "White"
+#       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # The following API functions are for configuring the pub/sub of Signal events. The functions are called by
 # the editor on 'Apply' of the MQTT settings. First, 'reset_signals_mqtt_configuration' is called to clear down
@@ -416,8 +426,8 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:subsidary_button_event(sig_id))
     # Signal Passed Button - We only want a small button - hence a small font size
-    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"), highlightthickness=0,
-                command=lambda:sig_passed_button_event(sig_id))
+    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
+                        highlightthickness=0, command=lambda:sig_passed_button_event(sig_id))
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
     # created if the signal has a subsidary, but the Button positions are adjusted so they always
     # remain in the "right" position relative to the signal. Note we also have to cater for the
@@ -552,8 +562,8 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
                             orientation:int, approach_button:bool, sig_released_callback):
     global signals
     # Create the approach release button - We only want a small button - hence a small font size
-    approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
-                                        command=lambda:approach_release_button_event(sig_id))
+    approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
+                        highlightthickness=0, command=lambda:approach_release_button_event(sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
@@ -1277,8 +1287,8 @@ def set_signals_to_publish_state(*sig_ids:int):
     global list_of_signals_to_publish
     for sig_id in sig_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(sig_id,int) or sig_id < 1 or sig_id > 999:
-            logging.error("Signal "+str(sig_id)+": set_signals_to_publish_state - ID must be an int (1-999)")
+        if not isinstance(sig_id,int) or sig_id < 1:
+            logging.error("Signal "+str(sig_id)+": set_signals_to_publish_state - ID must be a positive integer")
         elif sig_id in list_of_signals_to_publish:
             logging.warning("Signal "+str(sig_id)+": set_signals_to_publish_state -"
                                 +" Signal is already configured to publish state to MQTT broker")

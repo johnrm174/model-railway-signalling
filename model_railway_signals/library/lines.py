@@ -31,7 +31,11 @@
 #   set_line_colour(line_id:int, colour:str) - change the colour of a line
 #
 #   reset_line_colour(line_id:int) - reset the colour of a line back to default
-# 
+#
+#   move_line_end_1(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
+#
+#   move_line_end_2(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
+#
 #---------------------------------------------------------------------------------------------
 
 import logging
@@ -69,8 +73,8 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
     # Create an aditional tag for the line "selection" indication
     selected_tag = "line"+str(line_id)+"selected"
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(line_id, int) or line_id < 1 or line_id > 999:
-        logging.error("Line "+str(line_id)+": create_line - Line ID must be an int (1-999)")
+    if not isinstance(line_id, int) or line_id < 1:
+        logging.error("Line "+str(line_id)+": create_line - Line ID must be a positive integer")
     elif line_exists(line_id):
         logging.error("Line "+str(line_id)+": create_line - Line ID already exists")
     else:
@@ -124,8 +128,8 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
 def update_line_styles(line_id:int, colour:str="black", line_width:int=3):
     global lines
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(line_id, int) or line_id < 1 or line_id > 999:
-        logging.error("Line "+str(line_id)+": update_line_styles - Line ID must be an int (1-999)")
+    if not isinstance(line_id, int) :
+        logging.error("Line "+str(line_id)+": update_line_styles - Line ID must be an int")
     elif not line_exists(line_id):
         logging.error("Line "+str(line_id)+": update_line_styles - Line ID does not exist")
     else:

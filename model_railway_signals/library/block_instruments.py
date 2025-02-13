@@ -39,6 +39,9 @@
 #   block_section_ahead_clear(inst_id:int) - Returns the state of the ASSOCIATED block instrument
 #                       (i.e. the linked instrument controlling the state of the block section ahead)
 #
+#   set_instrument_blocked(inst_id:int) - Returns the block instrument to its default state (BLOCKED)
+#                              Will also update the repeater display of any linked Block Instrument
+#
 # The following API functions are for configuring the pub/sub of Block Instrument events. The functions are called by
 # the editor on 'Apply' of the MQTT settings. First, 'reset_instruments_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_instruments_to_publish_state' (with the list of LOCAL Block
@@ -553,16 +556,16 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "instrument"+str(inst_id)
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(inst_id, int) or inst_id < 1 or inst_id > 999:
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be an int (1-999)")
+    if not isinstance(inst_id, int) or inst_id < 1:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be a positive integer")
     elif instrument_exists(inst_id):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID already exists")
     elif not isinstance(linked_to, str):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID must be a str")
     elif linked_to == str(inst_id):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID is the same as the Instrument ID")
-    elif linked_to != "" and linked_to.isdigit() and (int(linked_to) < 1 or int(linked_to) > 999):
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Linked (local) Instrument ID is out of range (1-999)")
+    elif linked_to != "" and linked_to.isdigit() and int(linked_to) < 1:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Linked (local) Instrument ID must be a positive int")
     elif linked_to != "" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
         logging.error("Instrument "+str(inst_id)+": create_instrument - Linked (Remote) Instrument ID is invalid format")
     elif inst_type != instrument_type.single_line and inst_type != instrument_type.double_line:
@@ -679,8 +682,8 @@ def update_linked_instrument(inst_id:int, linked_to:str):
         logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked ID must be a string")
     elif linked_to == str(inst_id):
         logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked Instrument ID is the same as the Instrument ID")
-    elif linked_to != "" and linked_to.isdigit() and (int(linked_to) < 1 or int(linked_to) > 999):
-        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked (local) Instrument ID is out of range (1-999)")
+    elif linked_to != "" and linked_to.isdigit() and int(linked_to) < 1:
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked (local) Instrument ID must be a positive int")
     elif linked_to != "" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
         logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked (Remote) Instrument ID is invalid format")
     else:
@@ -772,12 +775,27 @@ def block_section_ahead_clear(inst_id:int):
     if not isinstance(inst_id, int) :
         logging.error("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID must be an int")
         section_ahead_clear = False
-    if not instrument_exists(inst_id):
+    elif not instrument_exists(inst_id):
         logging.error ("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID does not exist")
         section_ahead_clear = False
     else:
         section_ahead_clear = instruments[str(inst_id)]["repeaterstate"]
     return(section_ahead_clear)
+
+# --------------------------------------------------------------------------------
+# Public API function to Reset the Instrument to its default state (BLOCKED).
+# This is represented by the current status of the REPEATER Indicator
+# --------------------------------------------------------------------------------
+
+def set_instrument_blocked(inst_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int) :
+        logging.error("Instrument "+str(inst_id)+": set_section_blocked - Instrument ID must be an int")
+    elif not instrument_exists(inst_id):
+        logging.error ("Instrument "+str(inst_id)+": set_section_blocked - Instrument ID does not exist")
+    else:
+        set_section_blocked(inst_id)
+    return()
 
 # ------------------------------------------------------------------------------------------
 # API function for deleting an instrument library object (including all the drawing objects)
@@ -838,8 +856,8 @@ def set_instruments_to_publish_state(*inst_ids:int):
     global list_of_instruments_to_publish
     for inst_id in inst_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(inst_id, int) or inst_id < 1 or inst_id > 999:
-            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be an int (1-999)")
+        if not isinstance(inst_id, int) or inst_id < 1:
+            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be a positive integer")
         elif inst_id in list_of_instruments_to_publish:
             logging.warning("Instrument "+str(inst_id)+": set_instruments_to_publish_state -"
                                 +" Instrument is already configured to publish state to MQTT broker")

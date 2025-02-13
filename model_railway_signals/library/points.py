@@ -311,12 +311,12 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
     global points
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "point"+str(point_id)
-    if not isinstance(point_id, int) or point_id < 1 or point_id > 999:
-        logging.error("Point "+str(point_id)+": create_point - Point ID must be an int (1-999)")
+    if not isinstance(point_id, int) or point_id < 1:
+        logging.error("Point "+str(point_id)+": create_point - Point ID must be a positive integer")
     elif point_exists(point_id):
         logging.error("Point "+str(point_id)+": create_point - Point ID already exists")
-    elif not isinstance(also_switch, int) or also_switch < 0 or also_switch > 999:
-        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an int (0-999)")
+    elif not isinstance(also_switch, int) or also_switch < 0:
+        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be a positive integer")
     elif also_switch == point_id:
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
     elif pointtype != point_type.LH and pointtype != point_type.RH and pointtype != point_type.Y:

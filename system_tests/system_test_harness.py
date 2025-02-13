@@ -15,6 +15,8 @@
 #    sleep(sleep_time)
 #
 # Supported Schematic test invocations:
+#    set_levers_on(*leverids)
+#    set_levers_off(*leverids)
 #    set_signals_on(*sigids)
 #    set_signals_off(*sigids)
 #    set_subsidaries_on(*sigids)
@@ -25,7 +27,7 @@
 #    trigger_signals_released(*sigids)
 #    trigger_sensors_passed(*sigids)
 #    set_points_switched(*pointids)
-#    set_points_normal(*pointids
+#    set_points_normal(*pointids)
 #    set_fpls_on(*pointids)
 #    set_fpls_off(*pointids)
 #    set_sections_occupied(*sectionids)
@@ -39,6 +41,10 @@
 #    simulate_buttons_clicked(*buttonids)
 #
 # Supported Schematic test assertions:
+#    assert_levers_off(*leverids)
+#    assert_levers_on(*leverids)
+#    assert_levers_locked(*leverids)
+#    assert_levers_unlocked(*leverids)
 #    assert_points_locked(*pointids)
 #    assert_points_unlocked(*pointids)
 #    assert_points_switched(*pointids)
@@ -47,6 +53,10 @@
 #    assert_signals_unlocked(*sigids)
 #    assert_subsidaries_locked(*sigids)
 #    assert_subsidaries_unlocked(*sigids)
+#    assert_signals_off(*sigids)
+#    assert_signals_on(*sigids)
+#    assert_subsidaries_off(*sigids)
+#    assert_subsidaries_on(*sigids)
 #    assert_signals_override_set(*sigids)
 #    assert_signals_override_clear(*sigids)
 #    assert_signals_override_caution_set(*sigids)
@@ -96,6 +106,7 @@
 #    create_textbox()
 #    create_route()
 #    create_switch()
+#    create_lever()
 #
 # Supported Schematic keypress / right click menu invocations:
 #    toggle_mode()                    - 'Cntl-m'
@@ -153,9 +164,9 @@ import threading
 
 import sys
 sys.path.append("..")
-from model_railway_signals.editor import editor
-from model_railway_signals.editor import schematic
-from model_railway_signals.editor import objects
+from model_railway_signals import editor
+from model_railway_signals import schematic
+from model_railway_signals import objects
 from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
@@ -164,6 +175,7 @@ from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
+from model_railway_signals.library import levers
 
 thread_delay_time = 0.150
 tkinter_thread_started = False
@@ -284,6 +296,24 @@ def sleep(sleep_time:float): time.sleep(sleep_time)
 # Functions to mimic layout 'events' - in terms of button pushes or other events
 # ------------------------------------------------------------------------------
     
+def set_levers_on(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("set_levers_on - Lever: "+str(leverid)+" does not exist")
+        elif not levers.lever_switched(leverid):
+            raise_test_warning ("set_levers_on - Lever: "+str(leverid)+" is already ON")
+        else:
+            run_function(lambda:levers.change_button_event(leverid))
+
+def set_levers_off(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("set_levers_off - Lever: "+str(leverid)+" does not exist")
+        elif levers.lever_switched(leverid):
+            raise_test_warning ("set_levers_off - Lever: "+str(leverid)+" is already OFF")
+        else:
+            run_function(lambda:levers.change_button_event(leverid))
+            
 def set_signals_on(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals.signals.keys():
@@ -485,6 +515,38 @@ def simulate_buttons_clicked(*buttonids):
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
 
+def assert_levers_locked(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_locked - Lever: "+str(leverid)+" does not exist")
+        elif not levers.levers[str(leverid)]["locked"]:
+            raise_test_error ("assert_levers_locked - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
+    
+def assert_levers_unlocked(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_unlocked - Lever: "+str(leverid)+" does not exist")
+        elif levers.levers[str(leverid)]["locked"]:
+            raise_test_error ("assert_levers_unlocked - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_levers_off(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_off - Lever: "+str(leverid)+" does not exist")
+        elif not levers.lever_switched(leverid):
+            raise_test_error ("assert_levers_off - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
+    
+def assert_levers_on(*leverids):
+    for leverid in leverids:
+        if str(leverid) not in levers.levers.keys():
+            raise_test_warning ("assert_levers_on - Lever: "+str(leverid)+" does not exist")
+        elif levers.lever_switched(leverid):
+            raise_test_error ("assert_levers_on - Lever: "+str(leverid)+" - Test Fail")
+        increment_tests_executed()
+
 def assert_points_locked(*pointids):
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
@@ -515,6 +577,38 @@ def assert_points_normal(*pointids):
             raise_test_warning ("assert_points_normal - Point: "+str(pointid)+" does not exist")
         elif points.points[str(pointid)]["switched"]:
             raise_test_error ("assert_points_normal - Point: "+str(pointid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_signals_off(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_signals_off - Signal: "+str(sigid)+" does not exist")
+        elif not signals.signals[str(sigid)]["sigclear"]:
+            raise_test_error ("assert_signals_off - Signal: "+str(sigid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_signals_on(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_signals_on - Signal: "+str(sigid)+" does not exist")
+        elif signals.signals[str(sigid)]["sigclear"]:
+            raise_test_error ("assert_signals_on - Signal: "+str(sigid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_subsidaries_off(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_subsidaries_off - Signal: "+str(sigid)+" does not exist")
+        elif not signals.signals[str(sigid)]["subclear"]:
+            raise_test_error ("assert_subsidaries_off - Signal: "+str(sigid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_subsidaries_on(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals.signals.keys():
+            raise_test_warning ("assert_signals_unlocked - Signal: "+str(sigid)+" does not exist")
+        elif signals.signals[str(sigid)]["subclear"]:
+            raise_test_error ("assert_signals_unlocked - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
 
 def assert_signals_locked(*sigids):
@@ -833,19 +927,33 @@ class dummy_event():
 def place_object(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
     move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
     event = dummy_event(x=xpos, y=ypos)
+    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress(), delay=0.2)
+    run_function(lambda:schematic.left_button_click(event))
+    run_function(lambda:schematic.left_button_release(event))
+    
+def place_object_after_create(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
+    move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
+    event = dummy_event(x=xpos, y=ypos)
     if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress())
+    run_function(lambda:schematic.left_button_click(event))
+    run_function(lambda:schematic.left_button_release(event))
+
+def place_object_after_copy(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
+    move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
+    event = dummy_event(x=xpos, y=ypos)
+    if test_cancel: run_function(lambda:schematic.cancel_copy_object_in_progress())
     run_function(lambda:schematic.left_button_click(event))
     run_function(lambda:schematic.left_button_release(event))
 
 def create_line(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.line))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_track_sensor(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.track_sensor))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -853,7 +961,7 @@ def create_colour_light_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                         signals.signal_type.colour_light.value,
                         signals.signal_subtype.four_aspect.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -861,7 +969,7 @@ def create_semaphore_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0, t
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.semaphore.value,
                            signals.semaphore_subtype.home.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -869,7 +977,7 @@ def create_ground_position_signal(xpos:int, ypos:int, steps:int=10, delay:float=
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.ground_position.value,
                            signals.ground_pos_subtype.standard.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -877,52 +985,58 @@ def create_ground_disc_signal(xpos:int, ypos:int, steps:int=10, delay:float=0.0,
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals.signal_type.ground_disc.value,
                            signals.ground_disc_subtype.standard.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_track_section(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.section))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_block_instrument(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.instrument,
                     block_instruments.instrument_type.single_line.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_left_hand_point(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.point,
                 points.point_type.LH.value, points.point_subtype.normal.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_right_hand_point(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.point,
                 points.point_type.RH.value, points.point_subtype.normal.value))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_textbox(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.textbox))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_route(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.route))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_switch(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     run_function(lambda:schematic.create_object(objects.object_type.switch))
-    place_object(xpos, ypos, steps, delay, test_cancel)
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
+    object_id = list(objects.schematic_objects)[-1]
+    return(object_id)
+
+def create_lever(xpos:int, ypos:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
+    run_function(lambda:schematic.create_object(objects.object_type.lever, levers.lever_type.spare.value))
+    place_object_after_create(xpos, ypos, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -1169,7 +1283,7 @@ def delete_selected_objects():
 def copy_selected_objects(xdiff:int, ydiff:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     event = dummy_event(x=0, y=0)
     run_function(lambda:schematic.copy_selected_objects(event))
-    place_object(xdiff, ydiff, steps, delay, test_cancel)
+    place_object_after_copy(xdiff, ydiff, steps, delay, test_cancel)
     object_id = list(objects.schematic_objects)[-1]
     return(schematic.schematic_state["selectedobjects"])
 
