@@ -15,6 +15,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object
+#    objects.finalise_object_updates
 #    objects.signal
 #    objects.point
 #    objects.section
@@ -719,10 +720,10 @@ class bulk_renumbering():
                 if value[0] in objects.schematic_objects.keys() and value[1] != value[2]:
                     new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
                     new_object_configuration["itemid"] = value[2]
-                    update_schematic_state = (list_of_all_values[-1][0] == value[0])
                     objects.update_object(value[0], new_object_configuration,
-                            update_schematic_state=update_schematic_state, create_selected=False)
+                                update_schematic_state=False, create_selected=False)
                     self.root_window.update_idletasks()
+            objects.finalise_object_updates()
             # close the window (on OK)
             if close_window: self.close_window()
             else: self.load_state()

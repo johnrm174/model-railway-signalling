@@ -58,7 +58,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
 > You have been warned!
 
-* TBD, TBD, TBD
+* Bugfix to the Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
+* TBD, TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

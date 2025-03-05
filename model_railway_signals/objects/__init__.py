@@ -33,6 +33,7 @@
 #    move_objects([object_IDs]) - Finalises the move of selected objects
 #    copy_objects([object_IDs]) - Copy the selected objects (returns list of new IDs)
 #    update_object(object_ID, new_object) - update the config of an existing object
+#    finalise_object_updates() - called after bulk updates to process any layout changes
 #    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
 #    undo() / redo() - Undo and re-do functions as you would expect
 #
@@ -67,6 +68,7 @@ from .objects import copy_objects
 from .objects import update_object
 from .objects import update_styles
 from .objects import save_schematic_state
+from .objects import finalise_object_updates
 
 from .objects_common import initialise
 from .objects_common import signal 
@@ -118,6 +120,7 @@ __all__ = [
     'copy_objects',
     'update_object',
     'update_styles',
+    'finalise_object_updates',
     # Helper functions to get the obj ID of an item ID
     'signal',
     'point',

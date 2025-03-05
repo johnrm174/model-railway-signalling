@@ -15,6 +15,7 @@
 #    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    update_styles(list of obj IDs, styles_dict) - update the styles of existing objects
+#    finalise_object_updates() - called after bulk updates to process any layout changes
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -288,6 +289,24 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
     return(object_id)
 
 #------------------------------------------------------------------------------------
+# Internal Function to update the state of a schematic and process any layout changes
+# after an object configuration update (where the object gets deleted and re-drawn).
+# Also an API function called after a 'bulk update' operation where the 'update_object'
+# function will get called multiple times with the 'update_schematic_state' flag set
+# to False as we only want to run all of this code when all updates have been completed.
+#------------------------------------------------------------------------------------
+
+def finalise_object_updates():
+    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    bring_track_sections_to_the_front()
+    # save the current state (for undo/redo)
+    save_schematic_state()
+    # Process any layout changes (interlocking, signal ahead etc)
+    # that might be dependent on the object configuration change(s)
+    run_layout.initialise_layout()
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to update the configuration of an existing schematic object and re-draw it
 # in its new configuration (delete the object then re-create in the new configuration)
 # For individual changes (e.g. after editing the configuration of a schematic object),
@@ -324,14 +343,7 @@ def update_object(object_id, new_object, update_schematic_state:bool=True, creat
         objects_levers.update_lever(object_id, new_object)
     # We normally process layout changes after each object update but for the bulk renumbering
     # use case we postpone this processing until all the renumbering has been completed
-    if update_schematic_state:
-        # Ensure all track sections are brought forward on the schematic (in front of any lines)
-        bring_track_sections_to_the_front()
-        # save the current state (for undo/redo)
-        save_schematic_state()
-        # Process any layout changes (interlocking, signal ahead etc)
-        # that might be dependent on the object configuration change
-        run_layout.initialise_layout()
+    if update_schematic_state: finalise_object_updates()
     return()
 
 #------------------------------------------------------------------------------------
