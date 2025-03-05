@@ -701,23 +701,27 @@ class main_menubar:
                     # We don't provide forward compatibility (too difficult) - so fail fast
                     logging.error("Load File - File was saved by "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
+                    logging.error("Load File - Upgrade application to "+sig_file_version+" or later to support this file.")
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
-                elif self.tuple_version(sig_file_version) < self.tuple_version("4.0.0"):
+                elif self.tuple_version(sig_file_version) < self.tuple_version("5.0.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
                     logging.error("Load File - File was saved by application "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
+                    logging.error("Load File - This version of the application only supports files saved by version 5.0.0 or later")
+                    logging.error("Load File - Try loading/saving your file with version 5.0.0 first")
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
-                        message="File was saved by "+sig_file_version+". "+
-                                "This version of the application only supports files saved by version "+
-                                "3.5.0 or later. Try loading/saving with an intermediate version first.")
+                        message="Layout file was saved by Application "+sig_file_version+".\n"+
+                            "This version of the application only supports files saved by version 5.0.0 "+
+                            "or later. Try loading/saving your file with version 5.0.0 first.")
                 else:
                     # We should now be OK to attempt the load, but if the file was saved under a
                     # previous version then we still want to flag a warning message to the user
                     if self.tuple_version(sig_file_version) < self.tuple_version(application_version):
                         logging.warning("Load File - File was saved by application "+sig_file_version)
                         logging.warning("Load File - Current version of the application is "+application_version)
+                        logging.warning("Load File - Re-save with current version to ensure forward compatibility")
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
