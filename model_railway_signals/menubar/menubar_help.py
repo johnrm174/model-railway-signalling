@@ -61,7 +61,7 @@ Schematic editor functions (Run Mode):
 
 Menubar Options
 
-1) File - All the save/load/new functions you would expect
+1) File => New/Open/Save/Save-as - choose 'examples' to access the example layout files
 2) Mode => Edit/Run/Reset - Select Edit or Run Mode (also Reset layout to default state)
 3) Automation => Enable/Disable - Toggle signal automation functions (in Run Mode)
 4) SPROG => Connect/Disconnect - Toggle the connection to the SPROG DCC Command Station
@@ -69,14 +69,17 @@ Menubar Options
 6) MQTT => Connect/disconnect - Toggle connection to an external MQTT broker
 7) Utilities => DCC Programmming - One touch and CV programming of signals/points
 8) Utilities => DCC Mapping - To view the assigned DCC addresses for your layout
-9) Settings => Canvas - Change the layout display size and grid configuration
-10) Settings => General - Enable/disable Signal Passed at Danger (SPAD) warnings
-11) Settings => MQTT - Configure the MQTT broker and signalling networking
-12) Settings => SPROG - Configure the serial port and SPROG behavior
-13) Settings => Logging - Set the log level for running the layout
-14) Settings => GPIO - Define the Ri-Pi GPIO port to track sensor mappings
-15) Help => About - Application version and licence information
-16) Help => Info - Add user notes to document your layout configuration
+9) Utilities => Item Renumbering - To 'bulk renumber' your schematic objects
+10) Settings => Canvas - Change the layout display size and grid configuration
+11) Settings => General - Change the general settings for RUN MODE
+12) Settings => MQTT - Configure the MQTT broker and signalling networking
+13) Settings => SPROG - Configure the serial port and SPROG behavior
+14) Settings => Logging - Set the log level for running the layout
+15) Settings => GPIO - Define the Ri-Pi GPIO port to track sensor mappings
+16) Styles => Change the default and applied styles of layout drawing objects
+17) Help => About - Application version and licence information
+18) Help => Docs - Access the user documentation packaged with the application
+19) Help => Info - Add user notes to document your layout configuration
 
 """
 
@@ -214,13 +217,16 @@ class display_docs():
             self.B3 = Tk.Button (self.window, width=25, text="Application networking guide",
                                  command=lambda:self.open_doc("networking_guide.pdf"))
             self.B3.pack(padx=2, pady=2)
-            self.B3 = Tk.Button (self.window, width=25, text="Remote Sensor node guide",
+            self.B4 = Tk.Button (self.window, width=25, text="Remote Sensor node guide",
                                  command=lambda:self.open_doc("sensor_node_guide.pdf"))
-            self.B3.pack(padx=2, pady=2)
-            # Create the close button and tooltip
-            self.B4 = Tk.Button (self.window, text = "Ok / Close",command=self.close_window)
             self.B4.pack(padx=2, pady=2)
-            self.TT1 = common.CreateToolTip(self.B4, "Close window")
+            self.B5 = Tk.Button (self.window, width=25, text="Signalling node guide",
+                                 command=lambda:self.open_doc("signalling_node_guide.pdf"))
+            self.B5.pack(padx=2, pady=2)
+            # Create the close button and tooltip
+            self.close = Tk.Button (self.window, text = "Ok / Close",command=self.close_window)
+            self.close.pack(padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.close, "Close window")
 
     def open_doc(self,file_name:str):
         try:
