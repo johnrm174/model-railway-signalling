@@ -59,6 +59,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * Bugfix to the Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
+* Added ability to specify the line width (in pixels) in the Edit Line configuration dialog
 * TBD, TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

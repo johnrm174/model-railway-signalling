@@ -49,7 +49,7 @@ class line_attributes():
     def __init__(self, parent_window):
         # Create a labelframe to hold the tkinter widgets
         # The parent class is responsible for packing the frame
-        self.frame= Tk.LabelFrame(parent_window,text="Attributes")
+        self.frame= Tk.LabelFrame(parent_window,text="Line end styles")
         # The Tk IntVar to hold the line end selection
         self.selection = Tk.IntVar(self.frame, 0)
         # Define the Available selections [filename,configuration]
@@ -148,7 +148,9 @@ class edit_line():
             # to provide consistent behavior with the other configure object popup windows)
             self.main_frame = Tk.Frame(self.window)
             self.main_frame.pack()
-            # Create a Frame to hold the Line ID and Line Colour Selections
+            # ---------------------------------------------------------------
+            # Create a Frame to hold the Line ID, Colour and width Selections
+            # ---------------------------------------------------------------
             self.frame = Tk.Frame(self.main_frame)
             self.frame.pack(fill='x')
             # Create the UI Element for Line ID selection
@@ -156,12 +158,28 @@ class edit_line():
                                     exists_function = library.line_exists) 
             self.lineid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the line colour selection element
-            self.colour = common.colour_selection(self.frame, label="Colour")
-            self.colour.pack(padx=2, pady=2, fill='x')
+            self.colour = common.colour_selection(self.frame, label="Line colour")
+            self.colour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            # Create a Labelframe for the Line Width
+            self.subframe1 = Tk.LabelFrame(self.frame, text="Line width")
+            self.subframe1.pack(padx=2, pady=2, fill='both', expand=True, side=Tk.LEFT)
+            # Create another subframe so all the other elements float in the labelframe
+            self.subframe2 = Tk.Frame(self.subframe1)
+            self.subframe2.pack(fill='y', expand=True)
+            # Create lanel and line width elements
+            self.label1 = Tk.Label(self.subframe2, text="Pixels:")
+            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.linewidth = common.integer_entry_box(self.subframe2, width=3, min_value=1, max_value=6,
+                   tool_tip="Select the line width (between 1 and 6 pixels)", allow_empty=False)
+            self.linewidth.pack(padx=2, pady=2, side=Tk.LEFT)
+            # ---------------------------------------------------------------
             # Create the line Attributes UI Element
+            # ---------------------------------------------------------------
             self.attributes = line_attributes(self.main_frame)
-            self.attributes.frame.pack(padx=2, pady=2)
+            self.attributes.frame.pack(padx=2, pady=2, fill='x')
+            # ---------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
+            # ---------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
@@ -185,6 +203,7 @@ class edit_line():
             # Set the Initial UI state from the current object settings
             self.lineid.set_value(item_id)
             self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            self.linewidth.set_value(objects.schematic_objects[self.object_id]["linewidth"])
             arrow_type = objects.schematic_objects[self.object_id]["arrowtype"]
             arrow_ends = objects.schematic_objects[self.object_id]["arrowends"]
             self.attributes.set_values(arrow_ends, arrow_type)
@@ -199,12 +218,13 @@ class edit_line():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
-        elif self.lineid.validate():
+        elif self.lineid.validate() and self.linewidth.validate():
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.lineid.get_value()
             new_object_configuration["colour"] = self.colour.get_value()
+            new_object_configuration["linewidth"] = self.linewidth.get_value()
             arrow_ends, arrow_type = self.attributes.get_values()
             new_object_configuration["arrowtype"] = arrow_type
             new_object_configuration["arrowends"] = arrow_ends
