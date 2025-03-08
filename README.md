@@ -59,8 +59,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * Bugfix to the Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
-* Added ability to change the line width in the Edit Line and Edit Point configuration dialogs
-* Added ability to change the styles (solid or dashed) for points/lines (config dialogs and styles)
+* Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
+* The line width can now be specified/changed in the Edit Line and Edit Point configuration dialogs.
+* Added ability to change the styles (solid or dashed) for points/lines (config dialogs and styles).
 * TBD, TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

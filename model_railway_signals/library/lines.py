@@ -38,6 +38,10 @@
 #
 #   move_line_end_2(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
 #
+# External API - classes and functions (used by the other library modules):
+#
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#
 #---------------------------------------------------------------------------------------------
 
 import logging
@@ -50,6 +54,18 @@ import math
 
 lines: dict = {}
                                                             
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    return()
+
 #---------------------------------------------------------------------------------------------
 # API Function to check if a Line Object exists in the list of Lines
 # Used in most externally-called functions to validate the Line ID
@@ -93,8 +109,10 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
             line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.BOTH, arrowshape=tuple(arrow_type), tags=canvas_tag)
         else:
             line_object = canvas.create_line(x1, y1, x2, y2, tags=canvas_tag)
-        # Draw the line end selection circles (i.e displayed when line selected)
-        if selected: state="normal"
+        # Draw the line-end selection circles if we are in Edit Mode and the 'selected' flag is set
+        # This is the case of the line being re-created (in its new configuration) after the config
+        # has been changed where we want to leave the line as selected
+        if selected and editing_enabled: state="normal"
         else: state = "hidden"
         end1_object = canvas.create_oval(x1-5, y1-5, x1+5, y1+5, tags=(canvas_tag, selected_tag), state=state)
         end2_object = canvas.create_oval(x2-5, y2-5, x2+5, y2+5, tags=(canvas_tag, selected_tag), state=state)
