@@ -201,7 +201,7 @@ class automation(Tk.LabelFrame):
 class dcc_address_settings(Tk.LabelFrame):
     def __init__(self, parent_frame):
         # Create a Label frame to hold the DCC Address settings
-        super().__init__(parent_frame, text="DCC Address and command logic")
+        super().__init__(parent_frame, text="DCC Address and logic")
         # Create a DCC Address element and a checkbox for the "reversed" selection
         # These are created in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self)
@@ -234,39 +234,61 @@ class dcc_address_settings(Tk.LabelFrame):
 
 class point_configuration_tab():
     def __init__(self, parent_tab):
-        # Create a Frame to hold the Point ID, Point Type and point colour Selections
-        self.frame = Tk.Frame(parent_tab)
-        self.frame.pack(fill='x')
+        #------------------------------------------------------------------------------
+        # Create a Frame to hold the Point ID, Line Colour and Line Width selections
+        #------------------------------------------------------------------------------
+        self.frame1 = Tk.Frame(parent_tab)
+        self.frame1.pack(fill='x')
         # Create the UI Element for Point ID selection
-        self.pointid = common.object_id_selection(self.frame, "Point ID",
+        self.pointid = common.object_id_selection(self.frame1, "Point ID",
                                 exists_function = library.point_exists) 
         self.pointid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
-        # Create the UI Element for Point Type selection
-        self.pointtype = common.selection_buttons(self.frame, label="Point Type", tool_tip="Select Point Type",
-                                    callback=self.point_type_updated, button_labels=("RH", "LH", "Y-Point"))
-        self.pointtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create the Point colour selection element
-        self.colour = common.colour_selection(self.frame, label="Colour")
-        self.colour.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
+        self.colour = common.colour_selection(self.frame1, label="Line colour")
+        self.colour.pack(side=Tk.LEFT,padx=2, pady=2, fill='x', expand=True)
+        # Create the Line width selection element
+        self.linewidth = common.line_width(self.frame1)
+        self.linewidth.pack( side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+        #------------------------------------------------------------------------------
+        # Create the UI Element for the Line style selection (solid or dashed)
+        #------------------------------------------------------------------------------
+        self.linestyle = common.line_styles(parent_tab)
+        self.linestyle.pack(padx=2, pady=2, fill='x')
+        #------------------------------------------------------------------------------
+        # Create the UI Element for the DCC command and Point Type selection
+        #------------------------------------------------------------------------------
+        self.frame2 = Tk.Frame(parent_tab)
+        self.frame2.pack(fill='x')
+        # Create the UI element for the DCC Settings
+        self.dccsettings = dcc_address_settings(self.frame2)
+        self.dccsettings.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.pointtype = common.selection_buttons(self.frame2, label="Point Type", tool_tip="Select Point Type",
+                                    callback=self.point_type_updated, button_labels=("RH", "LH", "Y-Point"))
+        self.pointtype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        #------------------------------------------------------------------------------
         # Create the point subtype selection
+        #------------------------------------------------------------------------------
         subtype_tooltip= ("Select Point Subtype:\nNorm=Default Point\nTRP=Trap Point\n"+
                     "SS1=Single Slip - side 1\nSS2=Single Slip - side 2\nDS1=Double Slip - side 1\n"+
                     "DS2=Double slip - side 2\nSX=Scissors crossover (or 3-way Point) components")
         self.pointsubtype = common.selection_buttons(parent_tab, label="Point Subtype", tool_tip=subtype_tooltip,
                                     callback=None, button_labels=("Norm", "TRP", "SS1", "SS2", "DS1", "DS2", "SX"))
         self.pointsubtype.pack(padx=2, pady=2, fill='x')
+        #------------------------------------------------------------------------------
         # Create the UI element for the point button offset settings
+        #------------------------------------------------------------------------------
         self.buttonoffsets = common.button_configuration(parent_tab)
         self.buttonoffsets.pack(padx=2, pady=2, fill='x')
+        #------------------------------------------------------------------------------
         # Create the UI element for the general settings
+        #------------------------------------------------------------------------------
         self.settings = general_settings(parent_tab)
         self.settings.pack(padx=2, pady=2, fill='x')
+        #------------------------------------------------------------------------------
         # Create the UI element for the "Also Switch" entry 
+        #------------------------------------------------------------------------------
         self.automation = automation(parent_tab, callback=self.switched_with_updated)
         self.automation.pack(padx=2, pady=2, fill='x')
-        # Create the UI element for the DCC Settings 
-        self.dccsettings = dcc_address_settings(parent_tab)
-        self.dccsettings.pack(padx=2, pady=2, fill='x')
 
     def switched_with_updated(self):
         # If 'Switched With' is selected then disable the FPL checkbox.
@@ -360,6 +382,8 @@ class edit_point():
             self.config.pointtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.config.pointsubtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
             self.config.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            self.config.linewidth.set_value(objects.schematic_objects[self.object_id]["linewidth"])
+            self.config.linestyle.set_value(objects.schematic_objects[self.object_id]["linestyle"])
             # These are the point button position offsets:
             hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
             xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
@@ -396,8 +420,9 @@ class edit_point():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
-        elif (self.config.pointid.validate() and self.config.automation.validate() and
-              self.config.dccsettings.validate() and self.config.buttonoffsets.validate()):
+        elif ( self.config.pointid.validate() and self.config.automation.validate() and
+               self.config.dccsettings.validate() and self.config.buttonoffsets.validate() and
+               self.config.linewidth.validate() ):
             # Copy the original point Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the point coniguration elements from the current user selections
@@ -405,6 +430,8 @@ class edit_point():
             new_object_configuration["itemtype"] = self.config.pointtype.get_value()
             new_object_configuration["itemsubtype"] = self.config.pointsubtype.get_value()
             new_object_configuration["colour"] = self.config.colour.get_value()
+            new_object_configuration["linewidth"] = self.config.linewidth.get_value()
+            new_object_configuration["linestyle"] = self.config.linestyle.get_value()
             # These are the point button position offsets:
             hidden, xoffset, yoffset = self.config.buttonoffsets.get_values()
             new_object_configuration["hidebuttons"] = hidden

@@ -44,6 +44,8 @@
 #    font_selection(selection_buttons) - Labelframe containing font selection radiobuttons
 #    font_style_selection(selection_check_boxes) - Labelframe containing font selection checkboxes
 #    button_configuration(Tk.LabelFrame) - Labelframe containing 'hidden' selection and/y offsets (signals/points)
+#    line_styles (TK LabelFrame) - Labelframe for changing the line styles (solid or dash type)
+#    line_width (TK LabelFrame) - Labelframe for changing the line width (1-6 pixels)
 #    window_controls(Tk.Frame) - Frame containing the 'apply/ok/reset/cancel' buttons
 #
 # Makes the following external API calls to the library package
@@ -89,6 +91,8 @@ from .common_complete import colour_selection
 from .common_complete import font_selection
 from .common_complete import font_style_selection
 from .common_complete import button_configuration
+from .common_complete import line_styles
+from .common_complete import line_width
 from .common_complete import window_controls
 
 __all__ = [
@@ -129,6 +133,8 @@ __all__ = [
     'font_selection',
     'font_style_selection',
     'button_configuration',
+    'line_styles',
+    'line_width',
     'window_controls' ]
 
 ##############################################################################################################

@@ -51,6 +51,7 @@ default_line_object["item"] = objects_common.object_type.line
 # Styles are initially set to the default styles (defensive programming)
 default_line_object["colour"] = settings.get_style("routelines", "colour")
 default_line_object["linewidth"] = settings.get_style("routelines", "linewidth")
+default_line_object["linestyle"] = settings.get_style("routelines", "linestyle")
 # Other object-specific parameters
 default_line_object["endx"] = 0
 default_line_object["endy"] = 0
@@ -100,6 +101,7 @@ def redraw_line_object(object_id, create_selected:bool=False):
                 arrow_type = objects_common.schematic_objects[object_id]["arrowtype"],
                 arrow_ends = objects_common.schematic_objects[object_id]["arrowends"],
                 line_width = objects_common.schematic_objects[object_id]["linewidth"],
+                line_style = objects_common.schematic_objects[object_id]["linestyle"],
                 selected = create_selected)
     # Store the canvas "tags" - for all line objects and for the selection circles
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
@@ -120,6 +122,7 @@ def create_line(xpos:int, ypos:int):
     # Styles for the new object are set to the current default styles
     objects_common.schematic_objects[object_id]["colour"] = settings.get_style("routelines", "colour")
     objects_common.schematic_objects[object_id]["linewidth"] = settings.get_style("routelines", "linewidth")
+    objects_common.schematic_objects[object_id]["linestyle"] = settings.get_style("routelines", "linestyle")
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = xpos - 50
@@ -167,7 +170,8 @@ def update_line_styles(object_id, dict_of_new_styles:dict):
     library.update_line_styles(
             line_id = objects_common.schematic_objects[object_id]["itemid"],
             colour = objects_common.schematic_objects[object_id]["colour"],
-            line_width = objects_common.schematic_objects[object_id]["linewidth"])
+            line_width = objects_common.schematic_objects[object_id]["linewidth"],
+            line_style = objects_common.schematic_objects[object_id]["linestyle"])
     return()
 
 #------------------------------------------------------------------------------------

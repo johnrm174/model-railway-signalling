@@ -16,6 +16,7 @@
 #       arrow_ends:int - how the arrow_types are to be applied -  0=none, 1=start, 2=end, 3=both (default 0)
 #       selected:bool:int - Set to True to create the line as "selected" (default False)
 #       line_width:str - Width of the line - default = 3
+#       line_style:[int,int,] - Dash style for the line (default [] = solid)
 #
 #   update_line_styles - updates the styles of a line object
 #     Mandatory Parameters:
@@ -23,6 +24,7 @@
 #     Optional Parameters:
 #       colour:str - Any tkinter colour can be specified as a string - default = "Black"
 #       line_width:str - Width of the line - default = 3
+#       line_style:[int,int,] - Dash style for the line (default [] = solid)
 #
 #   line_exists(line_id:int) - returns true if the Button object 'exists' on the schematic
 #
@@ -65,7 +67,7 @@ def line_exists(line_id:int):
 # Public API function to create a Line object (drawing objects)
 #---------------------------------------------------------------------------------------------
 
-def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str="black",
+def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str="black", line_style:list=[],
                   arrow_type:list=[0,0,0], arrow_ends:int=0, selected:bool=False, line_width:int=3):
     global lines
     # Set a unique 'tag' to reference the tkinter drawing objects
@@ -84,16 +86,13 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         # configuration as a list rather than the tuple needed by the tkinter create_line
         # function so it is serialisable to json for save and load.
         if arrow_type != [0,0,0] and arrow_type != [1,1,1] and arrow_ends == 1:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width,
-                            arrow=Tk.FIRST, arrowshape=tuple(arrow_type), tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.FIRST, arrowshape=tuple(arrow_type), tags=canvas_tag)
         elif arrow_type != [0,0,0] and arrow_type != [1,1,1] and arrow_ends == 2:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width,
-                            arrow=Tk.LAST, arrowshape=tuple(arrow_type), tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.LAST, arrowshape=tuple(arrow_type), tags=canvas_tag)
         elif arrow_type != [0,0,0] and arrow_type != [1,1,1] and arrow_ends == 3:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width,
-                            arrow=Tk.BOTH, arrowshape=tuple(arrow_type), tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.BOTH, arrowshape=tuple(arrow_type), tags=canvas_tag)
         else:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width, tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, tags=canvas_tag)
         # Draw the line end selection circles (i.e displayed when line selected)
         if selected: state="normal"
         else: state = "hidden"
@@ -106,8 +105,12 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         elif arrow_type == [1,1,1] and arrow_ends == 3: stop1, stop2 = "normal", "normal"
         else: stop1, stop2 = "hidden", "hidden"
         dx, dy = get_endstop_offsets(x1, y1, x2, y2)
-        stop1_object = canvas.create_line(x1+dx, y1+dy, x1-dx, y1-dy, fill=colour, width=line_width, tags=canvas_tag, state=stop1)
-        stop2_object = canvas.create_line(x2+dx, y2+dy, x2-dx, y2-dy, fill=colour, width=line_width, tags=canvas_tag, state=stop2)
+        stop1_object = canvas.create_line(x1+dx, y1+dy, x1-dx, y1-dy, tags=canvas_tag, state=stop1)
+        stop2_object = canvas.create_line(x2+dx, y2+dy, x2-dx, y2-dy, tags=canvas_tag, state=stop2)
+        # Apply the line styles
+        canvas.itemconfig(line_object, fill=colour, width=line_width, dash=tuple(line_style))
+        canvas.itemconfig(stop1_object, fill=colour, width=line_width, dash=tuple(line_style))
+        canvas.itemconfig(stop2_object, fill=colour, width=line_width, dash=tuple(line_style))
         # Compile a dictionary of everything we need to track
         lines[str(line_id)] = {}
         lines[str(line_id)]["canvas"] = canvas                  # Tkinter canvas object
@@ -125,7 +128,7 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
 # Public API function to Update the Line Styles
 #---------------------------------------------------------------------------------------------
 
-def update_line_styles(line_id:int, colour:str="black", line_width:int=3):
+def update_line_styles(line_id:int, colour:str="black", line_width:int=3, line_style:list=[]):
     global lines
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(line_id, int) :
@@ -134,9 +137,9 @@ def update_line_styles(line_id:int, colour:str="black", line_width:int=3):
         logging.error("Line "+str(line_id)+": update_line_styles - Line ID does not exist")
     else:
         logging.debug("Line "+str(line_id)+": Updating Line Styles")
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"], width=line_width)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"], width=line_width)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"], width=line_width)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"], width=line_width, dash=tuple(line_style))
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"], width=line_width, dash=tuple(line_style))
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"], width=line_width, dash=tuple(line_style))
         lines[str(line_id)]["colour"] = colour
         reset_line_colour(line_id)
     return()

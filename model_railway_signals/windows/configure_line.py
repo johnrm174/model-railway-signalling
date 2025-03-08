@@ -20,7 +20,8 @@
 #    common.colour_selection
 #    common.object_id_selection
 #    common.check_box
-#
+#    common.line_styles
+#    common.line_width
 #------------------------------------------------------------------------------------
 
 import copy
@@ -45,23 +46,26 @@ open_windows={}
 # Classes for the Edit Line UI Elements
 #####################################################################################
 
-class line_attributes():
-    def __init__(self, parent_window):
+#------------------------------------------------------------------------------------
+# Class for the UI element (TK Label Frame) for changing the line end styles
+#------------------------------------------------------------------------------------
+
+class line_end_styles(Tk.LabelFrame):
+    def __init__(self, parent_frame):
         # Create a labelframe to hold the tkinter widgets
-        # The parent class is responsible for packing the frame
-        self.frame= Tk.LabelFrame(parent_window,text="Line end styles")
+        super().__init__(parent_frame, text="Line end-stops")
         # The Tk IntVar to hold the line end selection
-        self.selection = Tk.IntVar(self.frame, 0)
+        self.selection = Tk.IntVar(self, 0)
         # Define the Available selections [filename,configuration]
-        self.selections = [ ["None",[0,0,0] ],
-                            ["endstop",[1,1,1] ],
-                            ["arrow1",[20,20,5] ],
-                            ["arrow2",[16,20,5] ],
-                            ["arrow3",[20,20,8] ],
-                            ["arrow4",[16,20,8] ] ]
+        self.selections = [ ["None", [0,0,0] ],
+                            ["endstop", [1,1,1] ],
+                            ["arrow1", [20,20,5] ],
+                            ["arrow2", [16,20,5] ],
+                            ["arrow3", [20,20,8] ],
+                            ["arrow4", [16,20,8] ] ]
         # Create a frame for the radiobuttons
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack()
+        self.subframe2 = Tk.Frame(self)
+        self.subframe2.pack(padx=5, pady=5)
         # Create the buttons we need (adding the references to the buttons, tooltips and
         # images to a list so they don't go out of scope and dont get garbage collected)
         self.buttons = []
@@ -85,7 +89,7 @@ class line_attributes():
             self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
             self.tooltips.append(common.CreateToolTip(self.buttons[-1], tooltip))
         # Create a frame for the two side by side checkboxes
-        self.subframe2 = Tk.Frame(self.frame)
+        self.subframe2 = Tk.Frame(self)
         self.subframe2.pack()
         self.CB1 = common.check_box(self.subframe2,label="Apply to start",
                     tool_tip="Select to apply the style to the start of the line")
@@ -108,7 +112,7 @@ class line_attributes():
             if selection_to_test[1] == arrow_type:
                 self.selection.set(index)
                 break
-        # Set the arrowe type (0=none, 1=start, 2=end, 3=both)
+        # Set the arrow type (0=none, 1=start, 2=end, 3=both)
         boolean_list = [bool(arrow_ends & (1<<n)) for n in range(2)]
         self.CB1.set_value(boolean_list[0])
         self.CB2.set_value(boolean_list[1])
@@ -122,6 +126,7 @@ class line_attributes():
         boolean_list = [self.CB2.get_value(),self.CB1.get_value()]
         arrow_ends = sum(v << i for i, v in enumerate(boolean_list[::-1]))
         return(arrow_ends,arrow_type)
+
 
 #####################################################################################
 # Top level Class for the Edit Line window
@@ -159,24 +164,17 @@ class edit_line():
             self.lineid.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the line colour selection element
             self.colour = common.colour_selection(self.frame, label="Line colour")
-            self.colour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            # Create a Labelframe for the Line Width
-            self.subframe1 = Tk.LabelFrame(self.frame, text="Line width")
-            self.subframe1.pack(padx=2, pady=2, fill='both', expand=True, side=Tk.LEFT)
-            # Create another subframe so all the other elements float in the labelframe
-            self.subframe2 = Tk.Frame(self.subframe1)
-            self.subframe2.pack(fill='y', expand=True)
-            # Create lanel and line width elements
-            self.label1 = Tk.Label(self.subframe2, text="Pixels:")
-            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-            self.linewidth = common.integer_entry_box(self.subframe2, width=3, min_value=1, max_value=6,
-                   tool_tip="Select the line width (between 1 and 6 pixels)", allow_empty=False)
-            self.linewidth.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.colour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True,)
+            # Create the line width selection element
+            self.linewidth = common.line_width(self.frame)
+            self.linewidth.pack(padx=2, pady=2, fill='both', expand=True, side=Tk.LEFT)
             # ---------------------------------------------------------------
-            # Create the line Attributes UI Element
+            # Create the line styles and line end styles UI Element
             # ---------------------------------------------------------------
-            self.attributes = line_attributes(self.main_frame)
-            self.attributes.frame.pack(padx=2, pady=2, fill='x')
+            self.linestyle = common.line_styles(self.main_frame)
+            self.linestyle.pack(padx=2, pady=2, fill='x')
+            self.lineendstyles = line_end_styles(self.main_frame)
+            self.lineendstyles.pack(padx=2, pady=2, fill='x')
             # ---------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             # ---------------------------------------------------------------
@@ -204,9 +202,10 @@ class edit_line():
             self.lineid.set_value(item_id)
             self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
             self.linewidth.set_value(objects.schematic_objects[self.object_id]["linewidth"])
+            self.linestyle.set_value(objects.schematic_objects[self.object_id]["linestyle"])
             arrow_type = objects.schematic_objects[self.object_id]["arrowtype"]
             arrow_ends = objects.schematic_objects[self.object_id]["arrowends"]
-            self.attributes.set_values(arrow_ends, arrow_type)
+            self.lineendstyles.set_values(arrow_ends, arrow_type)
             # Hide the validation error message
             self.validation_error.pack_forget()        
         return()
@@ -225,7 +224,8 @@ class edit_line():
             new_object_configuration["itemid"] = self.lineid.get_value()
             new_object_configuration["colour"] = self.colour.get_value()
             new_object_configuration["linewidth"] = self.linewidth.get_value()
-            arrow_ends, arrow_type = self.attributes.get_values()
+            new_object_configuration["linestyle"] = self.linestyle.get_value()
+            arrow_ends, arrow_type = self.lineendstyles.get_values()
             new_object_configuration["arrowtype"] = arrow_type
             new_object_configuration["arrowends"] = arrow_ends
             # Save the updated configuration (and re-draw the object)

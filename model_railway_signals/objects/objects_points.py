@@ -77,6 +77,7 @@ default_point_object["itemsubtype"] = library.point_subtype.normal.value
 # Styles are initially set to the default styles (defensive programming)
 default_point_object["colour"] = settings.get_style("routelines", "colour")
 default_point_object["linewidth"] = settings.get_style("routelines", "linewidth")
+default_point_object["linestyle"] = settings.get_style("routelines", "linestyle")
 default_point_object["buttoncolour"] = settings.get_style("points", "buttoncolour")
 default_point_object["textcolourtype"] = settings.get_style("points", "textcolourtype")
 default_point_object["textfonttuple"] = settings.get_style("points", "textfonttuple")
@@ -237,6 +238,7 @@ def redraw_point_object(object_id):
                 hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                 fpl = objects_common.schematic_objects[object_id]["hasfpl"],
                 line_width = objects_common.schematic_objects[object_id]["linewidth"],
+                line_style = objects_common.schematic_objects[object_id]["linestyle"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
                 button_colour = button_colour,
                 active_colour = active_colour,
@@ -260,6 +262,7 @@ def create_point(xpos:int, ypos:int, item_type, item_subtype):
     # Styles for the new object are set to the current default styles
     objects_common.schematic_objects[object_id]["colour"] = settings.get_style("routelines", "colour")
     objects_common.schematic_objects[object_id]["linewidth"] = settings.get_style("routelines", "linewidth")
+    objects_common.schematic_objects[object_id]["linestyle"] = settings.get_style("routelines", "linestyle")
     objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("points", "buttoncolour")
     objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("points", "textcolourtype")
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("points", "textfonttuple")
@@ -318,7 +321,8 @@ def update_point_styles(object_id, dict_of_new_styles:dict):
         library.update_point_styles(
                 point_id = objects_common.schematic_objects[object_id]["itemid"],
                 colour = objects_common.schematic_objects[object_id]["colour"],
-                line_width = objects_common.schematic_objects[object_id]["linewidth"])
+                line_width = objects_common.schematic_objects[object_id]["linewidth"],
+                line_style = objects_common.schematic_objects[object_id]["linestyle"])
     else:
         # Work out what the active and selected colours for the button should be
         button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]

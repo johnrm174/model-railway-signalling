@@ -36,7 +36,8 @@
 #    common.font_style_selection
 #    common.integer_entry_box
 #    common.entry_box
-#
+#    common.line_styles
+#    common.line_width
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -402,25 +403,24 @@ class edit_route_line_styles():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             edit_route_line_styles_window = self.window
-            # Create a subframe to center everything in
+            #------------------------------------------------------------------------
+            # Create a subframe for the line colour and line width elements
+            #------------------------------------------------------------------------
             self.frame1 = Tk.Frame(self.window)
             self.frame1.pack(fill='x')
             # Create the UI Elements
-            self.colour = common.colour_selection(self.frame1, label="Default line colour")
+            self.colour = common.colour_selection(self.frame1, label="Line colour")
             self.colour.pack(padx=5, pady=5, side=Tk.LEFT, fill='x', expand=True)
-            # Create a Labelframe for the Line Width
-            self.subframe1 = Tk.LabelFrame(self.frame1, text="Route line width")
-            self.subframe1.pack(padx=5, pady=5, fill='both', expand=True, side=Tk.LEFT)
-            # Create another subframe so all the other elements float in the labelframe
-            self.subframe2 = Tk.Frame(self.subframe1)
-            self.subframe2.pack(fill='y', expand=True)
-            # Create a subframe to center the line width elements in
-            self.label1 = Tk.Label(self.subframe2, text="Pixels:")
-            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-            self.linewidth = common.integer_entry_box(self.subframe2, width=3, min_value=1, max_value=6,
-                   tool_tip="Select the line width (between 1 and 6 pixels)", allow_empty=False)
-            self.linewidth.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.linewidth = common.line_width(self.frame1)
+            self.linewidth.pack(padx=5, pady=5, side=Tk.LEFT, fill='both', expand=True)
+            # ---------------------------------------------------------------
+            # Create the line styles UI Element (solid or dashed)
+            # ---------------------------------------------------------------
+            self.linestyle = common.line_styles(self.window)
+            self.linestyle.pack(padx=5, pady=5, fill='x')
+            #------------------------------------------------------------------------
             # Create the common buttons
+            #------------------------------------------------------------------------
             self.buttons = common_buttons(self.window, self.load_app_defaults, self.load_layout_defaults,
                             self.apply_all, self.apply_selected, self.set_layout_defaults, self.close_window)
             self.buttons.pack(padx=5, pady=5, side=Tk.BOTTOM, fill='x', expand=True)
@@ -430,27 +430,34 @@ class edit_route_line_styles():
     def load_app_defaults(self):
         self.colour.set_value(settings.get_default_style("routelines", "colour"))
         self.linewidth.set_value(settings.get_default_style("routelines", "linewidth"))
+        self.linestyle.set_value(settings.get_default_style("routelines", "linestyle"))
         
     def load_layout_defaults(self):
         self.colour.set_value(settings.get_style("routelines", "colour"))
         self.linewidth.set_value(settings.get_style("routelines", "linewidth"))
+        self.linestyle.set_value(settings.get_style("routelines", "linestyle"))
         
     def set_layout_defaults(self):
         if self.linewidth.validate():
             settings.set_style("routelines","colour", self.colour.get_value())
             settings.set_style("routelines","linewidth", self.linewidth.get_value())
+            settings.set_style("routelines","linestyle", self.linestyle.get_value())
 
     def apply_all(self):
         if self.linewidth.validate():
             objects_to_update = list(objects.point_index.values())+list(objects.line_index.values())
-            styles_to_apply = {"colour": self.colour.get_value(), "linewidth": self.linewidth.get_value()}
+            styles_to_apply = {"colour": self.colour.get_value(),
+                               "linewidth": self.linewidth.get_value(),
+                               "linestyle": self.linestyle.get_value()}
             objects.update_styles(objects_to_update, styles_to_apply)
 
     def apply_selected(self):
         if self.linewidth.validate():
             objects_to_update = ( schematic.get_selected_objects(object_type=objects.object_type.point) +
                                   schematic.get_selected_objects(object_type=objects.object_type.line) )
-            styles_to_apply = {"colour": self.colour.get_value(), "linewidth": self.linewidth.get_value()}
+            styles_to_apply = {"colour": self.colour.get_value(),
+                               "linewidth": self.linewidth.get_value(),
+                               "linestyle": self.linestyle.get_value()}
             objects.update_styles(objects_to_update, styles_to_apply)
 
     def close_window(self):
@@ -458,7 +465,6 @@ class edit_route_line_styles():
         if not self.colour.is_open():
             edit_route_line_styles_window = None
             self.window.destroy()
-
 
 #------------------------------------------------------------------------------------
 # Class for the Point Style Settings toolbar window.
