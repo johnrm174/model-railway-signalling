@@ -18,6 +18,8 @@
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_routes.update_references_to_line - called when the Line ID is changed
 #    objects_routes.remove_references_to_line - called when the Line is deleted
+#    objects_sections.update_references_to_line - called when the Line ID is changed
+#    objects_sections.remove_references_to_line - called when the Line is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -39,6 +41,7 @@ import copy
 
 from . import objects_common
 from . import objects_routes
+from . import objects_sections
 from .. import settings
 from .. import library
 
@@ -81,8 +84,9 @@ def update_line(object_id, new_object_configuration, create_selected:bool=True):
         # Update the type-specific index
         del objects_common.line_index[str(old_item_id)]
         objects_common.line_index[str(new_item_id)] = object_id
-        # Update any references to the line in the route tables
+        # Update any references to the line in any other objects' configuration
         objects_routes.update_references_to_line(old_item_id, new_item_id)
+        objects_sections.update_references_to_line(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -193,8 +197,9 @@ def delete_line_object(object_id):
 def delete_line(object_id):
     # Soft delete the associated library objects from the canvas
     delete_line_object(object_id)
-    # Remove any references to the line from the route tables
+    # Remove any references to the line from any other objects' configuration
     objects_routes.remove_references_to_line(objects_common.schematic_objects[object_id]["itemid"])
+    objects_sections.remove_references_to_line(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

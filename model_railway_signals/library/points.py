@@ -79,6 +79,10 @@
 #
 #   reset_point_colour(point_id:int) - reset the colour of a point back to default
 #
+#   set_point_colour_override(line_id:int, colour:str) - Override the point colour
+#
+#   reset_point_colour_override(line_id:int) - Reset the point colour override
+#
 # External API - classes and functions (used by the other library modules):
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
@@ -205,27 +209,59 @@ def toggle_fpl(point_id:int):
 
 def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
     global points
+    # Get the current blade/route line colours and swap (to represent the point change)
+    current_colour1 = points[str(point_id)]["currentcolour1"]
+    current_colour2 = points[str(point_id)]["currentcolour2"]
+    points[str(point_id)]["currentcolour1"] = current_colour2
+    points[str(point_id)]["currentcolour2"] = current_colour1
+    current_colour1 = points[str(point_id)]["currentcolour1"]
+    current_colour2 = points[str(point_id)]["currentcolour2"]
+    # Get the current override colour (to use later on)
+    override_colour = points[str(point_id)]["overridecolour"]
+    # Update the state of the point
     if not points[str(point_id)]["switched"]:
+        # Update the state of the point (for SWITCHED)
         if switched_by_another_point:
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED")
+        # Hide/show the blades and update the button to represent the switching of the point
         points[str(point_id)]["changebutton"].config(relief="sunken",bg=points[str(point_id)]["selectedcolour"])
         points[str(point_id)]["switched"] = True
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
-        dcc_control.update_dcc_point(point_id, True)
+        # Update the colours of the blade and route lines as appropriate
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
+        if points[str(point_id)]["colouroverride"]:
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=override_colour)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=override_colour)
+        else:
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
     else:
+        # Update the state of the point (for NORMAL)
         if switched_by_another_point:
             logging.info("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to NORMAL")
+        # Hide/show the blades and update the button to represent the switching of the point
         points[str(point_id)]["changebutton"].config(relief="raised",bg=points[str(point_id)]["deselectedcolour"])
         points[str(point_id)]["switched"] = False
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
-        dcc_control.update_dcc_point(point_id, False)
-    return
+        # Update the colours of the blade and route lines as appropriate
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
+        if points[str(point_id)]["colouroverride"]:
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=override_colour)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=override_colour)
+        else:
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
+    # Send out the DCC commands to change the point
+    dcc_control.update_dcc_point(point_id, points[str(point_id)]["switched"])
+    return()
 
 # -------------------------------------------------------------------------
 # Internal Function to update any downstream points (i.e. points
@@ -534,7 +570,11 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         points[str(point_id)]["fpllock"] = fpl                     # Initial state of the FPL (locked if it has FPL)
         points[str(point_id)]["locked"] = False                    # Initial "interlocking" state of the point
         points[str(point_id)]["switched"] = False                  # Initial "switched" state of the point
-        points[str(point_id)]["colour"] = colour                   # the default colour for the point lines
+        points[str(point_id)]["defaultcolour"] = colour            # the default point colour (all routes/blades)
+        points[str(point_id)]["overridecolour"] = colour           # the overridden point colour (all routes/blades)
+        points[str(point_id)]["currentcolour1"] = colour           # the current point colour (route/blade 1)
+        points[str(point_id)]["currentcolour2"] = colour           # the current point colour (route/blade 2)
+        points[str(point_id)]["colouroverride"] = False            # Whether the colour is overridden or not
         points[str(point_id)]["selectedcolour"] = selected_colour  # the default colour for the point buttons
         points[str(point_id)]["deselectedcolour"] = button_colour  # the default colour for the point buttons
         points[str(point_id)]["tags"] = canvas_tag                 # Canvas Tags for all drawing objects
@@ -582,7 +622,7 @@ def update_point_styles(point_id:int, colour:str="Black", line_width:int=3, line
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"], width=line_width, dash=tuple(line_style))
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"], width=line_width, dash=tuple(line_style))
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"], width=line_width, dash=tuple(line_style))
-        points[str(point_id)]["colour"] = colour
+        points[str(point_id)]["defaultcolour"] = colour
         reset_point_colour(point_id)
     return()
 
@@ -620,7 +660,9 @@ def update_point_button_styles(point_id:int, button_colour:str="Grey85", active_
         return()
 
 # -------------------------------------------------------------------------
-# Public API function to change the colour of a point
+# Public API function to change the colour of a point(for route highlighting).
+# Note that this change will only be effected immediately if the point colour is not
+# overridden. Otherwise the change will be applied when the colour override is reset
 # -------------------------------------------------------------------------
 
 def set_point_colour(point_id:int, colour:str):
@@ -628,16 +670,29 @@ def set_point_colour(point_id:int, colour:str):
         logging.error("Point "+str(point_id)+": set_point_colour - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": set_point_colour - Point ID does not exist")
-    elif points[str(point_id)]["switched"]:
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=colour)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=colour)
     else:
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=colour)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=colour)
+        # Store the current colours (depending on how the point is switched)
+        if points[str(point_id)]["switched"]:
+            points[str(point_id)]["currentcolour1"] = points[str(point_id)]["defaultcolour"]
+            points[str(point_id)]["currentcolour2"] = colour
+        else:
+            points[str(point_id)]["currentcolour1"] = colour
+            points[str(point_id)]["currentcolour2"] = points[str(point_id)]["defaultcolour"]
+        # Apply the highlighting (unless the colour is overridden):
+        if not points[str(point_id)]["colouroverride"]:
+            current_colour1 = points[str(point_id)]["currentcolour1"]
+            current_colour2 = points[str(point_id)]["currentcolour2"]
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
     return()
 
 # -------------------------------------------------------------------------
-# Public API function to set the colour of a point back to default
+# Public API function to reset the colour of a point back to its default
+# (for when a route is un-highlighted). Note that this change will only be
+# effected immediately if the point colour is not overridden. Otherwise the
+# change will be applied when the colour override is reset.
 # -------------------------------------------------------------------------
 
 def reset_point_colour(point_id:int):
@@ -646,10 +701,62 @@ def reset_point_colour(point_id:int):
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": reset_point_colour - Point ID does not exist")
     else:
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=points[str(point_id)]["colour"])
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=points[str(point_id)]["colour"])
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=points[str(point_id)]["colour"])
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=points[str(point_id)]["colour"])
+        if not points[str(point_id)]["colouroverride"]:
+            default_colour = points[str(point_id)]["defaultcolour"]
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=default_colour)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=default_colour)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=default_colour)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=default_colour)
+        points[str(point_id)]["currentcolour1"] = points[str(point_id)]["defaultcolour"]
+        points[str(point_id)]["currentcolour2"] = points[str(point_id)]["defaultcolour"]
+    return()
+
+# -------------------------------------------------------------------------
+# Public API function to override the colour of a point. This overrides any
+# current highlighting (by 'set_point_colour' and 'reset_point_colour' functions)
+# -------------------------------------------------------------------------
+
+def set_point_colour_override(point_id:int, colour:str):
+    if not isinstance(point_id, int):
+        logging.error("Point "+str(point_id)+": set_point_colour_override - Point ID must be an int")
+    elif not point_exists(point_id):
+        logging.error("Point "+str(point_id)+": set_point_colour_override - Point ID does not exist")
+    else:
+        # Work out what elements we need to override (depending on how the point is switched)
+        if points[str(point_id)]["switched"]:
+            override_colour1 = points[str(point_id)]["currentcolour1"]
+            override_colour2 = colour
+        else:
+            override_colour1 = colour
+            override_colour2 = points[str(point_id)]["currentcolour2"]
+        # Apply the highlighting:
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=override_colour1)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=override_colour1)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=override_colour2)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=override_colour2)
+        # Store the parameters we need to track
+        points[str(point_id)]["overridecolour"] = colour
+        points[str(point_id)]["colouroverride"] = True
+    return()
+
+# -------------------------------------------------------------------------
+# Public API function to reset the colour of a point to its 'normal' colour
+# (as configured by the 'set_point_colour' and 'reset_point_colour' functions).
+# -------------------------------------------------------------------------
+
+def reset_point_colour_override(point_id:int):
+    if not isinstance(point_id, int):
+        logging.error("Point "+str(point_id)+": reset_point_colour_override - Point ID must be an int")
+    elif not point_exists(point_id):
+        logging.error("Point "+str(point_id)+": reset_point_colour_override - Point ID does not exist")
+    else:
+        points[str(point_id)]["colouroverride"] = False
+        current_colour1 = points[str(point_id)]["currentcolour1"]
+        current_colour2 = points[str(point_id)]["currentcolour2"]
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
     return()
 
 # -------------------------------------------------------------------------

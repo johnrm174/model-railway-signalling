@@ -34,6 +34,10 @@
 #
 #   reset_line_colour(line_id:int) - reset the colour of a line back to default
 #
+#   set_line_colour_override(line_id:int, colour:str) - Override the line colour
+#
+#   reset_line_colour_override(line_id:int) - Reset the line colour override
+#
 #   move_line_end_1(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
 #
 #   move_line_end_2(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
@@ -132,7 +136,9 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         # Compile a dictionary of everything we need to track
         lines[str(line_id)] = {}
         lines[str(line_id)]["canvas"] = canvas                  # Tkinter canvas object
-        lines[str(line_id)]["colour"] = colour                  # Default colour for the line
+        lines[str(line_id)]["colouroverride"] = False           # Whether the colour is overridden or not
+        lines[str(line_id)]["defaultcolour"] = colour           # Default colour for the line
+        lines[str(line_id)]["currentcolour"] = colour           # Current Colour for the line
         lines[str(line_id)]["line"] = line_object               # Reference to the Tkinter drawing object
         lines[str(line_id)]["end1"] = end1_object               # Reference to the Tkinter drawing object
         lines[str(line_id)]["end2"] = end2_object               # Reference to the Tkinter drawing object
@@ -158,7 +164,8 @@ def update_line_styles(line_id:int, colour:str="black", line_width:int=3, line_s
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"], width=line_width, dash=tuple(line_style))
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"], width=line_width, dash=tuple(line_style))
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"], width=line_width, dash=tuple(line_style))
-        lines[str(line_id)]["colour"] = colour
+        lines[str(line_id)]["defaultcolour"] = colour
+        lines[str(line_id)]["currentcolour"] = colour
         reset_line_colour(line_id)
     return()
 
@@ -217,9 +224,11 @@ def move_line_end_2(line_id:int, xdiff:int,ydiff:int):
         lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
     return()
 
-# -------------------------------------------------------------------------
-# Public API function to change the colour of a line
-# -------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# Public API function to change the colour of a line (for route highlighting).
+# Note that this change will only be effected immediately if the line colour is not
+# overridden. Otherwise the change will be applied when the colour override is reset.
+#--------------------------------------------------------------------------
 
 def set_line_colour(line_id:int, colour:str):
     if not isinstance(line_id, int):
@@ -227,14 +236,19 @@ def set_line_colour(line_id:int, colour:str):
     elif not line_exists(line_id):
         logging.error("Line "+str(line_id)+": set_line_colour - Line ID does not exist")
     else:
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
+        if not lines[str(line_id)]["colouroverride"]:
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
+        lines[str(line_id)]["currentcolour"] = colour
     return()
 
-# -------------------------------------------------------------------------
-# Public API function to set the colour of a line back to default
-# -------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# Public API function to reset the colour of a line back to its default
+# (for when a route is un-highlighted). Note that this change will only be
+# effected immediately if the line colour is not overridden. Otherwise the
+# change will be applied when the colour override is reset.
+#--------------------------------------------------------------------------
 
 def reset_line_colour(line_id:int):
     if not isinstance(line_id, int):
@@ -242,9 +256,47 @@ def reset_line_colour(line_id:int):
     elif not line_exists(line_id):
         logging.error("Line "+str(line_id)+": reset_line_colour - Line ID does not exist")
     else:
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=lines[str(line_id)]["colour"])
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=lines[str(line_id)]["colour"])
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=lines[str(line_id)]["colour"])
+        if not lines[str(line_id)]["colouroverride"]:
+            default_colour = lines[str(line_id)]["defaultcolour"]
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=default_colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=default_colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=default_colour)
+        lines[str(line_id)]["currentcolour"] = lines[str(line_id)]["defaultcolour"]
+    return()
+
+#--------------------------------------------------------------------------
+# Public API function to override the colour of a line. This overrides any
+# current highlighting (by 'set_line_colour' and 'reset_line_colour' functions)
+#--------------------------------------------------------------------------
+
+def set_line_colour_override(line_id:int, colour:str):
+    if not isinstance(line_id, int):
+        logging.error("Line "+str(line_id)+": set_line_colour_override - Line ID must be an int")
+    elif not line_exists(line_id):
+        logging.error("Line "+str(line_id)+": set_line_colour_override - Line ID does not exist")
+    else:
+        lines[str(line_id)]["colouroverride"] = True
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
+    return()
+
+#--------------------------------------------------------------------------
+# Public API function to reset the colour of a line to its 'normal' colour
+# (as configured by the 'set_line_colour' and 'reset_line_colour' functions).
+#--------------------------------------------------------------------------
+
+def reset_line_colour_override(line_id:int):
+    if not isinstance(line_id, int):
+        logging.error("Line "+str(line_id)+": reset_line_colour_override - Line ID must be an int")
+    elif not line_exists(line_id):
+        logging.error("Line "+str(line_id)+": reset_line_colour_override - Line ID does not exist")
+    else:
+        lines[str(line_id)]["colouroverride"] = False
+        current_colour = lines[str(line_id)]["currentcolour"]
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=current_colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=current_colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=current_colour)
     return()
 
 #---------------------------------------------------------------------------------------------

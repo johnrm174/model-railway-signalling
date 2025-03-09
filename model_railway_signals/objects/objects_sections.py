@@ -11,6 +11,10 @@
 #    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    default_section_object - The dictionary of default values for the object
+#    remove_references_to_point(point_id) - remove point_id references from the route's configuration
+#    update_references_to_point(old_id, new_id) - update point_id references in the route's configuration
+#    remove_references_to_line(line_id) - remove line_id references from the route's configuration
+#    update_references_to_line(old_id, new_id) - update line_id references in the route's configuration
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default layout styles for the object
@@ -65,6 +69,10 @@ default_section_object["defaultlabel"] = settings.get_style("tracksections", "de
 default_section_object["editable"] = True
 default_section_object["hidden"] = False
 default_section_object["mirror"] = ""
+default_section_object["highlightcolour"] = "Red"
+# lines and points to highlight comprise variable length lists of Item IDs
+default_section_object["linestohighlight"] = []
+default_section_object["pointstohighlight"] = []
 
 #------------------------------------------------------------------------------------
 # Internal function to Update any references from other Track Sections (mirrored section)
@@ -94,6 +102,62 @@ def remove_references_to_section(deleted_sec_id:int):
             objects_common.schematic_objects[section_object]["mirror"] = ""
             # Update the mirrored section reference for the library object
             library.update_mirrored_section(int(section_id), "")
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove all references to a point from the Sections' configuration.
+# The 'pointstohighlight' table comprises a list of point IDs
+#------------------------------------------------------------------------------------
+
+def remove_references_to_point(point_id:int):
+    for section_id in objects_common.section_index:
+        current_points_table = objects_common.schematic_objects[objects_common.section(section_id)]["pointstohighlight"]
+        new_points_table = []
+        for item_id in current_points_table:
+            if item_id != point_id:
+                new_points_table.append(item_id)
+        objects_common.schematic_objects[objects_common.section(section_id)]["pointstohighlight"] = new_points_table
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update all references to a point in the Sections' configuration.
+# The 'pointstohighlight' table comprises a list of point IDs
+#------------------------------------------------------------------------------------
+
+def update_references_to_point(old_point_id:int, new_point_id:int):
+    for section_id in objects_common.section_index:
+        current_points_table = objects_common.schematic_objects[objects_common.section(section_id)]["pointstohighlight"]
+        for index, item_id in enumerate(current_points_table):
+            if item_id == old_point_id:
+                objects_common.schematic_objects[objects_common.section(section_id)]["pointstohighlight"][index] = new_point_id
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Line ID from the Section's configuration.
+# The 'linestohighlight' table comprises a list of line IDs for the route.
+#------------------------------------------------------------------------------------
+
+def remove_references_to_line(line_id:int):
+    for section_id in objects_common.section_index:
+        current_lines_table = objects_common.schematic_objects[objects_common.section(section_id)]["linestohighlight"]
+        new_lines_table = []
+        for item_id in current_lines_table:
+            if item_id != line_id:
+                new_lines_table.append(item_id)
+        objects_common.schematic_objects[objects_common.section(section_id)]["linestohighlight"] = new_lines_table
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Line ID in the Section's configuration.
+# The 'linestohighlight' table comprises a list of line IDs for the route.
+#------------------------------------------------------------------------------------
+
+def update_references_to_line(old_line_id:int, new_line_id:int):
+    for section_id in objects_common.section_index:
+        current_lines_table = objects_common.schematic_objects[objects_common.section(section_id)]["linestohighlight"]
+        for index, item_id in enumerate(current_lines_table):
+            if item_id == old_line_id:
+                objects_common.schematic_objects[objects_common.section(section_id)]["linestohighlight"][index] = new_line_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -175,7 +239,7 @@ def create_section(xpos:int, ypos:int):
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("tracksections", "textfonttuple")
     objects_common.schematic_objects[object_id]["defaultlabel"] = settings.get_style("tracksections", "defaultlabel")
     # Add the new object to the index of sections
-    objects_common.section_index[str(item_id)] = object_id 
+    objects_common.section_index[str(item_id)] = object_id
     # Draw the object on the canvas
     redraw_section_object(object_id)
     return(object_id)
