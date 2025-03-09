@@ -61,7 +61,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Bugfix to the Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
 * Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
 * The line width can now be specified/changed in the Edit Line and Edit Point configuration dialogs.
-* Added ability to change the styles (solid or dashed) for points/lines (config dialogs and styles).
+* New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
+* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied) 
 * TBD, TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

@@ -1011,6 +1011,11 @@ def update_all_signalbox_levers():
 #------------------------------------------------------------------------------------
 
 def update_route_highlighting_for_sections():
+    # We maintain a list of all points and lines we have overridden to support the use case of
+    # different track sections 'sharing' the same point and Lines (e.g. paths through pointwork)
+    lines_overridden = []
+    points_overridden = []
+    # Iterate through all the track sections to set/clear highlighting as appropriate
     for section_id in objects.section_index:
         # If we are in Edit mode then we want to clear down all route highlighting
         # Otherwise we set/clear the colour overrides based on the state of the track section
@@ -1018,13 +1023,20 @@ def update_route_highlighting_for_sections():
             colour_to_set = objects.schematic_objects[objects.section(section_id)]["highlightcolour"]
             for line_id in objects.schematic_objects[objects.section(section_id)]["linestohighlight"]:
                 library.set_line_colour_override(int(line_id),colour_to_set)
+                lines_overridden.append(line_id)
             for point_id in objects.schematic_objects[objects.section(section_id)]["pointstohighlight"]:
                 library.set_point_colour_override(int(point_id),colour_to_set)
+                points_overridden.append(point_id)
         else:
+            # Note that we only clear down point/line overrides if no other Track Section is currently
+            # highlighting them as OCCUPIED. This is the use case of having several track sections
+            # through pointwork where each track section is highlighting a particular path
             for line_id in objects.schematic_objects[objects.section(section_id)]["linestohighlight"]:
-                library.reset_line_colour_override(int(line_id))
+                if line_id not in lines_overridden:
+                    library.reset_line_colour_override(int(line_id))
             for point_id in objects.schematic_objects[objects.section(section_id)]["pointstohighlight"]:
-                library.reset_point_colour_override(int(point_id))
+                if point_id not in points_overridden:
+                    library.reset_point_colour_override(int(point_id))
     return()
 
 ##################################################################################################
