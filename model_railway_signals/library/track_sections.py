@@ -292,20 +292,25 @@ def section_button_entered_event(section_id:int):
     return()
 
 #---------------------------------------------------------------------------------------------
-# Internal function for processing toggling of a Track Sections
+# Internal function for processing toggling of a Track Sections. Called on Button Events
+# (where Section is toggled on/off) and also for GPIO Events linked to the Track Section.
+# The make_callback flag is used to supress layout processing during GPIO sensor initialisation
+# on Layout Load. Whilst the Track Section will have been created (so we can set the initial
+# state), other objects involved in that processing may not yet exist on the schematic.
 #---------------------------------------------------------------------------------------------
 
-def section_state_toggled(section_id:int):
-    logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
-    # Toggle the state of the track section button itself
-    toggle_section_button(section_id)
-    # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
-    # be published if the MQTT interface has been configured for publishing updates for this track section
-    send_mqtt_section_updated_event(section_id)
-    # Update any LOCAL mirrored sections (no callbacks or MQTT Messages will be generated for these updates)
-    update_mirrored_sections(section_id)
-    # Make the external callback (if one has been defined)
-    sections[str(section_id)]["extcallback"] (section_id)
+def section_state_toggled(section_id:int, required_state:bool=None, make_callback:bool=True):
+    if required_state != sections[str(section_id)]["occupied"]:
+        logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
+        # Toggle the state of the track section button itself
+        toggle_section_button(section_id)
+        # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+        # be published if the MQTT interface has been configured for publishing updates for this track section
+        send_mqtt_section_updated_event(section_id)
+        # Update any LOCAL mirrored sections (no callbacks or MQTT Messages will be generated for these updates)
+        update_mirrored_sections(section_id)
+        # Make the external callback (if one has been defined)
+        if make_callback: sections[str(section_id)]["extcallback"] (section_id)
     return ()
 
 #---------------------------------------------------------------------------------------------

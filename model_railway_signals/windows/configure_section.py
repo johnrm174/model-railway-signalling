@@ -25,7 +25,9 @@
 #    common.object_id_selection
 #    common.signal_route_frame
 #    common.window_controls
-#
+#    common.grid_of_generic_entry_boxes
+#    common.colour_selection
+#    common.validated_gpio_sensor_entry_box
 #------------------------------------------------------------------------------------
 
 import copy
@@ -185,34 +187,49 @@ class section_configuration_tab():
                      tool_tip= "Select to hide the Track Section in Run Mode")
         self.hidden.pack(padx=2, side=Tk.LEFT, fill="y")
         #----------------------------------------------------------------------------------
-        # Create a Label Frame to hold the mirrored and colour selections(Frame2)
+        # Create a Label Frame to hold the GPIO Sensor Settings (Frame2)
         #----------------------------------------------------------------------------------
-        self.frame2 = Tk.Frame(parent_tab)
-        self.frame2.pack(fill='x')
+        self.frame2=Tk.LabelFrame(parent_tab, text="GPIO sensor")
+        self.frame2.pack(padx=2, pady=2, fill='x', expand=True)
+        # Create a Frame to center everything in
+        self.subframe1 = Tk.Frame(self.frame2)
+        self.subframe1.pack()
+        self.label = Tk.Label(self.subframe1, text="Track circuit sensor:")
+        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1, item_type="Sensor",
+                tool_tip="Specify the ID of a GPIO Sensor for the 'track circuit' - for layouts using "+
+                "current detecting (or similar) 'occupancy' sensors rather than 'momentary' sensors. "+
+                "The Track Section will then always reflect the state of the GPIO Sensor")
+        self.gpiosensor.pack(side=Tk.LEFT, padx=2, pady=2)
+        #----------------------------------------------------------------------------------
+        # Create a Label Frame to hold the mirrored and colour selections (Frame3)
+        #----------------------------------------------------------------------------------
+        self.frame3 = Tk.Frame(parent_tab)
+        self.frame3.pack(fill='x')
         # Create the Label frame for the Mirrored Section elements
-        self.frame2subframe1 = Tk.LabelFrame(self.frame2, text="Section to mirror")
-        self.frame2subframe1.pack(side=Tk.LEFT, fill='both', padx=2, pady=2)
+        self.frame3subframe1 = Tk.LabelFrame(self.frame3, text="Section to mirror")
+        self.frame3subframe1.pack(side=Tk.LEFT, fill='both', padx=2, pady=2)
         # Call the common base class init function to create the EB
-        self.mirror = common.str_int_item_id_entry_box(self.frame2subframe1, tool_tip = "Enter the ID of "+
+        self.mirror = common.str_int_item_id_entry_box(self.frame3subframe1, tool_tip = "Enter the ID of "+
                     "the track section to mirror - This can be a local section ID or a remote section ID "+
                     "(in the form 'Node-ID') which has been subscribed to via MQTT networking",
                     exists_function = library.section_exists)
         self.mirror.pack(padx=2, pady=2)
         # Create the UI Element for the Highlighting colour
-        self.highlightcolour = common.colour_selection(self.frame2, label="Route Highlighting")
+        self.highlightcolour = common.colour_selection(self.frame3, label="Route Highlighting")
         self.highlightcolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
         #----------------------------------------------------------------------------------
-        # Create the point and line to highlight lists (frames 9,10)
+        # Create the point and line to highlight lists (frame 4,5)
         #----------------------------------------------------------------------------------
-        self.frame3 = Tk.LabelFrame(parent_tab, text="Route lines to highlight (when occupied)")
-        self.frame3.pack(padx=2, pady=2, fill='x')
-        self.highlightlines = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.int_item_id_entry_box,
+        self.frame4 = Tk.LabelFrame(parent_tab, text="Route lines to highlight (when occupied)")
+        self.frame4.pack(padx=2, pady=2, fill='x')
+        self.highlightlines = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box,
                     columns=8, width=3, exists_function = library.line_exists, tool_tip="Specify the route lines "+
                                         "to highlight when the Track Section is occupied")
         self.highlightlines.pack(padx=2, pady=2, fill='x')
-        self.frame4 = Tk.LabelFrame(parent_tab, text="Points to highlight (when occupied)")
-        self.frame4.pack(padx=2, pady=2, fill='x')
-        self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box,
+        self.frame5 = Tk.LabelFrame(parent_tab, text="Points to highlight (when occupied)")
+        self.frame5.pack(padx=2, pady=2, fill='x')
+        self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box,
                     columns=8, width=3, exists_function = library.point_exists, tool_tip="Specify the points (manual "+
                     "or automatic) to be highlighted when the Track Section is occupied")
         self.highlightpoints.pack(padx=2, pady=2, fill='x')
@@ -307,7 +324,7 @@ class edit_section():
             item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Section ID
             self.window.title("Track Section "+str(item_id))
-            # Set the Initial UI state from the current object settings
+            # Set the Initial UI state (note the gpiosensor and mirror elements need the current Section id for validation)
             self.config.sectionid.set_value(item_id)
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
             self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
@@ -323,6 +340,7 @@ class edit_section():
             self.config.highlightlines.set_values(objects.schematic_objects[self.object_id]["linestohighlight"])
             self.config.highlightpoints.set_values(objects.schematic_objects[self.object_id]["pointstohighlight"])
             self.config.highlightcolour.set_value(objects.schematic_objects[self.object_id]["highlightcolour"])
+            self.config.gpiosensor.set_value(objects.schematic_objects[self.object_id]["gpiosensor"], item_id)
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
@@ -334,8 +352,9 @@ class edit_section():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then.
-        elif (self.config.sectionid.validate() and self.config.mirror.validate() and
-              self.config.highlightlines.validate() and self.config.highlightpoints.validate()):
+        elif ( self.config.sectionid.validate() and self.config.mirror.validate() and
+               self.config.highlightlines.validate() and self.config.highlightpoints.validate() and
+               self.config.gpiosensor.validate() ):
             # Copy the original section Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the section coniguration elements from the current user selections
@@ -346,6 +365,7 @@ class edit_section():
             new_object_configuration["linestohighlight"] = self.config.highlightlines.get_values()
             new_object_configuration["pointstohighlight"] = self.config.highlightpoints.get_values()
             new_object_configuration["highlightcolour"] = self.config.highlightcolour.get_value()
+            new_object_configuration["gpiosensor"] = self.config.gpiosensor.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

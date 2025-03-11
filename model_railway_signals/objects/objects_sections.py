@@ -70,6 +70,7 @@ default_section_object["editable"] = True
 default_section_object["hidden"] = False
 default_section_object["mirror"] = ""
 default_section_object["highlightcolour"] = "Red"
+default_section_object["gpiosensor"] = ""
 # lines and points to highlight comprise variable length lists of Item IDs
 default_section_object["linestohighlight"] = []
 default_section_object["pointstohighlight"] = []
@@ -194,6 +195,7 @@ def update_section(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
 
 def redraw_section_object(object_id):
+    item_id = objects_common.schematic_objects[object_id]["itemid"]
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
@@ -201,7 +203,7 @@ def redraw_section_object(object_id):
     # Create the Track Section library object
     canvas_tags = library.create_section(
                 canvas = objects_common.canvas,
-                section_id = objects_common.schematic_objects[object_id]["itemid"],
+                section_id = item_id,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
                 section_callback = run_layout.section_updated_callback,
@@ -216,6 +218,9 @@ def redraw_section_object(object_id):
     # Create/update the canvas "tags" and selection rectangle for the Track Section
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
     objects_common.set_bbox(object_id, canvas_tags)
+    # If an external GPIO sensor is specified then map this to the Track Section
+    gpio_sensor = objects_common.schematic_objects[object_id]["gpiosensor"]
+    if gpio_sensor != "": library.update_gpio_sensor_callback(gpio_sensor, track_section=item_id)
     return()
  
 #------------------------------------------------------------------------------------
@@ -264,6 +269,9 @@ def paste_section(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy:
     objects_common.schematic_objects[new_object_id]["mirror"] = default_section_object["mirror"]
+    objects_common.schematic_objects[new_object_id]["gpiosensor"] = default_section_object["gpiosensor"]
+    objects_common.schematic_objects[new_object_id]["linestohighlight"] = default_section_object["linestohighlight"]
+    objects_common.schematic_objects[new_object_id]["pointstohighlight"] = default_section_object["pointstohighlight"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object
@@ -303,6 +311,9 @@ def update_section_styles(object_id, dict_of_new_styles:dict):
 def delete_section_object(object_id):
     library.delete_section(objects_common.schematic_objects[object_id]["itemid"])
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["tags"])
+    # Delete the track sensor mapping for the Track Sensor (if any)
+    linked_gpio_sensor = objects_common.schematic_objects[object_id]["gpiosensor"]
+    if linked_gpio_sensor != "": library.update_gpio_sensor_callback(linked_gpio_sensor)
     return()
 
 #------------------------------------------------------------------------------------

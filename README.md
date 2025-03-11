@@ -62,7 +62,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
 * The line width can now be specified/changed in the Edit Line and Edit Point configuration dialogs.
 * New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
-* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied) 
+* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied)
+* New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
+(NOTE THAT THIS INTRODUCES A CHANGE TO THE API IF YOU HAVE DEVELOPED YOUR OWN LAYOUT INTERFACE).
 * TBD, TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
@@ -175,3 +177,4 @@ To change the backend - Run "sudo raspi-config", select 'Advanced Options' then 
 
 An additional benifit was that some of the other applications I use (such as the kazam video capture software)
 will now work as normal on the Raspberry Pi 5.
+

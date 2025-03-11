@@ -876,6 +876,7 @@ class gpio_port_entry_frame():
                     if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
                     elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
                     elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
+                    elif event_mappings[3] > 0: mapping_text = u"\u2192"+" Track Section "+str(event_mappings[3])
                     else: mapping_text="-------------------------"
                     self.list_of_entry_boxes[index].set_value(gpio_mapping[0])
                     self.list_of_entry_boxes[index].mapping.config(text=mapping_text)
