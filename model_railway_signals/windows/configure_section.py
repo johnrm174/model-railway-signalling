@@ -196,7 +196,7 @@ class section_configuration_tab():
         self.subframe1.pack()
         self.label = Tk.Label(self.subframe1, text="Track circuit sensor:")
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1, item_type="Sensor",
+        self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1, item_type="Section",
                 tool_tip="Specify the ID of a GPIO Sensor for the 'track circuit' - for layouts using "+
                 "current detecting (or similar) 'occupancy' sensors rather than 'momentary' sensors. "+
                 "The Track Section will then always reflect the state of the GPIO Sensor")
