@@ -191,6 +191,8 @@
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
+#   mqtt_send_all_signal_states_on_broker_connect() - transmit the state of all signals set to publish
+#
 #---------------------------------------------------------------------------------------------
 
 # NOTE - MORE IMPORTS ARE DECLARED BELOW THE GLOBAL API CLASS DEFINITIONS
@@ -1254,6 +1256,17 @@ def send_mqtt_signal_updated_event(sig_id:int):
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("signal_updated_event",sig_id,data=data,log_message=log_message,retain=True)
         return()
+
+#---------------------------------------------------------------------------------------------------
+# Internal Library function for transmitting the current state of all Signals on
+# broker connection (to synchronise the state of all library objects across the network)
+#---------------------------------------------------------------------------------------------------
+
+def mqtt_send_all_signal_states_on_broker_connect():
+    for signal_id in signals:
+        if signal_id.isdigit():
+            send_mqtt_signal_updated_event(int(signal_id))
+    return()
 
 #---------------------------------------------------------------------------------------------
 # API function to reset the list of published/subscribed Signals. This function is called by

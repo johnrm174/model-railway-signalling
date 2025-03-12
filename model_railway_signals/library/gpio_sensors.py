@@ -59,6 +59,8 @@
 #   handle_mqtt_gpio_sensor_triggered_event(message:dict) - Called on receipt of a remote 'gpio_sensor_event'
 #        Dictionary comprises ["sourceidentifier"] - the identifier for the remote gpio sensor
 #
+#    mqtt_send_all_gpio_sensor_states_on_broker_connect() - transmit the state of all sensors set to publish
+#
 #---------------------------------------------------------------------------------------------------
 # IMPLEMENTATION NOTES
 #
@@ -257,22 +259,44 @@ def gpio_sensor_released(gpio_port:int):
 
 #---------------------------------------------------------------------------------------------------
 # Internal functions for building and sending MQTT messages (if configured to publish)
+# The connectionevent flag is to tell receiving systems if the message is the initial
+# GPIO sensor state message transmitted following broker connect/re-connect. The
+#receiving system can then ignore the message if mapped to transitory callbacks
+# (i.e. 'signal passed', 'signal_approach', sensor_passed')
 #---------------------------------------------------------------------------------------------------
 
-def send_mqtt_gpio_sensor_triggered_event(sensor_id:int):
+def send_mqtt_gpio_sensor_triggered_event(sensor_id:int, mqtt_connection_event:bool=False):
     if sensor_id in list_of_track_sensors_to_publish:
         log_message = "GPIO Sensor "+str(sensor_id)+": Publishing 'sensor triggered' event to MQTT Broker"
         # Publish as 'retained' messages - so the subscribing system will always pick up the latest state
-        mqtt_interface.send_mqtt_message("gpio_sensor_event", sensor_id, data={"state":True},
-                                              log_message=log_message, retain=True)
+        mqtt_interface.send_mqtt_message("gpio_sensor_event", sensor_id,
+                            data={"state":True, "connectionevent":mqtt_connection_event},
+                            log_message=log_message, retain=True)
     return()
 
-def send_mqtt_gpio_sensor_released_event(sensor_id:int):
+def send_mqtt_gpio_sensor_released_event(sensor_id:int, mqtt_connection_event:bool=False):
     if sensor_id in list_of_track_sensors_to_publish:
         log_message = "GPIO Sensor "+str(sensor_id)+": Publishing 'sensor released' event to MQTT Broker"
         # Publish as 'retained' messages - so the subscribing system will always pick up the latest state
-        mqtt_interface.send_mqtt_message("gpio_sensor_event", sensor_id, data={"state":False},
-                                               log_message=log_message, retain=True)
+        mqtt_interface.send_mqtt_message("gpio_sensor_event", sensor_id,
+                            data={"state":False, "connectionevent":mqtt_connection_event},
+                            log_message=log_message, retain=True)
+    return()
+
+#---------------------------------------------------------------------------------------------------
+# Internal Library function for transmitting the current state of all GPIO Sensors on
+# broker connection (to synchronise the state of all library objects across the network)
+#---------------------------------------------------------------------------------------------------
+
+def mqtt_send_all_gpio_sensor_states_on_broker_connect():
+    for gpio_port in gpio_port_mappings:
+        if gpio_port.isdigit():
+            sensor_id = gpio_port_mappings[gpio_port]["sensor_id"]
+            sensor_state = gpio_port_mappings[gpio_port]["sensor_state"]
+            if sensor_state:
+                send_mqtt_gpio_sensor_triggered_event(sensor_id, mqtt_connection_event=True)
+            else:
+                send_mqtt_gpio_sensor_released_event(sensor_id, mqtt_connection_event=True)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -291,13 +315,21 @@ def handle_mqtt_gpio_sensor_event(message):
         logging.warning("GPIO Interface: handle_mqtt_gpio_sensor_triggered_event - Message received from Remote Sensor "+
                         message["sourceidentifier"]+" but this Sensor has not been subscribed to")
     else:
+        # Work out whether this is a broker connection event. Note that if the "connectionevent" flag is not in
+        # the message then the other node is running an old version that does not transmit connection events
+        # The 'make_gpio_sensor_triggered_callback' function uses this flag to supress transitory event callbacks
+        # if the event is a connection event to prevent spurious layout processing (track occupancy changes)
+        if "connectionevent" in message.keys():
+            connection_event = message["connectionevent"]
+        else:
+            connection_event = False
         # Note that the remote sensor object would have been created with the sensor_identifier 
         # as the 'key' to the dict of gpio_port_mappings rather than the GPIO port number
         if "state" not in message.keys() or message["state"]:
             logging.info("GPIO Sensor "+message["sourceidentifier"]+": Remote GPIO sensor has been triggered *********************")
             gpio_port_mappings[message["sourceidentifier"]]["sensor_state"] = True
             # We are already running in the main Tkinter thread so just call the function to make the callback
-            make_gpio_sensor_triggered_callback(message["sourceidentifier"])
+            make_gpio_sensor_triggered_callback(message["sourceidentifier"], mqtt_connection_event=connection_event)
             if "state" not in message.keys() and not warning_issued:
                 logging.warning("MQTT Interface: GPIO sensor 'state' missing from received remote-sensor message - "+str(message))
                 logging.warning("MQTT Interface: Track Sections linked to 'Track Circuit' type sensors will not function correctly")
@@ -315,19 +347,24 @@ def handle_mqtt_gpio_sensor_event(message):
 # or released. Note that these functions will already be running in the main Tkinter thread
 #---------------------------------------------------------------------------------------------------
 
-def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
+def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str], mqtt_connection_event:bool=False):
     # The sensor_id could be either an int (local sensor) or a str (remote sensor)
     str_gpio_port = mapped_gpio_port(sensor_id)
-    if gpio_port_mappings[str_gpio_port]["signal_passed"] > 0:
-        sig_id = gpio_port_mappings[str_gpio_port]["signal_passed"]
-        signals.sig_passed_button_event(sig_id)
-    elif gpio_port_mappings[str_gpio_port]["signal_approach"] > 0:
-        sig_id = gpio_port_mappings[str_gpio_port]["signal_approach"]
-        signals.approach_release_button_event(sig_id)
-    elif gpio_port_mappings[str_gpio_port]["sensor_passed"] > 0:
-        sensor_id = gpio_port_mappings[str_gpio_port]["sensor_passed"]
-        track_sensors.track_sensor_triggered(sensor_id)
-    elif gpio_port_mappings[str_gpio_port]["track_section"] > 0:
+    # Only make the callback for transient events if the event is not a MQTT connection event message.
+    # These are transmitted by the sending node to synchronise the state of the 'subscribed' gpio
+    # object and then update any dependant objects (such as Track Sections) mapped to this state.
+    if not mqtt_connection_event:
+        if gpio_port_mappings[str_gpio_port]["signal_passed"] > 0:
+            sig_id = gpio_port_mappings[str_gpio_port]["signal_passed"]
+            signals.sig_passed_button_event(sig_id)
+        elif gpio_port_mappings[str_gpio_port]["signal_approach"] > 0:
+            sig_id = gpio_port_mappings[str_gpio_port]["signal_approach"]
+            signals.approach_release_button_event(sig_id)
+        elif gpio_port_mappings[str_gpio_port]["sensor_passed"] > 0:
+            sensor_id = gpio_port_mappings[str_gpio_port]["sensor_passed"]
+            track_sensors.track_sensor_triggered(sensor_id)
+    # We always want to process mqtt connection event messages to set the initial state of Track Sections
+    if gpio_port_mappings[str_gpio_port]["track_section"] > 0:
         section_id = gpio_port_mappings[str_gpio_port]["track_section"]
         track_sections.section_state_toggled(section_id, required_state=True)
     return()
@@ -335,6 +372,8 @@ def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
 def make_gpio_sensor_released_callback(sensor_id:Union[int,str]):
     # The sensor_id could be either an int (local sensor) or a str (remote sensor)
     str_gpio_port = mapped_gpio_port(sensor_id)
+    # Note that as only Track sections care about gpio released events we always want to process them
+    # irrespective as to whether it is a real event or a MQTT connection message (for synchronisation)
     if gpio_port_mappings[str_gpio_port]["track_section"] > 0:
         section_id = gpio_port_mappings[str_gpio_port]["track_section"]
         track_sections.section_state_toggled(section_id, required_state=False)

@@ -64,6 +64,8 @@
 #        Dict comprises ["sourceidentifier"] - the identifier for the remote block instrument sensor
 #                       ["instrumentid"] - the identifier of the 'target' instrument on the local schematic
 #
+#   mqtt_send_all_instrument_states_on_broker_connect() - transmit the state of all instruments set to publish
+#
 # ------------------------------------------------------------------------------------------
 # To use Block Instruments with full sound enabled (bell rings and telegraph key sounds) then
 # the 'simpleaudio' package will need to be installed. Note that for Windows it has a dependency 
@@ -341,6 +343,17 @@ def send_mqtt_ring_section_bell_event(inst_id:int):
         log_message = "Instrument "+str(inst_id)+": Publishing telegraph key event to MQTT Broker"
         # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
         mqtt_interface.send_mqtt_message("instrument_telegraph_event", inst_id, data=data, log_message=log_message, retain=False)
+    return()
+
+#---------------------------------------------------------------------------------------------------
+# Internal Library function for transmitting the current state of allBlock Instruments on
+# broker connection (to synchronise the state of all library objects across the network)
+#---------------------------------------------------------------------------------------------------
+
+def mqtt_send_all_instrument_states_on_broker_connect():
+    for inst_id in instruments:
+        if inst_id.isdigit():
+            send_mqtt_instrument_updated_event(int(inst_id))
     return()
 
 # --------------------------------------------------------------------------------

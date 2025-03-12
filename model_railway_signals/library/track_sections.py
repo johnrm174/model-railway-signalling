@@ -69,6 +69,8 @@
 #                       ["labeltext"] - the current label (train designator) for the remote section
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#
+#   mqtt_send_all_section_states_on_broker_connect() - transmit the state of all sections set to publish
 # 
 #---------------------------------------------------------------------------------------------
 
@@ -358,6 +360,17 @@ def send_mqtt_section_updated_event(section_id:int):
         log_message = "Section "+str(section_id)+": Publishing section state to MQTT Broker"
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("section_updated_event",section_id,data=data,log_message=log_message,retain=True)
+    return()
+
+#---------------------------------------------------------------------------------------------------
+# Internal Library function for transmitting the current state of all Track Sections on
+# broker connection (to synchronise the state of all library objects across the network)
+#---------------------------------------------------------------------------------------------------
+
+def mqtt_send_all_section_states_on_broker_connect():
+    for section_id in sections:
+        if section_id.isdigit():
+            send_mqtt_section_updated_event(int(section_id))
     return()
 
 #---------------------------------------------------------------------------------------------

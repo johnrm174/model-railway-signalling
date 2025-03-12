@@ -225,7 +225,7 @@ def split_remote_item_identifier(item_identifier:str):
     return (return_value)
 
 #-----------------------------------------------------------------------------------------------
-# Internal call-back to process mqtt log messages (only called if enhanced_debugging is set)
+# MQTT client call-back to process mqtt log messages (only called if enhanced_debugging is set)
 #-----------------------------------------------------------------------------------------------
 
 def on_log(mqtt_client, obj, level, mqtt_log_message):
@@ -233,7 +233,7 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Internal call-back to process broker disconnection events
+# MQTT client call-back call-back to process broker disconnection events
 #-----------------------------------------------------------------------------------------------
 
 def on_disconnect(mqtt_client, userdata, rc):
@@ -244,7 +244,7 @@ def on_disconnect(mqtt_client, userdata, rc):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Internal call-back to process broker connection / re-connection events
+# MQTT client call-back call-back to process broker connection / re-connection events
 #-----------------------------------------------------------------------------------------------
 
 def on_connect(mqtt_client, userdata, flags, rc):
@@ -275,11 +275,25 @@ def on_connect(mqtt_client, userdata, flags, rc):
         mqtt_client.subscribe(shutdown_topic)
         # Set the flag to report a successful connection
         node_config["connected_to_broker"] = True
+        # Call the function to transmit the current state of all library objects
+        # this is to synchronise objects across the entire signalling network
+        common.execute_function_in_tkinter_thread(lambda:common.mqtt_transmit_all())
     elif rc == 1: logging.error("MQTT-Client: Connection refused – incorrect protocol version")
     elif rc == 2: logging.error("MQTT-Client: Connection refused – invalid client identifier")
     elif rc == 3: logging.error("MQTT-Client: Connection refused – server unavailable")
     elif rc == 4: logging.error("MQTT-Client: Connection refused – bad username or password")
     elif rc == 5: logging.error("MQTT-Client: Connection refused – not authorised")
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Internal function to handle messages received from the MQTT Broker. Note that we "pass"
+# the execution for processing the function back into the main Tkinter thread
+#-----------------------------------------------------------------------------------------------
+
+def on_message(mqtt_client,obj,msg):
+    # Only process the message if there is a payload - If there is no payload then the message is
+    # a "null message" - sent to purge retained messages from the broker on application exit
+    if msg.payload: common.execute_function_in_tkinter_thread(lambda:process_message(msg))
     return()
 
 #--------------------------------------------------------------------------------------------------------
@@ -316,17 +330,6 @@ def process_message(msg):
             node_config["callbacks"][msg.topic.rpartition('/')[0]+"/+"] (unpacked_json)
         else:
             logging.warning("MQTT-Client: unhandled message topic: "+str(msg.topic))
-    return()
-
-#-----------------------------------------------------------------------------------------------
-# Internal function to handle messages received from the MQTT Broker. Note that we "pass"
-# the execution for processing the function back into the main Tkinter thread
-#-----------------------------------------------------------------------------------------------
-
-def on_message(mqtt_client,obj,msg):
-    # Only process the message if there is a payload - If there is no payload then the message is
-    # a "null message" - sent to purge retained messages from the broker on application exit
-    if msg.payload: common.execute_function_in_tkinter_thread(lambda:process_message(msg))
     return()
 
 #-----------------------------------------------------------------------------------------------

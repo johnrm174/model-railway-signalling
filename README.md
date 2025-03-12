@@ -64,6 +64,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
 * New Feature - Route lines & points can be added to Track Sections (to highlight when occupied)
 * New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
+* Improved synchronisation of gpio sensors and linked objects on MQTT broker connect
 (NOTE THAT THIS INTRODUCES A CHANGE TO THE API IF YOU HAVE DEVELOPED YOUR OWN LAYOUT INTERFACE).
 * TBD, TBD
 
