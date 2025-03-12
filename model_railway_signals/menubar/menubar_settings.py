@@ -581,10 +581,10 @@ class mqtt_subscribe_tab():
         self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
         self.instruments.pack(padx=2, pady=2, fill='x')
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
+        self.frame5 = Tk.LabelFrame(parent_tab, text="GPIO sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
         self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
-            tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
+            tool_tip="Enter the IDs of the remote GPIO sensors to subscribe to (in the form 'node-ID')")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
@@ -620,10 +620,10 @@ class mqtt_publish_tab():
         self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
         self.instruments.pack(padx=2, pady=2, fill='x')
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
+        self.frame5 = Tk.LabelFrame(parent_tab, text="GPIO sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
         self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
-            tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
+            tool_tip="Enter the IDs of the GPIO sensors to publish via the MQTT network")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
