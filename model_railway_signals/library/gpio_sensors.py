@@ -86,6 +86,8 @@
 
 import time
 import logging
+import threading
+import queue
 from typing import Union
 
 from . import common
@@ -93,6 +95,7 @@ from . import track_sensors
 from . import track_sections
 from . import mqtt_interface
 from . import signals
+
 
 #---------------------------------------------------------------------------------------------------
 # We can only use gpiozero interface if we're running on a Raspberry Pi. Other Platforms may not
@@ -182,24 +185,79 @@ editing_enabled = False
 def configure_edit_mode(edit_mode:bool):
     global editing_enabled
     editing_enabled = edit_mode
-    
+
+#---------------------------------------------------------------------------------------------------
+# Event queue and internal thread that provides the circuit breaker function for each of the
+# GPIO Ports. Every time a trigger or release event is received, this is notified to the
+# circuit breaker thread via the event_queue. The software then tests to see if the number
+# of events has exceeded the 'max_events' per second limit on the circuit breaker.
+#---------------------------------------------------------------------------------------------------
+
+event_queue = queue.Queue()
+
+def circuit_breaker_thread():
+    global gpio_port_mappings
+    while True:
+        while not event_queue.empty():
+            # Retrieve the gpio_port that has triggered the event
+            gpio_port = event_queue.get(False)
+            # Put exception handling around the code to keep the thread alive to
+            # cover edge cases that might arise (e.g. sensor deleted in main thread)
+            try:
+                # This is the maximum number of events per second for the breaker to cut out
+                max_events = gpio_port_mappings[str(gpio_port)]["breaker_threshold"]
+                # Increment/decrement the unprocessed event counter for the gpio port
+                gpio_port_mappings[str(gpio_port)]["breaker_events"] += 1
+                # See if there have been more than 100 events since the last count reset
+                if gpio_port_mappings[str(gpio_port)]["breaker_events"] > max_events:
+                    # If these have happened within the last second then trip the breaker
+                    time_period = time.time() - gpio_port_mappings[str(gpio_port)]["breaker_reset"]
+                    if time_period < 1.0:
+                        gpio_port_mappings[str(gpio_port)]["breaker_tripped"] = True
+                        sensor_id = "GPIO Sensor "+str(gpio_port_mappings[str(gpio_port)]["sensor_id"])
+                        str_time_period = str(round(time_period,2))
+                        logging.error("**********************************************************************************************")
+                        logging.error(sensor_id+" - Circuit breaker function for GPIO Port "+ str(gpio_port)+" has tripped due to over "+str(max_events))
+                        logging.error(sensor_id+" - trigger/release events being received within the last "+str_time_period+" seconds.")
+                        logging.error(sensor_id+" - All subsequent trigger / release events will be ignored by the software.")
+                        logging.error(sensor_id+" - Try resetting the GPIO sensor settings to see if this rectifies the fault.")
+                        logging.error(sensor_id+" - Otherwise the cause could be a faulty external sensor or GPIO input.")
+                        logging.error("**********************************************************************************************")
+                    # reset the event count and sample period start time
+                    gpio_port_mappings[str(gpio_port)]["breaker_events"] = 0
+                    gpio_port_mappings[str(gpio_port)]["breaker_reset"] = time.time()
+            except Exception as exception:
+                pass
+        time.sleep(0.0001)
+    return()
+
+circuit_breaker_thread = threading.Thread(target=circuit_breaker_thread)
+circuit_breaker_thread.setDaemon(True)
+circuit_breaker_thread.start()
+
 #---------------------------------------------------------------------------------------------------
 # The 'gpio_triggered_callback' function is called whenever a "Button Held" event is detected for
 # an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
 #---------------------------------------------------------------------------------------------------
 
-def gpio_triggered_callback(*args):
-    if not editing_enabled:
-        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(*args))
+def gpio_triggered_callback(gpio_port:int):
+    global gpio_port_mappings
+    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"] and not editing_enabled:
+            event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
+            common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(gpio_port))
+    return()
 
 #---------------------------------------------------------------------------------------------------
 # The 'gpio_released_callback' function is called whenever a "Button Held" event is detected for
 # an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
 #---------------------------------------------------------------------------------------------------
 
-def gpio_released_callback(*args):
-    if not editing_enabled:
-        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(*args))
+def gpio_released_callback(gpio_port:int):
+    global gpio_port_mappings
+    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"] and not editing_enabled:
+            event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
+            common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
+    return()
 
 #---------------------------------------------------------------------------------------------------
 # Internal function executed in the main Tkinter thread whenever a "Button Held" event is detected
@@ -230,8 +288,7 @@ def gpio_sensor_triggered(gpio_port:int):
     return()
 
 #---------------------------------------------------------------------------------------------------
-# Internal function executed in the main Tkinter thread whenever a "Button Released" event is detected
-# for the external GPIO port.
+# Internal function executed in the main Tkinter thread whenever a "Button Released" event is detected.
 #---------------------------------------------------------------------------------------------------
 
 def gpio_sensor_released(gpio_port:int):
@@ -385,7 +442,7 @@ def make_gpio_sensor_released_callback(sensor_id:Union[int,str]):
 # This is then added to a dictionary of sensors for later reference
 #---------------------------------------------------------------------------------------------------
 
-def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, trigger_period:float):
+def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, trigger_period:float, max_events_per_second:int=100):
     global gpio_port_mappings
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sensor_id,int) or sensor_id < 1:
@@ -418,6 +475,10 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
         gpio_port_mappings[str(gpio_channel)]["sensor_passed"] = 0
         gpio_port_mappings[str(gpio_channel)]["track_section"] = 0
         gpio_port_mappings[str(gpio_channel)]["sensor_state"] = False
+        gpio_port_mappings[str(gpio_channel)]["breaker_reset"] = time.time()
+        gpio_port_mappings[str(gpio_channel)]["breaker_events"] = 0
+        gpio_port_mappings[str(gpio_channel)]["breaker_tripped"] = False
+        gpio_port_mappings[str(gpio_channel)]["breaker_threshold"] = max_events_per_second
         # We only create /update the gpiozero button object if we are running on a raspberry pi
         if running_on_raspberry_pi:
             # We only create the gpiozero button object if it doesn't already exist
