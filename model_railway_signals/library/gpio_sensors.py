@@ -198,7 +198,7 @@ def subscribe_to_gpio_port_status(gpio_port:int, callback):
         gpio_port_subscriptions[str(gpio_port)] = callback
         report_gpio_port_status(gpio_port)
     return()
-    
+
 def unsubscribe_from_gpio_port_status(gpio_port:int):
     global gpio_port_subscriptions
     if str(gpio_port) not in gpio_port_subscriptions.keys():
@@ -206,7 +206,7 @@ def unsubscribe_from_gpio_port_status(gpio_port:int):
     else:
         del gpio_port_subscriptions[str(gpio_port)]
     return()
-        
+
 def report_gpio_port_status(gpio_port:int):
     if str(gpio_port) in gpio_port_subscriptions.keys():
         if str(gpio_port) not in gpio_port_mappings.keys(): status = 0
