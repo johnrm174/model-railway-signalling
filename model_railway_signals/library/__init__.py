@@ -162,6 +162,8 @@ from .gpio_sensors import update_gpio_sensor_callback
 from .gpio_sensors import reset_gpio_mqtt_configuration
 from .gpio_sensors import set_gpio_sensors_to_publish_state
 from .gpio_sensors import subscribe_to_remote_gpio_sensors
+from .gpio_sensors import subscribe_to_gpio_port_status
+from .gpio_sensors import unsubscribe_from_gpio_port_status
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -301,6 +303,8 @@ __all__ = [
         'reset_gpio_mqtt_configuration',
         'subscribe_to_remote_gpio_sensors',
         'set_gpio_sensors_to_publish_state',
+        'subscribe_to_gpio_port_status',
+        'unsubscribe_from_gpio_port_status',
       # Public SPROG control functions
         'sprog_connect',
         'sprog_disconnect',

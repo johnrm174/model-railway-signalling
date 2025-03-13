@@ -55,6 +55,9 @@
 #   set_gpio_sensors_to_publish_state(*sensor_ids:int) - Set GPIO Sensors to publish trigger events.
 #
 #   subscribe_to_remote_gpio_sensors(*remote_ids:str) - Subscribe to remote GPIO Sensor trigger events
+#
+#   subscribe_to_gpio_port_status(gpio_port:int, callback) - to get real-time status updates
+#   unsubscribe_from_gpio_port_status (gpio_port:int) - to get real-time status updates
 # 
 # External API - classes and functions (used by the other library modules):
 #
@@ -182,15 +185,36 @@ def gpio_sensor_exists(sensor_id:Union[int,str]):
     return(sensor_exists)
 
 #---------------------------------------------------------------------------------------------
-# Library function to set/clear Edit Mode (called by the editor on mode change)
-# GPIO Events are only processed in Run Mode
+# Function to subscribe/unsubscribe from GPIO port status updates
 #---------------------------------------------------------------------------------------------
 
-editing_enabled = False
+gpio_port_subscriptions = {}
 
-def configure_edit_mode(edit_mode:bool):
-    global editing_enabled
-    editing_enabled = edit_mode
+def subscribe_to_gpio_port_status(gpio_port:int, callback):
+    global gpio_port_subscriptions
+    if gpio_port not in get_list_of_available_gpio_ports():
+        logging.error("GPIO Port "+str(gpio_port)+": subscribe_to_gpio_port_status - GPIO Port is not supported")
+    else:
+        gpio_port_subscriptions[str(gpio_port)] = callback
+        report_gpio_port_status(gpio_port)
+    return()
+    
+def unsubscribe_from_gpio_port_status(gpio_port:int):
+    global gpio_port_subscriptions
+    if str(gpio_port) not in gpio_port_subscriptions.keys():
+        logging.error("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - GPIO Port is not subscribed")
+    else:
+        del gpio_port_subscriptions[str(gpio_port)]
+    return()
+        
+def report_gpio_port_status(gpio_port:int):
+    if str(gpio_port) in gpio_port_subscriptions.keys():
+        if str(gpio_port) not in gpio_port_mappings.keys(): status = 0
+        elif gpio_port_mappings[str(gpio_port)]["breaker_tripped"]: status = 1
+        elif gpio_port_mappings[str(gpio_port)]["sensor_state"]: status = 2
+        else: status = 3
+        gpio_port_subscriptions[str(gpio_port)] (status)
+    return()
 
 #---------------------------------------------------------------------------------------------------
 # Event queue and internal thread that provides the circuit breaker function for each of the
@@ -229,6 +253,8 @@ def circuit_breaker_thread():
                         logging.error(sensor_id+" - Try resetting the GPIO sensor settings to see if this rectifies the fault.")
                         logging.error(sensor_id+" - Otherwise the cause could be a faulty external sensor or GPIO input.")
                         logging.error("**********************************************************************************************")
+                    # Report the sensor status to any subscribed modules
+                    report_gpio_port_status(gpio_port)
                     # reset the event count and sample period start time
                     gpio_port_mappings[str(gpio_port)]["breaker_events"] = 0
                     gpio_port_mappings[str(gpio_port)]["breaker_reset"] = time.time()
@@ -248,9 +274,9 @@ circuit_breaker_thread.start()
 
 def gpio_triggered_callback(gpio_port:int):
     global gpio_port_mappings
-    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"] and not editing_enabled:
-            event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
-            common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(gpio_port))
+    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+        event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
+        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(gpio_port))
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -260,9 +286,9 @@ def gpio_triggered_callback(gpio_port:int):
 
 def gpio_released_callback(gpio_port:int):
     global gpio_port_mappings
-    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"] and not editing_enabled:
-            event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
-            common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
+    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+        event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
+        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -287,6 +313,8 @@ def gpio_sensor_triggered(gpio_port:int):
             send_mqtt_gpio_sensor_triggered_event(sensor_id)
             # Make the mapped signal or track sensor callback
             make_gpio_sensor_triggered_callback(sensor_id)
+            # Report the sensor status to any subscribed modules
+            report_gpio_port_status(gpio_port)
         else:
             logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
         # Reset the timeout period (whether we have acted on it or not)
@@ -315,6 +343,8 @@ def gpio_sensor_released(gpio_port:int):
                 logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
                 send_mqtt_gpio_sensor_released_event(sensor_id)
                 make_gpio_sensor_released_callback(sensor_id)
+                # Report the sensor status to any subscribed modules
+                report_gpio_port_status(gpio_port)
             else:
                 remaining_timeout_ms = int((timeout_start + timeout_value - time.time())*100)
                 common.root_window.after(remaining_timeout_ms+10, lambda:gpio_sensor_released(gpio_port))
@@ -512,6 +542,8 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
                 # Transmit the initial state of the GPIO Sensor (if networking enabled)
                 if initial_state: send_mqtt_gpio_sensor_triggered_event(sensor_id)
                 else: send_mqtt_gpio_sensor_released_event(sensor_id)
+        # Report the sensor status to any subscribed modules
+        report_gpio_port_status(gpio_channel)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -605,6 +637,8 @@ def update_gpio_sensor_callback (sensor_id:Union[int,str], signal_passed:int=0,
         if track_section > 0:
             current_state = gpio_port_mappings[str_gpio_port]["sensor_state"]
             track_sections.section_state_toggled(track_section, required_state=current_state, make_callback=False)
+        # Report the sensor status (if a local sensor) to any subscribed modules
+        if sensor_id.isdigit(): report_gpio_port_status(int(str_gpio_port))
     return()
 
 #---------------------------------------------------------------------------------------------------

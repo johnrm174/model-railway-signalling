@@ -58,15 +58,16 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
 > You have been warned!
 
-* Bugfix to the Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
+* Bugfix to Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
 * Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
-* The line width can now be specified/changed in the Edit Line and Edit Point configuration dialogs.
+* Improvement - Line width can now be edited in the Line and Point configuration dialogs.
+* Improvement - To the synchronisation of state across networked layouts on MQTT broker connect.
 * New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
-* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied)
+* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied).
 * New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
-* Improved synchronisation of gpio sensors and linked objects on MQTT broker connect
-* New 'circuit breaker' functionality for GPIO ports to lock out noisy external track sensors.
-(NOTE THAT THIS INTRODUCES A CHANGE TO THE API IF YOU HAVE DEVELOPED YOUR OWN LAYOUT INTERFACE).
+* GPIO Sensors - Are now enabled in all Modes (inhibiting them in Edit mode wasn't a good idea).
+* GPIO Sensors - New 'circuit breaker' functionality to lock out 'noisy' GPIO inputs.
+* GPIO Sensors - Settings window now provides an indication of the state of each GPIO input.
 * TBD, TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

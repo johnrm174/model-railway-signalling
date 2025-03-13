@@ -305,7 +305,6 @@ def shutdown_step5():
 def configure_edit_mode(edit_mode:bool):
     global run_mode
     run_mode = not edit_mode
-    gpio_sensors.configure_edit_mode(edit_mode)
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)
