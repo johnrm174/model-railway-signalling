@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------------------------------------
 #
 # External API functions / objects intended for use by other editor modules:
-#    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
+#    create_gpio_sensors(trigger,timeout,max_events,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
 #
@@ -61,13 +61,14 @@ def delete_references_to_sensors_that_no_longer_exist():
 # still 'exists'. All local GPIO Sensors that no longer exist are removed from the signal/track sensor config.
 #-------------------------------------------------------------------------------------------------------------
 
-def create_gpio_sensors(trigger:float, timeout:float, gpio_mappings:list):
+def create_gpio_sensors(trigger:float, timeout:float, max_events:int, gpio_mappings:list):
     # Delete all existing 'local' GPIO sensor objects first
     library.delete_all_local_gpio_sensors()
     # Iterate through the sensor mappings to create each (new) GPIO sensor object in turn
     for mapping in gpio_mappings:
         sensor_id, gpio_port = mapping[0], mapping[1]
-        library.create_gpio_sensor(sensor_id, gpio_port, trigger_period=trigger, sensor_timeout=timeout)
+        library.create_gpio_sensor(sensor_id, gpio_port, trigger_period=trigger,
+                            sensor_timeout=timeout, max_events_per_second = max_events)
     return()
 
 #-------------------------------------------------------------------------------------------------------------

@@ -24,6 +24,8 @@
 #         gpio_channel:int - The GPIO port port for the sensor (not the physical pin number)
 #         trigger_period:float - Active duration for sensor before triggering
 #         sensor_timeout:float - Time period for ignoring further triggers
+#      Optional Parameters:
+#         max_events_per_second:int - max number events per second before circuit breaker trips (default 100)
 #
 # The following API functions are for adding/removing Signal and Track Sensor callback events to the GPIO
 # Sensor. The 'remove_gpio_sensor_callback' function is called by the editor whenever a Signal or Track Sensor
@@ -96,7 +98,6 @@ from . import track_sections
 from . import mqtt_interface
 from . import signals
 
-
 #---------------------------------------------------------------------------------------------------
 # We can only use gpiozero interface if we're running on a Raspberry Pi. Other Platforms may not
 # include the RPi specific GPIO package so this is a quick and dirty way of detecting it on startup.
@@ -133,14 +134,19 @@ def get_list_of_available_gpio_ports():
 #---------------------------------------------------------------------------------------------------
 # GPIO port mappings are stored in a global dictionary when created - key is the GPIO port ID 
 # Each Entry is a dictionary specific to the GPIO port that has been mapped with the following Keys:
-# "sensor_id"       : Unique ID for the sensor - int (for local sensors) or str (for remote sensors)
-# "trigger_delay"   : Time that the GPIO port must remain active to raise a trigger event - float
-# "timeout_value"   : Time period (from initial trigger event) for ignoring further triggers - float
-# "timeout_start"   : The time the sensor was triggered (after any 'debounce period) - time
-# "sensor_device"   : The reference to the gpiozero button object mapped to the GPIO port
-# "signal_approach" : The signal ID (to raise a 'signal approached' event when triggered) - int
-# "signal_passed"   : The signal ID (to raise a 'signal passed' event for when triggered) - int
-# "sensor_passed"   : The Track Sensor ID (to raise a 'sensor passed' event when triggered) - int
+# "sensor_id"         : Unique ID for the sensor - int (for local sensors) or str (for remote sensors)
+# "timeout_value"     : Time period (in seconds) during which subsequent trigger events will be ignored
+# "timeout_start"     : Absolute time the sensor was first triggered (after any 'debounce' period)
+# "signal_approach"   : A signal ID (to raise a 'signal approached' event when triggered)
+# "signal_passed"     : A signal ID (to raise a 'signal passed' event for when triggered)
+# "sensor_passed"     : A Sensor ID (to raise a 'sensor passed' event when triggered)
+# "track_section"     : A Section ID (to raise a occupied/clear event when triggered/released)
+# "sensor_state"      : The current state of the GPIO input (True=active, False=inactive)
+# "breaker_reset"     : The start of the one second time period for counting sensor events
+# "breaker_events"    : A count of the number of trigger/release events since the last reset
+# "breaker_threshold" : The maximum number of events allowed within the one second time period
+# "breaker_tripped"   : A flag to indicate if the sircuit breaker has tripped or not
+# "sensor_device"     : The reference to the gpiozero button object mapped to the GPIO port
 #---------------------------------------------------------------------------------------------------
 
 gpio_port_mappings: dict = {}
@@ -226,7 +232,7 @@ def circuit_breaker_thread():
                     # reset the event count and sample period start time
                     gpio_port_mappings[str(gpio_port)]["breaker_events"] = 0
                     gpio_port_mappings[str(gpio_port)]["breaker_reset"] = time.time()
-            except Exception as exception:
+            except:
                 pass
         time.sleep(0.0001)
     return()

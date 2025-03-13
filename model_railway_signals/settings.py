@@ -84,6 +84,7 @@ default_settings["mqtt"]["pubsensors"] = []
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
+default_settings["gpio"]["maxevents"] = 100
 default_settings["gpio"]["portmappings"] = []
 
 # The following settings define the default application styles (object appearance)

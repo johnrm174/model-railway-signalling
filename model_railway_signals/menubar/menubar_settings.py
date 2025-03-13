@@ -908,25 +908,40 @@ class edit_gpio_settings():
             # Create an overall frame to pack everything in
             self.frame = Tk.Frame(self.window)
             self.frame.pack()
+            #---------------------------------------------------------------------
             # Create the labelframe for the general GPIO settings
+            #---------------------------------------------------------------------
             self.subframe1 = Tk.LabelFrame(self.frame, text="GPIO Port Settings")
             self.subframe1.pack(padx=2, pady=2, fill='x')
             # Put the elements in a subframe to center them
             self.subframe2 = Tk.Frame(self.subframe1)
             self.subframe2.pack()
+            # Trigger Period entry box
             self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
             self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
                 tool_tip="Enter the delay period (before GPIO sensor events will be triggered) in milliseconds (0-1000)")
             self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
+            # timeout Period entry box            
+            self.label2 = Tk.Label(self.subframe2, text="  Timeout (ms):")
             self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.timeout = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=5000, allow_empty=False, 
                 tool_tip="Enter the timeout period (during which further triggers will be ignored) in milliseconds (0-5000)")
             self.timeout.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            # Circuit breaker threahold entry
+            self.label3 = Tk.Label(self.subframe2, text="  Max events per second:")
+            self.label3.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.maxevents = common.integer_entry_box(self.subframe2, width=5, min_value=10, max_value=1000, allow_empty=False, 
+                tool_tip="Enter the maximum number of events per second for each GPIO port (10-1000). If a GPIO port exceeds "+
+                            "this rate then the GPIO port will be locked out to protect the application.")
+            self.maxevents.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            #---------------------------------------------------------------------
             # Create the Label frame for the GPIO port assignments 
+            #---------------------------------------------------------------------
             self.gpio = gpio_port_entry_frame(self.frame)
+            #---------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #---------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
@@ -938,20 +953,24 @@ class edit_gpio_settings():
         self.validation_error.pack_forget()
         trigger = settings.get_gpio("triggerdelay")
         timeout = settings.get_gpio("timeoutperiod")
+        max_events = settings.get_gpio("maxevents")
         mappings = settings.get_gpio("portmappings")
         self.gpio.set_values(mappings)
         self.trigger.set_value(int(trigger*1000))
         self.timeout.set_value(int(timeout*1000))
+        self.maxevents.set_value(max_events)
 
     def save_state(self, close_window:bool):
         # Only allow close if valid
-        if self.gpio.validate() and self.trigger.validate() and self.timeout.validate():
+        if self.gpio.validate() and self.trigger.validate() and self.timeout.validate() and self.maxevents.validate():
             self.validation_error.pack_forget()
             mappings = self.gpio.get_values()
             trigger = float(self.trigger.get_value())/1000
             timeout = float(self.timeout.get_value())/1000
+            max_events = self.maxevents.get_value()
             settings.set_gpio("triggerdelay", trigger)
             settings.set_gpio("timeoutperiod", timeout)
+            settings.set_gpio("maxevents", max_events)
             settings.set_gpio("portmappings", mappings)
             # Make the callback to apply the updated settings
             self.update_function()

@@ -18,7 +18,7 @@
 #
 #    switch_exists(item_id:int) - helper function to find if a DCC Switch Exists
 #
-#    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
+#    create_gpio_sensors(trigger,timeout,max_events,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
 #

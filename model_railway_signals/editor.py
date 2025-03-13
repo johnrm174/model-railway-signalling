@@ -608,6 +608,7 @@ class main_menubar:
         trigger = settings.get_gpio("triggerdelay")
         timeout = settings.get_gpio("timeoutperiod")
         mappings = settings.get_gpio("portmappings")
+        max_events = settings.get_gpio("maxevents")
         # Generate a pop-up warning if mappings have been defined but we are not running on a Pi
         if len(mappings)>0 and not library.gpio_interface_enabled():
             Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
@@ -615,7 +616,7 @@ class main_menubar:
         # Delete all track sensor objects and then re-create from the updated settings - we do this
         # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
         # Then update the GPIO Sensor to Signal / Track Sensor Event Mapings as required
-        objects.create_gpio_sensors(trigger, timeout, mappings)
+        objects.create_gpio_sensors(trigger, timeout, max_events, mappings)
         objects.configure_local_gpio_sensor_event_mappings()
         
     def general_settings_update(self):
