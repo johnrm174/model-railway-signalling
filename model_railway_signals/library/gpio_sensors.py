@@ -213,9 +213,9 @@ def unsubscribe_from_gpio_port_status(gpio_port:int):
 
 def report_gpio_port_status(gpio_port:int, status:int):
     if str(gpio_port) in gpio_port_subscriptions.keys():
-        # We test the 'tripped' flag AND the status code that we are given to cope
-        # with event timing edge cases where a set/reset event is processed in the
-        # main tkinter thread AFTER the circuit breaker has tripped
+        # We test the 'tripped' flag AND the status code that we are given to cope with event timing edge cases
+        # where a set/reset event is processed in the main tkinter thread AFTER the circuit breaker has tripped.
+        # Note we need to test the mapping exists here (it might have been subscribed to but not yet mapped).
         if str(gpio_port) in gpio_port_mappings.keys() and gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
             status = 1
         gpio_port_subscriptions[str(gpio_port)] (status)
@@ -275,6 +275,8 @@ circuit_breaker_thread.start()
 #---------------------------------------------------------------------------------------------------
 # The 'gpio_triggered_callback' function is called whenever a "Button Held" event is detected for
 # an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
+# Note that the GPIO port entry is never deleted once created - the sensor ID gets unmapped instead
+# so we don't have to check the gpio_port_mapping entry still exists before querying it.
 #---------------------------------------------------------------------------------------------------
 
 def gpio_triggered_callback(gpio_port:int):
@@ -287,6 +289,8 @@ def gpio_triggered_callback(gpio_port:int):
 #---------------------------------------------------------------------------------------------------
 # The 'gpio_released_callback' function is called whenever a "Button Held" event is detected for
 # an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
+# Note that the GPIO port entry is never deleted once created - the sensor ID gets unmapped instead
+# so we don't have to check the gpio_port_mapping entry still exists before querying it.
 #---------------------------------------------------------------------------------------------------
 
 def gpio_released_callback(gpio_port:int):
@@ -305,9 +309,11 @@ def gpio_released_callback(gpio_port:int):
 
 def gpio_sensor_triggered(gpio_port:int):
     global gpio_port_mappings
-    # Check the sensor still exists (hasn't been deleted) and the breaker hasn't tripped in the time
-    # between when the event was raised and the time this event is being processed in the tkinter thread
-    if str(gpio_port) in gpio_port_mappings.keys() and not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+    # Check the breaker hasn't tripped in the time between when the event was raised in the
+    # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
+    # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
+    # so we don't have to check the gpio_port_mapping entry still exists before querying it.
+    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
         sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
         # Only process the event if we are not in the timeout period from a previous trigger
         # If we are in the timeout period then 'our' sensor state will still be active
@@ -331,9 +337,11 @@ def gpio_sensor_triggered(gpio_port:int):
 
 def gpio_sensor_released(gpio_port:int):
     global gpio_port_mappings
-    # Check the sensor still exists (hasn't been deleted) and the breaker hasn't tripped in the time
-    # between when the event was raised and the time this event is being processed in the tkinter thread
-    if str(gpio_port) in gpio_port_mappings.keys() and not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+    # Check the breaker hasn't tripped in the time between when the event was raised in the
+    # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
+    # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
+    # so we don't have to check the gpio_port_mapping entry still exists before querying it.
+    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
         timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
         timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
         button_object = gpio_port_mappings[str(gpio_port)]["sensor_device"]
