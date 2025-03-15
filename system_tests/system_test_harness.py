@@ -503,6 +503,7 @@ def simulate_gpio_triggered(*gpioids):
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
 
 def simulate_buttons_clicked(*buttonids):
     for buttonid in buttonids:
