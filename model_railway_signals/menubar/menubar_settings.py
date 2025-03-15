@@ -866,7 +866,7 @@ class gpio_port_mapping(Tk.Frame):
 
     def get_value(self):
         # A gpio_mapping is a list comprising [sensor_id, gpio_port]
-        return(self.sensorid.get_value(), self.gpio_port)
+        return([self.sensorid.get_value(), self.gpio_port])
 
     def shutdown(self):
         library.unsubscribe_from_gpio_port_status(self.gpio_port)
