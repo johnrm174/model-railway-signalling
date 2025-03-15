@@ -302,7 +302,9 @@ def section_button_entered_event(section_id:int):
 #---------------------------------------------------------------------------------------------
 
 def section_state_toggled(section_id:int, required_state:bool=None, make_callback:bool=True):
-    if required_state != sections[str(section_id)]["occupied"]:
+    if not section_exists(section_id):
+        logging.error("Section "+str(section_id)+": Track Section Toggled event - section does not exist")
+    elif required_state != sections[str(section_id)]["occupied"]:
         logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
         # Toggle the state of the track section button itself
         toggle_section_button(section_id)
