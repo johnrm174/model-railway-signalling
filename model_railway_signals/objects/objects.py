@@ -584,7 +584,12 @@ def set_all(new_objects):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 else:
-                    objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
+                    # Tuples are converted to lists by the json.dumps function on layout save
+                    # We convert them back to tuples (primarily to stop the system tests breaking)
+                    if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
+                        objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
+                    else:
+                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
