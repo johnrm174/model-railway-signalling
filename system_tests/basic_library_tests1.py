@@ -19,7 +19,7 @@ from model_railway_signals.editor import schematic
 # Test GPIO Sensor Library objects
 #---------------------------------------------------------------------------------------------------------
 
-def run_gpio_sensor_library_tests():
+def run_gpio_sensor_library_api_tests():
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - GPIO Sensors")
     canvas = schematic.canvas
@@ -27,7 +27,7 @@ def run_gpio_sensor_library_tests():
     assert gpio_sensors.gpio_interface_enabled()
     # create_gpio_sensor - Sensor ID combinations
     assert len(gpio_sensors.gpio_port_mappings) == 0
-    print ("GPIO Sensors - create_gpio_sensor - will generate 10 errors")
+    print ("GPIO Sensors - create_gpio_sensor - will generate 12 errors")
     gpio_sensors.create_gpio_sensor(10, 4, trigger_period=0.01, sensor_timeout=0.00)  # Success - int > 0 with valid port
     gpio_sensors.create_gpio_sensor(11, 5, trigger_period=0.01, sensor_timeout=1.00)  # Success - int > 0 with valid port
     gpio_sensors.create_gpio_sensor(12, 6, trigger_period=0.01, sensor_timeout=2.00)  # Success - int > 0 with valid port
@@ -43,11 +43,13 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.create_gpio_sensor(18, 14, trigger_period=0.01, sensor_timeout=0.01)  # Fail - invalid port number
     gpio_sensors.create_gpio_sensor(18, 4, trigger_period=0.01, sensor_timeout=0.01)   # Fail - port already mapped
     assert len(gpio_sensors.gpio_port_mappings) == 4
-    # create_gpio_sensor - Invalid Timeout and trigger period 
+    # create_gpio_sensor - Invalid Timeout, trigger period and max_events_per_second
     gpio_sensors.create_gpio_sensor(18, 9, trigger_period=1, sensor_timeout=0.01)       # Fail - not a float
     gpio_sensors.create_gpio_sensor(18, 9, trigger_period=0.01, sensor_timeout=1)       # Fail - not a float
     gpio_sensors.create_gpio_sensor(18, 9, trigger_period=-0.1, sensor_timeout=0.01)    # Fail - must be >= 0.0
     gpio_sensors.create_gpio_sensor(18, 9, trigger_period=0.01, sensor_timeout=-0.01)   # Fail - must be >= 0.0
+    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=0.01, sensor_timeout=1.0, max_events_per_second = 0.1)  # Fail - not an int
+    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=0.01, sensor_timeout=1.0, max_events_per_second = 0)    # Fail  must be > 0
     assert len(gpio_sensors.gpio_port_mappings) == 4
     # track_sensor_exists (accepts ints and strs)
     print ("GPIO Sensors - gpio_sensor_exists - will generate 1 error")
@@ -60,40 +62,95 @@ def run_gpio_sensor_library_tests():
     assert not gpio_sensors.gpio_sensor_exists(107.0)   # False (with Error) - not an int or str
     # get_gpio_sensor_callback
     print ("GPIO Sensors - get_gpio_sensor_callback - will generate 3 errors")
-    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,0]    # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback(11) == [0,0,0]    # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,0,0]  # Success - ID is str
-    assert gpio_sensors.get_gpio_sensor_callback("13") == [0,0,0]  # Success - ID is str
-    assert gpio_sensors.get_gpio_sensor_callback(14.0) == [0,0,0]  # Error - not int or str
-    assert gpio_sensors.get_gpio_sensor_callback(18) == [0,0,0]    # Error - Does not exist
-    assert gpio_sensors.get_gpio_sensor_callback("18") == [0,0,0]  # Error - Does not exist
+    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,0,0]    # Success - ID is int
+    assert gpio_sensors.get_gpio_sensor_callback(11) == [0,0,0,0]    # Success - ID is int
+    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,0,0,0]  # Success - ID is str
+    assert gpio_sensors.get_gpio_sensor_callback("13") == [0,0,0,0]  # Success - ID is str
+    assert gpio_sensors.get_gpio_sensor_callback(14.0) == [0,0,0,0]  # Error - not int or str
+    assert gpio_sensors.get_gpio_sensor_callback(18) == [0,0,0,0]    # Error - Does not exist
+    assert gpio_sensors.get_gpio_sensor_callback("18") == [0,0,0,0]  # Error - Does not exist
     # add_gpio_sensor_callbacks
-    print ("GPIO Sensors - update_gpio_sensor_callback - will generate 13 errors")
+    print ("GPIO Sensors - update_gpio_sensor_callback - will generate 17 errors")
     gpio_sensors.update_gpio_sensor_callback(10, sensor_passed=1)      # Success - int and exists
-    gpio_sensors.update_gpio_sensor_callback(11, signal_passed=1)      # Success - str and exists
+    gpio_sensors.update_gpio_sensor_callback(11, signal_passed=1)      # Success - int and exists
     gpio_sensors.update_gpio_sensor_callback("12", signal_approach=1)  # Success - str and exists
-    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,1]        # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback(11) == [1,0,0]        # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,1,0]      # Success - ID is str
-    gpio_sensors.update_gpio_sensor_callback(10)                       # Success - int and exists
-    gpio_sensors.update_gpio_sensor_callback(11)                       # Success - str and exists
-    gpio_sensors.update_gpio_sensor_callback("12")                     # Success - str and exists
-    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,0]        # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback(11) == [0,0,0]        # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,0,0]      # Success - ID is str
-    gpio_sensors.update_gpio_sensor_callback(18, signal_passed=1)                                      # Fail - Does not exist
-    gpio_sensors.update_gpio_sensor_callback("18", signal_passed=1)                                    # Fail - Does not exist
-    gpio_sensors.update_gpio_sensor_callback(12.0, signal_passed=1)                                    # Fail - not an int or str
-    gpio_sensors.update_gpio_sensor_callback(12, signal_passed="1")                                    # Fail - Item not an int
-    gpio_sensors.update_gpio_sensor_callback(12, signal_approach="1")                                  # Fail - Item not an int
-    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed="1")                                    # Fail - Item not an int
-    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=-1)                                     # Fail - invalid item id
-    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=-1)                                   # Fail - invalid item id
-    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=-1)                                     # Fail - invalid item id
-    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
-    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1)                   # Fail - multiple specified
-    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=1, sensor_passed=1)                   # Fail - multiple specified
-    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, sensor_passed=1)                     # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback("13", track_section=1)    # Success - str and exists (but error for toggling track section)
+    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,1,0]
+    assert gpio_sensors.get_gpio_sensor_callback(11) == [1,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,1,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("13") == [0,0,0,1]
+    gpio_sensors.update_gpio_sensor_callback(10)
+    gpio_sensors.update_gpio_sensor_callback(11)
+    gpio_sensors.update_gpio_sensor_callback("12")
+    gpio_sensors.update_gpio_sensor_callback("13")
+    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback(11) == [0,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("13") == [0,0,0,0]
+    gpio_sensors.update_gpio_sensor_callback(18, signal_passed=1)                     # Fail - ID Does not exist
+    gpio_sensors.update_gpio_sensor_callback(12.0, signal_passed=1)                   # Fail - ID not an int or str
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed="1")                   # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach="1")                 # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed="1")                   # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, track_section="1")                   # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=-1)                    # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=-1)                  # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=-1)                    # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, track_section=-1)                    # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1)  # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, sensor_passed=1)    # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, track_section=1)    # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=1, track_section=1)  # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=1, track_section=1)    # Fail - multiple specified
+    # subscribe_to_remote_gpio_sensors
+    print ("GPIO Sensors - subscribe_to_remote_gpio_sensors - Will generate 1 warning and 5 Errors")
+    assert len(gpio_sensors.gpio_port_mappings) == 4
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20","box1-21")  # Success - valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-22","box1-23")  # Success - valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20")            # Warning - already subscribed
+    gpio_sensors.subscribe_to_remote_gpio_sensors(120)                  # Fail - not a string
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1")               # Fail - not valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("20")                 # Fail - not valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-0")             # Fail - not valid remote ID
+    assert gpio_sensors.gpio_sensor_exists("box1-20")
+    assert gpio_sensors.gpio_sensor_exists("box1-21")
+    assert gpio_sensors.gpio_sensor_exists("box1-22")
+    assert gpio_sensors.gpio_sensor_exists("box1-23")
+    assert len(gpio_sensors.gpio_port_mappings) == 8
+    # Check the callbacks have been initialised correctly
+    assert gpio_sensors.get_gpio_sensor_callback("box1-20") == [0,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [0,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-23") == [0,0,0,0]
+    # Set up the correct callbacks
+    gpio_sensors.update_gpio_sensor_callback("box1-20", sensor_passed=10)      # Success - int and exists
+    gpio_sensors.update_gpio_sensor_callback("box1-21", signal_passed=10)      # Success - str and exists
+    gpio_sensors.update_gpio_sensor_callback("box1-22", signal_approach=10)    # Success - str and exists
+    gpio_sensors.update_gpio_sensor_callback("box1-23", track_section=10)    # Success - str and exists (Error for track section not existing)
+    # Check the callbacks have been updated correctly
+    assert gpio_sensors.get_gpio_sensor_callback("box1-20") == [0,0,10,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [10,0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,10,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-23") == [0,0,0,10]
+    # Test the triggering of remote sensors:
+    print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 4 errors (objects not existing) and 3 warnings")
+    # Test the latest Message formats (include 'state' and 'connectionevent'
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20", "state":True, "connectionevent":True})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21", "state":False, "connectionevent":True})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-22", "state":True, "connectionevent":False})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-23", "state":False, "connectionevent":False})
+    assert gpio_sensors.gpio_port_mappings["box1-20"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["box1-21"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["box1-22"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["box1-23"]["sensor_state"] == False
+    # Test the legacy message formats (previous releases)
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20"}) # No state => upgrade warning
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21"}) # No state => warning already given
+    assert gpio_sensors.gpio_port_mappings["box1-20"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["box1-21"]["sensor_state"] == True
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"wrongkey": "box1-20"})         # Fail - spurious message
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-15"}) # warning - not subscribed
     # set_gpio_sensors_to_publish_state
     print ("GPIO Sensors - set_gpio_sensors_to_publish_state - will generate 2 warnings and 2 errors")
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 0
@@ -102,64 +159,19 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.set_gpio_sensors_to_publish_state(10, 11)         # sensors already set to publish - will generate warnings
     gpio_sensors.set_gpio_sensors_to_publish_state("12", "13")     # Fail - not an int
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 4
-    # gpio_sensor_triggered - This is an internal function so no need to test invalid inputs
-    print ("GPIO Sensors - Sensor triggering tests - Triggering Sensors 10, 11, 12")
-    print ("GPIO Sensors - Will generate 3 Errors (signals / Track Sensors not existing)")
-    # Set up the initial state for the tests
-    gpio_sensors.update_gpio_sensor_callback(10, signal_passed=1)
-    gpio_sensors.update_gpio_sensor_callback(11, signal_approach=2)
-    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=3)
-    # Tests start here
-    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    time.sleep(0.25)
-    print ("GPIO Sensors - Re-triggering Sensors - 10 will be re-triggered - 11 and 12 will be extended")
-    print ("GPIO Sensors - Will generate 1 Error (signal 1 not existing)")
-    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    time.sleep(1.25)
-    print ("GPIO Sensors - Re-triggering Sensors - 10 & 11 will be re-triggered - 12 will be extended")
-    print ("GPIO Sensors - Will generate 2 Errors (signal 1 / Signal 2 not existing)")
-    gpio_sensors.gpio_triggered_callback(4)   # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    time.sleep(2.25)
-    print ("GPIO Sensors - End of sensor triggering tests -  all sensors should have timed out")
-    # subscribe_to_remote_gpio_sensors
-    print ("GPIO Sensors - subscribe_to_remote_gpio_sensors - Will generate 1 warning and 4 Errors")
-    assert len(gpio_sensors.gpio_port_mappings) == 4
-    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20","box1-21")  # Success - valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-22")            # Success - valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20")            # Warning - This is a duplicate
-    gpio_sensors.subscribe_to_remote_gpio_sensors(120)                  # Fail - not a string
-    gpio_sensors.subscribe_to_remote_gpio_sensors("box1")               # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensors("20")                 # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-0")             # Fail - not valid remote ID
-    assert gpio_sensors.gpio_sensor_exists("box1-20")
-    assert gpio_sensors.gpio_sensor_exists("box1-21")
-    assert gpio_sensors.gpio_sensor_exists("box1-22")
-    assert len(gpio_sensors.gpio_port_mappings) == 7
-    # Check the callbacks have been initialised correctly
-    assert gpio_sensors.get_gpio_sensor_callback("box1-20") == [0,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [0,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,0,0]
-    # Set up the correct callbacks
-    gpio_sensors.update_gpio_sensor_callback("box1-20", sensor_passed=10)      # Success - int and exists
-    gpio_sensors.update_gpio_sensor_callback("box1-21", signal_passed=10)      # Success - str and exists
-    gpio_sensors.update_gpio_sensor_callback("box1-22", signal_approach=10)    # Success - str and exists
-    # Check the callbacks have been updated correctly
-    assert gpio_sensors.get_gpio_sensor_callback("box1-20") == [0,0,10]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [10,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,10,0]
-    # Test the triggering of remote sensors:
-    print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 3 errors (signals / track sensors not existing) and 2 warnings")
-    gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-20"})
-    gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-21"})
-    gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-22"})
-    gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"wrongkey": "box1-20"})          # Fail - spurious message
-    gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-15"})  # Fail - not subscribed
+    print ("GPIO Sensors - Test Publishing of Sensors")
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    gpio_sensors.gpio_triggered_callback(4)   # Sensor 10
+    gpio_sensors.gpio_triggered_callback(5)   # Sensor 11
+    time.sleep(0.1)
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    gpio_sensors.gpio_released_callback(4)    # Sensor 10
+    time.sleep(0.1)
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    gpio_sensors.mqtt_send_all_gpio_sensor_states_on_broker_connect()
     # reset_mqtt_configuration (all remote sensors will be deleted)
     print ("GPIO Sensors - reset_mqtt_configuration")
     gpio_sensors.reset_gpio_mqtt_configuration()
@@ -168,6 +180,7 @@ def run_gpio_sensor_library_tests():
     assert not gpio_sensors.gpio_sensor_exists("box1-20")
     assert not gpio_sensors.gpio_sensor_exists("box1-21")
     assert not gpio_sensors.gpio_sensor_exists("box1-22")
+    assert not gpio_sensors.gpio_sensor_exists("box1-23")
     assert gpio_sensors.gpio_sensor_exists(10)
     assert gpio_sensors.gpio_sensor_exists(11)
     assert gpio_sensors.gpio_sensor_exists(12)
@@ -191,12 +204,247 @@ def run_gpio_sensor_library_tests():
     assert not gpio_sensors.gpio_sensor_exists("box1-20")
     assert not gpio_sensors.gpio_sensor_exists("box1-21")
     assert len(gpio_sensors.gpio_port_mappings) == 4
-    # gpio_shutdown
-    print ("GPIO Sensors - gpio_shutdown immediately after a trigger event")
-    gpio_sensors.create_gpio_sensor(10, 4, trigger_period=0.01, sensor_timeout=5.00)
-    gpio_sensors.gpio_triggered_callback(4)
+    # Cleanup
     gpio_sensors.delete_all_local_gpio_sensors()
-    gpio_sensors.gpio_triggered_callback(4)
+    return()
+
+def run_gpio_triggering_tests():
+    #------------------------------------------------------------------------------------------------------
+    print ("GPIO Sensors - Basic Sensor triggering/release tests - Triggering Sensors 10, 11, 12, 13")
+    print ("GPIO Sensors - Will generate 6 Errors (signals / Track Sensors / Track Sections not existing)")
+    # Create the GPIO sensor mappings for the tests
+    gpio_sensors.create_gpio_sensor(10, 4, trigger_period=0.01, sensor_timeout=0.00)  # Success - int > 0 with valid port
+    gpio_sensors.create_gpio_sensor(11, 5, trigger_period=0.01, sensor_timeout=1.00)  # Success - int > 0 with valid port
+    gpio_sensors.create_gpio_sensor(12, 6, trigger_period=0.01, sensor_timeout=2.00)  # Success - int > 0 with valid port
+    gpio_sensors.create_gpio_sensor(13, 7, trigger_period=0.01, sensor_timeout=3.00)  # Success - int > 0 with valid port
+    assert len(gpio_sensors.gpio_port_mappings) == 4
+    # Set up the initial state for the tests
+    gpio_sensors.update_gpio_sensor_callback(10, signal_passed=1)
+    gpio_sensors.update_gpio_sensor_callback(11, signal_approach=2)
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=3)
+    gpio_sensors.update_gpio_sensor_callback(13, track_section=4)   # Will generate Track Section not existing erroe
+    # Test the state of the GPIO sensors immediately after creation
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == False
+    # Trigger the GPIO inputs
+    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the state of the GPIO sensors shortly after triggering (to let the event be processed)
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the sensor timeouts 0.1 seconds after release - Port 4 should have been released
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True
+    # Test the sensor timeouts 1.1 seconds after release - Port 4,5 should have been released
+    time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True
+    # Test the sensor timeouts 2.1 seconds after release - Port 4,5,6 should have been released
+    time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True
+    # Test the sensor timeouts 3.1 seconds after release - Port 4,5,6,7 should have been released
+    time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == False
+    #------------------------------------------------------------------------------------------------------
+    print ("GPIO Sensors - Sensor Re-triggering tests (extending trigger timeouts) - Triggering Sensors 10, 11, 12, 13")
+    print ("  ----  Initial trigger (time=0.0) - Will generate 4 Errors (signals / Track Sensors / Track Sections not existing)")
+    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=2.0)
+    time.sleep(0.1)
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.5)
+    print ("  ----  Re-trigger Sensors 11,12,13 (time=0.5) - No errors (trigger periods extended)")
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=2.0)
+    time.sleep(0.1)
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the sensor state is still true
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True    
+    time.sleep(0.5)
+    print ("  ----  Re-trigger Sensors 11,12,13 (time=1.0) - No errors (trigger periods extended)")
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=2.0)
+    time.sleep(0.1)
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the sensor state is still true
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True    
+    time.sleep(0.5)
+    print ("  ----  Re-trigger Sensors 11,12,13 (time=1.5) - No errors (trigger periods extended)")
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=2.0)
+    time.sleep(0.1)
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the sensor state is still true
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True    
+    time.sleep(0.5)
+    print ("  ----  Re-trigger Sensors 11,12,13 (time=2.0) - No errors (trigger periods extended)")
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=2.0)
+    time.sleep(0.1)
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the sensor state is still true
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True     
+    print ("  ----  Re-trigger Sensors 11,12,13 (time=2.5) - No errors (trigger periods extended)")
+    time.sleep(0.5)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(7)  # Port number for GPIO Sensor 13 (timeout=2.0)
+    time.sleep(0.1)
+    # Release the GPIO inputs
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(7)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    time.sleep(0.1)
+    # Test the sensor state is still true
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True      
+    print ("  ----  Test the timeouts after re-triggering - Will generate 1 Error (Track Section not existing)")
+    # Test the sensor timeouts 1.1 seconds after release - Port 5 should have been released
+    time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True
+    # Test the sensor timeouts 2.1 seconds after release - Port 5,6 should have been released
+    time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == True
+    # Test the sensor timeouts 3.1 seconds after release - Port 5,6,7 should have been released
+    time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == False
+    assert gpio_sensors.gpio_port_mappings["7"]["sensor_state"] == False
+    # Clean up
+    gpio_sensors.delete_all_local_gpio_sensors() 
+    return()
+
+def gpio_port_10_status_reporting_callback(status):
+    if status == 0: print("  ----  Port 10 Status = Code 0 - No Mapping")
+    if status == 1: print("  ----  Port 10 Status = Code 1 - Breaker Tripped")
+    if status == 2: print("  ----  Port 10 Status = Code 2 - Port Active")
+    if status == 3: print("  ----  Port 10 Status = Code 3 - Port Inactive")
+    return()
+
+def run_gpio_circuit_breaker_tests():
+    print ("GPIO Sensors - Enable status reporting - Will generate 1 Error and one 'No Mapping' report")
+    gpio_sensors.subscribe_to_gpio_port_status(0, gpio_port_10_status_reporting_callback)   # Error
+    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)
+    print ("GPIO Sensors - Circuit Breaker tests 1 - Will report 'Inactive' => 'Active' => 'Inactive'")
+    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.03, max_events_per_second=100)
+    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
+    time.sleep(0.5)
+    # 100 or less events in a second shouldn't trip the breaker 
+    for count in range(50):
+        gpio_sensors.gpio_triggered_callback(10)
+        gpio_sensors.gpio_released_callback(10)
+    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
+    time.sleep(0.5)
+    print ("GPIO Sensors - Circuit Breaker tests 2 - Will report 'Active' => TRIP => 'Tripped'")
+    time.sleep(0.5)
+    # More than 100 events in a second should trip the breaker
+    for count in range(100):
+        gpio_sensors.gpio_triggered_callback(10)
+        gpio_sensors.gpio_released_callback(10)
+    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == True
+    time.sleep(0.5)
+    print ("GPIO Sensors - Circuit Breaker tests 3 - Will report 'Inactive' => 'Active' => 'Inactive'")
+    time.sleep(0.5)
+    # Check we can re-set the breaker
+    gpio_sensors.delete_all_local_gpio_sensors() 
+    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.03, max_events_per_second=100)
+    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
+    # 100 or less events in a second shouldn't trip the breaker
+    for count in range(50):
+        gpio_sensors.gpio_triggered_callback(10)
+        gpio_sensors.gpio_released_callback(10)
+    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
+    time.sleep(0.5)
+    print ("GPIO Sensors - Disable status reporting - Will generate 1 Error")
+    time.sleep(0.5)
+    gpio_sensors.unsubscribe_from_gpio_port_status(4) # Error
+    # Clean up for the next tests
+    gpio_sensors.unsubscribe_from_gpio_port_status(10)
+    gpio_sensors.delete_all_local_gpio_sensors() 
+    print ("GPIO Sensors - Status reporting on subscribe - Will report 'Inactive' => 2*'Active' => 2*'Tripped'")
+    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=1.0, max_events_per_second=100)
+    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback) # Inactive
+    gpio_sensors.gpio_triggered_callback(10)
+    time.sleep(0.2)
+    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback) # Active
+    gpio_sensors.gpio_released_callback(10)
+    for count in range(200):
+        gpio_sensors.gpio_triggered_callback(10)
+        gpio_sensors.gpio_released_callback(10)
+    time.sleep(0.2)
+    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)
+    time.sleep(0.5)
+    print ("GPIO Sensors - test callbacks received after circuit breaker tripped are handled gracefully")
+    gpio_sensors.gpio_triggered_callback(10)
+    gpio_sensors.gpio_released_callback(10)
+    gpio_sensors.gpio_sensor_triggered(10)
+    gpio_sensors.gpio_sensor_released(10)
+    time.sleep(0.5)
+    # Clean up
+    gpio_sensors.unsubscribe_from_gpio_port_status(10)
+    gpio_sensors.delete_all_local_gpio_sensors() 
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -602,7 +850,9 @@ def run_mqtt_interface_tests():
 
 def run_all_basic_library_tests():
     baud_rate = 115200    # change to 115200 for Pi-Sprog-3 V2 or 460800 for Pi-SPROG-3 V1
-    run_gpio_sensor_library_tests()
+    run_gpio_sensor_library_api_tests()
+    run_gpio_triggering_tests()
+    run_gpio_circuit_breaker_tests()
     run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
     run_mqtt_interface_tests()
