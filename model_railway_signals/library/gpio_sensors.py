@@ -598,10 +598,14 @@ def delete_all_local_gpio_sensors():
     # Remove all "local" GPIO sensors from the dictionary of gpio_port_mappings (where the
     # key in the gpio_port_mappings dict will be a a number' rather that a remote identifier).
     # Note that we leave the GPIO port configuration (in the dict of GPIO port mappings)
-    # unchanged (i.e. don't delete it) - we just remove the mapping to the Sensor ID
+    # unchanged - we just remove the mapping to the Sensor ID and any callbacks
     for gpio_port in gpio_port_mappings:
         if gpio_port.isdigit():
             gpio_port_mappings[gpio_port]["sensor_id"] = 0
+            gpio_port_mappings[gpio_port]["signal_passed"] = 0
+            gpio_port_mappings[gpio_port]["signal_approach"] = 0
+            gpio_port_mappings[gpio_port]["sensor_passed"] = 0
+            gpio_port_mappings[gpio_port]["track_section"] = 0
     return()
 
 #---------------------------------------------------------------------------------------------------
