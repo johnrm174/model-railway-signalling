@@ -286,13 +286,15 @@ def run_track_section_library_tests():
     assert not track_sections.section_occupied(1)
     assert track_sections.section_occupied(2)
     assert track_sections.section_label(2) == "Train4"
+    print("Library Tests - Negative est API update of section_state_toggled (GPIO events) - will generate 1 error")
+    track_sections.section_state_toggled(7)
     print("Library Tests - set/clear_section_occupied - negative tests - will generate 5 errors")
     track_sections.set_section_occupied("1")                    # Fail - not int
     track_sections.set_section_occupied(7)                      # Fail - does not exist
     track_sections.set_section_occupied(1,20)                   # Fail - new label not a str
     assert track_sections.clear_section_occupied("1") == ""     # Fail - not int
     assert track_sections.clear_section_occupied(7) == ""       # Fail - does not exist
-    print("Library Tests - create a new Sectiion set to mirror an existing section")
+    print("Library Tests - create a new Section set to mirror an existing section")
     # Track Section 2 Should already be OCCUPIED by "Train4" from the previous tests
     track_sections.create_section(canvas,7,700,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="2")
     assert len(track_sections.sections) == 7
@@ -366,6 +368,8 @@ def run_track_section_library_tests():
     track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","occupied":False})          # Warning - spurious message
     track_sections.handle_mqtt_section_updated_event({"occupied": False, "labeltext":"Train20"})               # Warning - spurious message
     track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","labeltext":"Train20"})     # Warning - spurious message    
+    print("Library Tests - mqtt_send_all_section_states_on_broker_connect - No errors or warnings")
+    track_sections.mqtt_send_all_section_states_on_broker_connect()
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
     track_sections.reset_sections_mqtt_configuration()
     assert len(track_sections.list_of_sections_to_publish) == 0
@@ -1081,6 +1085,8 @@ def run_instrument_library_tests():
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-50", "instrumentid":"box1-1"})   # Not subscribed
     block_instruments.handle_mqtt_ring_section_bell_event({"instrumentid": "box2-1"})                                 # Fail - spurious message
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20"})                            # Fail - spurious message
+    print("Library Tests - mqtt_send_all_instrument_states_on_broker_connect - No errors or warnings")
+    block_instruments.mqtt_send_all_instrument_states_on_broker_connect()
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
     block_instruments.reset_instruments_mqtt_configuration()
     assert len(block_instruments.list_of_instruments_to_publish) == 0

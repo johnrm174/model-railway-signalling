@@ -530,6 +530,8 @@ def run_library_api_tests():
     signals.handle_mqtt_signal_updated_event({"sourceidentifier":"box1-70", "sigstate":1,})        # Warning - Not subscribed
     signals.handle_mqtt_signal_updated_event({"sourceidentifier":"box1-50"})                       # Warning - spurious message
     signals.handle_mqtt_signal_updated_event({"sigstate": 1})                                      # Warning - spurious message
+    print("Library Tests - mqtt_send_all_signal_states_on_broker_connect - No errors or warnings")
+    signals.mqtt_send_all_signal_states_on_broker_connect()
     print("Library Tests - reset_signals_mqtt_configuration (all subscribed signals will be deleted) - no errors")
     signals.reset_signals_mqtt_configuration()
     assert len(signals.list_of_signals_to_publish) == 0
