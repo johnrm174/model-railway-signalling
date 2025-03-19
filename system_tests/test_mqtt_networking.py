@@ -99,7 +99,7 @@ def run_basic_networking_tests():
 
 def run_specific_signal_ahead_tests():
     print("MQTT interlocking and override on signals ahead tests")
-    print("Expected ERROR - assert_signals_PROCEED - Signal: 1 - Test Fail - Signal state: signal_state_type.CAUTION")
+    print("**** Expected ERROR - assert_signals_PROCEED - Signal: 1 - Test Fail - Signal state: signal_state_type.CAUTION ****")
     reset_layout()
     sleep(network_delay)
     # Test interlocking of distant signals against all home signal ahead

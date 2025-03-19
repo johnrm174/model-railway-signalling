@@ -136,10 +136,10 @@ def run_gpio_sensor_library_api_tests():
     # Test the triggering of remote sensors:
     print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 4 errors (objects not existing) and 3 warnings")
     # Test the latest Message formats (include 'state' and 'connectionevent'
-    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20", "state":True, "connectionevent":True})
-    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21", "state":False, "connectionevent":True})
-    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-22", "state":True, "connectionevent":False})
-    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-23", "state":False, "connectionevent":False})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20", "state":True, "tripped":False, "connectionevent":True})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21", "state":False, "tripped":False, "connectionevent":True})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-22", "state":True, "tripped":False, "connectionevent":False})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-23", "state":False, "tripped":False, "connectionevent":False})
     assert gpio_sensors.gpio_port_mappings["box1-20"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["box1-21"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["box1-22"]["sensor_state"] == True
@@ -151,6 +151,10 @@ def run_gpio_sensor_library_api_tests():
     assert gpio_sensors.gpio_port_mappings["box1-21"]["sensor_state"] == True
     gpio_sensors.handle_mqtt_gpio_sensor_event({"wrongkey": "box1-20"})         # Fail - spurious message
     gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-15"}) # warning - not subscribed
+    # Test the circuit breaker tripped message
+    print ("GPIO Sensors - Remote sensor circuit breaker tripped - will generate 2 Errors")
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20", "state":False, "tripped":True, "connectionevent":True})
+    gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21", "state":True, "tripped":True, "connectionevent":True})
     # set_gpio_sensors_to_publish_state
     print ("GPIO Sensors - set_gpio_sensors_to_publish_state - will generate 2 warnings and 2 errors")
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 0
@@ -384,8 +388,10 @@ def gpio_port_10_status_reporting_callback(status):
     return()
 
 def run_gpio_circuit_breaker_tests():
-    print ("GPIO Sensors - Enable status reporting - Will generate 1 Error and one 'No Mapping' report")
-    gpio_sensors.subscribe_to_gpio_port_status(0, gpio_port_10_status_reporting_callback)   # Error
+    print ("GPIO Sensors - Enable status reporting - Will generate 3 Errors and one 'No Mapping' report")
+    gpio_sensors.subscribe_to_gpio_port_status(1.0, gpio_port_10_status_reporting_callback)     # Error (not an int or str)
+    gpio_sensors.subscribe_to_gpio_port_status(0, gpio_port_10_status_reporting_callback)       # Error (not in list of local ports)
+    gpio_sensors.subscribe_to_gpio_port_status("box1", gpio_port_10_status_reporting_callback)  # Error (not a valid remote ID)
     gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)
     print ("GPIO Sensors - Circuit Breaker tests 1 - Will report 'Inactive' => 'Active' => 'Inactive'")
     gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.03, max_events_per_second=100)
@@ -419,7 +425,8 @@ def run_gpio_circuit_breaker_tests():
     time.sleep(0.5)
     print ("GPIO Sensors - Disable status reporting - Will generate 1 Error")
     time.sleep(0.5)
-    gpio_sensors.unsubscribe_from_gpio_port_status(4) # Error
+    gpio_sensors.unsubscribe_from_gpio_port_status(4.0) # Error (not an int or str)
+    gpio_sensors.unsubscribe_from_gpio_port_status(4)   # Warning (not subscribed)
     # Clean up for the next tests
     gpio_sensors.unsubscribe_from_gpio_port_status(10)
     gpio_sensors.delete_all_local_gpio_sensors() 
