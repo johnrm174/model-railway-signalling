@@ -99,7 +99,7 @@ def configure_local_gpio_sensor_event_mappings():
         object_id = objects_common.section(section_id)
         gpio_sensor = objects_common.schematic_objects[object_id]["gpiosensor"]
         if gpio_sensor.isdigit() and library.gpio_sensor_exists(gpio_sensor):
-            library.update_gpio_sensor_callback(gpio_sensor, track_section=int(gpio_sensor))
+            library.update_gpio_sensor_callback(gpio_sensor, track_section=int(section_id))
     # Remove any references to GPIO sensors that no longer exist from the Signal/Track Sensor configurations
     delete_references_to_sensors_that_no_longer_exist()
     return()
