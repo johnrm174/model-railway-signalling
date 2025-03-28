@@ -216,7 +216,7 @@ class section_configuration_tab():
                     exists_function = library.section_exists)
         self.mirror.pack(padx=2, pady=2)
         # Create the UI Element for the Highlighting colour
-        self.highlightcolour = common.colour_selection(self.frame3, label="Route Highlighting")
+        self.highlightcolour = common.colour_selection(self.frame3, label="Occupied colour")
         self.highlightcolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
         #----------------------------------------------------------------------------------
         # Create the point and line to highlight lists (frame 4,5)
