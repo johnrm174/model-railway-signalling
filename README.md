@@ -59,6 +59,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * Bugfix to Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
+* Bugfix to GPIO sensor settings page - mappings now correctly displayed after sensor unmapping.
 * Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
 * Improvement - Line width can now be edited in the Line and Point configuration dialogs.
 * Improvement - To the synchronisation of state across networked layouts on MQTT broker connect.
