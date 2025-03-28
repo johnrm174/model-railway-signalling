@@ -71,6 +71,8 @@
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
 #   mqtt_send_all_section_states_on_broker_connect() - transmit the state of all sections set to publish
+#
+#   section_state_toggled(id,required_state,make_callback) - Set the state of a section (GPIO sensors)
 # 
 #---------------------------------------------------------------------------------------------
 
@@ -155,17 +157,15 @@ def update_identifier(section_id:int, new_label:str):
     logging.info ("Section "+str(section_id)+": Label Updated to '"+new_label+"' ****************************")
     if len(new_label) > 0:
         # Assume that by entering a value the user wants to set the section to OCCUPIED.
-        update_label(section_id, new_label)
-        if not sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
+        logging.info ("Section "+str(section_id)+": New Train designator entered **********************************************")
+        # The following call will publish both changes to the MQTT broker and update any mirrored sections
+        set_section_occupied(section_id, new_label)
     else:
         # Assume that by entering a null value the user wants to set the section to CLEAR.
-        # In which case we clear the section and reset it to the default label
-        update_label(section_id, sections[str(section_id)]["defaultlabel"])
-        if sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
-    # Publish the label change to the MQTT broker (if the section has been configured to publish updates)
-    send_mqtt_section_updated_event(section_id)
-    # Update any Local mirrored sections (no callbacks will be raised for updating these)
-    update_mirrored_sections(section_id)
+        logging.info ("Section "+str(section_id)+": Train designator cleared **************************************************")
+        # We leave the existing label unchanged (but hidden as section is CLEAR).
+        # Note the following call will publish both changes to the MQTT broker and update any mirrored sections
+        clear_section_occupied(section_id)
     # Make an external callback to indicate the section has been updated
     sections[str(section_id)]["extcallback"] (section_id)
     return()
@@ -269,7 +269,7 @@ def section_button_released_event(section_id:int):
         section_released = None
     elif section_left1 == section_id:
         section_released = section_id
-        common.root_window.after(1, clear_section_button_released_event)
+        common.root_window.after(10, clear_section_button_released_event)
     section_pressed = None
     section_left1 = None
     section_left2 = None
@@ -281,7 +281,11 @@ def section_button_entered_event(section_id:int):
     #logging.debug("Section "+str(section_id)+": Track Section entered event ***********************************************")
     if section_left2 is not None:
         if section_occupied(section_left2):
+            logging.info ("Section "+str(section_id)+": Train moved from Section "+
+                          str(section_left2)+" ************************************************")
+            # The following call will publish both changes to the MQTT broker and update any mirrored sections
             set_section_occupied(section_id, clear_section_occupied(section_left2))
+            # Publish both section changes to the MQTT broker (if the sections are configured to publish updates)
             # Make the external callback - Note that we only make a single callback for the
             # Track section we have just updated as the 'run_layout' code processes any
             # changes based on the current state of all track sections (not the one changed)
@@ -540,10 +544,8 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         # Get the initial state for the section (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("sections",section_id)
         # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
-        if loaded_state["labeltext"]:
-            sections[str(section_id)]["labeltext"] = loaded_state["labeltext"]
-            sections[str(section_id)]["button"]["text"] = loaded_state["labeltext"]
         # Toggle the section if OCCUPIED (loaded_state_occupied will be 'None' if no data was loaded)
+        if loaded_state["labeltext"]: update_label(section_id, loaded_state["labeltext"])
         if loaded_state["occupied"]: toggle_section_button(section_id)
         # Update the state of the newly created section to reflect the mirrored section - Note that we need
         # to handle the case where it has yet to be created (file load case) or none specified (empty string)
