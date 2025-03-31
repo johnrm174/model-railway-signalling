@@ -38,6 +38,8 @@
 #    set_instrument_clear(*instrumentids)
 #    click_telegraph_key(*instrumentids)
 #    simulate_gpio_triggered(*gpioids)
+#    simulate_gpio_on(*gpioids)
+#    simulate_gpio_off(*gpioids)
 #    simulate_buttons_clicked(*buttonids)
 #
 # Supported Schematic test assertions:
@@ -503,6 +505,20 @@ def simulate_gpio_triggered(*gpioids):
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+
+def simulate_gpio_on(*gpioids):
+    for gpioid in gpioids:
+        if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
+            raise_test_warning ("simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
+        else:
+            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+
+def simulate_gpio_off(*gpioids):
+    for gpioid in gpioids:
+        if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
+            raise_test_warning ("simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
+        else:
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
 
 def simulate_buttons_clicked(*buttonids):

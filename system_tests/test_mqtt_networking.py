@@ -207,8 +207,18 @@ def run_specific_signal_ahead_tests():
 # Test Publish and subscribe to remote track sensors
 #-----------------------------------------------------------------------------------
 
-def run_remote_track_sensor_tests():
-    print("MQTT remote track sensor tests")
+def run_remote_gpio_sensor_tests():
+    print("MQTT remote track sensor tests - state")
+    assert_sections_clear(10)
+    simulate_gpio_on(8)
+    sleep(network_delay+gpio_trigger_delay)
+    assert_sections_occupied(10)
+    sleep(1.0)
+    assert_sections_occupied(10)
+    simulate_gpio_off(8)
+    sleep(network_delay+gpio_trigger_delay)
+    assert_sections_clear(10)
+    print("MQTT remote track sensor tests - events")
     reset_layout()
     sleep(network_delay)
     set_signals_off(5,7,8,9)
@@ -308,7 +318,7 @@ def run_all_mqtt_networking_tests():
     test_configuration_windows.test_all_object_edit_windows()
     set_run_mode()
     run_basic_networking_tests()
-    run_remote_track_sensor_tests()
+    run_remote_gpio_sensor_tests()
     run_specific_signal_ahead_tests()
     run_object_deletion_tests()
     report_results()
