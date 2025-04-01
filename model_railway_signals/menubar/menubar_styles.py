@@ -178,7 +178,7 @@ class button_style_selections(common_style_settings):
         # Create The Label frame for the button width
         self.frame2asubframe1 = Tk.LabelFrame(self.frame2a, text="Button width")
         self.frame2asubframe1.pack (padx=2, pady=2, side=Tk.LEFT, fill="x", expand=True)
-        # Create a subframe to center the font size elements in
+        # Create a subframe to center the button width elements in
         self.frame2asubframe2 = Tk.Frame(self.frame2asubframe1)
         self.frame2asubframe2.pack()
         self.frame2asubframe1label1 = Tk.Label(self.frame2asubframe2, text="Chars:")
