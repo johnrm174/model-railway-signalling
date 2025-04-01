@@ -22,6 +22,7 @@ without some of the Raspberry-Pi specific interfacing functions).
 * Uses the RPi GPIO inputs (connected to external track sensors) to detect train movements:
     * Add 'Track Sections' to the schematic to provide a mimic diagram of train location.
     * Train designators then 'move' through the schematic based on 'signal passed' events.
+    * Alternatively, use 'track circuits' for an absolute indication of block occupancy
     * Track occupancy can then be used to support signal automation (see below).
 * Provides full prototypical operation of your layout - just like the real thing.
     * Signals can be interlocked with points, other signals and Track Sections ahead.
@@ -50,12 +51,12 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.x.x:
+## What's new for Release 5.1.0:
 
 > [!IMPORTANT]
-> Release 5.x.x will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.1.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.1.0.
 > You have been warned!
 
 * Bugfix to Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
@@ -67,9 +68,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New Feature - Route lines & points can be added to Track Sections (to highlight when occupied).
 * New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
 * GPIO Sensors - Are now enabled in all Modes (inhibiting them in Edit mode wasn't a good idea).
-* GPIO Sensors - New 'circuit breaker' functionality to lock out 'noisy' GPIO inputs.
+* GPIO Sensors - New 'circuit breaker' functionality to lock out faulty GPIO inputs / sensors.
 * GPIO Sensors - Settings window now provides an indication of the state of each GPIO input.
-* TBD, TBD
+* Documentation - Minor updates to the documentation to reflect the new features in the release.
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
