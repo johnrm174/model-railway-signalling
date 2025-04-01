@@ -16,7 +16,7 @@
                 false,
                 ""
             ],
-            "bbox": 5415,
+            "bbox": 1112,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -415,7 +415,7 @@
         },
         "05c99664-2259-4355-a881-4c3e2c4279d3": {
             "background": "",
-            "bbox": 5418,
+            "bbox": 1115,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -434,7 +434,7 @@
         },
         "0cdde9d4-28ce-4644-8601-f613605ff8f4": {
             "background": "",
-            "bbox": 5421,
+            "bbox": 1118,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -458,12 +458,13 @@
                 0,
                 0
             ],
-            "bbox": 5427,
+            "bbox": 1124,
             "colour": "black",
             "endx": 1675,
             "endy": 275,
             "item": "line",
             "itemid": 1,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 1300.0,
             "posy": 275.0,
@@ -472,7 +473,7 @@
         },
         "147bdac0-2cb4-4de7-a45d-a87b46155eab": {
             "background": "",
-            "bbox": 5430,
+            "bbox": 1127,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -490,15 +491,19 @@
             ]
         },
         "233a09d0-5c3b-4fd7-9838-1045b392fc85": {
-            "bbox": 5434,
+            "bbox": 1131,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 10,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 50,
             "posy": 225,
             "tags": "section10",
@@ -511,7 +516,7 @@
         },
         "237bec79-c24f-4c2f-956a-a12133fa79db": {
             "background": "",
-            "bbox": 5437,
+            "bbox": 1134,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -530,7 +535,7 @@
         },
         "2809aba0-8417-4ffe-b8ab-9d0bcfd4b777": {
             "background": "",
-            "bbox": 5440,
+            "bbox": 1137,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -554,12 +559,13 @@
                 0,
                 0
             ],
-            "bbox": 5446,
+            "bbox": 1143,
             "colour": "black",
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": 2,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 1250.0,
             "posy": 275.0,
@@ -569,7 +575,7 @@
         "36c92467-cd2d-4608-bd3d-1ae2fe2fb9b0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 5452,
+            "bbox": 1149,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1005,
@@ -580,6 +586,7 @@
             "itemid": 5,
             "itemsubtype": 1,
             "itemtype": 2,
+            "linestyle": [],
             "linewidth": 3,
             "orientation": 0,
             "posx": 1275.0,
@@ -659,7 +666,7 @@
                 false,
                 ""
             ],
-            "bbox": 5469,
+            "bbox": 1166,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -974,7 +981,7 @@
         },
         "3d9905d7-3a8c-42d0-ada6-e78748273374": {
             "background": "",
-            "bbox": 5472,
+            "bbox": 1169,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -998,12 +1005,13 @@
                 0,
                 0
             ],
-            "bbox": 5478,
+            "bbox": 1175,
             "colour": "black",
             "endx": 1300.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 3,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 1675,
             "posy": 225,
@@ -1022,7 +1030,7 @@
                 false,
                 ""
             ],
-            "bbox": 5489,
+            "bbox": 1186,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -1377,7 +1385,7 @@
         },
         "4c400af8-bf96-447e-85f4-9928287360c5": {
             "background": "",
-            "bbox": 5492,
+            "bbox": 1189,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -1396,7 +1404,7 @@
         },
         "500f7750-b750-4d33-b9fe-1e6373da674d": {
             "background": "",
-            "bbox": 5495,
+            "bbox": 1192,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -1414,15 +1422,19 @@
             ]
         },
         "5424b00f-f0ad-4900-8b9c-7d858a2e05d0": {
-            "bbox": 5499,
+            "bbox": 1196,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 4,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 1450.0,
             "posy": 225.0,
             "tags": "section4",
@@ -1445,7 +1457,7 @@
                 false,
                 ""
             ],
-            "bbox": 5518,
+            "bbox": 1215,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -1838,7 +1850,7 @@
                 false,
                 ""
             ],
-            "bbox": 5535,
+            "bbox": 1232,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -2163,7 +2175,7 @@
                 false,
                 ""
             ],
-            "bbox": 5552,
+            "bbox": 1249,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -2519,7 +2531,7 @@
                 false,
                 ""
             ],
-            "bbox": 5569,
+            "bbox": 1266,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -2834,7 +2846,7 @@
         },
         "632a3066-6bfb-4269-81f1-c73b4b294ae9": {
             "background": "",
-            "bbox": 5572,
+            "bbox": 1269,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -2863,7 +2875,7 @@
                 false,
                 ""
             ],
-            "bbox": 5589,
+            "bbox": 1286,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -3198,7 +3210,7 @@
                 false,
                 ""
             ],
-            "bbox": 5600,
+            "bbox": 1297,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -3538,7 +3550,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5605,
+            "bbox": 1302,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3549,6 +3561,7 @@
             "itemid": 4,
             "itemsubtype": 1,
             "itemtype": 1,
+            "linestyle": [],
             "linewidth": 3,
             "orientation": 180,
             "posx": 1225.0,
@@ -3567,7 +3580,7 @@
         },
         "6df4e851-8669-4940-8dc9-fec3e1873294": {
             "background": "",
-            "bbox": 5608,
+            "bbox": 1305,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3586,7 +3599,7 @@
         },
         "709c0d2f-3d16-4669-b53f-38614ef26ea2": {
             "background": "",
-            "bbox": 5611,
+            "bbox": 1308,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3605,7 +3618,7 @@
         },
         "75eb7e1b-08a6-4223-8ed8-f31381186102": {
             "background": "",
-            "bbox": 5614,
+            "bbox": 1311,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3623,15 +3636,19 @@
             ]
         },
         "7648db7c-97c7-41f3-beee-e60656b9173a": {
-            "bbox": 5618,
+            "bbox": 1315,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 14,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 400.0,
             "posy": 275.0,
             "tags": "section14",
@@ -3643,15 +3660,19 @@
             ]
         },
         "768c5e02-b80c-4025-a27a-ab5a225ae105": {
-            "bbox": 5622,
+            "bbox": 1319,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 9,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 575.0,
             "posy": 275.0,
             "tags": "section9",
@@ -3664,7 +3685,7 @@
         },
         "7b1d99fb-c02e-48be-9c48-c5645301eb85": {
             "background": "",
-            "bbox": 5625,
+            "bbox": 1322,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3688,12 +3709,13 @@
                 0,
                 0
             ],
-            "bbox": 5631,
+            "bbox": 1328,
             "colour": "black",
             "endx": 800.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 4,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 1200.0,
             "posy": 225.0,
@@ -3712,7 +3734,7 @@
                 false,
                 ""
             ],
-            "bbox": 5642,
+            "bbox": 1339,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -4041,7 +4063,7 @@
         },
         "8c773174-1179-4350-946c-4e8548569e33": {
             "background": "",
-            "bbox": 5645,
+            "bbox": 1342,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4065,12 +4087,13 @@
                 0,
                 0
             ],
-            "bbox": 5651,
+            "bbox": 1348,
             "colour": "black",
             "endx": 1200.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 5,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 800.0,
             "posy": 175.0,
@@ -4079,7 +4102,7 @@
         },
         "956e68f3-b5ca-4869-9be5-186c3b2b2663": {
             "background": "",
-            "bbox": 5654,
+            "bbox": 1351,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4098,7 +4121,7 @@
         },
         "9754f858-e3bb-4c96-a3a6-d70b3cc8287f": {
             "background": "",
-            "bbox": 5657,
+            "bbox": 1354,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4117,7 +4140,7 @@
         },
         "9a537d13-0794-4f88-8386-67b76bbd39d7": {
             "background": "",
-            "bbox": 5660,
+            "bbox": 1357,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4136,7 +4159,7 @@
         },
         "9f0bd8e5-accc-4abc-8491-8db955715941": {
             "background": "",
-            "bbox": 5663,
+            "bbox": 1360,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4154,15 +4177,19 @@
             ]
         },
         "a19e74b3-1746-478b-92c3-2ae4183b4c71": {
-            "bbox": 5667,
+            "bbox": 1364,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 6,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 1625,
             "posy": 275,
             "tags": "section6",
@@ -4185,7 +4212,7 @@
                 false,
                 ""
             ],
-            "bbox": 5684,
+            "bbox": 1381,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -4510,7 +4537,7 @@
                 false,
                 ""
             ],
-            "bbox": 5701,
+            "bbox": 1398,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -4830,12 +4857,13 @@
                 1,
                 1
             ],
-            "bbox": 5707,
+            "bbox": 1404,
             "colour": "black",
             "endx": 1250.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 6,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 1525.0,
             "posy": 175.0,
@@ -4844,7 +4872,7 @@
         },
         "abd81429-2c2a-4b04-bc62-81a103da6e24": {
             "background": "#04fb8e",
-            "bbox": 5710,
+            "bbox": 1407,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -4873,7 +4901,7 @@
                 false,
                 ""
             ],
-            "bbox": 5727,
+            "bbox": 1424,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -5193,7 +5221,7 @@
         },
         "b31a2cd1-3494-4f09-95b8-f50e6708bdeb": {
             "background": "",
-            "bbox": 5730,
+            "bbox": 1427,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -5211,15 +5239,19 @@
             ]
         },
         "b3b255c4-744a-4476-a7d0-3535e718fac1": {
-            "bbox": 5734,
+            "bbox": 1431,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 3,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 950.0,
             "posy": 225.0,
             "tags": "section3",
@@ -5231,15 +5263,19 @@
             ]
         },
         "b55de778-8bb5-4d62-965e-d62ca9aa136d": {
-            "bbox": 5738,
+            "bbox": 1435,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 13,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 1450.0,
             "posy": 175.0,
             "tags": "section13",
@@ -5252,7 +5288,7 @@
         },
         "b778ffd2-cf39-4c24-b299-58e6131ff2d2": {
             "background": "",
-            "bbox": 5741,
+            "bbox": 1438,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -5272,7 +5308,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 5748,
+            "bbox": 1445,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1003,
@@ -5283,6 +5319,7 @@
             "itemid": 3,
             "itemsubtype": 1,
             "itemtype": 1,
+            "linestyle": [],
             "linewidth": 3,
             "orientation": 0,
             "posx": 1225.0,
@@ -5347,12 +5384,13 @@
                 0,
                 0
             ],
-            "bbox": 5754,
+            "bbox": 1451,
             "colour": "black",
             "endx": -50.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 7,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 750.0,
             "posy": 225.0,
@@ -5362,7 +5400,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 5761,
+            "bbox": 1458,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1002,
@@ -5373,6 +5411,7 @@
             "itemid": 2,
             "itemsubtype": 1,
             "itemtype": 2,
+            "linestyle": [],
             "linewidth": 3,
             "orientation": 0,
             "posx": 775.0,
@@ -5437,12 +5476,13 @@
                 1,
                 1
             ],
-            "bbox": 5767,
+            "bbox": 1464,
             "colour": "black",
             "endx": 525.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 8,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 750.0,
             "posy": 175.0,
@@ -5461,7 +5501,7 @@
                 false,
                 ""
             ],
-            "bbox": 5778,
+            "bbox": 1475,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -5809,15 +5849,19 @@
             "ybuttonoffset": 0
         },
         "cf7ab31e-b781-435b-8b96-0398da28e8f1": {
-            "bbox": 5782,
+            "bbox": 1479,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 7,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 1450.0,
             "posy": 275.0,
             "tags": "section7",
@@ -5829,15 +5873,19 @@
             ]
         },
         "d2c6a4dd-630c-4836-ad26-52269177edcc": {
-            "bbox": 5786,
+            "bbox": 1483,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 1,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 400.0,
             "posy": 225.0,
             "tags": "section1",
@@ -5849,15 +5897,19 @@
             ]
         },
         "d53174a7-e4e9-425d-94a8-80507bd85a04": {
-            "bbox": 5790,
+            "bbox": 1487,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 5,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 225.0,
             "posy": 225.0,
             "tags": "section5",
@@ -5869,15 +5921,19 @@
             ]
         },
         "d5d3aa4e-cc00-4d66-a1c6-8b52bb7b1a92": {
-            "bbox": 5794,
+            "bbox": 1491,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 12,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 950.0,
             "posy": 175.0,
             "tags": "section12",
@@ -5900,7 +5956,7 @@
                 false,
                 ""
             ],
-            "bbox": 5811,
+            "bbox": 1508,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -6216,7 +6272,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5816,
+            "bbox": 1513,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -6227,6 +6283,7 @@
             "itemid": 1,
             "itemsubtype": 1,
             "itemtype": 2,
+            "linestyle": [],
             "linewidth": 3,
             "orientation": 180,
             "posx": 775.0,
@@ -6244,15 +6301,19 @@
             "ybuttonoffset": 0
         },
         "e3b1ad43-1e39-456d-aad8-7943e5864ac8": {
-            "bbox": 5820,
+            "bbox": 1517,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 11,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 575.0,
             "posy": 175.0,
             "tags": "section11",
@@ -6265,7 +6326,7 @@
         },
         "e4853677-978f-4fc5-b03d-c92d0bb216ea": {
             "background": "#04fb8e",
-            "bbox": 5823,
+            "bbox": 1520,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -6284,7 +6345,7 @@
         },
         "e54253c4-ec5b-4a4a-835d-5e3b5eb4e183": {
             "background": "",
-            "bbox": 5826,
+            "bbox": 1523,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -6313,7 +6374,7 @@
                 false,
                 ""
             ],
-            "bbox": 5837,
+            "bbox": 1534,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -6661,15 +6722,19 @@
             "ybuttonoffset": 0
         },
         "ee774c2b-3946-44aa-9254-a31f2bebecb8": {
-            "bbox": 5841,
+            "bbox": 1538,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 15,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 225.0,
             "posy": 275.0,
             "tags": "section15",
@@ -6682,7 +6747,7 @@
         },
         "eeacfc57-2e9e-4a4e-b6df-ce1df762fcf0": {
             "background": "",
-            "bbox": 5844,
+            "bbox": 1541,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6711,7 +6776,7 @@
                 false,
                 ""
             ],
-            "bbox": 5855,
+            "bbox": 1552,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -7109,15 +7174,19 @@
             "ybuttonoffset": 0
         },
         "f1dbf1a3-0d5b-43e2-a476-18ccb8b0b920": {
-            "bbox": 5859,
+            "bbox": 1556,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 8,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 950.0,
             "posy": 275.0,
             "tags": "section8",
@@ -7131,7 +7200,7 @@
         "f2b7d2d9-eb4d-4e55-859f-100131262fe2": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 5864,
+            "bbox": 1561,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -7142,6 +7211,7 @@
             "itemid": 6,
             "itemsubtype": 1,
             "itemtype": 2,
+            "linestyle": [],
             "linewidth": 3,
             "orientation": 180,
             "posx": 1275.0,
@@ -7160,7 +7230,7 @@
         },
         "f514300f-50b5-477c-9673-8cacdaac0c5b": {
             "background": "",
-            "bbox": 5867,
+            "bbox": 1564,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -7178,15 +7248,19 @@
             ]
         },
         "f771894a-e7a8-4e26-a9d0-d316f9aff774": {
-            "bbox": 5871,
+            "bbox": 1568,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 2,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 575.0,
             "posy": 225.0,
             "tags": "section2",
@@ -7199,7 +7273,7 @@
         },
         "f7dc96fe-3f96-4f6b-8a63-8589f6b82d33": {
             "background": "",
-            "bbox": 5874,
+            "bbox": 1571,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -7228,7 +7302,7 @@
                 true,
                 "8"
             ],
-            "bbox": 5894,
+            "bbox": 1591,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -7678,7 +7752,7 @@
                 false,
                 ""
             ],
-            "bbox": 5911,
+            "bbox": 1608,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -7993,7 +8067,7 @@
         },
         "ff661e89-2111-4e98-8191-9fe3d3e39471": {
             "background": "",
-            "bbox": 5914,
+            "bbox": 1611,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -8012,7 +8086,7 @@
         },
         "ffc65294-6626-4af4-9a43-305530b7f891": {
             "background": "",
-            "bbox": 5917,
+            "bbox": 1614,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -8137,15 +8211,16 @@
         "general": {
             "automation": true,
             "editmode": true,
-            "filename": "/home/john/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
+            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nAlternatively, if running on a Raspberry pi, the track sensors can be triggered directly via the Ri-Pi's \nGPIO ports (momentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC pins). Select \n'Settings' =>'Sensors' from the Menubar to view the configuration. In this example the Track Sensor IDs\nhave been mapped to the GPIO port number, but any numbering scheme can be used (e.g. allocate the same ID \nfor the sensor as the signal ID it is triggering). \n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n\n",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.0.0"
+            "version": "Version 5.1.0"
         },
         "gpio": {
+            "maxevents": 100,
             "portmappings": [
                 [
                     4,
@@ -8307,6 +8382,7 @@
             },
             "routelines": {
                 "colour": "Black",
+                "linestyle": [],
                 "linewidth": 3
             },
             "signals": {
