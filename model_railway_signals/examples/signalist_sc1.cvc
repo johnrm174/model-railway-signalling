@@ -1,6 +1,6 @@
 {
-   "filename": "/home/pi/model-railway-signalling/configuration_examples/signalist_sc1.cvc",
-   "documentation": "Minimum Configuration for Harman Signallist SC1 Decoder\nThe base DCC address of the SC1 decoder is configured by CV1 and CV9 \n  - For Pi-SPROG3 V1, you need to set this to the required DCC address plus 4 (e.g. DCC 1: CV1=5 and CV9=0)\n  - For the Pi-SPROG3 V2 everything works as expected (not sure whats going on - just something I discovered)\nAlso, another thing I have found is that the base address has to be a multiple of 8 for it to work correctly\n(so DCC addresses need to be set as 1, 9, 17,25 etc - trying to set a DCC address of, say 4, doesn't work)\nThe decoder type of 8 gives 8 individually controlled outputs (addresses 1,2,3,4,5,6,7,8)",
+   "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/signalist_sc1.cvc",
+   "documentation": "Minimum Configuration for Harman Signallist SC1 Decoder\nThe base DCC address of the SC1 decoder is configured by CV1 and CV9 \n  - For Pi-SPROG3 V1, you need to set this to the required DCC address plus 4 (e.g. DCC 1: CV1=5 and CV9=0)\n  - For the Pi-SPROG3 V2 everything works as expected (This is the \"DCC address offset of 4\" issue)\nAlso, another thing I have found is that the base address has to be a multiple of 8 for it to work correctly\n(so DCC addresses need to be set as 1, 9, 17,25 etc - trying to set a DCC address of, say 4, doesn't work)\nThe decoder type of 8 gives 8 individually controlled outputs (addresses 1,2,3,4,5,6,7,8)",
    "configuration": [
       [
          1,
