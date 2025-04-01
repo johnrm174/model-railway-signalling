@@ -187,19 +187,39 @@ class section_configuration_tab():
                      tool_tip= "Select to hide the Track Section in Run Mode")
         self.hidden.pack(padx=2, side=Tk.LEFT, fill="y")
         #----------------------------------------------------------------------------------
-        # Create a Label Frame to hold the GPIO Sensor Settings (Frame2)
+        # Create a Label Frame to hold the Default label selection (Frame1a)
         #----------------------------------------------------------------------------------
-        self.frame2=Tk.LabelFrame(parent_tab, text="GPIO sensor")
-        self.frame2.pack(padx=2, pady=2, fill='x', expand=True)
-        # Create a Frame to center everything in
-        self.subframe1 = Tk.Frame(self.frame2)
-        self.subframe1.pack()
-        self.label = Tk.Label(self.subframe1, text="Track circuit sensor:")
+        self.frame1a = Tk.LabelFrame(parent_tab, text="Default section label")
+        self.frame1a.pack(padx=2, pady=2, fill='x')
+        self.defaultlabel = common.entry_box(self.frame1a, width=30, tool_tip = "Enter the default "+
+                                         "label to display when the Track Section is occupied")
+        self.defaultlabel.pack(padx=2, pady=2)
+        #----------------------------------------------------------------------------------
+        # Create a Frame to hold the Section Width and GPIO Sensor Settings (Frame2)
+        #----------------------------------------------------------------------------------
+        self.frame2 = Tk.Frame(parent_tab)
+        self.frame2.pack(fill='x')
+        # Create the Label frame for the Button Width
+        self.frame2subframe1 = Tk.LabelFrame(self.frame2, text="Section width")
+        self.frame2subframe1.pack(padx=2, pady=2, side=Tk.LEFT, fill="x", expand=True)
+        # Create a subframe to center the button width elements in
+        self.frame2subframe2 = Tk.Frame(self.frame2subframe1)
+        self.frame2subframe2.pack()
+        # Create the label and entry box elements
+        self.frame2subframe2label1 = Tk.Label(self.frame2subframe2, text="Chars:")
+        self.frame2subframe2label1.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.buttonwidth = common.integer_entry_box(self.frame2subframe2, width=3, min_value=5, max_value=25,
+               tool_tip="Select the section width (between 5 and 25 characters)", allow_empty=False)
+        self.buttonwidth.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
+        # Create The Label frame for the Track Circuit Sensor
+        self.frame2subframe3 = Tk.LabelFrame(self.frame2, text="'Track circuit' sensor")
+        self.frame2subframe3.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.label = Tk.Label(self.frame2subframe3, text="GPIO sensor:")
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1, item_type="Section",
-                tool_tip="Specify the ID of a GPIO Sensor for the 'track circuit' - for layouts using "+
-                "current detecting (or similar) 'occupancy' sensors rather than 'momentary' sensors. "+
-                "The Track Section will then always reflect the state of the GPIO Sensor")
+        self.gpiosensor = common.validated_gpio_sensor_entry_box(self.frame2subframe3, item_type="Section",
+                tool_tip="Specify the ID of the GPIO Sensor for the 'track circuit' (for layouts using "+
+                "'block occupancy' sensors rather than 'momentary' sensors). "+
+                "The Track Section will then always reflect the state of the GPIO Sensor.")
         self.gpiosensor.pack(side=Tk.LEFT, padx=2, pady=2)
         #----------------------------------------------------------------------------------
         # Create a Label Frame to hold the mirrored and colour selections (Frame3)
@@ -216,7 +236,7 @@ class section_configuration_tab():
                     exists_function = library.section_exists)
         self.mirror.pack(padx=2, pady=2)
         # Create the UI Element for the Highlighting colour
-        self.highlightcolour = common.colour_selection(self.frame3, label="Occupied colour")
+        self.highlightcolour = common.colour_selection(self.frame3, label="Highlight colour")
         self.highlightcolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
         #----------------------------------------------------------------------------------
         # Create the point and line to highlight lists (frame 4,5)
@@ -341,6 +361,8 @@ class edit_section():
             self.config.highlightpoints.set_values(objects.schematic_objects[self.object_id]["pointstohighlight"])
             self.config.highlightcolour.set_value(objects.schematic_objects[self.object_id]["highlightcolour"])
             self.config.gpiosensor.set_value(objects.schematic_objects[self.object_id]["gpiosensor"], item_id)
+            self.config.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
+            self.config.defaultlabel.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
@@ -354,7 +376,8 @@ class edit_section():
         # been validated on entry, but changes to other objects may have been made since then.
         elif ( self.config.sectionid.validate() and self.config.mirror.validate() and
                self.config.highlightlines.validate() and self.config.highlightpoints.validate() and
-               self.config.gpiosensor.validate() ):
+               self.config.gpiosensor.validate() and self.config.buttonwidth.validate() and
+               self.config.defaultlabel.validate() ):
             # Copy the original section Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the section coniguration elements from the current user selections
@@ -366,6 +389,8 @@ class edit_section():
             new_object_configuration["pointstohighlight"] = self.config.highlightpoints.get_values()
             new_object_configuration["highlightcolour"] = self.config.highlightcolour.get_value()
             new_object_configuration["gpiosensor"] = self.config.gpiosensor.get_value()
+            new_object_configuration["buttonwidth"] = self.config.buttonwidth.get_value()
+            new_object_configuration["defaultlabel"] = self.config.defaultlabel.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"
