@@ -1004,6 +1004,40 @@ def update_all_signalbox_levers():
                             library.unlock_lever(int(str_other_lever_id))
     return()
 
+#------------------------------------------------------------------------------------
+# Function to Update the route highlighting to show sections OCCUPIED. Called from all
+# callback functions that could result in an update to the state of Track Sections
+# (signal_passed, sensor_passed, section_updated). Also called from initialise_layout.
+#------------------------------------------------------------------------------------
+
+def update_route_highlighting_for_sections():
+    # We maintain a list of all points and lines we have overridden to support the use case of
+    # different track sections 'sharing' the same point and Lines (e.g. paths through pointwork)
+    lines_overridden = []
+    points_overridden = []
+    # Iterate through all the track sections to set/clear highlighting as appropriate
+    for section_id in objects.section_index:
+        # If we are in Edit mode then we want to clear down all route highlighting
+        # Otherwise we set/clear the colour overrides based on the state of the track section
+        if library.section_occupied(int(section_id)) and run_mode:
+            colour_to_set = objects.schematic_objects[objects.section(section_id)]["highlightcolour"]
+            for line_id in objects.schematic_objects[objects.section(section_id)]["linestohighlight"]:
+                library.set_line_colour_override(int(line_id),colour_to_set)
+                lines_overridden.append(line_id)
+            for point_id in objects.schematic_objects[objects.section(section_id)]["pointstohighlight"]:
+                library.set_point_colour_override(int(point_id),colour_to_set)
+                points_overridden.append(point_id)
+        else:
+            # Note that we only clear down point/line overrides if no other Track Section is currently
+            # highlighting them as OCCUPIED. This is the use case of having several track sections
+            # through pointwork where each track section is highlighting a particular path
+            for line_id in objects.schematic_objects[objects.section(section_id)]["linestohighlight"]:
+                if line_id not in lines_overridden:
+                    library.reset_line_colour_override(int(line_id))
+            for point_id in objects.schematic_objects[objects.section(section_id)]["pointstohighlight"]:
+                if point_id not in points_overridden:
+                    library.reset_point_colour_override(int(point_id))
+    return()
 
 ##################################################################################################
 # Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
@@ -1038,8 +1072,10 @@ def initialise_layout():
     # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
     run_routes.enable_disable_schematic_routes()
     run_routes.initialise_all_schematic_routes()
-    # Finally, update all signalbox levers to reflect the current state of points and signals
+    # Update all signalbox levers to reflect the current state of points and signals
     update_all_signalbox_levers()
+    # Update any route highlighting (to show track sections occupied)
+    update_route_highlighting_for_sections()
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
@@ -1139,6 +1175,7 @@ def signal_passed_callback(signal_id:int):
     if enhanced_debugging: print("########## signal_passed_callback "+str(signal_id))
     if run_mode:
         update_track_occupancy_for_signal(signal_id)
+        update_route_highlighting_for_sections()
         if automation_enabled:
             trigger_timed_signal_sequence(signal_id)
             override_signals_based_on_track_sections_ahead()
@@ -1163,6 +1200,7 @@ def sensor_passed_callback(sensor_id:int):
     if enhanced_debugging: print("########## sensor_passed_callback "+str(sensor_id))
     if run_mode:
         update_track_occupancy_for_track_sensor(sensor_id)
+        update_route_highlighting_for_sections()
         if automation_enabled:
             override_signals_based_on_track_sections_ahead()
             update_approach_control_status_for_all_signals()    
@@ -1174,10 +1212,12 @@ def sensor_passed_callback(sensor_id:int):
         
 def section_updated_callback(section_id:int):
     if enhanced_debugging: print("########## section_updated_callback "+str(section_id))
-    if run_mode and automation_enabled:
-        override_signals_based_on_track_sections_ahead()
-        update_approach_control_status_for_all_signals()    
-        override_distant_signals_based_on_signals_ahead()
+    if run_mode:
+        update_route_highlighting_for_sections()
+        if automation_enabled:
+            override_signals_based_on_track_sections_ahead()
+            update_approach_control_status_for_all_signals()
+            override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
     return()

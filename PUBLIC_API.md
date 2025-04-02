@@ -1,5 +1,7 @@
 # model-railway-signalling - Public API
 
+NOTE THE CHANGE TO HOW GPIO SENSORS ARE HANDLED FROM RELEASE 5.1.0 ONWARDS (see below)
+
 Although the application is primarily designed for use with the SPROG DCC Programmer Controller
 (for control of the signals and points out on the layout) and the RPi GPIO interface (for detecting
 train movements as signals are passed), the MQTT networking functions supported by the application
@@ -61,24 +63,34 @@ gpio_sensor_event/network_identifier/item_identifier
 * The item_identifier is the unique identifier for each individual GPIO sensor in the format 'node_identifier-sensor_id'
 
 As an example, for a signalling network name of "layout1" and a node name (for the node running 
-your layout interfacing application) of "box2", trigger events for gpio sensor "3" would be
+your layout interfacing application) of "box2", GPIO sensor events for gpio sensor "3" would be
 published to the following topic:
 <pre>
 "gpio_sensor_event/layout1/box2-3"
 </pre>
 
-To encode a GPIO sensor event you just need to include the item-identifier in a json message and
-'publish' this to the MQTT broker on the appropriate topic. Note that as these messages relate to 
-transitory events, they should be published to the broker as 'non-retained' messages:
+NOTE THAT THE STATE OF THE GPIO SENSOR SHOULD NOW BE INCLUDED IN THE PAYLOAD FROM RELEASE 5.1.0 ONWARDS
+IF YOU WANT TO USE 'TRACK CIRCUIT' TYPE TRAIN DETECTION FOR TRACK SECTIONS. YOU SHOULD THEREFORE UPDATE
+YOUR APPLICATION TO PUBLISH BOTH TRIGGERED AND RELEASE EVENTS TO THE TOPIC.
+
+To encode a GPIO sensor event you just need to include the item-identifier and the state of the GPIO sensor in
+a json message and 'publish' this to the MQTT broker on the appropriate topic. Note that as the application can
+now support 'track circuit' type train detection to drive track occupancy (as an option to using event-type
+sensors to 'pass' trains from one Track Section to another) you should send both 'triggered' and 'released'
+events as appropriate, and they should be published to the broker as 'retained' messages so the application
+will always pick up the latest state (True for triggered, False for released).
+
+The DCC Signalling application also now implements a 'circuit breaker' function to lock out 'noisy'
+GPIO inputs / external sensors. You should therefore include the 'tripped' flag in the message (set to
+'Fasle' for normal operation - unless you want to implement similar functionality in your code).
+
 <pre>
-def publish_gpio_sensor_event(network_identifier:str, node_identifier:str, sensor_id:int):
+def publish_gpio_sensor_event(network_identifier:str, node_identifier:str, sensor_id:int, sensor_state:bool):
     item_identifier = node_identifier+"-"+str(sensor_id)
     topic = "gpio_sensor_event/"+network_identifier+"/"+item_identifier
-    payload = json.dumps( {"sourceidentifier": item_identifier } )
-    mqtt_client.publish(topic, payload, retain=False, qos=1)
+    payload = json.dumps( {"sourceidentifier": item_identifier, "state": sensor_state, "tripped": False} )
+    mqtt_client.publish(topic, payload, retain=True, qos=1)
 </pre>
 
 Note that it will be the responsibility of your application to implement any 'debounce' or 'timeouts' that
-may be required for whatever mechanisms you choose to use for train detection. Your application should
-only ever publish a single GPIO sensor event to the main Model Railway Signalling application when triggered
-by a passing train.
+may be required for whatever mechanisms you choose to use for train detection.

@@ -1013,11 +1013,11 @@ def run_sensor_config_update_on_change_of_id_tests():
     return()
 
 #-----------------------------------------------------------------------------------
-# These test the Item ID update functions for track sensors, specifically:
-#    Update of Track Sensor route tables to reflect change of Point ID
-#    Update of Track Sensor route tables to reflect deletion of Point
-#    Update of Track Sensor route tables to reflect change of section ID
-#    Update of Track Sensor route tables to reflect deletion of section
+# These test the Item ID update functions for signalbox levers, specifically:
+#    Update of Lever tables to reflect change of Point ID
+#    Update of Lever tables to reflect change of Signal ID
+#    Update of Lever tables to reflect deletion of Point
+#    Update of Lever tables to reflect deletion of Signal
 #-----------------------------------------------------------------------------------
 
 def run_lever_config_update_on_change_of_id_tests():
@@ -1049,6 +1049,53 @@ def run_lever_config_update_on_change_of_id_tests():
     select_single_object(s1)
     delete_selected_objects()
     assert_object_configuration(lev2,{"linkedpoint":0, "linkedsignal":0})
+    # clean up
+    select_all_objects()
+    delete_selected_objects()
+    return()
+
+#-----------------------------------------------------------------------------------
+# These test the Item ID update functions for Track Sections, specifically:
+#    Update of Track Section tables to reflect change of Point ID
+#    Update of Track Section tables to reflect deletion of Point
+#    Update of Track Section tables to reflect change of Line ID
+#    Update of Track Section tables to reflect deletion of Line
+#-----------------------------------------------------------------------------------
+
+def run_section_config_update_on_change_of_id_tests():
+    print("Object configuration updates - Test update of Section Configuration on change or delete of Item IDs")
+    # Add elements to the layout
+    p1 = create_left_hand_point(100,50)
+    p2 = create_left_hand_point(200,50)
+    l1 = create_line(300,50)
+    l2 = create_line(500,50)
+    assert_object_configuration(p1, {"itemid":1})
+    assert_object_configuration(l1, {"itemid":1})
+    assert_object_configuration(p2, {"itemid":2})
+    assert_object_configuration(l2, {"itemid":2})
+    t1 = create_track_section(100,100)
+    t2 = create_track_section(200,100)
+    # Add the points/lines to the track section configuration
+    update_object_configuration(t1,{"linestohighlight": [1], "pointstohighlight": [1] })
+    update_object_configuration(t2,{"linestohighlight": [1,2], "pointstohighlight": [1,2] })
+    # update the item IDs
+    update_object_configuration(p1,{"itemid":21})
+    update_object_configuration(p2,{"itemid":22})
+    update_object_configuration(l1,{"itemid":31})
+    update_object_configuration(l2,{"itemid":32})
+    # Test the linked signals/points have been updated correctly
+    assert_object_configuration(t1,{"linestohighlight": [31], "pointstohighlight": [21] })
+    assert_object_configuration(t2,{"linestohighlight": [31,32], "pointstohighlight": [21,22] })
+    # Delete Point 1 and test it has been removed from the track section objects
+    select_single_object(p1)
+    delete_selected_objects()
+    assert_object_configuration(t1,{"linestohighlight": [31], "pointstohighlight": [] })
+    assert_object_configuration(t2,{"linestohighlight": [31,32], "pointstohighlight": [22] })
+    # Delete line 1 and test it has been removed from the track section objects
+    select_single_object(l1)
+    delete_selected_objects()
+    assert_object_configuration(t1,{"linestohighlight": [], "pointstohighlight": [] })
+    assert_object_configuration(t2,{"linestohighlight": [32], "pointstohighlight": [22] })
     # clean up
     select_all_objects()
     delete_selected_objects()
@@ -1177,6 +1224,7 @@ def run_all_object_editing_tests():
     run_signal_config_update_on_change_of_id_tests()
     run_sensor_config_update_on_change_of_id_tests()
     run_lever_config_update_on_change_of_id_tests()
+    run_section_config_update_on_change_of_id_tests()
     run_reset_objects_tests()
     report_results()
     

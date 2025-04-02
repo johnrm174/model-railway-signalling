@@ -5,16 +5,41 @@ signalling schemes to be designed and configured via the UI without the need to 
 application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
 without some of the Raspberry-Pi specific interfacing functions). 
 
-* Enables layout schematics to be created with signals, points, track sections and block instruments.
-* Supports automation of signals based on track occupancy and state of signals on the route ahead.
-* Supports "one touch" configuration of routes (signals and points) with route highlighting.
-* Supports virtual DCC switches on the schematic for the control of other DCC layout accessories.
-* Supports most types of UK colour light signals, semaphore signals, and ground signals.
-* Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout.
-* Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation.
-* Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts.
-* Supports virtual Block Instruments (with networking)for coordinating movements between signal boxes
-* Provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) 
+* Enables signalling schematics to be easily created with route lines, points and signals:
+    * Supports most types of UK colour light signals, semaphore signals, and ground signals.
+    * Supports complex trackwork formations such as crossovers, slips and 3-way points.
+    * Get the schematic looking how you want by changing the styles of objects as required.
+* Interfaces with the Pi-SPROG DCC command station to drive all of your DCC Accessories:
+    * Uses a DCC Accessory bus (seperate from the track bus) to control your layout.
+    * Supports all standard DCC signals, point motors and other DCC accessory decoders.
+    * Signals and points are simply operated via their control buttons on the schematic.
+    * Add virtual 'DCC Switches' to the schematic to control other DCC accessories.
+    * Includes a DCC programming utility for both 'one touch' and CV Programming.
+* Enables full signalbox simulations to be realised for your layout:
+    * Add virtual 'Signal box Levers' to the schematic to control your signals/points.
+    * Supports integration with external switches (Such as the DCC Concepts Cobalt S Levers).
+    * Add virtual 'Block Instruments' for communication and coordination between signal boxes.
+* Uses the RPi GPIO inputs (connected to external track sensors) to detect train movements:
+    * Add 'Track Sections' to the schematic to provide a mimic diagram of train location.
+    * Train designators then 'move' through the schematic based on 'signal passed' events.
+    * Alternatively, use 'track circuits' for an absolute indication of block occupancy
+    * Track occupancy can then be used to support signal automation (see below).
+* Provides full prototypical operation of your layout - just like the real thing.
+    * Signals can be interlocked with points, other signals and Track Sections ahead.
+    * Points are interlocked with the signals that control movements across them.
+    * Multiple aspect signals will always reflect the state of the signal ahead.
+    * Signals can be automated based on the 'occupancy' of Track Sections ahead.
+* Provides "one click" set-up and clear-down routes through your layout:
+    * Interlocking is preserved - Routes are disabled if conflicting movements are set.
+    * Routes are highlighted on the schematic to show they have been successfully set.
+    * Supports automated set-up and clear-down of routes based on GPIO sensor events.
+* Incorporates MQTT networking to allow multiple signalling applications to be linked.
+    * Allows multiple signalling areas or signal boxes to be created for larger layouts
+    * Multiple applications use the same DCC command station for control of your layout.
+    * Provides easy expansion of the number of external Track Sensors that can be used.
+* Full documentation and several example layout files are packaged with the application.
+
+The application also provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) 
 to support custom layout control interfaces.
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
@@ -26,42 +51,28 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.0.0:
+## What's new for Release 5.1.0:
 
 > [!IMPORTANT]
-> Release 5.0.0 is the last release that will support layout files created by Release 4.9.x or earlier.
-> It is therefore crucial that all users upgrade to this release and then update (by loading and saving)
-> all layout files to ensure compatibility going forward - You have been warned!
+> Release 5.1.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> If you have layout files created by an earlier version of the application then you should first
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.1.0.
+> You have been warned!
 
-* Full documentation is now packaged with the application (Menubar => Help => Docs)
-* Example layout files are now packaged with the application (Menubar => File => Examples)
-* New 'Signalbox Levers' feature - enables you to achieve a fully prototypical simulation of a signalbox:
-    * Levers can be added to the schematic and 'connected' to the signals and points they control.
-    * Seperate levers can be assigned to a point's blades and Facing Point Lock (FPL). 
-    * Seperate levers can be asigned to each signal 'route' (i.e. semaphore signal arm or colour light signal route). 
-    * Full interlocking is preserved, with a clear indication on the Signalbox lever as to the state of the interlocking.
-* Keyboard 'keycode' events can be mapped to Signalbox Levers:
-    * Enables easy integration with physical levers (such as the DCC Concepts S lever) via readily available keyboard encoders. 
-    * Interlocking can either be preserved (recommended) or disabled (if you want the signals/points to reflect the state of the physical levers).
-    * Options are provide to display pop-up warnings if the user switches an external lever is switched whilst the lever is locked.
-* Schematic Object bulk renumbering utility:
-    * An easy way to consolidate your Signal, Point and Signalbox Lever numbering
-    * Most other schematic object types can also be renumbered as required
-* Improvements to the operation of Momentary DCC Switches:
-    * DCC Commands can now be specified for both the 'press' and 'release' events
-    * A fixed 'release delay' can now be specified to 'hold' the momentary switch on
-* New SPROG DCC Address Mode settings option - to cater for the 'DCC Address offsets of 4' issue sometimes
-experienced when transitioning from one DCC System to another (where the NMRA specification has been interpreted
-differently by different DCC system manufacturers/suppliers)
-* The 'Reset Layout' function now preserves track occupancy and incorporates a user-configurable switching 
-delay so point and signal changes can now be sequenced (to avoid overloading the DCC accessory bus on larger
-layouts which may require a large number of points and/or signals to be reset back to their default states).
-* Improved display of Signal Passed at Danger (SPAD warnings) - subsequent warnings are now added to the
-existing pop-up window (rather than appearing in a new pop-up). This can now be left open without affecting
-the normal operation of the application.
-* GPIO sensor events (e.g. 'signal passed', 'sensor passed' etc) are now only processed in Run Mode.
-* Bugfix to Block Instruments sound file selection (due to breaking change in 'importlib' package).
-* Bugfix to the display of validation messages in the 'settings' windows on Apply/OK.
+* Bugfix to Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
+* Bugfix to GPIO sensor settings page - mappings now correctly displayed after sensor unmapping.
+* Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
+* Improvement - Line width can now be edited in the Line and Point configuration dialogs.
+* Improvement - To the synchronisation of state across networked layouts on MQTT broker connect.
+* New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
+* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied).
+* New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
+* GPIO Sensors - Are now enabled in all Modes (inhibiting them in Edit mode wasn't a good idea).
+* GPIO Sensors - New 'circuit breaker' functionality to lock out faulty GPIO inputs / sensors.
+* GPIO Sensors - Settings window now provides an indication of the state of each GPIO input.
+* Documentation - Minor updates to the documentation to reflect the new features in the release.
+* [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) - 
+Has now been updated to suppport 'track circuit' type sensors.
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
@@ -137,7 +148,6 @@ $ sudo apt-get install libasound2-dev
 Note that for Windows, the 'simpleaudio' it has a dependency  on Microsoft Visual C++ 14.0 or greater 
 (so you will need to ensure Visual Studio 2015 is installed first).
 
-
 ## Running the application
 
 The python package should be run as a module (note underscores):
@@ -174,3 +184,4 @@ To change the backend - Run "sudo raspi-config", select 'Advanced Options' then 
 
 An additional benifit was that some of the other applications I use (such as the kazam video capture software)
 will now work as normal on the Raspberry Pi 5.
+

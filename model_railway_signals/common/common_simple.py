@@ -963,6 +963,9 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
             elif event_mappings[2] > 0 and (self.current_item_type != "Sensor" or event_mappings[2] != self.local_item_id):
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
+            elif event_mappings[3] > 0 and (self.current_item_type != "Section" or event_mappings[3] != self.local_item_id):
+                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Section "+str(event_mappings[3]))
+                valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
 

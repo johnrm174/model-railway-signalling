@@ -35,6 +35,8 @@
 # Uses the following library functions:
 #    library.get_list_of_available_gpio_ports() - to get a list of supported ports
 #    library.get_mqtt_node_status() - to get a list of connected nodes and timestamps
+#    library.subscribe_to_gpio_port_status(port,callback) - For the GPIO port status
+#    library.unsubscribe_from_gpio_port_status(port,callback) - For the GPIO port status
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -581,10 +583,10 @@ class mqtt_subscribe_tab():
         self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
         self.instruments.pack(padx=2, pady=2, fill='x')
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
+        self.frame5 = Tk.LabelFrame(parent_tab, text="GPIO sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
         self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
-            tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
+            tool_tip="Enter the IDs of the remote GPIO sensors to subscribe to (in the form 'node-ID')")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
@@ -620,10 +622,10 @@ class mqtt_publish_tab():
         self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
         self.instruments.pack(padx=2, pady=2, fill='x')
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
+        self.frame5 = Tk.LabelFrame(parent_tab, text="GPIO sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
         self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
-            tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
+            tool_tip="Enter the IDs of the GPIO sensors to publish via the MQTT network")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
@@ -805,19 +807,71 @@ class edit_mqtt_settings():
 # Classes for the GPIO (Track Sensors) configuration window
 #------------------------------------------------------------------------------------
 
-class gpio_port_entry_box(common.int_item_id_entry_box):
-    def __init__(self, parent_frame, label:str, tool_tip:str, callback):
-        # create a frame to hold the label and entry box
-        self.frame = Tk.Frame(parent_frame)
-        self.frame.pack()
+class gpio_port_mapping(Tk.Frame):
+    def __init__(self, parent_frame, callback):
+        self.gpio_port = 0
+        self.callback = callback
+        # Create a frame to hold the label and entry box
+        super().__init__(parent_frame)
+        # Create the status indication
+        self.status = Tk.Label(self, width=2,bd=1, relief="solid")
+        self.status.pack(side=Tk.LEFT,padx=2)
+        self.statusTT=common.CreateToolTip(self.status, text="GPIO port status")
+        self.defaultbg = self.status.cget("bg")
         # Create the label and call the parent init function to create the EB
-        self.label = Tk.Label(self.frame, width=8, text=label)
-        self.label.pack(side=Tk.LEFT)
-        super().__init__(self.frame, tool_tip=tool_tip, callback=callback)
-        super().pack(side=Tk.LEFT)
+        self.gpioport = Tk.Label(self, width=8)
+        self.gpioport.pack(side=Tk.LEFT, padx=2)
+        self.sensorid = common.int_item_id_entry_box(self, callback=self.entry_updated,
+                tool_tip="Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)")
+        self.sensorid.pack(side=Tk.LEFT, padx=2)
         # Create the Signal/Track sensor 'mapping' label
-        self.mapping = Tk.Label(self.frame, width=16, anchor='w')
-        self.mapping.pack(side=Tk.LEFT,padx=5)
+        self.mapping = Tk.Label(self, width=18, anchor='w')
+        self.mapping.pack(side=Tk.LEFT,padx=2)
+
+    def entry_updated(self, status_code:int=None):
+        # Update the mapping information
+        if library.gpio_sensor_exists(self.sensorid.get_value()):
+            event_mappings = library.get_gpio_sensor_callback(self.sensorid.get_value())
+            if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
+            elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
+            elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
+            elif event_mappings[3] > 0: mapping_text = u"\u2192"+" Track Section "+str(event_mappings[3])
+            else: mapping_text="--------------------------"
+        else:
+            mapping_text="--------------------------"
+        self.mapping.config(text=mapping_text)
+        # Update the GPIO port status
+        if status_code is not None:
+            if status_code == 0:
+                self.status.config(text="-", bg=self.defaultbg)
+                self.statusTT.text= "GPIO port is not mapped"
+            elif status_code == 1:
+                self.status.config(text="X", bg=self.defaultbg)
+                self.statusTT.text= "GPIO input has been disabled due to exceeding the maximum number of events in one second"
+            elif status_code == 2:
+                self.status.config(text="", bg="Red")
+                self.statusTT.text= "GPIO port status: Red = active, Black = inactive"
+            elif status_code == 3:
+                self.status.config(text="", bg="Black")
+                self.statusTT.text= "GPIO port status: Red = active, Black = inactive"
+
+    def set_value(self, gpio_mapping:list[int,int]):
+        # A gpio_mapping is a list comprising [sensor_id, gpio_port]
+        self.gpio_port = gpio_mapping[1]
+        self.gpioport.config(text="GPIO-"+str(gpio_mapping[1]))
+        self.sensorid.set_value(gpio_mapping[0])
+        self.entry_updated()
+        # Subscribe to updates on the state of the GPIO port
+        library.subscribe_to_gpio_port_status(self.gpio_port, self.entry_updated)
+
+    def get_value(self):
+        # A gpio_mapping is a list comprising [sensor_id, gpio_port]
+        return([self.sensorid.get_value(), self.gpio_port])
+
+    def shutdown(self):
+        library.unsubscribe_from_gpio_port_status(self.gpio_port)
+
+#------------------------------------------------------------------------------------
     
 class gpio_port_entry_frame():
     def __init__(self, parent_frame):
@@ -825,60 +879,56 @@ class gpio_port_entry_frame():
         self.frame = Tk.LabelFrame(parent_frame, text="GPIO port to GPIO Sensor mappings")
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
-        self.list_of_entry_boxes = []                
+        self.list_of_mappings = []
         self.list_of_available_gpio_ports = library.get_list_of_available_gpio_ports()
-        while len(self.list_of_entry_boxes) < len(self.list_of_available_gpio_ports):
+        while len(self.list_of_mappings) < len(self.list_of_available_gpio_ports):
             # Create the Frame for the row
             self.list_of_subframes.append(Tk.Frame(self.frame))
             self.list_of_subframes[-1].pack(side=Tk.LEFT, padx=2, fill='x')
             # Create the entry_boxes for the row
             for value in range (10):
-                if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
-                label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
-                tool_tip = "Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)"
-                self.list_of_entry_boxes.append(gpio_port_entry_box(self.list_of_subframes[-1],
-                                            label=label, tool_tip=tool_tip, callback=self.validate))
+                if len(self.list_of_mappings) == len(self.list_of_available_gpio_ports): break
+                self.list_of_mappings.append(gpio_port_mapping(self.list_of_subframes[-1], callback=self.validate))
+                self.list_of_mappings[-1].pack(fill='x')
                 
     def validate(self):
         valid = True
         # First do the basic validation on all entry boxes - we do this every time to
         # clear any duplicate entry validation errors that may now have been corrected
-        for entry_box in self.list_of_entry_boxes:
-            if not entry_box.validate(): valid = False
+        for mapping in self.list_of_mappings:
+            if not mapping.sensorid.validate(): valid = False
         # Then check for duplicate entries
-        for entry_box1 in self.list_of_entry_boxes:
-            value1 = entry_box1.get_value()
-            for entry_box2 in self.list_of_entry_boxes:
-                if entry_box1 != entry_box2 and value1 == entry_box2.get_value() and value1 != 0:
-                    entry_box1.TT.text = ("Duplicate ID - sensor is already assigned to another GPIO port")
-                    entry_box1.set_validation_status(False)
+        for mapping1 in self.list_of_mappings:
+            value1 = mapping1.get_value()[0]
+            for mapping2 in self.list_of_mappings:
+                value2 = mapping2.get_value()[0]
+                if mapping1 != mapping2 and value1 == value2 and value1 != 0:
+                    mapping1.sensorid.TT.text = ("Duplicate ID - sensor is already assigned to another GPIO port")
+                    mapping1.sensorid.set_validation_status(False)
                     valid = False
-        return (valid)
+        return(valid)
 
     def get_values(self):
-        list_of_mappings = []
-        for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
-            sensor_id = self.list_of_entry_boxes[index].get_value()
-            if sensor_id > 0: list_of_mappings.append([sensor_id, gpio_port])
-        return (list_of_mappings)
+        # A gpio_mapping is a list comprising [sensor_id, gpio_port]
+        list_of_mappings_to_return = []
+        for mapping_entry in self.list_of_mappings:
+            mapping = mapping_entry.get_value()
+            if mapping[0] > 0: list_of_mappings_to_return.append(mapping)
+        return(list_of_mappings_to_return)
     
-    def set_values(self,list_of_mappings:[[int,int],]):
-        # Clear down all entry boxes first before re-populating as we only
-        # populate those where a mapping has been defined
+    def set_values(self, list_of_mappings:list[[int,int],]):
+        # Clear down all entry boxes before re-populating as we only populate those where a mapping has been defined
         for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
-            self.list_of_entry_boxes[index].set_value(None)
+            self.list_of_mappings[index].set_value([None, gpio_port])
         # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
         for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
-            self.list_of_entry_boxes[index].mapping.config(text="-------------------------")
             for gpio_mapping in list_of_mappings:
                 if gpio_port == gpio_mapping[1]:
-                    event_mappings = library.get_gpio_sensor_callback(gpio_mapping[0])
-                    if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
-                    elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
-                    elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
-                    else: mapping_text="-------------------------"
-                    self.list_of_entry_boxes[index].set_value(gpio_mapping[0])
-                    self.list_of_entry_boxes[index].mapping.config(text=mapping_text)
+                    self.list_of_mappings[index].set_value(gpio_mapping)
+
+    def shutdown(self):
+        for mapping_entry in self.list_of_mappings:
+            mapping_entry.shutdown()
 
 #------------------------------------------------------------------------------------
 # Class for the "Sensors" window - Uses the classes above. Note the init function takes
@@ -907,25 +957,40 @@ class edit_gpio_settings():
             # Create an overall frame to pack everything in
             self.frame = Tk.Frame(self.window)
             self.frame.pack()
+            #---------------------------------------------------------------------
             # Create the labelframe for the general GPIO settings
+            #---------------------------------------------------------------------
             self.subframe1 = Tk.LabelFrame(self.frame, text="GPIO Port Settings")
             self.subframe1.pack(padx=2, pady=2, fill='x')
             # Put the elements in a subframe to center them
             self.subframe2 = Tk.Frame(self.subframe1)
             self.subframe2.pack()
+            # Trigger Period entry box
             self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
             self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
                 tool_tip="Enter the delay period (before GPIO sensor events will be triggered) in milliseconds (0-1000)")
             self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
+            # timeout Period entry box
+            self.label2 = Tk.Label(self.subframe2, text="  Timeout (ms):")
             self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.timeout = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=5000, allow_empty=False, 
                 tool_tip="Enter the timeout period (during which further triggers will be ignored) in milliseconds (0-5000)")
             self.timeout.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            # Circuit breaker threahold entry
+            self.label3 = Tk.Label(self.subframe2, text="  Max events per second:")
+            self.label3.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.maxevents = common.integer_entry_box(self.subframe2, width=5, min_value=10, max_value=1000, allow_empty=False, 
+                tool_tip="Enter the maximum number of events per second for each GPIO port (10-1000). If a GPIO port exceeds "+
+                            "this rate then the GPIO port will be locked out to protect the application.")
+            self.maxevents.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            #---------------------------------------------------------------------
             # Create the Label frame for the GPIO port assignments 
+            #---------------------------------------------------------------------
             self.gpio = gpio_port_entry_frame(self.frame)
+            #---------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #---------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
@@ -937,20 +1002,24 @@ class edit_gpio_settings():
         self.validation_error.pack_forget()
         trigger = settings.get_gpio("triggerdelay")
         timeout = settings.get_gpio("timeoutperiod")
+        max_events = settings.get_gpio("maxevents")
         mappings = settings.get_gpio("portmappings")
         self.gpio.set_values(mappings)
         self.trigger.set_value(int(trigger*1000))
         self.timeout.set_value(int(timeout*1000))
+        self.maxevents.set_value(max_events)
 
     def save_state(self, close_window:bool):
         # Only allow close if valid
-        if self.gpio.validate() and self.trigger.validate() and self.timeout.validate():
+        if self.gpio.validate() and self.trigger.validate() and self.timeout.validate() and self.maxevents.validate():
             self.validation_error.pack_forget()
             mappings = self.gpio.get_values()
             trigger = float(self.trigger.get_value())/1000
             timeout = float(self.timeout.get_value())/1000
+            max_events = self.maxevents.get_value()
             settings.set_gpio("triggerdelay", trigger)
             settings.set_gpio("timeoutperiod", timeout)
+            settings.set_gpio("maxevents", max_events)
             settings.set_gpio("portmappings", mappings)
             # Make the callback to apply the updated settings
             self.update_function()
@@ -963,6 +1032,8 @@ class edit_gpio_settings():
 
     def close_window(self):
         global edit_gpio_settings_window
+        # Make sure we unsubscribe from all GPIO event updates before shutting down
+        self.gpio.shutdown()
         edit_gpio_settings_window = None
         self.window.destroy()
 

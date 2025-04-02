@@ -27,6 +27,8 @@
 #
 # External API - classes and functions (used by the other library modules):
 #
+#   mqtt_transmit_all() - Transmit the current state of all schematic objects
+#
 #   rotate_point(ox,oy,px,py,angle) - Rotate a point (px,py) around the origin (ox,oy)
 #
 #   rotate_line(ox,oy,px1,py1,px2,py2,angle) - Rotate a line (px1,py1,px3,py2) around the origin (ox,oy)
@@ -51,8 +53,10 @@ from . import pi_sprog_interface
 from . import track_sensors
 from . import track_sections
 from . import text_boxes
+from . import block_instruments
 from . import buttons
 from . import points
+from . import lines
 from . import signals
 
 # -------------------------------------------------------------------------
@@ -180,6 +184,24 @@ def disable_keypress_events():
     return()
 
 #-------------------------------------------------------------------------
+# Function to transmit the current state of all schematic objects over the
+# MQTT signalling network - callen following broker connect/reconnect. Note
+# that we schedule this for about a second after connection to allow any
+# subscriptions to be established and to process any events arising from
+# those subscriptions - i.e. the node that connects/transmits first 'wins'
+#-------------------------------------------------------------------------
+
+def mqtt_transmit_all():
+    root_window.after(1000, lambda:mqtt_transmit_all_now_things_should_have_stabilised())
+
+def mqtt_transmit_all_now_things_should_have_stabilised():
+    gpio_sensors.mqtt_send_all_gpio_sensor_states_on_broker_connect()
+    block_instruments.mqtt_send_all_instrument_states_on_broker_connect()
+    track_sections.mqtt_send_all_section_states_on_broker_connect()
+    signals.mqtt_send_all_signal_states_on_broker_connect()
+    return()
+
+#-------------------------------------------------------------------------
 # Function to set the tkinter "root" window reference as this is used to
 # schedule callback events in the main tkinter event loop using the 'after'
 # method and also for feeding custom callback functions into the main tkinter
@@ -283,12 +305,12 @@ def shutdown_step5():
 def configure_edit_mode(edit_mode:bool):
     global run_mode
     run_mode = not edit_mode
-    gpio_sensors.configure_edit_mode(edit_mode)
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)
     buttons.configure_edit_mode(edit_mode)
     points.configure_edit_mode(edit_mode)
+    lines.configure_edit_mode(edit_mode)
     signals.configure_edit_mode(edit_mode)
     return()
 

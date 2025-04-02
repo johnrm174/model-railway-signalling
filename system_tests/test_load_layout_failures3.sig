@@ -42,7 +42,7 @@
             "endx": 200,
             "endy": 125,
             "item": "line",
-            "itemid": null,
+            "itemid": 1,
             "line": 159,
             "posx": 50,
             "posy": 125,
@@ -63,7 +63,7 @@
             "filename": "new_layout.sig",
             "info": "",
             "random-config-element": 25,
-            "version": "Version 4.0.0"
+            "version": "Version 5.0.0"
         },
         "logging": {
             "level": 2

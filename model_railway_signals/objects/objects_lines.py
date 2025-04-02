@@ -18,6 +18,8 @@
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_routes.update_references_to_line - called when the Line ID is changed
 #    objects_routes.remove_references_to_line - called when the Line is deleted
+#    objects_sections.update_references_to_line - called when the Line ID is changed
+#    objects_sections.remove_references_to_line - called when the Line is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -39,6 +41,7 @@ import copy
 
 from . import objects_common
 from . import objects_routes
+from . import objects_sections
 from .. import settings
 from .. import library
 
@@ -51,6 +54,7 @@ default_line_object["item"] = objects_common.object_type.line
 # Styles are initially set to the default styles (defensive programming)
 default_line_object["colour"] = settings.get_style("routelines", "colour")
 default_line_object["linewidth"] = settings.get_style("routelines", "linewidth")
+default_line_object["linestyle"] = settings.get_style("routelines", "linestyle")
 # Other object-specific parameters
 default_line_object["endx"] = 0
 default_line_object["endy"] = 0
@@ -80,8 +84,9 @@ def update_line(object_id, new_object_configuration, create_selected:bool=True):
         # Update the type-specific index
         del objects_common.line_index[str(old_item_id)]
         objects_common.line_index[str(new_item_id)] = object_id
-        # Update any references to the line in the route tables
+        # Update any references to the line in any other objects' configuration
         objects_routes.update_references_to_line(old_item_id, new_item_id)
+        objects_sections.update_references_to_line(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -100,6 +105,7 @@ def redraw_line_object(object_id, create_selected:bool=False):
                 arrow_type = objects_common.schematic_objects[object_id]["arrowtype"],
                 arrow_ends = objects_common.schematic_objects[object_id]["arrowends"],
                 line_width = objects_common.schematic_objects[object_id]["linewidth"],
+                line_style = objects_common.schematic_objects[object_id]["linestyle"],
                 selected = create_selected)
     # Store the canvas "tags" - for all line objects and for the selection circles
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
@@ -120,6 +126,7 @@ def create_line(xpos:int, ypos:int):
     # Styles for the new object are set to the current default styles
     objects_common.schematic_objects[object_id]["colour"] = settings.get_style("routelines", "colour")
     objects_common.schematic_objects[object_id]["linewidth"] = settings.get_style("routelines", "linewidth")
+    objects_common.schematic_objects[object_id]["linestyle"] = settings.get_style("routelines", "linestyle")
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = xpos - 50
@@ -167,7 +174,8 @@ def update_line_styles(object_id, dict_of_new_styles:dict):
     library.update_line_styles(
             line_id = objects_common.schematic_objects[object_id]["itemid"],
             colour = objects_common.schematic_objects[object_id]["colour"],
-            line_width = objects_common.schematic_objects[object_id]["linewidth"])
+            line_width = objects_common.schematic_objects[object_id]["linewidth"],
+            line_style = objects_common.schematic_objects[object_id]["linestyle"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -189,8 +197,9 @@ def delete_line_object(object_id):
 def delete_line(object_id):
     # Soft delete the associated library objects from the canvas
     delete_line_object(object_id)
-    # Remove any references to the line from the route tables
+    # Remove any references to the line from any other objects' configuration
     objects_routes.remove_references_to_line(objects_common.schematic_objects[object_id]["itemid"])
+    objects_sections.remove_references_to_line(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

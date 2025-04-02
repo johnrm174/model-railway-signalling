@@ -9,12 +9,14 @@
 #    font_selection(selection_buttons) - Labelframe containing font selection radiobuttons
 #    font_style_selection(selection_check_boxes) - Labelframe containing font selection checkboxes
 #    button_configuration(Tk.LabelFrame) - Labelframe containing 'hidden' and x/y offsets
+#    line_styles (TK Label Frame) - Labelframe for changing the line styles (solid or dash type)
+#    line_width (TK LabelFrame) - Labelframe for changing the line width (1-6 pixels)
 #    window_controls(Tk.Frame) - Frame containing the 'apply/ok/reset/cancel' buttons
-#
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
 from tkinter import colorchooser
+import importlib.resources
 
 from . import common_simple
 
@@ -340,7 +342,97 @@ class button_configuration(Tk.LabelFrame):
 
     def get_values(self):
         return (self.CB1.get_value(), self.EB1.get_value(), self.EB2.get_value())
-    
+
+#------------------------------------------------------------------------------------
+# Class for the UI element (TK Label Frame) for changing the line styles
+#    "set_value" - will set the entry box values (hidden:bool, xoff:int, yoff:int)
+#    "get_value" - will return the entry box values (hidden:bool, xoff:int, yoff:int]
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class line_styles(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        # Create a labelframe to hold the tkinter widgets
+        super().__init__(parent_frame, text="Line styles")
+        # The Tk IntVar to hold the line end selection
+        self.selection = Tk.IntVar(self, 0)
+        # Define the Available selections [filename, configuration]
+        self.selections = [ ["solidline", [] ],
+                            ["dashline1", [2,2] ],
+                            ["dashline2", [4,2] ],
+                            ["dashline3", [4,4] ],
+                            ["dashline4", [6,2] ],
+                            ["dashline5", [6,4] ],
+                            ["dashline6", [6,6] ] ]
+        # Create a frame for the radiobuttons
+        self.subframe2 = Tk.Frame(self)
+        self.subframe2.pack()
+        # Create the buttons we need (adding the references to the buttons, tooltips and
+        # images to a list so they don't go out of scope and dont get garbage collected)
+        self.buttons = []
+        self.tooltips = []
+        self.images = []
+        tooltip = " Select the style to apply to one or both line ends"
+        resource_folder = 'model_railway_signals.resources'
+        for index, button in enumerate (self.selections):
+            file_name = button[0]
+            try:
+                # Load the image file for the button if there is one
+                with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
+                    self.images.append(Tk.PhotoImage(file=file_path))
+                    self.buttons.append(Tk.Radiobutton(self.subframe2, anchor='w',
+                            indicatoron=0, variable=self.selection, value=index))
+                    self.buttons[-1].config(image=self.images[-1])
+            except:
+                # Else fall back to using a text label (and use a standard radio button)
+                self.buttons.append(Tk.Radiobutton(self.subframe2, text=file_name,
+                                 anchor='w', variable=self.selection, value=index))
+            self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            self.tooltips.append(common_simple.CreateToolTip(self.buttons[-1], tooltip))
+
+    def set_value(self, dash_type):
+        # Set the arrow ends (Default will remain '0' if not supported)
+        for index, selection_to_test in enumerate (self.selections):
+            if selection_to_test[1] == dash_type:
+                self.selection.set(index)
+                break
+
+    def get_value(self):
+        # dash_type is a list of values defining the tkinter dash type
+        dash_type = self.selections[self.selection.get()][1]
+        return(dash_type)
+
+#------------------------------------------------------------------------------------
+# Class for the UI element (TK Label Frame) for changing the line width
+#    "set_value" - will set the entry box values (hidden:bool, xoff:int, yoff:int)
+#    "get_value" - will return the entry box values (hidden:bool, xoff:int, yoff:int]
+#    "validate" - Ensure the Entry box is valid
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class line_width(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        # Create a labelframe to hold the tkinter widgets
+        super().__init__(parent_frame, text="Line width")
+        # Create another subframe so all the other elements float in the labelframe
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack(fill='y', expand=True)
+        # Create lanel and line width elements
+        self.label = Tk.Label(self.subframe, text="Pixels:")
+        self.label.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.linewidth = common_simple.integer_entry_box(self.subframe, width=3, min_value=1, max_value=6,
+                   tool_tip="Select the line width (between 1 and 6 pixels)", allow_empty=False)
+        self.linewidth.pack(padx=2, pady=2, side=Tk.LEFT)
+
+    def set_value(self, width:int):
+        self.linewidth.set_value(width)
+
+    def get_value(self):
+        return(self.linewidth.get_value())
+
+    def validate(self):
+        return(self.linewidth.validate())
+
 #------------------------------------------------------------------------------------
 # Stand Alone UI element for a Tk.Frame containing the Apply/OK/Reset/Cancel Buttons.
 # Will make callbacks to the specified "load_callback" and "save_callback" functions

@@ -67,6 +67,8 @@ from .points import point_switched
 from .points import fpl_active
 from .points import set_point_colour
 from .points import reset_point_colour
+from .points import set_point_colour_override
+from .points import reset_point_colour_override
 from .points import update_point_styles
 from .points import update_point_button_styles
 
@@ -105,6 +107,8 @@ from .lines import move_line_end_1
 from .lines import move_line_end_2
 from .lines import set_line_colour
 from .lines import reset_line_colour
+from .lines import set_line_colour_override
+from .lines import reset_line_colour_override
 from .lines import update_line_styles
 
 from .text_boxes import create_text_box
@@ -158,6 +162,8 @@ from .gpio_sensors import update_gpio_sensor_callback
 from .gpio_sensors import reset_gpio_mqtt_configuration
 from .gpio_sensors import set_gpio_sensors_to_publish_state
 from .gpio_sensors import subscribe_to_remote_gpio_sensors
+from .gpio_sensors import subscribe_to_gpio_port_status
+from .gpio_sensors import unsubscribe_from_gpio_port_status
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -202,6 +208,8 @@ __all__ = [
         'toggle_fpl',
         'set_point_colour',
         'reset_point_colour',
+        'set_point_colour_override',
+        'reset_point_colour_override',
       # Public lever types/functions
         'lever_type',
         'create_lever',
@@ -220,6 +228,8 @@ __all__ = [
         'delete_line',
         'set_line_colour',
         'reset_line_colour',
+        'set_line_colour_override',
+        'reset_line_colour_override',
         'move_line_end_1',
         'move_line_end_2',
       # public track sensor types/functions
@@ -293,6 +303,8 @@ __all__ = [
         'reset_gpio_mqtt_configuration',
         'subscribe_to_remote_gpio_sensors',
         'set_gpio_sensors_to_publish_state',
+        'subscribe_to_gpio_port_status',
+        'unsubscribe_from_gpio_port_status',
       # Public SPROG control functions
         'sprog_connect',
         'sprog_disconnect',

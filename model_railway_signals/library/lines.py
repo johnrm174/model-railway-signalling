@@ -16,6 +16,7 @@
 #       arrow_ends:int - how the arrow_types are to be applied -  0=none, 1=start, 2=end, 3=both (default 0)
 #       selected:bool:int - Set to True to create the line as "selected" (default False)
 #       line_width:str - Width of the line - default = 3
+#       line_style:[int,int,] - Dash style for the line (default [] = solid)
 #
 #   update_line_styles - updates the styles of a line object
 #     Mandatory Parameters:
@@ -23,6 +24,7 @@
 #     Optional Parameters:
 #       colour:str - Any tkinter colour can be specified as a string - default = "Black"
 #       line_width:str - Width of the line - default = 3
+#       line_style:[int,int,] - Dash style for the line (default [] = solid)
 #
 #   line_exists(line_id:int) - returns true if the Button object 'exists' on the schematic
 #
@@ -32,9 +34,17 @@
 #
 #   reset_line_colour(line_id:int) - reset the colour of a line back to default
 #
+#   set_line_colour_override(line_id:int, colour:str) - Override the line colour
+#
+#   reset_line_colour_override(line_id:int) - Reset the line colour override
+#
 #   move_line_end_1(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
 #
 #   move_line_end_2(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
+#
+# External API - classes and functions (used by the other library modules):
+#
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #
 #---------------------------------------------------------------------------------------------
 
@@ -48,6 +58,18 @@ import math
 
 lines: dict = {}
                                                             
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    return()
+
 #---------------------------------------------------------------------------------------------
 # API Function to check if a Line Object exists in the list of Lines
 # Used in most externally-called functions to validate the Line ID
@@ -65,7 +87,7 @@ def line_exists(line_id:int):
 # Public API function to create a Line object (drawing objects)
 #---------------------------------------------------------------------------------------------
 
-def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str="black",
+def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str="black", line_style:list=[],
                   arrow_type:list=[0,0,0], arrow_ends:int=0, selected:bool=False, line_width:int=3):
     global lines
     # Set a unique 'tag' to reference the tkinter drawing objects
@@ -84,18 +106,17 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         # configuration as a list rather than the tuple needed by the tkinter create_line
         # function so it is serialisable to json for save and load.
         if arrow_type != [0,0,0] and arrow_type != [1,1,1] and arrow_ends == 1:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width,
-                            arrow=Tk.FIRST, arrowshape=tuple(arrow_type), tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.FIRST, arrowshape=tuple(arrow_type), tags=canvas_tag)
         elif arrow_type != [0,0,0] and arrow_type != [1,1,1] and arrow_ends == 2:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width,
-                            arrow=Tk.LAST, arrowshape=tuple(arrow_type), tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.LAST, arrowshape=tuple(arrow_type), tags=canvas_tag)
         elif arrow_type != [0,0,0] and arrow_type != [1,1,1] and arrow_ends == 3:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width,
-                            arrow=Tk.BOTH, arrowshape=tuple(arrow_type), tags=canvas_tag)
+            line_object = canvas.create_line(x1, y1, x2, y2, arrow=Tk.BOTH, arrowshape=tuple(arrow_type), tags=canvas_tag)
         else:
-            line_object = canvas.create_line(x1, y1, x2, y2, fill=colour, width=line_width, tags=canvas_tag)
-        # Draw the line end selection circles (i.e displayed when line selected)
-        if selected: state="normal"
+            line_object = canvas.create_line(x1, y1, x2, y2, tags=canvas_tag)
+        # Draw the line-end selection circles if we are in Edit Mode and the 'selected' flag is set
+        # This is the case of the line being re-created (in its new configuration) after the config
+        # has been changed where we want to leave the line as selected
+        if selected and editing_enabled: state="normal"
         else: state = "hidden"
         end1_object = canvas.create_oval(x1-5, y1-5, x1+5, y1+5, tags=(canvas_tag, selected_tag), state=state)
         end2_object = canvas.create_oval(x2-5, y2-5, x2+5, y2+5, tags=(canvas_tag, selected_tag), state=state)
@@ -106,12 +127,18 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         elif arrow_type == [1,1,1] and arrow_ends == 3: stop1, stop2 = "normal", "normal"
         else: stop1, stop2 = "hidden", "hidden"
         dx, dy = get_endstop_offsets(x1, y1, x2, y2)
-        stop1_object = canvas.create_line(x1+dx, y1+dy, x1-dx, y1-dy, fill=colour, width=line_width, tags=canvas_tag, state=stop1)
-        stop2_object = canvas.create_line(x2+dx, y2+dy, x2-dx, y2-dy, fill=colour, width=line_width, tags=canvas_tag, state=stop2)
+        stop1_object = canvas.create_line(x1+dx, y1+dy, x1-dx, y1-dy, tags=canvas_tag, state=stop1)
+        stop2_object = canvas.create_line(x2+dx, y2+dy, x2-dx, y2-dy, tags=canvas_tag, state=stop2)
+        # Apply the line styles
+        canvas.itemconfig(line_object, fill=colour, width=line_width, dash=tuple(line_style))
+        canvas.itemconfig(stop1_object, fill=colour, width=line_width, dash=tuple(line_style))
+        canvas.itemconfig(stop2_object, fill=colour, width=line_width, dash=tuple(line_style))
         # Compile a dictionary of everything we need to track
         lines[str(line_id)] = {}
         lines[str(line_id)]["canvas"] = canvas                  # Tkinter canvas object
-        lines[str(line_id)]["colour"] = colour                  # Default colour for the line
+        lines[str(line_id)]["colouroverride"] = False           # Whether the colour is overridden or not
+        lines[str(line_id)]["defaultcolour"] = colour           # Default colour for the line
+        lines[str(line_id)]["currentcolour"] = colour           # Current Colour for the line
         lines[str(line_id)]["line"] = line_object               # Reference to the Tkinter drawing object
         lines[str(line_id)]["end1"] = end1_object               # Reference to the Tkinter drawing object
         lines[str(line_id)]["end2"] = end2_object               # Reference to the Tkinter drawing object
@@ -125,7 +152,7 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
 # Public API function to Update the Line Styles
 #---------------------------------------------------------------------------------------------
 
-def update_line_styles(line_id:int, colour:str="black", line_width:int=3):
+def update_line_styles(line_id:int, colour:str="black", line_width:int=3, line_style:list=[]):
     global lines
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(line_id, int) :
@@ -134,10 +161,11 @@ def update_line_styles(line_id:int, colour:str="black", line_width:int=3):
         logging.error("Line "+str(line_id)+": update_line_styles - Line ID does not exist")
     else:
         logging.debug("Line "+str(line_id)+": Updating Line Styles")
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"], width=line_width)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"], width=line_width)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"], width=line_width)
-        lines[str(line_id)]["colour"] = colour
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"], width=line_width, dash=tuple(line_style))
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"], width=line_width, dash=tuple(line_style))
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"], width=line_width, dash=tuple(line_style))
+        lines[str(line_id)]["defaultcolour"] = colour
+        lines[str(line_id)]["currentcolour"] = colour
         reset_line_colour(line_id)
     return()
 
@@ -196,9 +224,11 @@ def move_line_end_2(line_id:int, xdiff:int,ydiff:int):
         lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
     return()
 
-# -------------------------------------------------------------------------
-# Public API function to change the colour of a line
-# -------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# Public API function to change the colour of a line (for route highlighting).
+# Note that this change will only be effected immediately if the line colour is not
+# overridden. Otherwise the change will be applied when the colour override is reset.
+#--------------------------------------------------------------------------
 
 def set_line_colour(line_id:int, colour:str):
     if not isinstance(line_id, int):
@@ -206,14 +236,19 @@ def set_line_colour(line_id:int, colour:str):
     elif not line_exists(line_id):
         logging.error("Line "+str(line_id)+": set_line_colour - Line ID does not exist")
     else:
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
+        if not lines[str(line_id)]["colouroverride"]:
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
+        lines[str(line_id)]["currentcolour"] = colour
     return()
 
-# -------------------------------------------------------------------------
-# Public API function to set the colour of a line back to default
-# -------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# Public API function to reset the colour of a line back to its default
+# (for when a route is un-highlighted). Note that this change will only be
+# effected immediately if the line colour is not overridden. Otherwise the
+# change will be applied when the colour override is reset.
+#--------------------------------------------------------------------------
 
 def reset_line_colour(line_id:int):
     if not isinstance(line_id, int):
@@ -221,9 +256,47 @@ def reset_line_colour(line_id:int):
     elif not line_exists(line_id):
         logging.error("Line "+str(line_id)+": reset_line_colour - Line ID does not exist")
     else:
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=lines[str(line_id)]["colour"])
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=lines[str(line_id)]["colour"])
-        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=lines[str(line_id)]["colour"])
+        if not lines[str(line_id)]["colouroverride"]:
+            default_colour = lines[str(line_id)]["defaultcolour"]
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=default_colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=default_colour)
+            lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=default_colour)
+        lines[str(line_id)]["currentcolour"] = lines[str(line_id)]["defaultcolour"]
+    return()
+
+#--------------------------------------------------------------------------
+# Public API function to override the colour of a line. This overrides any
+# current highlighting (by 'set_line_colour' and 'reset_line_colour' functions)
+#--------------------------------------------------------------------------
+
+def set_line_colour_override(line_id:int, colour:str):
+    if not isinstance(line_id, int):
+        logging.error("Line "+str(line_id)+": set_line_colour_override - Line ID must be an int")
+    elif not line_exists(line_id):
+        logging.error("Line "+str(line_id)+": set_line_colour_override - Line ID does not exist")
+    else:
+        lines[str(line_id)]["colouroverride"] = True
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=colour)
+    return()
+
+#--------------------------------------------------------------------------
+# Public API function to reset the colour of a line to its 'normal' colour
+# (as configured by the 'set_line_colour' and 'reset_line_colour' functions).
+#--------------------------------------------------------------------------
+
+def reset_line_colour_override(line_id:int):
+    if not isinstance(line_id, int):
+        logging.error("Line "+str(line_id)+": reset_line_colour_override - Line ID must be an int")
+    elif not line_exists(line_id):
+        logging.error("Line "+str(line_id)+": reset_line_colour_override - Line ID does not exist")
+    else:
+        lines[str(line_id)]["colouroverride"] = False
+        current_colour = lines[str(line_id)]["currentcolour"]
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["line"],fill=current_colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop1"],fill=current_colour)
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["stop2"],fill=current_colour)
     return()
 
 #---------------------------------------------------------------------------------------------

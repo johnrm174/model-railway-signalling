@@ -286,13 +286,15 @@ def run_track_section_library_tests():
     assert not track_sections.section_occupied(1)
     assert track_sections.section_occupied(2)
     assert track_sections.section_label(2) == "Train4"
+    print("Library Tests - Negative est API update of section_state_toggled (GPIO events) - will generate 1 error")
+    track_sections.section_state_toggled(7)
     print("Library Tests - set/clear_section_occupied - negative tests - will generate 5 errors")
     track_sections.set_section_occupied("1")                    # Fail - not int
     track_sections.set_section_occupied(7)                      # Fail - does not exist
     track_sections.set_section_occupied(1,20)                   # Fail - new label not a str
     assert track_sections.clear_section_occupied("1") == ""     # Fail - not int
     assert track_sections.clear_section_occupied(7) == ""       # Fail - does not exist
-    print("Library Tests - create a new Sectiion set to mirror an existing section")
+    print("Library Tests - create a new Section set to mirror an existing section")
     # Track Section 2 Should already be OCCUPIED by "Train4" from the previous tests
     track_sections.create_section(canvas,7,700,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="2")
     assert len(track_sections.sections) == 7
@@ -366,6 +368,8 @@ def run_track_section_library_tests():
     track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","occupied":False})          # Warning - spurious message
     track_sections.handle_mqtt_section_updated_event({"occupied": False, "labeltext":"Train20"})               # Warning - spurious message
     track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","labeltext":"Train20"})     # Warning - spurious message    
+    print("Library Tests - mqtt_send_all_section_states_on_broker_connect - No errors or warnings")
+    track_sections.mqtt_send_all_section_states_on_broker_connect()
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
     track_sections.reset_sections_mqtt_configuration()
     assert len(track_sections.list_of_sections_to_publish) == 0
@@ -382,7 +386,9 @@ def run_track_section_library_tests():
     track_sections.accept_entered_value(2)
     time.sleep(0.1)
     assert track_sections.section_label(1) == "Train22"
-    assert track_sections.section_label(2) == "OCCUPIED" # This is the default label
+    assert track_sections.section_label(2) == "Train23" # Unchanged
+    assert not track_sections.section_occupied(1)
+    assert not track_sections.section_occupied(2)
     print("Library Tests - delete_section - 2 errors will be generated")
     track_sections.delete_section(1)
     track_sections.delete_section(2)
@@ -647,7 +653,7 @@ def run_point_library_tests():
     points.toggle_point(12)
     assert points.point_switched(12)
     assert not points.point_switched(10)
-    print("Library Tests - set_point_colour - will generate 2 errors:")
+    print("Library Tests - set_point_colour part1- will generate 2 errors:")
     assert not points.point_switched(10)
     assert not points.point_switched(14)
     assert points.fpl_active(14)          # FPL should be active
@@ -677,11 +683,72 @@ def run_point_library_tests():
     assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "blue"
     assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
     assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "blue"
+    print("Library Tests - set_point_colour_override - will generate 2 errors:")
+    points.set_point_colour_override("10", "yellow") # Point ID not an int
+    points.set_point_colour_override(20, "yellow")   # Point ID does not exist
+    points.set_point_colour_override(10, "yellow")
+    points.set_point_colour_override(14, "yellow")
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "yellow"
+    points.toggle_point(10)
+    assert points.point_switched(10)
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "yellow"
+    points.toggle_point(10)
+    assert not points.point_switched(10)
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "yellow"
+    print("Library Tests - reset_point_colour_override part1 - will generate 2 errors:")
+    points.reset_point_colour_override("10") # Point ID not an int
+    points.reset_point_colour_override(20)   # Point ID does not exist
+    points.reset_point_colour_override(14)
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "blue"
+    print("Library Tests - set_point_colour part2 - No errors:")
+    points.set_point_colour(10, "blue")
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
     print("Library Tests - reset_point_colour - will generate 2 errors:")
     points.reset_point_colour("10") # Point ID not an int
     points.reset_point_colour(20)   # Point ID does not exist
     points.reset_point_colour(10)
     points.reset_point_colour(14)
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "yellow"
+    assert canvas.itemcget(points.points[str(10)]["route2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "black"
+    print("Library Tests - reset_point_colour_override part2 - no errors:")
+    points.reset_point_colour_override(10)
     assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
     assert canvas.itemcget(points.points[str(10)]["route1"],"fill") == "red"
@@ -1081,6 +1148,8 @@ def run_instrument_library_tests():
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-50", "instrumentid":"box1-1"})   # Not subscribed
     block_instruments.handle_mqtt_ring_section_bell_event({"instrumentid": "box2-1"})                                 # Fail - spurious message
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20"})                            # Fail - spurious message
+    print("Library Tests - mqtt_send_all_instrument_states_on_broker_connect - No errors or warnings")
+    block_instruments.mqtt_send_all_instrument_states_on_broker_connect()
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
     block_instruments.reset_instruments_mqtt_configuration()
     assert len(block_instruments.list_of_instruments_to_publish) == 0
@@ -1203,20 +1272,58 @@ def run_line_library_tests():
     assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 300, 200]
     lines.move_line_end_2("10",100,100)   # Error - not an int (exists)
     lines.move_line_end_2(20,100,100)     # Error - does not exist
-    print("Library Tests - set_line_colour - will generate 2 errors:")
+    print("Library Tests - set_line_colour part1 - will generate 2 errors:")
     assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
     assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(12)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(13)]["line"],"fill") == "black"
     lines.set_line_colour("10", "blue") # Line ID not an int
     lines.set_line_colour(20, "blue")   # Line ID does not exist
     lines.set_line_colour(10, "blue")
     lines.set_line_colour(11, "blue")
     assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "blue"
     assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "blue"
+    assert canvas.itemcget(lines.lines[str(12)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(13)]["line"],"fill") == "black"
+    print("Library Tests - set_line_colour_override - will generate 2 errors:")
+    lines.set_line_colour_override("10", "blue") # Line ID not an int
+    lines.set_line_colour_override(20, "blue")   # Line ID does not exist
+    lines.set_line_colour_override(10, "yellow")
+    lines.set_line_colour_override(11, "yellow")
+    lines.set_line_colour_override(12, "yellow")
+    lines.set_line_colour_override(13, "yellow")
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "yellow"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "yellow"
+    assert canvas.itemcget(lines.lines[str(12)]["line"],"fill") == "yellow"
+    assert canvas.itemcget(lines.lines[str(13)]["line"],"fill") == "yellow"
+    print("Library Tests - reset_line_colour_override - part1 - will generate 2 errors:")
+    lines.reset_line_colour_override("10") # Line ID not an int
+    lines.reset_line_colour_override(20)   # Line ID does not exist
+    lines.reset_line_colour_override(10)
+    lines.reset_line_colour_override(12)
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "blue"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "yellow"
+    assert canvas.itemcget(lines.lines[str(12)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(13)]["line"],"fill") == "yellow"
+    print("Library Tests - set_line_colour - part2 - No errors:")
+    lines.set_line_colour(11, "blue")
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "yellow"
     print("Library Tests - reset_line_colour - will generate 2 errors:")
     lines.reset_line_colour("10") # Line ID not an int
     lines.reset_line_colour(20)   # Line ID does not exist
     lines.reset_line_colour(10)
     lines.reset_line_colour(11)
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "yellow"
+    assert canvas.itemcget(lines.lines[str(12)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(13)]["line"],"fill") == "yellow"
+    print("Library Tests - reset_line_colour_override - part2 - no errors:")
+    lines.reset_line_colour_override(11)
+    lines.reset_line_colour_override(13)
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(12)]["line"],"fill") == "black"
+    assert canvas.itemcget(lines.lines[str(13)]["line"],"fill") == "black"
     assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
     assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
     print("Library Tests - delete_line - will generate 2 errors:")

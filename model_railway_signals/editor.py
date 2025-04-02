@@ -608,6 +608,7 @@ class main_menubar:
         trigger = settings.get_gpio("triggerdelay")
         timeout = settings.get_gpio("timeoutperiod")
         mappings = settings.get_gpio("portmappings")
+        max_events = settings.get_gpio("maxevents")
         # Generate a pop-up warning if mappings have been defined but we are not running on a Pi
         if len(mappings)>0 and not library.gpio_interface_enabled():
             Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
@@ -615,7 +616,7 @@ class main_menubar:
         # Delete all track sensor objects and then re-create from the updated settings - we do this
         # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
         # Then update the GPIO Sensor to Signal / Track Sensor Event Mapings as required
-        objects.create_gpio_sensors(trigger, timeout, mappings)
+        objects.create_gpio_sensors(trigger, timeout, max_events, mappings)
         objects.configure_local_gpio_sensor_event_mappings()
         
     def general_settings_update(self):
@@ -701,23 +702,27 @@ class main_menubar:
                     # We don't provide forward compatibility (too difficult) - so fail fast
                     logging.error("Load File - File was saved by "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
+                    logging.error("Load File - Upgrade application to "+sig_file_version+" or later to support this file.")
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
-                elif self.tuple_version(sig_file_version) < self.tuple_version("4.0.0"):
+                elif self.tuple_version(sig_file_version) < self.tuple_version("5.0.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
                     logging.error("Load File - File was saved by application "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
+                    logging.error("Load File - This version of the application only supports files saved by version 5.0.0 or later")
+                    logging.error("Load File - Try loading/saving your file with version 5.0.0 first")
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
-                        message="File was saved by "+sig_file_version+". "+
-                                "This version of the application only supports files saved by version "+
-                                "3.5.0 or later. Try loading/saving with an intermediate version first.")
+                        message="Layout file was saved by Application "+sig_file_version+".\n"+
+                            "This version of the application only supports files saved by version 5.0.0 "+
+                            "or later. Try loading/saving your file with version 5.0.0 first.")
                 else:
                     # We should now be OK to attempt the load, but if the file was saved under a
                     # previous version then we still want to flag a warning message to the user
                     if self.tuple_version(sig_file_version) < self.tuple_version(application_version):
                         logging.warning("Load File - File was saved by application "+sig_file_version)
                         logging.warning("Load File - Current version of the application is "+application_version)
+                        logging.warning("Load File - Re-save with current version to ensure forward compatibility")
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")

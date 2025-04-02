@@ -25,7 +25,7 @@
                 false,
                 ""
             ],
-            "bbox": 8541,
+            "bbox": 7555,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -325,12 +325,13 @@
                 20,
                 5
             ],
-            "bbox": 8547,
+            "bbox": 7561,
             "colour": "black",
             "endx": 625.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 3,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 225.0,
             "posy": 300.0,
@@ -339,7 +340,7 @@
         },
         "3992df93-f016-42e7-a710-f0bddf9b1627": {
             "background": "grey85",
-            "bbox": 8550,
+            "bbox": 7564,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -363,12 +364,13 @@
                 20,
                 5
             ],
-            "bbox": 8556,
+            "bbox": 7570,
             "colour": "black",
             "endx": 625.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 1,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 175.0,
             "posy": 125.0,
@@ -376,7 +378,7 @@
             "tags": "line1"
         },
         "6085fa37-fea7-42cd-a7a9-f15aeb1ec731": {
-            "bbox": 8571,
+            "bbox": 7585,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -388,15 +390,19 @@
             "tags": "instrument2"
         },
         "6e4f0867-155b-4ed8-ae84-38e1cc667131": {
-            "bbox": 8575,
+            "bbox": 7589,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 5,
+            "linestohighlight": [],
             "mirror": "",
+            "pointstohighlight": [],
             "posx": 450.0,
             "posy": 125.0,
             "tags": "section5",
@@ -409,7 +415,7 @@
         },
         "70238cfa-4556-4ed9-9a92-46ac169573de": {
             "background": "grey85",
-            "bbox": 8578,
+            "bbox": 7592,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -433,12 +439,13 @@
                 20,
                 5
             ],
-            "bbox": 8584,
+            "bbox": 7598,
             "colour": "black",
             "endx": 225.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 2,
+            "linestyle": [],
             "linewidth": 3,
             "posx": 200.0,
             "posy": 125.0,
@@ -457,7 +464,7 @@
                 false,
                 ""
             ],
-            "bbox": 8610,
+            "bbox": 7624,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -763,7 +770,7 @@
         },
         "9ac66673-362c-4529-a451-6dba32782869": {
             "background": "grey85",
-            "bbox": 8613,
+            "bbox": 7627,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -792,7 +799,7 @@
                 false,
                 ""
             ],
-            "bbox": 8630,
+            "bbox": 7644,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1086,15 +1093,19 @@
             "ybuttonoffset": 0
         },
         "e26bc73f-b67e-4fed-ae67-8971af1d7b92": {
-            "bbox": 8634,
+            "bbox": 7648,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
             "editable": true,
+            "gpiosensor": "",
             "hidden": false,
+            "highlightcolour": "Red",
             "item": "section",
             "itemid": 4,
+            "linestohighlight": [],
             "mirror": "Node1-3",
+            "pointstohighlight": [],
             "posx": 275.0,
             "posy": 125.0,
             "tags": "section4",
@@ -1107,7 +1118,7 @@
         },
         "e497d420-ad7a-4cb5-877c-6dbd0d849296": {
             "background": "grey85",
-            "bbox": 8637,
+            "bbox": 7651,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1136,7 +1147,7 @@
                 false,
                 ""
             ],
-            "bbox": 8663,
+            "bbox": 7677,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1452,7 +1463,7 @@
                 false,
                 ""
             ],
-            "bbox": 8689,
+            "bbox": 7703,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1795,15 +1806,16 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/configuration_examples/networking1-node2.sig",
+            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/networking1-node2.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.0.0"
+            "version": "Version 5.1.0"
         },
         "gpio": {
+            "maxevents": 100,
             "portmappings": [],
             "timeoutperiod": 1.0,
             "triggerdelay": 0.001
@@ -1897,6 +1909,7 @@
             },
             "routelines": {
                 "colour": "Black",
+                "linestyle": [],
                 "linewidth": 3
             },
             "signals": {

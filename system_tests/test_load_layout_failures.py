@@ -18,7 +18,9 @@ def run_all_load_layout_negative_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_load_layout_failures2.sig")
     sleep(5.0)
     print("Load Layout Negative Tests - Old version but still supported")
+    print("Also tests block instruments audio file not found and invalid audio file")
     initialise_test_harness(filename="./test_load_layout_failures3.sig")
+    sleep(5.0)
     report_results()
     
 if __name__ == "__main__":

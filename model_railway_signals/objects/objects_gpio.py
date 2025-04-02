@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------------------------------------
 #
 # External API functions / objects intended for use by other editor modules:
-#    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
+#    create_gpio_sensors(trigger,timeout,max_events,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
 #
@@ -34,16 +34,23 @@ from .. import library
 #-------------------------------------------------------------------------------------------------------------
 
 def delete_references_to_sensors_that_no_longer_exist():
+    # Signal mappings (Signal Passed and Signal Approach events)
     for signal_id in objects_common.signal_index:
         object_id = objects_common.signal(signal_id)
         if not library.gpio_sensor_exists(objects_common.schematic_objects[object_id]["passedsensor"][1]):
             objects_common.schematic_objects[object_id]["passedsensor"][1] = ""
         if not library.gpio_sensor_exists(objects_common.schematic_objects[object_id]["approachsensor"][1]):
             objects_common.schematic_objects[object_id]["approachsensor"][1] = ""
+    # Track Sensor Mappings (Sensor Passed events)
     for sensor_id in objects_common.track_sensor_index:
         object_id = objects_common.track_sensor(sensor_id)
         if not library.gpio_sensor_exists(objects_common.schematic_objects[object_id]["passedsensor"]):
             objects_common.schematic_objects[object_id]["passedsensor"] = ""
+    # Track Section Mappings (Track Section updated events)
+    for section_id in objects_common.section_index:
+        object_id = objects_common.section(section_id)
+        if not library.gpio_sensor_exists(objects_common.schematic_objects[object_id]["gpiosensor"]):
+            objects_common.schematic_objects[object_id]["gpiosensor"] = ""
     return()
 
 #-------------------------------------------------------------------------------------------------------------
@@ -54,13 +61,14 @@ def delete_references_to_sensors_that_no_longer_exist():
 # still 'exists'. All local GPIO Sensors that no longer exist are removed from the signal/track sensor config.
 #-------------------------------------------------------------------------------------------------------------
 
-def create_gpio_sensors(trigger:float, timeout:float, gpio_mappings:list):
+def create_gpio_sensors(trigger:float, timeout:float, max_events:int, gpio_mappings:list):
     # Delete all existing 'local' GPIO sensor objects first
     library.delete_all_local_gpio_sensors()
     # Iterate through the sensor mappings to create each (new) GPIO sensor object in turn
     for mapping in gpio_mappings:
         sensor_id, gpio_port = mapping[0], mapping[1]
-        library.create_gpio_sensor(sensor_id, gpio_port, trigger_period=trigger, sensor_timeout=timeout)
+        library.create_gpio_sensor(sensor_id, gpio_port, trigger_period=trigger,
+                            sensor_timeout=timeout, max_events_per_second = max_events)
     return()
 
 #-------------------------------------------------------------------------------------------------------------
@@ -71,6 +79,7 @@ def create_gpio_sensors(trigger:float, timeout:float, gpio_mappings:list):
 #-------------------------------------------------------------------------------------------------------------
 
 def configure_local_gpio_sensor_event_mappings():
+    # Signal mappings (Signal Passed and Signal Approach events)
     for signal_id in objects_common.signal_index:
         object_id = objects_common.signal(signal_id)
         passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
@@ -79,11 +88,18 @@ def configure_local_gpio_sensor_event_mappings():
             library.update_gpio_sensor_callback(passed_sensor, signal_passed=int(signal_id))
         if approach_sensor.isdigit() and library.gpio_sensor_exists(approach_sensor):
             library.update_gpio_sensor_callback(approach_sensor, signal_approach=int(signal_id))
+    # Track Sensor Mappings (Sensor Passed events)
     for sensor_id in objects_common.track_sensor_index:
         object_id = objects_common.track_sensor(sensor_id)
         passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"]
-        if passed_sensor.isdigit() and  library.gpio_sensor_exists(passed_sensor):
+        if passed_sensor.isdigit() and library.gpio_sensor_exists(passed_sensor):
             library.update_gpio_sensor_callback(passed_sensor, sensor_passed=int(sensor_id))
+    # Track Section Mappings (Track Section updated events)
+    for section_id in objects_common.section_index:
+        object_id = objects_common.section(section_id)
+        gpio_sensor = objects_common.schematic_objects[object_id]["gpiosensor"]
+        if gpio_sensor.isdigit() and library.gpio_sensor_exists(gpio_sensor):
+            library.update_gpio_sensor_callback(gpio_sensor, track_section=int(section_id))
     # Remove any references to GPIO sensors that no longer exist from the Signal/Track Sensor configurations
     delete_references_to_sensors_that_no_longer_exist()
     return()
@@ -96,6 +112,7 @@ def configure_local_gpio_sensor_event_mappings():
 #-------------------------------------------------------------------------------------------------------------
 
 def configure_remote_gpio_sensor_event_mappings():
+    # Signal mappings (Signal Passed and Signal Approach events)
     for signal_id in objects_common.signal_index:
         object_id = objects_common.signal(signal_id)
         passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
@@ -104,11 +121,18 @@ def configure_remote_gpio_sensor_event_mappings():
             library.update_gpio_sensor_callback(passed_sensor, signal_passed=int(signal_id))
         if not approach_sensor.isdigit() and library.gpio_sensor_exists(approach_sensor):
             library.update_gpio_sensor_callback(approach_sensor, signal_approach=int(signal_id))
+    # Track Sensor Mappings (Sensor Passed events)
     for sensor_id in objects_common.track_sensor_index:
         object_id = objects_common.track_sensor(sensor_id)
         passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"]
-        if not passed_sensor.isdigit() and  library.gpio_sensor_exists(passed_sensor):
+        if not passed_sensor.isdigit() and library.gpio_sensor_exists(passed_sensor):
             library.update_gpio_sensor_callback(passed_sensor, sensor_passed=int(sensor_id))
+    # Track Section Mappings (Track Section updated events)
+    for section_id in objects_common.section_index:
+        object_id = objects_common.section(section_id)
+        gpio_sensor = objects_common.schematic_objects[object_id]["gpiosensor"]
+        if not gpio_sensor.isdigit() and library.gpio_sensor_exists(gpio_sensor):
+            library.update_gpio_sensor_callback(gpio_sensor, track_section=int(section_id))
     # Remove any references to GPIO sensors that no longer exist from the Signal/Track Sensor configurations
     delete_references_to_sensors_that_no_longer_exist()
     return()

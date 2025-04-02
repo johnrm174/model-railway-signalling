@@ -15,6 +15,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object
+#    objects.finalise_object_updates
 #    objects.signal
 #    objects.point
 #    objects.section
@@ -51,6 +52,7 @@ from tkinter import ttk
 import copy
 import json
 import os
+import pathlib
 
 from .. import common
 from .. import library
@@ -172,9 +174,12 @@ class cv_programming_element():
         # Create the Save/load Buttons and the filename label in a subframe to center them
         self.subframe2 = Tk.Frame(parent_frame)
         self.subframe2.pack(fill='y')
-        self.B3 = Tk.Button (self.subframe2, text = "Open",command=self.load_config)
-        self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT3 = common.CreateToolTip(self.B3, "Load a CV configuration from file")
+        self.B3a = Tk.Button (self.subframe2, text = "Examples",command=lambda:self.load_config(examples=True))
+        self.B3a.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT3a = common.CreateToolTip(self.B3a, "Open the folder containing example CV configuration files")
+        self.B3b = Tk.Button (self.subframe2, text = "Open",command=self.load_config)
+        self.B3b.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT3b = common.CreateToolTip(self.B3b, "Load a CV configuration from file")
         self.B4 = Tk.Button (self.subframe2, text = "Save",command=lambda:self.save_config(save_as=False))
         self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT4 = common.CreateToolTip(self.B4, "Save the current CV configuration to file")
@@ -305,11 +310,18 @@ class cv_programming_element():
                         self.loaded_file = filename_to_save
                         self.name.config(text="Configuration file: "+os.path.split(self.loaded_file)[1])
 
-    def load_config(self):
+    def load_config(self, examples:bool=False):
         self.B4.focus_set()
         self.root_window.update()
+        # Set the initial path to the examples directory if required
+        if examples:
+            library_sub_package_folder = pathlib.Path(__file__)
+            path, name = library_sub_package_folder.parent.parent / 'examples', ""
+        else:
+            path, name = ".", ""
+        # Open the file chooser dialog to select a file
         filename_to_load = Tk.filedialog.askopenfilename(parent=self.parent_window,title='Load CV configuration',
-                filetypes=(('cvc files','*.cvc'),('all files','*.*')),initialdir = '.')
+                filetypes=(('cvc files','*.cvc'),('all files','*.*')),initialdir = path)
         # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
         if filename_to_load == (): filename_to_load = ""
         # Only continue (to load the file) if the filename is not blank
@@ -719,10 +731,10 @@ class bulk_renumbering():
                 if value[0] in objects.schematic_objects.keys() and value[1] != value[2]:
                     new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
                     new_object_configuration["itemid"] = value[2]
-                    update_schematic_state = (list_of_all_values[-1][0] == value[0])
                     objects.update_object(value[0], new_object_configuration,
-                            update_schematic_state=update_schematic_state, create_selected=False)
+                                update_schematic_state=False, create_selected=False)
                     self.root_window.update_idletasks()
+            objects.finalise_object_updates()
             # close the window (on OK)
             if close_window: self.close_window()
             else: self.load_state()

@@ -30,7 +30,7 @@ default_settings = {}
 
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["version"] = "Version 5.0.0"
+default_settings["general"]["version"] = "Version 5.1.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
@@ -84,6 +84,7 @@ default_settings["mqtt"]["pubsensors"] = []
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
+default_settings["gpio"]["maxevents"] = 100
 default_settings["gpio"]["portmappings"] = []
 
 # The following settings define the default application styles (object appearance)
@@ -107,6 +108,7 @@ default_settings["styles"]["tracksections"]["defaultlabel"] = "XXXXX"
 default_settings["styles"]["routelines"] = {}
 default_settings["styles"]["routelines"]["colour"] = "Black"
 default_settings["styles"]["routelines"]["linewidth"] = 3
+default_settings["styles"]["routelines"]["linestyle"] = []  # Empty list = solid line
 default_settings["styles"]["points"] = {}
 default_settings["styles"]["points"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["points"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
