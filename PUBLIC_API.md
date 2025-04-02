@@ -78,12 +78,17 @@ a json message and 'publish' this to the MQTT broker on the appropriate topic. N
 now support 'track circuit' type train detection to drive track occupancy (as an option to using event-type
 sensors to 'pass' trains from one Track Section to another) you should send both 'triggered' and 'released'
 events as appropriate, and they should be published to the broker as 'retained' messages so the application
-will always pick up the latest state (True for triggered, False for released):
+will always pick up the latest state (True for triggered, False for released).
+
+The DCC Signalling application also now implements a 'circuit breaker' function to lock out 'noisy'
+GPIO inputs / external sensors. You should therefore include the 'tripped' flag in the message (set to
+'Fasle' for normal operation - unless you want to implement similar functionality in your code).
+
 <pre>
 def publish_gpio_sensor_event(network_identifier:str, node_identifier:str, sensor_id:int, sensor_state:bool):
     item_identifier = node_identifier+"-"+str(sensor_id)
     topic = "gpio_sensor_event/"+network_identifier+"/"+item_identifier
-    payload = json.dumps( {"sourceidentifier": item_identifier, "state": sensor_state} )
+    payload = json.dumps( {"sourceidentifier": item_identifier, "state": sensor_state, "tripped": False} )
     mqtt_client.publish(topic, payload, retain=True, qos=1)
 </pre>
 

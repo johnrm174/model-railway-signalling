@@ -71,6 +71,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * GPIO Sensors - New 'circuit breaker' functionality to lock out faulty GPIO inputs / sensors.
 * GPIO Sensors - Settings window now provides an indication of the state of each GPIO input.
 * Documentation - Minor updates to the documentation to reflect the new features in the release.
+* [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) - 
+Has now been updated to suppport 'track circuit' type sensors.
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
