@@ -14,6 +14,7 @@
 #       sig_passed_callback - the function to call on signal passed events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
 #       button_yoffset:int - Position offset for the point buttons (from default) - default = 0
 #       hide_buttons:bool - Point is configured to have the control buttons hidden in Run Mode - Default = False
@@ -50,6 +51,7 @@ def create_ground_position_signal(canvas, sig_id:int,
                                   sig_switched_callback,
                                   sig_passed_callback,
                                   orientation:int=0,
+                                  sig_passed_button:bool=False,
                                   button_xoffset:int=0,
                                   button_yoffset:int=0,
                                   hide_buttons:bool=False,
@@ -75,6 +77,7 @@ def create_ground_position_signal(canvas, sig_id:int,
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.ground_position,
                                             x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
                                             sig_switched_callback, sig_passed_callback,
+                                            sig_passed_button = sig_passed_button,
                                             button_colour = button_colour,
                                             active_colour = active_colour,
                                             selected_colour = selected_colour,

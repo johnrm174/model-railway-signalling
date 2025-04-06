@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       main_signal:bool - To create a signal arm for the main route - default = True
 #                        (Only set this to False when creating an "associated" distant signal
@@ -80,6 +81,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             sig_passed_callback,
                             sig_updated_callback,
                             orientation:int=0,
+                            sig_passed_button:bool=False,
                             sig_release_button:bool=False,
                             main_signal:bool=True,
                             lh1_signal:bool=False,
@@ -144,6 +146,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                                                 sig_switched_callback, sig_passed_callback,
                                                 sig_updated_callback = sig_updated_callback,
                                                 sub_switched_callback = sub_switched_callback,
+                                                sig_passed_button = sig_passed_button,
                                                 has_subsidary = has_subsidary,
                                                 sig_automatic = fully_automatic,
                                                 associated_home = associated_home,

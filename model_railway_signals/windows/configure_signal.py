@@ -568,12 +568,12 @@ def update_tab2_interlock_ahead_selection(signal):
 
 def update_tab3_signal_ui_elements(signal):
     # Unpack all the optional elements first
-    signal.automation.timed_signal.frame.pack_forget()
-    signal.automation.approach_control.frame.pack_forget()
+    signal.automation.timed_signal.pack_forget()
+    signal.automation.approach_control.pack_forget()
     # Only pack those elements relevant to the signal type and route type
     if ( signal.config.sigtype.get_value() == library.signal_type.colour_light.value or
          signal.config.sigtype.get_value() == library.signal_type.semaphore.value ):
-        signal.automation.timed_signal.frame.pack(padx=2, pady=2, fill='x')
+        signal.automation.timed_signal.pack(padx=2, pady=2, fill='x')
     rel_on_red = ( ( signal.config.sigtype.get_value() == library.signal_type.colour_light.value and
                      signal.config.subtype.get_value() != library.signal_subtype.distant.value) or
                    ( signal.config.sigtype.get_value() == library.signal_type.semaphore.value and
@@ -583,7 +583,7 @@ def update_tab3_signal_ui_elements(signal):
                    signal.config.subtype.get_value() != library.signal_subtype.distant.value and
                    signal.config.subtype.get_value() != library.signal_subtype.red_ylw.value )
     if rel_on_red or rel_on_yel:
-        signal.automation.approach_control.frame.pack(padx=2, pady=2, fill='x')
+        signal.automation.approach_control.pack(padx=2, pady=2, fill='x')
     return()
 
 #------------------------------------------------------------------------------------
@@ -720,7 +720,7 @@ def update_tab3_approach_control_selections(signal):
         if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable_route()
         else: signal.automation.approach_control.rh2.disable_route()
         # Enable the Approach sensor entry box
-        signal.automation.gpio_sensors.approach.enable()
+        signal.automation.signal_events.approach.enable()
     else:
         signal.automation.approach_control.main.disable_route()
         signal.automation.approach_control.lh1.disable_route()
@@ -731,7 +731,7 @@ def update_tab3_approach_control_selections(signal):
         signal.automation.approach_control.disable_release_on_red()
         signal.automation.approach_control.disable_release_on_red_sig_ahead()
         # Disable the Approach sensor entry box
-        signal.automation.gpio_sensors.approach.disable()
+        signal.automation.signal_events.approach.disable()
     return() 
 
 #------------------------------------------------------------------------------------
@@ -777,8 +777,7 @@ class edit_signal:
                     self.sub_routes_updated, self.dist_routes_updated)
             # The interlocking tab needs the parent object so the sig_id can be accessed for validation
             self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self)
-            # The automation tab needs the parent object so the sig_id can be accessed for validation
-            self.automation = configure_signal_tab3.signal_automation_tab(self.tab3, self)
+            self.automation = configure_signal_tab3.signal_automation_tab(self.tab3)
             # load the initial UI state
             self.load_state()
                 
@@ -899,8 +898,8 @@ class edit_signal:
             self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
             # These elements are for the Automation tab. Note that several elements 
             # need the current signal IDfor validation purposes
-            self.automation.gpio_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1], item_id)
-            self.automation.gpio_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1], item_id)
+            self.automation.signal_events.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"], item_id)
+            self.automation.signal_events.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
             override = objects.schematic_objects[self.object_id]["overridesignal"]
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
@@ -962,7 +961,7 @@ class edit_signal:
             if not self.locking.interlocking.validate(): valid = False
             if not self.locking.interlocked_sections.validate(): valid = False
             if not self.locking.conflicting_sigs.validate(): valid = False
-            if not self.automation.gpio_sensors.validate(): valid = False
+            if not self.automation.signal_events.validate(): valid = False
             if not self.automation.track_occupancy.validate(): valid = False
             if not self.automation.timed_signal.validate(): valid = False
             if valid:
@@ -1010,10 +1009,8 @@ class edit_signal:
                             new_sig_interlock_table[index].append(interlocked_signal)
                 new_object_configuration["siginterlock"] = new_sig_interlock_table
                 # These elements are for the Automation tab
-                new_object_configuration["passedsensor"][0] = True
-                new_object_configuration["passedsensor"][1] = self.automation.gpio_sensors.passed.get_value()
-                new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
-                new_object_configuration["approachsensor"][1] = self.automation.gpio_sensors.approach.get_value()
+                new_object_configuration["passedsensor"] = self.automation.signal_events.passed.get_value()
+                new_object_configuration["approachsensor"] = self.automation.signal_events.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
                 override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
                 new_object_configuration["fullyautomatic"] = main_auto

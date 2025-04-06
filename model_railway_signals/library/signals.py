@@ -398,9 +398,9 @@ def reset_sig_released_button(sig_id:int):
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 
-def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int,
-            button_xoffset:int, button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback,
-            sig_passed_callback, sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False,
+def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int, button_xoffset:int,
+            button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback, sig_passed_callback,
+            sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False, sig_passed_button:bool=False,
             sig_automatic:bool=False, associated_home:int=0, button_colour:str="Grey85", active_colour:str="Grey95",
             selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
     global signals
@@ -476,7 +476,7 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
         button_window2 = None
     # Signal passed button is created on the track at the base of the signal
     # Note we only create this if the signal IS NOT an 'associated distant' signal
-    if associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
+    if sig_passed_button and associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
     # Disable the main signal button if the signal is fully automatic
     canvas_colour = canvas.cget("background")
     if sig_automatic: sig_button.config(state="disabled",relief="sunken", background=canvas_colour, border=0)

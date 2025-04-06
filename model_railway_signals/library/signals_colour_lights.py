@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       has_subsidary:bool - Creates a subsidary position light signal - Default = False
 #       mainfeather:bool - Creates a MAIN route feather - Default = False
@@ -69,6 +70,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 sig_passed_callback,
                                 sig_updated_callback,
                                 orientation:int=0,
+                                sig_passed_button:bool=False,
                                 sig_release_button:bool=False,
                                 has_subsidary:bool=False,
                                 mainfeather:bool=False,
@@ -115,6 +117,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                                 sig_switched_callback, sig_passed_callback,
                                                 sig_updated_callback = sig_updated_callback,
                                                 sub_switched_callback = sub_switched_callback,
+                                                sig_passed_button = sig_passed_button,
                                                 has_subsidary = has_subsidary,
                                                 sig_automatic = fully_automatic,
                                                 button_colour = button_colour,

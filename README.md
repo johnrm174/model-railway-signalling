@@ -51,28 +51,17 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.1.0:
+## What's new for Release 5.2.0:
 
 > [!IMPORTANT]
-> Release 5.1.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.2.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.1.0.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.2.0.
 > You have been warned!
 
-* Bugfix to Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
-* Bugfix to GPIO sensor settings page - mappings now correctly displayed after sensor unmapping.
-* Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
-* Improvement - Line width can now be edited in the Line and Point configuration dialogs.
-* Improvement - To the synchronisation of state across networked layouts on MQTT broker connect.
-* New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
-* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied).
-* New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
-* GPIO Sensors - Are now enabled in all Modes (inhibiting them in Edit mode wasn't a good idea).
-* GPIO Sensors - New 'circuit breaker' functionality to lock out faulty GPIO inputs / sensors.
-* GPIO Sensors - Settings window now provides an indication of the state of each GPIO input.
-* Documentation - Minor updates to the documentation to reflect the new features in the release.
-* [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) - 
-Has now been updated to suppport 'track circuit' type sensors.
+* New Feature - Ability to interlock points with occupied Track Sections (representing Track Circuits)
+* Improvement - The entire point is highlighted when 'track circuits' are occupied (more prototypical)
+* 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
