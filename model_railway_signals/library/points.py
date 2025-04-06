@@ -231,12 +231,9 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
         # Update the colours of the blade and route lines as appropriate
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
-        if points[str(point_id)]["colouroverride"]:
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=override_colour)
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=override_colour)
-        else:
+        if not points[str(point_id)]["colouroverride"]:
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
     else:
@@ -251,14 +248,11 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
         # Update the colours of the blade and route lines as appropriate
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
-        if points[str(point_id)]["colouroverride"]:
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=override_colour)
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=override_colour)
-        else:
+        if not points[str(point_id)]["colouroverride"]:
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
     # Send out the DCC commands to change the point
     dcc_control.update_dcc_point(point_id, points[str(point_id)]["switched"])
     return()
@@ -722,18 +716,12 @@ def set_point_colour_override(point_id:int, colour:str):
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": set_point_colour_override - Point ID does not exist")
     else:
-        # Work out what elements we need to override (depending on how the point is switched)
-        if points[str(point_id)]["switched"]:
-            override_colour1 = points[str(point_id)]["currentcolour1"]
-            override_colour2 = colour
-        else:
-            override_colour1 = colour
-            override_colour2 = points[str(point_id)]["currentcolour2"]
-        # Apply the highlighting:
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=override_colour1)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=override_colour1)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=override_colour2)
-        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=override_colour2)
+        # Apply the highlighting to all elements - This is the case of a track circuit being
+        # active, which in real life would be the whole point (not just the point route selected
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=colour)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=colour)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=colour)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=colour)
         # Store the parameters we need to track
         points[str(point_id)]["overridecolour"] = colour
         points[str(point_id)]["colouroverride"] = True
