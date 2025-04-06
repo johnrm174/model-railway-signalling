@@ -316,9 +316,9 @@ class cv_programming_element():
         # Set the initial path to the examples directory if required
         if examples:
             library_sub_package_folder = pathlib.Path(__file__)
-            path, name = library_sub_package_folder.parent.parent / 'examples', ""
+            path = library_sub_package_folder.parent.parent / 'examples'
         else:
-            path, name = ".", ""
+            path = "."
         # Open the file chooser dialog to select a file
         filename_to_load = Tk.filedialog.askopenfilename(parent=self.parent_window,title='Load CV configuration',
                 filetypes=(('cvc files','*.cvc'),('all files','*.*')),initialdir = path)
