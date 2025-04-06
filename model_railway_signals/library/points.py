@@ -216,8 +216,6 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
     points[str(point_id)]["currentcolour2"] = current_colour1
     current_colour1 = points[str(point_id)]["currentcolour1"]
     current_colour2 = points[str(point_id)]["currentcolour2"]
-    # Get the current override colour (to use later on)
-    override_colour = points[str(point_id)]["overridecolour"]
     # Update the state of the point
     if not points[str(point_id)]["switched"]:
         # Update the state of the point (for SWITCHED)
