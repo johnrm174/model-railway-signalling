@@ -12,6 +12,8 @@
 #    redraw_point_object(object_id) - Redraw the object on the canvas following an update
 #    default_point_object - The dictionary of default values for the object
 #    reset_point_interlocking_tables() - recalculates interlocking tables from scratch
+#    remove_references_to_section(section_id) - remove section_id references from the Point's configuration
+#    update_references_to_section(old_id, new_id) - update section_id references in the Point's configuration
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default application styles for the object
@@ -101,6 +103,8 @@ default_point_object["dccreversed"] = False
 # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Each route element in the list of routes is a boolean value (True or False)
 default_point_object["siginterlock"] = []
+# The interlocked Sections table is a variable length list of Track Section IDs
+default_point_object["sectioninterlock"] = []
 
 #------------------------------------------------------------------------------------
 # Function to recalculate the point interlocking tables for all points
@@ -139,6 +143,34 @@ def reset_point_interlocking_tables():
             if point_interlocked_by_signal:
                 interlocked_signal = [objects_common.schematic_objects[signal_object]["itemid"], interlocked_routes]
                 objects_common.schematic_objects[point_object]["siginterlock"].append(interlocked_signal)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Section ID from the Point's configuration
+# The 'sectioninterlock' table comprises a list of IDs that will lock the point.
+#------------------------------------------------------------------------------------
+
+def remove_references_to_section(section_id:int):
+    for point_id in objects_common.point_index:
+        current_sections_table = objects_common.schematic_objects[objects_common.point(point_id)]["sectioninterlock"]
+        new_sections_table = []
+        for item_id in current_sections_table:
+            if item_id != section_id:
+                new_sections_table.append(item_id)
+        objects_common.schematic_objects[objects_common.point(point_id)]["sectioninterlock"] = new_sections_table
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Section ID from the Point's configuration
+# The 'sectioninterlock' table comprises a list of IDs that will lock the point.
+#------------------------------------------------------------------------------------
+
+def update_references_to_section(old_section_id:int, new_section_id:int):
+    for point_id in objects_common.point_index:
+        current_sections_table = objects_common.schematic_objects[objects_common.point(point_id)]["sectioninterlock"]
+        for index, item_id in enumerate(current_sections_table):
+            if item_id == old_section_id:
+                objects_common.schematic_objects[objects_common.point(point_id)]["sectioninterlock"][index] = new_section_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -305,6 +337,7 @@ def paste_point(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["dccaddress"] = default_point_object["dccaddress"]
     objects_common.schematic_objects[new_object_id]["dccreversed"] = default_point_object["dccreversed"]
     objects_common.schematic_objects[new_object_id]["siginterlock"] = default_point_object["siginterlock"]
+    objects_common.schematic_objects[new_object_id]["sectioninterlock"] = default_point_object["sectioninterlock"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create/draw the new object on the canvas

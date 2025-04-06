@@ -801,6 +801,12 @@ def process_all_point_interlocking():
                              library.subsidary_clear(interlocked_signal[0], library.route_type(index+1)) )):
                         point_locked = True
                         break
+        # The interlocked Sections table is a variable length list of Track Section IDs
+        # The point will be locked if any of these Sections are OCCUPIED
+        for interlocked_section in point_object["sectioninterlock"]:
+            if library.track_sections.section_occupied(interlocked_section):
+                point_locked = True
+        # Lock or unlock the Point as required
         if point_locked: library.lock_point(int_point_id)
         else: library.unlock_point(int_point_id)
         # Lock any Signalbox levers that are linked to the point (point, fpl or both)
@@ -1219,6 +1225,7 @@ def section_updated_callback(section_id:int):
             update_approach_control_status_for_all_signals()
             override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
+    process_all_point_interlocking()
     run_routes.enable_disable_schematic_routes()
     return()
 

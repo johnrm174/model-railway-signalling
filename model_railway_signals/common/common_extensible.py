@@ -4,8 +4,9 @@
 # Provides the following 'extensible' UI elements for the application
 #    signal_route_frame(Tk.LabelFrame) - read only list of signal_route_selections
 #    row_of_widgets(Tk.Frame) - Pass in the base class to create a fixed length row of the base class
-#    row_of_validated_dcc_commands(row_of_widgets) - Similar to above but 'get_values' removes blanks 
-#    row_of_point_settings(row_of_widgets) - Similar to above but 'get_values' removes duplicates and blanks
+#    row_of_validated_dcc_commands(row_of_widgets) - 'get_values' removes blanks
+#    row_of_int_item_id_entry_boxes(row_of_widgets) - 'get_values' removes duplicates and blanks
+#    row_of_point_settings(row_of_widgets) - 'get_values' removes duplicates and blanks
 #    grid_of_widgets(Tk.Frame) - an expandable grid of widgets (pass in the base class)
 #    grid_of_generic_entry_boxes(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks 
 #    grid_of_point_settings(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks
@@ -137,9 +138,6 @@ class row_of_widgets(Tk.Frame):
 
 class row_of_validated_dcc_commands(row_of_widgets):
     def __init__(self, parent_frame, columns:int, **kwargs):
-        # The overridden set_values function will need to know the number of columns as each
-        # validated_dcc_command_entry will need the current item id for validation purposes
-        self.number_of_columns = columns
         super().__init__(parent_frame, common_compound.validated_dcc_command_entry, columns, **kwargs)
         
     def get_values(self):
@@ -150,6 +148,33 @@ class row_of_validated_dcc_commands(row_of_widgets):
         values_to_return = []
         for entered_value in entered_values:
             if entered_value[0] > 0:
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+#------------------------------------------------------------------------------------
+# Class for a (fixed length) row_of_int_item_id_entry_boxes - builds on the row_of_widgets
+# The get_values function is overridden to remove blanks (value=0) and duplicates
+#
+# Main class methods used by the editor are:
+#    "set_values" - will set the intial values from the provided list
+#    "get_values" - will return the last "valid" values in a list
+#    "enable" - will enable all the widgets in the row
+#    "disable" - will disable all the widgets in the row
+#    "validate" - Will validate all entries
+#    "pack" - for packing the UI element
+#------------------------------------------------------------------------------------
+
+class row_of_int_item_id_entry_boxes(row_of_widgets):
+    def __init__(self, parent_frame, columns:int, **kwargs):
+        super().__init__(parent_frame, common_simple.int_item_id_entry_box, columns, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (value=0) or duplicates
+        values_to_return = []
+        for entered_value in entered_values :
+            if entered_value > 0 and entered_value not in values_to_return:
                 values_to_return.append(entered_value)
         return(values_to_return)
 
