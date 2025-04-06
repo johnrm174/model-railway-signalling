@@ -114,6 +114,7 @@ default_settings["styles"]["points"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["points"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["points"]["textfonttuple"] = ("Courier", 8, "")
 default_settings["styles"]["signals"] = {}
+default_settings["styles"]["signals"]["postcolour"] = "White"
 default_settings["styles"]["signals"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["signals"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["signals"]["textfonttuple"] = ("Courier", 8, "")

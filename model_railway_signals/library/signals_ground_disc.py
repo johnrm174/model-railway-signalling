@@ -22,6 +22,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post and base - default = "White"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # Classes and functions used by the other library modules:
@@ -59,6 +60,7 @@ def create_ground_disc_signal (canvas, sig_id:int,
                                active_colour:str="Grey95",
                                selected_colour:str="White",
                                text_colour:str="black",
+                               post_colour:str="black",
                                font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
@@ -82,11 +84,13 @@ def create_ground_disc_signal (canvas, sig_id:int,
                                                 selected_colour = selected_colour,
                                                 text_colour = text_colour,
                                                 font = font)
+        # Get the assigned tag to use for all the signal post elements
+        post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base
         line_coords = common.rotate_line (x,y,0,0,0,-11,orientation)
-        canvas.create_line (line_coords,width=2,tags=canvas_tag)
+        canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
         line_coords = common.rotate_line (x,y,0,-11,5,-11,orientation)
-        canvas.create_line (line_coords,width=2,tags=canvas_tag)
+        canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
         # Draw the White disc of the signal
         oval_coords = common.rotate_line (x,y,+5,-21,+21,-5,orientation)
         canvas.create_oval(oval_coords,fill="white",outline="black",tags=canvas_tag)

@@ -46,7 +46,7 @@ from .signals import update_colour_light_signal
 from .signals import reset_signals_mqtt_configuration
 from .signals import subscribe_to_remote_signals
 from .signals import set_signals_to_publish_state
-from .signals import update_signal_button_styles
+from .signals import update_signal_styles
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
@@ -278,7 +278,7 @@ __all__ = [
         'create_semaphore_signal',
         'create_ground_position_signal',
         'create_ground_disc_signal',
-        'update_signal_button_styles',
+        'update_signal_styles',
       # Public track section types/functions
         'create_section',
         'section_exists',

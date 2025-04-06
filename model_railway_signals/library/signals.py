@@ -152,7 +152,7 @@
 #   update_colour_light_signal(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
 #                 into account the internal state of the signal and displayed aspect of the signal ahead
 #
-#   update_signal_button_styles - Update the styles of the signal buttons
+#   update_signal_styles - Update the general styles of a signal
 #     Mandatory Parameters:
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #     Optional Parameters:
@@ -160,6 +160,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post - default = "white"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # The following API functions are for configuring the pub/sub of Signal events. The functions are called by
@@ -410,6 +411,7 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     # have been assigned to the associated home signal's drawing objects (so this can be used by the 
     # editor for moving the combined signal elements as one).
     main_canvas_tag = "signal"+str(sig_id)
+    signal_post_tag = main_canvas_tag+"post"
     if associated_home > 0: canvas_tag = (main_canvas_tag, "signal"+str(associated_home))
     else: canvas_tag = main_canvas_tag
     # Create the Signal Buttons. If an 'associated_home' has been specified then this represents the
@@ -514,16 +516,18 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["buttonfont"]          = font                   # MANDATORY - The Tkinter button font tuple
     signals[str(sig_id)]["selectedcolour"]      = selected_colour        # MANDATORY - The Tkinter button colours to use
     signals[str(sig_id)]["deselectedcolour"]    = button_colour          # MANDATORY - The Tkinter button colours to use
-    signals[str(sig_id)]["textcolour"]          = text_colour          # MANDATORY - The Tkinter button colours to use
+    signals[str(sig_id)]["textcolour"]          = text_colour            # MANDATORY - The Tkinter button colours to use
     signals[str(sig_id)]["tags"]                = main_canvas_tag        # MANDATORY - Canvas Tags for all drawing objects
+    signals[str(sig_id)]["posttag"]             = signal_post_tag        # MANDATORY - Canvas Tags for all signal post objects
     return(canvas_tag)
 
 # -------------------------------------------------------------------------
-# Public API function to Update the Point Styles
+# Public API function to Update the Signal Styles
 # -------------------------------------------------------------------------
 
-def update_signal_button_styles(signal_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
-                     selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
+def update_signal_styles(signal_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
+                         selected_colour:str="White", text_colour:str="black",
+                         post_colour:str="White", font=("Courier",8,"normal")):
     global signals
     if not isinstance(signal_id, int):
         logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID must be an int")
@@ -548,6 +552,8 @@ def update_signal_button_styles(signal_id:int, button_colour:str="Grey85", activ
         signals[str(signal_id)]["sigbutton"].config(activebackground=active_colour)
         signals[str(signal_id)]["sigbutton"].config(activeforeground=text_colour)
         signals[str(signal_id)]["sigbutton"].config(foreground=text_colour)
+        # Update the signal post styles
+        signals[str(signal_id)]["canvas"].itemconfig(signals[str(signal_id)]["posttag"], fill=post_colour)
         # Store the new values we need to track
         signals[str(signal_id)]["buttonfont"] = font
         signals[str(signal_id)]["selectedcolour"] = selected_colour

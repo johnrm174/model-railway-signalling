@@ -44,6 +44,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post and base - default = "White"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # Classes and functions used by the other library modules:
@@ -103,6 +104,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             active_colour:str="Grey95",
                             selected_colour:str="White",
                             text_colour:str="black",
+                            post_colour:str="white",
                             font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
@@ -155,6 +157,8 @@ def create_semaphore_signal(canvas, sig_id:int,
                                                 selected_colour = selected_colour,
                                                 text_colour = text_colour,
                                                 font = font)
+        # Get the assigned tag to use for all the signal post elements
+        post_tag = signals.signals[str(sig_id)]["posttag"]
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
@@ -181,46 +185,46 @@ def create_semaphore_signal(canvas, sig_id:int,
         # and we therefore only need to add the additional distant arms to the existing posts
         if associated_home == 0:
             line_coords = common.rotate_line(x,y,0,0,0,postoffset,orientation)
-            canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+            canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             line_coords = common.rotate_line(x,y,0,postoffset,+60,postoffset,orientation)
-            canvas.create_line(line_coords,width=3,fill="snow",tags=canvas_tag)
+            canvas.create_line(line_coords,width=3,fill=post_colour,tags=(canvas_tag,post_tag))
             # Draw the rest of the gantry to support other arms as required
             if lh2_signal or lh2_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,lh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if lh2_signal:
                     line_coords = common.rotate_line(x,y,25,lh2offset,55,lh2offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,lh2offset,38,lh2offset,orientation) ##
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if lh1_signal or lh1_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,lh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if lh1_signal:
                     line_coords = common.rotate_line(x,y,25,lh1offset,55,lh1offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,lh1offset,38,lh1offset,orientation) ###
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if rh2_signal or rh2_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,rh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if rh2_signal:
                     line_coords = common.rotate_line(x,y,25,rh2offset,55,rh2offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,rh2offset,38,rh2offset,orientation) ##
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if rh1_signal or rh1_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,rh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if rh1_signal:
                     line_coords = common.rotate_line(x,y,25,rh1offset,55,rh1offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,rh1offset,38,rh1offset,orientation) ##
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
         # set the colour of the signal arm according to the signal type
         if signalsubtype == semaphore_subtype.distant: arm_colour="yellow"
         else: arm_colour = "red"

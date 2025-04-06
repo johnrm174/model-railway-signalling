@@ -22,6 +22,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post and base - default = "White"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # Classes and functions used by the other library modules:
@@ -59,6 +60,7 @@ def create_ground_position_signal(canvas, sig_id:int,
                                   active_colour:str="Grey95",
                                   selected_colour:str="White",
                                   text_colour:str="black",
+                                  post_colour:str="black",
                                   font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)    # Do some basic validation on the parameters we have been given
@@ -83,22 +85,26 @@ def create_ground_position_signal(canvas, sig_id:int,
                                             selected_colour = selected_colour,
                                             text_colour = text_colour,
                                             font = font)
+        # Get the assigned tag to use for all the signal post elements
+        post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base
-        line_coords = common.rotate_line (x,y,0,0,0,-22,orientation)
-        canvas.create_line (line_coords,width=2,tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,0,0,0,-13,orientation)
+        canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
+        line_coords = common.rotate_line (x,y,0,-13,3,-13,orientation)
+        canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
         # Draw the main body of signal
-        point_coords1 = common.rotate_point (x,y,0,-5,orientation) 
-        point_coords2 = common.rotate_point (x,y,0,-22,orientation) 
-        point_coords3 = common.rotate_point (x,y,+15,-22,orientation) 
-        point_coords4 = common.rotate_point (x,y,+15,-16,orientation) 
-        point_coords5 = common.rotate_point (x,y,+5,-5,orientation) 
+        point_coords1 = common.rotate_point (x,y,3,-5,orientation)
+        point_coords2 = common.rotate_point (x,y,3,-22,orientation)
+        point_coords3 = common.rotate_point (x,y,+18,-22,orientation)
+        point_coords4 = common.rotate_point (x,y,+18,-16,orientation)
+        point_coords5 = common.rotate_point (x,y,+8,-5,orientation)
         points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
         canvas.create_polygon (points, outline="black",tags=canvas_tag)
         # Create the position light "dark" aspects (i.e. when particular aspect is "not-lit")
         # We don't need to create a "dark" aspect for the "root" position light as this is always lit
-        oval_coords = common.rotate_line (x,y,+7,-21,+12,-16,orientation)
+        oval_coords = common.rotate_line (x,y,+10,-21,+15,-16,orientation)
         canvas.create_oval (oval_coords,fill="grey",outline="black",tags=canvas_tag)
-        oval_coords = common.rotate_line (x,y,+1,-21,+6,-16,orientation)
+        oval_coords = common.rotate_line (x,y,+4,-21,+9,-16,orientation)
         canvas.create_oval (oval_coords,fill="grey",outline="black",tags=canvas_tag)
         # Draw the "DANGER" and "PROCEED" aspects (initially hidden)
         if signalsubtype in (ground_pos_subtype.early_shunt_ahead,ground_pos_subtype.shunt_ahead):
@@ -109,13 +115,13 @@ def create_ground_position_signal(canvas, sig_id:int,
             root_colour = danger_colour
         else:
             root_colour = "white"
-        line_coords = common.rotate_line (x,y,+1,-14,+6,-9,orientation)
+        line_coords = common.rotate_line (x,y,+4,-14,+9,-9,orientation)
         sigoff1 = canvas.create_oval (line_coords,fill="white",outline="black",state="hidden",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+7,-21,+12,-16,orientation)
+        line_coords = common.rotate_line (x,y,+10,-21,+15,-16,orientation)
         sigoff2 = canvas.create_oval (line_coords,fill="white",outline="black",state="hidden",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+1,-14,+6,-9,orientation)
+        line_coords = common.rotate_line (x,y,+4,-14,+9,-9,orientation)
         sigon1 = canvas.create_oval (line_coords,fill=root_colour,outline="black",state="hidden",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+1,-21,+6,-16,orientation)
+        line_coords = common.rotate_line (x,y,+4,-21,+9,-16,orientation)
         sigon2 = canvas.create_oval (line_coords,fill=danger_colour,outline="black",state="hidden",tags=canvas_tag)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
         signals.signals[str(sig_id)]["sig_subtype"]  = signalsubtype  # Type-specific - Signal Subtype

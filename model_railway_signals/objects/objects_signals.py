@@ -88,6 +88,7 @@ default_signal_object["item"] = objects_common.object_type.signal
 default_signal_object["itemtype"] = library.signal_type.colour_light.value
 default_signal_object["itemsubtype"] = library.signal_subtype.four_aspect.value
 # Styles are initially set to the default styles (defensive programming)
+default_signal_object["postcolour"] = settings.get_style("signals", "postcolour")
 default_signal_object["buttoncolour"] = settings.get_style("signals", "buttoncolour")
 default_signal_object["textcolourtype"] = settings.get_style("signals", "textcolourtype")
 default_signal_object["textfonttuple"] = settings.get_style("signals", "textfonttuple")
@@ -525,6 +526,7 @@ def redraw_signal_object(object_id):
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
                     active_colour = active_colour,
                     selected_colour = selected_colour,
@@ -570,6 +572,7 @@ def redraw_signal_object(object_id):
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
                     active_colour = active_colour,
                     selected_colour = selected_colour,
@@ -602,6 +605,7 @@ def redraw_signal_object(object_id):
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
                     active_colour = active_colour,
                     selected_colour = selected_colour,
@@ -624,6 +628,7 @@ def redraw_signal_object(object_id):
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
                     active_colour = active_colour,
                     selected_colour = selected_colour,
@@ -646,6 +651,7 @@ def redraw_signal_object(object_id):
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                    post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
                     active_colour = active_colour,
                     selected_colour = selected_colour,
@@ -666,6 +672,7 @@ def create_signal(xpos:int, ypos:int, item_type, item_subtype):
     # Assign the next 'free' one-up Item ID
     item_id = objects_common.new_item_id(exists_function=library.signal_exists)
     # Styles for the new object are set to the current default styles
+    objects_common.schematic_objects[object_id]["postcolour"] = settings.get_style("signals", "postcolour")
     objects_common.schematic_objects[object_id]["buttoncolour"] = settings.get_style("signals", "buttoncolour")
     objects_common.schematic_objects[object_id]["textcolourtype"] = settings.get_style("signals", "textcolourtype")
     objects_common.schematic_objects[object_id]["textfonttuple"] = settings.get_style("signals", "textfonttuple")
@@ -752,23 +759,27 @@ def update_signal_styles(object_id, dict_of_new_styles:dict):
     # The text_colour_type is defined as follows: 1=Auto, 2=Black, 3=White
     text_colour_type = objects_common.schematic_objects[object_id]["textcolourtype"]
     text_colour = objects_common.get_text_colour(text_colour_type, selected_colour)
+    # Get the Signal Post colour
+    post_colour = objects_common.schematic_objects[object_id]["postcolour"]
     # Update the styles of the library object
-    library.update_signal_button_styles(
+    library.update_signal_styles(
             signal_id = objects_common.schematic_objects[object_id]["itemid"],
             font = objects_common.schematic_objects[object_id]["textfonttuple"],
             button_colour = button_colour,
             active_colour = active_colour,
             selected_colour = selected_colour,
-            text_colour = text_colour)
+            text_colour = text_colour,
+            post_colour = post_colour)
     # Update the associated distant signal buttons as well
     if has_associated_distant(object_id):
-        library.update_signal_button_styles(
+        library.update_signal_styles(
                 signal_id = objects_common.schematic_objects[object_id]["itemid"] + 1000,
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
                 button_colour = button_colour,
                 active_colour = active_colour,
                 selected_colour = selected_colour,
-                text_colour = text_colour)
+                text_colour = text_colour,
+                post_colour = post_colour)
     # Create/update the selection rectangle for the button
     objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
     return()

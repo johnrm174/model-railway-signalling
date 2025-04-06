@@ -59,9 +59,10 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.2.0.
 > You have been warned!
 
-* New Feature - Ability to interlock points with occupied Track Sections (representing Track Circuits)
-* Improvement - The entire point is highlighted when 'track circuits' are occupied (more prototypical)
-* 
+* New Feature - Ability to interlock points with occupied Track Sections (representing Track Circuits).
+* Improvement - The entire point is highlighted when 'track circuits' are occupied (more prototypical).
+* Improvement - Signals can now be created with or without the 'signal passed' and 'approached' buttons.
+* Styles improvement - You can now specify/change the colour of Signal Posts (individually or globally).
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

@@ -213,9 +213,9 @@ class main_menubar:
                 command=lambda:menubar.edit_section_styles(self.root))
         self.styles_menu.add_command(label =" Point/Route lines...",
                 command=lambda:menubar.edit_route_line_styles(self.root))
-        self.styles_menu.add_command(label =" Point buttons...",
+        self.styles_menu.add_command(label =" Points...",
                 command=lambda:menubar.edit_point_styles(self.root))
-        self.styles_menu.add_command(label =" Signal buttons...",
+        self.styles_menu.add_command(label =" Signals...",
                 command=lambda:menubar.edit_signal_styles(self.root))
         self.styles_menu.add_command(label =" Signalbox levers...",
                 command=lambda:menubar.edit_lever_styles(self.root))

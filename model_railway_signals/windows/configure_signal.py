@@ -885,11 +885,12 @@ class edit_signal:
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
             self.config.settings.set_value(rot)
-            # These are the signal button position offsets:
+            # These are the signal button position offsets and styles:
             hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
             xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
             yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
             self.config.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
+            self.config.postcolour.set_value(objects.schematic_objects[self.object_id]["postcolour"])
             # These elements are for the signal intelocking tab. Note that several of 
             # the elements need the current signal ID to validate the signal entries
             self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"], item_id)
@@ -983,11 +984,12 @@ class edit_signal:
                 rot = self.config.settings.get_value()
                 if rot: new_object_configuration["orientation"] = 180
                 else: new_object_configuration["orientation"] = 0
-                # These are the point button position offsets:
+                # These are the point button position offsets and styles:
                 hidden, xoffset, yoffset = self.config.buttonoffsets.get_values()
                 new_object_configuration["hidebuttons"] = hidden
                 new_object_configuration["xbuttonoffset"] = xoffset
                 new_object_configuration["ybuttonoffset"] = yoffset
+                new_object_configuration["postcolour"] = self.config.postcolour.get_value()
                 # Set the Theatre route indicator flag if that particular radio button is selected
                 if self.config.routetype.get_value() == 3:
                     new_object_configuration["theatreroute"] = True
