@@ -357,9 +357,7 @@ def sig_passed_button_event(sig_id:int):
             common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
         # Reset the approach control 'released' state (if the signal supports approach control).
         # We don't reset the approach control mode  - this needs to be reset from the calling application.
-        if ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light or
-             signals[str(sig_id)]["sigtype"] == signal_type.semaphore ):
-            signals[str(sig_id)]["released"] = False
+        if "released" in signals[str(sig_id)].keys(): signals[str(sig_id)]["released"] = False
         # Make the external callback
         signals[str(sig_id)]['sigpassedcallback'] (sig_id)
     return ()
