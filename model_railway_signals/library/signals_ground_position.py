@@ -14,6 +14,7 @@
 #       sig_passed_callback - the function to call on signal passed events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       slot_with:int - The signal to 'slot' the ground signal with - Defauit = zero (no slotting)
 #       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
 #       button_yoffset:int - Position offset for the point buttons (from default) - default = 0
@@ -52,6 +53,7 @@ def create_ground_position_signal(canvas, sig_id:int,
                                   sig_switched_callback,
                                   sig_passed_callback,
                                   orientation:int=0,
+                                  slot_with:int=0,
                                   sig_passed_button:bool=False,
                                   button_xoffset:int=0,
                                   button_yoffset:int=0,
@@ -124,11 +126,12 @@ def create_ground_position_signal(canvas, sig_id:int,
         line_coords = common.rotate_line (x,y,+4,-21,+9,-16,orientation)
         sigon2 = canvas.create_oval (line_coords,fill=danger_colour,outline="black",state="hidden",tags=canvas_tag)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals.signals[str(sig_id)]["sig_subtype"]  = signalsubtype  # Type-specific - Signal Subtype
-        signals.signals[str(sig_id)]["sigoff1"]      = sigoff1         # Type-specific - drawing object
-        signals.signals[str(sig_id)]["sigoff2"]      = sigoff2         # Type-specific - drawing object
-        signals.signals[str(sig_id)]["sigon1"]       = sigon1          # Type-specific - drawing object
-        signals.signals[str(sig_id)]["sigon2"]       = sigon2          # Type-specific - drawing object
+        signals.signals[str(sig_id)]["subtype"]  = signalsubtype   # Type-specific - Signal Subtype
+        signals.signals[str(sig_id)]["slotwith"] = slot_with       # Type-specific - Main signal to slot with
+        signals.signals[str(sig_id)]["sigoff1"]  = sigoff1         # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sigoff2"]  = sigoff2         # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sigon1"]   = sigon1          # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sigon2"]   = sigon2          # Type-specific - drawing object
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
@@ -153,11 +156,17 @@ def create_ground_position_signal(canvas, sig_id:int,
 # change therefore we don't track the displayed aspect of the signal
 # -------------------------------------------------------------------------
 
-def update_ground_position_signal (sig_id:int):
-    # Establish what the signal should be displaying based on the state
-    if not signals.signals[str(sig_id)]["sigclear"]:
-        if ( signals.signals[str(sig_id)]["sig_subtype"] == ground_pos_subtype.shunt_ahead or
-             signals.signals[str(sig_id)]["sig_subtype"] == ground_pos_subtype.early_shunt_ahead ):
+def update_ground_position_signal(sig_id:int):
+    # If the Ground signal is slotted with a main signal and that signal is not at DANGER
+    # Then the ground signal needs to show PROCEED irrespective of any other state
+    slot_with = str(signals.signals[str(sig_id)]["slotwith"])
+    if slot_with in signals.signals.keys() and signals.signals[str(slot_with)]["sigstate"] != signals.signal_state_type.DANGER:
+        aspect_to_set = signals.signal_state_type.PROCEED
+        log_message = " (signal is slotted with Signal "+slot_with+")"
+    # Otherwise the aspect to display will depend on the state of the signal (ON or OFF)
+    elif not signals.signals[str(sig_id)]["sigclear"]:
+        if ( signals.signals[str(sig_id)]["subtype"] == ground_pos_subtype.shunt_ahead or
+             signals.signals[str(sig_id)]["subtype"] == ground_pos_subtype.early_shunt_ahead ):
             aspect_to_set = signals.signal_state_type.CAUTION
         else:
             aspect_to_set = signals.signal_state_type.DANGER

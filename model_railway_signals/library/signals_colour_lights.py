@@ -427,8 +427,12 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         dcc_control.update_dcc_signal_aspects(sig_id, new_aspect)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        signals.send_mqtt_signal_updated_event(sig_id)            
-
+        signals.send_mqtt_signal_updated_event(sig_id)
+        # Update any slotted ground signals (if the main sig is clear the ground signal needs to show clear)
+        for other_sig_id in signals.signals:
+            if "slotwith" in signals.signals[other_sig_id].keys():
+                if signals.signals[other_sig_id]["slotwith"] == sig_id:
+                    signals.update_signal_aspect(int(other_sig_id))
     return ()
 
 # -------------------------------------------------------------------------

@@ -680,6 +680,11 @@ def update_semaphore_signal(sig_id:int, updating_associated_signal:bool=False):
              signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.PROCEED ):
             logging.info("Signal "+str(sig_id)+": Updating signal state to PROCEED - associated (slotted) distant is now OFF")
             signals.signals[str(sig_id)]["sigstate"] = signals.signal_state_type.PROCEED
+        # Update any slotted ground signals (if the main sig is clear the ground signal needs to show clear)
+        for other_sig_id in signals.signals:
+            if "slotwith" in signals.signals[other_sig_id].keys():
+                if signals.signals[other_sig_id]["slotwith"] == sig_id:
+                    signals.update_signal_aspect(int(other_sig_id))
     return()
 
 # -------------------------------------------------------------------------
