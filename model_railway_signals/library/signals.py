@@ -1256,7 +1256,8 @@ def send_mqtt_signal_updated_event(sig_id:int):
         data = {}
         # The sig state is an enumeration type - so its the VALUE that gets passed in the message
         data["sigstate"] = signals[str(sig_id)]["sigstate"].value
-        log_message = "Signal "+str(sig_id)+": Publishing signal state to MQTT Broker"
+        log_message = ("Signal "+str(sig_id)+": Publishing signal state to MQTT Broker: "+
+                              str(signals[str(sig_id)]["sigstate"]).rpartition('.')[-1] )
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("signal_updated_event",sig_id,data=data,log_message=log_message,retain=True)
         return()
