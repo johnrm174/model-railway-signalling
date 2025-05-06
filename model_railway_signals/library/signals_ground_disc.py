@@ -115,14 +115,11 @@ def create_ground_disc_signal (canvas, sig_id:int,
         # 'sigclear' for ground signals - everything else gets set when the signal is updated
         if loaded_state["override"]: signals.set_signal_override(sig_id)
         if loaded_state["sigclear"]: signals.toggle_signal(sig_id)
-        # Update the signal to show the initial aspect (and send out DCC commands)
+        # Update the signal to display the initial aspect (and publish DCC / MQTT commands for the initial state)
+        # As 'sigstate' is initially set to 'None' on creation, there will always be a state change to do this
         update_ground_disc_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals.lock_signal(sig_id)
-        # Publish the initial state to the broker (for other nodes to consume). Note that changes will
-        # only be published if the MQTT interface has been configured for publishing updates for this 
-        # signal. This allows publish/subscribe to be configured prior to signal creation
-        signals.send_mqtt_signal_updated_event(sig_id)
         # Return the canvas_tag for the tkinter drawing objects
     return(canvas_tag)
 
@@ -155,7 +152,8 @@ def update_ground_disc_signal(sig_id:int):
     else:
         aspect_to_set = signals.signal_state_type.PROCEED
         log_message = " (signal is OFF)"
-    # Only refresh the signal if the aspect has been changed
+    # Only refresh the signal if the aspect has been changed. Note that on creation, the 'sigstate' will
+    # 'None' so there will always be a change to set the aspect and publish DCC commands / MQTT events
     if aspect_to_set != signals.signals[str(sig_id)]["sigstate"]:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
         signals.signals[str(sig_id)]["sigstate"] = aspect_to_set
