@@ -81,8 +81,10 @@ class signal_events_frame(Tk.LabelFrame):
         self.approach = signal_event_frame(self, event_type="Approach", callback=self.validate)
         
     def validate(self):
-        # validate the individual entry boxes first
-        valid = self.passed.validate() and self.approach.validate()
+        # validate BOTH individual entry boxes (to highlight ALL basic validation errors)
+        valid = True
+        if not self.passed.validate(): valid = False
+        if not self.approach.validate(): valid = False
         # validate the entries are not the same
         if valid and self.passed.get_value()[1] !="" and self.approach.get_value()[1] == self.passed.get_value()[1]:
             self.passed.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"

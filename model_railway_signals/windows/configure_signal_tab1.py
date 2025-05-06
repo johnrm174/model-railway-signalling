@@ -165,7 +165,12 @@ class semaphore_route_group():
         else: self.dist.disable0()
 
     def validate(self):
-        return(self.sig.validate() and self.sub.validate() and self.dist.validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.sig.validate(): valid = False
+        if not self.sub.validate(): valid = False
+        if not self.dist.validate(): valid = False
+        return(valid)
     
     def enable_route(self):
         self.sig.enable1()
@@ -256,11 +261,17 @@ class semaphore_signal_arms():
         # set the value and then disable the base tkinter widget (we can't use
         # the disable function as this would also 'blank' the checkbox)
         self.main.sig.CB.set_value(True)
-        self.main.sig.CB.config(state="disabled")
+        self.main.sig.CB.config(disabledforeground="black", state="disabled",)
              
     def validate(self):
-        return(self.main.validate() and self.lh1.validate() and self.lh2.validate()
-                    and self.rh1.validate() and self.rh2.validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return (valid)
 
     def enable_diverging_routes(self):
         self.lh1.enable_route()
@@ -408,13 +419,16 @@ class colour_light_aspects():
         else: self.EB.disable()
         
     def validate(self):
-        return ( self.grn.validate() and
-                 self.red.validate() and
-                 self.ylw.validate() and
-                 self.dylw.validate() and
-                 self.fylw.validate() and
-                 self.fdylw.validate() and
-                 self.EB.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.grn.validate(): valid = False
+        if not self.red.validate(): valid = False
+        if not self.ylw.validate(): valid = False
+        if not self.dylw.validate(): valid = False
+        if not self.fylw.validate(): valid = False
+        if not self.fdylw.validate(): valid = False
+        if not self.EB.validate(): valid = False
+        return(valid)
     
     def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
         # The Colour Light Aspects command sequences are: [grn, red, ylw, dylw, fylw, fdylw]
@@ -523,8 +537,11 @@ class theatre_route_element(common.row_of_validated_dcc_commands):
             else: self.disable()
 
     def validate(self):
-        # Validate the Theatre character EB and all DCC Address EBs
-        return (self.EB.validate() and super().validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.EB.validate(): valid = False
+        if not super().validate(): valid = False
+        return(valid)
                     
     def set_theatre(self,theatre:[str,[[int,bool],]], item_id:int):
         # Each route element comprises: [character, DCC_command_sequence]
@@ -598,13 +615,15 @@ class theatre_route_indications:
         else: self.dark.enable()
 
     def validate(self):
-        # Validate all the Theatre EBs and DCC Address entry boxes for all routes and DARK
-        return ( self.dark.validate() and
-                 self.main.validate() and
-                 self.lh1.validate() and
-                 self.lh2.validate() and
-                 self.rh1.validate() and
-                 self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.dark.validate(): valid = False
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return(valid)
                 
     def set_theatre(self, theatre:[[str,[[int,bool],],],], item_id:int):
         # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
@@ -787,13 +806,15 @@ class feather_route_indications:
         else: self.dark.enable()
 
     def validate(self):
-        # Validate all the DCC Address entry boxes for all routes and DARK
-        return ( self.dark.validate() and
-                 self.main.validate() and
-                 self.lh1.validate() and
-                 self.lh2.validate() and
-                 self.rh1.validate() and
-                 self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.dark.validate(): valid = False
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return(valid)
     
     def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
         # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
@@ -903,7 +924,7 @@ class route_selections():
         self.rh1.pack(side=Tk.LEFT)
         self.rh2 = common.check_box(self.subframe, label="RH2", tool_tip=tool_tip, callback=callback)        
         self.rh2.pack(side=Tk.LEFT)
-        if self.main_signal: self.main.config(state="disabled")
+        if self.main_signal: self.main.config(disabledforeground="Black", state="disabled")
 
     def enable_selection(self):
         if not self.main_signal: self.main.enable()
