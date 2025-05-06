@@ -430,8 +430,8 @@ class edit_logging_settings():
 #------------------------------------------------------------------------------------
 
 class mqtt_configuration_tab():
-    def __init__(self, parent_tab, connect_function):
-        self.connect_function = connect_function
+    def __init__(self, parent_tab, apply_function):
+        self.apply_function = apply_function
         #----------------------------------------------------------------
         # Create a label frame for the Broker configuration
         #----------------------------------------------------------------
@@ -500,13 +500,12 @@ class mqtt_configuration_tab():
             tool_tip="Select to shutdown and exit this application on reciept of a shutdown command published by another node")
         self.subshutdown.pack(padx=2, pady=2)
         #----------------------------------------------------------------
-        # Create the Button to test connectivity and status lable
+        # Create the Button to Apply the settings and connect to the broker
         #----------------------------------------------------------------
-        self.B1 = Tk.Button (parent_tab, text="Test Broker connectivity",command=self.test_connectivity)
+        self.B1 = Tk.Button (parent_tab, text="Apply and Connect", command=self.test_connectivity)
         self.B1.pack(padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, "Will attempt to establish a connection to the broker")
-        self.status = Tk.Label(parent_tab, text="")
-        self.status.pack(padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Apply the configuration settings and initiate broker connection "+
+                                                     "(connection status will be displayed on the main menubar)")
 
     def accept_all_entries(self):
         # Validate the entry_boxes to "accept" the current values
@@ -520,41 +519,10 @@ class mqtt_configuration_tab():
 
     def test_connectivity(self):
         # Validate the entry_boxes to "accept" the current values and focus onto the button
-        self. accept_all_entries()
+        self.accept_all_entries()
         self.B1.focus()
-        # Save the existing settings (as they haven't been "applied" yet)
-        current_url = settings.get_mqtt("url")
-        current_port = settings.get_mqtt("port")
-        current_network = settings.get_mqtt("network")
-        current_node = settings.get_mqtt("node")
-        current_username = settings.get_mqtt("username")
-        current_password = settings.get_mqtt("password")
-        current_debug = settings.get_mqtt("debug")
-        current_startup = settings.get_mqtt("startup")
-        # Apply the new settings (as they currently appear in the UI)
-        settings.set_mqtt("url", self.url.get_value())
-        settings.set_mqtt("port", self.port.get_value())
-        settings.set_mqtt("network", self.network.get_value())
-        settings.set_mqtt("node", self.node.get_value())
-        settings.set_mqtt("username", self.username.get_value())
-        settings.set_mqtt("password", self.password.get_value())
-        settings.set_mqtt("debug", self.debug.get_value())
-        settings.set_mqtt("startup", self.startup.get_value())
-        # The MQTT Connect function will return True if successful
-        # It will also update the Menubar to reflect the MQTT connection status
-        if self.connect_function(show_popup=False):
-            self.status.config(text="MQTT successfully connected", fg="green")
-        else:
-            self.status.config(text="MQTT connection failure", fg="red")
-        # Now restore the existing settings (as they haven't been "applied" yet)
-        settings.set_mqtt("url", current_url)
-        settings.set_mqtt("port", current_port)
-        settings.set_mqtt("network", current_network)
-        settings.set_mqtt("node", current_node)
-        settings.set_mqtt("username", current_username)
-        settings.set_mqtt("password", current_password)
-        settings.set_mqtt("debug", current_debug)
-        settings.set_mqtt("startup", current_startup)
+        # Make the callback to save the current settings and connect to the broker
+        self.apply_function(close_window=False, apply_and_connect=True)
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'Subscribe' Tab
@@ -691,7 +659,7 @@ class mqtt_status_tab():
 edit_mqtt_settings_window = None
 
 class edit_mqtt_settings():
-    def __init__(self, root_window, connect_function, update_function):
+    def __init__(self, root_window, update_function):
         global edit_mqtt_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
         if edit_mqtt_settings_window is not None:
@@ -699,7 +667,6 @@ class edit_mqtt_settings():
             edit_mqtt_settings_window.state('normal')
             edit_mqtt_settings_window.focus_force()
         else:
-            self.connect_function = connect_function
             self.update_function = update_function
             # Create the top level window for editing MQTT settings
             self.window = Tk.Toplevel(root_window)
@@ -725,7 +692,7 @@ class edit_mqtt_settings():
             self.tabs.add(self.tab4, text="Status")
             self.tabs.pack()
             # Create the tabs themselves:
-            self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
+            self.config = mqtt_configuration_tab(self.tab1, self.save_state)
             self.subscribe = mqtt_subscribe_tab(self.tab2)
             self.publish = mqtt_publish_tab(self.tab3)
             self.status = mqtt_status_tab(self.tab4)
@@ -733,8 +700,7 @@ class edit_mqtt_settings():
             self.load_state()
             
     def load_state(self):
-        # Hide the validation error and connection test messages
-        self.config.status.config(text="")
+        # Hide the validation error messag
         self.validation_error.pack_forget()
         # Populate the network configuration tab
         self.config.url.set_value(settings.get_mqtt("url"))
@@ -760,7 +726,7 @@ class edit_mqtt_settings():
         self.publish.instruments.set_values(settings.get_mqtt("pubinstruments"))
         self.publish.sensors.set_values(settings.get_mqtt("pubsensors"))
         
-    def save_state(self, close_window:bool):
+    def save_state(self, close_window:bool, apply_and_connect:bool=False):
         # Validate the entries to "accept" the current values before reading
         self.config.accept_all_entries()
         # Only allow close if valid
@@ -789,8 +755,8 @@ class edit_mqtt_settings():
             settings.set_mqtt("pubsections", self.publish.sections.get_values())
             settings.set_mqtt("pubinstruments", self.publish.instruments.get_values())
             settings.set_mqtt("pubsensors", self.publish.sensors.get_values())
-            # Make the callback to apply the updated settings
-            self.update_function()
+            # Make the callback to apply the updated settings (and connect if required)
+            self.update_function(apply_and_connect)
             # close the window (on OK)
             if close_window: self.close_window()
             else: self.load_state()

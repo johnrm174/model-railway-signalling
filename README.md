@@ -27,6 +27,7 @@ without some of the Raspberry-Pi specific interfacing functions).
 * Provides full prototypical operation of your layout - just like the real thing.
     * Signals can be interlocked with points, other signals and Track Sections ahead.
     * Points are interlocked with the signals that control movements across them.
+    * Points can also be interlocked with Track Sections representing 'track circuits'.
     * Multiple aspect signals will always reflect the state of the signal ahead.
     * Signals can be automated based on the 'occupancy' of Track Sections ahead.
 * Provides "one click" set-up and clear-down routes through your layout:
@@ -60,9 +61,11 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * New Feature - Ability to interlock points with occupied Track Sections (representing Track Circuits).
-* Improvement - The entire point is highlighted when 'track circuits' are occupied (more prototypical).
 * Improvement - Signals can now be created with or without the 'signal passed' and 'approached' buttons.
-* Styles improvement - You can now specify/change the colour of Signal Posts (individually or globally).
+* Improvement - The entire point is highlighted when 'track circuits' are occupied (more prototypical).
+* Improvement - You can now specify/change the colour of Signal Posts (individually or globally).
+* Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
