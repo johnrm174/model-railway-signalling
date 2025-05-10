@@ -60,12 +60,13 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.2.0.
 > You have been warned!
 
-* New Feature - Ability to interlock points with occupied Track Sections (representing Track Circuits).
-* Improvement - Signals can now be created with or without the 'signal passed' and 'approached' buttons.
-* Improvement - The entire point is highlighted when 'track circuits' are occupied (more prototypical).
-* Improvement - You can now specify/change the colour of Signal Posts (individually or globally).
+* New Features to enable more prototypical signal box diagrams/simulations to be created:
+    * Ability to interlock points with occupied Track Sections (representing Track Circuits).
+    * Ability to 'slot' ground signals with co-located main signals (as per the real thing)
+    * Signals can now be created with or without the 'signal passed' and 'approached' buttons.
+    * The entire point is highlighted when 'track circuits' are occupied (more prototypical).
+    * You can now specify/change the colour of Signal Posts (individually or globally).
 * Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load
-
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
