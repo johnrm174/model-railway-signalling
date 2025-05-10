@@ -1,6 +1,9 @@
 #------------------------------------------------------------------------------------
 # Functions and sub Classes for the Edit Signal "Configuration" Tab
 #
+# Accesses the following external editor objects directly:
+#    objects.schematic_objects - To validate signal type
+#
 # Makes the following external API calls to library modules:
 #    library.signal_exists(id) - To see if the signal exists (local)
 #
@@ -11,6 +14,7 @@
 #    common.check_box
 #    common.character_entry_box
 #    common.object_id_selection
+#    common.int_item_id_entry_box
 #    common.selection_buttons
 #    common.button_configuration
 #
@@ -18,6 +22,7 @@
 
 import tkinter as Tk
 
+from .. import objects
 from .. import common
 from .. import library
     
@@ -959,6 +964,40 @@ class route_selections():
                   self.rh2.get_value() ] )
 
 #------------------------------------------------------------------------------------
+# Class for a "slotted signals" UI element for ground signals only. This allows ground
+# signals to be 'slotted' with co-located main signals so the ground signal will be
+# forced to OFF whenever the main signal is OFF (irrespective of its state).
+#------------------------------------------------------------------------------------
+
+class signal_slotting(common.int_item_id_entry_box):
+    def __init__(self, parent_frame):
+        # Create a label frame for the UI element (packed by the calling code)
+        self.frame = Tk.LabelFrame(parent_frame, text="Signal slotting")
+        # We use a subframe to center the selections
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
+        # Create the label and entry box
+        self.label = Tk.Label(self.subframe, text="'Slot' ground signal with main signal:")
+        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+        super().__init__(self.subframe, tool_tip="For ground signals co-located with main signals. "+
+                        "The ground signal will be forced to 'OFF' whenever the main signal is 'OFF' ",
+                        exists_function=library.signal_exists)
+        self.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def validate(self):
+        # Do the basic validation first (does it exist, is it not the current signal ID)
+        valid = super().validate(update_validation_status=False)
+        # Now do the additional validation (is the entered signal a 'Main' Signal type)
+        if valid and self.entry.get() != "" and int(self.entry.get()) > 0:
+            signal_type = objects.schematic_objects[objects.signal(int(self.entry.get()))]["itemtype"]
+            if ( signal_type != library.signal_type.colour_light.value and
+                 signal_type != library.signal_type.semaphore.value ):
+                self.TT.text = "Ground signals should be slotted with 'main' signals"
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+
+#------------------------------------------------------------------------------------
 # Class for the Edit Signal Window Configuration Tab
 # sig_type_updated, sub_type_updated, route_type_updated, route_selections_updated,
 # sig_routes_updated, sub_routes_updated, dist_routes_updated are callback functions
@@ -1018,5 +1057,6 @@ class signal_configuration_tab:
                         "Routes to be controlled by the Subsidary Signal",
                         "Select one or more routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
+        self.slotwith = signal_slotting(parent_tab)
         
 #############################################################################################

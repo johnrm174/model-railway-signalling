@@ -203,7 +203,8 @@ def update_tab1_signal_ui_elements(signal):
     signal.config.feathers.frame.pack_forget()
     signal.config.sig_routes.frame.pack_forget()
     signal.config.sub_routes.frame.pack_forget()
-    # Only pack those elements relevant to the signal type and route type
+    signal.config.slotwith.frame.pack_forget()
+    # Pack the Aspect selection elements according to type (Semaphore or colour light)
     if signal.config.sigtype.get_value() == library.signal_type.colour_light.value:
         signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.sigtype.get_value() == library.signal_type.ground_position.value:
@@ -212,7 +213,8 @@ def update_tab1_signal_ui_elements(signal):
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.sigtype.get_value() == library.signal_type.ground_disc.value:
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
-    # Pack the Route selections according to type
+    # Pack the Route indication UI elements according to the route indication type selected
+    # Route indication type selections are: 1=None, 2=Feathers, 3=Theatre, 4=Route Arms
     if signal.config.routetype.get_value() == 1:
         signal.config.sig_routes.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
@@ -225,10 +227,19 @@ def update_tab1_signal_ui_elements(signal):
         signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
             signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+    # Pack the Signal Slotting UI Element (Ground Signals only)
+    elif signal.config.sigtype.get_value() == library.signal_type.ground_position.value:
+        signal.config.slotwith.frame.pack(padx=2, pady=2, fill='x')
+    elif signal.config.sigtype.get_value() == library.signal_type.ground_disc.value:
+        signal.config.slotwith.frame.pack(padx=2, pady=2, fill='x')
     return()
 
 #------------------------------------------------------------------------------------
 # Update the available signal subtype selections based on the signal type
+# There are a maximum of 5 signal subtypes (0-4) for colour light signals
+# There are a minimum of 2 signal subtypes (0-1) for semaphore Signals
+# Selections 0-1 are therefore always packed (we just change the labels)
+# Selections 2-4 are packed/hidden (and the labels changed) accordingly
 #------------------------------------------------------------------------------------
 
 def update_tab1_signal_subtype_selections(signal):
@@ -881,6 +892,7 @@ class edit_signal:
             self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"], item_id)
             self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
             self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
+            self.config.slotwith.set_value(objects.schematic_objects[self.object_id]["slotwith"], item_id)
             # These are the general settings for the signal
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
@@ -959,6 +971,7 @@ class edit_signal:
             if not self.config.theatre.validate(): valid = False
             if not self.config.feathers.validate(): valid = False
             if not self.config.semaphores.validate(): valid = False
+            if not self.config.slotwith.validate(): valid = False
             if not self.locking.interlocking.validate(): valid = False
             if not self.locking.interlocked_sections.validate(): valid = False
             if not self.locking.conflicting_sigs.validate(): valid = False
@@ -980,6 +993,7 @@ class edit_signal:
                 new_object_configuration["sigarms"] = self.config.semaphores.get_arms()
                 new_object_configuration["sigroutes"] = get_sig_routes(self)
                 new_object_configuration["subroutes"] = get_sub_routes(self)
+                new_object_configuration["slotwith"] = self.config.slotwith.get_value()
                 # These are the general settings for the signal
                 rot = self.config.settings.get_value()
                 if rot: new_object_configuration["orientation"] = 180
