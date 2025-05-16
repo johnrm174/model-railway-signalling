@@ -528,11 +528,11 @@ def update_signal_styles(signal_id:int, button_colour:str="Grey85", active_colou
                          post_colour:str="White", font=("Courier",8,"normal")):
     global signals
     if not isinstance(signal_id, int):
-        logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID must be an int")
+        logging.error("Signal "+str(signal_id)+": update_signal_styles - Signal ID must be an int")
     elif not signal_exists(signal_id):
-        logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID does not exist")
+        logging.error("Signal "+str(signal_id)+": update_signal_styles - Signal ID does not exist")
     else:
-        logging.debug("Signal "+str(signal_id)+": Updating Signal Button Styles")
+        logging.debug("Signal "+str(signal_id)+": Updating Signal Styles")
         # Update the Subsidary Change Button Styles according to the current state
         if signals[str(signal_id)]["subclear"]: signals[str(signal_id)]["subbutton"].config(background=selected_colour)
         else: signals[str(signal_id)]["subbutton"].config(background=button_colour)

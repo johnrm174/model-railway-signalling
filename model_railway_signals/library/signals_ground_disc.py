@@ -145,7 +145,7 @@ def update_ground_disc_signal(sig_id:int):
             aspect_to_set = signals.signal_state_type.DANGER
         log_message = " (signal is ON)"
     elif signals.signals[str(sig_id)]["override"]:
-        if signals.signals[str(sig_id)]["sig_subtype"] == ground_disc_subtype.shunt_ahead:
+        if signals.signals[str(sig_id)]["subtype"] == ground_disc_subtype.shunt_ahead:
             aspect_to_set = signals.signal_state_type.CAUTION
         else:
             aspect_to_set = signals.signal_state_type.DANGER
