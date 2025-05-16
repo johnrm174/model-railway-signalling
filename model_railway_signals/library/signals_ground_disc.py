@@ -111,12 +111,13 @@ def create_ground_disc_signal (canvas, sig_id:int,
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
-        # Set the initial state from the "loaded" state - We only need to set the 'override' and
-        # 'sigclear' for ground signals - everything else gets set when the signal is updated
+        # Update the initial state from the "loaded" state and set the displayed aspect accordingly.
+        # Note that each of the following three function calls will send out DCC commands to the
+        # SPROG and publish MQTT commands on a change of 'sigstate'. As 'sigstate' is initially
+        # set to 'None', there will ALWAYS be at least one state change - this ensures that
+        # MQTT/DCC messages are sent out to reflect the initial state of the signal.
         if loaded_state["override"]: signals.set_signal_override(sig_id)
         if loaded_state["sigclear"]: signals.toggle_signal(sig_id)
-        # Update the signal to display the initial aspect (and publish DCC / MQTT commands for the initial state)
-        # As 'sigstate' is initially set to 'None' on creation, there will always be a state change to do this
         update_ground_disc_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals.lock_signal(sig_id)
@@ -152,8 +153,9 @@ def update_ground_disc_signal(sig_id:int):
     else:
         aspect_to_set = signals.signal_state_type.PROCEED
         log_message = " (signal is OFF)"
-    # Only refresh the signal if the aspect has been changed. Note that on creation, the 'sigstate' will
-    # 'None' so there will always be a change to set the aspect and publish DCC commands / MQTT events
+    # Only refresh the signal if the aspect has been changed. Note that signals are created with
+    # a 'sigstate' of None - so there will always be a change of state on creation to ensure
+    # MQTT/DCC messages are sent out to reflect the post-creation state of the signal.
     if aspect_to_set != signals.signals[str(sig_id)]["sigstate"]:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
         signals.signals[str(sig_id)]["sigstate"] = aspect_to_set
