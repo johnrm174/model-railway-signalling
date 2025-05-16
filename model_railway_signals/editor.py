@@ -684,6 +684,7 @@ class main_menubar:
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
         # The 'examples' flag tells the load_schematic function to open the file load dialog
         # in the example layout files folder (which is now part of the package)
+        logging.info("*************************************************************************************************")
         file_loaded, layout_state = library.load_schematic(filename, examples=examples)
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
@@ -721,7 +722,9 @@ class main_menubar:
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
                     # Delete all existing objects
+                    logging.info("*************************************************************************************************")
                     schematic.delete_all_objects()
+                    logging.info("*************************************************************************************************")
                     settings.set_all(layout_state["settings"])
                     # Set the filename to reflect that actual name of the loaded file
                     settings.set_general("filename", file_loaded)
