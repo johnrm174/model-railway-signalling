@@ -461,6 +461,18 @@ def has_diverging_route_arms(sig_id:int):
     return(has_route_arms)
 
 #-------------------------------------------------------------------
+# Helper function to determine if there is an arm for the specified route
+#-------------------------------------------------------------------
+
+def has_route_arm(sig_id:int, route:signals.route_type):
+    has_route_arm = ( route == signals.route_type.MAIN and signals.signals[str(sig_id)]["main_signal"] is not None or
+                      route == signals.route_type.LH1 and signals.signals[str(sig_id)]["lh1_signal"] is not None or
+                      route == signals.route_type.LH2 and signals.signals[str(sig_id)]["lh2_signal"] is not None or
+                      route == signals.route_type.RH1 and signals.signals[str(sig_id)]["rh1_signal"] is not None or
+                      route == signals.route_type.RH2 and signals.signals[str(sig_id)]["rh2_signal"] is not None )
+    return(has_route_arm)
+
+#-------------------------------------------------------------------
 # Internal Function to update each of the subsidary signal arms supported by
 # a signal to reflect the current state of the subsidary (either ON or OFF)
 # and the route set for the signal (i.e the actual subsidary arm that is changed
@@ -605,7 +617,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 
 def update_semaphore_signal(sig_id:int):
     # Retrieve the current state info (to make the following code more readable)
-    route = signals.signals[str(sig_id)]["routeset"]
+    signal_route = signals.signals[str(sig_id)]["routeset"]
     current_aspect = signals.signals[str(sig_id)]["sigstate"]
     associated_signal = signals.signals[str(sig_id)]["associatedsignal"]
     # Semaphore signals are either HOME or DISTANT signals
@@ -620,19 +632,19 @@ def update_semaphore_signal(sig_id:int):
         elif signals.signals[str(sig_id)]["overcaution"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OVERRIDDEN to CAUTION"
-        elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        elif signals.signals[str(sig_id)]["timedsequence"][signal_route.value].sequence_in_progress:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is on a timed sequence"
         # If the DISTANT signal is associated with a HOME signal then we need to take into account
         # the state of the HOME signal when setting the state (co-located DISTANT signals are 'slotted'
-        # with the HOME signal - if the HOME is at DANGER then the distant is at CAUTION)
+        # with the HOME signal - if the HOME signal is at DANGER then the distant is forced to CAUTION.
         elif associated_signal > 0 and signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.DANGER:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = (" (CAUTION) - signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
         else:
             new_aspect = signals.signal_state_type.PROCEED
             log_message = (" (PROCEED) - signal is OFF - route is set to " +
-                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
+                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
     else:
         # Establish what the HOME signal should be displaying based on the state
         if not signals.signals[str(sig_id)]["sigclear"]:
@@ -641,32 +653,35 @@ def update_semaphore_signal(sig_id:int):
         elif signals.signals[str(sig_id)]["override"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is OVERRIDDEN"
-        elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        elif signals.signals[str(sig_id)]["timedsequence"][signal_route.value].sequence_in_progress:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is on a timed sequence"
         elif signals.signals[str(sig_id)]["releaseonred"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is subject to \'release on red\' approach control"
-        # If the HOME signal is associated with a DISTANT signal then we need to take into account
-        # the state of the DISTANT signal when setting the internal 'sigstate' to ensure any colour
-        # light signals behind this signal display the correct aspect. Note that this won't affect
-        # the state of the HOME signal arm (it will either be ON or OFF as appropriate)
-        elif associated_signal > 0 and signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.CAUTION:
+        # If the HOME signal is associated with a DISTANT signal *AND* the DISTANT signal has a route arm
+        # for the selected route then then we need to take into account the state of the DISTANT signal
+        # when setting the internal 'sigstate' (the signal state could be CAUTION or PROCEED) to ensure
+        # any colour light signals behind the signal display the correct aspect. Note that this won't
+        # affect the state of the HOME signal arm (it will either be ON or OFF as appropriate).
+        elif (associated_signal > 0 and has_route_arm(associated_signal, signal_route) and
+                signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.CAUTION):
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OFF but associated distant "+str(associated_signal)+" is at CAUTION"
-            # Log the new state if we're not goint to get a change of the signal arm
+            # Log the new state if we're not goint to get logging with a change of the signal arm
             if current_aspect == signals.signal_state_type.PROCEED:
                 logging.info("Signal "+str(sig_id)+": Changing signal state to"+log_message)
-        elif associated_signal > 0 and signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.PROCEED:
+        elif (associated_signal > 0 and has_route_arm(associated_signal, signal_route) and
+                signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.PROCEED):
             new_aspect = signals.signal_state_type.PROCEED
             log_message = " (PROCEED) - signal is OFF and associated distant "+str(associated_signal)+" is at PROCEED"
-            # Log the new state if we're not goint to get a change of the signal arm
+            # Log the new state if we're not goint to get logging with a change of the signal arm
             if current_aspect == signals.signal_state_type.CAUTION:
                 logging.info("Signal "+str(sig_id)+": Changing signal state to"+log_message)
         else:
             new_aspect = signals.signal_state_type.PROCEED
             log_message = (" (PROCEED) - signal is OFF - route is set to " +
-                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
+                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
     # Now refresh the displayed aspect (passing in the log message to be displayed) if the aspect has changed
     if new_aspect != current_aspect:
         signals.signals[str(sig_id)]["sigstate"] = new_aspect
