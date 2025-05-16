@@ -67,6 +67,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * The entire point is highlighted when 'track circuits' are occupied (more prototypical).
     * You can now specify/change the colour of Signal Posts (individually or globally).
 * Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load
+* Bugfix - To how signal state is reported for semaphore signals with secondary distant arms
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
