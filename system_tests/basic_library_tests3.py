@@ -1415,11 +1415,11 @@ def run_style_update_tests():
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
                             has_subsidary=True, sig_release_button=True)
     # Update the styles in Run Mode
-    signals.update_signal_button_styles("1", button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+    signals.update_signal_styles("1", button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
-    signals.update_signal_button_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+    signals.update_signal_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
-    signals.update_signal_button_styles(1, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+    signals.update_signal_styles(1, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
     # Test the styles have been updated
     assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
@@ -1445,7 +1445,7 @@ def run_style_update_tests():
     assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
     # Update the styles in Edit Mode
     signals.configure_edit_mode(edit_mode=True)
-    signals.update_signal_button_styles(1, button_colour="Blue4", active_colour="Blue3", selected_colour="Blue2",
+    signals.update_signal_styles(1, button_colour="Blue4", active_colour="Blue3", selected_colour="Blue2",
                                         text_colour="Red", font=("Courier", 9 ,"italic"))
     # Test the styles have been updated
     assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "Red"
