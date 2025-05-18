@@ -588,6 +588,40 @@ def set_all(new_objects):
                     # We convert them back to tuples (primarily to stop the system tests breaking)
                     if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
                         objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
+                    #########################################################################################################
+                    # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
+                    # The 'tracksections' element is now a list comprising: [section_behind, lists_of_sections_ahead]
+                    # The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                    # Each signal_route element comprises a variable length list of track sections: [T1,]
+                    # Note that each signal_route element contains at least one entry (the section directly ahead)
+                    # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
+                    # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
+                    #########################################################################################################
+                    elif new_object_type == objects_common.object_type.signal and element == "tracksections":
+                        new_structure = [0, [ [0], [0], [0], [0], [0]]]
+                        new_structure[0] = new_objects[object_id][element][0]
+                        for index1, route_entry in enumerate(new_objects[object_id][element][1]):
+                            for index2, section in enumerate(route_entry):
+                                if index2 == 0: new_structure[1][index1][0] = section
+                                elif section > 0: new_structure[1][index1].append(section)
+                        objects_common.schematic_objects[object_id][element] = new_structure
+                    #########################################################################################################
+                    # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
+                    # The 'trackinterlock' element now comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                    # Each route element contains a variable length list of interlocked sections for that route [t1,]
+                    # Each entry is the ID of a (local) track section the signal is to be interlocked with
+                    # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+                    # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
+                    #########################################################################################################
+                    elif new_object_type == objects_common.object_type.signal and element == "trackinterlock":
+                        new_structure = [[], [], [], [], []]
+                        for index1, route_entry in enumerate(new_objects[object_id][element]):
+                            for index2, section in enumerate(route_entry):
+                                if section > 0: new_structure[index1].append(section)
+                        objects_common.schematic_objects[object_id][element] = new_structure
+                    #########################################################################################################
+                    # End of code to handle changes in Object data structures
+                    #########################################################################################################
                     else:
                         objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             # Now report any elements missing from the new object - intended to provide a

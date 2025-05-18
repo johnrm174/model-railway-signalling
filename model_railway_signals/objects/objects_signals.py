@@ -159,10 +159,9 @@ default_signal_object["interlockahead"] = False
 # the 'block_id' is the ID of the LOCAL block instrument associated with the signal_route
 default_signal_object["pointinterlock"] = [ [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0] ]
 # The 'trackinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-# Each route element contains a fixed length list of interlocked sections for that route [t1,t2,t3]
-########## TECH DEBT - PLAN TO CHANGE THIS TO USE VARIABLE LENGTH LISTS OF TRACK SECTIONS #################
-# Each entry is the ID of a (loacl) track section the signal is to be interlocked with
-default_signal_object["trackinterlock"] = [ [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0] ]
+# Each route element contains a variable length list of interlocked sections for that route [t1,]
+# Each entry is the ID of a (local) track section the signal is to be interlocked with
+default_signal_object["trackinterlock"] = [ [], [], [], [], [] ]
 # From Release 4.5.0, the default opposing signal interlocking table for a signal
 # comprises a list of route elements [MAIN, LH1, LH2, RH1, RH2]
 # Each route element comprises a variable length list_of_signals [sig1, etc, ]
@@ -180,7 +179,7 @@ default_signal_object["approachsensor"] = [False,""]  # [button, linked track se
 # The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
 # Each signal_route element comprises a variable length list of track sections: [T1,]
 # Note that each signal_route element contains at least one entry (the section directly ahead)
-default_signal_object["tracksections"] = [0, [ [0], [0], [0], [0], [0,]]]
+default_signal_object["tracksections"] = [0, [ [0], [0], [0], [0], [0]]]
 # 'fullyautomatic' (all main signals) - Signal has no control button and will always be 'OFF'
 # 'distautomatic' (associated distant signals only) - Associated distant Signal has no control button
 # 'overrideahead' (sistant signal only) - override distant to CAUTION if any home signals ahead are at DANGER

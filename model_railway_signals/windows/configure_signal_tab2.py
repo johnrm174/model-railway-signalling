@@ -14,6 +14,7 @@
 #    common.str_int_item_id_entry_box
 #    common.signal_route_selections
 #    common.row_of_point_settings
+#    common.row_of_int_item_id_entry_boxes
 #
 #------------------------------------------------------------------------------------
 
@@ -283,48 +284,17 @@ class conflicting_signals_frame():
 #    "validate" - Validates all Entries (Track Section exists on schematic)
 #------------------------------------------------------------------------------------
 
-class interlocked_sections_group:
+class interlocked_sections_group(common.row_of_int_item_id_entry_boxes):
     def __init__(self, parent_frame, label:str):
+        # Create the label frame for the interlocked sections route group
         self.frame = Tk.LabelFrame(parent_frame, text=label)
-        self.frame.pack(side=Tk.LEFT, padx=8, pady=2)
+        self.frame.pack(side=Tk.LEFT, padx=5, pady=2, fill="x", expand=True)
+        # Create a Frame to center everything in
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
         tool_tip = "Specify any track sections along the route that will lock this signal when occupied by another train"
-        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=library.section_exists, tool_tip=tool_tip)
-        self.t1.pack(side = Tk.LEFT)
-        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=library.section_exists, tool_tip=tool_tip)
-        self.t2.pack(side = Tk.LEFT)
-        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=library.section_exists, tool_tip=tool_tip)
-        self.t3.pack(side = Tk.LEFT)
-
-    def validate(self):
-        # Validate everything - to highlight ALL validation failures in the UI
-        valid = True
-        if not self.t1.validate(): valid = False
-        if not self.t2.validate(): valid = False
-        if not self.t3.validate(): valid = False
-        return(valid)
-
-    def enable_route(self):
-        self.t1.enable()
-        self.t2.enable()
-        self.t3.enable()
-
-    def disable_route(self):
-        self.t1.disable()
-        self.t2.disable()
-        self.t3.disable()
-
-    def set_route(self, interlocked_route:[int,int,int]):
-        # An interlocked_route comprises: [t1,t2,t3] Where each element is
-        # the ID of a track section the signal is to be interlocked with
-        self.t1.set_value(interlocked_route[0])
-        self.t2.set_value(interlocked_route[1])
-        self.t3.set_value(interlocked_route[2])
-
-    def get_route(self):
-        # An interlocked_route comprises: [t1,t2,t3] Where each element is
-        # the ID of a track section the signal is to be interlocked with
-        interlocked_route = [ self.t1.get_value(), self.t2.get_value(), self.t3.get_value() ]
-        return(interlocked_route)
+        super().__init__(self.subframe, columns=3, exists_function=library.section_exists, tool_tip=tool_tip)
+        super().pack(padx=2, pady=2, side=Tk.LEFT)
 
 #------------------------------------------------------------------------------------
 # Class for a interlocked track sections frame UI Element
@@ -339,15 +309,12 @@ class interlocked_sections_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = Tk.LabelFrame(parent_frame, text="Interlock with occupied track sections")
-        # Create a subframe to pack everything into so the contents are centered
-        self.subframe = Tk.Frame(self.frame)
-        self.subframe.pack()
         # Create the Interlocked group UI elements (one for each signal route)
-        self.main = interlocked_sections_group(self.subframe, "Main")
-        self.lh1 = interlocked_sections_group(self.subframe, "LH1")
-        self.lh2 = interlocked_sections_group(self.subframe, "LH2")
-        self.rh1 = interlocked_sections_group(self.subframe, "RH1")
-        self.rh2 = interlocked_sections_group(self.subframe, "RH2")
+        self.main = interlocked_sections_group(self.frame, "Main")
+        self.lh1 = interlocked_sections_group(self.frame, "LH1")
+        self.lh2 = interlocked_sections_group(self.frame, "LH2")
+        self.rh1 = interlocked_sections_group(self.frame, "RH1")
+        self.rh2 = interlocked_sections_group(self.frame, "RH2")
 
     def validate(self):
         # Validate everything - to highlight ALL validation failures in the UI
@@ -363,21 +330,21 @@ class interlocked_sections_frame():
         # interlocked_sections comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
         # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
         # Each entry is the ID of a track section the signal is to be interlocked with
-        self.main.set_route(interlocked_sections[0])
-        self.lh1.set_route(interlocked_sections[1])
-        self.lh2.set_route(interlocked_sections[2])
-        self.rh1.set_route(interlocked_sections[3])
-        self.rh2.set_route(interlocked_sections[4])
+        self.main.set_values(interlocked_sections[0])
+        self.lh1.set_values(interlocked_sections[1])
+        self.lh2.set_values(interlocked_sections[2])
+        self.rh1.set_values(interlocked_sections[3])
+        self.rh2.set_values(interlocked_sections[4])
 
     def get_routes(self):
         # Returned list comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
         # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
         # Each entry is the ID of a track section the signal is to be interlocked with
-        return ( [self.main.get_route(),
-                  self.lh1.get_route(),
-                  self.lh2.get_route(),
-                  self.rh1.get_route(),
-                  self.rh2.get_route() ] )
+        return ( [self.main.get_values(),
+                  self.lh1.get_values(),
+                  self.lh2.get_values(),
+                  self.rh1.get_values(),
+                  self.rh2.get_values() ] )
 
 #------------------------------------------------------------------------------------
 # Class for the Distant 'interlock with home signals ahead" ui element
