@@ -105,6 +105,9 @@
 #   signal_exists(sig_id:int/str) - returns true if the Signal object 'exists' (either the Signal
 #                    exists on the local schematic or has been subscribed to via MQTT networking)
 #
+#   update_slotted_signal(sig_id:int, slot_with:int) - Ground signals only - Updates the reference
+#                        to the main signal without having to delete/re-create the ground signal
+#
 #   delete_signal(sig_id:int) - To delete the specified signal from the schematic
 #
 #   set_route(sig_id:int, route, theatre_text) - Set the signal route indication
@@ -681,6 +684,32 @@ def update_subsidary_aspect(sig_id:int):
         signals_colour_lights.update_colour_light_subsidary(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         signals_semaphores.update_semaphore_subsidary_arms(sig_id)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# API function for updating the ID of the signal to be 'slot' the ground signal with. This
+# saves having to delete the ground signal and then create it in its new state. The main
+# use case is  when bulk deleting objects via the schematic editor, where we want to avoid
+# interleaving tkinter 'create' commands in amongst the 'delete' commands outside of the
+# main tkinter loop as this can lead to problems with artefacts persisting on the canvas.
+# ------------------------------------------------------------------------------------------
+
+def update_slotted_signal(sig_id:int, slot_with:int):
+    if not isinstance(sig_id, int) or sig_id < 1:
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - Signal ID must be a positive integer")
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - Signal ID does not exist")
+    elif not isinstance(slot_with, int) or slot_with < 0:
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - 'slotwith' ID must be a positive integer")
+    elif signals[str(sig_id)]["sigtype"] not in (signal_type.ground_position, signal_type.ground_disc):
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - Function not supported by signal type")
+    else:
+        logging.debug("Signal "+str(sig_id)+": Updating slotted signal ID to: "+str(slot_with))
+        signals[str(sig_id)]["slotwith"] = slot_with
+        if signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
+            signals_ground_position.update_ground_position_signal(sig_id)
+        elif signals[str(sig_id)]["sigtype"] == signal_type.ground_disc:
+            signals_ground_disc.update_ground_disc_signal(sig_id)
     return()
 
 # -------------------------------------------------------------------------

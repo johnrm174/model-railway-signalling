@@ -22,6 +22,7 @@ from .signals import ground_disc_subtype
 from .signals import signal_state_type
 from .signals import route_type
 from .signals import signal_exists
+from .signals import update_slotted_signal
 from .signals import delete_signal
 from .signals import set_route
 from .signals import lock_signal
@@ -250,6 +251,7 @@ __all__ = [
         'signal_state_type',
         'route_type',
         'signal_exists',
+        'update_slotted_signal',
         'delete_signal',
         'set_route',
         'lock_signal',

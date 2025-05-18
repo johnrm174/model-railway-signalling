@@ -75,6 +75,8 @@ def create_ground_position_signal(canvas, sig_id:int,
     elif (signalsubtype != ground_pos_subtype.standard and signalsubtype != ground_pos_subtype.shunt_ahead and
           signalsubtype != ground_pos_subtype.early_standard and signalsubtype != ground_pos_subtype.early_shunt_ahead):
         logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
+    elif not isinstance(slot_with, int) or slot_with < 0:
+        logging.error("Signal "+str(sig_id)+": create_signal - 'slotwith' ID must be a positive integer")
     else:  
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
@@ -158,7 +160,7 @@ def update_ground_position_signal(sig_id:int):
     # If the Ground signal is slotted with a main signal and that signal is not at DANGER
     # Then the ground signal needs to show PROCEED irrespective of any other state
     slot_with = str(signals.signals[str(sig_id)]["slotwith"])
-    if slot_with in signals.signals.keys() and signals.signals[str(slot_with)]["sigstate"] != signals.signal_state_type.DANGER:
+    if signals.signal_exists(slot_with) and signals.signals[str(slot_with)]["sigstate"] != signals.signal_state_type.DANGER:
         aspect_to_set = signals.signal_state_type.PROCEED
         log_message = " (signal is slotted with Signal "+slot_with+")"
     # Otherwise the aspect to display will depend on the state of the signal (ON or OFF)

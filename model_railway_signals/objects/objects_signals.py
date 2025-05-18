@@ -59,6 +59,7 @@
 #    library.create_ground_disc_signal - To create the library object (create or redraw)
 #    library.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    library.delete_signal(id) - delete library drawing object (part of soft delete)
+#    library.update_slotted_signal(id,slotted_id) - update the reference to the slotted signal
 #    library.update_signal_button_styles(id,styles) - to change the styles of an existing signal
 #    library.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    library.map_dcc_signal - to create a new DCC mapping for the signal
@@ -256,6 +257,10 @@ def remove_references_to_signal(deleted_sig_id:int):
         for index1, timed_sequence in enumerate(list_of_timed_sequences):
             if timed_sequence[1] == deleted_sig_id:
                 objects_common.schematic_objects[sig_object]["timedsequences"][index1] = [False,0,0,0]
+        # Remove any 'Slot With' references (Ground signals slotted with main signals)
+        if objects_common.schematic_objects[sig_object]["slotwith"] == deleted_sig_id:
+            objects_common.schematic_objects[sig_object]["slotwith"] = 0
+            library.update_slotted_signal(int(signal_id), 0)
     return()
 
 #------------------------------------------------------------------------------------
@@ -293,6 +298,10 @@ def update_references_to_signal(old_sig_id:int, new_sig_id:int):
         for index1, timed_sequence in enumerate(list_of_timed_sequences):
             if timed_sequence[1] == old_sig_id:
                 objects_common.schematic_objects[sig_object]["timedsequences"][index1][1] = new_sig_id
+        # Update any 'Slot With' references (Ground signals slotted with main signals)
+        if objects_common.schematic_objects[sig_object]["slotwith"] == old_sig_id:
+            objects_common.schematic_objects[sig_object]["slotwith"] = new_sig_id
+            library.update_slotted_signal(int(signal_id), new_sig_id)
     return()
 
 #------------------------------------------------------------------------------------
