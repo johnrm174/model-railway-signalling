@@ -91,8 +91,11 @@ def test_menubar_help_windows():
 
 def callback_function():
     print("Received callback that settings have been updated")
-    
-def connect_function(show_popup):
+
+def mqtt_callback_function(apply_and_connect:bool=False):
+    print("Received callback that mqtt settings have been updated - apply_and_connect = ", apply_and_connect)
+
+def sprog_connect_function(show_popup):
     print("Received Connect callback - Show Popup = ",show_popup)
 
 def test_menubar_settings_windows():
@@ -173,8 +176,7 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["mqtt"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_mqtt_settings,
-                                                        connect_function, callback_function))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_mqtt_settings, mqtt_callback_function))
     system_test_harness.sleep(4.0)
     # Check the 'Test broker connectivity' function
     system_test_harness.run_function(lambda:test_mqtt_connectivity())
@@ -196,7 +198,7 @@ def test_menubar_settings_windows():
     initial_settings = copy.deepcopy(settings.settings["sprog"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(menubar.edit_sprog_settings,
-                                                        connect_function, callback_function))
+                                                        sprog_connect_function, callback_function))
     system_test_harness.sleep(4.0)
     # Test the popup help window for the SPROG address offsets
     help_window1 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
