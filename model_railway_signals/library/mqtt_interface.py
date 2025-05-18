@@ -40,7 +40,6 @@
 #         shutdown_callback - Callback to make on reciept of a shutdown message (default = None)
 #
 #   mqtt_broker_connect - Opens a connection to a local or remote MQTT broker
-#                    Returns whether the connection was successful or not (True/False)
 #     Mandatory Parameters:
 #         broker_host:str - The name/IP address of the MQTT broker host to be used
 #     Optional Parameters:
