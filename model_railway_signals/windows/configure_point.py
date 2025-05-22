@@ -315,7 +315,7 @@ class point_interlocking_tab():
         self.sections = common.row_of_int_item_id_entry_boxes(self.frame1, columns=5,
                     tool_tip = "Enter the ID of a Track Section (representing a 'track circuit') which "+
                     "will lock the point when the section is occupied", exists_function=library.section_exists)
-        self.sections.pack()
+        self.sections.pack(padx=2, pady=2)
         # Create the Signals Interlocking (read only) element
         self.signals = common.signal_route_frame(parent_tab, label="Signals interlocked with point",
                                 tool_tip="Edit the appropriate signals to configure interlocking")

@@ -44,7 +44,7 @@ class signal_route_frame(Tk.LabelFrame):
         # all the UI elements and create them again (asthe list may have changed)
         if self.subframe: self.subframe.destroy()
         self.subframe = Tk.Frame(self)
-        self.subframe.pack()
+        self.subframe.pack(padx=2, pady=2)
         self.sigelements = []
         # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
         if sig_interlocking_frame:
