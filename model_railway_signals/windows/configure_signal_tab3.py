@@ -1,6 +1,9 @@
 #------------------------------------------------------------------------------------
 # Functions and sub Classes for the Edit Signal "Automation" Tab
-##
+#
+# Accesses the following external editor objects directly:
+#    objects.schematic_objects - To validate signal type
+#
 # Makes the following external API calls to library modules:
 #    library.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    library.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
@@ -21,6 +24,7 @@ import tkinter as Tk
 
 from .. import common
 from .. import library
+from .. import objects
 
 #------------------------------------------------------------------------------------
 # Class for the Signal Event Frame (sensor ID entry and checkbox for the button)
@@ -295,6 +299,32 @@ class general_settings_frame(Tk.LabelFrame):
                  self.distant_automatic.get_value() )
 
 #------------------------------------------------------------------------------------
+# Class for a "Timed signal" UI element for ground signals only. Builds on the
+# common.int_item_id_entry_box but with additional validation to ensure the
+# selected signal is a 'main' signal type
+#------------------------------------------------------------------------------------
+
+class timed_signal_element(common.int_item_id_entry_box):
+    def __init__(self, parent_frame, callback):
+        super().__init__(parent_frame, allow_empty=False, callback=callback,
+                exists_function=library.signal_exists, tool_tip="Enter the ID of the signal " +
+                        "to trigger.  This can be the current signal or another semaphore / "+
+                        "colour light signal (on the route ahead of the current signal)")
+
+    def validate(self):
+        # Do the basic validation first (does it exist)
+        valid = super().validate(update_validation_status=False)
+        # Now do the additional validation (is the entered signal a 'Main' Signal type)
+        if valid and self.entry.get() != "" and int(self.entry.get()) > 0:
+            signal_type = objects.schematic_objects[objects.signal(int(self.entry.get()))]["itemtype"]
+            if ( signal_type != library.signal_type.colour_light.value and
+                 signal_type != library.signal_type.semaphore.value ):
+                self.TT.text = "Only main semaphore and colour light signals support timed sequences"
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+    
+#------------------------------------------------------------------------------------
 # Class for a Timed signal route frame comprising a route selection checkbox, a
 # signal ID entry box and two integer entry boxes for specifying the timed sequence
 # Public class instance methods provided by this class are 
@@ -322,10 +352,7 @@ class timed_signal_route_element(Tk.Frame):
         self.route.pack(side=Tk.LEFT)
         self.label2 = Tk.Label(self, text="  Signal to trigger:")
         self.label2.pack(side=Tk.LEFT)
-        self.sig = common.int_item_id_entry_box(self, allow_empty=False, callback=self.signal_updated,
-                exists_function=library.signal_exists, tool_tip="Enter the ID of the signal to "+
-                   "trigger. This can be the current signal or another semaphore / colour light "+
-                            "signal (on the route ahead of the current signal)")
+        self.sig = timed_signal_element(self, callback=self.signal_updated)
         self.sig.pack(side=Tk.LEFT)
         self.label3 = Tk.Label(self, text="  Start delay:")
         self.label3.pack(side=Tk.LEFT)

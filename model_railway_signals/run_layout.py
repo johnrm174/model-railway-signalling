@@ -421,21 +421,22 @@ def set_signal_route(int_signal_id:int):
 
 def trigger_timed_signal_sequence(int_signal_id:int):
     signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
-    if library.signal_clear(int_signal_id) and signal_route is not None:
-        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
+    if signal_route is not None:
         # Get the details of the timed signal sequence to initiate
         # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
+        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         trigger_signal = signal_object["timedsequences"][signal_route.value-1][0] 
         int_sig_id_to_trigger = signal_object["timedsequences"][signal_route.value-1][1]
         start_delay = signal_object["timedsequences"][signal_route.value-1][2]
         time_delay = signal_object["timedsequences"][signal_route.value-1][3]
-        # If the signal to trigger is the same as the current signal then we enforce
-        # a start delay of Zero - otherwise, every time the signal changes to RED
-        # (after the start delay) a "signal passed" event will be generated which
-        # would then trigger another timed signal sequence and so on and so on
-        if int_sig_id_to_trigger == int_signal_id: start_delay = 0
-        # Trigger the timed sequence
-        if trigger_signal and int_sig_id_to_trigger !=0:
+        # Only trigger the timed sequence if the signal (to trigger) is clear
+        if trigger_signal and int_sig_id_to_trigger > 0 and library.signal_clear(int_sig_id_to_trigger):
+            # If the signal to trigger is the same as the current signal then we enforce
+            # a start delay of Zero - otherwise, every time the signal changes to RED
+            # (after the start delay) a "signal passed" event will be generated which
+            # would then trigger another timed signal sequence and so on and so on
+            if int_sig_id_to_trigger == int_signal_id: start_delay = 0
+            # Trigger the timed sequence
             library.trigger_timed_signal(int_sig_id_to_trigger, start_delay, time_delay)                
     return()
 
