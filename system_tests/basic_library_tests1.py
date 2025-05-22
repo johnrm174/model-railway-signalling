@@ -837,6 +837,10 @@ def run_mqtt_interface_tests():
     mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", "password1") # success
     time.sleep(5.0)
     assert mqtt_connected
+    # Connect for a second time (this forces a disconnect and re-connect)
+    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", "password1") # success
+    time.sleep(5.0)
+    assert mqtt_connected
     print("Library Tests - mqtt_broker_disconnect (and then re-connect)")
     mqtt_interface.mqtt_broker_disconnect()
     time.sleep(1.0)
