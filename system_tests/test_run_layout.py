@@ -1659,29 +1659,6 @@ def interlock_and_override_on_home_signal_ahead_tests(edit_mode:bool, automation
 # controlled by one signal box can also appear on the signal box diagram of another
 # signal box if it is co-located (and slotted) with a home signal controlled by that box
 #-----------------------------------------------------------------------------------
-# Notes on the expected errors for Signal 23.
-#
-# No signal ahead of Signal 23 for MAIN - Signal 23 reports PROCEED when OFF for MAIN - Correct
-#
-# If a distant signal is specified ahead of Signal 23 on the MAIN route:
-#    - With the signal ahead ON - Signal 23 incorrectly reports CAUTION when OFF for MAIN (Should be PROCEED)
-#    - With the signal ahead OFF - Signal 23 correctly reports PROCEED when OFF for MAIN
-#    - Error only appears in EDIT mode with Automation ON
-#    - Think this is in the Library - Run Layout will be correctly setting the override caution for the distant
-#      'associated with' signal 23 (Which will be Signal 123) based on the state of the distant signal ahead as
-#      the box is ticked in the signal config and this will therefore be applied apply to all routes. Maybe need
-#      to update the library function to 'ignore' override cautions if there is no distant arm for the signal route.
-#
-# If a home signal is specified ahead of Signal 23 on the MAIN route:
-#    - With the signal ahead ON - Signal 23 incorrectly reports CAUTION when OFF for MAIN (Should be PROCEED)
-#    - With the signal ahead OFF - Signal 23 correctly reports PROCEED when OFF for MAIN
-#    - Error only appears in EDIT mode with Automation ON
-#    - Think this is in the Library where the software will be correctly setting override caution for the distant
-#      'associated with' signal 23 (Which will be Signal 123) based on the state of the Home signal ahead as the
-#      box is ticked in the signal config and this will therefore be applied apply to all routes. Maybe need
-#      to update the library function to 'ignore' override cautions if there is no distant arm for the signal route.
-#-----------------------------------------------------------------------------------
-
 
 def override_on_distant_signal_ahead_tests(edit_mode:bool, automation_enabled:bool):
     print("Override automatic secondary distant on distant signal ahead tests")
@@ -1693,8 +1670,7 @@ def override_on_distant_signal_ahead_tests(edit_mode:bool, automation_enabled:bo
     ################################ Run the tests with Signal 7 ON #############################################
     set_signals_off(23)
     if not edit_mode and automation_enabled:
-        print ("Expected Error Line 1857 - Signal 23 - incorrectly displaying CAUTION #####################")
-    assert_signals_PROCEED(23) ############################################################################
+    assert_signals_PROCEED(23)
     set_signals_on(23)
     assert_signals_DANGER(23)
     # diverting route - secondary distant overridden by distant ahead
