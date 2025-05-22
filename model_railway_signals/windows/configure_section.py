@@ -70,6 +70,20 @@ def interlocked_signals(object_id):
     return(list_of_interlocked_signals)
 
 #------------------------------------------------------------------------------------
+# Function to return the read-only interlocked_points element. This is the back-reference
+# to the points that are configured to be interlocked with one or more track sections
+#------------------------------------------------------------------------------------
+
+def interlocked_points(object_id):
+    list_of_interlocked_points = []
+    for point_id in objects.point_index:
+        for interlocked_section in objects.schematic_objects[objects.point(point_id)]["sectioninterlock"]:
+            if interlocked_section == int(objects.schematic_objects[object_id]["itemid"]):
+                list_of_interlocked_points.append(int(point_id))
+    list_of_interlocked_points.sort()
+    return(list_of_interlocked_points)
+
+#------------------------------------------------------------------------------------
 # Helper Function to return the list of available signal routes for the signal ahead
 #------------------------------------------------------------------------------------
 
@@ -258,11 +272,38 @@ class section_configuration_tab():
 # Class for the Track Section Interlocking Tab
 #####################################################################################
 
+class interlocked_points_frame(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        super().__init__(parent_frame, text="Points locked when section occupied")
+        self.frame = None
+
+    def set_values(self, values_to_set:list):
+        # If the lists are not empty (case of "reloading" the config) then destroy
+        # all the UI elements and create them again (asthe list may have changed)
+        if self.frame: self.frame.destroy()
+        self.frame = Tk.Frame(self)
+        self.frame.pack(padx=2, pady=2)
+        self.pointelements = []
+        tool_tip = "Edit the appropriate points to configure interlocking"
+        # values_to_set is a variable length list of point IDs (integers)
+        if values_to_set:
+            for value_to_set in values_to_set:
+                self.pointelements.append(common.entry_box(self.frame, tool_tip=tool_tip, width=3))
+                self.pointelements[-1].pack(side=Tk.LEFT)
+                self.pointelements[-1].set_value(str(value_to_set))
+                self.pointelements[-1].configure(state="disabled")
+        else:
+            self.label = Tk.Label(self.frame, text="Nothing configured")
+            self.label.pack()
+    
+
 class section_interlocking_tab():
     def __init__(self, parent_tab):
         self.signals = common.signal_route_frame(parent_tab, label="Signals locked when section occupied",
                                     tool_tip="Edit the appropriate signals to configure interlocking")
         self.signals.pack(padx=2, pady=2, fill='x')
+        self.points = interlocked_points_frame(parent_tab)
+        self.points.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Class for the main Track Section automation tab
@@ -350,6 +391,7 @@ class edit_section():
             self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
+            self.interlocking.points.set_values(interlocked_points(self.object_id))            
             self.automation.ahead.set_values(signals_ahead(self.object_id))
             signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
             self.automation.behind.set_values(signals_behind)
