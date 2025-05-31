@@ -72,7 +72,7 @@
     "levers": {},
     "objects": {
         "012e8acd-9407-4338-971e-12d19f98ab9e": {
-            "bbox": 3448,
+            "bbox": 3462,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -118,7 +118,7 @@
                 0,
                 0
             ],
-            "bbox": 3454,
+            "bbox": 3468,
             "colour": "black",
             "endx": 100.0,
             "endy": 375.0,
@@ -138,7 +138,7 @@
                 0,
                 0
             ],
-            "bbox": 3460,
+            "bbox": 3474,
             "colour": "black",
             "endx": 900.0,
             "endy": 200.0,
@@ -158,7 +158,7 @@
                 0,
                 0
             ],
-            "bbox": 3466,
+            "bbox": 3480,
             "colour": "black",
             "endx": 800.0,
             "endy": 425.0,
@@ -178,7 +178,7 @@
                 0,
                 0
             ],
-            "bbox": 3472,
+            "bbox": 3486,
             "colour": "black",
             "endx": 50.0,
             "endy": 575.0,
@@ -192,7 +192,7 @@
             "tags": "line65"
         },
         "08bd7aa3-6172-4418-b4fb-c5f8d13a3a63": {
-            "bbox": 3476,
+            "bbox": 3490,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -240,7 +240,7 @@
                 0,
                 0
             ],
-            "bbox": 3482,
+            "bbox": 3496,
             "colour": "black",
             "endx": 525.0,
             "endy": 375.0,
@@ -260,7 +260,7 @@
                 0,
                 0
             ],
-            "bbox": 3488,
+            "bbox": 3502,
             "colour": "black",
             "endx": 825.0,
             "endy": 375.0,
@@ -280,7 +280,7 @@
                 0,
                 0
             ],
-            "bbox": 3494,
+            "bbox": 3508,
             "colour": "black",
             "endx": 1250.0,
             "endy": 200.0,
@@ -300,7 +300,7 @@
                 0,
                 0
             ],
-            "bbox": 3500,
+            "bbox": 3514,
             "colour": "black",
             "endx": 250.0,
             "endy": 175.0,
@@ -320,7 +320,7 @@
                 0,
                 0
             ],
-            "bbox": 3506,
+            "bbox": 3520,
             "colour": "black",
             "endx": 200.0,
             "endy": 375.0,
@@ -334,7 +334,7 @@
             "tags": "line26"
         },
         "0fea6334-0b93-4fcd-bcbc-c580a6c2cc8e": {
-            "bbox": 3510,
+            "bbox": 3524,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -382,7 +382,7 @@
                 0,
                 0
             ],
-            "bbox": 3516,
+            "bbox": 3530,
             "colour": "black",
             "endx": 1250.0,
             "endy": 150.0,
@@ -402,7 +402,7 @@
                 0,
                 0
             ],
-            "bbox": 3522,
+            "bbox": 3536,
             "colour": "black",
             "endx": 150.0,
             "endy": 575.0,
@@ -418,7 +418,7 @@
         "131f1c29-65f4-4af6-8420-271462af5623": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3529,
+            "bbox": 3543,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -435,6 +435,7 @@
             "posx": 1125.0,
             "posy": 600.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point29",
             "textcolourtype": 1,
@@ -447,7 +448,7 @@
             "ybuttonoffset": 0
         },
         "13c86fba-96d2-4c67-94bd-f91a8a5dcd96": {
-            "bbox": 3533,
+            "bbox": 3547,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -493,7 +494,7 @@
                 0,
                 0
             ],
-            "bbox": 3539,
+            "bbox": 3553,
             "colour": "black",
             "endx": 825.0,
             "endy": 425.0,
@@ -509,7 +510,7 @@
         "16f6d440-2829-401f-916d-24f2a8fd74d8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3547,
+            "bbox": 3561,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -526,6 +527,7 @@
             "posx": 300.0,
             "posy": 375.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point4",
             "textcolourtype": 1,
@@ -538,7 +540,7 @@
             "ybuttonoffset": 0
         },
         "18878158-2b7c-4982-9e44-834de20f824b": {
-            "bbox": 3551,
+            "bbox": 3565,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -587,7 +589,7 @@
         "18e60c3e-4c95-4c3d-98a8-54c5c016a005": {
             "alsoswitch": 32,
             "automatic": false,
-            "bbox": 3558,
+            "bbox": 3572,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -604,6 +606,7 @@
             "posx": 850.0,
             "posy": 200.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point33",
             "textcolourtype": 1,
@@ -617,7 +620,7 @@
         },
         "1b80533d-389d-4d7a-92b3-0dc7d58abc45": {
             "background": "grey85",
-            "bbox": 3561,
+            "bbox": 3575,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -641,7 +644,7 @@
                 0,
                 0
             ],
-            "bbox": 3567,
+            "bbox": 3581,
             "colour": "black",
             "endx": 175.0,
             "endy": 525.0,
@@ -657,7 +660,7 @@
         "1f215078-299d-4950-903b-9a76228e19a8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3574,
+            "bbox": 3588,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -674,6 +677,7 @@
             "posx": 1175.0,
             "posy": 425.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point42",
             "textcolourtype": 1,
@@ -692,7 +696,7 @@
                 0,
                 0
             ],
-            "bbox": 3580,
+            "bbox": 3594,
             "colour": "black",
             "endx": 500.0,
             "endy": 325.0,
@@ -708,7 +712,7 @@
         "21bd347b-1210-4a91-802f-8be0c711650a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3587,
+            "bbox": 3601,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -725,6 +729,7 @@
             "posx": 1200.0,
             "posy": 475.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point45",
             "textcolourtype": 1,
@@ -739,7 +744,7 @@
         "235c4b99-057e-4029-aea5-b01b599fcccb": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3595,
+            "bbox": 3609,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -756,6 +761,7 @@
             "posx": 725.0,
             "posy": 375.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point15",
             "textcolourtype": 1,
@@ -769,7 +775,7 @@
         },
         "247cf23e-6255-425e-8fc9-4117033c362a": {
             "background": "grey85",
-            "bbox": 3598,
+            "bbox": 3612,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -788,7 +794,7 @@
         },
         "273d3962-26c9-4909-b389-7131962b5a57": {
             "background": "grey85",
-            "bbox": 3601,
+            "bbox": 3615,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -812,7 +818,7 @@
                 0,
                 0
             ],
-            "bbox": 3607,
+            "bbox": 3621,
             "colour": "black",
             "endx": 700.0,
             "endy": 200.0,
@@ -832,7 +838,7 @@
                 0,
                 0
             ],
-            "bbox": 3613,
+            "bbox": 3627,
             "colour": "black",
             "endx": 1100.0,
             "endy": 200.0,
@@ -847,7 +853,7 @@
         },
         "29137e31-f6b7-4819-87da-ba4508d19a77": {
             "background": "grey85",
-            "bbox": 3616,
+            "bbox": 3630,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -867,7 +873,7 @@
         "292247f0-8cc8-4dd2-b45b-0ef0c26e3e33": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3621,
+            "bbox": 3635,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -884,6 +890,7 @@
             "posx": 850.0,
             "posy": 200.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point36",
             "textcolourtype": 1,
@@ -898,7 +905,7 @@
         "2b8bde9c-7637-4299-a205-31ad6a46e75d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3631,
+            "bbox": 3645,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -915,6 +922,7 @@
             "posx": 100.0,
             "posy": 575.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point5",
             "textcolourtype": 1,
@@ -933,7 +941,7 @@
                 0,
                 0
             ],
-            "bbox": 3637,
+            "bbox": 3651,
             "colour": "black",
             "endx": 75.0,
             "endy": 625.0,
@@ -947,7 +955,7 @@
             "tags": "line55"
         },
         "2e3d2b1b-b596-4be4-a7fc-d5ef8aaf2cde": {
-            "bbox": 3641,
+            "bbox": 3655,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -1010,7 +1018,7 @@
                 0,
                 0
             ],
-            "bbox": 3647,
+            "bbox": 3661,
             "colour": "black",
             "endx": 1150.0,
             "endy": 475.0,
@@ -1025,7 +1033,7 @@
         },
         "32df5739-31c0-4811-a751-b3995f862dc5": {
             "background": "grey85",
-            "bbox": 3650,
+            "bbox": 3664,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1049,7 +1057,7 @@
                 0,
                 0
             ],
-            "bbox": 3656,
+            "bbox": 3670,
             "colour": "black",
             "endx": 250.0,
             "endy": 225.0,
@@ -1065,7 +1073,7 @@
         "35b02f65-7a77-4fea-9c09-a8385b0595e4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3661,
+            "bbox": 3675,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1082,6 +1090,7 @@
             "posx": 725.0,
             "posy": 150.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point26",
             "textcolourtype": 1,
@@ -1100,7 +1109,7 @@
                 0,
                 0
             ],
-            "bbox": 3667,
+            "bbox": 3681,
             "colour": "black",
             "endx": 1325.0,
             "endy": 600.0,
@@ -1120,7 +1129,7 @@
                 0,
                 0
             ],
-            "bbox": 3673,
+            "bbox": 3687,
             "colour": "black",
             "endx": 500.0,
             "endy": 575.0,
@@ -1140,7 +1149,7 @@
                 0,
                 0
             ],
-            "bbox": 3679,
+            "bbox": 3693,
             "colour": "black",
             "endx": 1200.0,
             "endy": 475.0,
@@ -1160,7 +1169,7 @@
                 0,
                 0
             ],
-            "bbox": 3685,
+            "bbox": 3699,
             "colour": "black",
             "endx": 500.0,
             "endy": 325.0,
@@ -1180,7 +1189,7 @@
                 0,
                 0
             ],
-            "bbox": 3691,
+            "bbox": 3705,
             "colour": "black",
             "endx": 725.0,
             "endy": 350.0,
@@ -1196,7 +1205,7 @@
         "41bd2ee1-f703-4536-8d60-8bfa38374130": {
             "alsoswitch": 26,
             "automatic": false,
-            "bbox": 3698,
+            "bbox": 3712,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1213,6 +1222,7 @@
             "posx": 725.0,
             "posy": 200.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point25",
             "textcolourtype": 1,
@@ -1231,7 +1241,7 @@
                 0,
                 0
             ],
-            "bbox": 3704,
+            "bbox": 3718,
             "colour": "black",
             "endx": 200.0,
             "endy": 325.0,
@@ -1247,7 +1257,7 @@
         "49fca724-fda3-44fa-b8e5-800443a78304": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3712,
+            "bbox": 3726,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1264,6 +1274,7 @@
             "posx": 150.0,
             "posy": 375.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point13",
             "textcolourtype": 1,
@@ -1277,7 +1288,7 @@
         },
         "533ace8f-9229-475c-afc8-eb59c7ac9eb0": {
             "background": "grey85",
-            "bbox": 3715,
+            "bbox": 3729,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1297,7 +1308,7 @@
         "535aef80-e3b7-4492-af6e-7831d8a5d1f9": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3725,
+            "bbox": 3739,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1314,6 +1325,7 @@
             "posx": 600.0,
             "posy": 575.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point8",
             "textcolourtype": 1,
@@ -1332,7 +1344,7 @@
                 0,
                 0
             ],
-            "bbox": 3731,
+            "bbox": 3745,
             "colour": "black",
             "endx": 525.0,
             "endy": 625.0,
@@ -1347,7 +1359,7 @@
         },
         "550bf579-44d3-4835-8ccf-3c0d4da10845": {
             "background": "grey85",
-            "bbox": 3734,
+            "bbox": 3748,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1367,7 +1379,7 @@
         "58bee3f2-f694-4f91-a93c-2d7ced3e6842": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3741,
+            "bbox": 3755,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1384,6 +1396,7 @@
             "posx": 1225.0,
             "posy": 425.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point43",
             "textcolourtype": 1,
@@ -1396,7 +1409,7 @@
             "ybuttonoffset": 0
         },
         "59867085-8526-4cc9-ae06-77aa3e18e96c": {
-            "bbox": 3745,
+            "bbox": 3759,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -1444,7 +1457,7 @@
                 0,
                 0
             ],
-            "bbox": 3751,
+            "bbox": 3765,
             "colour": "black",
             "endx": 300.0,
             "endy": 375.0,
@@ -1458,7 +1471,7 @@
             "tags": "line36"
         },
         "5d2fcb58-4cc5-4ae3-9e2e-934713504a80": {
-            "bbox": 3755,
+            "bbox": 3769,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -1498,7 +1511,7 @@
             "tracksensor": 0
         },
         "5f1c6afa-1c7b-4fdb-9a95-b536e5c267b4": {
-            "bbox": 3759,
+            "bbox": 3773,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -1540,7 +1553,7 @@
         "5f52c741-4bf4-4517-a384-8864c71a82dc": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3766,
+            "bbox": 3780,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1557,6 +1570,7 @@
             "posx": 1200.0,
             "posy": 175.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point31",
             "textcolourtype": 1,
@@ -1570,7 +1584,7 @@
         },
         "614b0d05-91fd-4146-981f-e11e9cd47d1b": {
             "background": "grey85",
-            "bbox": 3769,
+            "bbox": 3783,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1590,7 +1604,7 @@
         "62651d8c-eedf-452b-828a-83ea894559ad": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3776,
+            "bbox": 3790,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1607,6 +1621,7 @@
             "posx": 1150.0,
             "posy": 475.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point44",
             "textcolourtype": 1,
@@ -1621,7 +1636,7 @@
         "63610068-f6e1-48d1-afbd-de1e97a2c3d8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3786,
+            "bbox": 3800,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1638,6 +1653,7 @@
             "posx": 250.0,
             "posy": 575.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point1",
             "textcolourtype": 1,
@@ -1656,7 +1672,7 @@
                 0,
                 0
             ],
-            "bbox": 3792,
+            "bbox": 3806,
             "colour": "black",
             "endx": 1250.0,
             "endy": 600.0,
@@ -1676,7 +1692,7 @@
                 0,
                 0
             ],
-            "bbox": 3798,
+            "bbox": 3812,
             "colour": "black",
             "endx": 175.0,
             "endy": 225.0,
@@ -1692,7 +1708,7 @@
         "67811741-acf1-4677-b3cd-b2554e7a1419": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3808,
+            "bbox": 3822,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1709,6 +1725,7 @@
             "posx": 650.0,
             "posy": 575.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point9",
             "textcolourtype": 1,
@@ -1727,7 +1744,7 @@
                 0,
                 0
             ],
-            "bbox": 3814,
+            "bbox": 3828,
             "colour": "black",
             "endx": 175.0,
             "endy": 325.0,
@@ -1743,7 +1760,7 @@
         "6cade9d1-7352-4c04-a373-b88315a99a08": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3824,
+            "bbox": 3838,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1760,6 +1777,7 @@
             "posx": 300.0,
             "posy": 575.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point6",
             "textcolourtype": 1,
@@ -1774,7 +1792,7 @@
         "6f16ec1f-d3a8-4cdf-9964-5e6d9ac67e8c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3831,
+            "bbox": 3845,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1791,6 +1809,7 @@
             "posx": 100.0,
             "posy": 175.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point20",
             "textcolourtype": 1,
@@ -1805,7 +1824,7 @@
         "6f17c5e9-5121-4a3b-8daf-ca175d7763df": {
             "alsoswitch": 36,
             "automatic": false,
-            "bbox": 3838,
+            "bbox": 3852,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1822,6 +1841,7 @@
             "posx": 850.0,
             "posy": 150.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point35",
             "textcolourtype": 1,
@@ -1840,7 +1860,7 @@
                 0,
                 0
             ],
-            "bbox": 3844,
+            "bbox": 3858,
             "colour": "black",
             "endx": 1200.0,
             "endy": 425.0,
@@ -1860,7 +1880,7 @@
                 0,
                 0
             ],
-            "bbox": 3850,
+            "bbox": 3864,
             "colour": "black",
             "endx": 625.0,
             "endy": 375.0,
@@ -1875,7 +1895,7 @@
         },
         "71bab62a-8ea2-42bd-ae29-f0f5c6a99627": {
             "background": "grey85",
-            "bbox": 3853,
+            "bbox": 3867,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1895,7 +1915,7 @@
         "75fd19ff-237d-4415-9fa0-fcb1c96f936b": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3863,
+            "bbox": 3877,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1912,6 +1932,7 @@
             "posx": 500.0,
             "posy": 575.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point10",
             "textcolourtype": 1,
@@ -1930,7 +1951,7 @@
                 0,
                 0
             ],
-            "bbox": 3869,
+            "bbox": 3883,
             "colour": "black",
             "endx": 1175.0,
             "endy": 175.0,
@@ -1950,7 +1971,7 @@
                 0,
                 0
             ],
-            "bbox": 3875,
+            "bbox": 3889,
             "colour": "black",
             "endx": 375.0,
             "endy": 325.0,
@@ -1970,7 +1991,7 @@
                 0,
                 0
             ],
-            "bbox": 3881,
+            "bbox": 3895,
             "colour": "black",
             "endx": 400.0,
             "endy": 325.0,
@@ -1984,7 +2005,7 @@
             "tags": "line38"
         },
         "813448e4-f519-44ee-9bb3-d805867459a0": {
-            "bbox": 3885,
+            "bbox": 3899,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2028,7 +2049,7 @@
         },
         "864b3e09-1ea8-4b12-90ee-48379e0b2788": {
             "background": "grey85",
-            "bbox": 3888,
+            "bbox": 3902,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2048,7 +2069,7 @@
         "86672a6f-f09b-4d1d-bef5-ac6624fd5c0a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3895,
+            "bbox": 3909,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2065,6 +2086,7 @@
             "posx": 100.0,
             "posy": 225.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point19",
             "textcolourtype": 1,
@@ -2083,7 +2105,7 @@
                 0,
                 0
             ],
-            "bbox": 3901,
+            "bbox": 3915,
             "colour": "black",
             "endx": 275.0,
             "endy": 425.0,
@@ -2103,7 +2125,7 @@
                 0,
                 0
             ],
-            "bbox": 3907,
+            "bbox": 3921,
             "colour": "black",
             "endx": 200.0,
             "endy": 525.0,
@@ -2117,7 +2139,7 @@
             "tags": "line56"
         },
         "885ae7a8-0963-4d2d-a0be-49442e59aafc": {
-            "bbox": 3911,
+            "bbox": 3925,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2163,7 +2185,7 @@
                 0,
                 0
             ],
-            "bbox": 3917,
+            "bbox": 3931,
             "colour": "black",
             "endx": 700.0,
             "endy": 325.0,
@@ -2183,7 +2205,7 @@
                 0,
                 0
             ],
-            "bbox": 3923,
+            "bbox": 3937,
             "colour": "black",
             "endx": 75.0,
             "endy": 225.0,
@@ -2203,7 +2225,7 @@
                 0,
                 0
             ],
-            "bbox": 3929,
+            "bbox": 3943,
             "colour": "black",
             "endx": 1250.0,
             "endy": 475.0,
@@ -2219,7 +2241,7 @@
         "8f1bd03a-ce27-48ed-b500-fa59b0a4d69d": {
             "alsoswitch": 28,
             "automatic": false,
-            "bbox": 3936,
+            "bbox": 3950,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2236,6 +2258,7 @@
             "posx": 725.0,
             "posy": 150.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point27",
             "textcolourtype": 1,
@@ -2254,7 +2277,7 @@
                 0,
                 0
             ],
-            "bbox": 3942,
+            "bbox": 3956,
             "colour": "black",
             "endx": 825.0,
             "endy": 150.0,
@@ -2268,7 +2291,7 @@
             "tags": "line15"
         },
         "94071e83-94c1-4ea4-887c-e5379fba006f": {
-            "bbox": 3946,
+            "bbox": 3960,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2314,7 +2337,7 @@
         "9974d0bb-2f63-40d6-a8bc-4863b4b0ccdc": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3954,
+            "bbox": 3968,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2331,6 +2354,7 @@
             "posx": 575.0,
             "posy": 375.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point12",
             "textcolourtype": 1,
@@ -2345,7 +2369,7 @@
         "9b856101-0edb-42db-a000-c556bb804dc0": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3963,
+            "bbox": 3977,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2362,6 +2386,7 @@
             "posx": 100.0,
             "posy": 375.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point14",
             "textcolourtype": 1,
@@ -2375,7 +2400,7 @@
         },
         "9dae74af-842a-439e-a0a3-92b317bfc2da": {
             "background": "",
-            "bbox": 3966,
+            "bbox": 3980,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2395,7 +2420,7 @@
         "9fd94ff2-5098-4cb6-9665-f019caa4a34d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3975,
+            "bbox": 3989,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2412,6 +2437,7 @@
             "posx": 775.0,
             "posy": 375.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point16",
             "textcolourtype": 1,
@@ -2426,7 +2452,7 @@
         "a125c411-cd2a-45bc-8817-b3cc5add29f9": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3984,
+            "bbox": 3998,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2443,6 +2469,7 @@
             "posx": 525.0,
             "posy": 375.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point11",
             "textcolourtype": 1,
@@ -2456,7 +2483,7 @@
         },
         "a1669f45-8007-4d80-a489-4a8a74b01b6e": {
             "background": "grey85",
-            "bbox": 3987,
+            "bbox": 4001,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2474,7 +2501,7 @@
             ]
         },
         "a1fc37d8-6fe2-4cf8-8e01-e5afe52c857d": {
-            "bbox": 3991,
+            "bbox": 4005,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2521,7 +2548,7 @@
         "a289091f-866d-40be-a580-743c9799124d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3998,
+            "bbox": 4012,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2538,6 +2565,7 @@
             "posx": 1150.0,
             "posy": 600.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point30",
             "textcolourtype": 1,
@@ -2551,7 +2579,7 @@
         },
         "a3051485-e8d8-47c0-ab4d-e555913fe104": {
             "background": "grey85",
-            "bbox": 4001,
+            "bbox": 4015,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2575,7 +2603,7 @@
                 0,
                 0
             ],
-            "bbox": 4007,
+            "bbox": 4021,
             "colour": "black",
             "endx": 1250.0,
             "endy": 425.0,
@@ -2589,7 +2617,7 @@
             "tags": "line35"
         },
         "ac34e474-3ca8-449f-b037-9348d2b32ea2": {
-            "bbox": 4011,
+            "bbox": 4025,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2650,7 +2678,7 @@
             "tracksensor": 0
         },
         "af5f77e2-11d7-4a63-b5d4-f089af00db2f": {
-            "bbox": 4015,
+            "bbox": 4029,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2694,7 +2722,7 @@
         "b23e8471-c6a4-469c-8181-712d884a1d47": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4023,
+            "bbox": 4037,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2711,6 +2739,7 @@
             "posx": 1125.0,
             "posy": 175.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point34",
             "textcolourtype": 1,
@@ -2723,7 +2752,7 @@
             "ybuttonoffset": 0
         },
         "b263fa34-c17b-411c-9356-5f42a7ff6af0": {
-            "bbox": 4027,
+            "bbox": 4041,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2772,7 +2801,7 @@
         "b2f6dadf-506c-410f-8641-2028db0b41bb": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4034,
+            "bbox": 4048,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2789,6 +2818,7 @@
             "posx": 200.0,
             "posy": 225.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point22",
             "textcolourtype": 1,
@@ -2803,7 +2833,7 @@
         "b49bb4b9-eeed-4e02-a98b-3cf310a9177b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4039,
+            "bbox": 4053,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2820,6 +2850,7 @@
             "posx": 725.0,
             "posy": 200.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point28",
             "textcolourtype": 1,
@@ -2834,7 +2865,7 @@
         "b4e40068-28a1-4058-86b1-4ed2c35c7a47": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4044,
+            "bbox": 4058,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2851,6 +2882,7 @@
             "posx": 850.0,
             "posy": 150.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point32",
             "textcolourtype": 1,
@@ -2864,7 +2896,7 @@
         },
         "b4f56c10-201d-4e9b-894b-627d0d553070": {
             "background": "grey85",
-            "bbox": 4047,
+            "bbox": 4061,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2882,7 +2914,7 @@
             ]
         },
         "b7974a1e-49e9-4722-83ef-63b4683b0f9d": {
-            "bbox": 4051,
+            "bbox": 4065,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -2932,7 +2964,7 @@
                 0,
                 0
             ],
-            "bbox": 4057,
+            "bbox": 4071,
             "colour": "black",
             "endx": 400.0,
             "endy": 575.0,
@@ -2948,7 +2980,7 @@
         "b9f1c77f-0226-4b52-81fd-fd3d2c5e5c78": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4064,
+            "bbox": 4078,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2965,6 +2997,7 @@
             "posx": 1250.0,
             "posy": 600.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point37",
             "textcolourtype": 1,
@@ -2979,7 +3012,7 @@
         "bcf3e20c-4a84-41b7-9834-ad235f4410ea": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4071,
+            "bbox": 4085,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2996,6 +3029,7 @@
             "posx": 1275.0,
             "posy": 600.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point38",
             "textcolourtype": 1,
@@ -3014,7 +3048,7 @@
                 0,
                 0
             ],
-            "bbox": 4077,
+            "bbox": 4091,
             "colour": "black",
             "endx": 75.0,
             "endy": 175.0,
@@ -3034,7 +3068,7 @@
                 0,
                 0
             ],
-            "bbox": 4083,
+            "bbox": 4097,
             "colour": "black",
             "endx": 900.0,
             "endy": 150.0,
@@ -3054,7 +3088,7 @@
                 0,
                 0
             ],
-            "bbox": 4089,
+            "bbox": 4103,
             "colour": "black",
             "endx": 400.0,
             "endy": 525.0,
@@ -3074,7 +3108,7 @@
                 0,
                 0
             ],
-            "bbox": 4095,
+            "bbox": 4109,
             "colour": "black",
             "endx": 175.0,
             "endy": 175.0,
@@ -3089,7 +3123,7 @@
         },
         "cc28c313-5047-4d05-8340-8e7586b666c6": {
             "background": "grey85",
-            "bbox": 4098,
+            "bbox": 4112,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3107,7 +3141,7 @@
             ]
         },
         "cd265dde-6c1d-4fe6-b428-179f2906c3e4": {
-            "bbox": 4102,
+            "bbox": 4116,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -3156,7 +3190,7 @@
                 0,
                 0
             ],
-            "bbox": 4108,
+            "bbox": 4122,
             "colour": "black",
             "endx": 1100.0,
             "endy": 150.0,
@@ -3171,7 +3205,7 @@
         },
         "d3e48098-3f76-476b-a6b7-4021f7bd5637": {
             "background": "grey85",
-            "bbox": 4111,
+            "bbox": 4125,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3195,7 +3229,7 @@
                 0,
                 0
             ],
-            "bbox": 4117,
+            "bbox": 4131,
             "colour": "black",
             "endx": 425.0,
             "endy": 525.0,
@@ -3215,7 +3249,7 @@
                 0,
                 0
             ],
-            "bbox": 4123,
+            "bbox": 4137,
             "colour": "black",
             "endx": 700.0,
             "endy": 150.0,
@@ -3231,7 +3265,7 @@
         "dae197b5-8a12-414d-b12f-5164d0a6a21d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4130,
+            "bbox": 4144,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3248,6 +3282,7 @@
             "posx": 200.0,
             "posy": 175.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point21",
             "textcolourtype": 1,
@@ -3266,7 +3301,7 @@
                 0,
                 0
             ],
-            "bbox": 4136,
+            "bbox": 4150,
             "colour": "black",
             "endx": 1175.0,
             "endy": 600.0,
@@ -3282,7 +3317,7 @@
         "e0148185-4fe9-4742-a5f8-0a98346691b6": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4145,
+            "bbox": 4159,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3299,6 +3334,7 @@
             "posx": 350.0,
             "posy": 375.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point3",
             "textcolourtype": 1,
@@ -3312,7 +3348,7 @@
         },
         "e06f4afb-ebc7-4351-ba08-a417f1002da1": {
             "background": "grey85",
-            "bbox": 4148,
+            "bbox": 4162,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3336,7 +3372,7 @@
                 0,
                 0
             ],
-            "bbox": 4154,
+            "bbox": 4168,
             "colour": "black",
             "endx": 575.0,
             "endy": 400.0,
@@ -3350,7 +3386,7 @@
             "tags": "line45"
         },
         "e1fc346f-efb4-41c2-977f-609ebd4f90a1": {
-            "bbox": 4158,
+            "bbox": 4172,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -3390,7 +3426,7 @@
             "tracksensor": 0
         },
         "e3620645-ce1d-43f9-a00c-d325986c48e2": {
-            "bbox": 4162,
+            "bbox": 4176,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -3439,7 +3475,7 @@
             "tracksensor": 0
         },
         "e49bd002-0b47-4cd1-a6d8-77dcb30ecdb9": {
-            "bbox": 4166,
+            "bbox": 4180,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -3485,7 +3521,7 @@
         "e5435df4-5e78-4286-b779-f25844c24e52": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4176,
+            "bbox": 4190,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3502,6 +3538,7 @@
             "posx": 450.0,
             "posy": 575.0,
             "reverse": false,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point7",
             "textcolourtype": 1,
@@ -3520,7 +3557,7 @@
                 0,
                 0
             ],
-            "bbox": 4182,
+            "bbox": 4196,
             "colour": "black",
             "endx": 100.0,
             "endy": 600.0,
@@ -3540,7 +3577,7 @@
                 0,
                 0
             ],
-            "bbox": 4188,
+            "bbox": 4202,
             "colour": "black",
             "endx": 1075.0,
             "endy": 600.0,
@@ -3560,7 +3597,7 @@
                 0,
                 0
             ],
-            "bbox": 4194,
+            "bbox": 4208,
             "colour": "black",
             "endx": 725.0,
             "endy": 375.0,
@@ -3575,7 +3612,7 @@
         },
         "e74d0328-d99f-4f04-bf57-8d356f6bed91": {
             "background": "grey85",
-            "bbox": 4197,
+            "bbox": 4211,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3599,7 +3636,7 @@
                 0,
                 0
             ],
-            "bbox": 4203,
+            "bbox": 4217,
             "colour": "black",
             "endx": 525.0,
             "endy": 625.0,
@@ -3614,7 +3651,7 @@
         },
         "ea6b992c-2762-49ae-99c1-c7647ab675af": {
             "background": "grey85",
-            "bbox": 4206,
+            "bbox": 4220,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3638,7 +3675,7 @@
                 0,
                 0
             ],
-            "bbox": 4212,
+            "bbox": 4226,
             "colour": "black",
             "endx": 300.0,
             "endy": 400.0,
@@ -3652,7 +3689,7 @@
             "tags": "line41"
         },
         "ed453b53-bdf4-4520-a145-4cd615ed6c3d": {
-            "bbox": 4216,
+            "bbox": 4230,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "item": "route",
@@ -3723,7 +3760,7 @@
                 0,
                 0
             ],
-            "bbox": 4222,
+            "bbox": 4236,
             "colour": "black",
             "endx": 400.0,
             "endy": 375.0,
@@ -3743,7 +3780,7 @@
                 0,
                 0
             ],
-            "bbox": 4228,
+            "bbox": 4242,
             "colour": "black",
             "endx": 625.0,
             "endy": 425.0,
@@ -3763,7 +3800,7 @@
                 0,
                 0
             ],
-            "bbox": 4234,
+            "bbox": 4248,
             "colour": "black",
             "endx": 825.0,
             "endy": 200.0,
@@ -3778,7 +3815,7 @@
         },
         "f8186a69-c498-4d68-82f2-02346f09c972": {
             "background": "grey85",
-            "bbox": 4237,
+            "bbox": 4251,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3802,7 +3839,7 @@
                 0,
                 0
             ],
-            "bbox": 4243,
+            "bbox": 4257,
             "colour": "black",
             "endx": 1150.0,
             "endy": 425.0,
@@ -3822,7 +3859,7 @@
                 0,
                 0
             ],
-            "bbox": 4249,
+            "bbox": 4263,
             "colour": "black",
             "endx": 100.0,
             "endy": 400.0,
@@ -3842,7 +3879,7 @@
                 0,
                 0
             ],
-            "bbox": 4255,
+            "bbox": 4269,
             "colour": "black",
             "endx": 75.0,
             "endy": 425.0,
@@ -3858,7 +3895,7 @@
         "fe787384-3810-4c9d-864d-8d258e6ee74e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4265,
+            "bbox": 4279,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3875,6 +3912,7 @@
             "posx": 150.0,
             "posy": 575.0,
             "reverse": true,
+            "sectioninterlock": [],
             "siginterlock": [],
             "tags": "point2",
             "textcolourtype": 1,
@@ -4099,7 +4137,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.1.0"
+            "version": "Version 5.2.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -4188,6 +4226,7 @@
             },
             "signals": {
                 "buttoncolour": "Grey85",
+                "postcolour": "White",
                 "textcolourtype": 1,
                 "textfonttuple": [
                     "Courier",

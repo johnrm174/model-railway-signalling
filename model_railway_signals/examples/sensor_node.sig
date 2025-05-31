@@ -6,7 +6,7 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 14950,
+            "bbox": 15821,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -45,7 +45,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.1.0"
+            "version": "Version 5.2.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -236,6 +236,7 @@
             },
             "signals": {
                 "buttoncolour": "Grey85",
+                "postcolour": "White",
                 "textcolourtype": 1,
                 "textfonttuple": [
                     "Courier",

@@ -30,7 +30,7 @@ default_settings = {}
 
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["version"] = "Version 5.1.0"
+default_settings["general"]["version"] = "Version 5.2.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
