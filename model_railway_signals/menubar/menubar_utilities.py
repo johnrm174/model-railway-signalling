@@ -802,9 +802,11 @@ class application_upgrade():
         print("----------------------------------------------------------------------------------------------------------------")
         print("Updating the Model Railway Signalling Application - Do not close the application until the upgrade is complete")
         print("----------------------------------------------------------------------------------------------------------------")
-        subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore", "pip"])
+        subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                             "--break-system-packages", "pip"])
         time.sleep(0.5)
-        subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore", "model-railway-signals"])
+        subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                             "--break-system-packages", "model-railway-signals"])
         time.sleep(0.5)
         print("----------------------------------------------------------------------------------------------------------------")
         print("Application Upgrade process is now complete - Exit and re-open the application to use the new version")
