@@ -43,6 +43,7 @@
 #    menubar.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
 #    menubar.dcc_mappings(root)
 #    menubar.bulk_renumbering(root)
+#    menubar.application_upgrade(root)
 #    menubar.edit_switch_styles(root)
 #    menubar.edit_route_styles(root)
 #    menubar.edit_section_styles(root)
@@ -187,6 +188,8 @@ class main_menubar:
                 command=lambda:menubar.dcc_mappings(self.root))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
+        self.utilities_menu.add_command(label =" Application Upgrade",
+                command=lambda:menubar.application_upgrade(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -274,7 +277,6 @@ class main_menubar:
         # the application with the newly loaded settings (GPIO or MQTT events)
         if args.filename is not None:
             self.root.after(0, self.load_schematic, args.filename)
-            print(args.filename)
 
     # --------------------------------------------------------------------------------------
     # Advanced debugging functions (memory allocation monitoring/reporting)

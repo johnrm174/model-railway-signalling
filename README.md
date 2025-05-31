@@ -66,6 +66,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Signals can now be created with or without the 'signal passed' and 'approached' buttons.
     * The entire point is highlighted when 'track circuits' are occupied (more prototypical).
     * You can now specify/change the colour of Signal Posts (individually or globally).
+* New Application upgrade utility (to make future upgrdes easier for the user)
 * Improved validation for Timed Signal Sequences (can only select main signal types)
 * Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load
 * Bugfix - To how signal state is reported for semaphore signals with secondary distant arms
