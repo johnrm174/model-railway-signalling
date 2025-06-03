@@ -1669,7 +1669,6 @@ def override_on_distant_signal_ahead_tests(edit_mode:bool, automation_enabled:bo
     assert_signals_route_MAIN(23)
     ################################ Run the tests with Signal 7 ON #############################################
     set_signals_off(23)
-    if not edit_mode and automation_enabled:
     assert_signals_PROCEED(23)
     set_signals_on(23)
     assert_signals_DANGER(23)
