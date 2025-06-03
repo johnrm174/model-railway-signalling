@@ -54,6 +54,7 @@ from . import track_sensors
 from . import track_sections
 from . import text_boxes
 from . import block_instruments
+from . import dcc_control
 from . import buttons
 from . import points
 from . import lines
@@ -199,6 +200,16 @@ def mqtt_transmit_all_now_things_should_have_stabilised():
     block_instruments.mqtt_send_all_instrument_states_on_broker_connect()
     track_sections.mqtt_send_all_section_states_on_broker_connect()
     signals.mqtt_send_all_signal_states_on_broker_connect()
+    dcc_control.mqtt_send_all_dcc_command_states_on_broker_connect()
+    return()
+
+#-------------------------------------------------------------------------
+# Function to transmit the current state of all DCC Commands via the
+# Pi-SPROG interface - called following SPROG Connect and DCC Power ON.
+#-------------------------------------------------------------------------
+
+def sprog_transmit_all():
+    dcc_control.sprog_send_all_dcc_command_states_on_sprog_connect()
     return()
 
 #-------------------------------------------------------------------------

@@ -81,6 +81,8 @@ import time
 import logging
 import queue
 
+from . import common
+
 # Global class for the Serial Port (port is configured/opened later)
 serial_port = serial.Serial()
 
@@ -518,6 +520,9 @@ def request_dcc_power_on():
         else: logging.error("Pi-SPROG: Request to turn on Track Power failed")
         # Give things time to get established before sending out any commands
         time.sleep (0.1)
+        # Tell the application to send out any DCC commands that may have been 'issued' before
+        # DCC Power was turned on but not transmitted (as they would have been silently ignored)
+        if ton_response: common.sprog_transmit_all()
     return(ton_response)
 
 #------------------------------------------------------------------------------

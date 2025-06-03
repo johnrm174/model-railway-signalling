@@ -62,14 +62,20 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 * New Features to enable more prototypical signal box diagrams/simulations to be created:
     * Ability to interlock points with occupied Track Sections (representing Track Circuits).
-    * Ability to 'slot' ground signals with co-located main signals (as per the real thing)
+    * Ability to 'slot' ground signals with co-located main signals (as per the real thing).
     * Signals can now be created with or without the 'signal passed' and 'approached' buttons.
     * The entire point is highlighted when 'track circuits' are occupied (more prototypical).
     * You can now specify/change the colour of Signal Posts (individually or globally).
-* New Application upgrade utility (to make future upgrdes easier for the user)
-* Improved validation for Timed Signal Sequences (can only select main signal types)
-* Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load
-* Bugfix - To how signal state is reported for semaphore signals with secondary distant arms
+* Improved DCC interface - Ensures the layout is always updated to reflect the schematic:
+    * Before - DCC commands for events prior to DCC Power being enabled would be dropped.
+    * After - DCC commands are now 'queued' and will be sent out when DCC Power is enabled.
+* Improved Networking - Maintains synchronisation of DCC Command feeds across nodes:
+    * Before - DCC commands for events prior to broker-connect would not be published.
+    * After - DCC commands are now 'queued' and will be published on broker connect.
+* New Application upgrade utility (to make future upgrdes easier for the user).
+* Improved validation for Timed Signal Sequences (can only select main signal types).
+* Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load.
+* Bugfix - To how signal state is reported for semaphore signals with secondary distant arms.
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
