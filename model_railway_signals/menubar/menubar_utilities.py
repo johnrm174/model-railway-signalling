@@ -14,6 +14,7 @@
 #    library.request_dcc_power_off()
 #    library.request_dcc_power_on()
 #    library.get_dcc_address_mappings()
+#    library.gpio_interface_enabled()
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object
@@ -798,26 +799,43 @@ class application_upgrade():
         self.B1.update()
         self.B2.update()
         self.label.update()
-        # Perform the upgrade (with output to the main terminal window)
+        # Perform the upgrade (with output to the main terminal window).
+        # We use the library.gpio_interface_enabled function as a quick and dirty method of
+        # establishing if we are running on a raspberry Pi - otherwise we assume Windows
         print("----------------------------------------------------------------------------------------------------------------")
         print("Updating the Model Railway Signalling Application - Do not close the application until the upgrade is complete")
         print("----------------------------------------------------------------------------------------------------------------")
-        subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                             "--break-system-packages", "pip"])
-        time.sleep(0.5)
-        subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                             "--break-system-packages", "model-railway-signals"])
-        time.sleep(0.5)
-        print("----------------------------------------------------------------------------------------------------------------")
-        print("Application Upgrade process is now complete - Exit and re-open the application to use the new version")
-        print("----------------------------------------------------------------------------------------------------------------")
-        # Re-enable the close button and window close until the upgrade is complete
+        try:
+            if library.gpio_interface_enabled():
+                # Assume raspberry Pi - Install with sudo as a system package
+                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                                     "--break-system-packages", "pip"])
+                time.sleep(0.5)
+                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                                     "--break-system-packages", "model-railway-signals"])
+            else:
+                # Assume Windows platform - Install as a user package
+                result = subprocess.run(["pip", "install", "--upgrade", "pip"], shell=True, capture_output=True)
+                print(result.stdout.decode('utf-8'))
+                time.sleep(0.5)
+                result= subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
+                print(result.stdout.decode('utf-8'))
+        except Exception as exception:
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Upgrade Error - An unhandled exception occured - Try manually upgrading from the Terminal / Command Prompt")
+            print("----------------------------------------------------------------------------------------------------------------")
+            self.label.config(text="An unhandled exception occured\nTry manually upgrading from the Terminal / Cmd Prompt")
+        else:
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Application Upgrade process is now complete - Exit and re-open the application to use the new version")
+            print("----------------------------------------------------------------------------------------------------------------")
+            self.label.config(text="Upgrade process is complete\nExit and re-open the application to use the new version")
+        # Re-enable the close button and window close now the upgrade process is complete
         self.B1.update()
         self.B2.update()
         self.B1.config(state="normal")
         self.B2.config(state="normal")
         self.window.protocol("WM_DELETE_WINDOW", self.close_window)
-        self.label.config(text="Upgrade process is complete\nExit and re-open the application to use the new version")
         self.label.update()
 
     def close_window(self):
