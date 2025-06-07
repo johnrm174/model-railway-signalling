@@ -421,21 +421,22 @@ def set_signal_route(int_signal_id:int):
 
 def trigger_timed_signal_sequence(int_signal_id:int):
     signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
-    if library.signal_clear(int_signal_id) and signal_route is not None:
-        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
+    if signal_route is not None:
         # Get the details of the timed signal sequence to initiate
         # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
+        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         trigger_signal = signal_object["timedsequences"][signal_route.value-1][0] 
         int_sig_id_to_trigger = signal_object["timedsequences"][signal_route.value-1][1]
         start_delay = signal_object["timedsequences"][signal_route.value-1][2]
         time_delay = signal_object["timedsequences"][signal_route.value-1][3]
-        # If the signal to trigger is the same as the current signal then we enforce
-        # a start delay of Zero - otherwise, every time the signal changes to RED
-        # (after the start delay) a "signal passed" event will be generated which
-        # would then trigger another timed signal sequence and so on and so on
-        if int_sig_id_to_trigger == int_signal_id: start_delay = 0
-        # Trigger the timed sequence
-        if trigger_signal and int_sig_id_to_trigger !=0:
+        # Only trigger the timed sequence if the signal (to trigger) is clear
+        if trigger_signal and int_sig_id_to_trigger > 0 and library.signal_clear(int_sig_id_to_trigger):
+            # If the signal to trigger is the same as the current signal then we enforce
+            # a start delay of Zero - otherwise, every time the signal changes to RED
+            # (after the start delay) a "signal passed" event will be generated which
+            # would then trigger another timed signal sequence and so on and so on
+            if int_sig_id_to_trigger == int_signal_id: start_delay = 0
+            # Trigger the timed sequence
             library.trigger_timed_signal(int_sig_id_to_trigger, start_delay, time_delay)                
     return()
 
@@ -801,6 +802,12 @@ def process_all_point_interlocking():
                              library.subsidary_clear(interlocked_signal[0], library.route_type(index+1)) )):
                         point_locked = True
                         break
+        # The interlocked Sections table is a variable length list of Track Section IDs
+        # The point will be locked if any of these Sections are OCCUPIED
+        for interlocked_section in point_object["sectioninterlock"]:
+            if library.track_sections.section_occupied(interlocked_section):
+                point_locked = True
+        # Lock or unlock the Point as required
         if point_locked: library.lock_point(int_point_id)
         else: library.unlock_point(int_point_id)
         # Lock any Signalbox levers that are linked to the point (point, fpl or both)
@@ -1219,6 +1226,7 @@ def section_updated_callback(section_id:int):
             update_approach_control_status_for_all_signals()
             override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
+    process_all_point_interlocking()
     run_routes.enable_disable_schematic_routes()
     return()
 

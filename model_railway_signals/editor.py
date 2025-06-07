@@ -43,6 +43,7 @@
 #    menubar.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
 #    menubar.dcc_mappings(root)
 #    menubar.bulk_renumbering(root)
+#    menubar.application_upgrade(root)
 #    menubar.edit_switch_styles(root)
 #    menubar.edit_route_styles(root)
 #    menubar.edit_section_styles(root)
@@ -187,6 +188,8 @@ class main_menubar:
                 command=lambda:menubar.dcc_mappings(self.root))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
+        self.utilities_menu.add_command(label =" Application Upgrade",
+                command=lambda:menubar.application_upgrade(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -199,7 +202,7 @@ class main_menubar:
         self.settings_menu.add_command(label =" Logging...",
                 command=lambda:menubar.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
-                command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
+                command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_update))
         self.settings_menu.add_command(label =" SPROG...",
                 command=lambda:menubar.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
@@ -213,9 +216,9 @@ class main_menubar:
                 command=lambda:menubar.edit_section_styles(self.root))
         self.styles_menu.add_command(label =" Point/Route lines...",
                 command=lambda:menubar.edit_route_line_styles(self.root))
-        self.styles_menu.add_command(label =" Point buttons...",
+        self.styles_menu.add_command(label =" Points...",
                 command=lambda:menubar.edit_point_styles(self.root))
-        self.styles_menu.add_command(label =" Signal buttons...",
+        self.styles_menu.add_command(label =" Signals...",
                 command=lambda:menubar.edit_signal_styles(self.root))
         self.styles_menu.add_command(label =" Signalbox levers...",
                 command=lambda:menubar.edit_lever_styles(self.root))
@@ -274,7 +277,6 @@ class main_menubar:
         # the application with the newly loaded settings (GPIO or MQTT events)
         if args.filename is not None:
             self.root.after(0, self.load_schematic, args.filename)
-            print(args.filename)
 
     # --------------------------------------------------------------------------------------
     # Advanced debugging functions (memory allocation monitoring/reporting)
@@ -512,46 +514,40 @@ class main_menubar:
         return (self.power_label=="DCC Power:On" and self.sprog_label=="SPROG:Connected")
 
     #------------------------------------------------------------------------------------------
-    # MQTT menubar functions
+    # MQTT menubar functions - The MQTT library module now calls back into the 'update mqtt
+    # menubar controls' function to report connect/disconnect events (rather than waiting for
+    # the connect/disconnect functions to return (with the status)
     #------------------------------------------------------------------------------------------
 
-    def update_mqtt_menubar_controls(self, desired_state:bool, connected:bool, show_popup:bool):
+    def update_mqtt_menubar_controls(self, connected:bool):
         if connected:
             new_label = "MQTT:Connected"
-            if show_popup and connected != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
-                    message="Broker disconnection failure - try rebooting")
         else:
             new_label = "MQTT:Disconnected"
-            if show_popup and connected != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
-                    message="Broker connection failure- Check MQTT settings")
         self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
         self.mqtt_label = new_label
 
-    def mqtt_connect(self, show_popup:bool=True):
+    def mqtt_connect(self):
         url = settings.get_mqtt("url")
         port = settings.get_mqtt("port")
         username = settings.get_mqtt("username")
         password = settings.get_mqtt("password")
-        # The connect request returns True if successful
-        connected = library.mqtt_broker_connect(url, port, username, password)
-        self.update_mqtt_menubar_controls(True, connected, show_popup)
-        return(connected)
-    
-    def mqtt_disconnect(self):
-        # The disconnect request returns True if successful
-        connected = not library.mqtt_broker_disconnect()
-        self.update_mqtt_menubar_controls(False, connected, True)
+        library.mqtt_broker_connect(url, port, broker_username=username, broker_password=password,
+                                        status_callback=self.update_mqtt_menubar_controls)
+        return()
 
-    def mqtt_update(self):
+    def mqtt_disconnect(self):
+        library.mqtt_broker_disconnect()
+
+    def mqtt_update(self, apply_and_connect:bool=False):
         # Clear down the existing Pub/sub configuration
         self.reset_mqtt_pub_sub_configuration()
         # Apply the new signalling network confguration
         self.mqtt_reconfigure_client()
-        # Only reset the broker connection if we are already connected - otherwise 
+        # Only reset the broker connection if we are already connected or if the
+        # user has clicked the "apply and connect" button in the UI - otherwise
         # do nothing (wait until the next time the user attempts to connect)
-        if self.mqtt_label == "MQTT:Connected" : self.mqtt_connect()
+        if apply_and_connect or self.mqtt_label == "MQTT:Connected" : self.mqtt_connect()
         # Reconfigure all publish and subscribe settings
         self.apply_new_mqtt_pub_sub_configuration()
         
@@ -690,6 +686,7 @@ class main_menubar:
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
         # The 'examples' flag tells the load_schematic function to open the file load dialog
         # in the example layout files folder (which is now part of the package)
+        logging.info("*************************************************************************************************")
         file_loaded, layout_state = library.load_schematic(filename, examples=examples)
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
@@ -727,7 +724,9 @@ class main_menubar:
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
                     # Delete all existing objects
+                    logging.info("*************************************************************************************************")
                     schematic.delete_all_objects()
+                    logging.info("*************************************************************************************************")
                     settings.set_all(layout_state["settings"])
                     # Set the filename to reflect that actual name of the loaded file
                     settings.set_general("filename", file_loaded)

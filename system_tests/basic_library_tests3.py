@@ -1415,11 +1415,11 @@ def run_style_update_tests():
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
                             has_subsidary=True, sig_release_button=True)
     # Update the styles in Run Mode
-    signals.update_signal_button_styles("1", button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+    signals.update_signal_styles("1", button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
-    signals.update_signal_button_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+    signals.update_signal_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Does not exist
-    signals.update_signal_button_styles(1, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
+    signals.update_signal_styles(1, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
     # Test the styles have been updated
     assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "White"
@@ -1445,7 +1445,7 @@ def run_style_update_tests():
     assert signals.signals[str(1)]["subbutton"].cget('activebackground') == "Green3"
     # Update the styles in Edit Mode
     signals.configure_edit_mode(edit_mode=True)
-    signals.update_signal_button_styles(1, button_colour="Blue4", active_colour="Blue3", selected_colour="Blue2",
+    signals.update_signal_styles(1, button_colour="Blue4", active_colour="Blue3", selected_colour="Blue2",
                                         text_colour="Red", font=("Courier", 9 ,"italic"))
     # Test the styles have been updated
     assert signals.signals[str(1)]["sigbutton"].cget('foreground') == "Red"
@@ -1614,6 +1614,107 @@ def run_approach_control_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test ground signal 'slotting' with main signals
+#---------------------------------------------------------------------------------------------------------
+
+def color_sig_switched(sig_id:int):
+    signals.update_colour_light_signal(sig_id)
+
+def run_ground_signal_slotting_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    print("Library Tests - Slotting of ground signals with main signals - 4 errors")
+    # Create some main signals (before the ground signals) for this test
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 100,
+                    color_sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    signals.update_colour_light_signal(10)
+    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 100,
+                    sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    # Create the ground signals
+    create_ground_position_signal(canvas, 12, signals.ground_pos_subtype.standard, 100, 150,    # Fail
+                    sig_switched, sig_passed, slot_with="10")
+    create_ground_position_signal(canvas, 12, signals.ground_pos_subtype.standard, 100, 150,    # Fail
+                    sig_switched, sig_passed, slot_with=-10)
+    create_ground_position_signal(canvas, 12, signals.ground_pos_subtype.standard, 100, 150,
+                    sig_switched, sig_passed, slot_with=10)
+    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.standard, 250, 150,       # Fail
+                    sig_switched, sig_passed, slot_with="11")
+    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.standard, 250, 150,       # Fail
+                    sig_switched, sig_passed, slot_with=-11)
+    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.standard, 250, 150,
+                    sig_switched, sig_passed, slot_with=11)
+    create_ground_position_signal(canvas, 14, signals.ground_pos_subtype.standard, 500, 150,
+                    sig_switched, sig_passed, slot_with=16)
+    create_ground_disc_signal(canvas, 15, signals.ground_disc_subtype.standard, 650, 150,
+                    sig_switched, sig_passed, slot_with=17)
+    # Create some main signals (after the ground signals) for this test
+    create_colour_light_signal(canvas, 16, signals.signal_subtype.four_aspect, 500, 100,
+                    color_sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    signals.update_colour_light_signal(16)
+    create_semaphore_signal(canvas, 17, signals.semaphore_subtype.home, 650, 100,
+                    sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
+    # Test the basic signal slotting
+    assert signals.signal_state(12) == signals.signal_state_type.DANGER
+    assert signals.signal_state(13) == signals.signal_state_type.DANGER
+    assert signals.signal_state(14) == signals.signal_state_type.DANGER
+    assert signals.signal_state(15) == signals.signal_state_type.DANGER
+    # Change the main signal to clear - the subsidary should also change to clear
+    signals.signal_button_event(10)
+    assert signals.signal_state(12) == signals.signal_state_type.PROCEED
+    signals.signal_button_event(11)
+    assert signals.signal_state(13) == signals.signal_state_type.PROCEED
+    signals.signal_button_event(16)
+    assert signals.signal_state(14) == signals.signal_state_type.PROCEED
+    signals.signal_button_event(17)
+    assert signals.signal_state(15) == signals.signal_state_type.PROCEED
+    # Change the main signal back to danger - the subsidary should also change back to danger
+    signals.signal_button_event(10)
+    assert signals.signal_state(12) == signals.signal_state_type.DANGER
+    signals.signal_button_event(11)
+    assert signals.signal_state(13) == signals.signal_state_type.DANGER
+    signals.signal_button_event(16)
+    assert signals.signal_state(14) == signals.signal_state_type.DANGER
+    signals.signal_button_event(17)
+    assert signals.signal_state(15) == signals.signal_state_type.DANGER
+    print("Library Tests - Update slotting of ground signals with main signals - 6 errors")
+    # Negative testing of validation
+    signals.update_slotted_signal("12", 10)   # Fail - sig ID not an int
+    signals.update_slotted_signal(-10, 10)    # Fail - sig ID not positive int
+    signals.update_slotted_signal(12, "10")   # Fail - slot_with not an int
+    signals.update_slotted_signal(12, -10)    # Fail - slot_with not positive int
+    signals.update_slotted_signal(10, 16)     # Fail - invalid signal type
+    signals.update_slotted_signal(11, 17)     # Fail - invalid signal type
+    # Positive testing (main signal at DANGER and main signal at PROCEED)
+    signals.signal_button_event(10)
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.DANGER
+    assert signals.signal_state(12) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(13) == signals.signal_state_type.DANGER
+    signals.update_slotted_signal(12, 11)
+    signals.update_slotted_signal(13, 10)
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.DANGER
+    assert signals.signal_state(12) == signals.signal_state_type.DANGER
+    assert signals.signal_state(13) == signals.signal_state_type.PROCEED
+    # Change signals to check all is OK
+    signals.signal_button_event(10)
+    signals.signal_button_event(11)
+    assert signals.signal_state(10) == signals.signal_state_type.DANGER
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(12) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(13) == signals.signal_state_type.DANGER
+    # Clean up
+    signals.delete_signal(10)
+    signals.delete_signal(11)
+    signals.delete_signal(12)
+    signals.delete_signal(13)
+    signals.delete_signal(14)
+    signals.delete_signal(15)
+    signals.delete_signal(16)
+    signals.delete_signal(17)
+    return()
+
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
@@ -1628,6 +1729,7 @@ def run_all_basic_library_tests():
     run_approach_control_tests()
     run_mode_change_tests()
     run_style_update_tests()
+    run_ground_signal_slotting_tests()
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(signals.signals) == 0
     # Check the creation of all supported Signal configurations

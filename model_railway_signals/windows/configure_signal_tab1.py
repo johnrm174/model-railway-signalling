@@ -1,6 +1,9 @@
 #------------------------------------------------------------------------------------
 # Functions and sub Classes for the Edit Signal "Configuration" Tab
 #
+# Accesses the following external editor objects directly:
+#    objects.schematic_objects - To validate signal type
+#
 # Makes the following external API calls to library modules:
 #    library.signal_exists(id) - To see if the signal exists (local)
 #
@@ -11,6 +14,7 @@
 #    common.check_box
 #    common.character_entry_box
 #    common.object_id_selection
+#    common.int_item_id_entry_box
 #    common.selection_buttons
 #    common.button_configuration
 #
@@ -18,6 +22,7 @@
 
 import tkinter as Tk
 
+from .. import objects
 from .. import common
 from .. import library
     
@@ -165,7 +170,12 @@ class semaphore_route_group():
         else: self.dist.disable0()
 
     def validate(self):
-        return(self.sig.validate() and self.sub.validate() and self.dist.validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.sig.validate(): valid = False
+        if not self.sub.validate(): valid = False
+        if not self.dist.validate(): valid = False
+        return(valid)
     
     def enable_route(self):
         self.sig.enable1()
@@ -256,11 +266,17 @@ class semaphore_signal_arms():
         # set the value and then disable the base tkinter widget (we can't use
         # the disable function as this would also 'blank' the checkbox)
         self.main.sig.CB.set_value(True)
-        self.main.sig.CB.config(state="disabled")
+        self.main.sig.CB.config(disabledforeground="black", state="disabled",)
              
     def validate(self):
-        return(self.main.validate() and self.lh1.validate() and self.lh2.validate()
-                    and self.rh1.validate() and self.rh2.validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return (valid)
 
     def enable_diverging_routes(self):
         self.lh1.enable_route()
@@ -408,13 +424,16 @@ class colour_light_aspects():
         else: self.EB.disable()
         
     def validate(self):
-        return ( self.grn.validate() and
-                 self.red.validate() and
-                 self.ylw.validate() and
-                 self.dylw.validate() and
-                 self.fylw.validate() and
-                 self.fdylw.validate() and
-                 self.EB.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.grn.validate(): valid = False
+        if not self.red.validate(): valid = False
+        if not self.ylw.validate(): valid = False
+        if not self.dylw.validate(): valid = False
+        if not self.fylw.validate(): valid = False
+        if not self.fdylw.validate(): valid = False
+        if not self.EB.validate(): valid = False
+        return(valid)
     
     def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
         # The Colour Light Aspects command sequences are: [grn, red, ylw, dylw, fylw, fdylw]
@@ -523,8 +542,11 @@ class theatre_route_element(common.row_of_validated_dcc_commands):
             else: self.disable()
 
     def validate(self):
-        # Validate the Theatre character EB and all DCC Address EBs
-        return (self.EB.validate() and super().validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.EB.validate(): valid = False
+        if not super().validate(): valid = False
+        return(valid)
                     
     def set_theatre(self,theatre:[str,[[int,bool],]], item_id:int):
         # Each route element comprises: [character, DCC_command_sequence]
@@ -598,13 +620,15 @@ class theatre_route_indications:
         else: self.dark.enable()
 
     def validate(self):
-        # Validate all the Theatre EBs and DCC Address entry boxes for all routes and DARK
-        return ( self.dark.validate() and
-                 self.main.validate() and
-                 self.lh1.validate() and
-                 self.lh2.validate() and
-                 self.rh1.validate() and
-                 self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.dark.validate(): valid = False
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return(valid)
                 
     def set_theatre(self, theatre:[[str,[[int,bool],],],], item_id:int):
         # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
@@ -787,13 +811,15 @@ class feather_route_indications:
         else: self.dark.enable()
 
     def validate(self):
-        # Validate all the DCC Address entry boxes for all routes and DARK
-        return ( self.dark.validate() and
-                 self.main.validate() and
-                 self.lh1.validate() and
-                 self.lh2.validate() and
-                 self.rh1.validate() and
-                 self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.dark.validate(): valid = False
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return(valid)
     
     def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
         # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
@@ -903,7 +929,7 @@ class route_selections():
         self.rh1.pack(side=Tk.LEFT)
         self.rh2 = common.check_box(self.subframe, label="RH2", tool_tip=tool_tip, callback=callback)        
         self.rh2.pack(side=Tk.LEFT)
-        if self.main_signal: self.main.config(state="disabled")
+        if self.main_signal: self.main.config(disabledforeground="Black", state="disabled")
 
     def enable_selection(self):
         if not self.main_signal: self.main.enable()
@@ -936,6 +962,40 @@ class route_selections():
                   self.lh2.get_value(),
                   self.rh1.get_value(),
                   self.rh2.get_value() ] )
+
+#------------------------------------------------------------------------------------
+# Class for a "slotted signals" UI element for ground signals only. This allows ground
+# signals to be 'slotted' with co-located main signals so the ground signal will be
+# forced to OFF whenever the main signal is OFF (irrespective of its state).
+#------------------------------------------------------------------------------------
+
+class signal_slotting(common.int_item_id_entry_box):
+    def __init__(self, parent_frame):
+        # Create a label frame for the UI element (packed by the calling code)
+        self.frame = Tk.LabelFrame(parent_frame, text="Signal slotting")
+        # We use a subframe to center the selections
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
+        # Create the label and entry box
+        self.label = Tk.Label(self.subframe, text="'Slot' ground signal with main signal:")
+        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+        super().__init__(self.subframe, tool_tip="For ground signals co-located with main signals. "+
+                        "The ground signal will be forced to 'OFF' whenever the main signal is 'OFF' ",
+                        exists_function=library.signal_exists)
+        self.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def validate(self):
+        # Do the basic validation first (does it exist, is it not the current signal ID)
+        valid = super().validate(update_validation_status=False)
+        # Now do the additional validation (is the entered signal a 'Main' Signal type)
+        if valid and self.entry.get() != "" and int(self.entry.get()) > 0:
+            signal_type = objects.schematic_objects[objects.signal(int(self.entry.get()))]["itemtype"]
+            if ( signal_type != library.signal_type.colour_light.value and
+                 signal_type != library.signal_type.semaphore.value ):
+                self.TT.text = "Ground signals should be slotted with 'main' signals"
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
 
 #------------------------------------------------------------------------------------
 # Class for the Edit Signal Window Configuration Tab
@@ -974,9 +1034,13 @@ class signal_configuration_tab:
                     tool_tip="Select the route indications for the main signal", callback=route_type_updated,
                     button_labels=("None", "Route feathers", "Theatre indicator", "Route arms") )
         self.routetype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
-        # Create the labelframe for the signal button configuration elements
-        self.buttonoffsets = common.button_configuration(parent_tab)
-        self.buttonoffsets.pack(padx=2, pady=2, fill='x')
+        # Create the labelframe for the signal style configuration elements
+        self.frame3 = Tk.Frame(parent_tab)
+        self.frame3.pack(padx=2, pady=2, fill='x')
+        self.buttonoffsets = common.button_configuration(self.frame3)
+        self.buttonoffsets.pack(padx=2, pady=2, side=Tk.LEFT, fill='both', expand=True)
+        self.postcolour = common.colour_selection(self.frame3, label="Post colour")
+        self.postcolour.pack(padx=2, pady=2, side=Tk.LEFT, fill='x', expand=True)
         # Create the Checkboxes and DCC Entry Box frames for the type-specific selections
         # These frames are packed / hidden depending on the signal type and route 
         # indication type selections by the callback functions in "configure_signal.py"
@@ -993,5 +1057,6 @@ class signal_configuration_tab:
                         "Routes to be controlled by the Subsidary Signal",
                         "Select one or more routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
+        self.slotwith = signal_slotting(parent_tab)
         
 #############################################################################################

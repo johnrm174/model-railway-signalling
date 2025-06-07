@@ -203,7 +203,8 @@ def update_tab1_signal_ui_elements(signal):
     signal.config.feathers.frame.pack_forget()
     signal.config.sig_routes.frame.pack_forget()
     signal.config.sub_routes.frame.pack_forget()
-    # Only pack those elements relevant to the signal type and route type
+    signal.config.slotwith.frame.pack_forget()
+    # Pack the Aspect selection elements according to type (Semaphore or colour light)
     if signal.config.sigtype.get_value() == library.signal_type.colour_light.value:
         signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.sigtype.get_value() == library.signal_type.ground_position.value:
@@ -212,7 +213,8 @@ def update_tab1_signal_ui_elements(signal):
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.sigtype.get_value() == library.signal_type.ground_disc.value:
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
-    # Pack the Route selections according to type
+    # Pack the Route indication UI elements according to the route indication type selected
+    # Route indication type selections are: 1=None, 2=Feathers, 3=Theatre, 4=Route Arms
     if signal.config.routetype.get_value() == 1:
         signal.config.sig_routes.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
@@ -225,10 +227,19 @@ def update_tab1_signal_ui_elements(signal):
         signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
             signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+    # Pack the Signal Slotting UI Element (Ground Signals only)
+    elif signal.config.sigtype.get_value() == library.signal_type.ground_position.value:
+        signal.config.slotwith.frame.pack(padx=2, pady=2, fill='x')
+    elif signal.config.sigtype.get_value() == library.signal_type.ground_disc.value:
+        signal.config.slotwith.frame.pack(padx=2, pady=2, fill='x')
     return()
 
 #------------------------------------------------------------------------------------
 # Update the available signal subtype selections based on the signal type
+# There are a maximum of 5 signal subtypes (0-4) for colour light signals
+# There are a minimum of 2 signal subtypes (0-1) for semaphore Signals
+# Selections 0-1 are therefore always packed (we just change the labels)
+# Selections 2-4 are packed/hidden (and the labels changed) accordingly
 #------------------------------------------------------------------------------------
 
 def update_tab1_signal_subtype_selections(signal):
@@ -481,44 +492,44 @@ def update_tab2_available_signal_routes(signal):
     sub_routes = get_sub_routes(signal)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
-    signal.locking.interlocked_sections.main.enable_route()
+    signal.locking.interlocked_sections.main.enable()
     signal.locking.conflicting_sigs.main.enable()
     # Other routes are enabled if either the main signal or subsidary signal supports them
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
-        signal.locking.interlocked_sections.lh1.enable_route()
+        signal.locking.interlocked_sections.lh1.enable()
         signal.locking.conflicting_sigs.lh1.enable()
         signal.locking.conflicting_sigs.lh1_frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh1.disable_route()
-        signal.locking.interlocked_sections.lh1.disable_route()
+        signal.locking.interlocked_sections.lh1.disable()
         signal.locking.conflicting_sigs.lh1.disable()
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
-        signal.locking.interlocked_sections.lh2.enable_route()
+        signal.locking.interlocked_sections.lh2.enable()
         signal.locking.conflicting_sigs.lh2.enable()
         signal.locking.conflicting_sigs.lh2_frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh2.disable_route()
-        signal.locking.interlocked_sections.lh2.disable_route()
+        signal.locking.interlocked_sections.lh2.disable()
         signal.locking.conflicting_sigs.lh2.disable()
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
-        signal.locking.interlocked_sections.rh1.enable_route()
+        signal.locking.interlocked_sections.rh1.enable()
         signal.locking.conflicting_sigs.rh1.enable()
         signal.locking.conflicting_sigs.rh1_frame.pack(padx=2, pady=2, fill='x')
     else: 
         signal.locking.interlocking.rh1.disable_route()
-        signal.locking.interlocked_sections.rh1.disable_route()
+        signal.locking.interlocked_sections.rh1.disable()
         signal.locking.conflicting_sigs.rh1.disable()
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
-        signal.locking.interlocked_sections.rh2.enable_route()
+        signal.locking.interlocked_sections.rh2.enable()
         signal.locking.conflicting_sigs.rh2.enable()
         signal.locking.conflicting_sigs.rh2_frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.rh2.disable_route()
-        signal.locking.interlocked_sections.rh2.disable_route()
+        signal.locking.interlocked_sections.rh2.disable()
         signal.locking.conflicting_sigs.rh2.disable()
     # Enable/disable the signal / block instrument ahead selections on signal type
     # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
@@ -568,12 +579,12 @@ def update_tab2_interlock_ahead_selection(signal):
 
 def update_tab3_signal_ui_elements(signal):
     # Unpack all the optional elements first
-    signal.automation.timed_signal.frame.pack_forget()
-    signal.automation.approach_control.frame.pack_forget()
+    signal.automation.timed_signal.pack_forget()
+    signal.automation.approach_control.pack_forget()
     # Only pack those elements relevant to the signal type and route type
     if ( signal.config.sigtype.get_value() == library.signal_type.colour_light.value or
          signal.config.sigtype.get_value() == library.signal_type.semaphore.value ):
-        signal.automation.timed_signal.frame.pack(padx=2, pady=2, fill='x')
+        signal.automation.timed_signal.pack(padx=2, pady=2, fill='x')
     rel_on_red = ( ( signal.config.sigtype.get_value() == library.signal_type.colour_light.value and
                      signal.config.subtype.get_value() != library.signal_subtype.distant.value) or
                    ( signal.config.sigtype.get_value() == library.signal_type.semaphore.value and
@@ -583,7 +594,7 @@ def update_tab3_signal_ui_elements(signal):
                    signal.config.subtype.get_value() != library.signal_subtype.distant.value and
                    signal.config.subtype.get_value() != library.signal_subtype.red_ylw.value )
     if rel_on_red or rel_on_yel:
-        signal.automation.approach_control.frame.pack(padx=2, pady=2, fill='x')
+        signal.automation.approach_control.pack(padx=2, pady=2, fill='x')
     return()
 
 #------------------------------------------------------------------------------------
@@ -720,7 +731,7 @@ def update_tab3_approach_control_selections(signal):
         if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable_route()
         else: signal.automation.approach_control.rh2.disable_route()
         # Enable the Approach sensor entry box
-        signal.automation.gpio_sensors.approach.enable()
+        signal.automation.signal_events.approach.enable()
     else:
         signal.automation.approach_control.main.disable_route()
         signal.automation.approach_control.lh1.disable_route()
@@ -731,7 +742,7 @@ def update_tab3_approach_control_selections(signal):
         signal.automation.approach_control.disable_release_on_red()
         signal.automation.approach_control.disable_release_on_red_sig_ahead()
         # Disable the Approach sensor entry box
-        signal.automation.gpio_sensors.approach.disable()
+        signal.automation.signal_events.approach.disable()
     return() 
 
 #------------------------------------------------------------------------------------
@@ -777,8 +788,7 @@ class edit_signal:
                     self.sub_routes_updated, self.dist_routes_updated)
             # The interlocking tab needs the parent object so the sig_id can be accessed for validation
             self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self)
-            # The automation tab needs the parent object so the sig_id can be accessed for validation
-            self.automation = configure_signal_tab3.signal_automation_tab(self.tab3, self)
+            self.automation = configure_signal_tab3.signal_automation_tab(self.tab3)
             # load the initial UI state
             self.load_state()
                 
@@ -882,15 +892,17 @@ class edit_signal:
             self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"], item_id)
             self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
             self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
+            self.config.slotwith.set_value(objects.schematic_objects[self.object_id]["slotwith"], item_id)
             # These are the general settings for the signal
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
             self.config.settings.set_value(rot)
-            # These are the signal button position offsets:
+            # These are the signal button position offsets and styles:
             hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
             xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
             yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
             self.config.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
+            self.config.postcolour.set_value(objects.schematic_objects[self.object_id]["postcolour"])
             # These elements are for the signal intelocking tab. Note that several of 
             # the elements need the current signal ID to validate the signal entries
             self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"], item_id)
@@ -899,8 +911,8 @@ class edit_signal:
             self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
             # These elements are for the Automation tab. Note that several elements 
             # need the current signal IDfor validation purposes
-            self.automation.gpio_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1], item_id)
-            self.automation.gpio_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1], item_id)
+            self.automation.signal_events.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"], item_id)
+            self.automation.signal_events.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
             override = objects.schematic_objects[self.object_id]["overridesignal"]
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
@@ -959,10 +971,11 @@ class edit_signal:
             if not self.config.theatre.validate(): valid = False
             if not self.config.feathers.validate(): valid = False
             if not self.config.semaphores.validate(): valid = False
+            if not self.config.slotwith.validate(): valid = False
             if not self.locking.interlocking.validate(): valid = False
             if not self.locking.interlocked_sections.validate(): valid = False
             if not self.locking.conflicting_sigs.validate(): valid = False
-            if not self.automation.gpio_sensors.validate(): valid = False
+            if not self.automation.signal_events.validate(): valid = False
             if not self.automation.track_occupancy.validate(): valid = False
             if not self.automation.timed_signal.validate(): valid = False
             if valid:
@@ -980,15 +993,17 @@ class edit_signal:
                 new_object_configuration["sigarms"] = self.config.semaphores.get_arms()
                 new_object_configuration["sigroutes"] = get_sig_routes(self)
                 new_object_configuration["subroutes"] = get_sub_routes(self)
+                new_object_configuration["slotwith"] = self.config.slotwith.get_value()
                 # These are the general settings for the signal
                 rot = self.config.settings.get_value()
                 if rot: new_object_configuration["orientation"] = 180
                 else: new_object_configuration["orientation"] = 0
-                # These are the point button position offsets:
+                # These are the point button position offsets and styles:
                 hidden, xoffset, yoffset = self.config.buttonoffsets.get_values()
                 new_object_configuration["hidebuttons"] = hidden
                 new_object_configuration["xbuttonoffset"] = xoffset
                 new_object_configuration["ybuttonoffset"] = yoffset
+                new_object_configuration["postcolour"] = self.config.postcolour.get_value()
                 # Set the Theatre route indicator flag if that particular radio button is selected
                 if self.config.routetype.get_value() == 3:
                     new_object_configuration["theatreroute"] = True
@@ -1010,10 +1025,8 @@ class edit_signal:
                             new_sig_interlock_table[index].append(interlocked_signal)
                 new_object_configuration["siginterlock"] = new_sig_interlock_table
                 # These elements are for the Automation tab
-                new_object_configuration["passedsensor"][0] = True
-                new_object_configuration["passedsensor"][1] = self.automation.gpio_sensors.passed.get_value()
-                new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
-                new_object_configuration["approachsensor"][1] = self.automation.gpio_sensors.approach.get_value()
+                new_object_configuration["passedsensor"] = self.automation.signal_events.passed.get_value()
+                new_object_configuration["approachsensor"] = self.automation.signal_events.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
                 override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
                 new_object_configuration["fullyautomatic"] = main_auto

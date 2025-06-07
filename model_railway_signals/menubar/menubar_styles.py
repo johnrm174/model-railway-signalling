@@ -83,7 +83,7 @@ class common_buttons(Tk.Frame):
         self.button6 = Tk.Button (self, text = "Close Window", command=close_window_callback)
         self.button6.pack(padx=2, pady=2)
         self.button6TT = common.CreateToolTip(self.button6, "Close window")
-        
+
 #------------------------------------------------------------------------------------
 # Class for the common_style_settings UI Element
 #------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ class common_style_settings(Tk.Frame):
         # Create a Frame for the button colour and text colour elements (Frame 3)
         self.frame1 = Tk.Frame(self)
         self.frame1.pack(fill='x', padx=2)
-        self.widgetcolour = common.colour_selection(self.frame1, label="Background colour")
+        self.widgetcolour = common.colour_selection(self.frame1, label="Button colour")
         self.widgetcolour.pack(side=Tk.LEFT, padx=2, pady=2, fill="x", expand=True)
         self.textcolourtype = common.selection_buttons(self.frame1, label="Text colour",
                     tool_tip="Select the text colour (auto to select 'best' contrast with background)",
@@ -134,14 +134,14 @@ class common_style_settings(Tk.Frame):
             settings.set_style(self.object_type,"textfonttuple", font_tuple)
             settings.set_style(self.object_type,"textcolourtype", self.textcolourtype.get_value())
             settings.set_style(self.object_type,"buttoncolour", self.widgetcolour.get_value())
-        
+
     def load_app_defaults(self):
         self.textfont.set_value(settings.get_default_style(self.object_type,"textfonttuple")[0])
         self.fontsize.set_value(settings.get_default_style(self.object_type,"textfonttuple")[1])
         self.fontstyle.set_value(settings.get_default_style(self.object_type,"textfonttuple")[2])
         self.textcolourtype.set_value(settings.get_default_style(self.object_type,"textcolourtype"))
         self.widgetcolour.set_value(settings.get_default_style(self.object_type,"buttoncolour"))
-        
+
     def load_layout_defaults(self):
         self.textfont.set_value(settings.get_style(self.object_type,"textfonttuple")[0])
         self.fontsize.set_value(settings.get_style(self.object_type,"textfonttuple")[1])
@@ -156,10 +156,10 @@ class common_style_settings(Tk.Frame):
         styles_to_return["textcolourtype"] = self.textcolourtype.get_value()
         styles_to_return["buttoncolour"] = self.widgetcolour.get_value()
         return(styles_to_return)
-        
+
     def validate(self):
         return(self.fontsize.validate())
-    
+
 #------------------------------------------------------------------------------------
 # Class for the button_style_selections UI Element. Builds on the
 # common_style_settings class with the addition of a button width entry
@@ -191,11 +191,11 @@ class button_style_selections(common_style_settings):
         if self.validate():
             super().set_defaults()
             settings.set_style(self.object_type,"buttonwidth", self.buttonwidth.get_value())
-                
+
     def load_app_defaults(self):
         super().load_app_defaults()
         self.buttonwidth.set_value(settings.get_default_style(self.object_type,"buttonwidth"))
-        
+
     def load_layout_defaults(self):
         super().load_layout_defaults()
         self.buttonwidth.set_value(settings.get_style(self.object_type,"buttonwidth"))
@@ -207,6 +207,39 @@ class button_style_selections(common_style_settings):
 
     def validate(self):
         return(super().validate() and self.buttonwidth.validate())
+
+#------------------------------------------------------------------------------------
+# Class for the signal_style_selections UI Element. Builds on the
+# common_style_settings class with the addition of a post colour entry
+#------------------------------------------------------------------------------------
+
+class signal_style_selections(common_style_settings):
+    def __init__(self, parent_frame, object_type:str, max_font_size:int,
+                 apply_all_callback, apply_selected_callback, close_window_callback):
+        # Create the basic style settings elements
+        super().__init__(parent_frame, object_type, max_font_size, apply_all_callback,
+                             apply_selected_callback, close_window_callback)
+        # Create the Post colour component
+        self.postcolour = common.colour_selection(self, label="Signal post colour")
+        self.postcolour.pack(padx=2, pady=2, side=Tk.LEFT, fill='x', expand=True)
+
+    def set_defaults(self):
+        if self.validate():
+            super().set_defaults()
+            settings.set_style(self.object_type,"postcolour", self.postcolour.get_value())
+
+    def load_app_defaults(self):
+        super().load_app_defaults()
+        self.postcolour.set_value(settings.get_default_style(self.object_type,"postcolour"))
+
+    def load_layout_defaults(self):
+        super().load_layout_defaults()
+        self.postcolour.set_value(settings.get_style(self.object_type,"postcolour"))
+
+    def get_values(self):
+        styles_to_return = super().get_values()
+        styles_to_return["postcolour"] = self.postcolour.get_value()
+        return(styles_to_return)
 
 #------------------------------------------------------------------------------------
 # Class for the track_section_style_selections UI Element. Builds on the
@@ -228,11 +261,11 @@ class track_section_style_selections(button_style_selections):
         if self.validate():
             super().set_defaults()
             settings.set_style(self.object_type,"defaultlabel", self.defaultlabel.get_value())
-                
+
     def load_app_defaults(self):
         super().load_app_defaults()
         self.defaultlabel.set_value(settings.get_default_style(self.object_type,"defaultlabel"))
-        
+
     def load_layout_defaults(self):
         super().load_layout_defaults()
         self.defaultlabel.set_value(settings.get_style(self.object_type,"defaultlabel"))
@@ -291,13 +324,13 @@ class edit_section_styles():
         if not self.styles.widgetcolour.is_open():
             edit_section_styles_window = None
             self.window.destroy()
-        
+
 #------------------------------------------------------------------------------------
 # Class for the Route Button Style Settings toolbar window.
 #------------------------------------------------------------------------------------
 
 edit_route_styles_window = None
-            
+
 class edit_route_styles():
     def __init__(self, root_window):
         global edit_route_styles_window
@@ -336,13 +369,13 @@ class edit_route_styles():
         if not self.styles.widgetcolour.is_open():
             edit_route_styles_window = None
             self.window.destroy()
-        
+
 #------------------------------------------------------------------------------------
 # Class for the DCC Switch Button Style Settings toolbar window.
 #------------------------------------------------------------------------------------
 
 edit_switch_styles_window = None
-            
+
 class edit_switch_styles():
     def __init__(self, root_window):
         global edit_switch_styles_window
@@ -381,13 +414,13 @@ class edit_switch_styles():
         if not self.styles.widgetcolour.is_open():
             edit_switch_styles_window = None
             self.window.destroy()
-            
+
 #------------------------------------------------------------------------------------
 # Class for the Route Line Styles toolbar window.
 #------------------------------------------------------------------------------------
 
 edit_route_line_styles_window = None
-            
+
 class edit_route_line_styles():
     def __init__(self, root_window):
         global edit_route_line_styles_window
@@ -426,17 +459,17 @@ class edit_route_line_styles():
             self.buttons.pack(padx=5, pady=5, side=Tk.BOTTOM, fill='x', expand=True)
             # Load the initial UI state
             self.load_layout_defaults()
-            
+
     def load_app_defaults(self):
         self.colour.set_value(settings.get_default_style("routelines", "colour"))
         self.linewidth.set_value(settings.get_default_style("routelines", "linewidth"))
         self.linestyle.set_value(settings.get_default_style("routelines", "linestyle"))
-        
+
     def load_layout_defaults(self):
         self.colour.set_value(settings.get_style("routelines", "colour"))
         self.linewidth.set_value(settings.get_style("routelines", "linewidth"))
         self.linestyle.set_value(settings.get_style("routelines", "linestyle"))
-        
+
     def set_layout_defaults(self):
         if self.linewidth.validate():
             settings.set_style("routelines","colour", self.colour.get_value())
@@ -471,7 +504,7 @@ class edit_route_line_styles():
 #------------------------------------------------------------------------------------
 
 edit_point_styles_window = None
-            
+
 class edit_point_styles():
     def __init__(self, root_window):
         global edit_point_styles_window
@@ -483,7 +516,7 @@ class edit_point_styles():
         else:
             # Create the (non resizable) top level window
             self.window = Tk.Toplevel(root_window)
-            self.window.title("Point Button Styles")
+            self.window.title("Point Styles")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             edit_point_styles_window = self.window
@@ -516,7 +549,7 @@ class edit_point_styles():
 #------------------------------------------------------------------------------------
 
 edit_signal_styles_window = None
-            
+
 class edit_signal_styles():
     def __init__(self, root_window):
         global edit_signal_styles_window
@@ -528,12 +561,12 @@ class edit_signal_styles():
         else:
             # Create the (non resizable) top level window
             self.window = Tk.Toplevel(root_window)
-            self.window.title("Signal Button Styles")
+            self.window.title("Signal Styles")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             edit_signal_styles_window = self.window
             # Create the UI Elements
-            self.styles = common_style_settings(self.window, object_type="signals", max_font_size=12,
+            self.styles = signal_style_selections(self.window, object_type="signals", max_font_size=12,
                     apply_all_callback=self.apply_all, apply_selected_callback=self.apply_selected,
                     close_window_callback=self.close_window)
             self.styles.pack(padx=5, pady=5, fill='x')
@@ -561,7 +594,7 @@ class edit_signal_styles():
 #------------------------------------------------------------------------------------
 
 edit_textbox_styles_window = None
-            
+
 class edit_textbox_styles():
     def __init__(self, root_window):
         global edit_textbox_styles_window

@@ -105,6 +105,9 @@
 #   signal_exists(sig_id:int/str) - returns true if the Signal object 'exists' (either the Signal
 #                    exists on the local schematic or has been subscribed to via MQTT networking)
 #
+#   update_slotted_signal(sig_id:int, slot_with:int) - Ground signals only - Updates the reference
+#                        to the main signal without having to delete/re-create the ground signal
+#
 #   delete_signal(sig_id:int) - To delete the specified signal from the schematic
 #
 #   set_route(sig_id:int, route, theatre_text) - Set the signal route indication
@@ -152,7 +155,7 @@
 #   update_colour_light_signal(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
 #                 into account the internal state of the signal and displayed aspect of the signal ahead
 #
-#   update_signal_button_styles - Update the styles of the signal buttons
+#   update_signal_styles - Update the general styles of a signal
 #     Mandatory Parameters:
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #     Optional Parameters:
@@ -160,6 +163,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post - default = "white"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # The following API functions are for configuring the pub/sub of Signal events. The functions are called by
@@ -356,9 +360,7 @@ def sig_passed_button_event(sig_id:int):
             common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
         # Reset the approach control 'released' state (if the signal supports approach control).
         # We don't reset the approach control mode  - this needs to be reset from the calling application.
-        if ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light or
-             signals[str(sig_id)]["sigtype"] == signal_type.semaphore ):
-            signals[str(sig_id)]["released"] = False
+        if "released" in signals[str(sig_id)].keys(): signals[str(sig_id)]["released"] = False
         # Make the external callback
         signals[str(sig_id)]['sigpassedcallback'] (sig_id)
     return ()
@@ -398,9 +400,9 @@ def reset_sig_released_button(sig_id:int):
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 
-def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int,
-            button_xoffset:int, button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback,
-            sig_passed_callback, sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False,
+def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int, button_xoffset:int,
+            button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback, sig_passed_callback,
+            sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False, sig_passed_button:bool=False,
             sig_automatic:bool=False, associated_home:int=0, button_colour:str="Grey85", active_colour:str="Grey95",
             selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
     global signals
@@ -410,6 +412,7 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     # have been assigned to the associated home signal's drawing objects (so this can be used by the 
     # editor for moving the combined signal elements as one).
     main_canvas_tag = "signal"+str(sig_id)
+    signal_post_tag = main_canvas_tag+"post"
     if associated_home > 0: canvas_tag = (main_canvas_tag, "signal"+str(associated_home))
     else: canvas_tag = main_canvas_tag
     # Create the Signal Buttons. If an 'associated_home' has been specified then this represents the
@@ -476,7 +479,7 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
         button_window2 = None
     # Signal passed button is created on the track at the base of the signal
     # Note we only create this if the signal IS NOT an 'associated distant' signal
-    if associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
+    if sig_passed_button and associated_home == 0: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
     # Disable the main signal button if the signal is fully automatic
     canvas_colour = canvas.cget("background")
     if sig_automatic: sig_button.config(state="disabled",relief="sunken", background=canvas_colour, border=0)
@@ -514,23 +517,25 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["buttonfont"]          = font                   # MANDATORY - The Tkinter button font tuple
     signals[str(sig_id)]["selectedcolour"]      = selected_colour        # MANDATORY - The Tkinter button colours to use
     signals[str(sig_id)]["deselectedcolour"]    = button_colour          # MANDATORY - The Tkinter button colours to use
-    signals[str(sig_id)]["textcolour"]          = text_colour          # MANDATORY - The Tkinter button colours to use
+    signals[str(sig_id)]["textcolour"]          = text_colour            # MANDATORY - The Tkinter button colours to use
     signals[str(sig_id)]["tags"]                = main_canvas_tag        # MANDATORY - Canvas Tags for all drawing objects
+    signals[str(sig_id)]["posttag"]             = signal_post_tag        # MANDATORY - Canvas Tags for all signal post objects
     return(canvas_tag)
 
 # -------------------------------------------------------------------------
-# Public API function to Update the Point Styles
+# Public API function to Update the Signal Styles
 # -------------------------------------------------------------------------
 
-def update_signal_button_styles(signal_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
-                     selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
+def update_signal_styles(signal_id:int, button_colour:str="Grey85", active_colour:str="Grey95",
+                         selected_colour:str="White", text_colour:str="black",
+                         post_colour:str="White", font=("Courier",8,"normal")):
     global signals
     if not isinstance(signal_id, int):
-        logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID must be an int")
+        logging.error("Signal "+str(signal_id)+": update_signal_styles - Signal ID must be an int")
     elif not signal_exists(signal_id):
-        logging.error("Signal "+str(signal_id)+": update_signal_button_styles - Signal ID does not exist")
+        logging.error("Signal "+str(signal_id)+": update_signal_styles - Signal ID does not exist")
     else:
-        logging.debug("Signal "+str(signal_id)+": Updating Signal Button Styles")
+        logging.debug("Signal "+str(signal_id)+": Updating Signal Styles")
         # Update the Subsidary Change Button Styles according to the current state
         if signals[str(signal_id)]["subclear"]: signals[str(signal_id)]["subbutton"].config(background=selected_colour)
         else: signals[str(signal_id)]["subbutton"].config(background=button_colour)
@@ -548,6 +553,8 @@ def update_signal_button_styles(signal_id:int, button_colour:str="Grey85", activ
         signals[str(signal_id)]["sigbutton"].config(activebackground=active_colour)
         signals[str(signal_id)]["sigbutton"].config(activeforeground=text_colour)
         signals[str(signal_id)]["sigbutton"].config(foreground=text_colour)
+        # Update the signal post styles
+        signals[str(signal_id)]["canvas"].itemconfig(signals[str(signal_id)]["posttag"], fill=post_colour)
         # Store the new values we need to track
         signals[str(signal_id)]["buttonfont"] = font
         signals[str(signal_id)]["selectedcolour"] = selected_colour
@@ -677,6 +684,32 @@ def update_subsidary_aspect(sig_id:int):
         signals_colour_lights.update_colour_light_subsidary(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         signals_semaphores.update_semaphore_subsidary_arms(sig_id)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# API function for updating the ID of the signal to be 'slot' the ground signal with. This
+# saves having to delete the ground signal and then create it in its new state. The main
+# use case is  when bulk deleting objects via the schematic editor, where we want to avoid
+# interleaving tkinter 'create' commands in amongst the 'delete' commands outside of the
+# main tkinter loop as this can lead to problems with artefacts persisting on the canvas.
+# ------------------------------------------------------------------------------------------
+
+def update_slotted_signal(sig_id:int, slot_with:int):
+    if not isinstance(sig_id, int) or sig_id < 1:
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - Signal ID must be a positive integer")
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - Signal ID does not exist")
+    elif not isinstance(slot_with, int) or slot_with < 0:
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - 'slotwith' ID must be a positive integer")
+    elif signals[str(sig_id)]["sigtype"] not in (signal_type.ground_position, signal_type.ground_disc):
+        logging.error("Signal "+str(sig_id)+": update_slotted_signal - Function not supported by signal type")
+    else:
+        logging.debug("Signal "+str(sig_id)+": Updating slotted signal ID to: "+str(slot_with))
+        signals[str(sig_id)]["slotwith"] = slot_with
+        if signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
+            signals_ground_position.update_ground_position_signal(sig_id)
+        elif signals[str(sig_id)]["sigtype"] == signal_type.ground_disc:
+            signals_ground_disc.update_ground_disc_signal(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -1252,7 +1285,8 @@ def send_mqtt_signal_updated_event(sig_id:int):
         data = {}
         # The sig state is an enumeration type - so its the VALUE that gets passed in the message
         data["sigstate"] = signals[str(sig_id)]["sigstate"].value
-        log_message = "Signal "+str(sig_id)+": Publishing signal state to MQTT Broker"
+        log_message = ("Signal "+str(sig_id)+": Publishing signal state to MQTT Broker: "+
+                              str(signals[str(sig_id)]["sigstate"]).rpartition('.')[-1] )
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("signal_updated_event",sig_id,data=data,log_message=log_message,retain=True)
         return()

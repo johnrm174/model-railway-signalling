@@ -30,7 +30,7 @@ default_settings = {}
 
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["version"] = "Version 5.1.0"
+default_settings["general"]["version"] = "Version 5.2.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
@@ -114,6 +114,7 @@ default_settings["styles"]["points"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["points"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["points"]["textfonttuple"] = ("Courier", 8, "")
 default_settings["styles"]["signals"] = {}
+default_settings["styles"]["signals"]["postcolour"] = "White"
 default_settings["styles"]["signals"]["buttoncolour"] = "Grey85"
 default_settings["styles"]["signals"]["textcolourtype"] = 1   # 1=Auto, 2=Black, 3=White
 default_settings["styles"]["signals"]["textfonttuple"] = ("Courier", 8, "")

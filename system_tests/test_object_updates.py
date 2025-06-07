@@ -888,6 +888,68 @@ def run_signal_config_update_on_change_of_id_tests():
     assert_object_configuration(s1,{
         "tracksections":[0,[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] ],
         "trackinterlock":[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] } )
+    # Clean up before the next series of tests
+    select_all_objects()
+    delete_selected_objects()
+    #--------------------------------------------------------------------------------
+    # Test update/delete of signal ID for slotted ground signals
+    #--------------------------------------------------------------------------------
+    s1 = create_colour_light_signal(300,40)
+    s2 = create_colour_light_signal(400,40)
+    s3 = create_ground_position_signal(700,40)
+    s4 = create_ground_position_signal(800,40)
+    assert_object_configuration(s1,{"itemid":1})
+    assert_object_configuration(s2,{"itemid":2})
+    assert_object_configuration(s3,{"itemid":3})
+    assert_object_configuration(s4,{"itemid":4})
+    update_object_configuration(s3,{"slotwith":1})
+    update_object_configuration(s4,{"slotwith":2})
+    # Test the slotting works before we change the ids
+    # Note the ground signals are still 'on' but forced to PROCEED
+    assert_signals_on(1,2,3,4)
+    assert_signals_DANGER(3,4)
+    set_signals_off(1)
+    assert_signals_off(1)
+    assert_signals_on(2,3,4)
+    assert_signals_PROCEED(3)
+    assert_signals_DANGER(4)
+    set_signals_off(2)
+    assert_signals_off(1,2)
+    assert_signals_on(3,4)
+    assert_signals_PROCEED(3,4)
+    # Change the IDs of the main signals
+    update_object_configuration(s1,{"itemid":10})
+    update_object_configuration(s2,{"itemid":11})
+    assert_object_configuration(s3,{"slotwith":10})
+    assert_object_configuration(s4,{"slotwith":11})
+    # Test the slotting works after we change the ids
+    # Note signals revert to ON after an update
+    assert_signals_on(3,4,10,11)
+    assert_signals_DANGER(3,4)
+    set_signals_off(10)
+    assert_signals_off(10)
+    assert_signals_on(11,3,4)
+    assert_signals_PROCEED(3)
+    assert_signals_DANGER(4)
+    set_signals_off(11)
+    assert_signals_off(10,11)
+    assert_signals_on(3,4)
+    assert_signals_PROCEED(3,4)
+    # Test Deletion of main signals
+    select_single_object(s2)
+    delete_selected_objects()
+    assert_object_configuration(s3,{"slotwith":10})
+    assert_object_configuration(s4,{"slotwith":0})
+    assert_signals_off(10)
+    assert_signals_on(3,4)
+    assert_signals_PROCEED(3)
+    assert_signals_DANGER(4)
+    select_single_object(s1)
+    delete_selected_objects()
+    assert_object_configuration(s3,{"slotwith":0})
+    assert_object_configuration(s4,{"slotwith":0})
+    assert_signals_on(3,4)
+    assert_signals_DANGER(3,4)
     # clean up
     select_all_objects()
     delete_selected_objects()
@@ -1102,6 +1164,47 @@ def run_section_config_update_on_change_of_id_tests():
     return()
 
 #-----------------------------------------------------------------------------------
+# These test the Item ID update functions for Points, specifically:
+#    Update of Point tables to reflect change of Section ID
+#    Update of Point tables to reflect deletion of Section
+#-----------------------------------------------------------------------------------
+
+def run_point_config_update_on_change_of_id_tests():
+    print("Object configuration updates - Test update of Point Configuration on change or delete of Item IDs")
+    # Add elements to the layout
+    p1 = create_left_hand_point(100,50)
+    p2 = create_left_hand_point(200,50)
+    ts1 = create_track_section(100,100)
+    ts2 = create_track_section(200,100)
+    assert_object_configuration(p1, {"itemid":1, "sectioninterlock":[] })
+    assert_object_configuration(p2, {"itemid":2, "sectioninterlock":[] })
+    assert_object_configuration(ts1, {"itemid":1 })
+    assert_object_configuration(ts2, {"itemid":2 })
+    # Add the Track Sections to the point interlocking configuration
+    update_object_configuration(p1,{"sectioninterlock": [1] })
+    update_object_configuration(p2,{"sectioninterlock": [1,2] })
+    # update the item IDs
+    update_object_configuration(ts1,{"itemid":21})
+    update_object_configuration(ts2,{"itemid":22})
+    # Test the linked track sections have been updated correctly
+    assert_object_configuration(p1,{"sectioninterlock": [21] })
+    assert_object_configuration(p2,{"sectioninterlock": [21,22] })
+    # Delete Section 1 and test it has been removed from the point objects
+    select_single_object(ts1)
+    delete_selected_objects()
+    assert_object_configuration(p1,{"sectioninterlock": [] })
+    assert_object_configuration(p2,{"sectioninterlock": [22] })
+    # Delete section 2 and test it has been removed from the point objects
+    select_single_object(ts2)
+    delete_selected_objects()
+    assert_object_configuration(p1,{"sectioninterlock": [] })
+    assert_object_configuration(p2,{"sectioninterlock": [] })
+    # clean up
+    select_all_objects()
+    delete_selected_objects()
+    return()
+
+#-----------------------------------------------------------------------------------
 # These test the reset objects functions, specifically:
 # All points, instruments, signals and buttons are returned to their default states
 # Track Sections will remain unchanged. Any levers linked to signals/points will
@@ -1225,6 +1328,7 @@ def run_all_object_editing_tests():
     run_sensor_config_update_on_change_of_id_tests()
     run_lever_config_update_on_change_of_id_tests()
     run_section_config_update_on_change_of_id_tests()
+    run_point_config_update_on_change_of_id_tests()
     run_reset_objects_tests()
     report_results()
     

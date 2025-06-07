@@ -27,6 +27,7 @@ without some of the Raspberry-Pi specific interfacing functions).
 * Provides full prototypical operation of your layout - just like the real thing.
     * Signals can be interlocked with points, other signals and Track Sections ahead.
     * Points are interlocked with the signals that control movements across them.
+    * Points can also be interlocked with Track Sections representing 'track circuits'.
     * Multiple aspect signals will always reflect the state of the signal ahead.
     * Signals can be automated based on the 'occupancy' of Track Sections ahead.
 * Provides "one click" set-up and clear-down routes through your layout:
@@ -51,28 +52,30 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.1.0:
+## What's new for Release 5.2.0:
 
 > [!IMPORTANT]
-> Release 5.1.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.2.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.1.0.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.2.0.
 > You have been warned!
 
-* Bugfix to Bulk Renumbering - State is now saved so subsequent Undos/Redos work properly.
-* Bugfix to GPIO sensor settings page - mappings now correctly displayed after sensor unmapping.
-* Bugfix to applying line configuration changes in Run Mode - Selection circles are now hidden.
-* Improvement - Line width can now be edited in the Line and Point configuration dialogs.
-* Improvement - To the synchronisation of state across networked layouts on MQTT broker connect.
-* New Feature - New 'dashed' options for points and route lines (to represent hidden trackwork).
-* New Feature - Route lines & points can be added to Track Sections (to highlight when occupied).
-* New Feature - Support for 'track circuit' train detection as an alternative to event-based sensors.
-* GPIO Sensors - Are now enabled in all Modes (inhibiting them in Edit mode wasn't a good idea).
-* GPIO Sensors - New 'circuit breaker' functionality to lock out faulty GPIO inputs / sensors.
-* GPIO Sensors - Settings window now provides an indication of the state of each GPIO input.
-* Documentation - Minor updates to the documentation to reflect the new features in the release.
-* [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) - 
-Has now been updated to suppport 'track circuit' type sensors.
+* New Features to enable more prototypical signal box diagrams/simulations to be created:
+    * Ability to interlock points with occupied Track Sections (representing Track Circuits).
+    * Ability to 'slot' ground signals with co-located main signals (as per the real thing).
+    * Signals can now be created with or without the 'signal passed' and 'approached' buttons.
+    * The entire point is highlighted when 'track circuits' are occupied (more prototypical).
+    * You can now specify/change the colour of Signal Posts (individually or globally).
+* Improved DCC interface - Ensures the layout is always updated to reflect the schematic:
+    * Before - DCC commands for events prior to DCC Power being enabled would be dropped.
+    * After - DCC commands are now 'queued' and will be sent out when DCC Power is enabled.
+* Improved Networking - Maintains synchronisation of DCC Command feeds across nodes:
+    * Before - DCC commands for events prior to broker-connect would not be published.
+    * After - DCC commands are now 'queued' and will be published on broker connect.
+* New Application upgrade utility (to make future upgrdes easier for the user).
+* Improved validation for Timed Signal Sequences (can only select main signal types).
+* Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load.
+* Bugfix - To how signal state is reported for semaphore signals with secondary distant arms.
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

@@ -1,6 +1,9 @@
 #------------------------------------------------------------------------------------
 # Functions and sub Classes for the Edit Signal "Automation" Tab
-##
+#
+# Accesses the following external editor objects directly:
+#    objects.schematic_objects - To validate signal type
+#
 # Makes the following external API calls to library modules:
 #    library.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    library.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
@@ -14,123 +17,166 @@
 #    common.integer_entry_box
 #    common.CreateToolTip
 #    common.validated_gpio_sensor_entry_box
+#    common.row_of_int_item_id_entry_boxes
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
 
 from .. import common
 from .. import library
-        
+from .. import objects
+
 #------------------------------------------------------------------------------------
-# Class for the Signal Passed Sensor Frame - uses the validated_gpio_sensor_entry_box
-# Class with additional validation to ensure the same Sensor ID isn't entered
+# Class for the Signal Event Frame (sensor ID entry and checkbox for the button)
 #------------------------------------------------------------------------------------
 
-class signal_passed_sensor_frame:
-    def __init__(self, parent_frame, parent_object):
-        # The child class instances need the reference to the parent object so they can call
-        # the sibling class method to get the current value of the Signal ID for validation
-        self.frame = Tk.LabelFrame(parent_frame, text="GPIO sensor events")
-        # Create the elements in a subframe so they are centered
-        self.subframe = Tk.Frame(self.frame)
-        self.subframe.pack()
-        tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This "+
-                    "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
-                    "which has been subscribed to via MQTT networking")
-        self.label1 = Tk.Label(self.subframe, text="Signal 'passed' sensor:")
-        self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.passed = common.validated_gpio_sensor_entry_box(self.subframe, item_type="Signal",
-                                                    callback=self.validate, tool_tip=tool_tip)
-        self.passed.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.label2 = Tk.Label(self.subframe, text="Signal 'approached' sensor:")
-        self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.approach = common.validated_gpio_sensor_entry_box(self.subframe, item_type="Signal",
-                                                    callback=self.validate, tool_tip=tool_tip)
-        self.approach.pack(padx=2, pady=2, side=Tk.LEFT)
+class signal_event_frame(Tk.Frame):
+    def __init__(self, parent_frame, event_type:str, callback):
+        # Create the basic frame to hold everything in (and pack it)
+        super().__init__(parent_frame)
+        self.pack(padx=2,pady=2)
+        # Create a subframe to center all the elements in
+        self.label = Tk.Label(self, text="Signal '"+event_type+"' sensor:")
+        self.label.pack(padx=2, side=Tk.LEFT)
+        self.sensor = common.validated_gpio_sensor_entry_box(self, item_type="Signal", callback=callback,
+                           tool_tip="Specify the ID of a GPIO Sensor to trigger the event (or leave blank) - "+
+                                "This can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
+                                "which has been subscribed to via MQTT networking")
+        self.sensor.pack(padx=2, side=Tk.LEFT)
+        self.button = common.check_box(self, label="Signal '"+event_type+"' button",tool_tip="Select to "+
+                                "create a small button at the base of the signal to simulate '"+event_type+
+                                "' events and provide an indication of GPIO sensor events")
+        self.button.pack(padx=2, side=Tk.LEFT)
+
+    def set_value(self, value_to_set:list[bool,str], item_id:int):
+        # value_to_set is a list comprising: [button:bool, sensor_id:str]
+        # Note the GPIO Sensor entry box needs the current item ID for validation
+        self.button.set_value(value_to_set[0])
+        self.sensor.set_value(value_to_set[1], item_id)
+
+    def get_value(self):
+        # The returned value is a list comprising: [button:bool, sensor_id:str]
+        return( [ self.button.get_value(), self.sensor.get_value() ] )
+
+    def validate(self):
+        return(self.sensor.validate())
+
+    def enable(self):
+        self.button.enable()
+        self.sensor.enable()
+        self.label.configure(state="normal")
+
+    def disable(self):
+        self.button.disable()
+        self.sensor.disable()
+        self.label.configure(state="disabled")
+
+#------------------------------------------------------------------------------------
+# Class for the Signal Events LabelFrame - uses two instances of the above class with
+# additional validation to ensure the same sensor ID has not been entered in both.
+# Get/Set values and enable/disable is via the functions in the base classes
+#------------------------------------------------------------------------------------
+
+class signal_events_frame(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        # Note that the base classes pack themselves (we don't need to pack them here)
+        super().__init__(parent_frame, text="GPIO sensor events")
+        self.passed = signal_event_frame(self, event_type="Passed", callback=self.validate)
+        self.approach = signal_event_frame(self, event_type="Approach", callback=self.validate)
         
     def validate(self):
-        # validate the individual entry boxes first
-        valid = self.passed.validate() and self.approach.validate()
+        # validate BOTH individual entry boxes (to highlight ALL basic validation errors)
+        valid = True
+        if not self.passed.validate(): valid = False
+        if not self.approach.validate(): valid = False
         # validate the entries are not the same
-        if valid and self.passed.get_value() !="" and self.approach.get_value() == self.passed.get_value():
+        if valid and self.passed.get_value()[1] !="" and self.approach.get_value()[1] == self.passed.get_value()[1]:
             self.passed.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
-            self.approach.TT.text="The same keycode has been specified for both 'passed' and 'approach' events"
+            self.approach.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
             self.passed.set_validation_status(False)
             self.approach.set_validation_status(False)
             valid = False
         return(valid)
-            
+
 #------------------------------------------------------------------------------------
-# Sub Classes for the Track Occupancy automation subframe
-# Public Class instance methods (inherited from the base class) are
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box
-#    "set_value" - will set the current value (integer)
-#    "get_value" - will return the last "valid" value (integer)
-# Public Class instance methods provided by the section_ahead_frame class:
-#    "validate" - validate all 'section ahead' entry box values and return True/false
+# Sub Class for the section_behind_frame (Entry box & label in a Frame)
 #------------------------------------------------------------------------------------
 
-class section_behind_element(common.int_item_id_entry_box):
+class section_behind_frame(Tk.Frame):
     def __init__(self, parent_frame):
-        self.frame = Tk.Frame(parent_frame)
-        self.frame.pack()
-        tool_tip = "Sepecify the track section 'in the rear of' this signal to be cleared when the signal is passed"
-        super().__init__(self.frame, tool_tip=tool_tip, exists_function=library.section_exists)
-        self.pack(side=Tk.LEFT)
-        self.label = Tk.Label(self.frame, text=" "+u"\u2192")
+        # Create the frame to hold the individual UI elements (packed by the calling class)
+        super().__init__(parent_frame)
+        tool_tip = "Sepecify the track section 'in the rear of' this signal (to be cleared when the signal is passed)"
+        self.section=common.int_item_id_entry_box(self, tool_tip=tool_tip, exists_function=library.section_exists)
+        self.section.pack(side=Tk.LEFT)
+        self.label = Tk.Label(self, text=" "+u"\u2192")
         self.label.pack(side=Tk.LEFT)
 
-class section_ahead_element():
+    def set_value(self, value_to_set:int):
+        self.section.set_value(value_to_set)
+
+    def get_value(self):
+        return(self.section.get_value())
+
+    def validate(self):
+        return(self.section.validate())
+
+#------------------------------------------------------------------------------------
+# Sub Class for a section_ahead_element (Label and list of sections in a frame)
+#------------------------------------------------------------------------------------
+
+class section_ahead_element(Tk.Frame):
     def __init__(self, parent_frame, label):
-        self.frame = Tk.Frame(parent_frame)
-        self.frame.pack()
-        self.label1 = Tk.Label(self.frame, text=label, width=8)
-        self.label1.pack(side=Tk.LEFT)
-        tool_tip1 = ("Specify the track section on the route 'ahead of' the signal "+
-                             "to be occupied when the signal is passed")
-        tool_tip2 = ("Specify any other track sections on the route that will also override "+
-                            "this signal to ON if occupied (if enabled on the right)")
-        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=library.section_exists, tool_tip=tool_tip1)
-        self.t1.pack(side = Tk.LEFT)
-        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=library.section_exists, tool_tip=tool_tip2)
-        self.t2.pack(side = Tk.LEFT)
-        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=library.section_exists, tool_tip=tool_tip2)
-        self.t3.pack(side = Tk.LEFT)
+        # Create the frame to hold the individual UI elements (and pack it)
+        super().__init__(parent_frame)
+        self.pack()
+        self.label = Tk.Label(self, text=label, width=8)
+        self.label.pack(side=Tk.LEFT)
+        tool_tip1 = ("Specify the track section immediately 'ahead of' the signal (to be occupied when the signal is passed)")
+        tool_tip2 = ("Specify the track sections on the route ahead (leading up to the next signal). If enabled "+
+                     "on the right, the signal will be overridden to ON if any of these sections are occupied.")
+        self.first_section = common.int_item_id_entry_box(self, exists_function=library.section_exists, tool_tip=tool_tip1)
+        self.first_section.pack(side = Tk.LEFT, padx=2)
+        self.other_sections = common.row_of_int_item_id_entry_boxes(self, columns=2,
+                                exists_function=library.section_exists, tool_tip=tool_tip2)
+        self.other_sections.pack(side = Tk.LEFT)
 
     def validate(self):
         # Validate everything - to highlight ALL validation failures in the UI
         valid = True
-        if not self.t1.validate(): valid = False
-        if not self.t2.validate(): valid = False
-        if not self.t3.validate(): valid = False
+        if not self.first_section.validate(): valid = False
+        if not self.other_sections.validate(): valid = False
         return(valid)
 
     def enable(self):
-        self.t1.enable()
-        self.t2.enable()
-        self.t3.enable()
+        self.first_section.enable()
+        self.other_sections.enable()
 
     def disable(self):
-        self.t1.disable()
-        self.t2.disable()
-        self.t3.disable()
+        self.first_section.disable()
+        self.other_sections.disable()
 
-    def set_values(self, list_of_sections:[int,int,int]):
-        # The list_of_sections comprises: [t1,t2,t3] Where each element is
-        # the ID of a track section on the route ahead
-        self.t1.set_value(list_of_sections[0])
-        self.t2.set_value(list_of_sections[1])
-        self.t3.set_value(list_of_sections[2])
+    def set_values(self, list_of_sections:[int,]):
+        # The list_of_sections is a variable length list of section ids
+        # with at least one element (representing the section immediately ahead)
+        self.first_section.set_value(list_of_sections[0])
+        if len(list_of_sections) > 1: self.other_sections.set_values(list_of_sections[1:])
 
     def get_values(self):
-        # The list_of_sections comprises: [t1,t2,t3] Where each element is
-        # the ID of a track section on the route ahead
-        interlocked_route = [ self.t1.get_value(), self.t2.get_value(), self.t3.get_value() ]
+        # The list_of_sections is a variable length list of section ids
+        # with at least one element (representing the section immediately ahead)
+        interlocked_route = [ self.first_section.get_value() ] + self.other_sections.get_values()
         return(interlocked_route)
 
-class section_ahead_frame():
+#------------------------------------------------------------------------------------
+# Sub Class for a section_ahead_frame (multiple instances of section_ahead_elements)
+#------------------------------------------------------------------------------------
+
+class section_ahead_frame(Tk.Frame):
     def __init__(self, parent_frame):
+        # Create the frame to hold the individual route element frames (packed by the calling class)
+        # Note that the base classes pack themselves (we don't need to pack them here)
+        super().__init__(parent_frame)
         self.main = section_ahead_element(parent_frame, label="MAIN "+u"\u2192")
         self.lh1 = section_ahead_element(parent_frame, label="LH1 "+u"\u2192")
         self.lh2 = section_ahead_element(parent_frame, label="LH2 "+u"\u2192")
@@ -145,10 +191,10 @@ class section_ahead_frame():
         if not self.lh2.validate(): valid = False
         if not self.rh1.validate(): valid = False
         if not self.rh2.validate(): valid = False
-        return (valid)
+        return(valid)
 
 #------------------------------------------------------------------------------------
-# Class for the Track Occupancy Frame - inherits from the sub-classes above
+# Class for the Track Occupancy Frame - uses the various sub-classes above
 # Public Class instance methods provided by this class:
 #    "set_values" - will set the current values [behind,[MAIN,LH1,LH2,RH1,RH2]]
 #    "get_values" - will return the "valid" values [behind,[MAIN,LH1,LH2,RH1,RH2]]
@@ -158,21 +204,20 @@ class section_ahead_frame():
 #    "section_ahead.<route>.enable"  enables/loads the entry box
 #------------------------------------------------------------------------------------
 
-class track_occupancy_frame():
+class track_occupancy_frame(Tk.LabelFrame):
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = Tk.LabelFrame(parent_frame, text="Track occupancy changes")        
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack(side=Tk.LEFT)
-        self.section_behind = section_behind_element(self.subframe1)
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack(side=Tk.LEFT)
-        self.section_ahead = section_ahead_frame(self.subframe2)
+        super().__init__(parent_frame, text="Track occupancy changes")
+        self.section_behind = section_behind_frame(self)
+        self.section_behind.pack(side=Tk.LEFT)
+        self.section_ahead = section_ahead_frame(self)
+        self.section_ahead.pack(side=Tk.LEFT)
 
     def set_values(self, sections):
-        # sections is a list of [section_behind, sections_ahead]
-        # where sections_ahead is a list of routes [MAIN,LH1,LH2,RH1,RH2]
-        # And each route element is a list of track sections [t1,t2,t3]
+        # Sections is a list comprising: [section_behind, list_of_routes_ahead]
+        # The list_of_routes_ahead comprises a list of routes ahead of the signal: [MAIN,LH1,LH2,RH1,RH2]
+        # Eeach route element is a variable length list of track sections on the route ahead: [t1,t2,]
+        # Note that this list always comprises at least one entry (the section immediately ahead of the signal)
         self.section_behind.set_value(sections[0])
         self.section_ahead.main.set_values(sections[1][0])
         self.section_ahead.lh1.set_values(sections[1][1])
@@ -181,9 +226,10 @@ class track_occupancy_frame():
         self.section_ahead.rh2.set_values(sections[1][4])
 
     def get_values(self):
-        # sections is a list of [section_behind, sections_ahead]
-        # where sections_ahead is a list of routes [MAIN,LH1,LH2,RH1,RH2]
-        # And each route element is a list of track sections [t1,t2,t3]
+        # Sections is a list comprising: [section_behind, list_of_routes_ahead]
+        # The list_of_routes_ahead comprises a list of routes ahead of the signal: [MAIN,LH1,LH2,RH1,RH2]
+        # Eeach route element is a variable length list of track sections on the route ahead: [t1,t2,]
+        # Note that this list always comprises at least one entry (the section immediately ahead of the signal)
         return ( [ self.section_behind.get_value(),
                    [ self.section_ahead.main.get_values(),
                      self.section_ahead.lh1.get_values(),
@@ -199,7 +245,7 @@ class track_occupancy_frame():
         return (valid)
 
 #------------------------------------------------------------------------------------
-# Class for the General automation settings subframe
+# Class for the General automation settings Labelframe
 # Public Class instance methods provided by this class:
 #     "override.enable" - enable the override checkbox
 #     "override.disable"- disable the override checkbox
@@ -209,36 +255,36 @@ class track_occupancy_frame():
 #     "distant_automatic.disable"- disable the distant auto checkbox
 #     "override_ahead.enable" - enable the override ahead checkbox
 #     "override_ahead.disable"- disable the override ahead checkbox
-#     "set_values" - will set the current values (override, auto)
-#     "get_values" - will return the "valid" values (override, auto)
+#     "set_values" - will set the current checkbox values
+#     "get_values" - will return a list of current checkbox values
 #------------------------------------------------------------------------------------
 
-class general_settings_frame():
+class general_settings_frame(Tk.LabelFrame):
     def __init__(self, parent_frame):
-        # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = Tk.LabelFrame(parent_frame, text="General settings")
-        self.automatic = common.check_box(self.frame, width=39,
+        # Create the Label Frame for the UI element (packed by the calling class)
+        super().__init__(parent_frame, text="General settings")
+        self.automatic = common.check_box(self,
                     label="Fully automatic signal (no control button)",
                     tool_tip="Select to create without a main signal button "+
                     "(signal will have a default signal state of OFF, but can be "+
                         "overridden to ON via the selections below)")
-        self.automatic.pack()
-        self.distant_automatic = common.check_box(self.frame, width=39,
+        self.automatic.pack(anchor="w")
+        self.distant_automatic = common.check_box(self,
                     label="Fully automatic distant arms (no control button)",
                     tool_tip="Select to create without a distant signal button "+
                     "(distant arms will have a default signal state of OFF, but can "+
                         "be overridden to CAUTION via the selections below)")
-        self.distant_automatic.pack()
-        self.override = common.check_box(self.frame, width=39,
+        self.distant_automatic.pack(anchor="w")
+        self.override = common.check_box(self,
                     label="Override signal to ON if section(s) ahead occupied",
                     tool_tip="Select to override the signal to ON if the track "+
                     "sections ahead of the signal (specified on the left) are occupied")
-        self.override.pack()
-        self.override_ahead = common.check_box(self.frame, width=39,
+        self.override.pack(anchor="w")
+        self.override_ahead = common.check_box(self,
                     label="Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
-        self.override_ahead.pack()
+        self.override_ahead.pack(anchor="w")
                         
     def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
         self.override.set_value(override)
@@ -253,7 +299,33 @@ class general_settings_frame():
                  self.distant_automatic.get_value() )
 
 #------------------------------------------------------------------------------------
-# Class for a Timed signal route element comprising a route selection checkbox, a
+# Class for a "Timed signal" UI element for ground signals only. Builds on the
+# common.int_item_id_entry_box but with additional validation to ensure the
+# selected signal is a 'main' signal type
+#------------------------------------------------------------------------------------
+
+class timed_signal_element(common.int_item_id_entry_box):
+    def __init__(self, parent_frame, callback):
+        super().__init__(parent_frame, allow_empty=False, callback=callback,
+                exists_function=library.signal_exists, tool_tip="Enter the ID of the signal " +
+                        "to trigger.  This can be the current signal or another semaphore / "+
+                        "colour light signal (on the route ahead of the current signal)")
+
+    def validate(self):
+        # Do the basic validation first (does it exist)
+        valid = super().validate(update_validation_status=False)
+        # Now do the additional validation (is the entered signal a 'Main' Signal type)
+        if valid and self.entry.get() != "" and int(self.entry.get()) > 0:
+            signal_type = objects.schematic_objects[objects.signal(int(self.entry.get()))]["itemtype"]
+            if ( signal_type != library.signal_type.colour_light.value and
+                 signal_type != library.signal_type.semaphore.value ):
+                self.TT.text = "Only main semaphore and colour light signals support timed sequences"
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+    
+#------------------------------------------------------------------------------------
+# Class for a Timed signal route frame comprising a route selection checkbox, a
 # signal ID entry box and two integer entry boxes for specifying the timed sequence
 # Public class instance methods provided by this class are 
 #    "disable" - disables/blanks all checkboxes and selection boxes 
@@ -262,43 +334,36 @@ class general_settings_frame():
 #               Note this class also needs the current signal ID for validation
 #    "get_values" - get the last "validated" values of the check box and entry boxes
 #
-# ote that although the library.signal_exists function will match both local and remote
+# Note that although the library.signal_exists function will match both local and remote
 # Signal IDs, the int_item_id_entry_box only allows integers to be selected - so we
 # can safely use this function here for consistency.
 #------------------------------------------------------------------------------------
 
-class timed_signal_route_element():
-    def __init__(self, parent_frame, parent_object, label:str):
-        # We need to know the current Signal ID for validation purposes
-        self.current_item_id = 0
-        # This is the parent object (the signal instance)
-        self.parent_object = parent_object
-        # Create a frame for the route element
-        self.frame = Tk.Frame(parent_frame)
-        self.frame.pack()
+class timed_signal_route_element(Tk.Frame):
+    def __init__(self, parent_frame, label:str):
+        # Create the frame to contain everything (and pack it)
+        super().__init__(parent_frame)
+        self.pack()
         # Create the route element (selection, sig ID, start delay, aspect change delay)
-        self.label1 = Tk.Label(self.frame, width=5, text=label, anchor='w')
+        self.label1 = Tk.Label(self, width=5, text=label, anchor='w')
         self.label1.pack(side=Tk.LEFT)
-        self.route = common.check_box(self.frame, label="", callback=self.route_updated,
+        self.route = common.check_box(self, label="", callback=self.route_updated,
                 tool_tip="Select to trigger a timed sequence (for this route) when the current signal is passed")
         self.route.pack(side=Tk.LEFT)
-        self.label2 = Tk.Label(self.frame, text="  Signal to trigger:")
+        self.label2 = Tk.Label(self, text="  Signal to trigger:")
         self.label2.pack(side=Tk.LEFT)
-        self.sig = common.int_item_id_entry_box(self.frame, allow_empty=False, callback=self.signal_updated,
-                exists_function=library.signal_exists, tool_tip="Enter the ID of the signal to "+
-                   "trigger. This can be the current signal or another semaphore / colour light "+
-                            "signal (on the route ahead of the current signal)")
+        self.sig = timed_signal_element(self, callback=self.signal_updated)
         self.sig.pack(side=Tk.LEFT)
-        self.label3 = Tk.Label(self.frame, text="  Start delay:")
+        self.label3 = Tk.Label(self, text="  Start delay:")
         self.label3.pack(side=Tk.LEFT)
-        self.start = common.integer_entry_box(self.frame, width=3, min_value=0, max_value=60,
+        self.start = common.integer_entry_box(self, width=3, min_value=0, max_value=60,
                             allow_empty=False, tool_tip="Specify the time delay (in seconds) "+
                             "before triggering the timed sequence (if triggering the same " +
                             "signal then this will be zero)")
         self.start.pack(side=Tk.LEFT)
-        self.label4 = Tk.Label(self.frame, text="  Time delay:")
+        self.label4 = Tk.Label(self, text="  Time delay:")
         self.label4.pack(side=Tk.LEFT)
-        self.delay = common.integer_entry_box(self.frame, width=3, min_value=1, max_value=60,
+        self.delay = common.integer_entry_box(self, width=3, min_value=1, max_value=60,
                             allow_empty=False, tool_tip="Specify the time period (in seconds) "+
                                                         "between signal aspect changes")
         self.delay.pack(side=Tk.LEFT)
@@ -316,10 +381,16 @@ class timed_signal_route_element():
             self.sig.enable1()
             self.start.enable1()
             self.delay.enable1()
+            self.label2.config(state="normal")
+            self.label3.config(state="normal")
+            self.label4.config(state="normal")
         else:
             self.sig.disable1()
             self.start.disable1()
             self.delay.disable1()
+            self.label2.config(state="disabled")
+            self.label3.config(state="disabled")
+            self.label4.config(state="disabled")
         self.signal_updated()
     
     def enable(self):
@@ -327,12 +398,14 @@ class timed_signal_route_element():
         self.sig.enable()
         self.start.enable()
         self.delay.enable()
+        self.route_updated()
 
     def disable(self):
         self.route.disable()
         self.sig.disable()
         self.start.disable()
         self.delay.disable()
+        self.route_updated()
 
     def set_values(self, route:[bool,int,int,int], item_id:int):
         # A route comprises a list of [selected, sig_id, start_delay, time_delay)
@@ -374,23 +447,21 @@ class timed_signal_route_element():
 # should call the individual enable/disable functions for each route element
 #------------------------------------------------------------------------------------
 
-class timed_signal_frame():
-    def __init__(self, parent_frame, parent_object):
-        # Create a label frame for the UI element
-        self.frame = Tk.LabelFrame(parent_frame, text="Trigger timed signal sequence")
-        # Create a subframe for the context label
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')        
-        self.label = Tk.Label(self.frame, text="Routes to\ntrigger", anchor='w')
+class timed_signal_frame(Tk.LabelFrame):
+    def __init__(self, parent_frame):
+        # Create a label frame for the UI element (packed by the calling class)
+        super().__init__(parent_frame, text="Trigger timed signal sequence")
+        # Create athe context label
+        self.label = Tk.Label(self, text="Routes to\ntrigger", anchor='w')
         self.label.pack(side=Tk.LEFT)
-        # Create a subframe for the route elements
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)        
-        self.main=timed_signal_route_element(self.subframe2, parent_object, label="MAIN")
-        self.lh1=timed_signal_route_element(self.subframe2, parent_object, label="LH1")
-        self.lh2=timed_signal_route_element(self.subframe2, parent_object, label="LH2")
-        self.rh1=timed_signal_route_element(self.subframe2, parent_object, label="RH1")
-        self.rh2=timed_signal_route_element(self.subframe2, parent_object, label="RH2")
+        # Create a subframe for the route elements (packed in the base class)
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+        self.main=timed_signal_route_element(self.subframe, label="MAIN")
+        self.lh1=timed_signal_route_element(self.subframe, label="LH1")
+        self.lh2=timed_signal_route_element(self.subframe, label="LH2")
+        self.rh1=timed_signal_route_element(self.subframe, label="RH1")
+        self.rh2=timed_signal_route_element(self.subframe, label="RH2")
         
     def set_values(self, timed_sequence:[[bool,int,int,int],], item_id:int):
         # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
@@ -433,35 +504,35 @@ class timed_signal_frame():
 #    "get_values" - get the current values of the check box and radio buttons
 #------------------------------------------------------------------------------------
 
-class approach_control_route_element():
+class approach_control_route_element(Tk.Frame):
     def __init__(self, parent_frame, label:str):
-        # Create a frame for the route element
-        self.frame = Tk.Frame(parent_frame)
-        self.frame.pack()
+        # Create the frame for the route element (and pack it
+        super().__init__(parent_frame)
+        self.pack()
         # Create the route element (selection, sig ID, start delay, aspect change delay)
-        self.label1 = Tk.Label(self.frame, width=5, text=label, anchor='w')
+        self.label1 = Tk.Label(self, width=5, text=label, anchor='w')
         self.label1.pack(side=Tk.LEFT)
-        self.route = common.check_box(self.frame, label="", callback=self.route_selected,
+        self.route = common.check_box(self, label="", callback=self.route_selected,
                 tool_tip="Select to enable 'Approach Control' for this route")
         self.route.pack(side=Tk.LEFT)
         # Add a bit of white space
-        self.label2 = Tk.Label(self.frame, text="   Release on:")
+        self.label2 = Tk.Label(self, text="   Release on:")
         self.label2.pack(side=Tk.LEFT)
         # Create the approach control mode selection radiobuttons
-        self.selection = Tk.IntVar(self.frame, 0)
+        self.selection = Tk.IntVar(self, 0)
         self.approach_mode = 0
         self.red_enabled = True
         self.yel_enabled = True
         self.sig_enabled = True
-        self.B1 = Tk.Radiobutton(self.frame, text="Red", anchor='w',
+        self.B1 = Tk.Radiobutton(self, text="Red", anchor='w',
                 command=self.mode_selected, variable=self.selection, value=1)
         self.B1.pack(side=Tk.LEFT)
         self.B1TT = common.CreateToolTip(self.B1, "Signal will remain at DANGER until the train approaches")
-        self.B2 = Tk.Radiobutton(self.frame, text="Yellow", anchor='w',
+        self.B2 = Tk.Radiobutton(self, text="Yellow", anchor='w',
                 command=self.mode_selected, variable=self.selection, value=2)
         self.B2.pack(side=Tk.LEFT)
         self.B2TT = common.CreateToolTip(self.B2, "Signal will remain at CAUTION until the train approaches")
-        self.B3 = Tk.Radiobutton(self.frame, text="Red (on signals ahead)", anchor='w',
+        self.B3 = Tk.Radiobutton(self, text="Red (on signals ahead)", anchor='w',
                 command=self.mode_selected, variable=self.selection, value=3)
         self.B3.pack(side=Tk.LEFT)
         self.B3TT = common.CreateToolTip(self.B3, "Signal will remain at DANGER until the train approaches "+
@@ -472,6 +543,7 @@ class approach_control_route_element():
 
     def route_selected(self):
         if self.route.get_value():
+            self.label2.config(state="normal")
             if self.red_enabled: self.B1.configure(state="normal")
             else: self.B1.configure(state="disabled")
             if self.yel_enabled: self.B2.configure(state="normal")
@@ -485,6 +557,7 @@ class approach_control_route_element():
             if not self.sig_enabled and self.approach_mode == 3: self.approach_mode = 1
             self.selection.set(self.approach_mode)
         else:
+            self.label2.config(state="disabled")
             self.B1.configure(state="disabled")
             self.B2.configure(state="disabled")
             self.B3.configure(state="disabled")
@@ -553,23 +626,21 @@ class approach_control_route_element():
 # should call the individal route_enable/disable functions for each element
 #------------------------------------------------------------------------------------
 
-class approach_control_frame():
+class approach_control_frame(Tk.LabelFrame):
     def __init__(self, parent_frame):
         # Create a label frame for the UI element
-        self.frame = Tk.LabelFrame(parent_frame, text="Approach control selections")
-        # Create a subframe for the context label
-        self.subframe1 = Tk.Frame(self.frame)
-        self.subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')        
-        self.label = Tk.Label(self.frame, text="Routes\nsubject to\napproach\ncontrol", anchor='w')
+        super().__init__(parent_frame, text="Approach control selections")
+        # Create the context label
+        self.label = Tk.Label(self, text="Routes\nsubject to\napproach\ncontrol", anchor='w')
         self.label.pack(side=Tk.LEFT)
         # Create a subframe for the route elements
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)        
-        self.main=approach_control_route_element(self.subframe2, label="MAIN")
-        self.lh1=approach_control_route_element(self.subframe2, label="LH1")
-        self.lh2=approach_control_route_element(self.subframe2, label="LH2")
-        self.rh1=approach_control_route_element(self.subframe2, label="RH1")
-        self.rh2=approach_control_route_element(self.subframe2, label="RH2")
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+        self.main=approach_control_route_element(self.subframe, label="MAIN")
+        self.lh1=approach_control_route_element(self.subframe, label="LH1")
+        self.lh2=approach_control_route_element(self.subframe, label="LH2")
+        self.rh1=approach_control_route_element(self.subframe, label="RH1")
+        self.rh2=approach_control_route_element(self.subframe, label="RH2")
         
     def enable_release_on_red(self):
         self.main.enable_red()
@@ -645,19 +716,19 @@ class approach_control_frame():
 #------------------------------------------------------------------------------------
 
 class signal_automation_tab():
-    def __init__(self, parent_tab, parent_object):
+    def __init__(self, parent_tab):
         # Create the signal sensor frame (always packed)
-        self.gpio_sensors = signal_passed_sensor_frame(parent_tab, parent_object)
-        self.gpio_sensors.frame.pack(padx=2, pady=2, fill='x')
+        self.signal_events = signal_events_frame(parent_tab)
+        self.signal_events.pack(padx=2, pady=2, fill='x')
         # Create a Frame for the track occupancy and general settings (always packed)
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.track_occupancy = track_occupancy_frame(self.frame1)
-        self.track_occupancy.frame.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.track_occupancy.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
         self.general_settings = general_settings_frame(self.frame1)
-        self.general_settings.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
+        self.general_settings.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
         # Create a Frame for the timed signal configuration (packed according to signal type)
-        self.timed_signal = timed_signal_frame(parent_tab, parent_object)
+        self.timed_signal = timed_signal_frame(parent_tab)
         # Create a Frame for the Signal Approach control (packed according to signal type)
         self.approach_control = approach_control_frame(parent_tab)
 

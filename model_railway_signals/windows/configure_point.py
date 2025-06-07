@@ -23,6 +23,7 @@
 #    common.Createtool_tip
 #    common.check_box
 #    common.validated_dcc_entry_box
+#    common.row_of_int_item_id_entry_boxes
 #    common.object_id_selection
 #    common.selection_buttons
 #    common.signal_route_frame
@@ -308,6 +309,14 @@ class point_configuration_tab():
 
 class point_interlocking_tab():
     def __init__(self, parent_tab):
+        # Create a labelFrame to hold the Interlocked Sections element
+        self.frame1 = Tk.LabelFrame(parent_tab, text="interlocked Track Sections ('track circuits')")
+        self.frame1.pack(padx=2, pady=2, fill='x')
+        self.sections = common.row_of_int_item_id_entry_boxes(self.frame1, columns=5,
+                    tool_tip = "Enter the ID of a Track Section (representing a 'track circuit') which "+
+                    "will lock the point when the section is occupied", exists_function=library.section_exists)
+        self.sections.pack(padx=2, pady=2)
+        # Create the Signals Interlocking (read only) element
         self.signals = common.signal_route_frame(parent_tab, label="Signals interlocked with point",
                                 tool_tip="Edit the appropriate signals to configure interlocking")
         self.signals.pack(padx=2, pady=2, fill='x')
@@ -403,6 +412,8 @@ class edit_point():
             add = objects.schematic_objects[self.object_id]["dccaddress"]
             rev = objects.schematic_objects[self.object_id]["dccreversed"]
             self.config.dccsettings.set_values (add, rev, item_id)
+            # Set the list of interlocked Track Sections
+            self.locking.sections.set_values(objects.schematic_objects[self.object_id]["sectioninterlock"])
             # Set the read only list of Interlocked signals
             self.locking.signals.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
             # Hide the validation error message
@@ -422,7 +433,7 @@ class edit_point():
         # been validated on entry, but changes to other objects may have been made since then
         elif ( self.config.pointid.validate() and self.config.automation.validate() and
                self.config.dccsettings.validate() and self.config.buttonoffsets.validate() and
-               self.config.linewidth.validate() ):
+               self.config.linewidth.validate() and self.locking.sections.validate()):
             # Copy the original point Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the point coniguration elements from the current user selections
@@ -451,6 +462,8 @@ class edit_point():
             add, rev = self.config.dccsettings.get_values()
             new_object_configuration["dccaddress"] = add
             new_object_configuration["dccreversed"] = rev
+            # Get the list of Interlocked track Section (Interlocking tab)
+            new_object_configuration["sectioninterlock"] = self.locking.sections.get_values()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

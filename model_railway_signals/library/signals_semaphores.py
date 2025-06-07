@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       main_signal:bool - To create a signal arm for the main route - default = True
 #                        (Only set this to False when creating an "associated" distant signal
@@ -43,6 +44,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post and base - default = "White"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # Classes and functions used by the other library modules:
@@ -80,6 +82,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             sig_passed_callback,
                             sig_updated_callback,
                             orientation:int=0,
+                            sig_passed_button:bool=False,
                             sig_release_button:bool=False,
                             main_signal:bool=True,
                             lh1_signal:bool=False,
@@ -101,6 +104,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             active_colour:str="Grey95",
                             selected_colour:str="White",
                             text_colour:str="black",
+                            post_colour:str="white",
                             font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
@@ -144,6 +148,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                                                 sig_switched_callback, sig_passed_callback,
                                                 sig_updated_callback = sig_updated_callback,
                                                 sub_switched_callback = sub_switched_callback,
+                                                sig_passed_button = sig_passed_button,
                                                 has_subsidary = has_subsidary,
                                                 sig_automatic = fully_automatic,
                                                 associated_home = associated_home,
@@ -152,6 +157,8 @@ def create_semaphore_signal(canvas, sig_id:int,
                                                 selected_colour = selected_colour,
                                                 text_colour = text_colour,
                                                 font = font)
+        # Get the assigned tag to use for all the signal post elements
+        post_tag = signals.signals[str(sig_id)]["posttag"]
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
@@ -178,46 +185,46 @@ def create_semaphore_signal(canvas, sig_id:int,
         # and we therefore only need to add the additional distant arms to the existing posts
         if associated_home == 0:
             line_coords = common.rotate_line(x,y,0,0,0,postoffset,orientation)
-            canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+            canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             line_coords = common.rotate_line(x,y,0,postoffset,+60,postoffset,orientation)
-            canvas.create_line(line_coords,width=3,fill="snow",tags=canvas_tag)
+            canvas.create_line(line_coords,width=3,fill=post_colour,tags=(canvas_tag,post_tag))
             # Draw the rest of the gantry to support other arms as required
             if lh2_signal or lh2_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,lh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if lh2_signal:
                     line_coords = common.rotate_line(x,y,25,lh2offset,55,lh2offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,lh2offset,38,lh2offset,orientation) ##
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if lh1_signal or lh1_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,lh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if lh1_signal:
                     line_coords = common.rotate_line(x,y,25,lh1offset,55,lh1offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,lh1offset,38,lh1offset,orientation) ###
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if rh2_signal or rh2_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,rh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if rh2_signal:
                     line_coords = common.rotate_line(x,y,25,rh2offset,55,rh2offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,rh2offset,38,rh2offset,orientation) ##
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if rh1_signal or rh1_subsidary:
                 line_coords = common.rotate_line(x,y,25,postoffset,25,rh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if rh1_signal:
                     line_coords = common.rotate_line(x,y,25,rh1offset,55,rh1offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 else:
                     line_coords = common.rotate_line(x,y,25,rh1offset,38,rh1offset,orientation) ##
-                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                    canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
         # set the colour of the signal arm according to the signal type
         if signalsubtype == semaphore_subtype.distant: arm_colour="yellow"
         else: arm_colour = "red"
@@ -282,14 +289,14 @@ def create_semaphore_signal(canvas, sig_id:int,
         if not rh1_signal: canvas.itemconfigure(rh1sigon,state='hidden')
         if not lh2_signal: canvas.itemconfigure(lh2sigon,state='hidden')
         if not rh2_signal: canvas.itemconfigure(rh2sigon,state='hidden')
-        # Set the initial state of the signal Arms. We use True/False to represent the current
-        # state of the signal arm, or a value of 'None' if the arm doesn't exist. We set the
-        # arms that do exist in the "wrong" state initially, so that when they are first updated
-        # they get "changed" to the correct initial state (causing the appropriate DCC commands
-        # to be sent out to the external signal). So, bearing in mind that the parameters passed
-        # into this function were either True or False (with False representing no signal arm)
-        # Signal arm specified - corresponding arm will bee set to True (OFF) initially
-        # No signal arm specified - corresponding arm will be set to None
+        # Set the initial internal 'state' of each signal arm supported by the signal:
+        # - If no signal arm is specified then this is represented by a state of 'None'.
+        # - If a signal arm is specified, then its state is represented by True/False.
+        # Signals default to 'ON' on creation (a state of 'False'), but we set the internal
+        # state of each arm (that does exist) to True so that each arm gets 'changed' by the
+        # initial 'update_signal' call (at the end of this function). As the signal arm 'flags
+        # are either True (create sig arm) or False (don't create signal arm), we therefore
+        # need to change any 'False' values to 'None'.
         if not main_signal: main_signal = None
         if not main_subsidary: main_subsidary = None 
         if not lh1_subsidary: lh1_subsidary = None
@@ -351,19 +358,18 @@ def create_semaphore_signal(canvas, sig_id:int,
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
-        # Note that for Enum types we load the value - need to turn this back into the Enum
-        if loaded_state["routeset"] is not None:
-            loaded_state["routeset"] = signals.route_type(loaded_state["routeset"])
-        # Set the initial state from the "loaded" state
+        # Update the initial state from the "loaded" state and set the displayed aspect.
+        # Note that the following function calls will send out DCC commands to the SPROG
+        # and publish MQTT commands to reflect the state of the signal as appropriate.
+        if loaded_state["routeset"]: signals.set_route(sig_id,route=signals.route_type(loaded_state["routeset"]))
         if loaded_state["releaseonred"]: signals.set_approach_control(sig_id,release_on_yellow=False)
         if loaded_state["releaseonyel"]: signals.set_approach_control(sig_id,release_on_yellow=True)
-        if loaded_state["theatretext"]: signals.update_theatre_route_indication(sig_id,loaded_state["theatretext"])
-        if loaded_state["routeset"]: signals.signals[str(sig_id)]["routeset"]=loaded_state["routeset"]
+        if loaded_state["theatretext"]: signals.set_route(sig_id, theatre_text=loaded_state["theatretext"])
         if loaded_state["override"]: signals.set_signal_override(sig_id)
-        # If no state was loaded we still need to toggle fully automatic signals to OFF
-        # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
-        # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
-        # We test to see if there is a arm for each route (as the signal may not have one for all the routes)
+        # If no state was loaded, but the signal is 'automatic' then we need to set the appropriate signal
+        # arm to 'OFF'. Note that we Set the signal arm to the "wrong" initial state so that when we
+        # toggle the signal this ensures the appropriate DCC commands and MQTT Messages are sent out.
+        # Note also we test test to see if there is a arm for the route (i.e. the flag is not 'None')
         if loaded_state["sigclear"] or fully_automatic:
             if (signals.signals[str(sig_id)]["routeset"]==signals.route_type.MAIN
                    and signals.signals[str(sig_id)]["main_signal"]==True ):
@@ -381,14 +387,14 @@ def create_semaphore_signal(canvas, sig_id:int,
                    and signals.signals[str(sig_id)]["rh2_signal"]==True ):
                 signals.signals[str(sig_id)]["rh2_signal"] = False
             signals.toggle_signal(sig_id)
-        # Update the signal to show the initial aspect (and send out DCC commands)
+        # Update the signal to show the initial aspect (and send out DCC/MQTT commands)
         update_semaphore_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals.lock_signal(sig_id)
-        # Set the initial state of the subsidary from the "loaded" state
-        # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
-        # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
-        # We test to see if there is a subsidary arm (as the signal may not have one for all the routes)
+        # If the loaded state of the subsidary is 'Clear' then we need to set the appropriate signal
+        # arm to 'OFF'. Note that we set the subsidary arm to the "wrong" initial state so that when we
+        # toggle the signal this ensures the appropriate DCC commands and MQTT Messages are sent out.
+        # Note also we test test to see if there is a arm for the route (i.e. the flag is not 'None')
         if has_subsidary:
             if loaded_state["subclear"]:
                 signals.toggle_subsidary(sig_id)
@@ -411,10 +417,6 @@ def create_semaphore_signal(canvas, sig_id:int,
             update_semaphore_subsidary_arms(sig_id)
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals.lock_subsidary(sig_id)
-        # Publish the initial state to the broker (for other nodes to consume). Note that changes will
-        # only be published if the MQTT interface has been configured for publishing updates for this 
-        # signal. This allows publish/subscribe to be configured prior to signal creation
-        signals.send_mqtt_signal_updated_event(sig_id)
         # Return the canvas_tag for the tkinter drawing objects
     return(canvas_tag)
 
@@ -457,6 +459,18 @@ def has_diverging_route_arms(sig_id:int):
                       signals.signals[str(sig_id)]["rh1_signal"] is not None or
                       signals.signals[str(sig_id)]["rh2_signal"] is not None )
     return(has_route_arms)
+
+#-------------------------------------------------------------------
+# Helper function to determine if there is an arm for the specified route
+#-------------------------------------------------------------------
+
+def has_route_arm(sig_id:int, route:signals.route_type):
+    has_route_arm = ( route == signals.route_type.MAIN and signals.signals[str(sig_id)]["main_signal"] is not None or
+                      route == signals.route_type.LH1 and signals.signals[str(sig_id)]["lh1_signal"] is not None or
+                      route == signals.route_type.LH2 and signals.signals[str(sig_id)]["lh2_signal"] is not None or
+                      route == signals.route_type.RH1 and signals.signals[str(sig_id)]["rh1_signal"] is not None or
+                      route == signals.route_type.RH2 and signals.signals[str(sig_id)]["rh2_signal"] is not None )
+    return(has_route_arm)
 
 #-------------------------------------------------------------------
 # Internal Function to update each of the subsidary signal arms supported by
@@ -601,12 +615,14 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 # This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_semaphore_signal(sig_id:int, updating_associated_signal:bool=False):
-    route = signals.signals[str(sig_id)]["routeset"]
-    # Get the ID of the associated signal (to make the following code more readable)
+def update_semaphore_signal(sig_id:int):
+    # Retrieve the current state info (to make the following code more readable)
+    signal_route = signals.signals[str(sig_id)]["routeset"]
+    current_aspect = signals.signals[str(sig_id)]["sigstate"]
     associated_signal = signals.signals[str(sig_id)]["associatedsignal"]
-    # Establish what the signal should be displaying based on the state
+    # Semaphore signals are either HOME or DISTANT signals
     if signals.signals[str(sig_id)]["subtype"] == semaphore_subtype.distant:
+        # Establish what the DISTANT signal should be displaying based on the state
         if not signals.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is ON"
@@ -616,37 +632,56 @@ def update_semaphore_signal(sig_id:int, updating_associated_signal:bool=False):
         elif signals.signals[str(sig_id)]["overcaution"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OVERRIDDEN to CAUTION"
-        elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        elif signals.signals[str(sig_id)]["timedsequence"][signal_route.value].sequence_in_progress:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is on a timed sequence"
+        # If the DISTANT signal is associated with a HOME signal then we need to take into account
+        # the state of the HOME signal when setting the state (co-located DISTANT signals are 'slotted'
+        # with the HOME signal - if the HOME signal is at DANGER then the distant is forced to CAUTION.
         elif associated_signal > 0 and signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.DANGER:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = (" (CAUTION) - signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
         else:
             new_aspect = signals.signal_state_type.PROCEED
             log_message = (" (PROCEED) - signal is OFF - route is set to " +
-                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
+                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
     else:
+        # Establish what the HOME signal should be displaying based on the state
         if not signals.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is ON"
         elif signals.signals[str(sig_id)]["override"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is OVERRIDDEN"
-        elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        elif signals.signals[str(sig_id)]["timedsequence"][signal_route.value].sequence_in_progress:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is on a timed sequence"
         elif signals.signals[str(sig_id)]["releaseonred"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is subject to \'release on red\' approach control"
-        elif associated_signal > 0 and signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.CAUTION:
+        # If the HOME signal is associated with a DISTANT signal *AND* the DISTANT signal has a route arm
+        # for the selected route then then we need to take into account the state of the DISTANT signal
+        # when setting the internal 'sigstate' (the signal state could be CAUTION or PROCEED) to ensure
+        # any colour light signals behind the signal display the correct aspect. Note that this won't
+        # affect the state of the HOME signal arm (it will either be ON or OFF as appropriate).
+        elif (associated_signal > 0 and has_route_arm(associated_signal, signal_route) and
+                signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.CAUTION):
             new_aspect = signals.signal_state_type.CAUTION
-            log_message = (" (CAUTION) - signal is OFF but associated distant "+str(associated_signal)+" is at CAUTION")
+            log_message = " (CAUTION) - signal is OFF but associated distant "+str(associated_signal)+" is at CAUTION"
+            # Log the new state if we're not goint to get logging with a change of the signal arm
+            if current_aspect == signals.signal_state_type.PROCEED:
+                logging.info("Signal "+str(sig_id)+": Changing signal state to"+log_message)
+        elif (associated_signal > 0 and has_route_arm(associated_signal, signal_route) and
+                signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.PROCEED):
+            new_aspect = signals.signal_state_type.PROCEED
+            log_message = " (PROCEED) - signal is OFF and associated distant "+str(associated_signal)+" is at PROCEED"
+            # Log the new state if we're not goint to get logging with a change of the signal arm
+            if current_aspect == signals.signal_state_type.CAUTION:
+                logging.info("Signal "+str(sig_id)+": Changing signal state to"+log_message)
         else:
             new_aspect = signals.signal_state_type.PROCEED
             log_message = (" (PROCEED) - signal is OFF - route is set to " +
-                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
-    current_aspect = signals.signals[str(sig_id)]["sigstate"]
+                 str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
     # Now refresh the displayed aspect (passing in the log message to be displayed) if the aspect has changed
     if new_aspect != current_aspect:
         signals.signals[str(sig_id)]["sigstate"] = new_aspect
@@ -656,23 +691,18 @@ def update_semaphore_signal(sig_id:int, updating_associated_signal:bool=False):
         # home signal is set to DANGER then the distant signal (on the same arm) should show CAUTION
         # Associated Home signals need to be updated as the internal state of home signals relies on the state of
         # the distant signal and the home signal (i.e. Home is OFF but distant is ON - State is therefore CAUTION
-        # We set a flag for the recursive call so we don't end up in a circular recursion
-        if associated_signal > 0 and not updating_associated_signal:
-            update_semaphore_signal(associated_signal, updating_associated_signal=True)
+        if associated_signal > 0: update_semaphore_signal(associated_signal)
         # Call the common function to update the theatre route indicator elements
         # (if the signal has a theatre route indicator - otherwise no effect)
         signals.enable_disable_theatre_route_indication(sig_id)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
         signals.send_mqtt_signal_updated_event(sig_id)
-        # For associated distant signals we need to take into account the state of both the home and distant signals
-        # to set the correct "state" for the associated home/distant signal - and we will only know this state once
-        # both home and distant signals have been updated (to take into account any "slotting")
-        if ( signals.signals[str(sig_id)]["subtype"] == semaphore_subtype.home and associated_signal > 0 and
-             signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.CAUTION and
-             signals.signals[str(associated_signal)]["sigstate"] == signals.signal_state_type.PROCEED ):
-            logging.info("Signal "+str(sig_id)+": Updating signal state to PROCEED - associated (slotted) distant is now OFF")
-            signals.signals[str(sig_id)]["sigstate"] = signals.signal_state_type.PROCEED
+        # Update any slotted ground signals (if the main sig is clear the ground signal needs to show clear)
+        for other_sig_id in signals.signals:
+            if "slotwith" in signals.signals[other_sig_id].keys():
+                if signals.signals[other_sig_id]["slotwith"] == sig_id:
+                    signals.update_signal_aspect(int(other_sig_id))
     return()
 
 # -------------------------------------------------------------------------

@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       has_subsidary:bool - Creates a subsidary position light signal - Default = False
 #       mainfeather:bool - Creates a MAIN route feather - Default = False
@@ -33,6 +34,7 @@
 #       active_colour:str - Fill colour for the button when active (cursor over button) - default = "Grey95"
 #       selected_colour:str - Fill colour for the button when selected - default = "White"
 #       text_colour:str - Colour of the button text (Button foreground colour) - default = "Black"
+#       post_colour:str - Colour of the signal post and base - default = "White"
 #       font:(str, int, str) - Tkinter font tuple for the button text - default = ("Courier", 8, "normal")
 #
 # Classes and functions used by the other library modules:
@@ -69,6 +71,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 sig_passed_callback,
                                 sig_updated_callback,
                                 orientation:int=0,
+                                sig_passed_button:bool=False,
                                 sig_release_button:bool=False,
                                 has_subsidary:bool=False,
                                 mainfeather:bool=False,
@@ -85,6 +88,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 active_colour:str="Grey95",
                                 selected_colour:str="White",
                                 text_colour:str="black",
+                                post_colour:str="white",
                                 font=("Courier", 8, "normal")):
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
@@ -115,6 +119,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                                 sig_switched_callback, sig_passed_callback,
                                                 sig_updated_callback = sig_updated_callback,
                                                 sub_switched_callback = sub_switched_callback,
+                                                sig_passed_button = sig_passed_button,
                                                 has_subsidary = has_subsidary,
                                                 sig_automatic = fully_automatic,
                                                 button_colour = button_colour,
@@ -122,11 +127,13 @@ def create_colour_light_signal (canvas, sig_id:int,
                                                 selected_colour = selected_colour,
                                                 text_colour = text_colour,
                                                 font = font)
+        # Get the assigned tag to use for all the signal post elements
+        post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base line & signal post   
         line_coords = common.rotate_line (x,y,0,0,0,-15,orientation) 
-        canvas.create_line (line_coords,width=2,tags=canvas_tag,fill="snow")
+        canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
         line_coords = common.rotate_line (x,y,0,-15,+30,-15,orientation) 
-        canvas.create_line (line_coords,width=3,tags=canvas_tag,fill="snow")
+        canvas.create_line (line_coords,width=3,tags=(canvas_tag,post_tag),fill=post_colour)
         # Draw the body of the subsidary signal - only if a subsidary has been specified
         if has_subsidary:
             point_coords1 = common.rotate_point (x,y,+13,-8,orientation) 
@@ -229,30 +236,29 @@ def create_colour_light_signal (canvas, sig_id:int,
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
-        # Note that for Enum types we load the value - need to turn this back into the Enum
-        if loaded_state["routeset"] is not None:
-            loaded_state["routeset"] = signals.route_type(loaded_state["routeset"])
-        # Set the initial state from the "loaded" state
+        # Update the state of the signal from the "loaded" state. Note that the following function calls
+        # only update the internal signal state. The displayed aspect will only be updated and DCC/MQTT
+        # messages will only be sent out when 'update_colour_light_signal' is called for the first time.
+        if loaded_state["routeset"]: signals.set_route(sig_id,route=signals.route_type(loaded_state["routeset"]))
         if loaded_state["releaseonred"]: signals.set_approach_control(sig_id,release_on_yellow=False)
         if loaded_state["releaseonyel"]: signals.set_approach_control(sig_id,release_on_yellow=True)
-        if loaded_state["theatretext"]: signals.update_theatre_route_indication(sig_id,loaded_state["theatretext"])
-        if loaded_state["routeset"]: update_feather_route_indication(sig_id,loaded_state["routeset"])
+        if loaded_state["theatretext"]: signals.set_route(sig_id, theatre_text=loaded_state["theatretext"])
         if loaded_state["override"]: signals.set_signal_override(sig_id)
-        # If no state was loaded we still need to toggle fully automatic signals to OFF
+        # If no state was loaded, but the signal is 'automatic' then toggle the signal to 'OFF'
         if loaded_state["sigclear"] or fully_automatic: signals.toggle_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals.lock_signal(sig_id)
+        # Now set the inoitial state of the subsidary (if one has been specified)
         if has_subsidary:
-            # Set the initial state of the subsidary from the "loaded" state
-            if loaded_state["subclear"]: signals.toggle_subsidary(sig_id)
-            # Update the signal to show the initial aspect (and send out DCC commands)
-            update_colour_light_subsidary(sig_id)
+            # If the loaded state is 'Clear' then toggle the subsidary to 'OFF' (which will update the
+            # displayed aspect). Otherwise the displayed aspect is updated to reflect the default 'ON' state.
+            # Both functions will send out the appropriate DCC commands to reflect the displayed aspect.
+            if loaded_state["subclear"]:
+                signals.toggle_subsidary(sig_id)
+            else:
+                update_colour_light_subsidary(sig_id)
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals.lock_subsidary(sig_id)
-        # Publish the initial state to the broker (for other nodes to consume). Note that changes will
-        # only be published if the MQTT interface has been configured for publishing updates for this 
-        # signal. This allows publish/subscribe to be configured prior to signal creation
-        signals.send_mqtt_signal_updated_event(sig_id)
         # Return the canvas_tag for the tkinter drawing objects
     return(canvas_tag)
 
@@ -403,10 +409,10 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
             new_aspect = signals.signal_state_type.PROCEED
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
                       + str(signals.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
-
+    # Only refresh the signal if the aspect has been changed. Note that signals are created with
+    # a 'sigstate' of None - so there will always be a change of state on creation to ensure
+    # MQTT/DCC messages are sent out to reflect the post-creation state of the signal.
     current_aspect = signals.signals[str(sig_id)]["sigstate"]
-        
-    # Only refresh the signal if the aspect has been changed
     if new_aspect != current_aspect:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)
         # Update the current aspect - note that this dictionary element is also used by the Flash Aspects Thread
@@ -420,8 +426,12 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         dcc_control.update_dcc_signal_aspects(sig_id, new_aspect)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        signals.send_mqtt_signal_updated_event(sig_id)            
-
+        signals.send_mqtt_signal_updated_event(sig_id)
+        # Update any slotted ground signals (if the main sig is clear the ground signal needs to show clear)
+        for other_sig_id in signals.signals:
+            if "slotwith" in signals.signals[other_sig_id].keys():
+                if signals.signals[other_sig_id]["slotwith"] == sig_id:
+                    signals.update_signal_aspect(int(other_sig_id))
     return ()
 
 # -------------------------------------------------------------------------

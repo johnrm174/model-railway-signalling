@@ -4,6 +4,8 @@
 # Classes (pop up windows) called from the main editor module menubar selections
 #    dcc_programming(root, dcc_programming_enabled_function, dcc_power_on_function, dcc_power_off_function)
 #    dcc_mappings(root)
+#    bulk_renumbering(root)
+#    application_upgrade(root)
 #
 # Uses the following library functions:
 #    library.service_mode_read_cv(cv_to_read)
@@ -12,6 +14,7 @@
 #    library.request_dcc_power_off()
 #    library.request_dcc_power_on()
 #    library.get_dcc_address_mappings()
+#    library.gpio_interface_enabled()
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object
@@ -53,6 +56,8 @@ import copy
 import json
 import os
 import pathlib
+import subprocess
+import time
 
 from .. import common
 from .. import library
@@ -316,9 +321,9 @@ class cv_programming_element():
         # Set the initial path to the examples directory if required
         if examples:
             library_sub_package_folder = pathlib.Path(__file__)
-            path, name = library_sub_package_folder.parent.parent / 'examples', ""
+            path = library_sub_package_folder.parent.parent / 'examples'
         else:
-            path, name = ".", ""
+            path = "."
         # Open the file chooser dialog to select a file
         filename_to_load = Tk.filedialog.askopenfilename(parent=self.parent_window,title='Load CV configuration',
                 filetypes=(('cvc files','*.cvc'),('all files','*.*')),initialdir = path)
@@ -745,6 +750,97 @@ class bulk_renumbering():
     def close_window(self):
         global renumbering_utility_window
         renumbering_utility_window = None
+        self.window.destroy()
+
+#---------------------------------------------------------------------------------------
+# Class for the "Application Upgrade" utility window (uses the classes above)
+#---------------------------------------------------------------------------------------
+
+upgrade_utility_window = None
+
+class application_upgrade():
+    def __init__(self, root_window):
+        global upgrade_utility_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if upgrade_utility_window is not None:
+            upgrade_utility_window.lift()
+            upgrade_utility_window.state('normal')
+            upgrade_utility_window.focus_force()
+        else:
+            # Create the top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Application Upgrade")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            upgrade_utility_window = self.window
+            # Create the main text for the upgrade window
+            self.label = Tk.Label(self.window, width=50, height=2, text="Check for and install any application updates\n"+
+                                                          "(Progress will be displayed in the Terminal window)")
+            self.label.pack(padx=5, pady=5)
+            self.frame=Tk.Frame(self.window)
+            self.frame.pack(padx=5, pady=5)
+            # Create the buttons and tooltip
+            self.B1 = Tk.Button(self.frame, text = "Upgrade", command=self.upgrade)
+            self.TT1 = common.CreateToolTip(self.B1, "Proceed with the upgrade")
+            self.B1.pack(padx=5, pady=5, side=Tk.LEFT)
+            self.B2 = Tk.Button(self.frame, text = "Cancel / Close", command=self.close_window)
+            self.TT1 = common.CreateToolTip(self.B2, "Close the window")
+            self.B2.pack(padx=5, pady=5, side=Tk.LEFT)
+
+    def null_function(self):
+        pass
+
+    def upgrade(self):
+        # Inhibit the Buttons and window close function until the upgrade is complete
+        self.B1.config(state="disabled")
+        self.B2.config(state="disabled")
+        self.window.protocol("WM_DELETE_WINDOW", self.null_function)
+        self.label.config(text="Upgrade in progress - please wait\nDo not close application until upgrade is complete")
+        self.B1.update()
+        self.B2.update()
+        self.label.update()
+        # Perform the upgrade (with output to the main terminal window).
+        # We use the library.gpio_interface_enabled function as a quick and dirty method of
+        # establishing if we are running on a raspberry Pi - otherwise we assume Windows
+        print("----------------------------------------------------------------------------------------------------------------")
+        print("Updating the Model Railway Signalling Application - Do not close the application until the upgrade is complete")
+        print("----------------------------------------------------------------------------------------------------------------")
+        try:
+            if library.gpio_interface_enabled():
+                # Assume raspberry Pi - Install with sudo as a system package
+                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                                     "--break-system-packages", "pip"])
+                time.sleep(0.5)
+                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                                     "--break-system-packages", "model-railway-signals"])
+            else:
+                # Assume Windows platform - Install as a user package
+                result = subprocess.run(["pip", "install", "--upgrade", "pip"], shell=True, capture_output=True)
+                print(result.stdout.decode('utf-8'))
+                time.sleep(0.5)
+                result= subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
+                print(result.stdout.decode('utf-8'))
+        except Exception as exception:
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Upgrade Error - An unhandled exception occured - Try manually upgrading from the Terminal / Command Prompt")
+            print("----------------------------------------------------------------------------------------------------------------")
+            self.label.config(text="An unhandled exception occured\nTry manually upgrading from the Terminal / Cmd Prompt")
+        else:
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Application Upgrade process is now complete - Exit and re-open the application to use the new version")
+            print("----------------------------------------------------------------------------------------------------------------")
+            self.label.config(text="Upgrade process is complete\nExit and re-open the application to use the new version")
+        # Re-enable the close button and window close now the upgrade process is complete
+        self.B1.update()
+        self.B2.update()
+        self.B1.config(state="normal")
+        self.B2.config(state="normal")
+        self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+        self.label.update()
+
+    def close_window(self):
+        global upgrade_utility_window
+        upgrade_utility_window = None
         self.window.destroy()
 
 #############################################################################################

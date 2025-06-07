@@ -25,6 +25,8 @@
 #    objects_signals.remove_references_to_section - when the Section is deleted
 #    objects_sensors.update_references_to_section - called when the Section ID is changed
 #    objects_sensors.remove_references_to_section - called when the Section is deleted
+#    objects_points.update_references_to_section - called when the Section ID is changed
+#    objects_points.remove_references_to_section - called when the Section is deleted
 #    
 # Accesses the following external editor objects directly:
 #    run_layout.section_updated_callback - setting the object callbacks when created/recreated
@@ -49,6 +51,7 @@ import copy
 from . import objects_common
 from . import objects_signals
 from . import objects_sensors
+from . import objects_points
 from .. import settings
 from .. import run_layout 
 from .. import library
@@ -181,6 +184,7 @@ def update_section(object_id, new_object_configuration):
         # Update any references to the section from the Signal / track sensor tables
         objects_signals.update_references_to_section(old_item_id, new_item_id)
         objects_sensors.update_references_to_section(old_item_id, new_item_id)
+        objects_points.update_references_to_section(old_item_id, new_item_id)
         # Update any references from other Track Sections (mirrored sections)
         update_references_to_section(old_item_id, new_item_id)
     return()
@@ -327,6 +331,7 @@ def delete_section(object_id):
     # Remove any references to the section from the signal / track sensor tables
     objects_signals.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     objects_sensors.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
+    objects_points.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # Remove any references from other Track Sections (mirrored sections)
     remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting

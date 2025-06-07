@@ -796,6 +796,13 @@ def shutdown_callback():
 def message_callback(message):
     print("Library Tests - MQTT message received: "+str(message))
 
+mqtt_connected = False
+
+def mqtt_status_callback(connection_status:bool):
+    global mqtt_connected
+    mqtt_connected = connection_status
+    print("Library Tests - MQTT connection_status is: ",connection_status)
+
 def run_mqtt_interface_tests():
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - MQTT Interface Tests")
@@ -814,16 +821,33 @@ def run_mqtt_interface_tests():
     mqtt_interface.configure_mqtt_client("network1","node1", False, False, "False", shutdown_callback) # error
     mqtt_interface.configure_mqtt_client("network1","node1", True, True, True, shutdown_callback) # Success
     print("Library Tests - mqtt_broker_connect - 4 Errors should be generated")
-    assert not mqtt_interface.mqtt_broker_connect(127,1883) # Fail
-    assert not mqtt_interface.mqtt_broker_connect("127.0.0.1","1883") # Fail
-    assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, 100, "password1") # Fail
-    assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", 100) # Fail
-    assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
+    assert not mqtt_connected
+    mqtt_interface.mqtt_broker_connect(127,1883, mqtt_status_callback) # Fail
     time.sleep(0.2)
+    assert not mqtt_connected
+    mqtt_interface.mqtt_broker_connect("127.0.0.1","1883", mqtt_status_callback) # Fail
+    time.sleep(0.2)
+    assert not mqtt_connected
+    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, 100, "password1") # Fail
+    time.sleep(0.2)
+    assert not mqtt_connected
+    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", 100) # Fail
+    time.sleep(0.2)
+    assert not mqtt_connected
+    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", "password1") # success
+    time.sleep(5.0)
+    assert mqtt_connected
+    # Connect for a second time (this forces a disconnect and re-connect)
+    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", "password1") # success
+    time.sleep(5.0)
+    assert mqtt_connected
     print("Library Tests - mqtt_broker_disconnect (and then re-connect)")
-    assert mqtt_interface.mqtt_broker_disconnect()
-    assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
-    time.sleep(0.2)
+    mqtt_interface.mqtt_broker_disconnect()
+    time.sleep(1.0)
+    assert not mqtt_connected
+    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", "password1") # success
+    time.sleep(5.0)
+    assert mqtt_connected
     print("Library Tests - subscribe_to_mqtt_messages")
     assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 0
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_1", "node1", 1, message_callback)

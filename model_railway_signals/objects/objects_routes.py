@@ -12,8 +12,8 @@
 #    delete_route_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_route_object(object_id) - Redraw the object on the canvas following an update
 #    default_route_object - The dictionary of default values for the object
-#    remove_references_to_sensor(sensor_id) - remove section_id references from the route's configuration
-#    update_references_to_sensor(old_id, new_id) - update section_id references in the route's configuration
+#    remove_references_to_sensor(sensor_id) - remove sensor_id references from the route's configuration
+#    update_references_to_sensor(old_id, new_id) - update sensor_id references in the route's configuration
 #    remove_references_to_signal(signal_id) - remove signal_id references from the route's configuration
 #    update_references_to_signal(old_id, new_id) - update signal_id references in the route's configuration
 #    remove_references_to_point(point_id) - remove point_id references from the route's configuration

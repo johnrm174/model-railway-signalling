@@ -219,6 +219,12 @@ def check_conflicting_points(route_object:dict, route_tooltip:str, route_viable:
                             message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
                             route_tooltip = route_tooltip + message
                             route_viable = False
+            # We also need to iterate through the List of interlocked Track Sections
+            for interlocked_section in point_object["sectioninterlock"]:
+                if library.section_occupied(interlocked_section):
+                    message = "\nPoint "+str_point_id+" is locked by Track Section "+str(interlocked_section)
+                    route_tooltip = route_tooltip + message
+                    route_viable = False
     return(route_tooltip, route_viable)
 
 #------------------------------------------------------------------------------------

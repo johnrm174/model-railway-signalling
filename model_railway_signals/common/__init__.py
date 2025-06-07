@@ -29,8 +29,9 @@
 #
 #    signal_route_frame(Tk.LabelFrame) - read only list of signal_route_selections
 #    row_of_widgets(Tk.Frame) - Pass in the base class to create a fixed length row of the base class
-#    row_of_validated_dcc_commands(row_of_widgets) - Similar to above but 'get_values' removes blanks 
-#    row_of_point_settings(row_of_widgets) - Similar to above but 'get_values' removes duplicates and blanks
+#    row_of_validated_dcc_commands(row_of_widgets) - 'get_values' removes blanks
+#    row_of_int_item_id_entry_boxes(row_of_widgets) - 'get_values' removes blanks and duplicates
+#    row_of_point_settings(row_of_widgets) - 'get_values' removes blanks and duplicates
 #    grid_of_widgets(Tk.Frame) - an expandable grid of widgets (pass in the base class)
 #    grid_of_generic_entry_boxes(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks 
 #    grid_of_point_settings(grid_of_widgets) - As above but 'get_values' removes duplicates and blanks
@@ -78,6 +79,7 @@ from .common_compound import signal_route_selections
 from .common_extensible import signal_route_frame
 from .common_extensible import row_of_widgets
 from .common_extensible import row_of_validated_dcc_commands
+from .common_extensible import row_of_int_item_id_entry_boxes
 from .common_extensible import row_of_point_settings
 from .common_extensible import grid_of_widgets
 from .common_extensible import grid_of_generic_entry_boxes
@@ -120,6 +122,7 @@ __all__ = [
     'signal_route_frame',
     'row_of_widgets',
     'row_of_validated_dcc_commands',
+    'row_of_int_item_id_entry_boxes',
     'row_of_point_settings',
     'grid_of_widgets',
     'grid_of_generic_entry_boxes',
