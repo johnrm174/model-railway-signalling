@@ -39,7 +39,7 @@
 #
 # Classes and functions used by the other library modules:
 #
-#   update_colour_light_signal(sig_id:int) - called on state changes if signal is set to auto refresh
+#   update_colour_light_signal(sig_id:int, sig_ahead_id) - update the aspect of the signal
 #   update_colour_light_subsidary(sig_id:int) - to update the subsidary aspect after a change in state
 #   update_feather_route_indication(sig_id:int, route_to_set) - to update the route indication (feathers)
 #   trigger_timed_colour_light_signal(sig_id:int, start_delay:int, time_delay:int) - trigger a timed sequence
@@ -281,25 +281,29 @@ def update_colour_light_subsidary(sig_id:int):
         dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
     return ()
 
-# -------------------------------------------------------------------------
-# API Function to Refresh the displayed signal aspect according the signal state
+#-------------------------------------------------------------------------
+# Function to Refresh the displayed signal aspect according the signal state
 # Also takes into account the state of the signal ahead if one is specified
 # to ensure the correct aspect is displayed (for 3/4 aspect types and 2 aspect 
 # distant signals). E.g. for a 3/4 aspect signal - if the signal ahead is ON
 # and this signal is OFF then we want to change it to YELLOW rather than GREEN
-# -------------------------------------------------------------------------
+# Note the API function (which does the validation is in the 'signals' module
+#-------------------------------------------------------------------------
 
 def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
-    
     # Get the signal route (for any timed sequences in progress)
     route = signals.signals[str(sig_id)]["routeset"]
-    
-    # ---------------------------------------------------------------------------------
-    #  First deal with the Signal ON, Overridden or "Release on Red" cases
-    #  as they will apply to all colour light signal types (2, 3 or 4 aspect)
-    # ---------------------------------------------------------------------------------
-
-    # If signal is set to "ON" then its DANGER (or CAUTION if its a 2 aspect distant)
+    #---------------------------------------------------------------------------------
+    # First deal with the cases that would force the signal to a specific aspect
+    # These will apply to all colour light signal types (2, 3 or 4 aspect):
+    #   Signal ON => DANGER (2 aspect DISTANT signals will display CAUTION)
+    #   OVERRIDE => DANGER (2 aspect DISTANT signals will display CAUTION)
+    #   OVERRIDE CAUTION => CAUTION (does not apply to 2 aspect HOME signals)
+    #   RELEEASE ON RED => DANGER (does not apply to 2 aspect DISTANT signals)
+    #   RELEASE ON YELLOW => CAUTION (does not apply to 2 aspect HOME signals)
+    #   TIMED SEQUENCE => Signal will display the aspect for its timed sequence
+    #---------------------------------------------------------------------------------
+    # If signal is "ON" then its DANGER (or CAUTION for 2 aspect DISTANT signals)
     if not signals.signals[str(sig_id)]["sigclear"]:
         if signals.signals[str(sig_id)]["subtype"] == signal_subtype.distant:
             new_aspect = signals.signal_state_type.CAUTION
@@ -307,111 +311,94 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         else:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (signal is ON)"
-
-    # If signal is Overriden the set the signal to its overriden aspect
+    # If signal is Overriden the set the signal to its overriden aspect.
+    # This will be DANGER (or CAUTION for 2 aspect DISTANT signals).
     elif signals.signals[str(sig_id)]["override"]:
         new_aspect = signals.signals[str(sig_id)]["overriddenaspect"]
         log_message = " (signal is OVERRIDEN)"
-
     # If signal is Overriden to CAUTION set the signal to display CAUTION
-    # Note we are relying on the public API function to only allow this to
-    # be set for signal types apart from 2 aspect home signals
+    # Note this will only apply to signals OTHER THAN 2 aspect home signals.
     elif signals.signals[str(sig_id)]["overcaution"]:
         new_aspect = signals.signal_state_type.CAUTION
         log_message = " (signal is OVERRIDDEN to CAUTION)"
-
-    # If signal is triggered on a timed sequence then set to the sequence aspect
-    elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
-        new_aspect = signals.signals[str(sig_id)]["timedsequence"][route.value].aspect
-        log_message = " (signal is on a timed sequence)"
-
     # Set to DANGER if the signal is subject to "Release on Red" approach control
-    # Note that this state should never apply to 2 aspect distant signals
+    # Note this will only apply to signals OTHER THAN 2 aspect distant signals.
     elif signals.signals[str(sig_id)]["releaseonred"]:
         new_aspect = signals.signal_state_type.DANGER
-        log_message = " (signal is OFF - but subject to \'release on red\' approach control)"
-
-    # ---------------------------------------------------------------------------------
-    #  From here, the Signal is Displaying "OFF" - but could still be of any type
-    # ---------------------------------------------------------------------------------
-
-    # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
-    # we can ignore the signal ahead and set it to its "clear" aspect
-    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.home:
-        new_aspect = signals.signal_state_type.PROCEED
-        log_message = " (signal is OFF and 2-aspect home)"
-
-    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.red_ylw:
-        new_aspect = signals.signal_state_type.CAUTION
-        log_message = " (signal is OFF and 2-aspect R/Y)"
-        
-    # ---------------------------------------------------------------------------------
-    # From here, the Signal is CLEAR and is a 2 aspect Distant or a 3/4 aspect signal
-    # ---------------------------------------------------------------------------------
-
-    # Set to CAUTION if the signal is subject to "Release on YELLOW" approach control
-    # We use the special CAUTION_APPROACH_CONTROL for "update on signal ahead" purposes
+        log_message = " (signal is OFF - but subject to 'release on red' approach control)"
+    # Set to CAUTION_APPROACH_CONTROL if the signal is subject to "Release on YELLOW"
+    # Note this will only apply to signals OTHER THAN 2 aspect home signals.
     elif signals.signals[str(sig_id)]["releaseonyel"]:
         new_aspect = signals.signal_state_type.CAUTION_APP_CNTL
         log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
-
-    # ---------------------------------------------------------------------------------
-    # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
-    # and will display the "normal" aspects based on the signal ahead (if one has been specified)
-    # ---------------------------------------------------------------------------------
-    
+    # If signal is currently on a timed sequence then set to the sequence aspect
+    elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        new_aspect = signals.signals[str(sig_id)]["timedsequence"][route.value].aspect
+        log_message = " (signal is on a timed sequence)"
+    #---------------------------------------------------------------------------------
+    # From here, the Signal is CLEAR - but could still be of any type
+    # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
+    # we can ignore the signal ahead and set it to its "clear" aspect. This
+    # will be PROCEED for home signals or CAUTION for red/yellow signals.
+    #---------------------------------------------------------------------------------
+    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.home:
+        new_aspect = signals.signal_state_type.PROCEED
+        log_message = " (signal is OFF and 2-aspect home)"
+    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.red_ylw:
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = " (signal is OFF and 2-aspect R/Y)"
+    #---------------------------------------------------------------------------------
+    # From here, the Signal is CLEAR and is a 2 aspect Distant or a 3/4 aspect signal
+    # We therefore need to take into account the displayed aspect of the signal ahead
+    #---------------------------------------------------------------------------------
     # If no signal ahead has been specified then we can set the signal to its "clear" aspect
     # (Applies to 2 aspect distant signals as well as the remaining 3 and 4 aspect signals types)
     elif sig_ahead_id is None:
         new_aspect = signals.signal_state_type.PROCEED
         log_message = " (signal is OFF and no signal ahead specified)"
-
-    # ---------------------------------------------------------------------------------
-    # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
-    # and will display the "normal" aspects based on the signal ahead (one has been specified
-    # ---------------------------------------------------------------------------------
-        
-    else:
-        
-        if signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.DANGER:
-            # All remaining signal types (3/4 aspects and 2 aspect distants) should display CAUTION
-            new_aspect = signals.signal_state_type.CAUTION
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying DANGER)")
-            
-        elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION_APP_CNTL:
-            # All remaining signal types (3/4 aspects and 2 aspect distants) should display FLASHING CAUTION
-            new_aspect = signals.signal_state_type.FLASH_CAUTION
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
-                             " is subject to \'release on yellow\' approach control)")
-            
-        elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION:
-            if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
-                # 4 aspect signals should display a PRELIM_CAUTION aspect
-                new_aspect = signals.signal_state_type.PRELIM_CAUTION
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
-            else:
-                # 3 aspect signals and 2 aspect distant signals should display PROCEED
-                new_aspect = signals.signal_state_type.PROCEED
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
-                            
-        elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION:
-            if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
-                # 4 aspect signals will display a FLASHING PRELIM CAUTION aspect 
-                new_aspect = signals.signal_state_type.FLASH_PRELIM_CAUTION
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING_CAUTION)")
-            else:
-                # 3 aspect signals and 2 aspect distant signals should display PROCEED
-                new_aspect = signals.signal_state_type.PROCEED
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying PROCEED)")
+    # If the signal ahead is specified as a 'STOP' we set the displayed aspect to CAUTION.
+    # Example use case -  the route controlled by the signal leads into a bay platform
+    elif str(sig_ahead_id).casefold() == "STOP".casefold():
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = (" (signal is OFF and signal ahead is specified as a STOP)")
+    # If the signal ahead is DANGER, the signal should display CAUTION
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.DANGER:
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying DANGER)")
+    # If the signal ahead is CAUTION_APP_CNTL, the signal should display FLASHING CAUTION
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION_APP_CNTL:
+        new_aspect = signals.signal_state_type.FLASH_CAUTION
+        log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
+                         " is subject to \'release on yellow\' approach control)")
+    # If the signal ahead is CAUTION then 4 aspect signals should display a PRELIM_CAUTION aspect
+    # All other signal types (3 aspect signals and 2 aspect distant signals) should display PROCEED
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION:
+        if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
+            new_aspect = signals.signal_state_type.PRELIM_CAUTION
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
         else:
-            # A signal ahead state is either PRELIM_CAUTION, FLASH PRELIM CAUTION or PROCEED
-            # These states have have no effect on the signal we are updating - Signal will show PROCEED
             new_aspect = signals.signal_state_type.PROCEED
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
-                      + str(signals.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
-    # Only refresh the signal if the aspect has been changed. Note that signals are created with
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
+    # If the signal ahead is FLASH_CAUTION then 4 aspect signals should display a FLASH_PRELIM_CAUTION aspect
+    # All other signal types (3 aspect signals and 2 aspect distant signals) should display PROCEED
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION:
+        if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
+            new_aspect = signals.signal_state_type.FLASH_PRELIM_CAUTION
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING_CAUTION)")
+        else:
+            new_aspect = signals.signal_state_type.PROCEED
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying PROCEED)")
+    else:
+        # From here, the signal ahead state is either PRELIM_CAUTION, FLASH_PRELIM_CAUTION or PROCEED
+        # These states have have no effect on the signal we are updating - Signal will show PROCEED
+        new_aspect = signals.signal_state_type.PROCEED
+        log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
+                  + str(signals.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
+    #---------------------------------------------------------------------------------
+    # Refresh the signal if the aspect has been changed. Note that signals are created with
     # a 'sigstate' of None - so there will always be a change of state on creation to ensure
     # MQTT/DCC messages are sent out to reflect the post-creation state of the signal.
+    #---------------------------------------------------------------------------------
     current_aspect = signals.signals[str(sig_id)]["sigstate"]
     if new_aspect != current_aspect:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)

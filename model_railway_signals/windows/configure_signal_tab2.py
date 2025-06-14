@@ -24,6 +24,30 @@ from .. import common
 from .. import library
 
 #------------------------------------------------------------------------------------
+# Class for the 'signal ahead' entry box. This builds on the common.str_int_item_id_entry_box
+# class to validate the entered signal ID exists and isn't the same as the current signal,
+# but also allows 'STOP' to be a valid entry - this is the special case where the the route
+# controlled by the signal leads to a dead end and so the signal needs to display CAUTION
+#------------------------------------------------------------------------------------
+
+class sig_ahead_entry(common.str_int_item_id_entry_box):
+    def __init__(self, parent_frame):
+        super().__init__(parent_frame, exists_function=library.signal_exists,
+                        tool_tip = "Specify the next signal along the specified route - This "+
+                        "can be a local signal ID or a remote signal ID (in the form 'Node-ID') "+
+                        " which has been subscribed to via MQTT networking")
+
+    def validate(self):
+        if self.entry.get().casefold() == "STOP".casefold():
+            # If the entered value is 'stop' then the entry is valid
+            valid = True
+        else:
+            # check the entered ID exists and isn't the same as the current ID
+            valid = super().validate(update_validation_status=False)
+        self.set_validation_status(valid)
+        return(valid)
+
+#------------------------------------------------------------------------------------
 # Class for a route interlocking group (comprising 6 points, a signal and an instrument)
 # Uses the common row_of_point_settings class for the point entries
 # Public class instance methods provided are:
@@ -41,9 +65,6 @@ from .. import library
 
 class interlocking_route_group: 
     def __init__(self, parent_frame, label:str):
-        # These are the 'item exists' functions for validation
-        signal_exists_function = library.signal_exists
-        instrument_exists_function = library.instrument_exists
         # Create a frame for this UI element (always packed into the parent frame)
         self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
@@ -57,14 +78,11 @@ class interlocking_route_group:
         # Create the signal ahead and instrument ahead elements (always packed)
         self.label1 = Tk.Label(self.frame, text=" Sig:")
         self.label1.pack(side=Tk.LEFT)
-        self.sig = common.str_int_item_id_entry_box(self.frame, exists_function=signal_exists_function,
-                        tool_tip = "Specify the next signal along the specified route - This "+
-                        "can be a local signal ID or a remote signal ID (in the form 'Node-ID') "+
-                        " which has been subscribed to via MQTT networking")
+        self.sig = sig_ahead_entry(self.frame)
         self.sig.pack(side=Tk.LEFT)
         self.label2 = Tk.Label(self.frame, text=" Blk:")
         self.label2.pack(side=Tk.LEFT)
-        self.block = common.int_item_id_entry_box(self.frame, exists_function=instrument_exists_function,
+        self.block = common.int_item_id_entry_box(self.frame, exists_function=library.instrument_exists,
                                 tool_tip="Specify the ID of the Block Instrument on the local schematic which "+
                                     "controls access to the block section along the specified route") 
         self.block.pack(side=Tk.LEFT)
