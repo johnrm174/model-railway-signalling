@@ -192,15 +192,20 @@ def update_ground_position_signal(sig_id:int):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff2"],state="normal")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon1"],state="hidden")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon2"],state="hidden")
+            # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
+            # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
+            dcc_control.update_dcc_signal_aspects(sig_id, signals.signal_state_type.PROCEED)
         elif ( signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.DANGER or
                signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.CAUTION):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff1"],state="hidden")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff2"],state="hidden")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon1"],state="normal")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon2"],state="normal")
-        # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
-        # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
-        dcc_control.update_dcc_signal_aspects(sig_id, aspect_to_set)
+            # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
+            # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
+            # Note that we always send out the DCC commands for DANGER irrespective of whether the signal is a STOP or
+            # SHUNT AHEAD signal as DCC Mappings are only created for PROCEED and DANGER
+            dcc_control.update_dcc_signal_aspects(sig_id, signals.signal_state_type.DANGER)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
         signals.send_mqtt_signal_updated_event(sig_id)            
