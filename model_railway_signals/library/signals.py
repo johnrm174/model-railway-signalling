@@ -1211,7 +1211,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         logging.error("Signal "+str(sig_id)+": update_colour_light_signal - Signal Ahead ID must be an int or str")
     elif not signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal does not exist")
-    elif sig_ahead_id is not None and str(sig_ahead_id).casefold() != "STOP".casefold() and not signals.signal_exists(sig_id):
+    elif sig_ahead_id is not None and str(sig_ahead_id).casefold() != "STOP".casefold() and not signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
     elif str(sig_id) == str(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
