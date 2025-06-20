@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "model-railway-signals"
-version = "5.2.0"
+version = "5.2.1"
 authors = [ { name="johnrm174", email="johnrm17418@gmail.com" }, ]
 maintainers = [ { name="johnrm174", email="johnrm17418@gmail.com" }, ]
 description = "Create your own DCC model railway signalling scheme"
