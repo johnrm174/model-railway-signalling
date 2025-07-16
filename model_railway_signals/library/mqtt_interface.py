@@ -175,9 +175,9 @@ def publish_heartbeat_message():
         # 'psudo thread' won't get killed if the publish inadvertantly errors
         try: mqtt_client.publish(topic,payload,retain=False,qos=1)
         except: pass
-        # The heartbeat_frequency is an integer in seconds. The root.after() function uses milliseconds
-        if not common.shutdown_initiated:
-            common.root_window.after(node_config["heartbeat_frequency"]*1000,publish_heartbeat_message)
+    # The heartbeat_frequency is an integer in seconds. The root.after() function uses milliseconds
+    if not common.shutdown_initiated:
+        common.root_window.after(node_config["heartbeat_frequency"]*1000,publish_heartbeat_message)
     return()
 
 # ---------------------------------------------------------------------------------------------
@@ -443,9 +443,9 @@ def mqtt_broker_connect (broker_host:str,
         try:
             mqtt_client.loop_start()
             mqtt_client.connect_async(node_config["broker_host"], port=node_config["broker_port"], keepalive=10, clean_start=True)
-            # Schedule an event to check for a successful connection after 5 seconds. We store the 'handle'
+            # Schedule an event to check for a successful connection after 10 seconds. We store the 'handle'
             # to the event so this can be cancelled if the user disconnects before the event has been processed
-            node_config["connection_check_event"] = common.root_window.after(5000, check_for_successful_connection)
+            node_config["connection_check_event"] = common.root_window.after(10000, check_for_successful_connection)
         except Exception as exception:
             logging.error("MQTT-Client: Error connecting to broker: "+str(exception))
             check_for_successful_connection()

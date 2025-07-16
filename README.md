@@ -52,12 +52,12 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.2.2:
+## What's new for Release 5.x.x:
 
 > [!IMPORTANT]
-> Release 5.2.2 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.x.x will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.2.2.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
 > You have been warned!
 
 * The next signal can now be specified as a "STOP" for any route ahead (signal interlocking tab):
@@ -65,6 +65,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
 * Added ability to 'reverse' the DCC command logic for the subsidary aspect of colour light signals.
 * Bugfix for DCC control of shunt agead ground position signals (commands were not being sent out).
+* Bugfix for MQTT heartbeats (broker disconnect/reconnect would stop messages being sent out)
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
