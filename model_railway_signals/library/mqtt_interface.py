@@ -112,6 +112,7 @@ node_config["broker_password"] = None                   # Set by mqtt_broker_con
 node_config["status_callback"] = None                   # Set by mqtt_broker_connect (user defined)
 node_config["connection_check_event"] = None            # The scheduled 'after' event to check connection status
 node_config["local_ip_address"] = ""                    # Set by the 'on_connect' function
+node_config["local_hostname"] = ""                      # Set by the 'on_connect' function
 node_config["connected_to_broker"] = False              # Set by the 'on_connect' / 'on_disconnect functions
 node_config["disconnection_in_progress"] = False        # Set/cleared by the mqtt_disconnect function
 node_config["heartbeat_thread_started"] = False         # Set by the 'on_connect' function
@@ -169,7 +170,9 @@ def publish_heartbeat_message():
         # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
         topic = "heartbeat"+"/"+node_config["network_identifier"]
         # Payload for the heartbeat message is a dictionary comprising the source node
-        heartbeat_message = {"node":node_config["node_identifier"],"ip":node_config["local_ip_address"]}
+        heartbeat_message = {"node":node_config["node_identifier"],
+                             "host":node_config["local_hostname"],
+                             "ip":node_config["local_ip_address"]}
         payload = json.dumps(heartbeat_message)
         # We put exception handling around the publish so the heartbeat
         # 'psudo thread' won't get killed if the publish inadvertantly errors
@@ -233,8 +236,9 @@ def on_connect(mqtt_client, userdata, flags, rc):
     global node_config
     if rc == 0:
         logging.info("MQTT-Client - Successfully connected to MQTT Broker")
-        # Find the assigned IP address of the machine we are running on (for the heartbeat messages)
+        # Find the hostname and assigned IP address of the machine we are running on (for the heartbeat messages)
         node_config["local_ip_address"] = find_local_ip_address()
+        node_config["local_hostname"] = socket.gethostname()
         # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
         # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
         # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
@@ -303,7 +307,13 @@ def process_message(msg):
     else:
         # If it is a heartbeat message then we just update the list of connected nodes
         if msg.topic.startswith("heartbeat"):
-            heartbeats[unpacked_json["node"]] = [unpacked_json["ip"], int(time.time())]
+            ###############################################################################################
+            ### Handle case of receiving a heartbeat message from an older version of the application #####
+            ### (version 5.2.2 or before, which didn't include the hostname element #######################
+            ###############################################################################################
+            if "host" not in unpacked_json.keys(): unpacked_json["host"] = "unknown"
+            ###############################################################################################
+            heartbeats[unpacked_json["node"]] = [unpacked_json["host"], unpacked_json["ip"], int(time.time())]
         # If it is a shutdown message we only act on it if configured to do so
         elif msg.topic.startswith("shutdown"):
             if node_config["act_on_shutdown"] and node_config["shutdown_callback"] is not None:
