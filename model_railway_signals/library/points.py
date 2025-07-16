@@ -60,7 +60,7 @@
 #
 #   update_autoswitch(point_id:int, autoswitch_id:int) - To update the 'autoswitch' reference
 #
-#   lock_point(point_id:int) - use for point/signal interlocking
+#   lock_point(point_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
 # 
 #   unlock_point(point_id:int) - use for point/signal interlocking
 #
@@ -96,6 +96,8 @@ import tkinter as Tk
 from . import dcc_control
 from . import common
 from . import file_interface
+
+from ..common import CreateToolTip
 
 # -------------------------------------------------------------------------
 # Public API classes (to be used by external functions)
@@ -193,12 +195,16 @@ def toggle_fpl(point_id:int):
             logging.info("Point "+str(point_id)+": Activating FPL")
             points[str(point_id)]["changebutton"].config(state="disabled") 
             points[str(point_id)]["lockbutton"].config(relief="sunken",bg=points[str(point_id)]["selectedcolour"])
-            points[str(point_id)]["fpllock"] = True 
+            points[str(point_id)]["fpllock"] = True
+            # Set the tooltip for the CHANGE button to reflect the FPL is active
+            points[str(point_id)]["tooltip1"].text = "FPL is active"
         else:
             logging.info("Point "+str(point_id)+": Clearing FPL")
             points[str(point_id)]["changebutton"].config(state="normal")  
             points[str(point_id)]["lockbutton"].config(relief="raised",bg=points[str(point_id)]["deselectedcolour"])
             points[str(point_id)]["fpllock"] = False
+            # Set the tooltip for the CHANGE button to reflect the point is unlocked
+            points[str(point_id)]["tooltip1"].text = "Unlocked"
     return()
 
 # -------------------------------------------------------------------------
@@ -371,6 +377,15 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                             highlightthickness=0, padx=2, pady=0, background=selected_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:fpl_button_event(point_id))
+        # Create and store the default tool-tips for the buttons
+        point_button_tooltip = CreateToolTip(point_button)
+        point_button_tooltip.waittime = 200     # miliseconds
+        point_button_tooltip.wraplength = 400   # pixels
+        point_button_tooltip.text = "Unlocked"
+        fpl_button_tooltip = CreateToolTip(fpl_button)
+        fpl_button_tooltip.waittime = 200     # miliseconds
+        fpl_button_tooltip.wraplength = 400   # pixels
+        fpl_button_tooltip.text = "Unlocked"
         # Create the Tkinter drawing objects (lines) for each point/ We use tkinter 'tags' to uniquely identify
         # each point's 'blades' and route lines so these can easily be hidden/displayed/highlighted as required
         # 'route1' is the tag for route lines through the point when the point is in its unswitched configuration
@@ -539,7 +554,10 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         canvas.itemconfig(route1_tag, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(route2_tag, fill=colour, width=line_width, dash=tuple(line_style))
         # Disable the change button if the point has FPL (default state = FPL active)
-        if fpl: point_button.config(state="disabled")
+        # The tooltip for the (disabled) CHANGE button will reflect that the FPL is active
+        if fpl:
+            point_button.config(state="disabled")
+            point_button_tooltip.text="FPL is active"
         # Hide the line for the switched route (display it later when we need it)
         canvas.itemconfig(blade2_tag, state="hidden")
         # Compile a dictionary of everything we need to track
@@ -553,6 +571,8 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         points[str(point_id)]["window2"] = fpl_button_window       # Tkinter tag for the FPL button window
         points[str(point_id)]["changebutton"] = point_button       # Tkinter button object
         points[str(point_id)]["lockbutton"] = fpl_button           # Tkinter button object
+        points[str(point_id)]["tooltip1"] = point_button_tooltip   # Tooltip object
+        points[str(point_id)]["tooltip2"] = fpl_button_tooltip     # Tooltip object
         points[str(point_id)]["fplcallback"] = fpl_callback        # The callback to make on an event
         points[str(point_id)]["pointcallback"] = point_callback    # The callback to make on an event
         points[str(point_id)]["alsoswitch"] = also_switch          # Point to automatically switch (0=none)
@@ -749,22 +769,26 @@ def reset_point_colour_override(point_id:int):
 # Public API function to Lock a points (Warning generated if APL and not FPL active)
 # -------------------------------------------------------------------------
 
-def lock_point(point_id:int):
+def lock_point(point_id:int, tooltip:str="Locked"):
     global points 
     if not isinstance(point_id, int):
         logging.error("Point "+str(point_id)+": lock_point - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": lock_point - Point ID does not exist")
-    elif not points[str(point_id)]["locked"]:
-        logging.info ("Point "+str(point_id)+": Locking point")
+    else:
+        # Only generate a log message if the point is not yet locked
+        if not points[str(point_id)]["locked"]: logging.info ("Point "+str(point_id)+": Locking point")
+        # If the point doesn't have a FPL we just inhibit the change button
+        # The tooltip for the CHANGE button will reflect that the point is LOCKED
         if not points[str(point_id)]["hasfpl"]:
-            # If the point doesn't have a FPL we just inhibit the change button
             points[str(point_id)]["changebutton"].config(state="disabled")
+            points[str(point_id)]["tooltip1"].text = tooltip
+        # If the FPL is not already active then we need to activate it (with a warning)
         elif not points[str(point_id)]["fpllock"]:
-            # If the FPL is not already active then we need to activate it (with a warning)
             logging.warning ("Point "+str(point_id)+": lock_point - Activating FPL before locking")
-            toggle_fpl (point_id)
-        # Now inhibit the FPL button to stop it being manually unlocked
+            toggle_fpl(point_id)
+        # We always inhibit the FPL button object(all points have one even if they are hidden
+        points[str(point_id)]["tooltip2"].text = tooltip
         points[str(point_id)]["lockbutton"].config(state="disabled") 
         points[str(point_id)]["locked"] = True
     return()
@@ -784,9 +808,16 @@ def unlock_point(point_id:int):
         if not points[str(point_id)]["hasfpl"]:
             # If the point doesn't have FPL we need to re-enable the change button
             points[str(point_id)]["changebutton"].config(state="normal")
+            # As there is no FPL the tooltip for the CHANGE button will revert to 'Unlocked'
+            points[str(point_id)]["tooltip1"].text="Unlocked"
         else:
-            # If the point has FPL we just need to re-enable the FPL button
-            points[str(point_id)]["lockbutton"].config(state="normal") 
+            # If the point has FPL we need to re-enable the FPL button
+            points[str(point_id)]["lockbutton"].config(state="normal")
+            # The tooltip for the FPL button will revert to 'Unlocked'
+            points[str(point_id)]["tooltip2"].text="Unlocked"
+            # The tooltip for the CHANGE button will depend on the state of the FPL
+            if points[str(point_id)]["fpllock"]: points[str(point_id)]["tooltip1"].text="FPL is active"
+            else: points[str(point_id)]["tooltip1"].text="Unlocked"
         points[str(point_id)]["locked"] = False
     return()
 

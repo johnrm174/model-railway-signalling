@@ -790,29 +790,37 @@ def process_all_point_interlocking():
     for str_point_id in objects.point_index:
         int_point_id = int(str_point_id)
         point_object = objects.schematic_objects[objects.point(int_point_id)]
-        point_locked = False
+        point_locked, point_tooltip = False,  "Point "+str_point_id+" is locked because:"
         # siginterlock comprises a variable length list of interlocked signals
         # Each signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Each route element is a boolean value (True or False)
         for interlocked_signal in point_object["siginterlock"]:
             for index, interlocked_route in enumerate(interlocked_signal[1]):
                 if interlocked_route:
-                    if ( library.signal_clear(interlocked_signal[0], library.route_type(index+1)) or
-                         ( has_subsidary(interlocked_signal[0]) and
-                             library.subsidary_clear(interlocked_signal[0], library.route_type(index+1)) )):
+                    if library.signal_clear(interlocked_signal[0], library.route_type(index+1)):
+                        message = ("\nSignal "+str(interlocked_signal[0])+" is cleared for "+
+                                      str(library.route_type(index+1)).rpartition('.')[-1])
+                        point_tooltip = point_tooltip + message
                         point_locked = True
-                        break
+                    if has_subsidary(interlocked_signal[0]) and library.subsidary_clear(interlocked_signal[0], library.route_type(index+1)):
+                        message = ("\nSubsidary "+str(interlocked_signal[0])+" is cleared for "+
+                                      str(library.route_type(index+1)).rpartition('.')[-1])
+                        point_tooltip = point_tooltip + message
+                        point_locked = True
         # The interlocked Sections table is a variable length list of Track Section IDs
         # The point will be locked if any of these Sections are OCCUPIED
         for interlocked_section in point_object["sectioninterlock"]:
             if library.track_sections.section_occupied(interlocked_section):
+                message = "\nTrack Section "+str(interlocked_section)+" is Occupied"
+                point_tooltip = point_tooltip + message
                 point_locked = True
         # Lock or unlock the Point as required
-        if point_locked: library.lock_point(int_point_id)
+        if point_locked: library.lock_point(int_point_id, point_tooltip)
         else: library.unlock_point(int_point_id)
         # Lock any Signalbox levers that are linked to the point (point, fpl or both)
         for str_lever_id in objects.lever_index:
             if objects.schematic_objects[objects.lever(str_lever_id)]["linkedpoint"] == int_point_id:
+                ################################# TODO - Tooltips for levers #####################################
                 if point_locked: library.lock_lever(int(str_lever_id))
                 else: library.unlock_lever(int(str_lever_id))
     return()
