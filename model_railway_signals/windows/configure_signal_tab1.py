@@ -381,9 +381,9 @@ class colour_light_aspect(common.row_of_validated_dcc_commands):
 #    "set_addresses" - set the DCC command sequences for the aspects (pass in a list)
 #                    Also sets the current item ID (int) for validation purposes
 #    "get_addresses" - return a list of the "validated" DCC command sequences
-#    "set_subsidary" - set the subsidary signal status [has_subsidary, dcc_address]
+#    "set_subsidary" - set the subsidary signal status [has_subsidary, dcc_address, reversed_flag]
 #                    Also sets the current item ID (int) for validation purposes
-#    "get_subsidary" - return the subsidary signal status [has_subsidary, dcc_address]
+#    "get_subsidary" - return the subsidary signal status [has_subsidary, dcc_address, reversed_flag]
 #    "enable_subsidary" - enables/loads the subsidary signal selection (CB/address)
 #    "disable_subsidary" - disables/clears the subsidary signal selection (CB/address)
 #    "enable_aspects" - enables/loads the dcc command sequences for all aspects
@@ -408,20 +408,30 @@ class colour_light_aspects():
         # Create a subframe to hold the subsidary signal entry box (always packed)
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.CB = common.check_box(self.subframe, label="Subsidary signal",   
-                    tool_tip="Select to add a seperate calling on aspect",callback=self.sub_updated)
+        self.CB = common.check_box(self.subframe, label="Subsidary signal", tool_tip="Select to add a "+
+                    "seperate calling on aspect for the signal", callback=self.sub_updated)
         self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.EB = common.validated_dcc_entry_box(self.subframe, item_type="Signal",
-                        tool_tip="Enter the DCC address for the subsidary signal aspect (1-2047)")
+        self.label = Tk.Label(self.subframe, text="     DCC Address:")
+        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB = common.validated_dcc_entry_box(self.subframe, item_type="Signal", tool_tip="Enter the DCC "+
+                    "address for the subsidary signal aspect (1-2047)", callback=self.dcc_updated)
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.CB2 = common.check_box(self.subframe, label="Reversed logic", tool_tip="Select to reverse "+
+                    "the DCC command logic for the subsidary signal aspect")
+        self.CB2.pack(side=Tk.LEFT, padx=10, pady=2)
 
     def sub_updated(self):
         self.update_eb_state()
         if self.callback is not None: self.callback()
         
+    def dcc_updated(self):
+        if self.EB.entry.get()=="": self.CB2.disable()
+        else: self.CB2.enable()
+
     def update_eb_state(self):
         if self.CB.get_value(): self.EB.enable()
         else: self.EB.disable()
+        self.dcc_updated()
         
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
@@ -457,15 +467,16 @@ class colour_light_aspects():
                  self.fylw.get_values(),
                  self.fdylw.get_values() ] )
     
-    def set_subsidary(self, subsidary:[bool,int], item_id:int):
-        # Subsidary is defined as [has_subsidary, dcc_address]
+    def set_subsidary(self, subsidary:[bool,int,bool], item_id:int):
+        # Subsidary comprises [has_subsidary:bool, dcc_address:int, reversed_command_logic:bool]
         self.CB.set_value(subsidary[0])
         self.EB.set_value(subsidary[1], item_id)
+        self.CB2.set_value(subsidary[2])
         self.update_eb_state()
 
     def get_subsidary(self):
-        # Subsidary is defined as [has_subsidary, dcc_address]
-        return([self.CB.get_value(), self.EB.get_value()])
+        # Subsidary comprises [has_subsidary:bool, dcc_address:int, reversed_command_logic:bool]
+        return([self.CB.get_value(), self.EB.get_value(), self.CB2.get_value()])
 
     def enable_subsidary(self):
         self.CB.enable()

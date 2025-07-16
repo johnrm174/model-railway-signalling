@@ -117,8 +117,8 @@ default_signal_object["dccautoinhibit"] = False
 #------------------------------------------------------------------------------------
 # General Configuration - parameters specific to colour light signals
 #------------------------------------------------------------------------------------
-# The 'subsidary' element comprises a list: [has_subsidary:bool, dcc_address]
-default_signal_object["subsidary"] = [False, 0]
+# The 'subsidary' element comprises a list: [has_subsidary:bool, dcc_address:int, reversed_logic:bool]
+default_signal_object["subsidary"] = [False, 0, False]
 # The 'feathers' element is a list_of_signal_routes [MAIN,LH1,LH2,RH1,RH2]
 # Each signal_route element is a boolean flag to specify a feather for the route
 default_signal_object["feathers"] = [False,False,False,False,False]
@@ -496,6 +496,8 @@ def redraw_signal_object(object_id):
     if (sig_type == library.signal_type.colour_light or
             sig_type == library.signal_type.ground_position):
         # Create the new DCC Mapping for the Colour Light Signal
+        # Note the 'subsidary' element comprises [has_subsidary:bool, dcc_address:int, reversed_logic:bool]
+        # We only need to pass the dcc_address and reversed_logic flag in to create the mapping
         library.map_dcc_signal (objects_common.schematic_objects[object_id]["itemid"],
                     auto_route_inhibit = objects_common.schematic_objects[object_id]["dccautoinhibit"],
                     proceed = objects_common.schematic_objects[object_id]["dccaspects"][0],
@@ -510,7 +512,7 @@ def redraw_signal_object(object_id):
                     LH2 = objects_common.schematic_objects[object_id]["dccfeathers"][3],
                     RH1 = objects_common.schematic_objects[object_id]["dccfeathers"][4],
                     RH2 = objects_common.schematic_objects[object_id]["dccfeathers"][5],
-                    subsidary = objects_common.schematic_objects[object_id]["subsidary"][1],
+                    subsidary = objects_common.schematic_objects[object_id]["subsidary"][1:3],
                     THEATRE = objects_common.schematic_objects[object_id]["dcctheatre"] )
     elif (sig_type == library.signal_type.semaphore or
               sig_type == library.signal_type.ground_disc):
@@ -777,8 +779,9 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
     for index1,signal_route in enumerate(objects_common.schematic_objects[new_object_id]["sigarms"]):
         for index2,signal_arm in enumerate(signal_route):
             objects_common.schematic_objects[new_object_id]["sigarms"][index1][index2][1] = 0
-    # The DCC Address for the subsidary signal
+    # The DCC Address and reversed command logic flag for the subsidary signal
     objects_common.schematic_objects[new_object_id]["subsidary"][1] = 0
+    objects_common.schematic_objects[new_object_id]["subsidary"][2] = False
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create/draw the new object on the canvas

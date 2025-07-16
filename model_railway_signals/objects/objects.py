@@ -620,6 +620,13 @@ def set_all(new_objects):
                                 if section > 0: new_structure[index1].append(section)
                         objects_common.schematic_objects[object_id][element] = new_structure
                     #########################################################################################################
+                    # From Release 5.2.2 the 'subsidary' element in the signal object configuration changed from
+                    # [has_sub:bool, dcc_address:int] to [has:sub:bool, dcc_address:int, reversed_command_logic:bool]
+                    #########################################################################################################
+                    elif new_object_type == objects_common.object_type.signal and element == "subsidary":
+                        if len(new_objects[object_id][element]) < 3:
+                            objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
+                    #########################################################################################################
                     # End of code to handle changes in Object data structures
                     #########################################################################################################
                     else:

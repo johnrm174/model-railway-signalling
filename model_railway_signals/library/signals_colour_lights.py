@@ -273,12 +273,12 @@ def update_colour_light_subsidary(sig_id:int):
         logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to PROCEED")
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos1"],fill="white")
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="white")
-        dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")  
+        dcc_control.update_dcc_signal_subsidary(sig_id, True)
     else:
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos1"],fill="grey")
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="grey")
         logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to UNLIT")
-        dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
+        dcc_control.update_dcc_signal_subsidary(sig_id, False)
     return ()
 
 #-------------------------------------------------------------------------

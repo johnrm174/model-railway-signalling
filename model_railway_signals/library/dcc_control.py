@@ -51,7 +51,7 @@
 #         MAIN[[add:int,state:bool],]                 - List of DCC Commands for the MAIN Feather
 #         NONE[[add:int,state:bool],]                 - List of DCC Commands to inhibit all Feathers
 #         THEATRE[["char",[add:int,state:bool],],]    - List of Theatre states and their DCC command sequences
-#         subsidary:int                               - DCC address for the "subsidary" signal
+#         subsidary:[add:int,rev:bool]                - DCC address for the Subsidary (and flag for reversed logic)
 # 
 #   map_semaphore_signal - Generate DCC mappings for a semaphore signal
 #      Mandatory Parameters:
@@ -373,7 +373,7 @@ def map_dcc_signal(sig_id:int,
                 MAIN = [[0,False],],
                 NONE = [[0,False],],
                 THEATRE = [["#", [[0,False],]],],
-                subsidary:int=0):
+                subsidary = [0,False]):
     global dcc_signal_mappings
     # Do some basic validation on the parameters we have been given
     if not isinstance(sig_id,int) or sig_id < 1:
@@ -389,7 +389,7 @@ def map_dcc_signal(sig_id:int,
         # Validate all DCC commands for the Colour Light Signal DCC Mapping
         commands_valid = dcc_commands_valid ("map_dcc_signal", "Signal", sig_id, list_of_commands)
         # Validate all DCC addresses for the Colour Light Signal (this is the Subsidary DCC address)
-        addresses_valid = dcc_address_valid("map_dcc_signal", "Signal", sig_id, subsidary)
+        addresses_valid = dcc_address_valid("map_dcc_signal", "Signal", sig_id, subsidary[0])
         # If all DCC commands and addresses are valid then we can create the DCC Mapping
         if commands_valid and addresses_valid:
             logging.debug ("DCC Control - Creating DCC Address mapping for Colour Light Signal "+str(sig_id))
@@ -397,8 +397,8 @@ def map_dcc_signal(sig_id:int,
             new_dcc_mapping = {
                 "mapping_type" : mapping_type.COLOUR_LIGHT,                                 # Common to Colour_Light & Semaphore Mappings
                 "auto_route_inhibit" : auto_route_inhibit,                                  # Common to Colour_Light & Semaphore Mappings
-                "main_subsidary" :  subsidary,                                              # Common to Colour_Light & Semaphore Mappings
                 "THEATRE" : THEATRE,                                                        # Common to Colour_Light & Semaphore Mappings
+                "subsidary" : subsidary,                                                    # Specific to Colour_Light Mappings
                 str(signals.signal_state_type.DANGER) : danger,                             # Specific to Colour_Light Mappings
                 str(signals.signal_state_type.PROCEED) : proceed,                           # Specific to Colour_Light Mappings
                 str(signals.signal_state_type.CAUTION) : caution,                           # Specific to Colour_Light Mappings
@@ -413,9 +413,9 @@ def map_dcc_signal(sig_id:int,
                 str(signals.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
                 str(signals.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-            # Update the DCC mappings dictionary with all addresses used by the signal
+            # Update the DCC mappings dictionary with all commands/addresses used by the signal.
             add_dcc_commands_to_dcc_address_mappings("Signal", sig_id, list_of_commands)
-            add_dcc_address_to_dcc_address_mappings("Signal", sig_id, subsidary)
+            add_dcc_address_to_dcc_address_mappings("Signal", sig_id, subsidary[0])
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -458,17 +458,18 @@ def map_semaphore_signal(sig_id:int,
             new_dcc_mapping = {
                 "mapping_type" : mapping_type.SEMAPHORE,     # Common to Colour_Light & Semaphore Mappings
                 "auto_route_inhibit" : False,                # Common to Colour_Light & Semaphore Mappings
-                "main_subsidary" :  main_subsidary,          # Common to Colour_Light & Semaphore Mappings 
-                "THEATRE"       : THEATRE,                   # Common to Colour_Light & Semaphore Mappings
-                "main_signal"   : main_signal,               # Specific to Semaphore Signal Mappings
-                "lh1_signal"    : lh1_signal,                # Specific to Semaphore Signal Mappings
-                "lh1_subsidary" : lh1_subsidary,             # Specific to Semaphore Signal Mappings
-                "lh2_signal"    : lh2_signal,                # Specific to Semaphore Signal Mappings
-                "lh2_subsidary" : lh2_subsidary,             # Specific to Semaphore Signal Mappings
-                "rh1_signal"    : rh1_signal,                # Specific to Semaphore Signal Mappings
-                "rh1_subsidary" : rh1_subsidary,             # Common to both Semaphore and Colour Lights
-                "rh2_signal"    : rh2_signal,                # Specific to Semaphore Signal Mappings
-                "rh2_subsidary" : rh2_subsidary }            # Finally save the DCC mapping into the dictionary of mappings 
+                "THEATRE"        : THEATRE,                  # Common to Colour_Light & Semaphore Mappings
+                "main_signal"    : main_signal,              # Specific to Semaphore Signal Mappings
+                "main_subsidary" : main_subsidary,           # Specific to Semaphore Signal Mappings
+                "lh1_signal"     : lh1_signal,               # Specific to Semaphore Signal Mappings
+                "lh1_subsidary"  : lh1_subsidary,            # Specific to Semaphore Signal Mappings
+                "lh2_signal"     : lh2_signal,               # Specific to Semaphore Signal Mappings
+                "lh2_subsidary"  : lh2_subsidary,            # Specific to Semaphore Signal Mappings
+                "rh1_signal"     : rh1_signal,               # Specific to Semaphore Signal Mappings
+                "rh1_subsidary"  : rh1_subsidary,            # Common to both Semaphore and Colour Lights
+                "rh2_signal"     : rh2_signal,               # Specific to Semaphore Signal Mappings
+                "rh2_subsidary"  : rh2_subsidary }
+            # Finally save the DCC mapping into the dictionary of mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
             # Update the DCC mappings dictionary with all addresses used by the signal
             add_dcc_commands_to_dcc_address_mappings("Signal", sig_id, list_of_commands)
@@ -529,6 +530,7 @@ def map_dcc_switch(switch_id:int, on_commands:[[int,bool],], off_commands:[[int,
 
 #----------------------------------------------------------------------------------------------------
 # Function to send the appropriate DCC command to set the state of a DCC Point
+# This mapping comprises the DCC address and a 'reversed' command logic flag
 #----------------------------------------------------------------------------------------------------
 
 def update_dcc_point(point_id:int, state:bool):    
@@ -539,8 +541,8 @@ def update_dcc_point(point_id:int, state:bool):
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the state of a DCC accessory.
-# The variable length command lists contain valid DCC commands with no 'blanks' (address=zero)
+# Function to send the appropriate DCC commands to set the state of a DCC accessory (switch)
+# The mappings comprise variable length lists of DCC commands [address:int,state:bool]
 #----------------------------------------------------------------------------------------------------
 
 def update_dcc_switch(switch_id:int, state:bool):
@@ -552,14 +554,12 @@ def update_dcc_switch(switch_id:int, state:bool):
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the state of a DCC Colour Light 
-# Signal. The commands to be sent will depend on the displayed aspect of the signal.
+# Function to send the appropriate DCC commands to set the state of a DCC Colour Light Signal
+# The retrieved mapping is a list of DCC commands, where each entry is [add:int, state:bool]
 #----------------------------------------------------------------------------------------------------
 
 def update_dcc_signal_aspects(sig_id:int, sig_state:signals.signal_state_type):
     if sig_mapped(sig_id):
-        # Retrieve the DCC mappings for our signal and validate its the correct mapping
-        # This function should only be called for Colour Light Signal Types
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         if dcc_mapping["mapping_type"] != mapping_type.COLOUR_LIGHT:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
@@ -569,18 +569,30 @@ def update_dcc_signal_aspects(sig_id:int, sig_state:signals.signal_state_type):
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to change a single element of a signal
-# This function primarily used for semaphore signals where each signal "arm" is normally
-# mapped to a single DCC address. Also used for the subsidary aspect of main colour light
-# signals where this subsidary aspect is normally mapped to a single DCC Address
+# Function to send the appropriate DCC commands to set the state of a DCC Colour Light Subsidary
+# The mapping comprises [add:int, rev:bool] where 'rev' is the flag for reversed command logic
+#----------------------------------------------------------------------------------------------------
+
+def update_dcc_signal_subsidary(sig_id:int, state:bool):
+    if sig_mapped(sig_id):
+        dcc_mapping = dcc_signal_mappings[str(sig_id)]
+        if dcc_mapping["mapping_type"] != mapping_type.COLOUR_LIGHT:
+            logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for subsidary - Expecting a Colour Light signal")
+        else:
+            if dcc_mapping["subsidary"][1]: state = not state
+            if dcc_mapping["subsidary"][0] > 0:
+                issue_local_dcc_command(dcc_mapping["subsidary"][0], state)
+    return()
+
+#----------------------------------------------------------------------------------------------------
+# Function to send the appropriate DCC commands to change a single element of a semaphore
+# signal where each signal "arm" is mapped to a single DCC address.
 #----------------------------------------------------------------------------------------------------
             
 def update_dcc_signal_element(sig_id:int, state:bool, element:str="main_subsidary"):    
     if sig_mapped(sig_id):
-        # Retrieve the DCC mappings for our signal and validate its the correct mapping
-        # This function should only be called for anything other than the "main_subsidary" for Semaphore Signal Types
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
-        if element != "main_subsidary" and dcc_mapping["mapping_type"] != mapping_type.SEMAPHORE:
+        if dcc_mapping["mapping_type"] != mapping_type.SEMAPHORE:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Semaphore signal")
         else:
             if dcc_mapping[element] > 0: issue_local_dcc_command(dcc_mapping[element], state)
@@ -706,9 +718,9 @@ def delete_signal_mapping(sig_id:int):
         # Retrieve the DCC mappings for the signal and determine the mapping type
         dcc_signal_mapping = dcc_signal_mappings[str(sig_id)]
         if dcc_signal_mapping["mapping_type"] == mapping_type.COLOUR_LIGHT:
-            # Remove all DCC addresses used by the colour light signal from the dcc_address_mappings dictionary
+            # Remove all DCC commands/addresses used by the colour light signal from the dcc_address_mappings dict
             # Note we don't need to remove the 'CAUTION_APP_CNTL' commands as they are the same as CAUTION
-            remove_dcc_commands_from_dcc_address_mappings([[dcc_signal_mapping["main_subsidary"], True]])
+            remove_dcc_address_from_dcc_address_mappings(dcc_signal_mapping["subsidary"][0])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.signal_state_type.DANGER)])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.signal_state_type.PROCEED)])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.signal_state_type.CAUTION)])
