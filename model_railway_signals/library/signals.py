@@ -112,11 +112,11 @@
 #
 #   set_route(sig_id:int, route, theatre_text) - Set the signal route indication
 #
-#   lock_signal(sig_id:int) - use for point/signal interlocking
+#   lock_signal(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
 #
 #   unlock_signal(sig_id:int) - use for point/signal interlocking
 #
-#   lock_subsidary(sig_id:int) - use for point/signal interlocking
+#   lock_subsidary(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
 #
 #   unlock_subsidary(sig_id:int) - use for point/signal interlocking
 #
@@ -204,6 +204,8 @@ import logging
 import enum
 import tkinter as Tk
 from typing import Union
+
+from ..common import CreateToolTip
 
 # -------------------------------------------------------------------------
 # API Classes to be used externally when creating/updating signals or 
@@ -430,6 +432,15 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
                             highlightthickness=0, padx=2, pady=0, background=button_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:subsidary_button_event(sig_id))
+    # Create and store the default tool-tips for the buttons
+    sig_button_tooltip = CreateToolTip(sig_button)
+    sig_button_tooltip.waittime = 200     # miliseconds
+    sig_button_tooltip.wraplength = 400   # pixels
+    sig_button_tooltip.text = "Unlocked"
+    sub_button_tooltip = CreateToolTip(sub_button)
+    sub_button_tooltip.waittime = 200     # miliseconds
+    sub_button_tooltip.wraplength = 400   # pixels
+    sub_button_tooltip.text = "Unlocked"
     # Signal Passed Button - We only want a small button - hence a small font size
     passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
                         highlightthickness=0, command=lambda:sig_passed_button_event(sig_id))
@@ -510,6 +521,8 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["sublocked"]           = False                  # MANDATORY - State of subsidary interlocking
     signals[str(sig_id)]["sigbutton"]           = sig_button             # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]           = sub_button             # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["tooltip1"]            = sig_button_tooltip     # Tooltip object
+    signals[str(sig_id)]["tooltip2"]            = sub_button_tooltip     # Tooltip object
     signals[str(sig_id)]["passedbutton"]        = passed_button          # MANDATORY - Button drawing object (subsidary signal)
     signals[str(sig_id)]["buttonwindow1"]       = button_window1         # MANDATORY - Button window object (main signal)
     signals[str(sig_id)]["buttonwindow2"]       = button_window2         # MANDATORY - Button window object (subsidary signal)
@@ -956,20 +969,24 @@ def clear_signal_override_caution(sig_id:int):
 # Library API function to lock a signal - all signal types
 # -------------------------------------------------------------------------
 
-def lock_signal(sig_id:int):
+def lock_signal(sig_id:int, tooltip:str="Locked"):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
         logging.error("Signal "+str(sig_id)+": lock_signal - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": lock_signal - Signal ID does not exist")
-    elif not signals[str(sig_id)]["siglocked"]:
-        # If signal/point locking has been correctly implemented it should
-        # only be possible to lock a signal that is "ON" (i.e. at DANGER)
-        if signals[str(sig_id)]["sigclear"]:
-            logging.warning("Signal "+str(sig_id)+": lock_signal - Signal is OFF - Locking Anyway")            
+    else:
+        # Only generate log messages if the signal is not yet locked. If signal/point locking has been
+        # correctly implemented it should only be possible to lock a signal that is "ON" (i.e. at DANGER)
+        if not signals[str(sig_id)]["siglocked"]:
+            if signals[str(sig_id)]["sigclear"]:
+                logging.warning("Signal "+str(sig_id)+": lock_signal - Signal is OFF - Locking Anyway")
+            else:
+                logging.info("Signal "+str(sig_id)+": Locking signal")
         # Lock the signal (by disabling the signal change button)
-        logging.info("Signal "+str(sig_id)+": Locking signal")
+        # The tooltip for the CHANGE button will reflect that the signal is LOCKED
+        signals[str(sig_id)]["tooltip1"].text = tooltip
         signals[str(sig_id)]["sigbutton"].config(state="disabled")
         signals[str(sig_id)]["siglocked"] = True
     return()
@@ -987,18 +1004,20 @@ def unlock_signal(sig_id:int):
         logging.error("Signal "+str(sig_id)+": unlock_signal - Signal ID does not exist")
     elif signals[str(sig_id)]["siglocked"]:
         # UnLock the signal (by enabling the signal change button)
+        # The tooltip for the CHANGE button will revert to 'Unlocked'
         logging.info("Signal "+str(sig_id)+": Unlocking signal")
         if not signals[str(sig_id)]["automatic"]:
             signals[str(sig_id)]["sigbutton"].config(state="normal")
         signals[str(sig_id)]["siglocked"] = False
-    return() 
+        signals[str(sig_id)]["tooltip1"].text="Unlocked"
+        return()
 
 # -------------------------------------------------------------------------
 # Library API function to lock a subsidary - all signal types if
 # they were created with a subsidary (Colour lights and semaphores).
 # -------------------------------------------------------------------------
 
-def lock_subsidary(sig_id:int):
+def lock_subsidary(sig_id:int, tooltip:str="Locked"):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
@@ -1007,13 +1026,17 @@ def lock_subsidary(sig_id:int):
         logging.error("Signal "+str(sig_id)+": lock_subsidary - Signal ID does not exist")
     elif not signals[str(sig_id)]["hassubsidary"]:
         logging.error("Signal "+str(sig_id)+": lock_subsidary - Signal does not have a subsidary")
-    elif not signals[str(sig_id)]["sublocked"]:
-        # If signal/point locking has been correctly implemented it should
-        # only be possible to lock a subsidary that is "ON" (i.e. at DANGER)
-        if signals[str(sig_id)]["subclear"]:
-            logging.warning("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")            
+    else:
+        # Only generate log messages if the subsidary is not yet locked. If signal/point locking has been
+        # correctly implemented it should only be possible to lock a subsidary that is "ON" (i.e. at DANGER)
+        if not signals[str(sig_id)]["siglocked"]:
+            if signals[str(sig_id)]["subclear"]:
+                logging.warning("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")
+            else:
+                logging.info("Signal "+str(sig_id)+": Locking subsidary")
         # Lock the subsidary (by disabling the subsidary change button)
-        logging.info("Signal "+str(sig_id)+": Locking subsidary")
+        # The tooltip for the CHANGE button will reflect that the signal is LOCKED
+        signals[str(sig_id)]["tooltip2"].text = tooltip
         signals[str(sig_id)]["subbutton"].config(state="disabled")        
         signals[str(sig_id)]["sublocked"] = True
     return()
@@ -1034,9 +1057,11 @@ def unlock_subsidary(sig_id:int):
         logging.error("Signal "+str(sig_id)+": unlock_subsidary - Signal does not have a subsidary")
     elif signals[str(sig_id)]["sublocked"]:
         # UnLock the subsidary (by enabling the subsidary change button)
+        # The tooltip for the CHANGE button will revert to 'Unlocked'
         logging.info("Signal "+str(sig_id)+": Unlocking subsidary")
         signals[str(sig_id)]["subbutton"].config(state="normal")
         signals[str(sig_id)]["sublocked"] = False
+        signals[str(sig_id)]["tooltip2"].text="Unlocked"
     return()
 
 # -------------------------------------------------------------------------

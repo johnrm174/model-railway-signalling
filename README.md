@@ -65,7 +65,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
 * Added display of hostname on MQTT status tab (MQTT heartbeat messages) to ease configuration.
 * Added ability to 'reverse' the DCC command logic for subsidary aspects of colour light signals.
-* Added tooltips in edit/run modes to report state of point interlocking
+* Added tooltips in edit/run modes to report state of point and signal interlocking
 * Bugfix for DCC control of shunt agead ground position signals (commands were not being sent out).
 * Bugfix for MQTT heartbeats (broker disconnect/reconnect would stop messages being sent out)
 

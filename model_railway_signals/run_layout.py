@@ -682,20 +682,40 @@ def process_all_signal_interlocking():
         int_signal_id = int(str_signal_id)
         # Note that the ID of any associated distant signal is sig_id+1000
         int_associated_distant_id = int_signal_id + 1000
-        distant_arms_can_be_unlocked = has_distant_arms(int_signal_id)
-        signal_can_be_unlocked = False
-        subsidary_can_be_unlocked = False
+        distant_arms_can_be_unlocked, dist_tooltip = has_distant_arms(int_signal_id), "Distant arm is locked because:"
+        signal_can_be_unlocked, sig_tooltip = True, "Signal "+str_signal_id+" is locked because:"
+        subsidary_can_be_unlocked, sub_tooltip = True, "Subsidary "+str_signal_id+" is locked because:"
+        # These are the flags to stop adding new messages to the tooltips (to avoid spam)
+        add_to_sig_tt, add_to_sub_tt, add_to_dist_tt = True, True, True
         # Find the signal route (all points are set and locked by their FPLs)
         signal_route = find_locked_route(objects.signal(int_signal_id),"pointinterlock")
-        # If there is a set/locked route then the signal/subsidary can be unlocked
-        if signal_route is not None:
+        # If there is no set/locked route then the signal/subsidary should be locked
+        if signal_route is None:
+            # Limit the tooltips to display just these messages (further messages irrelevant)
+            sig_tooltip = sig_tooltip + "\nNo set/locked route ahead of signal"
+            sub_tooltip = sub_tooltip + "\nNo set/locked route ahead of signal"
+            signal_can_be_unlocked, add_to_sig_tt  = False, False
+            subsidary_can_be_unlocked, add_to_sub_tt = False, False
+        else:
             signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-            # 'sigroutes' and 'subroutes' represent the routes supported by the
-            # signal (and its subsidary) - of the form [main, lh1, lh2, rh1, rh2]
-            if signal_object["sigroutes"][signal_route.value-1]:
-                signal_can_be_unlocked = True
-            if signal_object["subroutes"][signal_route.value-1]:
-                subsidary_can_be_unlocked = True
+            # Lock the signal/subsidary if the srt/locked route is not supported by the signal/subsidary
+            # 'sigroutes' and 'subroutes' comprise [main, lh1, lh2, rh1, rh2] where each entry is a boolean
+            # Limit the tooltips to display just these messages (further messages irrelevant)
+            if not signal_object["sigroutes"][signal_route.value-1]:
+                sig_tooltip = sig_tooltip + "\nRoute not supported by signal"
+                signal_can_be_unlocked, add_to_sig_tt = False, False
+            elif not signal_object["subroutes"][signal_route.value-1]:
+                sub_tooltip = sub_tooltip + "\nRoute not supported by subsidary"
+                subsidary_can_be_unlocked, add_to_sub_tt = False, False
+            # Interlock the main signal with the subsidary (and vice versa)
+            # Limit the tooltips to display just these messages (further messages irrelevant)
+            if library.signal_clear(int_signal_id):
+                if add_to_sub_tt: sub_tooltip = sub_tooltip + "\nMain signal is clear"
+                subsidary_can_be_unlocked, add_to_sub_tt = False, False
+            if has_subsidary(int_signal_id) and library.subsidary_clear(int_signal_id):
+                if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nSubsidary is clear"
+                signal_can_be_unlocked, add_to_sig_tt = False, False
+            # Interlock the signal with any opposing signals
             # 'siginterlock' comprises a list of routes [main, lh1, lh2, rh1, rh2]
             # Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
             # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
@@ -711,6 +731,10 @@ def process_all_signal_interlocking():
                                 library.subsidary_clear(int_opposing_signal_id, library.route_type(index+1)))):
                             subsidary_can_be_unlocked = False
                             signal_can_be_unlocked = False
+                            message = ("\nSignal "+str(opposing_signal_to_test[0])+" is cleared for "+
+                                      str(library.route_type(index+1)).rpartition('.')[-1])
+                            if add_to_sub_tt: sub_tooltip = sub_tooltip + message
+                            if add_to_sig_tt: sig_tooltip = sig_tooltip + message
             # See if the signal is interlocked with a block instrument on the route ahead
             # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
             # The block instrument is the local block instrument - ID is an integer
@@ -719,18 +743,19 @@ def process_all_signal_interlocking():
                 block_clear = library.block_section_ahead_clear(int_block_instrument)
                 if not block_clear and not library.signal_clear(signal_object["itemid"]):
                     signal_can_be_unlocked = False
+                    if add_to_sig_tt: sig_tooltip = sig_tooltip + ("\nBlock section ahead is not clear")
             # The "interlockedahead" flag will only be True if selected and it can only be selected for
             # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
             # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
             if signal_object["interlockahead"] and home_signal_ahead_at_danger(int_signal_id):
-                if has_distant_arms(int_signal_id):
-                    # Must be a home semaphore signal with secondary distant arms
-                    if not library.signal_clear(signal_object["itemid"]+1000):
-                        distant_arms_can_be_unlocked = False
-                else:
-                    # Must be a distant signal (colour light or semaphore)
-                    if not library.signal_clear(signal_object["itemid"]):
-                        signal_can_be_unlocked = False
+                if has_distant_arms(int_signal_id) and not library.signal_clear(signal_object["itemid"]+1000):
+                    # Home semaphore signal with secondary distant arms (distant signal is sig_id + 1000)
+                    if add_to_dist_tt: dist_tooltip = dist_tooltip + "\nHome signals ahead are at danger"
+                    distant_arms_can_be_unlocked = False
+                elif not library.signal_clear(signal_object["itemid"]):
+                    # Straight forward distant signal (colour light or semaphore)
+                    signal_can_be_unlocked = False
+                    if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nHome signals ahead are at danger"
             # Interlock against track sections on the route ahead - note that this is the
             # one bit of interlocking functionality that we can only do in RUN mode as
             # track section objects dont 'exist' as such in EDIT mode
@@ -742,27 +767,25 @@ def process_all_signal_interlocking():
                         # signalman to return the signal to ON if it is currently OFF
                         if not library.signal_clear(signal_object["itemid"]):
                             signal_can_be_unlocked = False
-                            break
-        # Interlock the main signal with the subsidary
-        if library.signal_clear(int_signal_id):
-            subsidary_can_be_unlocked = False
-        if has_subsidary(int_signal_id) and library.subsidary_clear(int_signal_id):
-            signal_can_be_unlocked = False
+                            if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nTrack Section "+str(section)+" is occupied"
         # Lock/unlock the signal as required
         if signal_can_be_unlocked: library.unlock_signal(int_signal_id)
-        else: library.lock_signal(int_signal_id)
+        else: library.lock_signal(int_signal_id, sig_tooltip)
         # Lock/unlock the subsidary as required (if the signal has one)
         if has_subsidary(int_signal_id):
             if subsidary_can_be_unlocked: library.unlock_subsidary(int_signal_id)
-            else: library.lock_subsidary(int_signal_id)
+            else: library.lock_subsidary(int_signal_id, sub_tooltip)
         # lock/unlock the associated distant arms (if the signal has any)
         if has_distant_arms(int_signal_id):
-            if distant_arms_can_be_unlocked: library.unlock_signal(int_associated_distant_id)
-            else: library.lock_signal(int_associated_distant_id)
+            if distant_arms_can_be_unlocked:
+                library.unlock_signal(int_associated_distant_id)
+            else:
+                library.lock_signal(int_associated_distant_id, dist_tooltip)
         # lock any Signalbox levers that are linked to the signal
         for str_lever_id in objects.lever_index:
             lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
             if lever_object["linkedsignal"] == int_signal_id:
+                ################################# TODO - Tooltips for levers #####################################
                 # Find the current 'route' for the signal and see if the lever is configured to switch
                 # the current signal route - This allows different levers to switch different signal arms
                 signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
