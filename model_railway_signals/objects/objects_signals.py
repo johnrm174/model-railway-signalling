@@ -94,6 +94,7 @@ default_signal_object["buttoncolour"] = settings.get_style("signals", "buttoncol
 default_signal_object["textcolourtype"] = settings.get_style("signals", "textcolourtype")
 default_signal_object["textfonttuple"] = settings.get_style("signals", "textfonttuple")
 default_signal_object["orientation"] = 0 
+default_signal_object["flipped"] = False
 default_signal_object["xbuttonoffset"] = 0
 default_signal_object["ybuttonoffset"] = 0
 default_signal_object["hidebuttons"] = False
@@ -555,6 +556,7 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     has_subsidary = objects_common.schematic_objects[object_id]["subsidary"][0],
@@ -597,6 +599,7 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     main_signal = True,
@@ -638,6 +641,7 @@ def redraw_signal_object(object_id):
                     associated_home = objects_common.schematic_objects[object_id]["itemid"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][2][0],
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][2][0],
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][2][0],
@@ -666,6 +670,7 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     slot_with = objects_common.schematic_objects[object_id]["slotwith"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
@@ -690,6 +695,7 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     slot_with = objects_common.schematic_objects[object_id]["slotwith"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],

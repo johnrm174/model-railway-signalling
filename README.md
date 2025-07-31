@@ -63,12 +63,14 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * The next signal can now be specified as a "STOP" for any route ahead (signal interlocking tab):
     * This supports the case of signals controlling routes into 'dead ends' such as bay platforms.
     * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
+* Signals can now be 'flipped' around their horizontal axis (move to the other side of the track).
+* New 'f' shortcut key to 'flip' selected signals/points around their horizontal axis (edit-mode).
+* New tooltips for point and signal buttons in edit/run modes to report the interlocking state.
 * Added display of hostname on MQTT status tab (MQTT heartbeat messages) to ease configuration.
 * Added ability to 'reverse' the DCC command logic for subsidary aspects of colour light signals.
-* Added tooltips in edit/run modes to report state of point and signal interlocking
-* Bugfix for route highlighting through points (Y Points, single slips and double slips)
+* Bugfix for route highlighting through points (Y Points, single slips and double slips).
 * Bugfix for DCC control of shunt agead ground position signals (commands were not being sent out).
-* Bugfix for MQTT heartbeats (broker disconnect/reconnect would stop messages being sent out)
+* Bugfix for MQTT heartbeats (broker disconnect/reconnect would stop messages being sent out).
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

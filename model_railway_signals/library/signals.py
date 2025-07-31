@@ -402,8 +402,8 @@ def reset_sig_released_button(sig_id:int):
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 
-def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int, button_xoffset:int,
-            button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback, sig_passed_callback,
+def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int, post_offset:int,
+            button_xoffset:int, button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback, sig_passed_callback,
             sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False, sig_passed_button:bool=False,
             sig_automatic:bool=False, associated_home:int=0, button_colour:str="Grey85", active_colour:str="Grey95",
             selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
@@ -432,7 +432,7 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
                             highlightthickness=0, padx=2, pady=0, background=button_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:subsidary_button_event(sig_id))
-    # Create and store the default tool-tips for the buttons
+    # Create and store the default tool-tips for the Signal and Subsidary Buttons
     sig_button_tooltip = CreateToolTip(sig_button)
     sig_button_tooltip.waittime = 200     # miliseconds
     sig_button_tooltip.wraplength = 400   # pixels
@@ -441,52 +441,47 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     sub_button_tooltip.waittime = 200     # miliseconds
     sub_button_tooltip.wraplength = 400   # pixels
     sub_button_tooltip.text = "Unlocked"
-    # Signal Passed Button - We only want a small button - hence a small font size
+    # Create the Signal Passed Button - We only want a small button - hence a small font size
     passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
                         highlightthickness=0, command=lambda:sig_passed_button_event(sig_id))
+    # Set the anchor point for the buttons according to the position of the signal
+    if orientation != 180 and post_offset < 0:
+        sig_button_anchor=Tk.SE
+        sub_button_anchor=Tk.SW
+    elif orientation != 180 and post_offset >= 0:
+        sig_button_anchor=Tk.NE
+        sub_button_anchor=Tk.NW
+    elif orientation == 180 and post_offset < 0:
+        sig_button_anchor=Tk.NW
+        sub_button_anchor=Tk.NE
+    elif orientation == 180 and post_offset >= 0:
+        sig_button_anchor=Tk.SW
+        sub_button_anchor=Tk.SE
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
-    # created if the signal has a subsidary, but the Button positions are adjusted so they always
+    # created if the signal has a subsidary. The Button positions are adjusted so they always
     # remain in the "right" position relative to the signal. Note we also have to cater for the
     # special case of a semaphore distant signal being created on the same "post" as a home signal.
     # In this case we apply an additional offset to deconflict with the home signal buttons.
-    # Note the code also applies offsets to take into account the default font size in 'common'
+    button_yposition = button_yoffset + (post_offset / 2)
     if associated_home > 0:
         if sig_automatic:
             button_window1 = None
             button_window2 = None
         elif signals[str(associated_home)]["hassubsidary"]:
-            if orientation == 180:
-                anchor=Tk.NW
-            else:
-                anchor=Tk.SE
-            button_position = common.rotate_point(x, y, button_xoffset - 52, button_yoffset - 6, orientation) 
-            button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+            button_position = common.rotate_point(x, y, button_xoffset - 52, button_yposition, orientation)
+            button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
             button_window2 = None            
         else:
-            if orientation == 180:
-                anchor=Tk.NW
-            else:
-                anchor=Tk.SE
-            button_position = common.rotate_point(x, y, button_xoffset - 32, button_yoffset - 6, orientation)
-            button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+            button_position = common.rotate_point(x, y, button_xoffset - 32, button_yposition, orientation)
+            button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
             button_window2 = None
     elif has_subsidary:
-        if orientation == 180:
-            anchor1=Tk.NW
-            anchor2=Tk.NE
-        else:
-            anchor1=Tk.SE
-            anchor2=Tk.SW
-        button_position = common.rotate_point(x, y, button_xoffset - 23, button_yoffset - 6, orientation) 
-        button_window1 = canvas.create_window(button_position, anchor=anchor1, window=sig_button, tags=canvas_tag)
-        button_window2 = canvas.create_window(button_position, anchor=anchor2, window=sub_button, tags=canvas_tag)
+        button_position = common.rotate_point(x, y, button_xoffset - 23, button_yposition, orientation)
+        button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
+        button_window2 = canvas.create_window(button_position, anchor=sub_button_anchor, window=sub_button, tags=canvas_tag)
     else:
-        if orientation == 180:
-            anchor=Tk.NW
-        else:
-            anchor=Tk.SE
-        button_position = common.rotate_point (x, y, button_xoffset - 3, button_yoffset - 6, orientation) 
-        button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+        button_position = common.rotate_point (x, y, button_xoffset - 3, button_yposition, orientation)
+        button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
         button_window2 = None
     # Signal passed button is created on the track at the base of the signal
     # Note we only create this if the signal IS NOT an 'associated distant' signal

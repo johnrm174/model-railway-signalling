@@ -11,6 +11,7 @@
 #    create_object(obj_type, item_type, item_subtype) - create a new object on the canvas
 #    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
+#    flip_objects(list of obj IDs) - Flip the selected objects on the canvas
 #    move_objects(list of obj IDs) - Finalises the move of selected objects
 #    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
@@ -106,6 +107,7 @@ from . import objects_switches
 from . import objects_levers
 
 from .. import run_layout
+from .. import library
 
 #------------------------------------------------------------------------------------
 # Internal function to bring all track sections, route buttons and switches to the
@@ -386,7 +388,7 @@ def delete_objects(list_of_object_ids:list, initialise_layout_after_delete:bool=
     # save the current state (for undo/redo)
     save_schematic_state()
     # Process any layout changes (interlocking, signal ahead etc)
-    # that might need to change following objet deletion
+    # that might need to change following object deletion
     if initialise_layout_after_delete: run_layout.initialise_layout()
     return()
 
@@ -416,7 +418,48 @@ def rotate_objects(list_of_object_ids:list):
             elif type_of_object == objects_common.object_type.point: objects_points.redraw_point_object(object_id)    
     # save the current state (for undo/redo)
     save_schematic_state()
-    # As we are just rotating objects we don't need to process layout changes
+    # As we are deleting/re-creating objects we still need to process layout changes as the
+    # signals may need to be locked depending on the state of the points and vice versa
+    run_layout.initialise_layout()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to Flip one or more objects on the schematic. For signals this
+# will flip the position to the other side of the track. For points, this will
+# change them from LH to RH or vice versa (Y points remain unchanged)
+#------------------------------------------------------------------------------------
+
+def flip_objects(list_of_object_ids:list):
+    # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
+    # processing a load of intermixed deletes/creates when it returns to the main loop
+    for object_id in list_of_object_ids:
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
+        # Delete the drawing objects from the canvas
+        if type_of_object == objects_common.object_type.signal: objects_signals.delete_signal_object(object_id)
+        elif type_of_object == objects_common.object_type.point:
+            current_point_type = objects_common.schematic_objects[object_id]["itemtype"]
+            if current_point_type in(library.point_type.LH.value, library.point_type.RH.value):
+                objects_points.delete_point_object(object_id)
+    # Re-draw the drawing objects on the canvas in their new position
+    for object_id in list_of_object_ids:
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
+        if type_of_object == objects_common.object_type.signal:
+            current_flipped_state = objects_common.schematic_objects[object_id]["flipped"]
+            objects_common.schematic_objects[object_id]["flipped"] = not current_flipped_state
+            objects_signals.redraw_signal_object(object_id)
+        elif type_of_object == objects_common.object_type.point:
+            current_point_type = objects_common.schematic_objects[object_id]["itemtype"]
+            if current_point_type == library.point_type.LH.value:
+                objects_common.schematic_objects[object_id]["itemtype"] = library.point_type.RH.value
+                objects_points.redraw_point_object(object_id)
+            elif current_point_type == library.point_type.RH.value:
+                objects_common.schematic_objects[object_id]["itemtype"] = library.point_type.LH.value
+                objects_points.redraw_point_object(object_id)
+    # save the current state (for undo/redo)
+    save_schematic_state()
+    # As we are deleting/re-creating objects we still need to process layout changes as the
+    # signals may need to be locked depending on the state of the points and vice versa
+    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------

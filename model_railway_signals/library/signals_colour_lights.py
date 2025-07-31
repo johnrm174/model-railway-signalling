@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       flip_position:bool - Position the signal on the other side of the track - Default = False
 #       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       has_subsidary:bool - Creates a subsidary position light signal - Default = False
@@ -71,6 +72,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 sig_passed_callback,
                                 sig_updated_callback,
                                 orientation:int=0,
+                                flip_position:bool=False,
                                 sig_passed_button:bool=False,
                                 sig_release_button:bool=False,
                                 has_subsidary:bool=False,
@@ -113,53 +115,50 @@ def create_colour_light_signal (canvas, sig_id:int,
         logging.error("Signal "+str(sig_id)+": create_signal - 2 Aspect distant signals do not support Approach Control")
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
+        # Flip the position of the signal offset to the track (if we need to)
+        if flip_position: post_offset = +15
+        else: post_offset = -15
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.colour_light,
-                                                x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
-                                                sig_switched_callback, sig_passed_callback,
-                                                sig_updated_callback = sig_updated_callback,
-                                                sub_switched_callback = sub_switched_callback,
-                                                sig_passed_button = sig_passed_button,
-                                                has_subsidary = has_subsidary,
-                                                sig_automatic = fully_automatic,
-                                                button_colour = button_colour,
-                                                active_colour = active_colour,
-                                                selected_colour = selected_colour,
-                                                text_colour = text_colour,
-                                                font = font)
+                                    x, y, post_offset, button_xoffset, button_yoffset, hide_buttons, orientation,
+                                    sig_switched_callback, sig_passed_callback, sig_updated_callback = sig_updated_callback,
+                                    sub_switched_callback=sub_switched_callback,sig_passed_button=sig_passed_button,
+                                    has_subsidary=has_subsidary, sig_automatic=fully_automatic,
+                                    button_colour=button_colour, active_colour=active_colour, selected_colour=selected_colour,
+                                    text_colour=text_colour, font=font)
         # Get the assigned tag to use for all the signal post elements
         post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base line & signal post   
-        line_coords = common.rotate_line (x,y,0,0,0,-15,orientation) 
+        line_coords = common.rotate_line (x,y,0,0,0,post_offset,orientation)
         canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
-        line_coords = common.rotate_line (x,y,0,-15,+30,-15,orientation) 
+        line_coords = common.rotate_line (x,y,0,post_offset,+30,post_offset,orientation)
         canvas.create_line (line_coords,width=3,tags=(canvas_tag,post_tag),fill=post_colour)
         # Draw the body of the subsidary signal - only if a subsidary has been specified
         if has_subsidary:
-            point_coords1 = common.rotate_point (x,y,+13,-8,orientation) 
-            point_coords2 = common.rotate_point (x,y,+13,-21,orientation) 
-            point_coords3 = common.rotate_point (x,y,+25,-21,orientation) 
-            point_coords4 = common.rotate_point (x,y,+25,-18,orientation) 
-            point_coords5 = common.rotate_point (x,y,+18,-8,orientation) 
+            point_coords1 = common.rotate_point (x,y,+13,post_offset+7,orientation)
+            point_coords2 = common.rotate_point (x,y,+13,post_offset-6,orientation)
+            point_coords3 = common.rotate_point (x,y,+25,post_offset-6,orientation)
+            point_coords4 = common.rotate_point (x,y,+25,post_offset-3,orientation)
+            point_coords5 = common.rotate_point (x,y,+18,post_offset+7,orientation)
             points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
             canvas.create_polygon (points, outline="black", fill="black",tags=canvas_tag)
         # Draw the subsidary signal aspects (but hide then if the signal doesn't have a subsidary)
-        line_coords = common.rotate_line (x,y,+18,-21,+23,-16,orientation) 
+        line_coords = common.rotate_line (x,y,+18,post_offset-6,+23,post_offset-1,orientation)
         poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+14,-9,+19,-14,orientation) 
+        line_coords = common.rotate_line (x,y,+14,post_offset+6,+19,post_offset+1,orientation)
         poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black",tags=canvas_tag)
         if not has_subsidary:
             canvas.itemconfigure(poslight1,state='hidden')
             canvas.itemconfigure(poslight2,state='hidden')
         # Draw all aspects for a 4-aspect  signal (running from bottom to top)
         # Unused spects (if its a 2 or 3 aspect signal) get 'hidden' later
-        line_coords = common.rotate_line (x,y,+38,-19,+30,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+38,post_offset-4,+30,post_offset+4,orientation)
         red = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+46,-19,+38,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+46,post_offset-4,+38,post_offset+4,orientation)
         yel = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+54,-19,+46,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+54,post_offset-4,+46,post_offset+4,orientation)
         grn = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag) 
-        line_coords = common.rotate_line (x,y,+62,-19,+54,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+62,post_offset-4,+54,post_offset+4,orientation)
         yel2 = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag)
         # Hide the aspects we don't need and define the 'offset' for the route indications based on
         # the signal type - so that the feathers and theatre route indicator sit on top of the signal

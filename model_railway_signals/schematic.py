@@ -16,6 +16,7 @@
 #    objects.create_object(obj, type, subtype) - Create a default object on the schematic
 #    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
+#    objects.flip_objects(list of obj IDs) - Flip the selected objects on the canvas
 #    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
 #    objects.undo() / objects.redo() - Undo and re-do functions as you would expect
@@ -405,11 +406,15 @@ def delete_selected_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Rotate all selected Objects ('r' key and popup menu)
+# Internal functions to Rotate / flip all selected Objects ('r' key and popup menu)
 #------------------------------------------------------------------------------------
 
 def rotate_selected_objects(event=None):
     objects.rotate_objects(schematic_state["selectedobjects"])
+    return()
+
+def flip_selected_objects(event=None):
+    objects.flip_objects(schematic_state["selectedobjects"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -911,6 +916,7 @@ def enable_edit_mode_event_bindings():
     canvas.bind('<Control-Key-y>', schematic_redo)
     canvas.bind('<Control-Key-s>', canvas_event_callback)
     canvas.bind('r', rotate_selected_objects)
+    canvas.bind('f', flip_selected_objects)
     canvas.bind('s', snap_selected_objects_to_grid)      
     # Edit-mode-specific cursor event bindings
     canvas.bind('<Button-2>', right_button_click)
@@ -931,6 +937,7 @@ def disable_edit_mode_event_bindings():
     canvas.unbind('<Control-Key-y>')
     canvas.unbind('<Control-Key-s>')
     canvas.unbind('r')
+    canvas.unbind('f')
     canvas.unbind('s')
     # Edit-mode-specific cursor event bindings
     canvas.unbind('<Button-2>')

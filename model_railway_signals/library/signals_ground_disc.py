@@ -14,6 +14,7 @@
 #       sig_passed_callback - the function to call on signal passed events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       flip_position:bool - Position the signal on the other side of the track - Default = False
 #       slot_with:int - The signal to 'slot' the ground signal with - Defauit = zero (no slotting)
 #       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
 #       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
@@ -53,6 +54,7 @@ def create_ground_disc_signal (canvas, sig_id:int,
                                sig_switched_callback,
                                sig_passed_callback,
                                orientation:int=0,
+                               flip_position:bool=False,
                                slot_with:int=0,
                                sig_passed_button:bool=False,
                                button_xoffset:int=0,
@@ -78,32 +80,31 @@ def create_ground_disc_signal (canvas, sig_id:int,
         logging.error("Signal "+str(sig_id)+": create_signal - 'slotwith' ID must be a positive integer")
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
+        # Flip the position of the signal offset to the track (if we need to)
+        if flip_position: post_offset = +12
+        else: post_offset = -12
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.ground_disc,
-                                                x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
-                                                sig_switched_callback, sig_passed_callback,
-                                                sig_passed_button = sig_passed_button,
-                                                button_colour = button_colour,
-                                                active_colour = active_colour,
-                                                selected_colour = selected_colour,
-                                                text_colour = text_colour,
-                                                font = font)
+                            x, y, post_offset, button_xoffset, button_yoffset,hide_buttons, orientation,
+                            sig_switched_callback, sig_passed_callback, sig_passed_button=sig_passed_button,
+                            button_colour=button_colour, active_colour=active_colour, selected_colour=selected_colour,
+                            text_colour=text_colour, font=font)
         # Get the assigned tag to use for all the signal post elements
         post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base
-        line_coords = common.rotate_line (x,y,0,0,0,-11,orientation)
+        line_coords = common.rotate_line (x,y,0,0,0,post_offset,orientation)
         canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
-        line_coords = common.rotate_line (x,y,0,-11,5,-11,orientation)
+        line_coords = common.rotate_line (x,y,0,post_offset,5,post_offset,orientation)
         canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
         # Draw the White disc of the signal
-        oval_coords = common.rotate_line (x,y,+5,-21,+21,-5,orientation)
+        oval_coords = common.rotate_line (x,y,+5,post_offset-8,+21,post_offset+8,orientation)
         canvas.create_oval(oval_coords,fill="white",outline="black",tags=canvas_tag)
         # Draw the banner arms for the signal
         if signalsubtype == ground_disc_subtype.shunt_ahead: arm_colour="yellow3"
         else: arm_colour = "red"
-        line_coords = common.rotate_line(x,y,+13,-21,+13,-5,orientation)
+        line_coords = common.rotate_line(x,y,+13,post_offset-8,+13,post_offset+8,orientation)
         sigon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+18,-19,+8,-7,orientation)
+        line_coords = common.rotate_line(x,y,+18,post_offset-7,+8,post_offset+7,orientation)
         sigoff = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
         signals.signals[str(sig_id)]["subtype"] = signalsubtype   # Type-specific - signal subtype

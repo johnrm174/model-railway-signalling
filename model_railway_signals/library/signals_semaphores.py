@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       flip_position:bool - Position the signal on the other side of the track - Default = False
 #       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       main_signal:bool - To create a signal arm for the main route - default = True
@@ -82,6 +83,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             sig_passed_callback,
                             sig_updated_callback,
                             orientation:int=0,
+                            flip_position:bool=False,
                             sig_passed_button:bool=False,
                             sig_release_button:bool=False,
                             main_signal:bool=True,
@@ -142,55 +144,48 @@ def create_semaphore_signal(canvas, sig_id:int,
         logging.error("Signal "+str(sig_id)+": create_signal - Signal must have a signal arm for the main route")
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
+        # Flip the position of the signal offset to the track (if we need to)
+        if flip_position: post_offset = +20
+        else: post_offset = -15
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
-        canvas_tag = signals.create_common_signal_elements (canvas, sig_id,signals.signal_type.semaphore,
-                                                x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
-                                                sig_switched_callback, sig_passed_callback,
-                                                sig_updated_callback = sig_updated_callback,
-                                                sub_switched_callback = sub_switched_callback,
-                                                sig_passed_button = sig_passed_button,
-                                                has_subsidary = has_subsidary,
-                                                sig_automatic = fully_automatic,
-                                                associated_home = associated_home,
-                                                button_colour = button_colour,
-                                                active_colour = active_colour,
-                                                selected_colour = selected_colour,
-                                                text_colour = text_colour,
-                                                font = font)
+        canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.semaphore,
+                                x, y, post_offset,button_xoffset, button_yoffset, hide_buttons, orientation,
+                                sig_switched_callback, sig_passed_callback, sig_updated_callback=sig_updated_callback,
+                                sub_switched_callback=sub_switched_callback, sig_passed_button=sig_passed_button,
+                                has_subsidary=has_subsidary, sig_automatic=fully_automatic, associated_home=associated_home,
+                                button_colour=button_colour, active_colour=active_colour, selected_colour=selected_colour,
+                                text_colour=text_colour, font=font)
         # Get the assigned tag to use for all the signal post elements
         post_tag = signals.signals[str(sig_id)]["posttag"]
-        # Work out the offset for the post depending on the combination of signal arms. Note that if
-        # this is a distant signal associated with another home signal then we'll use the post offset
-        # for the existing signal (as there may be a different combination of home arms specified)
-        # This to cater for the situation where not all home arms have an associated distant arm
+        # If this is a distant signal associated with another home signal then we'll use the post offset
+        # for the existing home signal (as there may be a different combination of home arms specified).
+        # Otherwise, shift the post offset depending on the combination of diverging route signal arms.
         if associated_home > 0:
-            postoffset = signals.signals[str(associated_home)]["postoffset"]
-        elif (not rh2_signal and not rh2_subsidary and not rh1_signal and not rh1_subsidary ):
-            if lh2_signal or lh2_subsidary or lh1_signal or lh1_subsidary:
-                postoffset = -8
-            else:
-                postoffset = -15
-        elif rh2_signal or rh2_subsidary:
-            postoffset = -34
-        elif rh1_signal or rh1_subsidary:
-            postoffset = -20
-        else:
-            postoffset = -20
-        lh2offset = postoffset-26 
-        lh1offset = postoffset-13
-        rh1offset = postoffset+13
-        rh2offset = postoffset+26 
+            post_offset = signals.signals[str(associated_home)]["postoffset"]
+        elif post_offset < 0:
+            if rh2_signal or rh2_subsidary: post_offset = post_offset-19
+            elif rh1_signal or rh1_subsidary: post_offset = post_offset-5
+            elif lh2_signal or lh2_subsidary or lh1_signal or lh1_subsidary: post_offset = post_offset+7
+        elif post_offset >= 0:
+            if lh2_signal or lh2_subsidary: post_offset = post_offset+19
+            elif lh1_signal or lh1_subsidary: post_offset = post_offset+5
+            elif rh2_signal or rh2_subsidary or rh1_signal or rh1_subsidary: post_offset = post_offset-7
+        # Now we know the offset for the main post - work out the offsets for each signal arm
+        lh2offset = post_offset-26
+        lh1offset = post_offset-13
+        rh1offset = post_offset+13
+        rh2offset = post_offset+26
         # Draw the signal base & signal post (unless this is a distant associated with an existing home signal
         # in which case the signal base & post will already have been drawn when the home signal was created
         # and we therefore only need to add the additional distant arms to the existing posts
         if associated_home == 0:
-            line_coords = common.rotate_line(x,y,0,0,0,postoffset,orientation)
+            line_coords = common.rotate_line(x,y,0,0,0,post_offset,orientation)
             canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
-            line_coords = common.rotate_line(x,y,0,postoffset,+60,postoffset,orientation)
+            line_coords = common.rotate_line(x,y,0,post_offset,+60,post_offset,orientation)
             canvas.create_line(line_coords,width=3,fill=post_colour,tags=(canvas_tag,post_tag))
             # Draw the rest of the gantry to support other arms as required
             if lh2_signal or lh2_subsidary:
-                line_coords = common.rotate_line(x,y,25,postoffset,25,lh2offset,orientation)
+                line_coords = common.rotate_line(x,y,25,post_offset,25,lh2offset,orientation)
                 canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if lh2_signal:
                     line_coords = common.rotate_line(x,y,25,lh2offset,55,lh2offset,orientation)
@@ -199,7 +194,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                     line_coords = common.rotate_line(x,y,25,lh2offset,38,lh2offset,orientation) ##
                     canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if lh1_signal or lh1_subsidary:
-                line_coords = common.rotate_line(x,y,25,postoffset,25,lh1offset,orientation)
+                line_coords = common.rotate_line(x,y,25,post_offset,25,lh1offset,orientation)
                 canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if lh1_signal:
                     line_coords = common.rotate_line(x,y,25,lh1offset,55,lh1offset,orientation)
@@ -208,7 +203,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                     line_coords = common.rotate_line(x,y,25,lh1offset,38,lh1offset,orientation) ###
                     canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if rh2_signal or rh2_subsidary:
-                line_coords = common.rotate_line(x,y,25,postoffset,25,rh2offset,orientation)
+                line_coords = common.rotate_line(x,y,25,post_offset,25,rh2offset,orientation)
                 canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if rh2_signal:
                     line_coords = common.rotate_line(x,y,25,rh2offset,55,rh2offset,orientation)
@@ -217,7 +212,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                     line_coords = common.rotate_line(x,y,25,rh2offset,38,rh2offset,orientation) ##
                     canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
             if rh1_signal or rh1_subsidary:
-                line_coords = common.rotate_line(x,y,25,postoffset,25,rh1offset,orientation)
+                line_coords = common.rotate_line(x,y,25,post_offset,25,rh1offset,orientation)
                 canvas.create_line(line_coords,width=2,fill=post_colour,tags=(canvas_tag,post_tag))
                 if rh1_signal:
                     line_coords = common.rotate_line(x,y,25,rh1offset,55,rh1offset,orientation)
@@ -233,14 +228,14 @@ def create_semaphore_signal(canvas, sig_id:int,
         if associated_home > 0: armoffset = -8
         else: armoffset = 0
         # Draw the signal arm for the main route
-        line_coords = common.rotate_line(x,y,55+armoffset,postoffset+3,55+armoffset,postoffset-8,orientation)
+        line_coords = common.rotate_line(x,y,55+armoffset,post_offset+3,55+armoffset,post_offset-8,orientation)
         mainsigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,55+armoffset,postoffset+3,62+armoffset,postoffset-8,orientation)
+        line_coords = common.rotate_line(x,y,55+armoffset,post_offset+3,62+armoffset,post_offset-8,orientation)
         mainsigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arm for the main route
-        line_coords = common.rotate_line(x,y,+37,postoffset+3,+37,postoffset-6,orientation)
+        line_coords = common.rotate_line(x,y,+37,post_offset+3,+37,post_offset-6,orientation)
         mainsubon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+37,postoffset+3,+42,postoffset-6,orientation)
+        line_coords = common.rotate_line(x,y,+37,post_offset+3,+42,post_offset-6,orientation)
         mainsuboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Draw the signal arms for the RH routes
         line_coords = common.rotate_line(x,y,50+armoffset,rh1offset+2,50+armoffset,rh1offset-8,orientation)
@@ -308,7 +303,7 @@ def create_semaphore_signal(canvas, sig_id:int,
         if not lh2_signal: lh2_signal = None
         if not rh2_signal: rh2_signal = None
         # Create the signal elements for a Theatre Route indicator
-        signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=24, yoff=postoffset,
+        signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=24, yoff=post_offset,
                         orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator)
         # Create the signal elements to support Approach Control
         signals.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation, canvas_tag=canvas_tag,
@@ -328,7 +323,7 @@ def create_semaphore_signal(canvas, sig_id:int,
         signals.signals[str(sig_id)]["rh1_signal"]       = rh1_signal             # Type-specific - details of the signal configuration
         signals.signals[str(sig_id)]["lh2_signal"]       = lh2_signal             # Type-specific - details of the signal configuration
         signals.signals[str(sig_id)]["rh2_signal"]       = rh2_signal             # Type-specific - details of the signal configuration
-        signals.signals[str(sig_id)]["postoffset"]       = postoffset             # Type-specific - used for drawing associated distants
+        signals.signals[str(sig_id)]["postoffset"]       = post_offset             # Type-specific - used for drawing associated distants
         signals.signals[str(sig_id)]["mainsigon"]        = mainsigon              # Type-specific - drawing object
         signals.signals[str(sig_id)]["mainsigoff"]       = mainsigoff             # Type-specific - drawing object
         signals.signals[str(sig_id)]["lh1sigon"]         = lh1sigon               # Type-specific - drawing object

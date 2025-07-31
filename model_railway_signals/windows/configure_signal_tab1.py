@@ -27,21 +27,22 @@ from .. import common
 from .. import library
     
 #------------------------------------------------------------------------------------
-# Class for the General Settings UI Element - Builds on the common checkbox class
-# Public class instance methods inherited from the base check box class are:
-#    "set_value" - set the initial value of the Rotate checkbutton (int) 
-#    "get_value" - get the last "validated" value of the Rotate checkbutton (int) 
+# Class for the General Settings UI Element
 #------------------------------------------------------------------------------------
 
-class general_settings(common.check_box):
+class general_settings(Tk.LabelFrame):
     def __init__(self, parent_frame):
         # Create a Label frame to hold the general settings UI element
         # Packed onto the parent frame by the creating function/class
-        self.frame = Tk.LabelFrame(parent_frame,text="General Config")
-        # Create the "rotate" checkbutton and tool Tip
-        super().__init__(self.frame, label="Rotated",
-                    tool_tip = "Select to rotate signal by 180 degrees")
-        self.pack()
+        super().__init__(parent_frame, text="General Config")
+        # Create a subframe to center everything in
+        self.subframe=Tk.Frame(self)
+        self.subframe.pack()
+        # Create the "rotated" and 'flipped' checkbutton and tool Tip
+        self.rotated = common.check_box(self.subframe, label="Rotated", tool_tip = "Select to rotate signal by 180 degrees")
+        self.rotated.pack(side=Tk.LEFT)
+        self.flipped = common.check_box(self.subframe, label="Flipped", tool_tip = "Select to position the signal on the other side of the track")
+        self.flipped.pack(side=Tk.LEFT)
 
 #------------------------------------------------------------------------------------
 # Class for a semaphore route arm element (comprising checkbox and DCC address Box)
@@ -1040,10 +1041,10 @@ class signal_configuration_tab:
         self.frame2 = Tk.Frame(parent_tab)
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.settings = general_settings(self.frame2)
-        self.settings.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
+        self.settings.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         self.routetype = common.selection_buttons(self.frame2, label="Route Indications",
                     tool_tip="Select the route indications for the main signal", callback=route_type_updated,
-                    button_labels=("None", "Route feathers", "Theatre indicator", "Route arms") )
+                    button_labels=("None", "Feathers", "Theatre", "Route arms") )
         self.routetype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
         # Create the labelframe for the signal style configuration elements
         self.frame3 = Tk.Frame(parent_tab)
