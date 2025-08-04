@@ -598,7 +598,8 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
 
 def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
                                   xoff:int, yoff:int, canvas_tag:str,
-                                  orientation:int, has_theatre:bool):
+                                  orientation:int, has_theatre:bool,
+                                  enable_for_subsidary:bool):
     global signals
     # Draw the theatre route indicator box only if one is specified for this particular signal
     # The text object is created anyway - but 'hidden' if not required for this particular signal
@@ -611,10 +612,11 @@ def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
     else:
         theatre_text = canvas.create_text(text_coordinates,state='hidden',tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
-    signals[str(sig_id)]["theatretext"]    = ""                  # SHARED - Initial Theatre Text to display (none)
-    signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
-    signals[str(sig_id)]["theatreobject"]  = theatre_text        # SHARED - Text drawing object
-    signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display (None at creation)
+    signals[str(sig_id)]["theatretext"]    = ""                      # SHARED - Initial Theatre Text to display (none)
+    signals[str(sig_id)]["hastheatre"]     = has_theatre             # SHARED - Whether the signal has a theatre display or not
+    signals[str(sig_id)]["theatreobject"]  = theatre_text            # SHARED - Text drawing object
+    signals[str(sig_id)]["theatreenabled"] = None                    # SHARED - State of the Theatre display (None at creation)
+    signals[str(sig_id)]["subsidarytheatre"] = enable_for_subsidary  # SHARED - State of the Theatre display (None at creation)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -647,19 +649,19 @@ def update_theatre_route_indication(sig_id:int, theatre_text:str):
 # This will Enable/disable the theatre route indicator on a signal aspect changes to/from DANGER 
 #---------------------------------------------------------------------------------------------
 
-def enable_disable_theatre_route_indication(sig_id:int):
+def enable_disable_theatre_route_indication(sig_id:int, sig_at_danger:bool):
     global signals
     # Only update the Theatre route indication if one exists for the signal
     if signals[str(sig_id)]["hastheatre"]:
         # Deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
         # We test for Not True and Not False to support the initial state when the signal is created (state = None)
-        if signals[str(sig_id)]["sigstate"] == signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != False:
+        if sig_at_danger and signals[str(sig_id)]["theatreenabled"] != False:
             logging.info("Signal "+str(sig_id)+": Disabling theatre route display (signal is at DANGER)")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="hidden")
             signals[str(sig_id)]["theatreenabled"] = False
             # This is where we send the special character to inhibit the theatre route indication
             dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
-        elif signals[str(sig_id)]["sigstate"] != signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != True:
+        elif not sig_at_danger and signals[str(sig_id)]["theatreenabled"] != True:
             logging.info("Signal "+str(sig_id)+": Enabling theatre route display of '"+signals[str(sig_id)]["theatretext"]+"'")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="normal")
             signals[str(sig_id)]["theatreenabled"] = True

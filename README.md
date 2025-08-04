@@ -63,6 +63,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * The next signal can now be specified as a "STOP" for any route ahead (signal interlocking tab):
     * This supports the case of signals controlling routes into 'dead ends' such as bay platforms.
     * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
+* Theatre route indications can now be used with the subsidary signal (as well as the main signal).
 * Signals can now be 'flipped' around their horizontal axis (move to the other side of the track).
 * New 'f' shortcut key to 'flip' selected signals/points around their horizontal axis (edit-mode).
 * New tooltips for points, signals and levers in edit/run modes to report the interlocking state.

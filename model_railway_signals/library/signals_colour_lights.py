@@ -82,6 +82,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
                                 theatre_route_indicator:bool=False,
+                                theatre_route_subsidary:bool=False,
                                 fully_automatic:bool=False,
                                 button_xoffset:int=0,
                                 button_yoffset:int=0,
@@ -205,7 +206,8 @@ def create_colour_light_signal (canvas, sig_id:int,
             override_aspect = signals.signal_state_type.DANGER
         # Create the signal elements for a Theatre Route indicator
         signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=offset+69, yoff=-15,
-                        orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator)
+                    orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator,
+                    enable_for_subsidary=theatre_route_subsidary)
         # Create the signal elements to support Approach Control
         signals.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation, canvas_tag=canvas_tag,
                                         approach_button=sig_release_button, sig_released_callback=sig_released_callback)
@@ -278,6 +280,9 @@ def update_colour_light_subsidary(sig_id:int):
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="grey")
         logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to UNLIT")
         dcc_control.update_dcc_signal_subsidary(sig_id, False)
+    # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
+    if signals.signals[str(sig_id)]["subsidarytheatre"]:
+        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
     return ()
 
 #-------------------------------------------------------------------------
@@ -406,7 +411,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         refresh_signal_aspects(sig_id)
         # Update the Theatre & Feather route indications as these are inhibited/enabled for transitions to/from DANGER
         enable_disable_feather_route_indication(sig_id)
-        signals.enable_disable_theatre_route_indication(sig_id)
+        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(new_aspect==signals.signal_state_type.DANGER))
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
         dcc_control.update_dcc_signal_aspects(sig_id, new_aspect)

@@ -621,14 +621,18 @@ class theatre_route_indications:
         # disabled so it can never be selected (not really a route indication as such)
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit selection
-        self.CB = common.check_box(self.frame, label="Auto inhibit route indications on DANGER",
+        self.CB1 = common.check_box(self.frame, label="Auto inhibit route indications on DANGER", width=35,
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
                             "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
-        self.CB.pack(padx=2, pady=2) 
+        self.CB1.pack(padx=2, pady=2)
+        # Create the checkbox and tool tip for Enable Theatre for Subsidary selection
+        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidary", width=35,
+                    tool_tip = "Select to enable theatre indications for the subsidary signal (as well as the main signal)")
+        self.CB2.pack(padx=2, pady=2)
 
     def auto_inhibit_update(self):
-        if self.CB.get_value(): self.dark.disable()
+        if self.CB1.get_value(): self.dark.disable()
         else: self.dark.enable()
 
     def validate(self):
@@ -670,7 +674,7 @@ class theatre_route_indications:
                  self.rh1.get_theatre(),
                  self.rh2.get_theatre() ] )
     
-    def enable_selection(self):
+    def enable_selection(self, enable_subsidary_selection:bool=True):
         # Enable the Theatre EBs for diverging routes (will also enable the address EBs)        
         self.lh1.enable_selection()
         self.lh2.enable_selection()
@@ -680,7 +684,10 @@ class theatre_route_indications:
         self.main.enable()
         self.main.enable_selection()
         # Enable the "auto inhibit route" CB
-        self.CB.enable()
+        self.CB1.enable()
+        # Enable the Subsidary selection (as required)
+        if enable_subsidary_selection: self.CB2.enable()
+        else: self.CB2.disable()
         # Enabling of the "dark" DCC address EBs will depend on the state of the
         # auto inhibit checkbox (the "dark" Theatre EB remains disabled and blank)
         self.auto_inhibit_update()
@@ -694,15 +701,22 @@ class theatre_route_indications:
         self.lh2.disable_selection()
         self.rh1.disable_selection()
         self.rh2.disable_selection()
-        # Disable the "auto inhibit route" CB
-        self.CB.disable()
+        # Disable the "auto inhibit route" and enable theatre for subsidary CBs
+        self.CB1.disable()
+        self.CB2.disable()
 
     def set_auto_inhibit(self, auto_inhibit:bool):
-        self.CB.set_value(auto_inhibit)
+        self.CB1.set_value(auto_inhibit)
         self.auto_inhibit_update()
         
     def get_auto_inhibit(self):
-        return(self.CB.get_value())
+        return(self.CB1.get_value())
+
+    def set_enable_subsidary(self, enable_subsidary:bool):
+        self.CB2.set_value(enable_subsidary)
+
+    def get_enable_subsidary(self):
+        return(self.CB2.get_value())
 
 #------------------------------------------------------------------------------------
 # Class to create Feather route indication with a check box to enable the route indication

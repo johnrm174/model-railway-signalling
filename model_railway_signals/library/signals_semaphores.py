@@ -97,6 +97,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             rh1_subsidary:bool=False,
                             rh2_subsidary:bool=False,
                             theatre_route_indicator:bool=False,
+                            theatre_route_subsidary:bool=False,
                             fully_automatic:bool=False,
                             associated_home:int=0,
                             button_xoffset:int=0,
@@ -304,7 +305,8 @@ def create_semaphore_signal(canvas, sig_id:int,
         if not rh2_signal: rh2_signal = None
         # Create the signal elements for a Theatre Route indicator
         signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=24, yoff=post_offset,
-                        orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator)
+                    orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator,
+                    enable_for_subsidary=theatre_route_subsidary)
         # Create the signal elements to support Approach Control
         signals.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation, canvas_tag=canvas_tag,
                                         approach_button=sig_release_button, sig_released_callback=sig_released_callback)
@@ -528,6 +530,9 @@ def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
         update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
         update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
         update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+    # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
+    if signals.signals[str(sig_id)]["subsidarytheatre"]:
+        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
     return ()
 
 # -------------------------------------------------------------------------
@@ -689,7 +694,7 @@ def update_semaphore_signal(sig_id:int):
         if associated_signal > 0: update_semaphore_signal(associated_signal)
         # Call the common function to update the theatre route indicator elements
         # (if the signal has a theatre route indicator - otherwise no effect)
-        signals.enable_disable_theatre_route_indication(sig_id)
+        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(new_aspect==signals.signal_state_type.DANGER))
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
         signals.send_mqtt_signal_updated_event(sig_id)

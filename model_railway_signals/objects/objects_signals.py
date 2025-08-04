@@ -106,6 +106,7 @@ default_signal_object["subroutes"] = [False,False,False,False,False]
 # General Configuration - parameters specific to semaphore AND colour light signals
 #------------------------------------------------------------------------------------
 default_signal_object["theatreroute"] = False
+default_signal_object["theatresubsidary"] = False
 # The 'dcctheatre' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,RH1,RH2]
 # Note that 'DARK' is a dummy signal_route to inhibit all route indications ('#')
 # Each 'signal_route' element comprises: [character_to_ display, dcc_command_sequence]
@@ -566,6 +567,7 @@ def redraw_signal_object(object_id):
                     rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][3],
                     rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
+                    theatre_route_subsidary = objects_common.schematic_objects[object_id]["theatresubsidary"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
@@ -613,6 +615,7 @@ def redraw_signal_object(object_id):
                     rh1_subsidary = objects_common.schematic_objects[object_id]["sigarms"][3][1][0],
                     rh2_subsidary = objects_common.schematic_objects[object_id]["sigarms"][4][1][0],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
+                    theatre_route_subsidary = objects_common.schematic_objects[object_id]["theatresubsidary"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
