@@ -640,7 +640,6 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_dcc_point(6, 2048, False)   # Fail - Invalid address 
     assert len(dcc_control.dcc_point_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 22
-    
     print("Library Tests - map_dcc_switch - Two Debug messages - 7 error messages should be generated")
     assert len(dcc_control.dcc_switch_mappings) == 0
     dcc_control.map_dcc_switch(1, on_commands = [[40,True], [41,True]], off_commands = [[40,False], [41,False]])
@@ -676,7 +675,6 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_point(2, False)
     dcc_control.update_dcc_point(3, True)
     dcc_control.update_dcc_point(3, False)
-    print("Library Tests - update_dcc_signal_aspects - 1 Error - DCC commands should be sent")
     dcc_control.update_dcc_signal_aspects(2, signals.signal_state_type.DANGER) # Error - wrong type
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
@@ -686,9 +684,12 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.FLASH_PRELIM_CAUTION)
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
     dcc_control.update_dcc_signal_aspects(3, signals.signal_state_type.DANGER)
+    print("Library Tests - update_dcc_signal_subsidary - 1 Error - DCC commands should be sent")
+    dcc_control.update_dcc_signal_subsidary(1, True) # OK
+    dcc_control.update_dcc_signal_subsidary(2, True) # Error - wrong type
     print("Library Tests - update_dcc_signal_element - 2 Errors - DCC commands should be sent")
-    dcc_control.update_dcc_signal_element(1, True, element="main_signal")
-    dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
+    dcc_control.update_dcc_signal_element(1, True, element="main_signal")     # error
+    dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")  # error
     dcc_control.update_dcc_signal_element(2, True, element="main_signal")
     dcc_control.update_dcc_signal_element(2, True, element="main_subsidary")
     dcc_control.update_dcc_signal_element(2, True, element="lh1_signal")
@@ -738,11 +739,11 @@ def run_dcc_control_tests(baud_rate):
     print("Library Tests - reset_mqtt_configuration - No warnings or errors")
     dcc_control.reset_dcc_mqtt_configuration()
     print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors - DCC Commands should be sent out")
-    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000}) # Error
-    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccstate": True}) # Error
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000}) # Error
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccstate": True}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"dccaddress": 1000, "dccstate": True}) # Error
-    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000, "dccstate": True}) # Valid
-    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000, "dccstate": False}) # Valid
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": True}) # Valid
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": False}) # Valid
     logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
     print("Library Tests - delete_switch_mapping - 2 Errors should be generated")
     assert len(dcc_control.dcc_switch_mappings) == 2
@@ -765,6 +766,32 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.delete_point_mapping(2) 
     assert len(dcc_control.dcc_point_mappings) == 0
     assert len(dcc_control.dcc_address_mappings) == 20
+    print("Library Tests - DCC control Tests - disconnecting from SPROG")
+    time.sleep(1.0) # Give the SPROG a chance to send all DCC commands
+    assert pi_sprog_interface.request_dcc_power_off()
+    assert pi_sprog_interface.sprog_disconnect()
+    print("Library Tests - DCC control Tests - sending of commands before Sprog connected/power on")
+    # Queue up some 'remote' DCC commands
+    dcc_control.reset_dcc_mqtt_configuration()
+    dcc_control.subscribe_to_dcc_command_feed("box1")
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": True})
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": False})
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1001, "dccstate": False})
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1001, "dccstate": True})
+    # Queue up some 'local' DCC commands
+    dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
+    dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
+    dcc_control.update_dcc_signal_subsidary(1, True)
+    dcc_control.update_dcc_signal_subsidary(1, False)
+    dcc_control.update_dcc_signal_element(2, True, element="main_signal")
+    dcc_control.update_dcc_signal_element(2, True, element="main_subsidary")
+    dcc_control.update_dcc_signal_element(2, False, element="main_signal")
+    dcc_control.update_dcc_signal_element(2, False, element="main_subsidary")
+    assert pi_sprog_interface.sprog_connect()
+    logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
+    assert pi_sprog_interface.request_dcc_power_on()
+    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
+    dcc_control.reset_dcc_mqtt_configuration()
     print("Library Tests - delete_signal_mapping - 2 Errors shoould be generated")
     assert len(dcc_control.dcc_signal_mappings) == 2
     dcc_control.delete_signal_mapping("100") # Error
@@ -775,10 +802,6 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.delete_signal_mapping(1) 
     assert len(dcc_control.dcc_signal_mappings) == 0
     assert len(dcc_control.dcc_address_mappings) == 0
-    print("Library Tests - DCC control Tests - disconnecting from SPROG")
-    time.sleep(1.0) # Give the SPROG a chance to send all DCC commands
-    assert pi_sprog_interface.request_dcc_power_off()
-    assert pi_sprog_interface.sprog_disconnect()
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(dcc_control.dcc_signal_mappings) == 0
     assert len(dcc_control.dcc_address_mappings) == 0

@@ -1676,11 +1676,12 @@ def run_ground_signal_slotting_tests():
     assert signals.signal_state(14) == signals.signal_state_type.DANGER
     signals.signal_button_event(17)
     assert signals.signal_state(15) == signals.signal_state_type.DANGER
-    print("Library Tests - Update slotting of ground signals with main signals - 6 errors")
+    print("Library Tests - Update slotting of ground signals with main signals - 7 errors")
     # Negative testing of validation
     signals.update_slotted_signal("12", 10)   # Fail - sig ID not an int
     signals.update_slotted_signal(-10, 10)    # Fail - sig ID not positive int
     signals.update_slotted_signal(12, "10")   # Fail - slot_with not an int
+    signals.update_slotted_signal(100, 100)   # Fail - sig ID does not exist
     signals.update_slotted_signal(12, -10)    # Fail - slot_with not positive int
     signals.update_slotted_signal(10, 16)     # Fail - invalid signal type
     signals.update_slotted_signal(11, 17)     # Fail - invalid signal type
