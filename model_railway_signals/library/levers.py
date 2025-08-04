@@ -339,13 +339,14 @@ def lock_lever(lever_id:int, tooltip:str="Locked"):
         logging.error("Lever "+str(lever_id)+": lock_lever - Lever ID must be an int")
     elif not lever_exists(lever_id):
         logging.error("Lever "+str(lever_id)+": lock_lever - Lever ID does not exist")
-    elif not levers[str(lever_id)]["locked"]:
-        logging.info ("Lever "+str(lever_id)+": Locking lever")
-        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], state="normal")
-        levers[str(lever_id)]["button"].config(state="disabled")
-        levers[str(lever_id)]["locked"] = True
-    # Always update the tooltip as the reason for locking may have changed
-    levers[str(lever_id)]["tooltip"].text = tooltip
+    else:
+        if not levers[str(lever_id)]["locked"]:
+            logging.info ("Lever "+str(lever_id)+": Locking lever")
+            levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], state="normal")
+            levers[str(lever_id)]["button"].config(state="disabled")
+            levers[str(lever_id)]["locked"] = True
+        # Always update the tooltip as the reason for locking may have changed
+        levers[str(lever_id)]["tooltip"].text = tooltip
     return()
 
 #---------------------------------------------------------------------------------------------
