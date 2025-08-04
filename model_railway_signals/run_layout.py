@@ -748,10 +748,11 @@ def process_all_signal_interlocking():
             # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
             # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
             if signal_object["interlockahead"] and home_signal_ahead_at_danger(int_signal_id):
-                if has_distant_arms(int_signal_id) and not library.signal_clear(signal_object["itemid"]+1000):
-                    # Home semaphore signal with secondary distant arms (distant signal is sig_id + 1000)
-                    if add_to_dist_tt: dist_tooltip = dist_tooltip + "\nHome signals ahead are at danger"
-                    distant_arms_can_be_unlocked = False
+                if has_distant_arms(int_signal_id):
+                    if not library.signal_clear(signal_object["itemid"]+1000):
+                        # Home semaphore signal with secondary distant arms (distant signal is sig_id + 1000)
+                        if add_to_dist_tt: dist_tooltip = dist_tooltip + "\nHome signals ahead are at danger"
+                        distant_arms_can_be_unlocked = False
                 elif not library.signal_clear(signal_object["itemid"]):
                     # Straight forward distant signal (colour light or semaphore)
                     signal_can_be_unlocked = False
