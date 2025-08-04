@@ -820,7 +820,7 @@ class application_upgrade():
                 time.sleep(0.5)
                 result= subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
-        except Exception as exception:
+        except:
             print("----------------------------------------------------------------------------------------------------------------")
             print("Upgrade Error - An unhandled exception occured - Try manually upgrading from the Terminal / Command Prompt")
             print("----------------------------------------------------------------------------------------------------------------")

@@ -40,7 +40,6 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
-import tkinter.font as TkFont
 from tkinter import ttk
 
 import time
