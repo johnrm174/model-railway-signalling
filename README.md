@@ -65,7 +65,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
 * Signals can now be 'flipped' around their horizontal axis (move to the other side of the track).
 * New 'f' shortcut key to 'flip' selected signals/points around their horizontal axis (edit-mode).
-* New tooltips for point and signal buttons in edit/run modes to report the interlocking state.
+* New tooltips for points, signals and levers in edit/run modes to report the interlocking state.
 * Added display of hostname on MQTT status tab (MQTT heartbeat messages) to ease configuration.
 * Added ability to 'reverse' the DCC command logic for subsidary aspects of colour light signals.
 * Bugfix for route highlighting through points (Y Points, single slips and double slips).

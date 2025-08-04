@@ -45,7 +45,7 @@
 #
 #   delete_lever(lever_id:int) - To delete the specified lever from the schematic
 #
-#   lock_lever(lever_id:int) - use in conjunction with point/signal interlocking
+#   lock_lever(lever_id:int, tooltip:str) - use for interlocking (tooltip displays locking status)
 # 
 #   unlock_lever(lever_id:int) - use in conjunction with point/signal interlocking
 #
@@ -63,6 +63,8 @@ import tkinter as Tk
 
 from . import common
 from . import file_interface
+
+from ..common import CreateToolTip
 
 #-------------------------------------------------------------------------
 # Public API classes (to be used by external functions)
@@ -251,6 +253,11 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                             font=font, highlightthickness=0, padx=2, pady=0, background=button_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:change_button_event(lever_id) )
+        # Create and store the default tool-tip for the button
+        lever_button_tooltip = CreateToolTip(button)
+        lever_button_tooltip.waittime = 200     # miliseconds
+        lever_button_tooltip.wraplength = 400   # pixels
+        lever_button_tooltip.text = "Unlocked"
         # Create the Tkinter drawing objects for the schematic object
         rectangle = canvas.create_rectangle(x-12,y,x+12,y+30 ,fill=frame_colour, width=1, tags=canvas_tag)
         canvas.create_window(x, y+33, window=button, anchor=Tk.N, tags=canvas_tag)
@@ -268,6 +275,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         levers[str(lever_id)] = {}
         levers[str(lever_id)]["canvas"] = canvas                   # Tkinter canvas object
         levers[str(lever_id)]["button"] = button                   # Tkinter button object
+        levers[str(lever_id)]["tooltip"] = lever_button_tooltip    # button tooltip object
         levers[str(lever_id)]["rectangle"] = rectangle             # Tkinter drawing object
         levers[str(lever_id)]["lever1a"] = lever1a                 # Tkinter drawing object
         levers[str(lever_id)]["lever1b"] = lever1b                 # Tkinter drawing object
@@ -325,7 +333,7 @@ def update_lever_styles(lever_id:int, button_colour:str="Grey85", active_colour:
 # Public API function to Lock a Lever
 #---------------------------------------------------------------------------------------------
 
-def lock_lever(lever_id:int):
+def lock_lever(lever_id:int, tooltip:str="Locked"):
     global levers 
     if not isinstance(lever_id, int):
         logging.error("Lever "+str(lever_id)+": lock_lever - Lever ID must be an int")
@@ -336,6 +344,8 @@ def lock_lever(lever_id:int):
         levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], state="normal")
         levers[str(lever_id)]["button"].config(state="disabled")
         levers[str(lever_id)]["locked"] = True
+    # Always update the tooltip as the reason for locking may have changed
+    levers[str(lever_id)]["tooltip"].text = tooltip
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -353,6 +363,7 @@ def unlock_lever(lever_id:int):
         levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["locktext"], state="hidden")
         levers[str(lever_id)]["button"].config(state="normal") 
         levers[str(lever_id)]["locked"] = False
+        levers[str(lever_id)]["tooltip"].text = "Unlocked"
     return()
 
 #---------------------------------------------------------------------------------------------

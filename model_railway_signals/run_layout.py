@@ -785,23 +785,34 @@ def process_all_signal_interlocking():
         for str_lever_id in objects.lever_index:
             lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
             if lever_object["linkedsignal"] == int_signal_id:
-                ################################# TODO - Tooltips for levers #####################################
-                # Find the current 'route' for the signal and see if the lever is configured to switch
-                # the current signal route - This allows different levers to switch different signal arms
-                signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
-                if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
-                    lever_valid_for_route = True
-                else:
+                # See if the lever is configured to switch the current signal route - This enables
+                # different levers to switch different signal arms (for diverging routes) If the signal_route
+                # is None then the signal/subsidary/dist will already be locked (with an appropriate tooltip)
+                # We therefore need to check the case of route valid for ths signal but not for the lever
+                if signal_route is not None and not lever_object["signalroutes"][signal_route.value-1]:
                     lever_valid_for_route = False
-                # Lock or unlock the signal lever as appropriate
-                if lever_object["switchsignal"] and lever_valid_for_route and signal_can_be_unlocked:
-                    library.unlock_lever(int(str_lever_id))
-                elif lever_object["switchsubsidary"] and lever_valid_for_route and subsidary_can_be_unlocked:
-                    library.unlock_lever(int(str_lever_id))
-                elif lever_object["switchdistant"] and lever_valid_for_route and distant_arms_can_be_unlocked:
-                    library.unlock_lever(int(str_lever_id))
+                    if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nSignal route is not set/locked for this lever"
+                    if add_to_sub_tt: sub_tooltip = sub_tooltip + "\nSignal route is not set/locked for this lever"
+                    if add_to_dist_tt: dist_tooltip = dist_tooltip + "\nSignal route is not set/locked for this lever"
+                    add_to_sig_tt, add_to_sub_tt, add_to_dist_tt = False, False, False
                 else:
-                    library.lock_lever(int(str_lever_id))
+                    lever_valid_for_route = True
+                # Lock or unlock the signal lever as appropriate
+                if lever_object["switchsignal"]:
+                    if lever_valid_for_route and signal_can_be_unlocked:
+                        library.unlock_lever(int(str_lever_id))
+                    else:
+                        library.lock_lever(int(str_lever_id), sig_tooltip)
+                elif lever_object["switchsubsidary"]:
+                    if lever_valid_for_route and subsidary_can_be_unlocked:
+                        library.unlock_lever(int(str_lever_id))
+                    else:
+                        library.lock_lever(int(str_lever_id), sub_tooltip)
+                elif lever_object["switchdistant"]:
+                    if lever_valid_for_route and distant_arms_can_be_unlocked:
+                        library.unlock_lever(int(str_lever_id))
+                    else:
+                        library.lock_lever(int(str_lever_id), dist_tooltip)
     return()
 
 #------------------------------------------------------------------------------------
@@ -840,11 +851,11 @@ def process_all_point_interlocking():
         # Lock or unlock the Point as required
         if point_locked: library.lock_point(int_point_id, point_tooltip)
         else: library.unlock_point(int_point_id)
-        # Lock any Signalbox levers that are linked to the point (point, fpl or both)
+        # Lock any Signalbox levers that are linked to the Point
         for str_lever_id in objects.lever_index:
-            if objects.schematic_objects[objects.lever(str_lever_id)]["linkedpoint"] == int_point_id:
-                ################################# TODO - Tooltips for levers #####################################
-                if point_locked: library.lock_lever(int(str_lever_id))
+            lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
+            if lever_object["linkedpoint"] == int_point_id :
+                if point_locked: library.lock_lever(int(str_lever_id), point_tooltip)
                 else: library.unlock_lever(int(str_lever_id))
     return()
 
@@ -1037,7 +1048,7 @@ def update_all_signalbox_levers():
                     other_lever_object = objects.schematic_objects[objects.lever(str_other_lever_id)]
                     if other_lever_object["linkedpoint"] == linked_point and other_lever_object["switchpoint"]:
                         if library.fpl_active(linked_point) or library.point_locked(linked_point):
-                            library.lock_lever(int(str_other_lever_id))
+                            library.lock_lever(int(str_other_lever_id), "FPL is active")
                         else:
                             library.unlock_lever(int(str_other_lever_id))
     return()
