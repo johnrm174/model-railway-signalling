@@ -150,7 +150,7 @@ def run_basic_signal_lever_tests():
     # configure the signals to what we need
     update_object_configuration(s1,{"pointinterlock":[ [[[1,False]],"",0],[[],"",0],[[],"",0],[[],"",0],[[],"",0] ],
                                     "subroutes": [True, False, False, False, False], 
-                                    "subsidary":[True, 0]} )    
+                                    "subsidary":[True, 0, False]} )    
     update_object_configuration(s2,{"pointinterlock":[ [[[1,False]],"",0],[[],"",0],[[],"",0],[[],"",0],[[],"",0] ],
                                     "subroutes": [True, False, False, False, False],
                                     "sigarms":[ [ [True,0],[True,0],[True,0] ],
@@ -173,7 +173,8 @@ def run_basic_signal_lever_tests():
     # Interlocking of signal with points
     assert_levers_unlocked(1,2,3,4,5)
     set_points_switched(1)
-    assert_levers_locked(1,2,3,4,5)
+    assert_levers_locked(1,2,3,4)
+    assert_levers_unlocked(5)
     set_points_normal(1)
     assert_levers_unlocked(1,2,3,4,5)
     # Interlocking of signa1 1 with subsidary 1

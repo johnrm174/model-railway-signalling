@@ -423,7 +423,7 @@ def run_gpio_circuit_breaker_tests():
         gpio_sensors.gpio_released_callback(10)
     assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
     time.sleep(0.5)
-    print ("GPIO Sensors - Disable status reporting - Will generate 1 Error")
+    print ("GPIO Sensors - Disable status reporting - Will generate 1 Error and one Warning")
     time.sleep(0.5)
     gpio_sensors.unsubscribe_from_gpio_port_status(4.0) # Error (not an int or str)
     gpio_sensors.unsubscribe_from_gpio_port_status(4)   # Warning (not subscribed)
@@ -686,7 +686,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.FLASH_PRELIM_CAUTION)
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
     dcc_control.update_dcc_signal_aspects(3, signals.signal_state_type.DANGER)
-    print("Library Tests - update_dcc_signal_element - 1 Error - DCC commands should be sent")
+    print("Library Tests - update_dcc_signal_element - 2 Errors - DCC commands should be sent")
     dcc_control.update_dcc_signal_element(1, True, element="main_signal")
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
     dcc_control.update_dcc_signal_element(2, True, element="main_signal")

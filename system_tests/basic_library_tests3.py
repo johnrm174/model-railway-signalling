@@ -476,7 +476,7 @@ def run_library_api_tests():
     signals.update_colour_light_signal(1,sig_ahead_id=10)    # Success
     signals.update_colour_light_signal(1,sig_ahead_id="10")  # Success
     signals.update_colour_light_signal("1",sig_ahead_id=10)  # Fail - Sig ID not an int
-    signals.update_colour_light_signal(1,sig_ahead_id=10.1)  # Fail - Sig ahead ID not an int
+    signals.update_colour_light_signal(1,sig_ahead_id=10.1)  # Fail - Sig ahead ID not an int or str
     signals.update_colour_light_signal(6,sig_ahead_id=10)    # Fail - Sig ID does not exist
     signals.update_colour_light_signal(1,sig_ahead_id=6)     # Fail - Sig ahead ID does not exist
     signals.update_colour_light_signal(1,sig_ahead_id=1)     # Fail - Sig ahead ID is same as sig ID

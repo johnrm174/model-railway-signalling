@@ -1238,7 +1238,7 @@ def run_line_library_tests():
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Line Objects")
     canvas = schematic.canvas
-    print("Library Tests - create_line - will generate 4 errors:")
+    print("Library Tests - create_line - will generate 3 errors:")
     assert len(lines.lines) == 0    
     lines.create_line(canvas, 10, 100, 100, 200, 100, arrow_type=[20,20,5], arrow_ends=0, colour="red")  # success
     lines.create_line(canvas, 11, 100, 150, 200, 150, arrow_type=[20,20,5], arrow_ends=1)                 # success
@@ -1377,7 +1377,7 @@ def run_button_library_tests():
     # Ensure we start off in Run Mode
     buttons.configure_edit_mode(edit_mode=False)
     canvas = schematic.canvas
-    print("Library Tests - create_button - will generate 5 errors:")
+    print("Library Tests - create_button - will generate 4 errors:")
     buttontype = buttons.button_type.switched
     assert len(buttons.buttons) == 0
     buttons.create_button(canvas,0,buttontype,100,100,selected_callback,deselected_callback)      # Error - ID out of range
@@ -1724,7 +1724,7 @@ def run_lever_library_tests():
     levers.unlock_lever(7)
     common.keyboard_handler(on_keypress_event)
     assert not levers.lever_switched(7)
-    print("Library Tests - keypress events (lever locked/ignore interlocking) - 4 warnings will be generated:")
+    print("Library Tests - keypress events (lever locked/ignore interlocking) - 2 warnings will be generated:")
     levers.set_lever_switching_behaviour(ignore_locking=True, display_popups=False)
     levers.lock_lever(7)
     common.keyboard_handler(off_keypress_event)

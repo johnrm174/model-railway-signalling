@@ -1233,7 +1233,7 @@ def run_reset_objects_tests():
     update_object_configuration(i2,{"linkedto":"1"})
     # Configure the signal and point for the levers
     update_object_configuration(p1,{"hasfpl":True})
-    update_object_configuration(s1,{"subsidary":[True,0],"subroutes":[True,True,True,True,True]})
+    update_object_configuration(s1,{"subsidary":[True,0,False],"subroutes":[True,True,True,True,True]})
     # Link the levers to the signal/point (lever 5 is a spare)
     update_object_configuration(lev1,{"itemtype":2, "linkedsignal":1, "switchsignal":True, "signalroutes":[True,True,True,True,True]})
     update_object_configuration(lev2,{"itemtype":2, "linkedsignal":1, "switchsubsidary":True, "signalroutes":[True,True,True,True,True]})
