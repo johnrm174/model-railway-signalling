@@ -5,7 +5,7 @@
     "levers": {},
     "objects": {
         "0069c0e5-ea44-4868-9287-276ad65c1407": {
-            "bbox": 10029,
+            "bbox": 10033,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 2,
@@ -59,7 +59,7 @@
             "tags": "sensor2"
         },
         "0bfb0559-02cb-4e91-85a7-dd78aeba631a": {
-            "bbox": 10033,
+            "bbox": 10037,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -94,7 +94,7 @@
                 false,
                 ""
             ],
-            "bbox": 10050,
+            "bbox": 10054,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -147,6 +147,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -287,7 +288,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal2",
             "textcolourtype": 1,
@@ -297,6 +299,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     true,
@@ -360,7 +363,7 @@
             "ybuttonoffset": 0
         },
         "25899818-cd4d-4f23-8b7b-3163bc7c2482": {
-            "bbox": 10054,
+            "bbox": 10058,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 3,
@@ -434,7 +437,7 @@
             "tags": "sensor3"
         },
         "3caae2e0-a491-4353-a526-5e93054a51e5": {
-            "bbox": 10058,
+            "bbox": 10062,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -464,7 +467,7 @@
                 0,
                 0
             ],
-            "bbox": 10064,
+            "bbox": 10068,
             "colour": "Black",
             "endx": 475.0,
             "endy": 175.0,
@@ -484,7 +487,7 @@
                 0,
                 0
             ],
-            "bbox": 10070,
+            "bbox": 10074,
             "colour": "Black",
             "endx": 625.0,
             "endy": 150.0,
@@ -498,7 +501,7 @@
             "tags": "line5"
         },
         "67ed5620-8f45-46b5-ae65-cd152d4926c7": {
-            "bbox": 10074,
+            "bbox": 10078,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -533,7 +536,7 @@
                 false,
                 ""
             ],
-            "bbox": 10091,
+            "bbox": 10095,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -586,6 +589,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -726,7 +730,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal1",
             "textcolourtype": 1,
@@ -736,6 +741,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -807,7 +813,7 @@
                 0,
                 0
             ],
-            "bbox": 10097,
+            "bbox": 10101,
             "colour": "Black",
             "endx": 375.0,
             "endy": 200.0,
@@ -821,7 +827,7 @@
             "tags": "line4"
         },
         "a5f95aa9-b869-4dff-933a-d1d83c7fb44b": {
-            "bbox": 10101,
+            "bbox": 10105,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -845,7 +851,7 @@
             ]
         },
         "a732c9a1-625a-4875-a802-706c56273db8": {
-            "bbox": 10105,
+            "bbox": 10109,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 1,
@@ -899,7 +905,7 @@
             "tags": "sensor1"
         },
         "a9b08221-b11c-4b63-a7ad-124f585c44fb": {
-            "bbox": 10109,
+            "bbox": 10113,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -925,7 +931,7 @@
         "b4981c47-bf98-478a-8356-77710753c1fd": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 10116,
+            "bbox": 10120,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -955,7 +961,7 @@
             "ybuttonoffset": 0
         },
         "be998d8b-50f1-40a4-b663-ec5bf1e8ba5c": {
-            "bbox": 10120,
+            "bbox": 10124,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -979,7 +985,7 @@
             ]
         },
         "ced7bc00-e0aa-4bc2-bef3-9fa7da7f92c5": {
-            "bbox": 10124,
+            "bbox": 10128,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1003,7 +1009,7 @@
             ]
         },
         "d2f6f51a-0bbf-452b-bd1c-b3b3839329b8": {
-            "bbox": 10128,
+            "bbox": 10132,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1033,7 +1039,7 @@
                 0,
                 0
             ],
-            "bbox": 10134,
+            "bbox": 10138,
             "colour": "Black",
             "endx": 725.0,
             "endy": 75.0,
@@ -1053,7 +1059,7 @@
                 0,
                 0
             ],
-            "bbox": 10140,
+            "bbox": 10144,
             "colour": "Black",
             "endx": 375.0,
             "endy": 150.0,
@@ -1069,7 +1075,7 @@
         "fb9e5b3a-1a61-4b99-866d-03878bed3c10": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 10147,
+            "bbox": 10151,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -1105,7 +1111,7 @@
                 0,
                 0
             ],
-            "bbox": 10153,
+            "bbox": 10157,
             "colour": "Black",
             "endx": 625.0,
             "endy": 200.0,
@@ -1123,7 +1129,7 @@
         "1": {
             "fpllock": false,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "2": {
             "fpllock": false,
@@ -1184,7 +1190,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.2.0"
+            "version": "Version 5.3.0"
         },
         "gpio": {
             "maxevents": 100,

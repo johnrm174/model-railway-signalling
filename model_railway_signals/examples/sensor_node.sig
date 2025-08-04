@@ -6,7 +6,7 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 15821,
+            "bbox": 15825,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -45,7 +45,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.2.0"
+            "version": "Version 5.3.0"
         },
         "gpio": {
             "maxevents": 100,

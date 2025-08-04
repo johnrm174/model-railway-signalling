@@ -69,6 +69,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -209,7 +210,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal50",
             "textcolourtype": 1,
@@ -219,6 +221,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -346,6 +349,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -486,7 +490,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal5",
             "textcolourtype": 1,
@@ -496,6 +501,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -623,6 +629,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -763,7 +770,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal28",
             "textcolourtype": 1,
@@ -773,6 +781,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -900,6 +909,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1040,7 +1050,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal2",
             "textcolourtype": 1,
@@ -1050,6 +1061,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -1177,6 +1189,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1317,7 +1330,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal22",
             "textcolourtype": 1,
@@ -1327,6 +1341,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -1454,6 +1469,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1594,7 +1610,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal31",
             "textcolourtype": 1,
@@ -1604,6 +1621,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -1731,6 +1749,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1871,7 +1890,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal32",
             "textcolourtype": 1,
@@ -1881,6 +1901,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -2008,6 +2029,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2148,7 +2170,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal27",
             "textcolourtype": 1,
@@ -2158,6 +2181,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -2285,6 +2309,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2425,7 +2450,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal19",
             "textcolourtype": 1,
@@ -2435,6 +2461,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -2562,6 +2589,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2702,7 +2730,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal13",
             "textcolourtype": 1,
@@ -2712,6 +2741,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -2839,6 +2869,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2979,7 +3010,8 @@
             ],
             "subsidary": [
                 true,
-                0
+                0,
+                false
             ],
             "tags": "signal68",
             "textcolourtype": 1,
@@ -2989,6 +3021,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -3116,6 +3149,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -3256,7 +3290,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal12",
             "textcolourtype": 1,
@@ -3266,6 +3301,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -3393,6 +3429,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -3533,7 +3570,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal29",
             "textcolourtype": 1,
@@ -3543,6 +3581,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -3670,6 +3709,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -3810,7 +3850,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal9",
             "textcolourtype": 1,
@@ -3820,6 +3861,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -3947,6 +3989,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -4087,7 +4130,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal46",
             "textcolourtype": 1,
@@ -4097,6 +4141,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -4224,6 +4269,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -4364,7 +4410,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal11",
             "textcolourtype": 1,
@@ -4374,6 +4421,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -4501,6 +4549,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -4641,7 +4690,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal41",
             "textcolourtype": 1,
@@ -4651,6 +4701,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -4778,6 +4829,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -4918,7 +4970,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal33",
             "textcolourtype": 1,
@@ -4928,6 +4981,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -5055,6 +5109,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -5195,7 +5250,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal34",
             "textcolourtype": 1,
@@ -5205,6 +5261,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -5332,6 +5389,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -5472,7 +5530,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal23",
             "textcolourtype": 1,
@@ -5482,6 +5541,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -5609,6 +5669,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -5749,7 +5810,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal53",
             "textcolourtype": 1,
@@ -5759,6 +5821,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -5886,6 +5949,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -6026,7 +6090,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal48",
             "textcolourtype": 1,
@@ -6036,6 +6101,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -6163,6 +6229,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -6303,7 +6370,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal25",
             "textcolourtype": 1,
@@ -6313,6 +6381,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -6440,6 +6509,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -6580,7 +6650,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal8",
             "textcolourtype": 1,
@@ -6590,6 +6661,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -6717,6 +6789,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -6857,7 +6930,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal24",
             "textcolourtype": 1,
@@ -6867,6 +6941,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -6994,6 +7069,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -7134,7 +7210,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal58",
             "textcolourtype": 1,
@@ -7144,6 +7221,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -7271,6 +7349,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -7411,7 +7490,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal36",
             "textcolourtype": 1,
@@ -7421,6 +7501,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -7567,6 +7648,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -7707,7 +7789,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal7",
             "textcolourtype": 1,
@@ -7717,6 +7800,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -7844,6 +7928,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -7984,7 +8069,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal57",
             "textcolourtype": 1,
@@ -7994,6 +8080,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -8121,6 +8208,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -8261,7 +8349,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal14",
             "textcolourtype": 1,
@@ -8271,6 +8360,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -8398,6 +8488,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -8538,7 +8629,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal3",
             "textcolourtype": 1,
@@ -8548,6 +8640,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -8675,6 +8768,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -8815,7 +8909,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal15",
             "textcolourtype": 1,
@@ -8825,6 +8920,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -8952,6 +9048,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -9092,7 +9189,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal39",
             "textcolourtype": 1,
@@ -9102,6 +9200,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -9229,6 +9328,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -9369,7 +9469,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal30",
             "textcolourtype": 1,
@@ -9379,6 +9480,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -9506,6 +9608,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -9646,7 +9749,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal17",
             "textcolourtype": 1,
@@ -9656,6 +9760,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -9783,6 +9888,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -9923,7 +10029,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal45",
             "textcolourtype": 1,
@@ -9933,6 +10040,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -10060,6 +10168,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -10200,7 +10309,8 @@
             ],
             "subsidary": [
                 true,
-                0
+                0,
+                false
             ],
             "tags": "signal67",
             "textcolourtype": 1,
@@ -10210,6 +10320,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -10337,6 +10448,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -10477,7 +10589,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal35",
             "textcolourtype": 1,
@@ -10487,6 +10600,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -10614,6 +10728,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -10754,7 +10869,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal44",
             "textcolourtype": 1,
@@ -10764,6 +10880,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -10891,6 +11008,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -11031,7 +11149,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal47",
             "textcolourtype": 1,
@@ -11041,6 +11160,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -11168,6 +11288,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -11308,7 +11429,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal18",
             "textcolourtype": 1,
@@ -11318,6 +11440,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -11445,6 +11568,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -11585,7 +11709,8 @@
             ],
             "subsidary": [
                 true,
-                0
+                0,
+                false
             ],
             "tags": "signal55",
             "textcolourtype": 1,
@@ -11595,6 +11720,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -11722,6 +11848,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -11862,7 +11989,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal16",
             "textcolourtype": 1,
@@ -11872,6 +12000,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -11999,6 +12128,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -12139,7 +12269,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal4",
             "textcolourtype": 1,
@@ -12149,6 +12280,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -12276,6 +12408,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -12416,7 +12549,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal20",
             "textcolourtype": 1,
@@ -12426,6 +12560,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -12553,6 +12688,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -12693,7 +12829,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal52",
             "textcolourtype": 1,
@@ -12703,6 +12840,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -12830,6 +12968,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -12970,7 +13109,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal1",
             "textcolourtype": 1,
@@ -12980,6 +13120,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -13107,6 +13248,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -13247,7 +13389,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal6",
             "textcolourtype": 1,
@@ -13257,6 +13400,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -13384,6 +13528,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -13524,7 +13669,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal51",
             "textcolourtype": 1,
@@ -13534,6 +13680,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -13661,6 +13808,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -13801,7 +13949,8 @@
             ],
             "subsidary": [
                 true,
-                0
+                0,
+                false
             ],
             "tags": "signal56",
             "textcolourtype": 1,
@@ -13811,6 +13960,7 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -13938,6 +14088,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -14078,7 +14229,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal10",
             "textcolourtype": 1,
@@ -14088,6 +14240,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -14215,6 +14368,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -14355,7 +14509,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal54",
             "textcolourtype": 1,
@@ -14365,6 +14520,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -14492,6 +14648,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -14632,7 +14789,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal42",
             "textcolourtype": 1,
@@ -14642,6 +14800,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -14769,6 +14928,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -14909,7 +15069,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal43",
             "textcolourtype": 1,
@@ -14919,6 +15080,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -15046,6 +15208,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -15186,7 +15349,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal37",
             "textcolourtype": 1,
@@ -15196,6 +15360,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -15323,6 +15488,7 @@
                 true,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -15463,7 +15629,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal38",
             "textcolourtype": 1,
@@ -15473,6 +15640,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -15600,6 +15768,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -15740,7 +15909,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal26",
             "textcolourtype": 1,
@@ -15750,6 +15920,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -15877,6 +16048,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -16017,7 +16189,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal21",
             "textcolourtype": 1,
@@ -16027,6 +16200,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -16154,6 +16328,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -16294,7 +16469,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal40",
             "textcolourtype": 1,
@@ -16304,6 +16480,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -16431,6 +16608,7 @@
                 true,
                 true
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -16571,7 +16749,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal49",
             "textcolourtype": 1,
@@ -16581,6 +16760,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -16665,7 +16845,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.2.0"
+            "version": "Version 5.3.0"
         },
         "gpio": {
             "maxevents": 100,

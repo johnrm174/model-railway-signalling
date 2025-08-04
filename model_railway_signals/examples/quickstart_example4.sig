@@ -6,7 +6,7 @@
     "objects": {
         "027167c4-575e-4384-9e79-d97b56ae3e01": {
             "background": "grey85",
-            "bbox": 9593,
+            "bbox": 9597,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -30,7 +30,7 @@
                 20,
                 5
             ],
-            "bbox": 9599,
+            "bbox": 9603,
             "colour": "black",
             "endx": 1275.0,
             "endy": 225.0,
@@ -46,7 +46,7 @@
         "07d52e15-c961-4ee9-8227-5c7e7ade9d7c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9606,
+            "bbox": 9610,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -98,7 +98,7 @@
                 false,
                 ""
             ],
-            "bbox": 9623,
+            "bbox": 9627,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -171,6 +171,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -311,7 +312,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal12",
             "textcolourtype": 1,
@@ -321,6 +323,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -385,7 +388,7 @@
         },
         "1cd0d6ee-bf33-4e85-ad10-162a5114e499": {
             "background": "grey85",
-            "bbox": 9626,
+            "bbox": 9630,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -403,7 +406,7 @@
             ]
         },
         "1d324970-3029-401b-8c66-8425a680ff42": {
-            "bbox": 9630,
+            "bbox": 9634,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -438,7 +441,7 @@
                 false,
                 ""
             ],
-            "bbox": 9647,
+            "bbox": 9651,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -521,6 +524,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -661,7 +665,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal3",
             "textcolourtype": 1,
@@ -671,6 +676,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -740,7 +746,7 @@
                 0,
                 0
             ],
-            "bbox": 9653,
+            "bbox": 9657,
             "colour": "black",
             "endx": 900.0,
             "endy": 100.0,
@@ -765,7 +771,7 @@
                 false,
                 ""
             ],
-            "bbox": 9670,
+            "bbox": 9674,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -838,6 +844,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -983,7 +990,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal10",
             "textcolourtype": 1,
@@ -993,6 +1001,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -1067,7 +1076,7 @@
                 false,
                 ""
             ],
-            "bbox": 9687,
+            "bbox": 9691,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -1140,6 +1149,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1296,7 +1306,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal8",
             "textcolourtype": 1,
@@ -1306,6 +1317,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -1370,7 +1382,7 @@
         },
         "33bf5593-6030-4282-a957-c96d2a12548f": {
             "background": "grey85",
-            "bbox": 9690,
+            "bbox": 9694,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -1394,7 +1406,7 @@
                 20,
                 5
             ],
-            "bbox": 9696,
+            "bbox": 9700,
             "colour": "black",
             "endx": 800.0,
             "endy": 275.0,
@@ -1419,7 +1431,7 @@
                 false,
                 ""
             ],
-            "bbox": 9713,
+            "bbox": 9717,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -1492,6 +1504,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1632,7 +1645,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal6",
             "textcolourtype": 1,
@@ -1642,6 +1656,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     true,
@@ -1716,7 +1731,7 @@
                 false,
                 ""
             ],
-            "bbox": 9730,
+            "bbox": 9734,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -1789,6 +1804,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -1929,7 +1945,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal13",
             "textcolourtype": 1,
@@ -1939,6 +1956,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     true,
@@ -2002,7 +2020,7 @@
             "ybuttonoffset": 0
         },
         "55eab425-03d7-40a2-8b77-2c7d23b8e933": {
-            "bbox": 9734,
+            "bbox": 9738,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2037,7 +2055,7 @@
                 false,
                 ""
             ],
-            "bbox": 9751,
+            "bbox": 9755,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -2110,6 +2128,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2250,7 +2269,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal11",
             "textcolourtype": 1,
@@ -2260,6 +2280,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -2334,7 +2355,7 @@
                 false,
                 ""
             ],
-            "bbox": 9768,
+            "bbox": 9772,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -2407,6 +2428,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2547,7 +2569,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal5",
             "textcolourtype": 1,
@@ -2557,6 +2580,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     true,
@@ -2631,7 +2655,7 @@
                 false,
                 ""
             ],
-            "bbox": 9785,
+            "bbox": 9789,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -2704,6 +2728,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -2844,7 +2869,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal9",
             "textcolourtype": 1,
@@ -2854,6 +2880,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -2917,7 +2944,7 @@
             "ybuttonoffset": 0
         },
         "628c161f-b9f5-46fd-837c-4f36eecd60ab": {
-            "bbox": 9789,
+            "bbox": 9793,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2941,7 +2968,7 @@
             ]
         },
         "65c6b251-6622-4fd2-958f-b28a6778dc76": {
-            "bbox": 9793,
+            "bbox": 9797,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2966,7 +2993,7 @@
         },
         "6966a516-b636-4321-ae7b-3a733356e215": {
             "background": "grey85",
-            "bbox": 9796,
+            "bbox": 9800,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2985,7 +3012,7 @@
         },
         "6b03065c-be75-450c-8af5-af5dc644b14f": {
             "background": "grey85",
-            "bbox": 9799,
+            "bbox": 9803,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3005,7 +3032,7 @@
         "719f6d7b-e39c-4d3a-8b22-f232dff5443e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9805,
+            "bbox": 9809,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3057,7 +3084,7 @@
         },
         "7c1562c4-2d75-46cf-b559-bef25efa2c9e": {
             "background": "grey85",
-            "bbox": 9808,
+            "bbox": 9812,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3075,7 +3102,7 @@
             ]
         },
         "7d95452f-2bb7-48b8-8418-6d83598356d4": {
-            "bbox": 9812,
+            "bbox": 9816,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3105,7 +3132,7 @@
                 20,
                 5
             ],
-            "bbox": 9818,
+            "bbox": 9822,
             "colour": "black",
             "endx": 1275.0,
             "endy": 100.0,
@@ -3119,7 +3146,7 @@
             "tags": "line8"
         },
         "a6541a21-387c-4ebc-93dd-3b86a950f45d": {
-            "bbox": 9822,
+            "bbox": 9826,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3144,7 +3171,7 @@
         },
         "a6d29d1d-43c7-4b82-bca6-0fd6d90d6c89": {
             "background": "grey85",
-            "bbox": 9825,
+            "bbox": 9829,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3162,7 +3189,7 @@
             ]
         },
         "a6e61479-8736-4f06-b351-c8e99ff870f5": {
-            "bbox": 9829,
+            "bbox": 9833,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3187,7 +3214,7 @@
         },
         "a96bd506-67b8-4312-a415-169eae42e657": {
             "background": "grey85",
-            "bbox": 9832,
+            "bbox": 9836,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3211,7 +3238,7 @@
                 0,
                 0
             ],
-            "bbox": 9838,
+            "bbox": 9842,
             "colour": "black",
             "endx": 1275.0,
             "endy": 275.0,
@@ -3236,7 +3263,7 @@
                 false,
                 ""
             ],
-            "bbox": 9855,
+            "bbox": 9859,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -3309,6 +3336,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -3449,7 +3477,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal7",
             "textcolourtype": 1,
@@ -3459,6 +3488,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -3522,7 +3552,7 @@
             "ybuttonoffset": 0
         },
         "b1288a67-ed1d-427f-98d5-f7963edaf7f4": {
-            "bbox": 9859,
+            "bbox": 9863,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3552,7 +3582,7 @@
                 0,
                 0
             ],
-            "bbox": 9865,
+            "bbox": 9869,
             "colour": "black",
             "endx": 925.0,
             "endy": 150.0,
@@ -3566,7 +3596,7 @@
             "tags": "line6"
         },
         "b62548e4-2291-454e-9f01-4c3163fb178a": {
-            "bbox": 9869,
+            "bbox": 9873,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3590,7 +3620,7 @@
             ]
         },
         "bc423a55-8a1d-42b1-82ee-24b38662af63": {
-            "bbox": 9873,
+            "bbox": 9877,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3620,7 +3650,7 @@
                 0,
                 0
             ],
-            "bbox": 9879,
+            "bbox": 9883,
             "colour": "black",
             "endx": 1275.0,
             "endy": 150.0,
@@ -3635,7 +3665,7 @@
         },
         "d6a52ed1-1079-413c-ba46-7d8bb9b44dfd": {
             "background": "grey85",
-            "bbox": 9882,
+            "bbox": 9886,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3654,7 +3684,7 @@
         },
         "db5992bd-ce35-492b-9453-b8a860f4a69b": {
             "background": "grey85",
-            "bbox": 9885,
+            "bbox": 9889,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3673,7 +3703,7 @@
         },
         "e5810a77-a225-4247-acd8-0df551fe4184": {
             "background": "grey85",
-            "bbox": 9888,
+            "bbox": 9892,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3702,7 +3732,7 @@
                 false,
                 ""
             ],
-            "bbox": 9905,
+            "bbox": 9909,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -3785,6 +3815,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -3925,7 +3956,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal2",
             "textcolourtype": 1,
@@ -3935,6 +3967,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -4009,7 +4042,7 @@
                 true,
                 "14"
             ],
-            "bbox": 9923,
+            "bbox": 9927,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -4097,6 +4130,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
@@ -4258,7 +4292,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal4",
             "textcolourtype": 1,
@@ -4268,6 +4303,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -4331,7 +4367,7 @@
             "ybuttonoffset": 0
         },
         "eca7185e-bfed-4cfb-8430-a3153bc29573": {
-            "bbox": 9927,
+            "bbox": 9931,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4356,7 +4392,7 @@
         },
         "edf730b4-253d-4ac9-a473-0a3ba0e72183": {
             "background": "grey85",
-            "bbox": 9930,
+            "bbox": 9934,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4385,7 +4421,7 @@
                 false,
                 ""
             ],
-            "bbox": 9947,
+            "bbox": 9951,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [
@@ -4458,6 +4494,7 @@
                 false,
                 false
             ],
+            "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
             "interlockahead": false,
@@ -4598,7 +4635,8 @@
             ],
             "subsidary": [
                 false,
-                0
+                0,
+                false
             ],
             "tags": "signal1",
             "textcolourtype": 1,
@@ -4608,6 +4646,7 @@
                 ""
             ],
             "theatreroute": false,
+            "theatresubsidary": false,
             "timedsequences": [
                 [
                     false,
@@ -4671,7 +4710,7 @@
             "ybuttonoffset": 0
         },
         "f85047ff-ffac-4342-835a-98803dee39b6": {
-            "bbox": 9951,
+            "bbox": 9955,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4701,7 +4740,7 @@
                 0,
                 0
             ],
-            "bbox": 9957,
+            "bbox": 9961,
             "colour": "black",
             "endx": 775.0,
             "endy": 225.0,
@@ -4715,7 +4754,7 @@
             "tags": "line1"
         },
         "fdcafbec-2869-438c-ba72-2a8d5d849f58": {
-            "bbox": 9961,
+            "bbox": 9965,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4740,7 +4779,7 @@
         },
         "ff002fef-4577-4b37-8b4c-c09a758ae29f": {
             "background": "grey85",
-            "bbox": 9964,
+            "bbox": 9968,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4843,7 +4882,7 @@
             "leverpopupwarnings": false,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.2.0"
+            "version": "Version 5.3.0"
         },
         "gpio": {
             "maxevents": 100,
