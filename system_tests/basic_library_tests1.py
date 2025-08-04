@@ -581,7 +581,7 @@ def run_dcc_control_tests(baud_rate):
                                            ['3', [[4,False], [5,True], [6,True]] ],
                                            ['4', [[4,False], [5,True], [6,False]] ],
                                            ['5', [[4,False], [5,False], [6,True]] ] ],
-                               subsidary = 7 )
+                               subsidary = [7, False] )
     # Negative tests - all will fail with errors
     dcc_control.map_dcc_signal(0)       # Fail - out of range
     dcc_control.map_dcc_signal(1)       # Fail - already exists
