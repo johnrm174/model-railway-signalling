@@ -181,15 +181,15 @@ def create_colour_light_signal (canvas, sig_id:int,
         else: # its a 4 aspect signal
             offset = 0
         # Now draw the feathers (x has been adjusted for the no of aspects)            
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+75,-15,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+75,post_offset,orientation)
         main = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+71,-8,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset+7,orientation)
         rhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+63,-5,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset+10,orientation)
         rhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+71,-22,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset-7,orientation)
         lhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+63,-25,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset-10,orientation)
         lhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
         # Hide any feather drawing objects we don't need for this particular signal
         if not mainfeather: canvas.itemconfigure(main,state='hidden')
@@ -205,7 +205,7 @@ def create_colour_light_signal (canvas, sig_id:int,
         else:
             override_aspect = signals.signal_state_type.DANGER
         # Create the signal elements for a Theatre Route indicator
-        signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=offset+69, yoff=-15,
+        signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=offset+69, yoff=post_offset,
                     orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator,
                     enable_for_subsidary=theatre_route_subsidary)
         # Create the signal elements to support Approach Control

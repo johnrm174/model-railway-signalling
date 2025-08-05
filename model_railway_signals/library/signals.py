@@ -583,7 +583,7 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
                         highlightthickness=0, command=lambda:approach_release_button_event(sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=canvas_tag)
-    # Add the Theatre elements to the dictionary of signal objects
+    # Add the Approach Control elements to the dictionary of signal objects
     signals[str(sig_id)]["released"] = False                             # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                         # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releaseonyel"] = False                         # SHARED - State of the "Approach Release for the signal
