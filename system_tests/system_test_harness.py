@@ -117,6 +117,7 @@
 #    reset_window_size()              - 'Cntl-r'
 #    snap_selected_objects_to_grid()  - 's' key - also right-click-menu function
 #    rotate_selected_objects()        - 'r' key - also right-click-menu function
+#    flip_selected_objects()          - 'f' key - also right-click-menu function
 #    delete_selected_objects()        - 'del' key - also right-click-menu function
 #    nudge_selected_objects()         - 'arrow' keys
 #    copy_selected_objects()          - 'Cntl-c' - also right-click-menu function
@@ -1289,6 +1290,11 @@ def deselect_all_objects():
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def rotate_selected_objects():
     run_function(lambda:schematic.rotate_selected_objects(),delay=0.5)
+
+# Simulates the <f> keypress or 'flip' selection from the object popup menu
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
+def flip_selected_objects():
+    run_function(lambda:schematic.flip_selected_objects(),delay=0.5)
 
 # Simulates the <backspace>/<delete> keypress or 'delete' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
