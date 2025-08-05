@@ -4,6 +4,286 @@
     "instruments": {},
     "levers": {},
     "objects": {
+        "005ddb37-c4c2-4e9f-b702-e219151310ab": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 16915,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 103,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1375.0,
+            "posy": 100.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal103",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "006c9316-3555-4f4f-8660-ab493ccf1397": {
             "approachcontrol": [
                 0,
@@ -16,7 +296,7 @@
                 false,
                 ""
             ],
-            "bbox": 12390,
+            "bbox": 13183,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -113,7 +393,7 @@
             ],
             "postcolour": "White",
             "posx": 100.0,
-            "posy": 325.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -284,7 +564,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "02ae5fdb-6ec7-4e02-8a14-d27f1e851edb": {
+        "00977f18-20f3-4c1d-9493-ca7afe2fbbfd": {
             "approachcontrol": [
                 0,
                 0,
@@ -296,7 +576,7 @@
                 false,
                 ""
             ],
-            "bbox": 12420,
+            "bbox": 17130,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -354,8 +634,8 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 9,
-            "itemsubtype": 1,
+            "itemid": 108,
+            "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -392,8 +672,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 825.0,
-            "posy": 725.0,
+            "posx": 775.0,
+            "posy": 175.0,
             "sigarms": [
                 [
                     [
@@ -411,7 +691,7 @@
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -453,7 +733,7 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -477,8 +757,8 @@
                 true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -493,7 +773,7 @@
                 0,
                 false
             ],
-            "tags": "signal9",
+            "tags": "signal108",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -501,566 +781,6 @@
                 ""
             ],
             "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "06697dfc-8285-4325-9dc8-d54bad211be4": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 12448,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 10,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 300.0,
-            "posy": 725.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                false,
-                false,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal10",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "06bd6b77-715b-484a-a82b-b340671eb10d": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 12476,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "M",
-                    []
-                ],
-                [
-                    "1",
-                    []
-                ],
-                [
-                    "2",
-                    []
-                ],
-                [
-                    "3",
-                    []
-                ],
-                [
-                    "4",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 77,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 1375.0,
-            "posy": 475.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal77",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": true,
             "theatresubsidary": false,
             "timedsequences": [
                 [
@@ -1136,7 +856,7 @@
                 false,
                 ""
             ],
-            "bbox": 12526,
+            "bbox": 13319,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1232,8 +952,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 275.0,
-            "posy": 325.0,
+            "posx": 225.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -1404,6 +1124,566 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "07b96ae5-eaed-44de-b13a-80e8228b8a34": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18557,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 11,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 525.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal11",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "09ad7be2-8290-4cb0-95f4-86ca3659d069": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 27386,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 93,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1350.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal93",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "0a1c3835-83f1-4f05-9650-c49f5d653200": {
             "approachcontrol": [
                 0,
@@ -1416,7 +1696,7 @@
                 false,
                 ""
             ],
-            "bbox": 12556,
+            "bbox": 13349,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1512,8 +1792,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 400.0,
-            "posy": 100.0,
+            "posx": 350.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -1684,286 +1964,6 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "0a5bc344-bc8d-4d7f-8ba4-c442362dbc94": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 12584,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 67,
-            "itemsubtype": 2,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 575.0,
-            "posy": 425.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                true,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal67",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
         "0afa819f-766b-4fd2-8f37-eabfe2c01fa2": {
             "approachcontrol": [
                 0,
@@ -1976,7 +1976,7 @@
                 false,
                 ""
             ],
-            "bbox": 12613,
+            "bbox": 13406,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2072,8 +2072,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 75.0,
-            "posy": 850.0,
+            "posx": 1175.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -2244,7 +2244,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "0dc95192-28f9-400d-8fd5-9fd3409e4d48": {
+        "0b049ce8-9c50-42ce-bd3a-8e1f2189897c": {
             "approachcontrol": [
                 0,
                 0,
@@ -2256,7 +2256,7 @@
                 false,
                 ""
             ],
-            "bbox": 12642,
+            "bbox": 22209,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2309,12 +2309,292 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 86,
+            "itemid": 163,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 650.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal163",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "0e8119d2-7c43-40b5-aaae-65d1a72f5955": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21245,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 150,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
@@ -2352,8 +2632,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 425.0,
-            "posy": 850.0,
+            "posx": 750.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -2365,39 +2645,15 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ]
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
                     [
                         false,
                         0
@@ -2405,9 +2661,33 @@
                     [
                         true,
                         0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
                     ],
                     [
                         false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
                         0
                     ]
                 ],
@@ -2445,7 +2725,7 @@
                 false,
                 false,
                 false,
-                true,
+                false,
                 false
             ],
             "subsidary": [
@@ -2453,7 +2733,7 @@
                 0,
                 false
             ],
-            "tags": "signal86",
+            "tags": "signal150",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -2536,7 +2816,7 @@
                 false,
                 ""
             ],
-            "bbox": 12668,
+            "bbox": 13461,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2633,7 +2913,7 @@
             ],
             "postcolour": "White",
             "posx": 100.0,
-            "posy": 100.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -2816,7 +3096,7 @@
                 false,
                 ""
             ],
-            "bbox": 12699,
+            "bbox": 13492,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2912,8 +3192,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 950.0,
-            "posy": 250.0,
+            "posx": 725.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -3084,6 +3364,286 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "10be3c07-31fa-4d1f-98df-b211a7e034dd": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20695,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 146,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 675.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal146",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "11507464-0111-435c-be98-ecf60e7eb096": {
             "approachcontrol": [
                 0,
@@ -3096,7 +3656,7 @@
                 false,
                 ""
             ],
-            "bbox": 12733,
+            "bbox": 13526,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3192,7 +3752,7 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 975.0,
+            "posx": 950.0,
             "posy": 100.0,
             "sigarms": [
                 [
@@ -3364,6 +3924,566 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "119aacb4-0416-4ee8-988e-a324c1fad60b": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20486,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 139,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 400.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal139",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "1272bcaf-78e5-42be-9ad6-bb381500cd8c": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 27355,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 90,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1375.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal90",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "14b35749-3a8d-42a6-aa72-13cb3e96bdae": {
             "approachcontrol": [
                 0,
@@ -3376,7 +4496,7 @@
                 false,
                 ""
             ],
-            "bbox": 12786,
+            "bbox": 13579,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3437,7 +4557,7 @@
             "itemid": 22,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -3472,8 +4592,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 475.0,
-            "posy": 500.0,
+            "posx": 400.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -3644,6 +4764,306 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "16298efe-2144-4357-8cf2-f7d952136f14": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 25983,
+            "colour": "Black",
+            "endx": 1250.0,
+            "endy": 550.0,
+            "item": "line",
+            "itemid": 14,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 550.0,
+            "selection": "line14selected",
+            "tags": "line14"
+        },
+        "18259f62-6953-4010-a225-ee07ee776005": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26680,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 174,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1350.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal174",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "18a2140e-96bc-4c42-a3d2-4719977c6813": {
             "approachcontrol": [
                 0,
@@ -3656,7 +5076,7 @@
                 false,
                 ""
             ],
-            "bbox": 12817,
+            "bbox": 13610,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3717,7 +5137,7 @@
             "itemid": 92,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -3752,8 +5172,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 300.0,
-            "posy": 875.0,
+            "posx": 1225.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
@@ -3924,286 +5344,6 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "1934f5bf-6ae4-4c7b-b114-db28648cba36": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 12846,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 13,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 650.0,
-            "posy": 575.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                true,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                true,
-                false,
-                false,
-                true,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal13",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
         "1a1f1e3c-a9b0-4c6a-8fbd-d4d1bf06d504": {
             "approachcontrol": [
                 0,
@@ -4216,7 +5356,7 @@
                 false,
                 ""
             ],
-            "bbox": 12877,
+            "bbox": 13670,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4312,8 +5452,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 600.0,
-            "posy": 850.0,
+            "posx": 1050.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -4484,6 +5624,866 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "1cea947d-d304-4f16-bb49-ad593ba9d126": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26837,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 179,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1000.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal179",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "1ed3b3c9-f6ad-4a2f-9b11-2c8a23593281": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 19561,
+            "colour": "Black",
+            "endx": 1575.0,
+            "endy": 275.0,
+            "item": "line",
+            "itemid": 6,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 275.0,
+            "selection": "line6selected",
+            "tags": "line6"
+        },
+        "211bfe37-4f09-43d0-91c1-94b11e26f4e4": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 25903,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 77,
+            "itemsubtype": 2,
+            "itemtype": 4,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1050.0,
+            "posy": 550.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal77",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "21891723-a9a3-448c-95b6-518ccabc8e34": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21853,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 156,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 750.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal156",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "2210310c-bb1f-4826-9dbe-06f7a88578c5": {
             "approachcontrol": [
                 0,
@@ -4496,7 +6496,7 @@
                 false,
                 ""
             ],
-            "bbox": 12927,
+            "bbox": 13720,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4592,8 +6592,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 625.0,
-            "posy": 325.0,
+            "posx": 475.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -4764,6 +6764,566 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "22219aa1-6d1f-42d4-9af6-0d5f42e7a6dc": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24694,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 13,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1400.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal13",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "2393ee0a-eaf8-4ad1-ba67-9f498fa58000": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24798,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 44,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1025.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal44",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "25a489a1-5231-49a1-b9a4-1f5503c04890": {
             "approachcontrol": [
                 0,
@@ -4776,7 +7336,7 @@
                 false,
                 ""
             ],
-            "bbox": 12962,
+            "bbox": 13755,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4872,8 +7432,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1150.0,
-            "posy": 250.0,
+            "posx": 1350.0,
+            "posy": 100.0,
             "sigarms": [
                 [
                     [
@@ -5044,7 +7604,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "31678ef6-2539-4d43-a4e1-cd0115aa0796": {
+        "26375bee-a191-472b-8893-fa113e6e8f0e": {
             "approachcontrol": [
                 0,
                 0,
@@ -5056,7 +7616,7 @@
                 false,
                 ""
             ],
-            "bbox": 13018,
+            "bbox": 17276,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5114,8 +7674,8 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 19,
-            "itemsubtype": 1,
+            "itemid": 113,
+            "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -5152,8 +7712,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1200.0,
-            "posy": 650.0,
+            "posx": 275.0,
+            "posy": 175.0,
             "sigarms": [
                 [
                     [
@@ -5165,7 +7725,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
@@ -5179,13 +7739,13 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -5193,13 +7753,13 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -5207,13 +7767,13 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -5221,7 +7781,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ]
@@ -5235,10 +7795,10 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -5253,7 +7813,7 @@
                 0,
                 false
             ],
-            "tags": "signal19",
+            "tags": "signal113",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -5324,7 +7884,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "31ec32d8-b193-4853-a128-d61acdd5ae88": {
+        "26f1bdd1-6555-4193-944a-701b63a9c9ae": {
             "approachcontrol": [
                 0,
                 0,
@@ -5336,7 +7896,567 @@
                 false,
                 ""
             ],
-            "bbox": 13049,
+            "bbox": 21143,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 148,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 250.0,
+            "posy": 675.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal148",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "27e6ebdb-829d-4402-8cca-b4345f0f16a4": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26808,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 178,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1375.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal178",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "28172c28-94d1-4fe3-8bb0-4d94512406c5": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18529,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5394,7 +8514,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 31,
+            "itemid": 10,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -5432,8 +8552,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 825.0,
-            "posy": 575.0,
+            "posx": 775.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -5441,7 +8561,21 @@
                         0
                     ],
                     [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
                         true,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ],
                     [
@@ -5465,25 +8599,11 @@
                 ],
                 [
                     [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
                         true,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -5493,11 +8613,11 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -5517,23 +8637,1463 @@
                 true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false,
+                false
             ],
             "subsidary": [
                 false,
                 0,
                 false
             ],
-            "tags": "signal31",
+            "tags": "signal10",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "287f7aa6-88a6-4882-8a08-8c83854b0638": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18759,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 117,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 425.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal117",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "2937b1e5-6359-4991-8168-60c31e2ba927": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 22005,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 159,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 150.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal159",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "2975190d-878d-4452-a240-51b412296365": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 13789,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 97,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 975.0,
+            "posy": 100.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal97",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "2a029db8-bb8e-46d8-beff-a05948fe4f29": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 21653,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 675.0,
+            "item": "line",
+            "itemid": 9,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 675.0,
+            "selection": "line9selected",
+            "tags": "line9"
+        },
+        "2bfd4543-55d8-4627-8887-6fddabf8ecfd": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 26523,
+            "colour": "Black",
+            "endx": 1550.0,
+            "endy": 650.0,
+            "item": "line",
+            "itemid": 15,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 650.0,
+            "selection": "line15selected",
+            "tags": "line15"
+        },
+        "2da6988f-527f-4cea-b6c9-6be5519426bb": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24467,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 7,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1225.0,
+            "posy": 400.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal7",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "31c592bc-78e0-4ab1-b43b-d72a44c1986a": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26614,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 172,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 975.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal172",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -5616,7 +10176,7 @@
                 false,
                 ""
             ],
-            "bbox": 13079,
+            "bbox": 13906,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5712,8 +10272,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 800.0,
-            "posy": 400.0,
+            "posx": 600.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -5896,7 +10456,7 @@
                 false,
                 ""
             ],
-            "bbox": 13107,
+            "bbox": 13934,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5992,8 +10552,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 275.0,
-            "posy": 400.0,
+            "posx": 225.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -6176,7 +10736,7 @@
                 false,
                 ""
             ],
-            "bbox": 13137,
+            "bbox": 13964,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6272,8 +10832,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 950.0,
-            "posy": 400.0,
+            "posx": 725.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -6444,6 +11004,566 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "33b223d3-f8be-4176-8476-6ca93ce1deed": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 23798,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 29,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 875.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal29",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "33ea51fb-661a-4f6d-bcdf-ddaca186cefd": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 25933,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 81,
+            "itemsubtype": 2,
+            "itemtype": 4,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1200.0,
+            "posy": 550.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal81",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "36287f17-5011-42f4-9d84-809ec111a846": {
             "approachcontrol": [
                 0,
@@ -6456,7 +11576,7 @@
                 false,
                 ""
             ],
-            "bbox": 13189,
+            "bbox": 14016,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6552,8 +11672,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 950.0,
-            "posy": 325.0,
+            "posx": 725.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -6724,7 +11844,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "3792d9ca-8ea6-452c-94ae-f8ce0e472b52": {
+        "3931e8d5-d905-46f9-9956-7e9d7f8ab645": {
             "approachcontrol": [
                 0,
                 0,
@@ -6736,7 +11856,7 @@
                 false,
                 ""
             ],
-            "bbox": 13215,
+            "bbox": 20517,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6794,8 +11914,8 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 4,
-            "itemsubtype": 2,
+            "itemid": 140,
+            "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -6832,8 +11952,288 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 125.0,
-            "posy": 425.0,
+            "posx": 650.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal140",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "398886fc-5c8b-4d52-b319-253bd4b9d378": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 14070,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 100,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 500.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -6846,6 +12246,1165 @@
                     ],
                     [
                         false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal100",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "39b8878b-e139-45e3-82f7-2ff3b44829d1": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 16824,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 102,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1250.0,
+            "posy": 100.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal102",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "3a54447c-36e0-430b-8887-9af2ffb251b9": {
+            "background": "",
+            "bbox": 14073,
+            "borderwidth": 0,
+            "hidden": false,
+            "item": "textbox",
+            "itemid": 1,
+            "justification": 2,
+            "posx": 1425.0,
+            "posy": 550.0,
+            "tags": "textwidget1",
+            "text": "Some of the Semaphore Signal\ncombinations that can be supported\nby the application",
+            "textcolour": "Black",
+            "textfonttuple": [
+                "TkFixedFont",
+                10,
+                "bold "
+            ]
+        },
+        "3ade5850-fd49-4843-b802-bb72cfd5b7bb": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20606,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 143,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 300.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal143",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "3d8bbfb9-5a30-43b5-bab0-13907420ce29": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21905,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 157,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 625.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal157",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "3edff34f-313d-4a5a-916e-7c2e3787f8b7": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 16766,
+            "colour": "Black",
+            "endx": 875.0,
+            "endy": 75.0,
+            "item": "line",
+            "itemid": 1,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 75.0,
+            "selection": "line1selected",
+            "tags": "line1"
+        },
+        "3fe9bdf9-d2d2-4c0e-96cc-2f8398af6c83": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24925,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 48,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1275.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
                         0
                     ]
                 ],
@@ -6933,7 +13492,287 @@
                 0,
                 false
             ],
-            "tags": "signal4",
+            "tags": "signal48",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "406059a6-a67e-4d5a-9a2b-ed1db56e3bea": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21193,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 149,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 500.0,
+            "posy": 675.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal149",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -7004,24 +13843,565 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "3a54447c-36e0-430b-8887-9af2ffb251b9": {
-            "background": "",
-            "bbox": 13218,
-            "borderwidth": 0,
-            "hidden": false,
-            "item": "textbox",
-            "itemid": 1,
-            "justification": 2,
-            "posx": 1300.0,
+        "40682573-a330-4ad0-957e-c3fe0618ba28": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 23900,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 32,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 275.0,
             "posy": 875.0,
-            "tags": "textwidget1",
-            "text": "Some of the Semaphore Signal\ncombinations that are supported\nby the application",
-            "textcolour": "Black",
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal32",
+            "textcolourtype": 1,
             "textfonttuple": [
-                "TkFixedFont",
-                10,
-                "bold "
-            ]
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "41153881-d98c-497c-b404-a48ef368b574": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19430,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 125,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1275.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal125",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "41c83912-67b8-417b-8013-334ac47c9908": {
             "approachcontrol": [
@@ -7035,7 +14415,7 @@
                 false,
                 ""
             ],
-            "bbox": 13247,
+            "bbox": 14102,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7131,8 +14511,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 625.0,
-            "posy": 250.0,
+            "posx": 475.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -7303,7 +14683,27 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "43a62c1b-dd11-452d-a1f7-0dd7b96b4972": {
+        "437b6a2e-3697-470e-8c59-b36d37f8d282": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 18441,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 275.0,
+            "item": "line",
+            "itemid": 4,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 275.0,
+            "selection": "line4selected",
+            "tags": "line4"
+        },
+        "44bfec66-d464-4631-bce0-008912cfbb35": {
             "approachcontrol": [
                 0,
                 0,
@@ -7315,7 +14715,7 @@
                 false,
                 ""
             ],
-            "bbox": 13281,
+            "bbox": 26585,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7373,8 +14773,8 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 6,
-            "itemsubtype": 2,
+            "itemid": 171,
+            "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -7411,8 +14811,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1000.0,
-            "posy": 425.0,
+            "posx": 1100.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -7430,21 +14830,7 @@
                 ],
                 [
                     [
-                        true,
-                        0
-                    ],
-                    [
                         false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
                         0
                     ],
                     [
@@ -7458,7 +14844,7 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -7472,11 +14858,25 @@
                 ],
                 [
                     [
+                        false,
+                        0
+                    ],
+                    [
                         true,
                         0
                     ],
                     [
                         false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
                         0
                     ],
                     [
@@ -7494,10 +14894,10 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -7512,7 +14912,7 @@
                 0,
                 false
             ],
-            "tags": "signal6",
+            "tags": "signal171",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -7583,7 +14983,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "47ff4417-de90-4fb2-b54e-208c98e9ad4a": {
+        "4587ff0b-6cc3-4ec1-96d6-d65bcab607e9": {
             "approachcontrol": [
                 0,
                 0,
@@ -7595,7 +14995,7 @@
                 false,
                 ""
             ],
-            "bbox": 13332,
+            "bbox": 20099,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7648,12 +15048,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 46,
+            "itemid": 132,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
@@ -7691,8 +15091,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 625.0,
-            "posy": 175.0,
+            "posx": 125.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -7704,20 +15104,6 @@
                         0
                     ],
                     [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
                         false,
                         0
                     ]
@@ -7738,15 +15124,29 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ]
                 ],
@@ -7776,15 +15176,15 @@
                 true,
                 false,
                 false,
-                true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
                 false,
                 false,
-                true,
+                false,
+                false,
                 false
             ],
             "subsidary": [
@@ -7792,7 +15192,7 @@
                 0,
                 false
             ],
-            "tags": "signal46",
+            "tags": "signal132",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -7863,6 +15263,586 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "473202f3-a82f-4548-8b09-d053de7987fb": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 16983,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 104,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1475.0,
+            "posy": 100.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal104",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "47a4cf25-027a-4bf5-a6bc-93679a6a2f83": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20577,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 142,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 550.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal142",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "47e04a16-f71e-4495-b5ca-9d152654e234": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 27537,
+            "colour": "Black",
+            "endx": 1550.0,
+            "endy": 875.0,
+            "item": "line",
+            "itemid": 17,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 975.0,
+            "posy": 875.0,
+            "selection": "line17selected",
+            "tags": "line17"
+        },
         "489aae48-52c2-4f34-91aa-6c7addbebcb4": {
             "approachcontrol": [
                 0,
@@ -7875,7 +15855,7 @@
                 false,
                 ""
             ],
-            "bbox": 13363,
+            "bbox": 14218,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7936,7 +15916,7 @@
             "itemid": 87,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -7971,8 +15951,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 650.0,
-            "posy": 875.0,
+            "posx": 1100.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
@@ -8143,7 +16123,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "4e094228-e093-45fd-a517-3b4c458c00e0": {
+        "496894a4-18e2-4f49-81c3-643964c95c1f": {
             "approachcontrol": [
                 0,
                 0,
@@ -8155,7 +16135,7 @@
                 false,
                 ""
             ],
-            "bbox": 13393,
+            "bbox": 26777,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -8208,13 +16188,13 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 16,
-            "itemsubtype": 2,
+            "itemid": 177,
+            "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -8251,8 +16231,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 850.0,
-            "posy": 425.0,
+            "posx": 1250.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -8270,11 +16250,11 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -8288,7 +16268,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -8298,7 +16278,7 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -8334,9 +16314,9 @@
             ],
             "sigroutes": [
                 true,
-                true,
                 false,
-                true,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -8352,7 +16332,7 @@
                 0,
                 false
             ],
-            "tags": "signal16",
+            "tags": "signal177",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -8423,7 +16403,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "4e199681-9310-4929-8ddb-13f7f44b949b": {
+        "49c6a3da-5b7a-48fd-bbdd-0a5dde3e42b8": {
             "approachcontrol": [
                 0,
                 0,
@@ -8435,7 +16415,7 @@
                 false,
                 ""
             ],
-            "bbox": 13422,
+            "bbox": 24722,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -8460,7 +16440,7 @@
                     []
                 ],
                 [
-                    "",
+                    "M",
                     []
                 ],
                 [
@@ -8493,7 +16473,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 89,
+            "itemid": 38,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -8531,8 +16511,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 125.0,
-            "posy": 875.0,
+            "posx": 1125.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -8540,7 +16520,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -8554,7 +16534,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -8621,6 +16601,286 @@
             ],
             "slotwith": 0,
             "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal38",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": true,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "4d5e1f96-edff-4366-af9e-f88ed31129a0": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19192,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 120,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1400.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
                 false,
                 false,
                 false,
@@ -8632,7 +16892,7 @@
                 0,
                 false
             ],
-            "tags": "signal89",
+            "tags": "signal120",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -8715,7 +16975,7 @@
                 false,
                 ""
             ],
-            "bbox": 13451,
+            "bbox": 14306,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -8776,7 +17036,7 @@
             "itemid": 91,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -8811,8 +17071,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 475.0,
-            "posy": 875.0,
+            "posx": 1475.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
@@ -8995,7 +17255,7 @@
                 false,
                 ""
             ],
-            "bbox": 13480,
+            "bbox": 14335,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9091,8 +17351,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 275.0,
-            "posy": 250.0,
+            "posx": 225.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -9275,7 +17535,7 @@
                 false,
                 ""
             ],
-            "bbox": 13510,
+            "bbox": 14365,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9371,8 +17631,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 825.0,
-            "posy": 100.0,
+            "posx": 725.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -9543,7 +17803,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "542c6d4b-36c6-4fcd-996f-0ad1058791a7": {
+        "529d8e84-1a12-4103-97d6-8aa988f5b4bf": {
             "approachcontrol": [
                 0,
                 0,
@@ -9555,7 +17815,7 @@
                 false,
                 ""
             ],
-            "bbox": 13539,
+            "bbox": 18729,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9608,12 +17868,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 15,
+            "itemid": 70,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -9651,8 +17911,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 300.0,
-            "posy": 575.0,
+            "posx": 550.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -9660,7 +17920,35 @@
                         0
                     ],
                     [
-                        true,
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ],
                     [
@@ -9674,7 +17962,819 @@
                         0
                     ],
                     [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal70",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "52ca94fa-06b0-4d31-a652-9f40e4af380a": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26489,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 169,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1450.0,
+            "posy": 650.0,
+            "sigarms": [
+                [
+                    [
                         true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal169",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "549e4f30-ade4-4c47-800b-9e5435b49f04": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17100,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 107,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 500.0,
+            "posy": 175.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal107",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "55fec2be-e27c-4d91-bc2b-a789f0da79f1": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 25941,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 165,
+            "itemsubtype": 1,
+            "itemtype": 4,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1100.0,
+            "posy": 550.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ],
                     [
@@ -9734,15 +18834,15 @@
             ],
             "sigroutes": [
                 true,
-                true,
+                false,
                 false,
                 false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
-                true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -9752,7 +18852,287 @@
                 0,
                 false
             ],
-            "tags": "signal15",
+            "tags": "signal165",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "57236850-a1b3-46fa-af85-144a29082842": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19282,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 122,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1125.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal122",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -9835,7 +19215,7 @@
                 false,
                 ""
             ],
-            "bbox": 13592,
+            "bbox": 14447,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9896,7 +19276,7 @@
             "itemid": 26,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -9931,8 +19311,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 825.0,
-            "posy": 500.0,
+            "posx": 700.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -10103,7 +19483,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "582f1ec0-204e-4bed-8b9e-688ada36c051": {
+        "5a0b0c75-172e-47fb-bd53-dafd3dd52e21": {
             "approachcontrol": [
                 0,
                 0,
@@ -10115,7 +19495,7 @@
                 false,
                 ""
             ],
-            "bbox": 13619,
+            "bbox": 21701,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -10140,23 +19520,23 @@
                     []
                 ],
                 [
-                    "M",
+                    "",
                     []
                 ],
                 [
-                    "1",
+                    "",
                     []
                 ],
                 [
-                    "2",
+                    "",
                     []
                 ],
                 [
-                    "3",
+                    "",
                     []
                 ],
                 [
-                    "4",
+                    "",
                     []
                 ]
             ],
@@ -10173,7 +19553,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 17,
+            "itemid": 153,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -10211,8 +19591,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1375.0,
-            "posy": 350.0,
+            "posx": 125.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -10224,7 +19604,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ]
                 ],
@@ -10294,10 +19674,10 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -10312,14 +19692,14 @@
                 0,
                 false
             ],
-            "tags": "signal17",
+            "tags": "signal153",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 8,
                 ""
             ],
-            "theatreroute": true,
+            "theatreroute": false,
             "theatresubsidary": false,
             "timedsequences": [
                 [
@@ -10395,7 +19775,7 @@
                 false,
                 ""
             ],
-            "bbox": 13646,
+            "bbox": 14501,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -10491,8 +19871,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 325.0,
+            "posx": 950.0,
+            "posy": 400.0,
             "sigarms": [
                 [
                     [
@@ -10675,7 +20055,7 @@
                 false,
                 ""
             ],
-            "bbox": 13681,
+            "bbox": 14536,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -10736,7 +20116,7 @@
             "itemid": 94,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -10771,8 +20151,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1075.0,
-            "posy": 825.0,
+            "posx": 975.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
@@ -10943,6 +20323,566 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "5ddd455a-871d-4f8b-97f9-dfaab7391540": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 22105,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 161,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 525.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal161",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "5de908a8-6351-41f6-b474-5a3040099047": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26649,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 173,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1500.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal173",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "5ea5b1b2-6906-4261-ad94-150a3a8bd713": {
             "approachcontrol": [
                 0,
@@ -10955,7 +20895,7 @@
                 false,
                 ""
             ],
-            "bbox": 13709,
+            "bbox": 14564,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11051,8 +20991,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 625.0,
-            "posy": 400.0,
+            "posx": 475.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -11223,7 +21163,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "60cc03da-b85f-43ed-8db8-d6c7f89c558e": {
+        "5f61298a-ee2f-4c94-a1e0-0069b403532d": {
             "approachcontrol": [
                 0,
                 0,
@@ -11235,7 +21175,7 @@
                 false,
                 ""
             ],
-            "bbox": 13761,
+            "bbox": 27208,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11288,15 +21228,15 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 32,
+            "itemid": 86,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -11331,8 +21271,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 475.0,
-            "posy": 650.0,
+            "posx": 1025.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -11344,7 +21284,287 @@
                         0
                     ],
                     [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
                         true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal86",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "605f718d-488b-43b0-94aa-875632fef413": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 14594,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 95,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 375.0,
+            "posy": 75.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ]
                 ],
@@ -11358,7 +21578,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
@@ -11372,7 +21592,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
@@ -11414,8 +21634,8 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -11432,7 +21652,7 @@
                 0,
                 false
             ],
-            "tags": "signal32",
+            "tags": "signal95",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -11515,7 +21735,7 @@
                 false,
                 ""
             ],
-            "bbox": 13811,
+            "bbox": 14696,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11611,8 +21831,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 700.0,
+            "posx": 1375.0,
+            "posy": 400.0,
             "sigarms": [
                 [
                     [
@@ -11720,6 +21940,1686 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": true,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "6333f5fe-1f1e-4c04-a6c0-a9919a7ef1c0": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21751,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 154,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 250.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal154",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "63c40a76-ca9a-45ef-b2cc-1448f3caead9": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20130,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 133,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 375.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal133",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "6496b7df-c658-4913-bbbe-f43f16faa3eb": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17190,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 110,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 625.0,
+            "posy": 175.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal110",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "6511e24b-8341-4ab5-92f0-f75febc5e356": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 27324,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 89,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1500.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal89",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "65b13bdc-d491-4e28-9bbd-e7a8a821eb85": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20633,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 144,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 175.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal144",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "663a9559-0a10-4e0b-b0de-f64b5c83a208": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19373,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 124,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1250.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal124",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
             "theatresubsidary": false,
             "timedsequences": [
                 [
@@ -11795,7 +23695,7 @@
                 false,
                 ""
             ],
-            "bbox": 13860,
+            "bbox": 14745,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11856,7 +23756,7 @@
             "itemid": 34,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -11891,8 +23791,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 125.0,
-            "posy": 500.0,
+            "posx": 100.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -12075,7 +23975,7 @@
                 false,
                 ""
             ],
-            "bbox": 13916,
+            "bbox": 14801,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -12171,8 +24071,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1150.0,
-            "posy": 325.0,
+            "posx": 1075.0,
+            "posy": 100.0,
             "sigarms": [
                 [
                     [
@@ -12343,7 +24243,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "68501d7c-d8e0-472f-bcad-33c83718eb85": {
+        "693271e4-9c9a-4adb-afb4-60fcb0921a60": {
             "approachcontrol": [
                 0,
                 0,
@@ -12355,7 +24255,7 @@
                 false,
                 ""
             ],
-            "bbox": 13951,
+            "bbox": 20455,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -12413,10 +24313,10 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 93,
+            "itemid": 138,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 0,
+            "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -12451,8 +24351,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 925.0,
-            "posy": 900.0,
+            "posx": 150.0,
+            "posy": 575.0,
             "sigarms": [
                 [
                     [
@@ -12460,20 +24360,6 @@
                         0
                     ],
                     [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
                         true,
                         0
                     ],
@@ -12488,7 +24374,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -12502,7 +24388,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -12516,7 +24402,21 @@
                         0
                     ],
                     [
-                        true,
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ],
                     [
@@ -12542,17 +24442,17 @@
             "slotwith": 0,
             "subroutes": [
                 false,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "subsidary": [
                 false,
                 0,
                 false
             ],
-            "tags": "signal93",
+            "tags": "signal138",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -12623,7 +24523,27 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "6b7f5b0e-7a3b-4cb3-9795-ae95f0a870a1": {
+        "699b5fa1-89f6-4247-9147-beac2fb64f9e": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 20339,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 475.0,
+            "item": "line",
+            "itemid": 7,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 475.0,
+            "selection": "line7selected",
+            "tags": "line7"
+        },
+        "69f63e00-8c75-4900-9441-ed4c50a2f750": {
             "approachcontrol": [
                 0,
                 0,
@@ -12635,7 +24555,7 @@
                 false,
                 ""
             ],
-            "bbox": 14001,
+            "bbox": 20370,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -12660,23 +24580,23 @@
                     []
                 ],
                 [
-                    "M",
+                    "",
                     []
                 ],
                 [
-                    "1",
+                    "",
                     []
                 ],
                 [
-                    "2",
+                    "",
                     []
                 ],
                 [
-                    "3",
+                    "",
                     []
                 ],
                 [
-                    "4",
+                    "",
                     []
                 ]
             ],
@@ -12693,7 +24613,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 81,
+            "itemid": 135,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -12731,8 +24651,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1375.0,
-            "posy": 725.0,
+            "posx": 775.0,
+            "posy": 575.0,
             "sigarms": [
                 [
                     [
@@ -12744,7 +24664,867 @@
                         0
                     ],
                     [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
                         true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal135",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "6fb46c61-5c29-4540-a20a-3bbf6ae2ea60": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 22267,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 775.0,
+            "item": "line",
+            "itemid": 10,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 775.0,
+            "selection": "line10selected",
+            "tags": "line10"
+        },
+        "6fe19f02-df5d-447b-ad60-a9319903da09": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18701,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 69,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 800.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal69",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "707d8264-96ad-4688-859f-e1661d972330": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 14916,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 101,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 625.0,
+            "posy": 75.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal101",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "70f90bc1-b3bf-4c83-94db-1d72c572601b": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17072,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 106,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 150.0,
+            "posy": 175.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ]
                 ],
@@ -12814,14 +25594,14 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -12832,7 +25612,847 @@
                 0,
                 false
             ],
-            "tags": "signal81",
+            "tags": "signal106",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "71604a81-4085-4599-84e3-f9fffd150221": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18269,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 28,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 125.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal28",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "71b60e0d-56c6-4f3b-b2d4-1d609f99cad1": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 14946,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 98,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 750.0,
+            "posy": 75.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal98",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "7223d7c9-b70f-4229-b979-81af675d3106": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24644,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 12,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1000.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal12",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -12840,6 +26460,286 @@
                 ""
             ],
             "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "737d3172-8739-40d2-817d-1f921e7e77aa": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18499,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 9,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 275.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal9",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
             "theatresubsidary": false,
             "timedsequences": [
                 [
@@ -12915,7 +26815,7 @@
                 false,
                 ""
             ],
-            "bbox": 14028,
+            "bbox": 14973,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13012,7 +26912,7 @@
             ],
             "postcolour": "White",
             "posx": 100.0,
-            "posy": 250.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -13183,6 +27083,26 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "77f672e1-2fd8-4644-8f4e-cbf9464bb383": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 25231,
+            "colour": "Black",
+            "endx": 1500.0,
+            "endy": 400.0,
+            "item": "line",
+            "itemid": 12,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 400.0,
+            "selection": "line12selected",
+            "tags": "line12"
+        },
         "78359a4b-9392-4338-b8fc-7b6d4097e8d9": {
             "approachcontrol": [
                 0,
@@ -13195,7 +27115,7 @@
                 false,
                 ""
             ],
-            "bbox": 14062,
+            "bbox": 15007,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13291,8 +27211,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1150.0,
-            "posy": 425.0,
+            "posx": 1450.0,
+            "posy": 100.0,
             "sigarms": [
                 [
                     [
@@ -13463,7 +27383,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "7e9c1980-88e1-40e6-8471-32e52ecac937": {
+        "7934cdb2-e3b3-46c8-9232-34052e3e5f36": {
             "approachcontrol": [
                 0,
                 0,
@@ -13475,7 +27395,7 @@
                 false,
                 ""
             ],
-            "bbox": 14093,
+            "bbox": 21093,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13528,12 +27448,1432 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 88,
+            "itemid": 147,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 125.0,
+            "posy": 675.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal147",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "7a999e5b-e913-403e-b40a-69740bc40d2e": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 17925,
+            "colour": "Black",
+            "endx": 1575.0,
+            "endy": 100.0,
+            "item": "line",
+            "itemid": 3,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 100.0,
+            "selection": "line3selected",
+            "tags": "line3"
+        },
+        "7cf8238f-56f8-45bb-8c0c-8242b6288b7b": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19465,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 126,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1425.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal126",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "7df81328-fe59-4694-8dd0-2d843604a18d": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24418,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 5,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1100.0,
+            "posy": 400.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal5",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "8216d255-31a5-4c1d-9aa0-49360ff554f1": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24876,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 47,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1150.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal47",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": true,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "85666f71-1038-4d1b-b949-3963584f5004": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24848,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 46,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1425.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal46",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "85a43dc0-9fe2-4eb8-b3dd-7de127d575c5": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20072,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 131,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
@@ -13572,7 +28912,7 @@
             ],
             "postcolour": "White",
             "posx": 250.0,
-            "posy": 850.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -13580,7 +28920,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -13590,7 +28930,7 @@
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -13608,7 +28948,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -13662,8 +29002,8 @@
             "slotwith": 0,
             "subroutes": [
                 false,
-                true,
-                true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -13672,7 +29012,7 @@
                 0,
                 false
             ],
-            "tags": "signal88",
+            "tags": "signal131",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -13743,7 +29083,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "82c95228-d829-4c84-bc6d-b375abadf2e8": {
+        "86fdfee7-5a93-430d-bd5b-4d69a2f97332": {
             "approachcontrol": [
                 0,
                 0,
@@ -13755,7 +29095,7 @@
                 false,
                 ""
             ],
-            "bbox": 14146,
+            "bbox": 26402,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13808,575 +29148,15 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 44,
+            "itemid": 168,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 450.0,
-            "posy": 175.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                true,
-                false,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                true,
-                true,
-                true,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal44",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "82d21f56-759d-4d26-9f2a-12ae51e223c9": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 14199,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 48,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 975.0,
-            "posy": 175.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                false,
-                true,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                true,
-                true,
-                false,
-                true,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal48",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "85b9cc41-35ee-44bb-89c8-9ee0105a0e13": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 14207,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 27,
-            "itemsubtype": 1,
-            "itemtype": 4,
-            "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -14412,7 +29192,7 @@
             ],
             "postcolour": "White",
             "posx": 1325.0,
-            "posy": 175.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
@@ -14425,6 +29205,1146 @@
                     ],
                     [
                         false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal168",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "873dd116-3ef3-4199-9f55-ced10da41503": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19499,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 127,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1550.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal127",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "87752197-a700-4739-a8ab-e8402c3e5f3f": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 25237,
+            "colour": "Black",
+            "endx": 1500.0,
+            "endy": 475.0,
+            "item": "line",
+            "itemid": 13,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 475.0,
+            "selection": "line13selected",
+            "tags": "line13"
+        },
+        "882da0f8-4a17-44ec-97bc-add158463e0d": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17754,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 3,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1100.0,
+            "posy": 100.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal3",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "892e16b1-87ba-4ac5-bfab-646961604238": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18213,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 19,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 500.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal19",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "8b444c6f-a2f0-497a-a827-d39e8601032d": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 23745,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 25,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 125.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
                         0
                     ]
                 ],
@@ -14512,7 +30432,1407 @@
                 0,
                 false
             ],
-            "tags": "signal27",
+            "tags": "signal25",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "8bde3c31-ec29-4ff8-8f00-594a31fb3e97": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24771,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 43,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1250.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal43",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "8d6fa61b-2d74-4ed4-ace3-f8c2e3a8b5b6": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 15180,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 99,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 250.0,
+            "posy": 75.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal99",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "8e5bfd0b-faf5-4cc5-b811-e979690ef948": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 23643,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 15,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 425.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal15",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "8ea5342d-3690-4def-8626-4caa21517abd": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18185,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 16,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 750.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal16",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "928a41d3-d33a-4f1b-b0a7-e076392d2e61": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20161,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 134,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 625.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal134",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -14595,7 +31915,7 @@
                 false,
                 ""
             ],
-            "bbox": 14235,
+            "bbox": 15208,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -14691,8 +32011,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 250.0,
-            "posy": 100.0,
+            "posx": 225.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -14863,7 +32183,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "94926fc3-42ae-450f-a0d5-719475827366": {
+        "936232ae-3d82-412b-aa5d-abe43e89acf7": {
             "approachcontrol": [
                 0,
                 0,
@@ -14875,7 +32195,7 @@
                 false,
                 ""
             ],
-            "bbox": 14285,
+            "bbox": 26086,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -14928,15 +32248,15 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 7,
+            "itemid": 27,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -14971,7 +32291,7 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 650.0,
+            "posx": 950.0,
             "posy": 650.0,
             "sigarms": [
                 [
@@ -14984,20 +32304,6 @@
                         0
                     ],
                     [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
                         false,
                         0
                     ]
@@ -15007,16 +32313,6 @@
                         false,
                         0
                     ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
                     [
                         true,
                         0
@@ -15024,9 +32320,19 @@
                     [
                         false,
                         0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
                     ],
                     [
                         true,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ]
                 ],
@@ -15036,7 +32342,21 @@
                         0
                     ],
                     [
+                        true,
+                        0
+                    ],
+                    [
                         false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
                         0
                     ],
                     [
@@ -15056,7 +32376,7 @@
                 true,
                 false,
                 false,
-                true,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -15072,7 +32392,7 @@
                 0,
                 false
             ],
-            "tags": "signal7",
+            "tags": "signal27",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -15143,7 +32463,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "97dd43aa-63f5-463e-a844-957aeedcdae6": {
+        "958515cb-4a8b-498b-abfb-5cafcf30e5c0": {
             "approachcontrol": [
                 0,
                 0,
@@ -15155,7 +32475,7 @@
                 false,
                 ""
             ],
-            "bbox": 14333,
+            "bbox": 19226,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -15208,292 +32528,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 1,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 125.0,
-            "posy": 650.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal1",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "995cded1-3e71-40f8-b498-f8e53ba9f868": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 14363,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 69,
+            "itemid": 121,
             "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 180,
@@ -15531,8 +32571,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 725.0,
-            "posy": 425.0,
+            "posx": 1025.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -15550,7 +32590,7 @@
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -15564,7 +32604,7 @@
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -15616,8 +32656,8 @@
                 true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -15632,7 +32672,7 @@
                 0,
                 false
             ],
-            "tags": "signal69",
+            "tags": "signal121",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -15703,7 +32743,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "9a54a4d7-7ccc-46ba-9943-040baf535563": {
+        "9c56a5f5-21e0-41ca-b9aa-bce5db82baf8": {
             "approachcontrol": [
                 0,
                 0,
@@ -15715,7 +32755,7 @@
                 false,
                 ""
             ],
-            "bbox": 14415,
+            "bbox": 26746,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -15768,12 +32808,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 25,
+            "itemid": 176,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -15811,8 +32851,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 825.0,
-            "posy": 650.0,
+            "posx": 1125.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -15824,20 +32864,6 @@
                         0
                     ],
                     [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
                         false,
                         0
                     ]
@@ -15858,7 +32884,7 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -15866,21 +32892,35 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
+                        false,
+                        0
+                    ],
+                    [
                         true,
                         0
                     ],
                     [
                         false,
                         0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
                     ],
                     [
                         true,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ]
                 ]
@@ -15896,8 +32936,8 @@
                 true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -15912,7 +32952,7 @@
                 0,
                 false
             ],
-            "tags": "signal25",
+            "tags": "signal176",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -15983,7 +33023,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "9d751585-be00-4ff8-8508-928264525ee0": {
+        "9cf5a438-a878-4594-9af8-2950f39803e8": {
             "approachcontrol": [
                 0,
                 0,
@@ -15995,7 +33035,7 @@
                 false,
                 ""
             ],
-            "bbox": 14446,
+            "bbox": 21297,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16048,15 +33088,15 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 29,
+            "itemid": 151,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -16091,8 +33131,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 475.0,
-            "posy": 575.0,
+            "posx": 625.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -16100,39 +33140,11 @@
                         0
                     ],
                     [
-                        true,
-                        0
-                    ],
-                    [
                         false,
                         0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
                     ],
                     [
                         true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
                         0
                     ]
                 ],
@@ -16161,6 +33173,34 @@
                     ],
                     [
                         false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
                         0
                     ]
                 ]
@@ -16174,16 +33214,16 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
+                false,
+                false,
                 false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
-                true,
-                true,
+                false,
+                false,
+                false,
                 false,
                 false
             ],
@@ -16192,7 +33232,7 @@
                 0,
                 false
             ],
-            "tags": "signal29",
+            "tags": "signal151",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -16275,7 +33315,7 @@
                 false,
                 ""
             ],
-            "bbox": 14474,
+            "bbox": 15447,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16371,8 +33411,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 450.0,
+            "posx": 1075.0,
+            "posy": 400.0,
             "sigarms": [
                 [
                     [
@@ -16543,6 +33583,286 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "9ecc5c37-35e6-4625-8103-4a5b30cd15bf": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18785,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 118,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 175.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal118",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "9edd2112-16e0-4e57-8d8f-10f1621dd574": {
             "approachcontrol": [
                 0,
@@ -16555,7 +33875,7 @@
                 false,
                 ""
             ],
-            "bbox": 14527,
+            "bbox": 15500,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16616,7 +33936,7 @@
             "itemid": 23,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -16651,8 +33971,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1000.0,
-            "posy": 500.0,
+            "posx": 850.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -16835,7 +34155,7 @@
                 false,
                 ""
             ],
-            "bbox": 14579,
+            "bbox": 15552,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16931,8 +34251,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 800.0,
-            "posy": 325.0,
+            "posx": 600.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -17103,7 +34423,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "a0208c11-024a-430a-9a3d-4850bce18741": {
+        "9f85c35b-1916-4a0b-a684-eed706f4e273": {
             "approachcontrol": [
                 0,
                 0,
@@ -17115,7 +34435,7 @@
                 false,
                 ""
             ],
-            "bbox": 14632,
+            "bbox": 17330,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -17173,10 +34493,10 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 47,
-            "itemsubtype": 1,
+            "itemid": 115,
+            "itemsubtype": 2,
             "itemtype": 3,
-            "orientation": 0,
+            "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -17211,7 +34531,7 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 800.0,
+            "posx": 525.0,
             "posy": 175.0,
             "sigarms": [
                 [
@@ -17220,20 +34540,6 @@
                         0
                     ],
                     [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
                         false,
                         0
                     ],
@@ -17258,15 +34564,15 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
@@ -17276,11 +34582,25 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ]
                 ]
@@ -17296,23 +34616,23 @@
                 true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
                 false,
                 false,
-                true,
-                true
+                false,
+                false,
+                false
             ],
             "subsidary": [
                 false,
                 0,
                 false
             ],
-            "tags": "signal47",
+            "tags": "signal115",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -17395,7 +34715,7 @@
                 false,
                 ""
             ],
-            "bbox": 14640,
+            "bbox": 15613,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -17491,8 +34811,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 100.0,
+            "posx": 950.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
@@ -17663,6 +34983,866 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "a2d497af-d3e3-4e8d-9785-50abafeaf51e": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 17366,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 175.0,
+            "item": "line",
+            "itemid": 2,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 175.0,
+            "selection": "line2selected",
+            "tags": "line2"
+        },
+        "a2f73fb4-4a24-40d5-bfe2-bbb0e6f9e0b1": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18471,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 8,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 650.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal8",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "a3781f97-420d-4271-aa54-ccf80b27ef82": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26250,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 167,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1075.0,
+            "posy": 650.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal167",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "a3d7481b-13fa-4104-8769-253a5216f0ff": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20428,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 137,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 275.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal137",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "a50a8824-fe99-4eb5-8d00-887b46582589": {
             "approachcontrol": [
                 0,
@@ -17675,7 +35855,7 @@
                 false,
                 ""
             ],
-            "bbox": 14697,
+            "bbox": 15670,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -17771,8 +35951,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1150.0,
-            "posy": 175.0,
+            "posx": 1225.0,
+            "posy": 100.0,
             "sigarms": [
                 [
                     [
@@ -17943,7 +36123,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "a785d875-f569-492f-80c6-c2489437ff6e": {
+        "a6332800-7cea-4dcf-98fd-ff2dde6d7a37": {
             "approachcontrol": [
                 0,
                 0,
@@ -17955,7 +36135,7 @@
                 false,
                 ""
             ],
-            "bbox": 14723,
+            "bbox": 25925,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18013,9 +36193,9 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 70,
+            "itemid": 79,
             "itemsubtype": 1,
-            "itemtype": 3,
+            "itemtype": 4,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
@@ -18051,8 +36231,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 125.0,
-            "posy": 725.0,
+            "posx": 1125.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
@@ -18152,7 +36332,7 @@
                 0,
                 false
             ],
-            "tags": "signal70",
+            "tags": "signal79",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -18223,7 +36403,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "aef0e45c-7935-44fa-960c-5cdffe333f18": {
+        "a988f81b-48eb-4e48-b084-d127fc0efea9": {
             "approachcontrol": [
                 0,
                 0,
@@ -18235,7 +36415,7 @@
                 false,
                 ""
             ],
-            "bbox": 14773,
+            "bbox": 22261,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18288,12 +36468,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 2,
+            "itemid": 164,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -18331,8 +36511,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 300.0,
-            "posy": 650.0,
+            "posx": 400.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -18364,7 +36544,7 @@
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -18372,7 +36552,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ]
                 ],
@@ -18414,7 +36594,7 @@
             ],
             "sigroutes": [
                 true,
-                true,
+                false,
                 false,
                 false,
                 false
@@ -18432,7 +36612,7 @@
                 0,
                 false
             ],
-            "tags": "signal2",
+            "tags": "signal164",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -18503,7 +36683,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "b14597cd-c8e7-4bd7-bbc3-9350ef93ad72": {
+        "ae710613-4567-4cb6-8128-8ebceb6031c0": {
             "approachcontrol": [
                 0,
                 0,
@@ -18515,7 +36695,7 @@
                 false,
                 ""
             ],
-            "bbox": 14830,
+            "bbox": 17046,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18573,8 +36753,8 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 28,
-            "itemsubtype": 1,
+            "itemid": 105,
+            "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -18611,8 +36791,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1200.0,
-            "posy": 500.0,
+            "posx": 400.0,
+            "posy": 175.0,
             "sigarms": [
                 [
                     [
@@ -18620,11 +36800,11 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
@@ -18634,11 +36814,11 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
@@ -18648,39 +36828,39 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ]
@@ -18694,25 +36874,305 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false,
+                false
             ],
             "subsidary": [
                 false,
                 0,
                 false
             ],
-            "tags": "signal28",
+            "tags": "signal105",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "b0798f34-4a70-4f4b-974d-433f694fe86d": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21349,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 152,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 375.0,
+            "posy": 675.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal152",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -18795,7 +37255,7 @@
                 false,
                 ""
             ],
-            "bbox": 14861,
+            "bbox": 15834,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18891,8 +37351,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 750.0,
-            "posy": 850.0,
+            "posx": 1350.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
@@ -19063,6 +37523,286 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "b34984a5-3ad1-42d4-b7ce-42f6a0dffaf5": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20014,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 129,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 750.0,
+            "posy": 475.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal129",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "b4fc8fed-ec2d-492a-88e8-e5dda1fc3b73": {
             "approachcontrol": [
                 0,
@@ -19075,7 +37815,7 @@
                 false,
                 ""
             ],
-            "bbox": 14892,
+            "bbox": 15865,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19171,8 +37911,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 450.0,
-            "posy": 250.0,
+            "posx": 350.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -19343,6 +38083,286 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "b8898dca-c7d1-4fe1-af47-8b7e376e6eb2": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26715,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 175,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1525.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal175",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "bb706b4e-4cc9-479b-a662-d7b584af0d62": {
             "approachcontrol": [
                 0,
@@ -19355,7 +38375,7 @@
                 false,
                 ""
             ],
-            "bbox": 14941,
+            "bbox": 15914,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19451,8 +38471,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 575.0,
+            "posx": 1200.0,
+            "posy": 400.0,
             "sigarms": [
                 [
                     [
@@ -19623,7 +38643,27 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "bcbff895-125b-4d60-b2c2-efadaf67f71f": {
+        "bbd22339-a7ab-4979-bee2-d007b1d5c812": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 20701,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 575.0,
+            "item": "line",
+            "itemid": 8,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 575.0,
+            "selection": "line8selected",
+            "tags": "line8"
+        },
+        "be82f20c-557c-4bd1-9f74-8f3151d5f932": {
             "approachcontrol": [
                 0,
                 0,
@@ -19635,7 +38675,7 @@
                 false,
                 ""
             ],
-            "bbox": 14992,
+            "bbox": 21957,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19693,10 +38733,10 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 43,
+            "itemid": 158,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 0,
+            "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -19731,8 +38771,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 275.0,
-            "posy": 175.0,
+            "posx": 375.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -19740,7 +38780,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -19754,7 +38794,7 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -19764,7 +38804,7 @@
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -19772,7 +38812,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ]
                 ],
@@ -19814,15 +38854,15 @@
             ],
             "sigroutes": [
                 true,
-                true,
+                false,
                 false,
                 false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
-                true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -19832,7 +38872,7 @@
                 0,
                 false
             ],
-            "tags": "signal43",
+            "tags": "signal158",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -19903,7 +38943,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "bf6e39a3-41e9-44e1-822c-b914341c0af9": {
+        "bf46d318-83ca-430d-9963-873a831d5049": {
             "approachcontrol": [
                 0,
                 0,
@@ -19915,7 +38955,7 @@
                 false,
                 ""
             ],
-            "bbox": 15022,
+            "bbox": 26554,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19973,7 +39013,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 11,
+            "itemid": 170,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -20011,8 +39051,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 975.0,
-            "posy": 725.0,
+            "posx": 1225.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -20030,33 +39070,9 @@
                 ],
                 [
                     [
-                        true,
-                        0
-                    ],
-                    [
                         false,
                         0
                     ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
                     [
                         true,
                         0
@@ -20064,10 +39080,6 @@
                     [
                         false,
                         0
-                    ],
-                    [
-                        false,
-                        0
                     ]
                 ],
                 [
@@ -20075,260 +39087,8 @@
                         false,
                         0
                     ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                false,
-                true,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal11",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "c0e0e299-431e-4270-86bd-9d7a97dce429": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15050,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 24,
-            "itemsubtype": 2,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 275.0,
-            "posy": 425.0,
-            "sigarms": [
-                [
                     [
                         true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
                         0
                     ],
                     [
@@ -20374,7 +39134,7 @@
             ],
             "sigroutes": [
                 true,
-                true,
+                false,
                 false,
                 false,
                 false
@@ -20392,7 +39152,7 @@
                 0,
                 false
             ],
-            "tags": "signal24",
+            "tags": "signal170",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -20475,7 +39235,7 @@
                 false,
                 ""
             ],
-            "bbox": 15081,
+            "bbox": 16054,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -20571,8 +39331,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 800.0,
-            "posy": 250.0,
+            "posx": 600.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -20755,7 +39515,7 @@
                 false,
                 ""
             ],
-            "bbox": 15133,
+            "bbox": 16106,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -20851,8 +39611,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 450.0,
-            "posy": 325.0,
+            "posx": 350.0,
+            "posy": 675.0,
             "sigarms": [
                 [
                     [
@@ -21023,6 +39783,846 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "c15549b9-e5ac-4814-88b1-df943fe6d827": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20548,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 141,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 800.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal141",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "c5db5bf6-ec36-4381-bab4-8feab75e5cea": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17160,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 109,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 375.0,
+            "posy": 175.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal109",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "c5e53671-8664-492b-9f22-1c25ab367bf4": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17360,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 116,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 650.0,
+            "posy": 175.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal116",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "c743269b-e4cf-4c4c-93d5-3b4c67718923": {
             "approachcontrol": [
                 0,
@@ -21035,7 +40635,7 @@
                 false,
                 ""
             ],
-            "bbox": 15141,
+            "bbox": 16114,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -21131,8 +40731,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 150.0,
+            "posx": 1025.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
@@ -21303,7 +40903,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "c75652cb-dcc8-4082-97e0-b6abf9fa5b51": {
+        "c8249929-8356-4305-8ad9-a30756734c0c": {
             "approachcontrol": [
                 0,
                 0,
@@ -21315,7 +40915,7 @@
                 false,
                 ""
             ],
-            "bbox": 15193,
+            "bbox": 27237,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -21368,852 +40968,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 12,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 975.0,
-            "posy": 650.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                false,
-                true,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal12",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "cad755b0-1146-4199-a39d-b95e028a1f8c": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15221,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 18,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 650.0,
-            "posy": 725.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                true,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal18",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "cb6e0491-9538-40fd-92db-063d3f0249a3": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15270,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "M",
-                    []
-                ],
-                [
-                    "1",
-                    []
-                ],
-                [
-                    "2",
-                    []
-                ],
-                [
-                    "3",
-                    []
-                ],
-                [
-                    "4",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 79,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 1375.0,
-            "posy": 600.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal79",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": true,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "ce4af929-30a9-47f6-8faa-5c781fb00b24": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15319,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 38,
+            "itemid": 88,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
@@ -22251,7 +41011,287 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 100.0,
+            "posx": 1150.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal88",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "c82a82ec-4931-4ef1-990a-1e1a3142bd18": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17248,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 112,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 250.0,
             "posy": 175.0,
             "sigarms": [
                 [
@@ -22260,17 +41300,17 @@
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ]
                 ],
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -22334,14 +41374,14 @@
             ],
             "sigroutes": [
                 true,
-                true,
+                false,
                 false,
                 false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -22352,7 +41392,1687 @@
                 0,
                 false
             ],
-            "tags": "signal38",
+            "tags": "signal112",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "c84fdd70-6b5b-4dc1-af5c-b0876b157953": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19316,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 123,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1525.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal123",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "ca58890f-edf1-43a0-894b-da81586d7064": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18671,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 68,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 300.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal68",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "ca7f2c58-6743-4a01-a76f-da87413b7929": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 22055,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 160,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 275.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal160",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "ca8c5dec-70eb-4b60-a0c9-317fda401c07": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 23849,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 31,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 575.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal31",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "cb40f0b0-bda0-4533-bb68-05f13f7d2830": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 21801,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 155,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 500.0,
+            "posy": 775.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal155",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "cd312376-7783-4560-b8b5-c47a7ad1ec68": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18127,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 4,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 625.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal4",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -22435,7 +43155,7 @@
                 false,
                 ""
             ],
-            "bbox": 15370,
+            "bbox": 16343,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -22496,7 +43216,7 @@
             "itemid": 14,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -22531,8 +43251,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 650.0,
-            "posy": 500.0,
+            "posx": 550.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -22703,7 +43423,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "d49bd71c-fe0b-4be9-84f5-53d34d5fab39": {
+        "d0679783-05f8-4f8a-bfd8-f8d0d783ea9f": {
             "approachcontrol": [
                 0,
                 0,
@@ -22715,7 +43435,907 @@
                 false,
                 ""
             ],
-            "bbox": 15404,
+            "bbox": 16369,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 96,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 125.0,
+            "posy": 75.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal96",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "d1a07120-4ff0-4a13-adfb-123f694ee709": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 26843,
+            "colour": "Black",
+            "endx": 1550.0,
+            "endy": 775.0,
+            "item": "line",
+            "itemid": 16,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 900.0,
+            "posy": 775.0,
+            "selection": "line16selected",
+            "tags": "line16"
+        },
+        "d20b43e0-d1b3-4e9e-ad0c-570b9a2715ee": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 24210,
+            "colour": "Black",
+            "endx": 950.0,
+            "endy": 875.0,
+            "item": "line",
+            "itemid": 11,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 875.0,
+            "selection": "line11selected",
+            "tags": "line11"
+        },
+        "d299cd2c-1f1f-478d-bab4-783e51045587": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 18791,
+            "colour": "Black",
+            "endx": 850.0,
+            "endy": 375.0,
+            "item": "line",
+            "itemid": 5,
+            "linestyle": [],
+            "linewidth": 3,
+            "posx": 50.0,
+            "posy": 375.0,
+            "selection": "line5selected",
+            "tags": "line5"
+        },
+        "d355fd18-7888-4a23-ace2-76a3165179d4": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 26341,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 33,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1200.0,
+            "posy": 650.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal33",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "d3ff1431-5f65-4dc6-ba59-283de78ba4c9": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18643,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 67,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 675.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal67",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "d51503dd-c1ed-4665-84b0-1910c060c65c": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20399,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -22773,7 +44393,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 21,
+            "itemid": 136,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -22811,8 +44431,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1200.0,
-            "posy": 725.0,
+            "posx": 525.0,
+            "posy": 575.0,
             "sigarms": [
                 [
                     [
@@ -22820,6 +44440,34 @@
                         0
                     ],
                     [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
                         false,
                         0
                     ],
@@ -22834,7 +44482,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -22844,35 +44492,7 @@
                 ],
                 [
                     [
-                        true,
-                        0
-                    ],
-                    [
                         false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
                         0
                     ],
                     [
@@ -22894,10 +44514,10 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
@@ -22912,7 +44532,7 @@
                 0,
                 false
             ],
-            "tags": "signal21",
+            "tags": "signal136",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -22995,7 +44615,7 @@
                 false,
                 ""
             ],
-            "bbox": 15432,
+            "bbox": 16431,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23091,8 +44711,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 550.0,
-            "posy": 100.0,
+            "posx": 475.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -23263,6 +44883,286 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "d56cc613-b437-462e-aa9b-d998b7ff59ca": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18613,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 21,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 150.0,
+            "posy": 375.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal21",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "d6ac6bbc-beeb-4f10-b492-04bc0f576a04": {
             "approachcontrol": [
                 0,
@@ -23275,7 +45175,7 @@
                 false,
                 ""
             ],
-            "bbox": 15462,
+            "bbox": 16461,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23371,8 +45271,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 450.0,
-            "posy": 400.0,
+            "posx": 350.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -23543,7 +45443,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "dbe7d833-a653-4612-af88-5e2d1d2bf94f": {
+        "d8ee1299-5595-4600-9da2-8351fffbc70b": {
             "approachcontrol": [
                 0,
                 0,
@@ -23555,7 +45455,7 @@
                 false,
                 ""
             ],
-            "bbox": 15489,
+            "bbox": 18587,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23613,7 +45513,7 @@
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 20,
+            "itemid": 18,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -23651,8 +45551,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 125.0,
-            "posy": 575.0,
+            "posx": 400.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -23660,7 +45560,287 @@
                         0
                     ],
                     [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
                         true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal18",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "da7f4775-0b21-495b-b618-272420c5c822": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 25895,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 17,
+            "itemsubtype": 1,
+            "itemtype": 4,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 975.0,
+            "posy": 550.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ],
                     [
@@ -23741,7 +45921,567 @@
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal17",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "da82213d-9575-487b-93d5-a813193481a4": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 17302,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 114,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
                 true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 125.0,
+            "posy": 175.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal114",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "e0914807-2bee-4509-85cf-d5342c1668ce": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 23696,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 20,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 725.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
                 false,
                 false,
                 false,
@@ -23823,7 +46563,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "df25f98a-e896-42cd-a6ff-28fad36da233": {
+        "e4d9709b-dc3c-4ad8-a7ce-6fa4513eca87": {
             "approachcontrol": [
                 0,
                 0,
@@ -23835,7 +46575,7 @@
                 false,
                 ""
             ],
-            "bbox": 15519,
+            "bbox": 22157,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23888,292 +46628,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 3,
-            "itemsubtype": 2,
-            "itemtype": 3,
-            "orientation": 180,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                ""
-            ],
-            "pointinterlock": [
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ],
-                [
-                    [],
-                    "",
-                    0
-                ]
-            ],
-            "postcolour": "White",
-            "posx": 425.0,
-            "posy": 425.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "sigroutes": [
-                true,
-                true,
-                true,
-                false,
-                false
-            ],
-            "slotwith": 0,
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0,
-                false
-            ],
-            "tags": "signal3",
-            "textcolourtype": 1,
-            "textfonttuple": [
-                "Courier",
-                8,
-                ""
-            ],
-            "theatreroute": false,
-            "theatresubsidary": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ],
-                    [
-                        0
-                    ]
-                ]
-            ],
-            "xbuttonoffset": 0,
-            "ybuttonoffset": 0
-        },
-        "e03b81bf-aa91-4cc1-a49f-704997db259f": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 15550,
-            "buttoncolour": "Grey85",
-            "dccaspects": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ],
-                [
-                    "",
-                    []
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "flipped": false,
-            "fullyautomatic": false,
-            "hidebuttons": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 90,
+            "itemid": 162,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -24211,8 +46671,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 800.0,
-            "posy": 875.0,
+            "posx": 775.0,
+            "posy": 775.0,
             "sigarms": [
                 [
                     [
@@ -24224,6 +46684,34 @@
                         0
                     ],
                     [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
                         false,
                         0
                     ]
@@ -24238,35 +46726,7 @@
                         0
                     ],
                     [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
                         true,
-                        0
-                    ],
-                    [
-                        false,
                         0
                     ]
                 ],
@@ -24312,7 +46772,7 @@
                 0,
                 false
             ],
-            "tags": "signal90",
+            "tags": "signal162",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -24395,7 +46855,7 @@
                 false,
                 ""
             ],
-            "bbox": 15601,
+            "bbox": 16600,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -24456,7 +46916,7 @@
             "itemid": 30,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -24491,8 +46951,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 300.0,
-            "posy": 500.0,
+            "posx": 250.0,
+            "posy": 875.0,
             "sigarms": [
                 [
                     [
@@ -24663,7 +47123,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "e5910411-443c-4b04-9a4a-aebf44349b61": {
+        "e67c5564-7e53-4eb3-a247-25d8e32a38ab": {
             "approachcontrol": [
                 0,
                 0,
@@ -24675,7 +47135,7 @@
                 false,
                 ""
             ],
-            "bbox": 15632,
+            "bbox": 19555,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -24728,12 +47188,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 5,
+            "itemid": 128,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -24771,8 +47231,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 975.0,
-            "posy": 575.0,
+            "posx": 1150.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -24780,6 +47240,300 @@
                         0
                     ],
                     [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal128",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "e91623b3-fad3-4f73-ab51-872867ab032b": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 27415,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 180,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1475.0,
+            "posy": 875.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
                         true,
                         0
                     ],
@@ -24790,20 +47544,6 @@
                 ],
                 [
                     [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
                         false,
                         0
                     ],
@@ -24818,11 +47558,11 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
@@ -24854,17 +47594,17 @@
             ],
             "sigroutes": [
                 true,
-                true,
                 false,
-                true,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
-                true,
                 false,
-                true,
+                false,
+                false,
+                false,
                 false
             ],
             "subsidary": [
@@ -24872,7 +47612,7 @@
                 0,
                 false
             ],
-            "tags": "signal5",
+            "tags": "signal180",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -24955,7 +47695,7 @@
                 false,
                 ""
             ],
-            "bbox": 15662,
+            "bbox": 16661,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25051,8 +47791,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 700.0,
-            "posy": 100.0,
+            "posx": 600.0,
+            "posy": 75.0,
             "sigarms": [
                 [
                     [
@@ -25223,6 +47963,1406 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
+        "ec5004d8-6fd0-4eb4-b7b1-e45ea4613592": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18243,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 24,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 375.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal24",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "eeb40e9c-4fce-4e2a-991d-db31c6b4cee6": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24390,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 2,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1400.0,
+            "posy": 400.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal2",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": true,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "ef8131fe-b144-442d-bcbc-0b2a699ae482": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 20664,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 145,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 425.0,
+            "posy": 575.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal145",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "f0f74fb9-d4e7-4693-9d53-b9fe003f80b7": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 19157,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": false,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 119,
+            "itemsubtype": 2,
+            "itemtype": 3,
+            "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 1000.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal119",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "f2f2eeff-cf6b-48b3-be49-8549d4f38458": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 24340,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "M",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 1,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 975.0,
+            "posy": 400.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal1",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": true,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
         "f3b75836-88bb-4f1f-ad43-0313eb6617d4": {
             "approachcontrol": [
                 0,
@@ -25235,7 +49375,7 @@
                 false,
                 ""
             ],
-            "bbox": 15688,
+            "bbox": 16687,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25332,7 +49472,7 @@
             ],
             "postcolour": "White",
             "posx": 100.0,
-            "posy": 400.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -25503,7 +49643,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "f3ce3c58-0f88-48c8-b468-a4661df497ba": {
+        "f827c619-c57e-4da7-8541-3deb765d8ef2": {
             "approachcontrol": [
                 0,
                 0,
@@ -25515,7 +49655,7 @@
                 false,
                 ""
             ],
-            "bbox": 15696,
+            "bbox": 25949,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25568,12 +49708,12 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 33,
+            "itemid": 166,
             "itemsubtype": 2,
             "itemtype": 4,
             "orientation": 180,
@@ -25611,8 +49751,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1325.0,
-            "posy": 225.0,
+            "posx": 1175.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
@@ -25712,7 +49852,7 @@
                 0,
                 false
             ],
-            "tags": "signal33",
+            "tags": "signal166",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -25783,7 +49923,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "f4cd000b-1e01-4eb1-9302-10029b4c749e": {
+        "fb6dc929-ef72-4951-ad44-d7345ae8082b": {
             "approachcontrol": [
                 0,
                 0,
@@ -25795,7 +49935,7 @@
                 false,
                 ""
             ],
-            "bbox": 15731,
+            "bbox": 20043,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25848,15 +49988,15 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 8,
+            "itemid": 130,
             "itemsubtype": 1,
             "itemtype": 3,
-            "orientation": 180,
+            "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
             "passedsensor": [
@@ -25891,8 +50031,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 1200.0,
-            "posy": 575.0,
+            "posx": 500.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -25910,11 +50050,25 @@
                 ],
                 [
                     [
-                        true,
+                        false,
                         0
                     ],
                     [
-                        true,
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
                         0
                     ],
                     [
@@ -25938,25 +50092,11 @@
                 ],
                 [
                     [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
+                        false,
                         0
                     ],
                     [
                         false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        true,
                         0
                     ],
                     [
@@ -25974,25 +50114,25 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
-                true,
-                true,
-                true,
-                true,
-                true
+                false,
+                false,
+                false,
+                false,
+                false
             ],
             "subsidary": [
                 false,
                 0,
                 false
             ],
-            "tags": "signal8",
+            "tags": "signal130",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -26063,7 +50203,7 @@
             "xbuttonoffset": 0,
             "ybuttonoffset": 0
         },
-        "fa9110ee-90c6-4877-9466-7712819b8c05": {
+        "fcd9d4e1-6e8b-4573-b3f6-69908b0e5cf9": {
             "approachcontrol": [
                 0,
                 0,
@@ -26075,7 +50215,7 @@
                 false,
                 ""
             ],
-            "bbox": 15761,
+            "bbox": 17220,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -26128,13 +50268,13 @@
                 false,
                 false
             ],
-            "flipped": false,
+            "flipped": true,
             "fullyautomatic": false,
             "hidebuttons": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 68,
-            "itemsubtype": 1,
+            "itemid": 111,
+            "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 180,
             "overrideahead": false,
@@ -26171,8 +50311,8 @@
                 ]
             ],
             "postcolour": "White",
-            "posx": 475.0,
-            "posy": 725.0,
+            "posx": 750.0,
+            "posy": 175.0,
             "sigarms": [
                 [
                     [
@@ -26204,7 +50344,287 @@
                 ],
                 [
                     [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
                         true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "slotwith": 0,
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0,
+                false
+            ],
+            "tags": "signal111",
+            "textcolourtype": 1,
+            "textfonttuple": [
+                "Courier",
+                8,
+                ""
+            ],
+            "theatreroute": false,
+            "theatresubsidary": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ]
+                ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
+        },
+        "ff558184-2a26-4941-be67-7fc051617178": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 18155,
+            "buttoncolour": "Grey85",
+            "dccaspects": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "flipped": true,
+            "fullyautomatic": false,
+            "hidebuttons": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 6,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ]
+            ],
+            "postcolour": "White",
+            "posx": 250.0,
+            "posy": 275.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
                         0
                     ],
                     [
@@ -26254,8 +50674,8 @@
             ],
             "sigroutes": [
                 true,
-                true,
-                true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -26272,7 +50692,7 @@
                 0,
                 false
             ],
-            "tags": "signal68",
+            "tags": "signal6",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
@@ -26354,11 +50774,11 @@
             "gridcolour": "#999",
             "height": 950,
             "snaptogrid": true,
-            "width": 1475
+            "width": 1600
         },
         "general": {
             "automation": true,
-            "editmode": false,
+            "editmode": true,
             "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/semaphore_signals.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
@@ -26496,7 +50916,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "10": {
             "override": false,
@@ -26509,7 +50929,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1001": {
+        "100": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26531,6 +50951,17 @@
             "sublocked": false,
             "theatretext": ""
         },
+        "1003": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
         "1007": {
             "override": false,
             "releaseonred": false,
@@ -26542,7 +50973,18 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1012": {
+        "101": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1013": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26564,7 +51006,29 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1019": {
+        "1015": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "102": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "1020": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26591,7 +51055,7 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": false,
+            "sigclear": true,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
@@ -26619,7 +51083,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1028": {
+        "1029": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26630,7 +51094,29 @@
             "sublocked": false,
             "theatretext": ""
         },
+        "103": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
         "1030": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1031": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26663,7 +51149,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1038": {
+        "1039": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26674,7 +51160,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1039": {
+        "104": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26696,29 +51182,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1044": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
         "1046": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": ""
-        },
-        "1047": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26741,6 +51205,17 @@
             "theatretext": ""
         },
         "1049": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "105": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26784,6 +51259,17 @@
             "sublocked": false,
             "theatretext": ""
         },
+        "106": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
         "1061": {
             "override": false,
             "releaseonred": false,
@@ -26817,7 +51303,18 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1079": {
+        "107": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "108": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26839,7 +51336,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1081": {
+        "1082": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26850,7 +51347,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "1082": {
+        "109": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26872,6 +51369,369 @@
             "sublocked": false,
             "theatretext": ""
         },
+        "110": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1102": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "111": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "112": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1122": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1124": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1125": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1128": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "113": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "114": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1147": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1148": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1149": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "115": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1150": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1151": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1152": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1153": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1154": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1155": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1156": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1157": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1158": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1159": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "116": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1160": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1161": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1162": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1163": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "1164": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "117": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "118": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "119": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
         "12": {
             "override": false,
             "releaseonred": false,
@@ -26881,6 +51741,116 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
+            "theatretext": "M"
+        },
+        "120": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "121": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "122": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "123": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "124": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "125": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "126": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "127": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "128": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "129": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "13": {
@@ -26892,6 +51862,116 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
+            "theatretext": "M"
+        },
+        "130": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "131": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "132": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "133": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "134": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "135": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "136": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "137": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "138": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "139": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "14": {
@@ -26905,7 +51985,227 @@
             "sublocked": false,
             "theatretext": ""
         },
+        "140": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "141": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "142": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "143": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "144": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "145": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "146": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "147": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "148": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "149": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
         "15": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "150": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "151": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "152": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "153": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "154": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "155": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "156": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "157": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "158": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "159": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26927,7 +52227,7 @@
             "sublocked": false,
             "theatretext": ""
         },
-        "17": {
+        "160": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
@@ -26936,7 +52236,227 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "M"
+            "theatretext": ""
+        },
+        "161": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "162": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "163": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "164": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "165": {
+            "override": false,
+            "releaseonred": null,
+            "releaseonyel": null,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": null
+        },
+        "166": {
+            "override": false,
+            "releaseonred": null,
+            "releaseonyel": null,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": null
+        },
+        "167": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "168": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "169": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "17": {
+            "override": false,
+            "releaseonred": null,
+            "releaseonyel": null,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": null
+        },
+        "170": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "171": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "172": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "173": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "174": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "175": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "176": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "177": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "178": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
+        },
+        "179": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
+            "theatretext": ""
         },
         "18": {
             "override": false,
@@ -26947,6 +52467,17 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
+            "theatretext": ""
+        },
+        "180": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "19": {
@@ -26969,7 +52500,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "20": {
             "override": false,
@@ -26979,7 +52510,7 @@
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "21": {
@@ -27034,7 +52565,7 @@
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "26": {
@@ -27050,14 +52581,14 @@
         },
         "27": {
             "override": false,
-            "releaseonred": null,
-            "releaseonyel": null,
+            "releaseonred": false,
+            "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
-            "theatretext": null
+            "sublocked": true,
+            "theatretext": ""
         },
         "28": {
             "override": false,
@@ -27078,7 +52609,7 @@
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "3": {
@@ -27111,7 +52642,7 @@
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "32": {
@@ -27122,19 +52653,19 @@
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "33": {
             "override": false,
-            "releaseonred": null,
-            "releaseonyel": null,
+            "releaseonred": false,
+            "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
-            "sublocked": false,
-            "theatretext": null
+            "sublocked": true,
+            "theatretext": ""
         },
         "34": {
             "override": false,
@@ -27189,7 +52720,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "39": {
             "override": false,
@@ -27255,7 +52786,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "44": {
             "override": false,
@@ -27266,7 +52797,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "45": {
             "override": false,
@@ -27288,7 +52819,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "47": {
             "override": false,
@@ -27299,7 +52830,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "48": {
             "override": false,
@@ -27310,7 +52841,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "49": {
             "override": false,
@@ -27332,7 +52863,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "50": {
             "override": false,
@@ -27574,7 +53105,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "70": {
             "override": false,
@@ -27655,14 +53186,14 @@
         },
         "77": {
             "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
+            "releaseonred": null,
+            "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "M"
+            "theatretext": null
         },
         "78": {
             "override": false,
@@ -27677,14 +53208,14 @@
         },
         "79": {
             "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
+            "releaseonred": null,
+            "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "M"
+            "theatretext": null
         },
         "8": {
             "override": false,
@@ -27710,14 +53241,14 @@
         },
         "81": {
             "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
+            "releaseonred": null,
+            "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "M"
+            "theatretext": null
         },
         "82": {
             "override": false,
@@ -27871,6 +53402,61 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": true,
+            "theatretext": ""
+        },
+        "95": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "96": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "97": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": true,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "98": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": ""
+        },
+        "99": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
             "theatretext": ""
         }
     }
