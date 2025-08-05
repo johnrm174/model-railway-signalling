@@ -1044,6 +1044,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     # Define the Object Popup menu for Right Click (something selected)
     popup1 = Tk.Menu(tearoff=0)
     popup1.add_command(label="Edit", command=edit_selected_object)
+    popup1.add_command(label="Flip", command=flip_selected_objects)
     popup1.add_command(label="Rotate", command=rotate_selected_objects)
     popup1.add_command(label="Delete", command=delete_selected_objects)
     popup1.add_command(label="Snap to Grid", command=snap_selected_objects_to_grid)
