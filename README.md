@@ -52,12 +52,12 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.x.x:
+## What's new for Release 5.3.0:
 
 > [!IMPORTANT]
-> Release 5.x.x will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.3.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.3.0.
 > You have been warned!
 
 * The next signal can now be specified as a "STOP" for any route ahead (signal interlocking tab):
