@@ -165,11 +165,9 @@ If required, the logging level can be specified at startup (ERROR, WARNING, INFO
 $ python -m model_railway_signals -f layout_file.sig -l DEBUG
 </pre>
 
-Application documentation, can be found in the 'user_guide' folder: 
-[https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide](https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide)
+Full documentation is packaged with the application (access by selecting Help => Docs from the main menubar).
 
-Some example layout configuration files can be found in the 'configuration_examples' folder:
-[https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)
+A number of example layout configuration files are also packaged with the application (access by selecting File => Examples from the main menubar)
 
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
