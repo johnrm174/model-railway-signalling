@@ -52,30 +52,27 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.2.0:
+## What's new for Release 5.3.0:
 
 > [!IMPORTANT]
-> Release 5.2.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.3.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.2.0.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.3.0.
 > You have been warned!
 
-* New Features to enable more prototypical signal box diagrams/simulations to be created:
-    * Ability to interlock points with occupied Track Sections (representing Track Circuits).
-    * Ability to 'slot' ground signals with co-located main signals (as per the real thing).
-    * Signals can now be created with or without the 'signal passed' and 'approached' buttons.
-    * The entire point is highlighted when 'track circuits' are occupied (more prototypical).
-    * You can now specify/change the colour of Signal Posts (individually or globally).
-* Improved DCC interface - Ensures the layout is always updated to reflect the schematic:
-    * Before - DCC commands for events prior to DCC Power being enabled would be dropped.
-    * After - DCC commands are now 'queued' and will be sent out when DCC Power is enabled.
-* Improved Networking - Maintains synchronisation of DCC Command feeds across nodes:
-    * Before - DCC commands for events prior to broker-connect would not be published.
-    * After - DCC commands are now 'queued' and will be published on broker connect.
-* New Application upgrade utility (to make future upgrdes easier for the user).
-* Improved validation for Timed Signal Sequences (can only select main signal types).
-* Bugfix - Changes to MQTT connect and disconnect to address resiliance issues on layout load.
-* Bugfix - To how signal state is reported for semaphore signals with secondary distant arms.
+* The next signal can now be specified as a "STOP" for any route ahead (signal interlocking tab):
+    * This supports the case of signals controlling routes into 'dead ends' such as bay platforms.
+    * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
+* Theatre route indications can now be used with the subsidary signal (as well as the main signal).
+* Signals can now be 'flipped' around their horizontal axis (move to the other side of the track).
+* New 'f' shortcut key to 'flip' selected signals/points around their horizontal axis (edit-mode).
+* New tooltips for points, signals and levers in edit/run modes to report the interlocking state.
+* Added display of hostname on MQTT status tab (MQTT heartbeat messages) to ease configuration.
+* Added ability to 'reverse' the DCC command logic for subsidary aspects of colour light signals.
+* Bugfix for route highlighting through points (Y Points, single slips and double slips).
+* Bugfix for DCC control of shunt agead ground position signals (commands were not being sent out).
+* Bugfix for MQTT heartbeats (broker disconnect/reconnect would stop messages being sent out).
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
@@ -168,11 +165,9 @@ If required, the logging level can be specified at startup (ERROR, WARNING, INFO
 $ python -m model_railway_signals -f layout_file.sig -l DEBUG
 </pre>
 
-Application documentation, can be found in the 'user_guide' folder: 
-[https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide](https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide)
+Full documentation is packaged with the application (access by selecting Help => Docs from the main menubar).
 
-Some example layout configuration files can be found in the 'configuration_examples' folder:
-[https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)
+A number of example layout configuration files are also packaged with the application (access by selecting File => Examples from the main menubar)
 
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)

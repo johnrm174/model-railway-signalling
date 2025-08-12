@@ -94,6 +94,7 @@ default_signal_object["buttoncolour"] = settings.get_style("signals", "buttoncol
 default_signal_object["textcolourtype"] = settings.get_style("signals", "textcolourtype")
 default_signal_object["textfonttuple"] = settings.get_style("signals", "textfonttuple")
 default_signal_object["orientation"] = 0 
+default_signal_object["flipped"] = False
 default_signal_object["xbuttonoffset"] = 0
 default_signal_object["ybuttonoffset"] = 0
 default_signal_object["hidebuttons"] = False
@@ -105,6 +106,7 @@ default_signal_object["subroutes"] = [False,False,False,False,False]
 # General Configuration - parameters specific to semaphore AND colour light signals
 #------------------------------------------------------------------------------------
 default_signal_object["theatreroute"] = False
+default_signal_object["theatresubsidary"] = False
 # The 'dcctheatre' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,RH1,RH2]
 # Note that 'DARK' is a dummy signal_route to inhibit all route indications ('#')
 # Each 'signal_route' element comprises: [character_to_ display, dcc_command_sequence]
@@ -117,8 +119,8 @@ default_signal_object["dccautoinhibit"] = False
 #------------------------------------------------------------------------------------
 # General Configuration - parameters specific to colour light signals
 #------------------------------------------------------------------------------------
-# The 'subsidary' element comprises a list: [has_subsidary:bool, dcc_address]
-default_signal_object["subsidary"] = [False, 0]
+# The 'subsidary' element comprises a list: [has_subsidary:bool, dcc_address:int, reversed_logic:bool]
+default_signal_object["subsidary"] = [False, 0, False]
 # The 'feathers' element is a list_of_signal_routes [MAIN,LH1,LH2,RH1,RH2]
 # Each signal_route element is a boolean flag to specify a feather for the route
 default_signal_object["feathers"] = [False,False,False,False,False]
@@ -496,6 +498,8 @@ def redraw_signal_object(object_id):
     if (sig_type == library.signal_type.colour_light or
             sig_type == library.signal_type.ground_position):
         # Create the new DCC Mapping for the Colour Light Signal
+        # Note the 'subsidary' element comprises [has_subsidary:bool, dcc_address:int, reversed_logic:bool]
+        # We only need to pass the dcc_address and reversed_logic flag in to create the mapping
         library.map_dcc_signal (objects_common.schematic_objects[object_id]["itemid"],
                     auto_route_inhibit = objects_common.schematic_objects[object_id]["dccautoinhibit"],
                     proceed = objects_common.schematic_objects[object_id]["dccaspects"][0],
@@ -510,7 +514,7 @@ def redraw_signal_object(object_id):
                     LH2 = objects_common.schematic_objects[object_id]["dccfeathers"][3],
                     RH1 = objects_common.schematic_objects[object_id]["dccfeathers"][4],
                     RH2 = objects_common.schematic_objects[object_id]["dccfeathers"][5],
-                    subsidary = objects_common.schematic_objects[object_id]["subsidary"][1],
+                    subsidary = objects_common.schematic_objects[object_id]["subsidary"][1:3],
                     THEATRE = objects_common.schematic_objects[object_id]["dcctheatre"] )
     elif (sig_type == library.signal_type.semaphore or
               sig_type == library.signal_type.ground_disc):
@@ -553,6 +557,7 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     has_subsidary = objects_common.schematic_objects[object_id]["subsidary"][0],
@@ -562,6 +567,7 @@ def redraw_signal_object(object_id):
                     rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][3],
                     rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
+                    theatre_route_subsidary = objects_common.schematic_objects[object_id]["theatresubsidary"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
@@ -595,6 +601,7 @@ def redraw_signal_object(object_id):
                     sig_passed_callback = run_layout.signal_passed_callback,
                     sig_updated_callback = run_layout.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     main_signal = True,
@@ -608,6 +615,7 @@ def redraw_signal_object(object_id):
                     rh1_subsidary = objects_common.schematic_objects[object_id]["sigarms"][3][1][0],
                     rh2_subsidary = objects_common.schematic_objects[object_id]["sigarms"][4][1][0],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
+                    theatre_route_subsidary = objects_common.schematic_objects[object_id]["theatresubsidary"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
@@ -636,6 +644,7 @@ def redraw_signal_object(object_id):
                     associated_home = objects_common.schematic_objects[object_id]["itemid"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][2][0],
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][2][0],
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][2][0],
@@ -664,6 +673,7 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     slot_with = objects_common.schematic_objects[object_id]["slotwith"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
@@ -688,6 +698,7 @@ def redraw_signal_object(object_id):
                     sig_switched_callback = run_layout.signal_switched_callback,
                     sig_passed_callback = run_layout.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
+                    flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     slot_with = objects_common.schematic_objects[object_id]["slotwith"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
@@ -777,8 +788,9 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
     for index1,signal_route in enumerate(objects_common.schematic_objects[new_object_id]["sigarms"]):
         for index2,signal_arm in enumerate(signal_route):
             objects_common.schematic_objects[new_object_id]["sigarms"][index1][index2][1] = 0
-    # The DCC Address for the subsidary signal
+    # The DCC Address and reversed command logic flag for the subsidary signal
     objects_common.schematic_objects[new_object_id]["subsidary"][1] = 0
+    objects_common.schematic_objects[new_object_id]["subsidary"][2] = False
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create/draw the new object on the canvas

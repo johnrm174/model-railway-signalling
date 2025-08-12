@@ -60,7 +60,7 @@
 #
 #   update_autoswitch(point_id:int, autoswitch_id:int) - To update the 'autoswitch' reference
 #
-#   lock_point(point_id:int) - use for point/signal interlocking
+#   lock_point(point_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
 # 
 #   unlock_point(point_id:int) - use for point/signal interlocking
 #
@@ -96,6 +96,8 @@ import tkinter as Tk
 from . import dcc_control
 from . import common
 from . import file_interface
+
+from ..common import CreateToolTip
 
 # -------------------------------------------------------------------------
 # Public API classes (to be used by external functions)
@@ -193,12 +195,16 @@ def toggle_fpl(point_id:int):
             logging.info("Point "+str(point_id)+": Activating FPL")
             points[str(point_id)]["changebutton"].config(state="disabled") 
             points[str(point_id)]["lockbutton"].config(relief="sunken",bg=points[str(point_id)]["selectedcolour"])
-            points[str(point_id)]["fpllock"] = True 
+            points[str(point_id)]["fpllock"] = True
+            # Set the tooltip for the CHANGE button to reflect the FPL is active
+            points[str(point_id)]["tooltip1"].text = "FPL is active"
         else:
             logging.info("Point "+str(point_id)+": Clearing FPL")
             points[str(point_id)]["changebutton"].config(state="normal")  
             points[str(point_id)]["lockbutton"].config(relief="raised",bg=points[str(point_id)]["deselectedcolour"])
             points[str(point_id)]["fpllock"] = False
+            # Set the tooltip for the CHANGE button to reflect the point is unlocked
+            points[str(point_id)]["tooltip1"].text = "Unlocked"
     return()
 
 # -------------------------------------------------------------------------
@@ -371,11 +377,21 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                             highlightthickness=0, padx=2, pady=0, background=selected_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:fpl_button_event(point_id))
+        # Create and store the default tool-tips for the buttons
+        point_button_tooltip = CreateToolTip(point_button)
+        point_button_tooltip.waittime = 200     # miliseconds
+        point_button_tooltip.wraplength = 400   # pixels
+        point_button_tooltip.text = "Unlocked"
+        fpl_button_tooltip = CreateToolTip(fpl_button)
+        fpl_button_tooltip.waittime = 200     # miliseconds
+        fpl_button_tooltip.wraplength = 400   # pixels
+        fpl_button_tooltip.text = "Unlocked"
         # Create the Tkinter drawing objects (lines) for each point/ We use tkinter 'tags' to uniquely identify
         # each point's 'blades' and route lines so these can easily be hidden/displayed/highlighted as required
         # 'route1' is the tag for route lines through the point when the point is in its unswitched configuration
         # 'route2' is the tag for route lines through the point when the point is in its switched configuration
-        # Single slips can form a crossover so we also use 'route3' for the 'crossing' route ('route1' is the 'straight' route
+        # 'route0' is the tag for route lines through the point when the point is either switched or unswitched
+        route0_tag = canvas_tag+"route0"
         blade1_tag, blade2_tag = canvas_tag+"blade1", canvas_tag+"blade2"
         route1_tag, route2_tag = canvas_tag+"route1", canvas_tag+"route2"
         # How the tags actually get applied to the point drawing objects will depend on whether the point is reversed or not
@@ -435,8 +451,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         # Y Point (the point subtype is ignored)
         elif pointtype==point_type.Y:
             # Create the line objects to represent the point
+            # Note that we use the 'route0' tag for the 'root' of the point so it will be highlighted for either route
             line_coords = common.rotate_line(x,y,-25,0,0,0,orientation)
-            canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## 'Root' route line (switched or unswitched)
+            canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## 'Root' route line (switched or unswitched)
             line_coords = common.rotate_line(x,y,0,0,+10,-10,orientation) 
             canvas.create_line(line_coords, tags=(canvas_tag, blade1))  ## 'Unswitched' blade
             line_coords = common.rotate_line(x,y,0,0,+10,+10,orientation)
@@ -451,6 +468,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                     switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation != 180))
         # Parts 1 and 2 of a Single Slip or Double Slip - Left Hand
         elif pointtype == point_type.LH and pointsubtype in (point_subtype.sslip1, point_subtype.dslip1, point_subtype.sslip2, point_subtype.dslip2):
+            # Note that we use the 'route0' tag for the parts of the point applicable to either route - at the moment
+            # most of the sslip/dslip point lines are tagged this way until I find a better way of highlighting routes
+            # through both 'halves' of the sslip/dslip (each will need knowledge of the switched state of the other)
             # If the point is part 2 of a single slip them we reverse the blades to give a 'crossover'
             # This is more sensible for the default (unswitched) configuration of the double slip)
             if pointsubtype == point_subtype.sslip2: blade1, blade2 = blade2, blade1
@@ -458,9 +478,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             if pointsubtype in (point_subtype.sslip2, point_subtype.dslip2): orientation = orientation + 180
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,0,0,+7,0,orientation)
-            canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 1 (straight)
+            canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 1 (straight)
             line_coords = common.rotate_line(x,y,0,+25,+12,+13,orientation)
-            canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 2 (crossing)
+            canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 2 (crossing)
             # Only create the blades for the straight route (and switched route line) if its a double slip or part 1 of a single slip
             if pointsubtype in (point_subtype.dslip1, point_subtype.dslip2, point_subtype.sslip1):
                 line_coords = common.rotate_line(x,y,+7,0,+29,0,orientation)
@@ -468,10 +488,10 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,+7,0,+20,-5,orientation)
                 canvas.create_line(line_coords, tags=(canvas_tag, blade2))  ## 'switched' blade (straight route)
                 line_coords = common.rotate_line(x,y,+20,-5,+25,-7,orientation)
-                canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Switched Route line
+                canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Switched Route line
             else:
                 line_coords = common.rotate_line(x,y,+7,0,+29,0,orientation)
-                canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 1 (straight)
+                canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 1 (straight)
             # Only create the blades for the crossing route if its a double slip or part 2 of a single slip
             if pointsubtype in (point_subtype.dslip1, point_subtype.dslip2, point_subtype.sslip2):
                 line_coords = common.rotate_line(x,y,+12,+13,+28,-3,orientation)
@@ -480,18 +500,16 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 canvas.create_line(line_coords, tags=(canvas_tag, blade1))  ## 'unswitched' blade (crossing route)
             else:
                 line_coords = common.rotate_line(x,y,+12,+13,+28,-3,orientation)
-                canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 2 (crossing)
+                canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 2 (crossing)
             # Work out the offsets of the buttons and create them (in windows)
             point_coords = common.rotate_point (x, y, button_xoffset - 10, button_yoffset - 5, orientation)
             point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
                     switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation != 180))
-        # Note that we use apply both the 'route1' and 'route2' tags to all sslip and dslip route lines so the whole point will be
-        # highlighted (for a route) rather than just the selected route through the point. This is because the route we ideally need
-        # to highlight will also depend on the state of the other 'half' of the sslip or dslip point (and in the case of single slips
-        # which form a crossover in their default state we don't know which route through the point is the active one to highlight).
-        # This limitation will hopefully be addressed in a future release once I've figured out the best way of doing it.
         # Parts 1 and 2 of a Single Slip or Double Slip - Right Hand
         elif pointtype == point_type.RH and pointsubtype in (point_subtype.sslip1, point_subtype.dslip1, point_subtype.sslip2, point_subtype.dslip2):
+            # Note that we use the 'route0' tag for the parts of the point applicable to either route - at the moment
+            # most of the sslip/dslip point lines are tagged this way until I find a better way of highlighting routes
+            # through both 'halves' of the sslip/dslip (each will need knowledge of the switched state of the other)
             # If the point is part 2 of a single slip them we reverse the blades to give a 'crossover'
             # This is more sensible for the default (unswitched) configuration of the double slip)
             if pointsubtype == point_subtype.sslip2: blade1, blade2 = blade2, blade1
@@ -499,9 +517,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             if pointsubtype in (point_subtype.sslip2, point_subtype.dslip2): orientation = orientation + 180
             # If its the second half of a double slip or single slip we rotate the point elements by 180 degrees
             line_coords = common.rotate_line(x,y,0,0,+7,0,orientation)
-            canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 1 (straight)
+            canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 1 (straight)
             line_coords = common.rotate_line(x,y,0,-25,+12,-13,orientation)
-            canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 2 (crossing)
+            canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 2 (crossing)
             # Only create the blades for the straight route (and switched route line) if its a double slip or part 1 of a single slip
             if pointsubtype in (point_subtype.dslip1, point_subtype.dslip2, point_subtype.sslip1):
                 line_coords = common.rotate_line(x,y,+7,0,+29,0,orientation)
@@ -509,10 +527,10 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,+7,0,+20,+5,orientation)
                 canvas.create_line(line_coords, tags=(canvas_tag, blade2))  ## 'switched' blade (straight route)
                 line_coords = common.rotate_line(x,y,+20,+5,+25,+7,orientation)
-                canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Switched Route line
+                canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Switched Route line
             else:
                 line_coords = common.rotate_line(x,y,+7,0,+29,0,orientation)
-                canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 1 (straight)
+                canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 1 (straight)
             # Only create the blades for the crossing route if its a double slip or part 2 of a single slip
             if pointsubtype in (point_subtype.dslip1, point_subtype.dslip2, point_subtype.sslip2):
                 line_coords = common.rotate_line(x,y,+12,-13,+28,+3,orientation)
@@ -521,7 +539,7 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 canvas.create_line(line_coords, tags=(canvas_tag, blade1))  ## 'unswitched' blade (crossing route)
             else:
                 line_coords = common.rotate_line(x,y,+12,-13,+28,+3,orientation)
-                canvas.create_line(line_coords, tags=(canvas_tag, route1, route2))  ## Main Route line 2 (crossing)
+                canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 2 (crossing)
             # Work out the offsets of the buttons and create them (in windows)
             point_coords = common.rotate_point (x, y, button_xoffset - 10, button_yoffset + 5, orientation)
             point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
@@ -534,25 +552,32 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             if point_button_window is not None: canvas.itemconfig(point_button_window, state="normal")
             if fpl_button_window is not None: canvas.itemconfig(fpl_button_window, state="normal")
         # Apply the line styles (solid or dashed)
+        canvas.itemconfig(route0_tag, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(blade1_tag, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(blade2_tag, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(route1_tag, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(route2_tag, fill=colour, width=line_width, dash=tuple(line_style))
         # Disable the change button if the point has FPL (default state = FPL active)
-        if fpl: point_button.config(state="disabled")
-        # Hide the line for the switched route (display it later when we need it)
+        # The tooltip for the (disabled) CHANGE button will reflect that the FPL is active
+        if fpl:
+            point_button.config(state="disabled")
+            point_button_tooltip.text="FPL is active"
+        # Hide the blade line for the switched route (display it later when we need it)
         canvas.itemconfig(blade2_tag, state="hidden")
         # Compile a dictionary of everything we need to track
         points[str(point_id)] = {}
         points[str(point_id)]["canvas"] = canvas                   # Tkinter canvas object
         points[str(point_id)]["blade1"] = blade1_tag               # Tkinter tag for blade1 (Normal)
         points[str(point_id)]["blade2"] = blade2_tag               # Tkinter tag for blade2 (switched)
-        points[str(point_id)]["route1"] = route1_tag               # Tkinter tag for "normal" route lines
+        points[str(point_id)]["route0"] = route0_tag               # Tkinter tag for "common" route lines
+        points[str(point_id)]["route1"] = route1_tag               # Tkinter tag for "unswitched" route lines
         points[str(point_id)]["route2"] = route2_tag               # Tkinter tag for "switched" route lines
         points[str(point_id)]["window1"] = point_button_window     # Tkinter tag for the point button window
         points[str(point_id)]["window2"] = fpl_button_window       # Tkinter tag for the FPL button window
         points[str(point_id)]["changebutton"] = point_button       # Tkinter button object
         points[str(point_id)]["lockbutton"] = fpl_button           # Tkinter button object
+        points[str(point_id)]["tooltip1"] = point_button_tooltip   # Tooltip object
+        points[str(point_id)]["tooltip2"] = fpl_button_tooltip     # Tooltip object
         points[str(point_id)]["fplcallback"] = fpl_callback        # The callback to make on an event
         points[str(point_id)]["pointcallback"] = point_callback    # The callback to make on an event
         points[str(point_id)]["alsoswitch"] = also_switch          # Point to automatically switch (0=none)
@@ -562,10 +587,10 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         points[str(point_id)]["fpllock"] = fpl                     # Initial state of the FPL (locked if it has FPL)
         points[str(point_id)]["locked"] = False                    # Initial "interlocking" state of the point
         points[str(point_id)]["switched"] = False                  # Initial "switched" state of the point
-        points[str(point_id)]["defaultcolour"] = colour            # the default point colour (all routes/blades)
-        points[str(point_id)]["overridecolour"] = colour           # the overridden point colour (all routes/blades)
-        points[str(point_id)]["currentcolour1"] = colour           # the current point colour (route/blade 1)
-        points[str(point_id)]["currentcolour2"] = colour           # the current point colour (route/blade 2)
+        points[str(point_id)]["defaultcolour"] = colour            # the default point colour (all route lines/blades)
+        points[str(point_id)]["currentcolour0"] = colour           # the current point colour (common route lines)
+        points[str(point_id)]["currentcolour1"] = colour           # the current point colour (route line/blade 1)
+        points[str(point_id)]["currentcolour2"] = colour           # the current point colour (route line/blade 2)
         points[str(point_id)]["colouroverride"] = False            # Whether the colour is overridden or not
         points[str(point_id)]["selectedcolour"] = selected_colour  # the default colour for the point buttons
         points[str(point_id)]["deselectedcolour"] = button_colour  # the default colour for the point buttons
@@ -610,6 +635,7 @@ def update_point_styles(point_id:int, colour:str="Black", line_width:int=3, line
         logging.error("Point "+str(point_id)+": update_point_styles - Point ID does not exist")
     else:
         logging.debug("Point "+str(point_id)+": Updating Line Styles")
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route0"], width=line_width, dash=tuple(line_style))
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"], width=line_width, dash=tuple(line_style))
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"], width=line_width, dash=tuple(line_style))
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"], width=line_width, dash=tuple(line_style))
@@ -664,6 +690,7 @@ def set_point_colour(point_id:int, colour:str):
         logging.error("Point "+str(point_id)+": set_point_colour - Point ID does not exist")
     else:
         # Store the current colours (depending on how the point is switched)
+        points[str(point_id)]["currentcolour0"] = colour
         if points[str(point_id)]["switched"]:
             points[str(point_id)]["currentcolour1"] = points[str(point_id)]["defaultcolour"]
             points[str(point_id)]["currentcolour2"] = colour
@@ -672,8 +699,10 @@ def set_point_colour(point_id:int, colour:str):
             points[str(point_id)]["currentcolour2"] = points[str(point_id)]["defaultcolour"]
         # Apply the highlighting (unless the colour is overridden):
         if not points[str(point_id)]["colouroverride"]:
+            current_colour0 = points[str(point_id)]["currentcolour0"]
             current_colour1 = points[str(point_id)]["currentcolour1"]
             current_colour2 = points[str(point_id)]["currentcolour2"]
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route0"],fill=current_colour0)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=current_colour2)
@@ -695,10 +724,12 @@ def reset_point_colour(point_id:int):
     else:
         if not points[str(point_id)]["colouroverride"]:
             default_colour = points[str(point_id)]["defaultcolour"]
+            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route0"],fill=default_colour)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=default_colour)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=default_colour)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=default_colour)
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=default_colour)
+        points[str(point_id)]["currentcolour0"] = points[str(point_id)]["defaultcolour"]
         points[str(point_id)]["currentcolour1"] = points[str(point_id)]["defaultcolour"]
         points[str(point_id)]["currentcolour2"] = points[str(point_id)]["defaultcolour"]
     return()
@@ -715,13 +746,13 @@ def set_point_colour_override(point_id:int, colour:str):
         logging.error("Point "+str(point_id)+": set_point_colour_override - Point ID does not exist")
     else:
         # Apply the highlighting to all elements - This is the case of a track circuit being
-        # active, which in real life would be the whole point (not just the point route selected
+        # active, which in real life would be the whole point (not just the point route selected)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route0"],fill=colour)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=colour)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=colour)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route2"],fill=colour)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=colour)
         # Store the parameters we need to track
-        points[str(point_id)]["overridecolour"] = colour
         points[str(point_id)]["colouroverride"] = True
     return()
 
@@ -737,8 +768,10 @@ def reset_point_colour_override(point_id:int):
         logging.error("Point "+str(point_id)+": reset_point_colour_override - Point ID does not exist")
     else:
         points[str(point_id)]["colouroverride"] = False
+        current_colour0 = points[str(point_id)]["currentcolour0"]
         current_colour1 = points[str(point_id)]["currentcolour1"]
         current_colour2 = points[str(point_id)]["currentcolour2"]
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route0"],fill=current_colour0)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=current_colour1)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["route1"],fill=current_colour1)
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=current_colour2)
@@ -749,22 +782,26 @@ def reset_point_colour_override(point_id:int):
 # Public API function to Lock a points (Warning generated if APL and not FPL active)
 # -------------------------------------------------------------------------
 
-def lock_point(point_id:int):
+def lock_point(point_id:int, tooltip:str="Locked"):
     global points 
     if not isinstance(point_id, int):
         logging.error("Point "+str(point_id)+": lock_point - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": lock_point - Point ID does not exist")
-    elif not points[str(point_id)]["locked"]:
-        logging.info ("Point "+str(point_id)+": Locking point")
+    else:
+        # Only generate a log message if the point is not yet locked
+        if not points[str(point_id)]["locked"]: logging.info ("Point "+str(point_id)+": Locking point")
+        # If the point doesn't have a FPL we just inhibit the change button
+        # The tooltip for the CHANGE button will reflect that the point is LOCKED
         if not points[str(point_id)]["hasfpl"]:
-            # If the point doesn't have a FPL we just inhibit the change button
             points[str(point_id)]["changebutton"].config(state="disabled")
+            points[str(point_id)]["tooltip1"].text = tooltip
+        # If the FPL is not already active then we need to activate it (with a warning)
         elif not points[str(point_id)]["fpllock"]:
-            # If the FPL is not already active then we need to activate it (with a warning)
             logging.warning ("Point "+str(point_id)+": lock_point - Activating FPL before locking")
-            toggle_fpl (point_id)
-        # Now inhibit the FPL button to stop it being manually unlocked
+            toggle_fpl(point_id)
+        # We always inhibit the FPL button object(all points have one even if they are hidden
+        points[str(point_id)]["tooltip2"].text = tooltip
         points[str(point_id)]["lockbutton"].config(state="disabled") 
         points[str(point_id)]["locked"] = True
     return()
@@ -784,9 +821,16 @@ def unlock_point(point_id:int):
         if not points[str(point_id)]["hasfpl"]:
             # If the point doesn't have FPL we need to re-enable the change button
             points[str(point_id)]["changebutton"].config(state="normal")
+            # As there is no FPL the tooltip for the CHANGE button will revert to 'Unlocked'
+            points[str(point_id)]["tooltip1"].text="Unlocked"
         else:
-            # If the point has FPL we just need to re-enable the FPL button
-            points[str(point_id)]["lockbutton"].config(state="normal") 
+            # If the point has FPL we need to re-enable the FPL button
+            points[str(point_id)]["lockbutton"].config(state="normal")
+            # The tooltip for the FPL button will revert to 'Unlocked'
+            points[str(point_id)]["tooltip2"].text="Unlocked"
+            # The tooltip for the CHANGE button will depend on the state of the FPL
+            if points[str(point_id)]["fpllock"]: points[str(point_id)]["tooltip1"].text="FPL is active"
+            else: points[str(point_id)]["tooltip1"].text="Unlocked"
         points[str(point_id)]["locked"] = False
     return()
 

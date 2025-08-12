@@ -41,15 +41,16 @@ Schematic editor functions (Edit Mode):
 6) Double-left-click on a schematic object to open the object configuraton window
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
-9) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
-10) <backspace> will delete all currently selected objects from the schematic
-11) <cntl-c> will copy all currently selected objects (to be moved/placed as required)
-12) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
-13) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
-14) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
-15) <Esc> will deselect all objects (or cancel the move of selected objects)
-16) Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
-17) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+9) <f> will 'flip' all selected point and signal objects around their horizontal axis
+10) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
+11) <backspace> will delete all currently selected objects from the schematic
+12) <cntl-c> will copy all currently selected objects (to be moved/placed as required)
+13) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
+14) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
+15) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
+16) <Esc> will deselect all objects (or cancel the move of selected objects)
+17) Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
+18) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Schematic editor functions (Run Mode):
 

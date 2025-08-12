@@ -112,11 +112,11 @@
 #
 #   set_route(sig_id:int, route, theatre_text) - Set the signal route indication
 #
-#   lock_signal(sig_id:int) - use for point/signal interlocking
+#   lock_signal(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
 #
 #   unlock_signal(sig_id:int) - use for point/signal interlocking
 #
-#   lock_subsidary(sig_id:int) - use for point/signal interlocking
+#   lock_subsidary(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
 #
 #   unlock_subsidary(sig_id:int) - use for point/signal interlocking
 #
@@ -204,6 +204,8 @@ import logging
 import enum
 import tkinter as Tk
 from typing import Union
+
+from ..common import CreateToolTip
 
 # -------------------------------------------------------------------------
 # API Classes to be used externally when creating/updating signals or 
@@ -400,8 +402,8 @@ def reset_sig_released_button(sig_id:int):
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 
-def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int, button_xoffset:int,
-            button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback, sig_passed_callback,
+def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:int, y:int, post_offset:int,
+            button_xoffset:int, button_yoffset:int, hide_buttons:bool, orientation:int, sig_switched_callback, sig_passed_callback,
             sig_updated_callback=None, sub_switched_callback=None, has_subsidary:bool=False, sig_passed_button:bool=False,
             sig_automatic:bool=False, associated_home:int=0, button_colour:str="Grey85", active_colour:str="Grey95",
             selected_colour:str="White", text_colour:str="black", font=("Courier", 8 ,"normal")):
@@ -430,52 +432,56 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
                             highlightthickness=0, padx=2, pady=0, background=button_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:subsidary_button_event(sig_id))
-    # Signal Passed Button - We only want a small button - hence a small font size
+    # Create and store the default tool-tips for the Signal and Subsidary Buttons
+    sig_button_tooltip = CreateToolTip(sig_button)
+    sig_button_tooltip.waittime = 200     # miliseconds
+    sig_button_tooltip.wraplength = 400   # pixels
+    sig_button_tooltip.text = "Unlocked"
+    sub_button_tooltip = CreateToolTip(sub_button)
+    sub_button_tooltip.waittime = 200     # miliseconds
+    sub_button_tooltip.wraplength = 400   # pixels
+    sub_button_tooltip.text = "Unlocked"
+    # Create the Signal Passed Button - We only want a small button - hence a small font size
     passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
                         highlightthickness=0, command=lambda:sig_passed_button_event(sig_id))
+    # Set the anchor point for the buttons according to the position of the signal
+    if orientation != 180 and post_offset < 0:
+        sig_button_anchor=Tk.SE
+        sub_button_anchor=Tk.SW
+    elif orientation != 180 and post_offset >= 0:
+        sig_button_anchor=Tk.NE
+        sub_button_anchor=Tk.NW
+    elif orientation == 180 and post_offset < 0:
+        sig_button_anchor=Tk.NW
+        sub_button_anchor=Tk.NE
+    elif orientation == 180 and post_offset >= 0:
+        sig_button_anchor=Tk.SW
+        sub_button_anchor=Tk.SE
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
-    # created if the signal has a subsidary, but the Button positions are adjusted so they always
+    # created if the signal has a subsidary. The Button positions are adjusted so they always
     # remain in the "right" position relative to the signal. Note we also have to cater for the
     # special case of a semaphore distant signal being created on the same "post" as a home signal.
     # In this case we apply an additional offset to deconflict with the home signal buttons.
-    # Note the code also applies offsets to take into account the default font size in 'common'
+    button_yposition = button_yoffset + (post_offset / 2)
     if associated_home > 0:
         if sig_automatic:
             button_window1 = None
             button_window2 = None
         elif signals[str(associated_home)]["hassubsidary"]:
-            if orientation == 180:
-                anchor=Tk.NW
-            else:
-                anchor=Tk.SE
-            button_position = common.rotate_point(x, y, button_xoffset - 52, button_yoffset - 6, orientation) 
-            button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+            button_position = common.rotate_point(x, y, button_xoffset - 52, button_yposition, orientation)
+            button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
             button_window2 = None            
         else:
-            if orientation == 180:
-                anchor=Tk.NW
-            else:
-                anchor=Tk.SE
-            button_position = common.rotate_point(x, y, button_xoffset - 32, button_yoffset - 6, orientation)
-            button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+            button_position = common.rotate_point(x, y, button_xoffset - 32, button_yposition, orientation)
+            button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
             button_window2 = None
     elif has_subsidary:
-        if orientation == 180:
-            anchor1=Tk.NW
-            anchor2=Tk.NE
-        else:
-            anchor1=Tk.SE
-            anchor2=Tk.SW
-        button_position = common.rotate_point(x, y, button_xoffset - 23, button_yoffset - 6, orientation) 
-        button_window1 = canvas.create_window(button_position, anchor=anchor1, window=sig_button, tags=canvas_tag)
-        button_window2 = canvas.create_window(button_position, anchor=anchor2, window=sub_button, tags=canvas_tag)
+        button_position = common.rotate_point(x, y, button_xoffset - 23, button_yposition, orientation)
+        button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
+        button_window2 = canvas.create_window(button_position, anchor=sub_button_anchor, window=sub_button, tags=canvas_tag)
     else:
-        if orientation == 180:
-            anchor=Tk.NW
-        else:
-            anchor=Tk.SE
-        button_position = common.rotate_point (x, y, button_xoffset - 3, button_yoffset - 6, orientation) 
-        button_window1 = canvas.create_window(button_position, anchor=anchor, window=sig_button, tags=canvas_tag)
+        button_position = common.rotate_point (x, y, button_xoffset - 3, button_yposition, orientation)
+        button_window1 = canvas.create_window(button_position, anchor=sig_button_anchor, window=sig_button, tags=canvas_tag)
         button_window2 = None
     # Signal passed button is created on the track at the base of the signal
     # Note we only create this if the signal IS NOT an 'associated distant' signal
@@ -510,6 +516,8 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["sublocked"]           = False                  # MANDATORY - State of subsidary interlocking
     signals[str(sig_id)]["sigbutton"]           = sig_button             # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]           = sub_button             # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["tooltip1"]            = sig_button_tooltip     # Tooltip object
+    signals[str(sig_id)]["tooltip2"]            = sub_button_tooltip     # Tooltip object
     signals[str(sig_id)]["passedbutton"]        = passed_button          # MANDATORY - Button drawing object (subsidary signal)
     signals[str(sig_id)]["buttonwindow1"]       = button_window1         # MANDATORY - Button window object (main signal)
     signals[str(sig_id)]["buttonwindow2"]       = button_window2         # MANDATORY - Button window object (subsidary signal)
@@ -575,7 +583,7 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
                         highlightthickness=0, command=lambda:approach_release_button_event(sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=canvas_tag)
-    # Add the Theatre elements to the dictionary of signal objects
+    # Add the Approach Control elements to the dictionary of signal objects
     signals[str(sig_id)]["released"] = False                             # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                         # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releaseonyel"] = False                         # SHARED - State of the "Approach Release for the signal
@@ -590,7 +598,8 @@ def create_approach_control_elements(canvas, sig_id:int, x:int,y:int, canvas_tag
 
 def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
                                   xoff:int, yoff:int, canvas_tag:str,
-                                  orientation:int, has_theatre:bool):
+                                  orientation:int, has_theatre:bool,
+                                  enable_for_subsidary:bool):
     global signals
     # Draw the theatre route indicator box only if one is specified for this particular signal
     # The text object is created anyway - but 'hidden' if not required for this particular signal
@@ -603,10 +612,11 @@ def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
     else:
         theatre_text = canvas.create_text(text_coordinates,state='hidden',tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
-    signals[str(sig_id)]["theatretext"]    = ""                  # SHARED - Initial Theatre Text to display (none)
-    signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
-    signals[str(sig_id)]["theatreobject"]  = theatre_text        # SHARED - Text drawing object
-    signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display (None at creation)
+    signals[str(sig_id)]["theatretext"]    = ""                      # SHARED - Initial Theatre Text to display (none)
+    signals[str(sig_id)]["hastheatre"]     = has_theatre             # SHARED - Whether the signal has a theatre display or not
+    signals[str(sig_id)]["theatreobject"]  = theatre_text            # SHARED - Text drawing object
+    signals[str(sig_id)]["theatreenabled"] = None                    # SHARED - State of the Theatre display (None at creation)
+    signals[str(sig_id)]["subsidarytheatre"] = enable_for_subsidary  # SHARED - State of the Theatre display (None at creation)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -639,19 +649,19 @@ def update_theatre_route_indication(sig_id:int, theatre_text:str):
 # This will Enable/disable the theatre route indicator on a signal aspect changes to/from DANGER 
 #---------------------------------------------------------------------------------------------
 
-def enable_disable_theatre_route_indication(sig_id:int):
+def enable_disable_theatre_route_indication(sig_id:int, sig_at_danger:bool):
     global signals
     # Only update the Theatre route indication if one exists for the signal
     if signals[str(sig_id)]["hastheatre"]:
         # Deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
         # We test for Not True and Not False to support the initial state when the signal is created (state = None)
-        if signals[str(sig_id)]["sigstate"] == signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != False:
+        if sig_at_danger and signals[str(sig_id)]["theatreenabled"] != False:
             logging.info("Signal "+str(sig_id)+": Disabling theatre route display (signal is at DANGER)")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="hidden")
             signals[str(sig_id)]["theatreenabled"] = False
             # This is where we send the special character to inhibit the theatre route indication
             dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
-        elif signals[str(sig_id)]["sigstate"] != signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != True:
+        elif not sig_at_danger and signals[str(sig_id)]["theatreenabled"] != True:
             logging.info("Signal "+str(sig_id)+": Enabling theatre route display of '"+signals[str(sig_id)]["theatretext"]+"'")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="normal")
             signals[str(sig_id)]["theatreenabled"] = True
@@ -956,20 +966,24 @@ def clear_signal_override_caution(sig_id:int):
 # Library API function to lock a signal - all signal types
 # -------------------------------------------------------------------------
 
-def lock_signal(sig_id:int):
+def lock_signal(sig_id:int, tooltip:str="Locked"):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
         logging.error("Signal "+str(sig_id)+": lock_signal - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": lock_signal - Signal ID does not exist")
-    elif not signals[str(sig_id)]["siglocked"]:
-        # If signal/point locking has been correctly implemented it should
-        # only be possible to lock a signal that is "ON" (i.e. at DANGER)
-        if signals[str(sig_id)]["sigclear"]:
-            logging.warning("Signal "+str(sig_id)+": lock_signal - Signal is OFF - Locking Anyway")            
+    else:
+        # Only generate log messages if the signal is not yet locked. If signal/point locking has been
+        # correctly implemented it should only be possible to lock a signal that is "ON" (i.e. at DANGER)
+        if not signals[str(sig_id)]["siglocked"]:
+            if signals[str(sig_id)]["sigclear"]:
+                logging.warning("Signal "+str(sig_id)+": lock_signal - Signal is OFF - Locking Anyway")
+            else:
+                logging.info("Signal "+str(sig_id)+": Locking signal")
         # Lock the signal (by disabling the signal change button)
-        logging.info("Signal "+str(sig_id)+": Locking signal")
+        # The tooltip for the CHANGE button will reflect that the signal is LOCKED
+        signals[str(sig_id)]["tooltip1"].text = tooltip
         signals[str(sig_id)]["sigbutton"].config(state="disabled")
         signals[str(sig_id)]["siglocked"] = True
     return()
@@ -987,18 +1001,20 @@ def unlock_signal(sig_id:int):
         logging.error("Signal "+str(sig_id)+": unlock_signal - Signal ID does not exist")
     elif signals[str(sig_id)]["siglocked"]:
         # UnLock the signal (by enabling the signal change button)
+        # The tooltip for the CHANGE button will revert to 'Unlocked'
         logging.info("Signal "+str(sig_id)+": Unlocking signal")
         if not signals[str(sig_id)]["automatic"]:
             signals[str(sig_id)]["sigbutton"].config(state="normal")
         signals[str(sig_id)]["siglocked"] = False
-    return() 
+        signals[str(sig_id)]["tooltip1"].text="Unlocked"
+        return()
 
 # -------------------------------------------------------------------------
 # Library API function to lock a subsidary - all signal types if
 # they were created with a subsidary (Colour lights and semaphores).
 # -------------------------------------------------------------------------
 
-def lock_subsidary(sig_id:int):
+def lock_subsidary(sig_id:int, tooltip:str="Locked"):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
@@ -1007,13 +1023,17 @@ def lock_subsidary(sig_id:int):
         logging.error("Signal "+str(sig_id)+": lock_subsidary - Signal ID does not exist")
     elif not signals[str(sig_id)]["hassubsidary"]:
         logging.error("Signal "+str(sig_id)+": lock_subsidary - Signal does not have a subsidary")
-    elif not signals[str(sig_id)]["sublocked"]:
-        # If signal/point locking has been correctly implemented it should
-        # only be possible to lock a subsidary that is "ON" (i.e. at DANGER)
-        if signals[str(sig_id)]["subclear"]:
-            logging.warning("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")            
+    else:
+        # Only generate log messages if the subsidary is not yet locked. If signal/point locking has been
+        # correctly implemented it should only be possible to lock a subsidary that is "ON" (i.e. at DANGER)
+        if not signals[str(sig_id)]["siglocked"]:
+            if signals[str(sig_id)]["subclear"]:
+                logging.warning("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")
+            else:
+                logging.info("Signal "+str(sig_id)+": Locking subsidary")
         # Lock the subsidary (by disabling the subsidary change button)
-        logging.info("Signal "+str(sig_id)+": Locking subsidary")
+        # The tooltip for the CHANGE button will reflect that the signal is LOCKED
+        signals[str(sig_id)]["tooltip2"].text = tooltip
         signals[str(sig_id)]["subbutton"].config(state="disabled")        
         signals[str(sig_id)]["sublocked"] = True
     return()
@@ -1034,9 +1054,11 @@ def unlock_subsidary(sig_id:int):
         logging.error("Signal "+str(sig_id)+": unlock_subsidary - Signal does not have a subsidary")
     elif signals[str(sig_id)]["sublocked"]:
         # UnLock the subsidary (by enabling the subsidary change button)
+        # The tooltip for the CHANGE button will revert to 'Unlocked'
         logging.info("Signal "+str(sig_id)+": Unlocking subsidary")
         signals[str(sig_id)]["subbutton"].config(state="normal")
         signals[str(sig_id)]["sublocked"] = False
+        signals[str(sig_id)]["tooltip2"].text="Unlocked"
     return()
 
 # -------------------------------------------------------------------------
@@ -1211,7 +1233,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         logging.error("Signal "+str(sig_id)+": update_colour_light_signal - Signal Ahead ID must be an int or str")
     elif not signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal does not exist")
-    elif sig_ahead_id is not None and not signal_exists(sig_ahead_id): 
+    elif sig_ahead_id is not None and str(sig_ahead_id).casefold() != "STOP".casefold() and not signal_exists(sig_ahead_id):
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
     elif str(sig_id) == str(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")

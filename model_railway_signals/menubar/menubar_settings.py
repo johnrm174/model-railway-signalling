@@ -442,8 +442,8 @@ class mqtt_configuration_tab():
         self.subframe1.pack(padx=2, pady=2)
         self.label1 = Tk.Label(self.subframe1, text="Address:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.url = common.entry_box(self.subframe1, width=32,tool_tip="Specify the URL or IP address of "+
-                    "the MQTT broker (specify 'localhost' for a Broker running on the local machine)")
+        self.url = common.entry_box(self.subframe1, width=32,tool_tip="Specify the URL, hostname or IP address of "+
+                    "the MQTT broker (this can be 'localhost' for a Broker running on the local machine)")
         self.url.pack(side=Tk.LEFT, padx=2, pady=2)
         self.subframe2 = Tk.Frame(self.frame1)
         self.subframe2.pack(padx=2, pady=2)
@@ -577,22 +577,22 @@ class mqtt_publish_tab():
         self.dcc.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=10, width=3,
             tool_tip="Enter the IDs of the signals (on the local schematic) to publish via the MQTT network")
         self.signals.pack(padx=2, pady=2, fill='x')
         self.frame3 = Tk.LabelFrame(parent_tab, text="Track sections")
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.sections = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sections = common.grid_of_generic_entry_boxes(self.frame3, base_class=common.int_item_id_entry_box, columns=10, width=3,
             tool_tip="Enter the IDs of the track sections (on the local schematic) to publish via the MQTT network")
         self.sections.pack(padx=2, pady=2, fill='x')
         self.frame4 = Tk.LabelFrame(parent_tab, text="Block instruments")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.instruments = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box, columns=10, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
         self.instruments.pack(padx=2, pady=2, fill='x')
         self.frame5 = Tk.LabelFrame(parent_tab, text="GPIO sensors")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
+        self.sensors = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box, columns=10, width=3,
             tool_tip="Enter the IDs of the GPIO sensors to publish via the MQTT network")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
@@ -608,7 +608,7 @@ class mqtt_publish_tab():
 class mqtt_status_tab():
     def __init__(self, parent_tab):
         # Create the list of connected nodes
-        self.frame1 = Tk.LabelFrame(parent_tab, text="Node Status")
+        self.frame1 = Tk.LabelFrame(parent_tab, text="Signalling Node (Hostname, IP Address) - Last Seen")
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.frame2 = None
         self.button = Tk.Button(parent_tab, text="Refresh display", command=self.refresh)
@@ -624,31 +624,27 @@ class mqtt_status_tab():
         self.frame2.pack()
         # Populate the list of all nodes seen since application start
         for node_id in node_status.keys():
-            subframe = Tk.Frame(self.frame2)
-            subframe.pack(padx=2, pady=2, fill='x')
-            # User defined Node identifier
-            node = Tk.Label(subframe,text=node_id)
-            node.pack(side=Tk.LEFT)
-            # Ip address (received in the heartbeat message)
-            ip_address = node_status[node_id][0]
-            label1 = Tk.Label(subframe, text=" - ip:")
+            subframe1 = Tk.Frame(self.frame2)
+            subframe1.pack(padx=2, pady=2, fill='x', expand=True)
+            subframe2 = Tk.Frame(subframe1)
+            subframe2.pack(padx=2, pady=2)
+            # Each entry comprises [hostname:str, ip_address:str, time_stamp:time]
+            hostname = node_status[node_id][0]
+            ip_address = node_status[node_id][1]
+            time_stamp = node_status[node_id][2]
+            # Display the node id, hostname and ip_address
+            label1 = Tk.Label(subframe2, text=node_id+" ("+hostname+", "+ip_address+") -")
             label1.pack(side=Tk.LEFT)
-            ip_add = Tk.Label(subframe, text=ip_address)
-            ip_add.pack(side=Tk.LEFT)
-            # Timestamp (when the last heartbeat message was received)
-            time_stamp = node_status[node_id][1]
-            time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
-            label2 = Tk.Label(subframe, text="- Last seen: ")
+            # Display the 'last seen' timestamp
+            time_string = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
+            label2 = Tk.Label(subframe2, text=time_string)
             label2.pack(side=Tk.LEFT)
-            time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
-            last_time = Tk.Label(subframe, text=time_to_display)
-            last_time.pack(side=Tk.LEFT)
             # Set the colour of the timestamp according to how long ago it was
-            if time.time() - time_stamp > 10: last_time.config(fg="red")
-            else: last_time.config(fg="green")
+            if time.time() - time_stamp > 10: label2.config(fg="red")
+            else: label2.config(fg="green")
         if node_status == {}:
-            label = Tk.Label(self.frame2, text="No nodes seen since application start")
-            label.pack(side=Tk.LEFT)
+            label = Tk.Label(self.frame2, text="--- No nodes seen since application start ---")
+            label.pack(padx=10, pady=10)
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT Settings window (uses the classes above for each tab). Note that init

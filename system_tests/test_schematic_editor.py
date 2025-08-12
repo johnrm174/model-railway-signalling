@@ -26,6 +26,8 @@
 
 from system_test_harness import *
 
+from model_railway_signals.library import point_type
+
 #-----------------------------------------------------------------------------------
 # This function tests the Create and place of individual objects
 # Note the created objects are used in subsequent tests
@@ -680,6 +682,40 @@ def run_object_rotation_tests():
     return()
 
 #-----------------------------------------------------------------------------------
+# This function tests the flipping of selected objects (signals and points only).
+# Note the test uses the objects from the run_create_and_place_tests function.
+#-----------------------------------------------------------------------------------
+
+def run_object_flipping_tests():
+    global tb1, s1, s2, s3, s4, p1, p2, l1, l2, t1, i1, ts1, rb1, sb1, lev1
+    print("Schematic editor tests - Flipping of signals and points (f-key)")
+    select_all_objects()
+    assert_objects_selected(tb1,s1,s2,s3,s4,p1,p2,l1,l2,t1,i1,ts1,rb1,sb1,lev1)
+    assert_object_configuration(s1,{"flipped" : False})
+    assert_object_configuration(s2,{"flipped" : False})
+    assert_object_configuration(s3,{"flipped" : False})
+    assert_object_configuration(s4,{"flipped" : False})
+    assert_object_configuration(p1,{"itemtype" : point_type.LH.value})
+    assert_object_configuration(p2,{"itemtype" : point_type.RH.value})
+    flip_selected_objects()
+    assert_object_configuration(s1,{"flipped" : True})
+    assert_object_configuration(s2,{"flipped" : True})
+    assert_object_configuration(s3,{"flipped" : True})
+    assert_object_configuration(s4,{"flipped" : True})
+    assert_object_configuration(p1,{"itemtype" : point_type.RH.value})
+    assert_object_configuration(p2,{"itemtype" : point_type.LH.value})
+    flip_selected_objects()
+    assert_object_configuration(s1,{"flipped" : False})
+    assert_object_configuration(s2,{"flipped" : False})
+    assert_object_configuration(s3,{"flipped" : False})
+    assert_object_configuration(s4,{"flipped" : False})
+    assert_object_configuration(p1,{"itemtype" : point_type.LH.value})
+    assert_object_configuration(p2,{"itemtype" : point_type.RH.value})
+    # Unselect everything for the next test
+    deselect_all_objects()
+    return()
+
+#-----------------------------------------------------------------------------------
 # This function tests the copy (and 'place') of selected objects.
 # Note the test uses the objects from the run_create_and_place_tests function.
 #-----------------------------------------------------------------------------------
@@ -938,6 +974,7 @@ def run_all_schematic_editor_tests():
     run_area_selection_and_move_tests1()
     run_area_selection_and_move_tests2()
     run_object_rotation_tests()
+    run_object_flipping_tests()
     run_canvas_scroll_tests1("Edit Mode")
     set_run_mode()
     run_canvas_scroll_tests1("Run Mode")

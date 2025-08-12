@@ -37,6 +37,8 @@ def test_sprog_connectivity(): menubar_class_instance.test_connectivity()
 
 def test_mqtt_connectivity(): menubar_class_instance.config.test_connectivity()
 
+def test_application_upgrade(): menubar_class_instance.upgrade()
+
 #-----------------------------------------------------------------------------------
 # Open and then close all Menubar help windows - to excersise the code and check that
 # an apply straight after opening the window doesnt screw up the config
@@ -261,6 +263,17 @@ def test_menubar_utilities_windows():
     system_test_harness.sleep(2.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.sleep(2.0)
+    print("Testing Menubar utilities windows - APPLICATION UPGRADE")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade))
+    system_test_harness.sleep(4.0)
+    # Try the upgrade process
+    system_test_harness.run_function(lambda:test_application_upgrade())
+    system_test_harness.sleep(20.0)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window(cancel=True))
     system_test_harness.sleep(2.0)
     return()
 

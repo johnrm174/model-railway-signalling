@@ -98,23 +98,22 @@ def has_route_arms(signal):
 
 def get_sig_routes(signal):
     # Get the route selections from the appropriate UI element
+    # Route indications: 1=None, 2=Feathers, 3=Theatre, 4=Route Arms
     if signal.config.routetype.get_value() == 1:
         # MAIN route is always enabled (and greyed out)
         routes = signal.config.sig_routes.get_values()
     elif signal.config.routetype.get_value() == 2:
+        # Available signal routes will depend on the route feather selections
         # MAIN route is enabled even if a feather hasn't been selected
         routes = signal.config.feathers.get_feathers()
         routes[0] = True 
     elif signal.config.routetype.get_value() == 3:
-        # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
-        # Each route element comprises: [character, DCC_command_sequence]
-        # MAIN route is enabled even if a theatre character hasn't been selected
-        theatre_routes = signal.config.theatre.get_theatre()
-        routes = [True, False, False, False, False]
-        if theatre_routes[2][0] != "": routes[1] = True
-        if theatre_routes[3][0] != "": routes[2] = True
-        if theatre_routes[4][0] != "": routes[3] = True
-        if theatre_routes[5][0] != "": routes[4] = True
+        # From Release 5.3, the available signal routes will depend on the signal route selections
+        # Rather than the theatre character selections as the theatre indicator can now be used for
+        # both Main signal and Subsidary Signal routes (and you might want to have a subsidary route
+        # with a theatre indication when there is no associated Main Signal route).
+        # MAIN route is always enabled (and greyed out)
+        routes = signal.config.sig_routes.get_values()
     elif signal.config.routetype.get_value() == 4:
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
@@ -215,20 +214,27 @@ def update_tab1_signal_ui_elements(signal):
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
     # Pack the Route indication UI elements according to the route indication type selected
     # Route indication type selections are: 1=None, 2=Feathers, 3=Theatre, 4=Route Arms
+    # Route indications: 1=None, 2=Feathers, 3=Theatre, 4=Route Arms
     if signal.config.routetype.get_value() == 1:
+        # Signal and subsidary route selections are via the basic route selection elements
         signal.config.sig_routes.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
             signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
-    if signal.config.routetype.get_value() == 2:
+    elif signal.config.routetype.get_value() == 2:
+        # Signal route selections are via the Feather selections (with Main always selected)
+        # Subsidary route selections are via the basic route selection element
         signal.config.feathers.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
             signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.routetype.get_value() == 3:
+        # Signal and subsidary route selections are via the basic route selection elements
+        # As theatre characters can now be allocated to both main and subsidary signal routes
         signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
+        signal.config.sig_routes.frame.pack(padx=2, pady=2, fill='x')
         if has_subsidary(signal):
             signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
     # Pack the Signal Slotting UI Element (Ground Signals only)
-    elif signal.config.sigtype.get_value() == library.signal_type.ground_position.value:
+    if signal.config.sigtype.get_value() == library.signal_type.ground_position.value:
         signal.config.slotwith.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.sigtype.get_value() == library.signal_type.ground_disc.value:
         signal.config.slotwith.frame.pack(padx=2, pady=2, fill='x')
@@ -373,9 +379,9 @@ def update_tab1_route_selection_elements(signal):
                 signal.config.theatre.disable_selection()
                 signal.config.sig_routes.disable_selection()
             elif signal.config.routetype.get_value() == 3:
-                signal.config.theatre.enable_selection()
+                signal.config.theatre.enable_selection(enable_subsidary_selection=has_subsidary(signal))
                 signal.config.feathers.disable_selection()
-                signal.config.sig_routes.disable_selection()
+                signal.config.sig_routes.enable_selection()
             # If the signal has a subsidary then enable the subsidary route selections
             if has_subsidary(signal): signal.config.sub_routes.enable_selection()
             else: signal.config.sub_routes.disable_selection()
@@ -427,8 +433,8 @@ def update_tab1_route_selection_elements(signal):
                 else: signal.config.sub_routes.disable_selection()                
             elif signal.config.routetype.get_value() == 3:
                 signal.config.semaphores.disable_diverging_routes()
-                signal.config.theatre.enable_selection()
-                signal.config.sig_routes.disable_selection()
+                signal.config.theatre.enable_selection(enable_subsidary_selection=has_subsidary(signal))
+                signal.config.sig_routes.enable_selection()
                 # If the MAIN subsidary is selected then enable the subsidary route selections
                 # i.e. we still allow the single subsidary arm to control multiple routes
                 if has_subsidary(signal): signal.config.sub_routes.enable_selection()
@@ -888,6 +894,8 @@ class edit_signal:
             self.config.feathers.set_feathers(objects.schematic_objects[self.object_id]["feathers"])
             self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"], item_id)
             self.config.feathers.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
+            self.config.theatre.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
+            self.config.theatre.set_enable_subsidary(objects.schematic_objects[self.object_id]["theatresubsidary"])
             self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"], item_id)
             self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"], item_id)
             self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
@@ -896,7 +904,8 @@ class edit_signal:
             # These are the general settings for the signal
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
-            self.config.settings.set_value(rot)
+            self.config.settings.rotated.set_value(rot)
+            self.config.settings.flipped.set_value(objects.schematic_objects[self.object_id]["flipped"])
             # These are the signal button position offsets and styles:
             hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
             xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
@@ -995,9 +1004,10 @@ class edit_signal:
                 new_object_configuration["subroutes"] = get_sub_routes(self)
                 new_object_configuration["slotwith"] = self.config.slotwith.get_value()
                 # These are the general settings for the signal
-                rot = self.config.settings.get_value()
+                rot = self.config.settings.rotated.get_value()
                 if rot: new_object_configuration["orientation"] = 180
                 else: new_object_configuration["orientation"] = 0
+                new_object_configuration["flipped"] = self.config.settings.flipped.get_value()
                 # These are the point button position offsets and styles:
                 hidden, xoffset, yoffset = self.config.buttonoffsets.get_values()
                 new_object_configuration["hidebuttons"] = hidden
@@ -1007,10 +1017,12 @@ class edit_signal:
                 # Set the Theatre route indicator flag if that particular radio button is selected
                 if self.config.routetype.get_value() == 3:
                     new_object_configuration["theatreroute"] = True
+                    new_object_configuration["theatresubsidary"] = self.config.theatre.get_enable_subsidary()
                     new_object_configuration["dccautoinhibit"] = self.config.theatre.get_auto_inhibit()
                 else:
                     new_object_configuration["dccautoinhibit"] = self.config.feathers.get_auto_inhibit()
                     new_object_configuration["theatreroute"] = False
+                    new_object_configuration["theatresubsidary"] = False
                 # These elements are for the signal intelocking tab
                 new_object_configuration["pointinterlock"] = self.locking.interlocking.get_routes()
                 new_object_configuration["trackinterlock"] = self.locking.interlocked_sections.get_routes()

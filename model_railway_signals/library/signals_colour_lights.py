@@ -17,6 +17,7 @@
 #       sig_updated_callback - the function to call on signal updated events (returns item_id)
 #     Optional Parameters:
 #       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       flip_position:bool - Position the signal on the other side of the track - Default = False
 #       sig_passed_button:bool - Creates an "Signal Passed" button - Default = False
 #       sig_release_button:bool - Creates an "Approach Release" button - Default = False
 #       has_subsidary:bool - Creates a subsidary position light signal - Default = False
@@ -39,7 +40,7 @@
 #
 # Classes and functions used by the other library modules:
 #
-#   update_colour_light_signal(sig_id:int) - called on state changes if signal is set to auto refresh
+#   update_colour_light_signal(sig_id:int, sig_ahead_id) - update the aspect of the signal
 #   update_colour_light_subsidary(sig_id:int) - to update the subsidary aspect after a change in state
 #   update_feather_route_indication(sig_id:int, route_to_set) - to update the route indication (feathers)
 #   trigger_timed_colour_light_signal(sig_id:int, start_delay:int, time_delay:int) - trigger a timed sequence
@@ -71,6 +72,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 sig_passed_callback,
                                 sig_updated_callback,
                                 orientation:int=0,
+                                flip_position:bool=False,
                                 sig_passed_button:bool=False,
                                 sig_release_button:bool=False,
                                 has_subsidary:bool=False,
@@ -80,6 +82,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
                                 theatre_route_indicator:bool=False,
+                                theatre_route_subsidary:bool=False,
                                 fully_automatic:bool=False,
                                 button_xoffset:int=0,
                                 button_yoffset:int=0,
@@ -113,53 +116,50 @@ def create_colour_light_signal (canvas, sig_id:int,
         logging.error("Signal "+str(sig_id)+": create_signal - 2 Aspect distant signals do not support Approach Control")
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
+        # Flip the position of the signal offset to the track (if we need to)
+        if flip_position: post_offset = +15
+        else: post_offset = -15
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
         canvas_tag = signals.create_common_signal_elements (canvas, sig_id, signals.signal_type.colour_light,
-                                                x, y, button_xoffset, button_yoffset, hide_buttons, orientation,
-                                                sig_switched_callback, sig_passed_callback,
-                                                sig_updated_callback = sig_updated_callback,
-                                                sub_switched_callback = sub_switched_callback,
-                                                sig_passed_button = sig_passed_button,
-                                                has_subsidary = has_subsidary,
-                                                sig_automatic = fully_automatic,
-                                                button_colour = button_colour,
-                                                active_colour = active_colour,
-                                                selected_colour = selected_colour,
-                                                text_colour = text_colour,
-                                                font = font)
+                                    x, y, post_offset, button_xoffset, button_yoffset, hide_buttons, orientation,
+                                    sig_switched_callback, sig_passed_callback, sig_updated_callback = sig_updated_callback,
+                                    sub_switched_callback=sub_switched_callback,sig_passed_button=sig_passed_button,
+                                    has_subsidary=has_subsidary, sig_automatic=fully_automatic,
+                                    button_colour=button_colour, active_colour=active_colour, selected_colour=selected_colour,
+                                    text_colour=text_colour, font=font)
         # Get the assigned tag to use for all the signal post elements
         post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base line & signal post   
-        line_coords = common.rotate_line (x,y,0,0,0,-15,orientation) 
+        line_coords = common.rotate_line (x,y,0,0,0,post_offset,orientation)
         canvas.create_line (line_coords,width=2,tags=(canvas_tag,post_tag),fill=post_colour)
-        line_coords = common.rotate_line (x,y,0,-15,+30,-15,orientation) 
+        line_coords = common.rotate_line (x,y,0,post_offset,+30,post_offset,orientation)
         canvas.create_line (line_coords,width=3,tags=(canvas_tag,post_tag),fill=post_colour)
         # Draw the body of the subsidary signal - only if a subsidary has been specified
         if has_subsidary:
-            point_coords1 = common.rotate_point (x,y,+13,-8,orientation) 
-            point_coords2 = common.rotate_point (x,y,+13,-21,orientation) 
-            point_coords3 = common.rotate_point (x,y,+25,-21,orientation) 
-            point_coords4 = common.rotate_point (x,y,+25,-18,orientation) 
-            point_coords5 = common.rotate_point (x,y,+18,-8,orientation) 
+            point_coords1 = common.rotate_point (x,y,+13,post_offset+7,orientation)
+            point_coords2 = common.rotate_point (x,y,+13,post_offset-6,orientation)
+            point_coords3 = common.rotate_point (x,y,+25,post_offset-6,orientation)
+            point_coords4 = common.rotate_point (x,y,+25,post_offset-3,orientation)
+            point_coords5 = common.rotate_point (x,y,+18,post_offset+7,orientation)
             points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
             canvas.create_polygon (points, outline="black", fill="black",tags=canvas_tag)
         # Draw the subsidary signal aspects (but hide then if the signal doesn't have a subsidary)
-        line_coords = common.rotate_line (x,y,+18,-21,+23,-16,orientation) 
+        line_coords = common.rotate_line (x,y,+18,post_offset-6,+23,post_offset-1,orientation)
         poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+14,-9,+19,-14,orientation) 
+        line_coords = common.rotate_line (x,y,+14,post_offset+6,+19,post_offset+1,orientation)
         poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black",tags=canvas_tag)
         if not has_subsidary:
             canvas.itemconfigure(poslight1,state='hidden')
             canvas.itemconfigure(poslight2,state='hidden')
         # Draw all aspects for a 4-aspect  signal (running from bottom to top)
         # Unused spects (if its a 2 or 3 aspect signal) get 'hidden' later
-        line_coords = common.rotate_line (x,y,+38,-19,+30,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+38,post_offset-4,+30,post_offset+4,orientation)
         red = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+46,-19,+38,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+46,post_offset-4,+38,post_offset+4,orientation)
         yel = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,+54,-19,+46,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+54,post_offset-4,+46,post_offset+4,orientation)
         grn = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag) 
-        line_coords = common.rotate_line (x,y,+62,-19,+54,-11,orientation) 
+        line_coords = common.rotate_line (x,y,+62,post_offset-4,+54,post_offset+4,orientation)
         yel2 = canvas.create_oval (line_coords,fill="grey",tags=canvas_tag)
         # Hide the aspects we don't need and define the 'offset' for the route indications based on
         # the signal type - so that the feathers and theatre route indicator sit on top of the signal
@@ -181,15 +181,15 @@ def create_colour_light_signal (canvas, sig_id:int,
         else: # its a 4 aspect signal
             offset = 0
         # Now draw the feathers (x has been adjusted for the no of aspects)            
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+75,-15,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+75,post_offset,orientation)
         main = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+71,-8,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset+7,orientation)
         rhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+63,-5,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset+10,orientation)
         rhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+71,-22,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset-7,orientation)
         lhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,-15,offset+63,-25,orientation) 
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset-10,orientation)
         lhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
         # Hide any feather drawing objects we don't need for this particular signal
         if not mainfeather: canvas.itemconfigure(main,state='hidden')
@@ -205,8 +205,9 @@ def create_colour_light_signal (canvas, sig_id:int,
         else:
             override_aspect = signals.signal_state_type.DANGER
         # Create the signal elements for a Theatre Route indicator
-        signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=offset+69, yoff=-15,
-                        orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator)
+        signals.create_theatre_route_elements(canvas, sig_id, x, y, xoff=offset+69, yoff=post_offset,
+                    orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator,
+                    enable_for_subsidary=theatre_route_subsidary)
         # Create the signal elements to support Approach Control
         signals.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation, canvas_tag=canvas_tag,
                                         approach_button=sig_release_button, sig_released_callback=sig_released_callback)
@@ -273,33 +274,40 @@ def update_colour_light_subsidary(sig_id:int):
         logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to PROCEED")
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos1"],fill="white")
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="white")
-        dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")  
+        dcc_control.update_dcc_signal_subsidary(sig_id, True)
     else:
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos1"],fill="grey")
         signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="grey")
         logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to UNLIT")
-        dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
+        dcc_control.update_dcc_signal_subsidary(sig_id, False)
+    # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
+    if signals.signals[str(sig_id)]["subsidarytheatre"]:
+        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
     return ()
 
-# -------------------------------------------------------------------------
-# API Function to Refresh the displayed signal aspect according the signal state
+#-------------------------------------------------------------------------
+# Function to Refresh the displayed signal aspect according the signal state
 # Also takes into account the state of the signal ahead if one is specified
 # to ensure the correct aspect is displayed (for 3/4 aspect types and 2 aspect 
 # distant signals). E.g. for a 3/4 aspect signal - if the signal ahead is ON
 # and this signal is OFF then we want to change it to YELLOW rather than GREEN
-# -------------------------------------------------------------------------
+# Note the API function (which does the validation is in the 'signals' module
+#-------------------------------------------------------------------------
 
 def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
-    
     # Get the signal route (for any timed sequences in progress)
     route = signals.signals[str(sig_id)]["routeset"]
-    
-    # ---------------------------------------------------------------------------------
-    #  First deal with the Signal ON, Overridden or "Release on Red" cases
-    #  as they will apply to all colour light signal types (2, 3 or 4 aspect)
-    # ---------------------------------------------------------------------------------
-
-    # If signal is set to "ON" then its DANGER (or CAUTION if its a 2 aspect distant)
+    #---------------------------------------------------------------------------------
+    # First deal with the cases that would force the signal to a specific aspect
+    # These will apply to all colour light signal types (2, 3 or 4 aspect):
+    #   Signal ON => DANGER (2 aspect DISTANT signals will display CAUTION)
+    #   OVERRIDE => DANGER (2 aspect DISTANT signals will display CAUTION)
+    #   OVERRIDE CAUTION => CAUTION (does not apply to 2 aspect HOME signals)
+    #   RELEEASE ON RED => DANGER (does not apply to 2 aspect DISTANT signals)
+    #   RELEASE ON YELLOW => CAUTION (does not apply to 2 aspect HOME signals)
+    #   TIMED SEQUENCE => Signal will display the aspect for its timed sequence
+    #---------------------------------------------------------------------------------
+    # If signal is "ON" then its DANGER (or CAUTION for 2 aspect DISTANT signals)
     if not signals.signals[str(sig_id)]["sigclear"]:
         if signals.signals[str(sig_id)]["subtype"] == signal_subtype.distant:
             new_aspect = signals.signal_state_type.CAUTION
@@ -307,111 +315,94 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         else:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (signal is ON)"
-
-    # If signal is Overriden the set the signal to its overriden aspect
+    # If signal is Overriden the set the signal to its overriden aspect.
+    # This will be DANGER (or CAUTION for 2 aspect DISTANT signals).
     elif signals.signals[str(sig_id)]["override"]:
         new_aspect = signals.signals[str(sig_id)]["overriddenaspect"]
         log_message = " (signal is OVERRIDEN)"
-
     # If signal is Overriden to CAUTION set the signal to display CAUTION
-    # Note we are relying on the public API function to only allow this to
-    # be set for signal types apart from 2 aspect home signals
+    # Note this will only apply to signals OTHER THAN 2 aspect home signals.
     elif signals.signals[str(sig_id)]["overcaution"]:
         new_aspect = signals.signal_state_type.CAUTION
         log_message = " (signal is OVERRIDDEN to CAUTION)"
-
-    # If signal is triggered on a timed sequence then set to the sequence aspect
-    elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
-        new_aspect = signals.signals[str(sig_id)]["timedsequence"][route.value].aspect
-        log_message = " (signal is on a timed sequence)"
-
     # Set to DANGER if the signal is subject to "Release on Red" approach control
-    # Note that this state should never apply to 2 aspect distant signals
+    # Note this will only apply to signals OTHER THAN 2 aspect distant signals.
     elif signals.signals[str(sig_id)]["releaseonred"]:
         new_aspect = signals.signal_state_type.DANGER
-        log_message = " (signal is OFF - but subject to \'release on red\' approach control)"
-
-    # ---------------------------------------------------------------------------------
-    #  From here, the Signal is Displaying "OFF" - but could still be of any type
-    # ---------------------------------------------------------------------------------
-
-    # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
-    # we can ignore the signal ahead and set it to its "clear" aspect
-    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.home:
-        new_aspect = signals.signal_state_type.PROCEED
-        log_message = " (signal is OFF and 2-aspect home)"
-
-    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.red_ylw:
-        new_aspect = signals.signal_state_type.CAUTION
-        log_message = " (signal is OFF and 2-aspect R/Y)"
-        
-    # ---------------------------------------------------------------------------------
-    # From here, the Signal is CLEAR and is a 2 aspect Distant or a 3/4 aspect signal
-    # ---------------------------------------------------------------------------------
-
-    # Set to CAUTION if the signal is subject to "Release on YELLOW" approach control
-    # We use the special CAUTION_APPROACH_CONTROL for "update on signal ahead" purposes
+        log_message = " (signal is OFF - but subject to 'release on red' approach control)"
+    # Set to CAUTION_APPROACH_CONTROL if the signal is subject to "Release on YELLOW"
+    # Note this will only apply to signals OTHER THAN 2 aspect home signals.
     elif signals.signals[str(sig_id)]["releaseonyel"]:
         new_aspect = signals.signal_state_type.CAUTION_APP_CNTL
         log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
-
-    # ---------------------------------------------------------------------------------
-    # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
-    # and will display the "normal" aspects based on the signal ahead (if one has been specified)
-    # ---------------------------------------------------------------------------------
-    
+    # If signal is currently on a timed sequence then set to the sequence aspect
+    elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        new_aspect = signals.signals[str(sig_id)]["timedsequence"][route.value].aspect
+        log_message = " (signal is on a timed sequence)"
+    #---------------------------------------------------------------------------------
+    # From here, the Signal is CLEAR - but could still be of any type
+    # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
+    # we can ignore the signal ahead and set it to its "clear" aspect. This
+    # will be PROCEED for home signals or CAUTION for red/yellow signals.
+    #---------------------------------------------------------------------------------
+    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.home:
+        new_aspect = signals.signal_state_type.PROCEED
+        log_message = " (signal is OFF and 2-aspect home)"
+    elif signals.signals[str(sig_id)]["subtype"] == signal_subtype.red_ylw:
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = " (signal is OFF and 2-aspect R/Y)"
+    #---------------------------------------------------------------------------------
+    # From here, the Signal is CLEAR and is a 2 aspect Distant or a 3/4 aspect signal
+    # We therefore need to take into account the displayed aspect of the signal ahead
+    #---------------------------------------------------------------------------------
     # If no signal ahead has been specified then we can set the signal to its "clear" aspect
     # (Applies to 2 aspect distant signals as well as the remaining 3 and 4 aspect signals types)
     elif sig_ahead_id is None:
         new_aspect = signals.signal_state_type.PROCEED
         log_message = " (signal is OFF and no signal ahead specified)"
-
-    # ---------------------------------------------------------------------------------
-    # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
-    # and will display the "normal" aspects based on the signal ahead (one has been specified
-    # ---------------------------------------------------------------------------------
-        
-    else:
-        
-        if signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.DANGER:
-            # All remaining signal types (3/4 aspects and 2 aspect distants) should display CAUTION
-            new_aspect = signals.signal_state_type.CAUTION
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying DANGER)")
-            
-        elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION_APP_CNTL:
-            # All remaining signal types (3/4 aspects and 2 aspect distants) should display FLASHING CAUTION
-            new_aspect = signals.signal_state_type.FLASH_CAUTION
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
-                             " is subject to \'release on yellow\' approach control)")
-            
-        elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION:
-            if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
-                # 4 aspect signals should display a PRELIM_CAUTION aspect
-                new_aspect = signals.signal_state_type.PRELIM_CAUTION
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
-            else:
-                # 3 aspect signals and 2 aspect distant signals should display PROCEED
-                new_aspect = signals.signal_state_type.PROCEED
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
-                            
-        elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION:
-            if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
-                # 4 aspect signals will display a FLASHING PRELIM CAUTION aspect 
-                new_aspect = signals.signal_state_type.FLASH_PRELIM_CAUTION
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING_CAUTION)")
-            else:
-                # 3 aspect signals and 2 aspect distant signals should display PROCEED
-                new_aspect = signals.signal_state_type.PROCEED
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying PROCEED)")
+    # If the signal ahead is specified as a 'STOP' we set the displayed aspect to CAUTION.
+    # Example use case -  the route controlled by the signal leads into a bay platform
+    elif str(sig_ahead_id).casefold() == "STOP".casefold():
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = (" (signal is OFF and signal ahead is specified as a STOP)")
+    # If the signal ahead is DANGER, the signal should display CAUTION
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.DANGER:
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying DANGER)")
+    # If the signal ahead is CAUTION_APP_CNTL, the signal should display FLASHING CAUTION
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION_APP_CNTL:
+        new_aspect = signals.signal_state_type.FLASH_CAUTION
+        log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
+                         " is subject to \'release on yellow\' approach control)")
+    # If the signal ahead is CAUTION then 4 aspect signals should display a PRELIM_CAUTION aspect
+    # All other signal types (3 aspect signals and 2 aspect distant signals) should display PROCEED
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.CAUTION:
+        if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
+            new_aspect = signals.signal_state_type.PRELIM_CAUTION
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
         else:
-            # A signal ahead state is either PRELIM_CAUTION, FLASH PRELIM CAUTION or PROCEED
-            # These states have have no effect on the signal we are updating - Signal will show PROCEED
             new_aspect = signals.signal_state_type.PROCEED
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
-                      + str(signals.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
-    # Only refresh the signal if the aspect has been changed. Note that signals are created with
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
+    # If the signal ahead is FLASH_CAUTION then 4 aspect signals should display a FLASH_PRELIM_CAUTION aspect
+    # All other signal types (3 aspect signals and 2 aspect distant signals) should display PROCEED
+    elif signals.signals[str(sig_ahead_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION:
+        if signals.signals[str(sig_id)]["subtype"] == signal_subtype.four_aspect:
+            new_aspect = signals.signal_state_type.FLASH_PRELIM_CAUTION
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING_CAUTION)")
+        else:
+            new_aspect = signals.signal_state_type.PROCEED
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying PROCEED)")
+    else:
+        # From here, the signal ahead state is either PRELIM_CAUTION, FLASH_PRELIM_CAUTION or PROCEED
+        # These states have have no effect on the signal we are updating - Signal will show PROCEED
+        new_aspect = signals.signal_state_type.PROCEED
+        log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
+                  + str(signals.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
+    #---------------------------------------------------------------------------------
+    # Refresh the signal if the aspect has been changed. Note that signals are created with
     # a 'sigstate' of None - so there will always be a change of state on creation to ensure
     # MQTT/DCC messages are sent out to reflect the post-creation state of the signal.
+    #---------------------------------------------------------------------------------
     current_aspect = signals.signals[str(sig_id)]["sigstate"]
     if new_aspect != current_aspect:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)
@@ -420,7 +411,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         refresh_signal_aspects(sig_id)
         # Update the Theatre & Feather route indications as these are inhibited/enabled for transitions to/from DANGER
         enable_disable_feather_route_indication(sig_id)
-        signals.enable_disable_theatre_route_indication(sig_id)
+        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(new_aspect==signals.signal_state_type.DANGER))
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
         dcc_control.update_dcc_signal_aspects(sig_id, new_aspect)

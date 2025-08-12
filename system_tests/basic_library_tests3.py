@@ -447,21 +447,10 @@ def run_library_api_tests():
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)
     signals.update_colour_light_signal(10)
-    assert signals.signals["10"]["hastheatre"]
-    assert signals.signals["10"]["theatretext"] == ""
-    assert not signals.signals["10"]["theatreenabled"]
-    signals.set_route(10, theatre_text="1")
-    assert signals.signals["10"]["theatretext"] == "1"
-    assert not signals.signals["10"]["theatreenabled"]
-    signals.toggle_signal(10)
-    signals.update_colour_light_signal(10)
-    assert signals.signals["10"]["theatreenabled"]
-    signals.set_route(10, theatre_text="2")
-    assert signals.signals["10"]["theatretext"] == "2"
-    signals.toggle_signal(10)
-    signals.update_colour_light_signal(10)
-    assert not signals.signals["10"]["theatreenabled"]
+    signals.set_route(10, theatre_text="1") # Success
+    signals.set_route(10, theatre_text="2") # Success
     signals.delete_signal(10)
+    # Negative tests
     signals.set_route(1, theatre_text="1")    # Error - does not have a theatre
     signals.set_route(1, theatre_text="AB")   # Error - too many characters
     signals.set_route(1, theatre_text=8)      # Error - not a str
@@ -476,7 +465,7 @@ def run_library_api_tests():
     signals.update_colour_light_signal(1,sig_ahead_id=10)    # Success
     signals.update_colour_light_signal(1,sig_ahead_id="10")  # Success
     signals.update_colour_light_signal("1",sig_ahead_id=10)  # Fail - Sig ID not an int
-    signals.update_colour_light_signal(1,sig_ahead_id=10.1)  # Fail - Sig ahead ID not an int
+    signals.update_colour_light_signal(1,sig_ahead_id=10.1)  # Fail - Sig ahead ID not an int or str
     signals.update_colour_light_signal(6,sig_ahead_id=10)    # Fail - Sig ID does not exist
     signals.update_colour_light_signal(1,sig_ahead_id=6)     # Fail - Sig ahead ID does not exist
     signals.update_colour_light_signal(1,sig_ahead_id=1)     # Fail - Sig ahead ID is same as sig ID
@@ -1011,9 +1000,21 @@ def run_signal_aspect_tests():
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
     assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Signal ahead specified as "STOP"
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_PRELIM_CAUTION
+    signals.update_colour_light_signal(1,"STOP")
+    signals.update_colour_light_signal(2,"STOP")
+    signals.update_colour_light_signal(3,"STOP")
+    signals.update_colour_light_signal(4,"STOP")
+    signals.update_colour_light_signal(5,"STOP") # Home signal
+    assert signals.signal_state(1) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED    
-    signals.delete_signal(20)
     # Clean up
+    signals.delete_signal(20)
     signals.delete_signal(1)
     signals.delete_signal(2)
     signals.delete_signal(3)
@@ -1567,7 +1568,6 @@ def run_approach_control_tests():
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     assert signals.signal_state(11) == signals.signal_state_type.PROCEED
-    
     print("Library Tests - Approach Control Tests - Release on Yellow - no errors")
     # Set up the initial test conditions (for Approach Control Release on Yellow)
     # We can only test this for colour light signals (not supported by semaphores)
@@ -1676,11 +1676,12 @@ def run_ground_signal_slotting_tests():
     assert signals.signal_state(14) == signals.signal_state_type.DANGER
     signals.signal_button_event(17)
     assert signals.signal_state(15) == signals.signal_state_type.DANGER
-    print("Library Tests - Update slotting of ground signals with main signals - 6 errors")
+    print("Library Tests - Update slotting of ground signals with main signals - 7 errors")
     # Negative testing of validation
     signals.update_slotted_signal("12", 10)   # Fail - sig ID not an int
     signals.update_slotted_signal(-10, 10)    # Fail - sig ID not positive int
     signals.update_slotted_signal(12, "10")   # Fail - slot_with not an int
+    signals.update_slotted_signal(100, 100)   # Fail - sig ID does not exist
     signals.update_slotted_signal(12, -10)    # Fail - slot_with not positive int
     signals.update_slotted_signal(10, 16)     # Fail - invalid signal type
     signals.update_slotted_signal(11, 17)     # Fail - invalid signal type
@@ -1715,13 +1716,129 @@ def run_ground_signal_slotting_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test Theatre route indications for colour light and semaphore signals
+# Note that negative API validation tests are done in the test functions above
+#---------------------------------------------------------------------------------------------------------
+
+def run_signal_theate_route_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    print("Library Tests - signal route tests - no errors")
+    # Set up the initial test conditions
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
+                        sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                        has_subsidary=True, theatre_route_indicator=True, theatre_route_subsidary=False)
+    create_colour_light_signal(canvas, 11, signals.signal_subtype.home, 200, 250,
+                        sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                        has_subsidary=True, theatre_route_indicator=True, theatre_route_subsidary=True)
+    create_semaphore_signal(canvas, 12, signals.semaphore_subtype.home, 300, 250,
+                        sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                        main_subsidary=True, theatre_route_indicator=True, theatre_route_subsidary=False)
+    create_semaphore_signal(canvas, 13, signals.semaphore_subtype.home, 400, 250,
+                        sig_switched, sub_switched, sig_released, sig_passed, sig_updated,
+                        main_subsidary=True, theatre_route_indicator=True, theatre_route_subsidary=True)
+    signals.set_route(10, theatre_text="A")
+    signals.set_route(11, theatre_text="B")
+    signals.set_route(12, theatre_text="C")
+    signals.set_route(13, theatre_text="D")
+    signals.update_colour_light_signal(10)
+    signals.update_colour_light_signal(11)
+    # Test the initial state
+    assert signals.signals["10"]["theatretext"] == "A"
+    assert signals.signals["11"]["theatretext"] == "B"
+    assert signals.signals["12"]["theatretext"] == "C"
+    assert signals.signals["13"]["theatretext"] == "D"
+    assert not signals.signals["10"]["theatreenabled"]
+    assert not signals.signals["11"]["theatreenabled"]
+    assert not signals.signals["12"]["theatreenabled"]
+    assert not signals.signals["13"]["theatreenabled"]
+    # Test update of Route whilst theatre is disabled
+    signals.set_route(10, theatre_text="E")
+    signals.set_route(11, theatre_text="F")
+    signals.set_route(12, theatre_text="G")
+    signals.set_route(13, theatre_text="H")
+    signals.update_colour_light_signal(10)
+    signals.update_colour_light_signal(11)
+    assert signals.signals["10"]["theatretext"] == "E"
+    assert signals.signals["11"]["theatretext"] == "F"
+    assert signals.signals["12"]["theatretext"] == "G"
+    assert signals.signals["13"]["theatretext"] == "H"
+    assert not signals.signals["10"]["theatreenabled"]
+    assert not signals.signals["11"]["theatreenabled"]
+    assert not signals.signals["12"]["theatreenabled"]
+    assert not signals.signals["13"]["theatreenabled"]
+    # Test Enabling of Theatre display with the main signal
+    signals.toggle_signal(10)
+    signals.toggle_signal(11)
+    signals.toggle_signal(12)
+    signals.toggle_signal(13)
+    signals.update_colour_light_signal(10)
+    signals.update_colour_light_signal(11)
+    assert signals.signals["10"]["theatretext"] == "E"
+    assert signals.signals["11"]["theatretext"] == "F"
+    assert signals.signals["12"]["theatretext"] == "G"
+    assert signals.signals["13"]["theatretext"] == "H"
+    assert signals.signals["10"]["theatreenabled"]
+    assert signals.signals["11"]["theatreenabled"]
+    assert signals.signals["12"]["theatreenabled"]
+    assert signals.signals["13"]["theatreenabled"]
+    # Test update of Route whilst theatre is enabled
+    signals.set_route(10, theatre_text="J")
+    signals.set_route(11, theatre_text="K")
+    signals.set_route(12, theatre_text="L")
+    signals.set_route(13, theatre_text="M")
+    assert signals.signals["10"]["theatretext"] == "J"
+    assert signals.signals["11"]["theatretext"] == "K"
+    assert signals.signals["12"]["theatretext"] == "L"
+    assert signals.signals["13"]["theatretext"] == "M"
+    # Test disable of Theatre indication when main signal is OFF
+    signals.toggle_signal(10)
+    signals.toggle_signal(11)
+    signals.toggle_signal(12)
+    signals.toggle_signal(13)
+    signals.update_colour_light_signal(10)
+    signals.update_colour_light_signal(11)
+    assert signals.signals["10"]["theatretext"] == "J"
+    assert signals.signals["11"]["theatretext"] == "K"
+    assert signals.signals["12"]["theatretext"] == "L"
+    assert signals.signals["13"]["theatretext"] == "M"
+    assert not signals.signals["10"]["theatreenabled"]
+    assert not signals.signals["11"]["theatreenabled"]
+    assert not signals.signals["12"]["theatreenabled"]
+    assert not signals.signals["13"]["theatreenabled"]
+    # Test enabling of Theatre indicator when subsidary is ON
+    signals.toggle_subsidary(10)
+    signals.toggle_subsidary(11)
+    signals.toggle_subsidary(12)
+    signals.toggle_subsidary(13)
+    assert not signals.signals["10"]["theatreenabled"]
+    assert signals.signals["11"]["theatreenabled"]
+    assert not signals.signals["12"]["theatreenabled"]
+    assert signals.signals["13"]["theatreenabled"]
+    # Test disabling of Theatre indicator when subsidary is ON
+    signals.toggle_subsidary(10)
+    signals.toggle_subsidary(11)
+    signals.toggle_subsidary(12)
+    signals.toggle_subsidary(13)
+    assert not signals.signals["10"]["theatreenabled"]
+    assert not signals.signals["11"]["theatreenabled"]
+    assert not signals.signals["12"]["theatreenabled"]
+    assert not signals.signals["13"]["theatreenabled"]
+    # clean up
+    signals.delete_signal(10)
+    signals.delete_signal(11)
+    signals.delete_signal(12)
+    signals.delete_signal(13)
+    return()
+
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-    run_library_api_tests()
     print("----------------------------------------------------------------------------------------")
     print("")
+    run_library_api_tests()
     run_timed_signal_tests()
     run_signal_aspect_tests()
     run_signal_route_tests()
@@ -1730,6 +1847,7 @@ def run_all_basic_library_tests():
     run_mode_change_tests()
     run_style_update_tests()
     run_ground_signal_slotting_tests()
+    run_signal_theate_route_tests()
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(signals.signals) == 0
     # Check the creation of all supported Signal configurations
