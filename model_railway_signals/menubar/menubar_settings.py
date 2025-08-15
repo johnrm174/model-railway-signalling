@@ -1024,29 +1024,41 @@ class edit_general_settings():
             self.window.resizable(False, False)
             edit_general_settings_window = self.window
             #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Application settings
+            #----------------------------------------------------------------------------------
+            self.frame1 = Tk.LabelFrame(self.window, text = "Application appearance settings")
+            self.frame1.pack(padx=2, pady=2, fill=Tk.BOTH)
+            # Create the reset delay settings elements
+            self.frame1subframe1 = Tk.Frame(self.frame1)
+            self.frame1subframe1.pack()
+            self.label1 = Tk.Label(self.frame1subframe1, text="Menubar Font Size:")
+            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.fontsize = common.integer_entry_box(self.frame1subframe1, width=3, min_value=10, max_value=20,
+                        allow_empty=False, tool_tip="Specify the font size for the menubar items (10-20 pixels)")
+            self.fontsize.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------------
             # Create a Label Frame for the Run Layout settings
             #----------------------------------------------------------------------------------
-            # Create a labelframe for the run Layout Settings
-            self.frame1 = Tk.LabelFrame(self.window, text = "Run Layout settings")
-            self.frame1.pack(padx=2, pady=2, fill=Tk.BOTH)
+            self.frame2 = Tk.LabelFrame(self.window, text = "Run Layout settings")
+            self.frame2.pack(padx=2, pady=2, fill=Tk.BOTH)
             # Create the "SPAD Popups" selection element
-            self.enablespadpopups = common.check_box(self.frame1, label="Enable popup SPAD warnings",
+            self.enablespadpopups = common.check_box(self.frame2, label="Enable popup SPAD warnings",
                     tool_tip="Select to enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.enablespadpopups.pack(padx=2, pady=2)
-            self.enableleverpopups = common.check_box(self.frame1, label="Enable popup Lever warnings",
+            self.enableleverpopups = common.check_box(self.frame2, label="Enable popup Lever warnings",
                                 tool_tip="Select to enable popup interlocking warnings (when Signalbox Levers "+
                                      "are switched by external lever frame events events whilst locked)")
             self.enableleverpopups.pack(padx=2, pady=2)
-            self.leverinterlocking = common.check_box(self.frame1, label="Ignore Lever interlocking",
+            self.leverinterlocking = common.check_box(self.frame2, label="Ignore Lever interlocking",
                                 tool_tip="Select to ignore interlocking when Signalbox Levers are "+
                                      "switched by external lever frame events events")
             self.leverinterlocking.pack(padx=2, pady=2)
             # Create the reset delay settings elements
-            self.frame1subframe1 = Tk.Frame(self.frame1)
-            self.frame1subframe1.pack()
-            self.label1 = Tk.Label(self.frame1subframe1, text="Reset switching delay:")
+            self.frame2subframe1 = Tk.Frame(self.frame2)
+            self.frame2subframe1.pack()
+            self.label1 = Tk.Label(self.frame2subframe1, text="Reset switching delay:")
             self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-            self.resetdelay = common.integer_entry_box(self.frame1subframe1, width=5, min_value=0, max_value= 5000,
+            self.resetdelay = common.integer_entry_box(self.frame2subframe1, width=5, min_value=0, max_value= 5000,
                         allow_empty=False, tool_tip="Specify the time delay between signal and/or point "+
                         "switching events when resetting the layout back to its default state (0-5000ms)")
             self.resetdelay.pack(padx=2, pady=2)
@@ -1066,14 +1078,16 @@ class edit_general_settings():
         self.enableleverpopups.set_value(settings.get_general("leverpopupwarnings"))
         self.leverinterlocking.set_value(settings.get_general("leverinterlocking"))
         self.resetdelay.set_value(settings.get_general("resetdelay"))
+        self.fontsize.set_value(settings.get_general("menubarfontsize"))
 
     def save_state(self, close_window:bool):
-        if self.resetdelay.validate():
+        if self.resetdelay.validate() and self.fontsize.validate():
             self.validation_error.pack_forget()
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
             settings.set_general("leverpopupwarnings", self.enableleverpopups.get_value())
             settings.set_general("leverinterlocking", self.leverinterlocking.get_value())
             settings.set_general("resetdelay", self.resetdelay.get_value())
+            settings.set_general("menubarfontsize", self.fontsize.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )

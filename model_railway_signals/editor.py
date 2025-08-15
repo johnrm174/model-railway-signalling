@@ -151,6 +151,7 @@ class main_menubar:
         self.mode_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
+        self.mode_menu.add_separator()
         self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
         # Create the various menubar items for the Automation  Dropdown
@@ -188,7 +189,7 @@ class main_menubar:
                 command=lambda:menubar.dcc_mappings(self.root))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
-        self.utilities_menu.add_command(label =" Application Upgrade",
+        self.utilities_menu.add_command(label =" Application Upgrade...",
                 command=lambda:menubar.application_upgrade(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
@@ -581,7 +582,7 @@ class main_menubar:
         objects.configure_remote_gpio_sensor_event_mappings()
 
     #------------------------------------------------------------------------------------------
-    # OTHER menubar functions
+    # OTHER menubar function update callbacks
     #------------------------------------------------------------------------------------------
 
     def canvas_update(self):
@@ -616,10 +617,24 @@ class main_menubar:
         objects.configure_local_gpio_sensor_event_mappings()
         
     def general_settings_update(self):
+        # Run Layout Settings
         run_layout.configure_spad_popups(settings.get_general("spadpopups"))
         ignore_interlocking = settings.get_general("leverinterlocking")
         lever_warnings = settings.get_general("leverpopupwarnings")
         library.set_lever_switching_behaviour(ignore_interlocking, lever_warnings)
+        #Application Settings
+        font_size = settings.get_general("menubarfontsize")
+        self.mainmenubar.config(font=("", font_size))
+        self.file_menu.config(font=("", font_size))
+        self.mode_menu.config(font=("", font_size))
+        self.auto_menu.config(font=("", font_size))
+        self.sprog_menu.config(font=("", font_size))
+        self.power_menu.config(font=("", font_size))
+        self.mqtt_menu.config(font=("", font_size))
+        self.utilities_menu.config(font=("", font_size))
+        self.settings_menu.config(font=("", font_size))
+        self.styles_menu.config(font=("", font_size))
+        self.help_menu.config(font=("", font_size))
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
