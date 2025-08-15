@@ -16,6 +16,7 @@
 #    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
 #    schematic.update_canvas(*canvasargs) - Update the canvas following reload/resizing
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
+#    schematic.scroll_canvas(x:int,y:int) - Scroll the viewable area of the canvas to the given coords
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
@@ -124,6 +125,10 @@ class main_menubar:
         self.root = root
         self.mainmenubar = Tk.Menu(self.root)
         self.root.configure(menu=self.mainmenubar)
+        # Crete a frame underneath the menubar to hold any "quick scroll" buttons
+        self.quickscrollframe = Tk.Frame(self.root)
+        self.quickscrollframe.pack()
+        self.scroll_buttons = []
         # Create a dummy menubar item for the application Logo
         resource_folder = 'model_railway_signals.resources'
         logo_filename = 'dcc_signalling_logo.png'
@@ -363,7 +368,6 @@ class main_menubar:
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
     # --------------------------------------------------------------------------------------
-
     def handle_canvas_event(self, event=None):
         # Note that event.keysym returns the character (event.state would be 'Control')
         if event.keysym == 'm':
@@ -585,6 +589,13 @@ class main_menubar:
     # OTHER menubar function update callbacks
     #------------------------------------------------------------------------------------------
 
+    class quickscroll_button(Tk.Button):
+        def __init__(self, parent, label:str, width:int, xscroll:int, yscroll:int):
+            self.xscroll, self.yscroll = xscroll, yscroll
+            super().__init__(parent, text=label, width=width, command=self.clicked)
+        def clicked(self):
+            schematic.scroll_canvas(self.xscroll, self.yscroll)
+
     def canvas_update(self):
         schematic.update_canvas(width=settings.get_canvas("width"),
                                 height=settings.get_canvas("height"),
@@ -593,7 +604,16 @@ class main_menubar:
                                 display_grid=settings.get_canvas("displaygrid"),
                                 canvas_colour=settings.get_canvas("canvascolour"),
                                 grid_colour=settings.get_canvas("gridcolour"))
-        
+        # Destroy the old quick-scroll buttons
+        for scroll_button in self.scroll_buttons: scroll_button.destroy()
+        self.scroll_buttons = []
+        # create the new quick scroll buttons
+        quick_scroll_buttons = settings.get_canvas("scrollbuttons")
+        for new_button in quick_scroll_buttons:
+            label, width, xscroll, yscroll = new_button[0], new_button[1], new_button[2], new_button[3]
+            self.scroll_buttons.append(self.quickscroll_button(self.quickscrollframe, label, width, xscroll, yscroll))
+            self.scroll_buttons[-1].pack(padx=5, pady=2, side=Tk.LEFT)
+
     def logging_update(self):
         log_level = settings.get_logging("level")
         if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
@@ -622,7 +642,7 @@ class main_menubar:
         ignore_interlocking = settings.get_general("leverinterlocking")
         lever_warnings = settings.get_general("leverpopupwarnings")
         library.set_lever_switching_behaviour(ignore_interlocking, lever_warnings)
-        #Application Settings
+        # Application Settings - Menubar
         font_size = settings.get_general("menubarfontsize")
         self.mainmenubar.config(font=("", font_size))
         self.file_menu.config(font=("", font_size))
@@ -635,6 +655,9 @@ class main_menubar:
         self.settings_menu.config(font=("", font_size))
         self.styles_menu.config(font=("", font_size))
         self.help_menu.config(font=("", font_size))
+        # Application settings - quick scroll buttons
+        for scroll_button in self.scroll_buttons:
+            scroll_button.config(font=("", font_size))
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions

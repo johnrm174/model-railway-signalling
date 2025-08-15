@@ -48,6 +48,7 @@ default_settings["canvas"]["snaptogrid"] = True
 default_settings["canvas"]["displaygrid"] = True
 default_settings["canvas"]["canvascolour"] = "grey85"
 default_settings["canvas"]["gridcolour"] = "#999"
+default_settings["canvas"]["scrollbuttons"] = []
 
 default_settings["logging"] = {}
 default_settings["logging"]["level"] = 2   # Warning

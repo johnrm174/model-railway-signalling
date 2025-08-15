@@ -6,6 +6,7 @@
 # External API functions intended for use by other editor modules:
 #    initialise(root, callback, width, height, grid, snap) - Call once on startup
 #    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
+#    scroll_canvas(x:int,y:int) - Scroll the viewable area of the canvas to the given coords
 #    update_canvas(width,height,grid,snap) - Call following a size update (or layout load/canvas resize)
 #    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
 #    get_selected_objects(object_type=None) - return a list of selected object IDs (filtered on type)
@@ -835,9 +836,18 @@ def update_canvas(width:int, height:int, grid:int, snap_to_grid:bool,
 #------------------------------------------------------------------------------------
 
 def reset_window_size(event=None):
-    global canvas_width, canvas_height
     canvas.config(width=canvas_width, height=canvas_height, scrollregion=(0,0,canvas_width,canvas_height))
     root.geometry("")
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to Scroll the viewable area of the canvas to the required absolute coordinates.
+# The coordinates relate to the top left corner of the canvas - (0, 0) would be the origin.
+#------------------------------------------------------------------------------------
+
+def scroll_canvas(x:int, y:int):
+    canvas.xview_moveto(float(x+1)/canvas_width)
+    canvas.yview_moveto(float(y+1)/canvas_height)
     return()
 
 #------------------------------------------------------------------------------------
