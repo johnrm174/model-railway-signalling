@@ -50,6 +50,97 @@ from .. import settings
 from .. import library
 
 #------------------------------------------------------------------------------------
+# Class for a quick scroll button entry This is for large layouts, with a bigger
+# canvas area than the visible screen. These buttons provide a quick mechanism for
+# changing the current view without the scroll bars or dragging/nudging the screen.
+#------------------------------------------------------------------------------------
+
+class quick_scroll_entry(Tk.Frame):
+    def __init__(self, parent_frame):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame)
+        self.frame = Tk.LabelFrame(self, borderwidth=1)
+        self.frame.pack(padx=5,pady=2)
+        # Create a frame for the button name elements
+        self.subframe1 = Tk.Frame(self.frame)
+        self.subframe1.pack()
+        self.label1 = Tk.Label(self.subframe1, text="Button label:")
+        self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.buttonname = common.entry_box(self.subframe1, width=29, callback=self.button_name_updated,
+                                           tool_tip="Enter a name for the quick-scroll button")
+        self.buttonname.pack(padx=2, pady=2, side=Tk.LEFT)
+        # Create another subframe for all the other elements
+        self.subframe2 = Tk.Frame(self.frame)
+        self.subframe2.pack()
+        self.label2 = Tk.Label(self.subframe2, text="Button width:")
+        self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.buttonwidth = common.integer_entry_box(self.subframe2, width=3, min_value=0, max_value=25,
+                   tool_tip="Specify the button width (or leave blank to size the button to the label)")
+        self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.label3 = Tk.Label(self.subframe2, text="Scroll x:")
+        self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.xscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=8000, allow_empty=False,
+                empty_equals_zero=False, tool_tip="Specify the 'scroll to' X coordinate (for the top left corner of the window)")
+        self.xscroll.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.label3 = Tk.Label(self.subframe2, text="Scroll y:")
+        self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.yscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=4000, allow_empty=False,
+                empty_equals_zero=False, tool_tip="Specify the 'scroll to' Y coordinate (for the top left corner of the window)")
+        self.yscroll.pack(padx=2, pady=2, side=Tk.LEFT)
+        # Update the state for the 'empty' button definition
+        self.button_name_updated()
+
+    def button_name_updated(self):
+        if len(self.buttonname.get_value()) > 0:
+            self.buttonwidth.enable()
+            self.xscroll.enable()
+            self.yscroll.enable()
+            if self.xscroll.get_value()==None: self.xscroll.set_value(0)
+            if self.yscroll.get_value()==None: self.yscroll.set_value(0)
+        else:
+            self.buttonwidth.disable()
+            self.xscroll.disable()
+            self.yscroll.disable()
+
+    def set_value(self, button_entry:list):
+        self.buttonname.set_value(button_entry[0])
+        self.buttonwidth.set_value(button_entry[1])
+        self.xscroll.set_value(button_entry[2])
+        self.yscroll.set_value(button_entry[3])
+        self.button_name_updated()
+
+    def get_value(self):
+        # Deal with empty boxes (convert to zero)
+        return( [ self.buttonname.get_value(), self.buttonwidth.get_value(),
+                  self.xscroll.get_value(), self.yscroll.get_value() ] )
+
+    def reset(self):
+        self.set_value(button_entry=["", 0, 0, 0])
+
+    def validate(self):
+        valid = True
+        if not self.buttonname.validate(): valid=False
+        if not self.buttonwidth.validate(): valid=False
+        if not self.xscroll.validate(): valid=False
+        if not self.yscroll.validate(): valid=False
+        return(valid)
+
+class grid_of_quick_scroll_entries(common.grid_of_widgets):
+    def __init__(self, parent_frame, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, quick_scroll_entry, columns=1, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (button name is blank)
+        values_to_return = []
+        for entered_value in entered_values:
+            if entered_value[0] != "" :
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+#------------------------------------------------------------------------------------
 # Class for the Canvas configuration toolbar window. Note the init function takes
 # in a callback so it can apply the updated settings in the main editor application.
 # Note also that if a window is already open then we just raise it and exit.
@@ -113,6 +204,11 @@ class edit_canvas_settings():
             self.canvascolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             self.gridcolour = common.colour_selection(self.frame2, label="Grid colour")
             self.gridcolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
+            # Create a Label frame for the quick scroll buttons 
+            self.frame3 = Tk.LabelFrame(self.window, text="Quick scroll buttons (for schematics larger than the screen)")
+            self.frame3.pack(padx=2, pady=2, fill="x")
+            self.scrollbuttons = grid_of_quick_scroll_entries(self.frame3)
+            self.scrollbuttons.pack()
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.pack(padx=2, pady=2)
@@ -130,10 +226,11 @@ class edit_canvas_settings():
         self.displaygrid.set_value(settings.get_canvas("displaygrid"))
         self.canvascolour.set_value(settings.get_canvas("canvascolour"))
         self.gridcolour.set_value(settings.get_canvas("gridcolour"))
+        self.scrollbuttons.set_values(settings.get_canvas("scrollbuttons"))
         
     def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
-        if self.width.validate() and self.height.validate() and self.gridsize.validate():
+        if self.width.validate() and self.height.validate() and self.gridsize.validate() and self.scrollbuttons.validate():
             self.validation_error.pack_forget()
             settings.set_canvas("width", self.width.get_value())
             settings.set_canvas("height", self.height.get_value())
@@ -142,10 +239,12 @@ class edit_canvas_settings():
             settings.set_canvas("displaygrid", self.displaygrid.get_value())
             settings.set_canvas("canvascolour", self.canvascolour.get_value())
             settings.set_canvas("gridcolour", self.gridcolour.get_value())
+            settings.set_canvas("scrollbuttons", self.scrollbuttons.get_values())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
             if close_window: self.close_window()
+            else:self.load_state()
         else:
             # Display the validation error message
             self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)

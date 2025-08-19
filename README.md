@@ -60,7 +60,13 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
 > You have been warned!
 
+* Ability to define 'quick-scroll' buttons under canvas settings:
+    * Buttons are displayed on a new 'quick-scroll' bar (underneath the main menubar)
+    * Buttons will scroll the canvas to specified coordinates (within the displayed window).
+    * Provided as an alternative to the existing scroll-bars and drag-screen functionality.
+    * To improve user operation of larger schematics (especially where touchscreens are used).
 * Allow menubar font size to be increased (for improved operation with touchscreens).
+    * This new general setting will also increase the size of the new 'quick-scroll' buttons.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
