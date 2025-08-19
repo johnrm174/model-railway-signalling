@@ -188,7 +188,7 @@ class edit_canvas_settings():
             self.gridsize = common.integer_entry_box(self.subframe1, width=5, min_value=5, max_value=25,
                             allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
             self.gridsize.grid(row=2, column=1)
-            # Create the elements for the other settings in a second subframe (within the labelframe
+            # Create the elements for the other settings in a second subframe (within the labelframe)
             self.subframe2 = Tk.Frame(self.frame1)
             self.subframe2.pack()
             self.snaptogrid = common.check_box (self.subframe2, label="Snap to grid",
@@ -204,7 +204,7 @@ class edit_canvas_settings():
             self.canvascolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             self.gridcolour = common.colour_selection(self.frame2, label="Grid colour")
             self.gridcolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
-            # Create a Label frame for the quick scroll buttons 
+            # Create a Label frame for the quick scroll buttons
             self.frame3 = Tk.LabelFrame(self.window, text="Quick scroll buttons (for schematics larger than the screen)")
             self.frame3.pack(padx=2, pady=2, fill="x")
             self.scrollbuttons = grid_of_quick_scroll_entries(self.frame3)
