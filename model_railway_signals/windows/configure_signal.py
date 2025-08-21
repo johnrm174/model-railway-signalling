@@ -118,42 +118,44 @@ def get_sig_routes(signal):
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]        
-        # MAIN route should always be enabled for a semaphore
+        # MAIN route is always be enabled for a semaphore signal
+        # RH1, RH2, LH1, LH2 can be selected (LH3 and RH3 disabled)
         semaphore_routes = signal.config.semaphores.get_arms()
-        routes = [True, False, False, False, False]
+        routes = [True, False, False, False, False, False, False]
         routes[1] = semaphore_routes[1][0][0]
         routes[2] = semaphore_routes[2][0][0]
-        routes[3] = semaphore_routes[3][0][0]
-        routes[4] = semaphore_routes[4][0][0]
+        routes[4] = semaphore_routes[3][0][0]
+        routes[5] = semaphore_routes[4][0][0]
     else:
         # Defensive programming (MAIN route always enabled)
-        routes = [True, False, False, False, False]
+        routes = [True, False, False, False, False, False, False]
     return(routes)      
 
 def get_sub_routes(signal):
     # Get the route selections from the appropriate UI element
     if ( signal.config.sigtype.get_value() == library.signal_type.ground_position.value or
           signal.config.sigtype.get_value() == library.signal_type.ground_disc.value):
-        routes = [False, False, False, False, False]
+        routes = [False, False, False, False, False, False, False]
     elif signal.config.sigtype.get_value() == library.signal_type.colour_light.value:
         routes = signal.config.sub_routes.get_values()
     elif signal.config.sigtype.get_value() == library.signal_type.semaphore.value:
         if signal.config.routetype.get_value() == 4:
-            # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
+            # semaphore_routes list comprises:[main, LH1, LH2, RH1, RH2]
             # Each Route element comprises: [signal, subsidary, distant]
             # Each signal element comprises [enabled/disabled, address]        
+            # Only MAIN, RH1, RH2, LH1, LH2 can be selected (LH3 and RH3 disabled)
             semaphore_routes = signal.config.semaphores.get_arms()
-            routes = [False, False, False, False, False]
+            routes = [False, False, False, False, False, False, False]
             routes[0] = semaphore_routes[0][1][0]
             routes[1] = semaphore_routes[1][1][0]
             routes[2] = semaphore_routes[2][1][0]
-            routes[3] = semaphore_routes[3][1][0]
-            routes[4] = semaphore_routes[4][1][0]
+            routes[4] = semaphore_routes[3][1][0]
+            routes[5] = semaphore_routes[4][1][0]
         else:
             routes = signal.config.sub_routes.get_values()
     else:
         # Defensive programming (no subsidary routes)
-        routes = [False, False, False, False, False]
+        routes = [False, False, False, False, False, False, False]
     return(routes)
 
 def get_dist_routes(signal):
@@ -164,29 +166,31 @@ def get_dist_routes(signal):
         # MAIN route is always enabled (and greyed out)
         routes = signal.config.sig_routes.get_values()
     elif signal.config.routetype.get_value() == 3 and semaphore_routes[0][2][0]:
-        # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
+        # The Theatre route list comprises: [dark, main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each route element comprises: [character, DCC_command_sequence]
         # MAIN route is enabled even if a theatre character hasn't been selected
         theatre_routes = signal.config.theatre.get_theatre()
-        routes = [True, False, False, False, False]
+        routes = [True, False, False, False, False, False, False]
         if theatre_routes[2][0] != "": routes[1] = True
         if theatre_routes[3][0] != "": routes[2] = True
         if theatre_routes[4][0] != "": routes[3] = True
         if theatre_routes[5][0] != "": routes[4] = True
+        if theatre_routes[6][0] != "": routes[5] = True
+        if theatre_routes[7][0] != "": routes[6] = True
     elif signal.config.routetype.get_value() == 4:
-        # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
+        # The semaphore_routes list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]        
-        # MAIN route should always be enabled for a semaphore
-        routes = [False, False, False, False, False]
+        # Only MAIN, RH1, RH2, LH1, LH2 can be selected (LH3 and RH3 disabled)
+        routes = [False, False, False, False, False, False, False]
         routes[0] = semaphore_routes[0][2][0]
         routes[1] = semaphore_routes[1][2][0]
         routes[2] = semaphore_routes[2][2][0]
-        routes[3] = semaphore_routes[3][2][0]
-        routes[4] = semaphore_routes[4][2][0]
+        routes[4] = semaphore_routes[3][2][0]
+        routes[5] = semaphore_routes[4][2][0]
     else:
         # All other signal types do not support secondary distant arms
-        routes = [False, False, False, False, False]
+        routes = [False, False, False, False, False, False, False]
     return(routes)
 
 #------------------------------------------------------------------------------------
@@ -491,8 +495,10 @@ def update_tab2_available_signal_routes(signal):
     # The ones that need to be enabled get re-packed (in the right order) below
     signal.locking.conflicting_sigs.lh1_frame.pack_forget()
     signal.locking.conflicting_sigs.lh2_frame.pack_forget()
+    signal.locking.conflicting_sigs.lh3_frame.pack_forget()
     signal.locking.conflicting_sigs.rh1_frame.pack_forget()
     signal.locking.conflicting_sigs.rh2_frame.pack_forget()
+    signal.locking.conflicting_sigs.rh3_frame.pack_forget()
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
@@ -520,6 +526,15 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocked_sections.lh2.disable()
         signal.locking.conflicting_sigs.lh2.disable()
     if sig_routes[3] or sub_routes[3]:
+        signal.locking.interlocking.lh3.enable_route()
+        signal.locking.interlocked_sections.lh3.enable()
+        signal.locking.conflicting_sigs.lh3.enable()
+        signal.locking.conflicting_sigs.lh3_frame.pack(padx=2, pady=2, fill='x')
+    else: 
+        signal.locking.interlocking.lh3.disable_route()
+        signal.locking.interlocked_sections.lh3.disable()
+        signal.locking.conflicting_sigs.lh3.disable()
+    if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh1.enable_route()
         signal.locking.interlocked_sections.rh1.enable()
         signal.locking.conflicting_sigs.rh1.enable()
@@ -528,7 +543,7 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocking.rh1.disable_route()
         signal.locking.interlocked_sections.rh1.disable()
         signal.locking.conflicting_sigs.rh1.disable()
-    if sig_routes[4] or sub_routes[4]:
+    if sig_routes[5] or sub_routes[5]:
         signal.locking.interlocking.rh2.enable_route()
         signal.locking.interlocked_sections.rh2.enable()
         signal.locking.conflicting_sigs.rh2.enable()
@@ -537,6 +552,15 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocking.rh2.disable_route()
         signal.locking.interlocked_sections.rh2.disable()
         signal.locking.conflicting_sigs.rh2.disable()
+    if sig_routes[6] or sub_routes[6]:
+        signal.locking.interlocking.rh3.enable_route()
+        signal.locking.interlocked_sections.rh3.enable()
+        signal.locking.conflicting_sigs.rh3.enable()
+        signal.locking.conflicting_sigs.rh3_frame.pack(padx=2, pady=2, fill='x')
+    else:
+        signal.locking.interlocking.rh3.disable_route()
+        signal.locking.interlocked_sections.rh3.disable()
+        signal.locking.conflicting_sigs.rh3.disable()
     # Enable/disable the signal / block instrument ahead selections on signal type
     # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
     # Block Ahead selection is only enabled for Semaphore or Colour Light Home signals
@@ -655,16 +679,26 @@ def update_tab3_track_section_ahead_routes(signal):
         signal.automation.track_occupancy.section_ahead.lh2.enable()
     else:
         signal.automation.track_occupancy.section_ahead.lh2.disable()
-    # RH1 Route (sig or sub)
+    # LH3 Route (sig or sub)
     if sig_routes[3] or sub_routes[3]:
+        signal.automation.track_occupancy.section_ahead.lh3.enable()
+    else:
+        signal.automation.track_occupancy.section_ahead.lh3.disable()
+    # RH1 Route (sig or sub)
+    if sig_routes[4] or sub_routes[4]:
         signal.automation.track_occupancy.section_ahead.rh1.enable()
     else: 
         signal.automation.track_occupancy.section_ahead.rh1.disable()
     # RH2 Route (sig or sub)
-    if sig_routes[4] or sub_routes[4]:
+    if sig_routes[5] or sub_routes[5]:
         signal.automation.track_occupancy.section_ahead.rh2.enable()
     else:
         signal.automation.track_occupancy.section_ahead.rh2.disable()
+    # RH3 Route (sig or sub)
+    if sig_routes[6] or sub_routes[6]:
+        signal.automation.track_occupancy.section_ahead.rh3.enable()
+    else:
+        signal.automation.track_occupancy.section_ahead.rh3.disable()
     return()
 
 #------------------------------------------------------------------------------------
@@ -685,12 +719,18 @@ def update_tab3_timed_signal_selections(signal):
     # LH2 Route (sig or sub)
     if sig_routes[2] and timed_signal: signal.automation.timed_signal.lh2.enable()
     else: signal.automation.timed_signal.lh2.disable()
+    # LH3 Route (sig or sub)
+    if sig_routes[3] and timed_signal: signal.automation.timed_signal.lh3.enable()
+    else: signal.automation.timed_signal.lh3.disable()
     # RH1 Route (sig or sub)
-    if sig_routes[3] and timed_signal: signal.automation.timed_signal.rh1.enable()
+    if sig_routes[4] and timed_signal: signal.automation.timed_signal.rh1.enable()
     else: signal.automation.timed_signal.rh1.disable()
     # RH2 Route (sig or sub)
-    if sig_routes[4] and timed_signal: signal.automation.timed_signal.rh2.enable()
+    if sig_routes[5] and timed_signal: signal.automation.timed_signal.rh2.enable()
     else: signal.automation.timed_signal.rh2.disable()
+    # RH3 Route (sig or sub)
+    if sig_routes[6] and timed_signal: signal.automation.timed_signal.rh3.enable()
+    else: signal.automation.timed_signal.rh3.disable()
     return()
 
 #------------------------------------------------------------------------------------
@@ -730,20 +770,28 @@ def update_tab3_approach_control_selections(signal):
         # LH2 Route (sig or sub)
         if sig_routes[2] and approach_control: signal.automation.approach_control.lh2.enable_route()
         else: signal.automation.approach_control.lh2.disable_route()
+        # LH3 Route (sig or sub)
+        if sig_routes[3] and approach_control: signal.automation.approach_control.lh3.enable_route()
+        else: signal.automation.approach_control.lh3.disable_route()
         # RH1 Route (sig or sub)
-        if sig_routes[3] and approach_control: signal.automation.approach_control.rh1.enable_route()
+        if sig_routes[4] and approach_control: signal.automation.approach_control.rh1.enable_route()
         else: signal.automation.approach_control.rh1.disable_route()
         # RH2 Route (sig or sub)
-        if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable_route()
+        if sig_routes[5] and approach_control: signal.automation.approach_control.rh2.enable_route()
         else: signal.automation.approach_control.rh2.disable_route()
+        # RH3 Route (sig or sub)
+        if sig_routes[6] and approach_control: signal.automation.approach_control.rh3.enable_route()
+        else: signal.automation.approach_control.rh3.disable_route()
         # Enable the Approach sensor entry box
         signal.automation.signal_events.approach.enable()
     else:
         signal.automation.approach_control.main.disable_route()
         signal.automation.approach_control.lh1.disable_route()
         signal.automation.approach_control.lh2.disable_route()
+        signal.automation.approach_control.lh3.disable_route()
         signal.automation.approach_control.rh1.disable_route()
         signal.automation.approach_control.rh2.disable_route()
+        signal.automation.approach_control.rh3.disable_route()
         signal.automation.approach_control.disable_release_on_yel()
         signal.automation.approach_control.disable_release_on_red()
         signal.automation.approach_control.disable_release_on_red_sig_ahead()
@@ -935,7 +983,7 @@ class edit_signal:
             if objects.schematic_objects[self.object_id]["itemtype"] == library.signal_type.colour_light.value:
                 if objects.schematic_objects[self.object_id]["theatreroute"]:
                     self.config.routetype.set_value(3)
-                elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
+                elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4] or feathers[5] or feathers[6]:
                     self.config.routetype.set_value(2)
                 else:
                     self.config.routetype.set_value(1)      
@@ -1029,7 +1077,7 @@ class edit_signal:
                 new_object_configuration["siginterlock"] = self.locking.conflicting_sigs.get_values()
                 new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
                 # Remove any blank entries from the conflicting signals interlocking table
-                new_sig_interlock_table = [[],[],[],[],[]]
+                new_sig_interlock_table = [[],[],[],[],[],[],[]]
                 interlocked_signal_routes = self.locking.conflicting_sigs.get_values()
                 for index, interlocked_signal_route in enumerate(interlocked_signal_routes):
                     for interlocked_signal in interlocked_signal_route:

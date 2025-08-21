@@ -60,6 +60,11 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
 > You have been warned!
 
+* Additional routes for signals (giving up to 7 routes ahead of each signal):
+    * New LH3 and RH3 routes are available for selection in the signal configuration.
+    * Colour Light Signals support additional feathers for LH3 & RH3 route indications.
+    * Theatre route indicators also support these additional route indications.
+    * Semaphore route arms remain limited to MAIN, LH1, LH2, RH1 and RH2 indications.
 * Ability to define 'quick-scroll' buttons under canvas settings:
     * Buttons are displayed on a new 'quick-scroll' bar (underneath the main menubar).
     * Buttons will scroll the canvas to specified coordinates (within the displayed window).

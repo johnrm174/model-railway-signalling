@@ -99,8 +99,10 @@
 #      route_type.MAIN
 #      route_type.LH1
 #      route_type.LH2
+#      route_type.LH3
 #      route_type.RH1
 #      route_type.RH2
+#      route_type.RH3
 # 
 #   signal_exists(sig_id:int/str) - returns true if the Signal object 'exists' (either the Signal
 #                    exists on the local schematic or has been subscribed to via MQTT networking)
@@ -243,10 +245,12 @@ class ground_disc_subtype(enum.Enum):
 class route_type(enum.Enum):
     NONE = 0         # INTERNAL use - to "inhibit" route indications when signal is at DANGER)
     MAIN = 1         # Main route
-    LH1 = 2          # immediate left
-    LH2 = 3          # far left
-    RH1 = 4          # immediate right
-    RH2 = 5          # far right
+    LH1 = 2          # left 1
+    LH2 = 3          # left 2
+    LH3 = 4          # left 3 (added from release 5.4.0)
+    RH1 = 5          # right 1
+    RH2 = 6          # right 2
+    RH3 = 7          # right 3 (added from release 5.4.0)
 
 # The superset of Possible states (displayed aspects) for a signal
 # CAUTION_APROACH_CONTROL represents approach control set with "Release On Yellow"
@@ -1193,7 +1197,8 @@ def set_route(sig_id:int, route:route_type=None, theatre_text:str=""):
         logging.error("Signal "+str(sig_id)+": set_route - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": set_route - Signal ID does not exist")
-    elif route is not None and route not in (route_type.MAIN, route_type.LH1, route_type.LH2, route_type.RH1, route_type.RH2):
+    elif route is not None and route not in (route_type.MAIN, route_type.LH1, route_type.LH2,
+                            route_type.RH1, route_type.RH2, route_type.LH3, route_type.RH3):
         logging.error("Signal "+str(sig_id)+": set_route - Invalid route specified: '"+str(route)+"'")
     elif not isinstance(theatre_text, str) or len(theatre_text) > 1:
         logging.error("Signal "+str(sig_id)+": set_route - Invalid theatre text specified: '"+str(theatre_text)+"'")

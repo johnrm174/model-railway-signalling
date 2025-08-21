@@ -731,6 +731,13 @@ def set_all(new_objects:dict):
                     if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
                         objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
                     #########################################################################################################
+                    # From Release 5.2.2 the 'subsidary' element in the signal object configuration changed from
+                    # [has_sub:bool, dcc_address:int] to [has:sub:bool, dcc_address:int, reversed_command_logic:bool]
+                    #########################################################################################################
+                    elif (new_object_type == objects_common.object_type.signal and element == "subsidary" and
+                          len(new_objects[object_id][element]) < 3):
+                            objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
+                    #########################################################################################################
                     # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
                     # The 'tracksections' element is now a list comprising: [section_behind, lists_of_sections_ahead]
                     # The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
@@ -739,15 +746,6 @@ def set_all(new_objects:dict):
                     # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
                     # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
                     #########################################################################################################
-                    elif new_object_type == objects_common.object_type.signal and element == "tracksections":
-                        new_structure = [0, [ [0], [0], [0], [0], [0]]]
-                        new_structure[0] = new_objects[object_id][element][0]
-                        for index1, route_entry in enumerate(new_objects[object_id][element][1]):
-                            for index2, section in enumerate(route_entry):
-                                if index2 == 0: new_structure[1][index1][0] = section
-                                elif section > 0: new_structure[1][index1].append(section)
-                        objects_common.schematic_objects[object_id][element] = new_structure
-                    #########################################################################################################
                     # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
                     # The 'trackinterlock' element now comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
                     # Each route element contains a variable length list of interlocked sections for that route [t1,]
@@ -755,19 +753,69 @@ def set_all(new_objects:dict):
                     # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
                     # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
                     #########################################################################################################
-                    elif new_object_type == objects_common.object_type.signal and element == "trackinterlock":
-                        new_structure = [[], [], [], [], []]
-                        for index1, route_entry in enumerate(new_objects[object_id][element]):
-                            for index2, section in enumerate(route_entry):
-                                if section > 0: new_structure[index1].append(section)
-                        objects_common.schematic_objects[object_id][element] = new_structure
+                    # From Release 5.4.0 the application supports more Signal routes. All elements need to be extended
+                    # as appropriate and re-ordered to ensure the routes are correctly ordered after loading - i.e.
+                    # from [MAIN,LH1,LH2,RH1,RH2] to [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
                     #########################################################################################################
-                    # From Release 5.2.2 the 'subsidary' element in the signal object configuration changed from
-                    # [has_sub:bool, dcc_address:int] to [has:sub:bool, dcc_address:int, reversed_command_logic:bool]
-                    #########################################################################################################
-                    elif (new_object_type == objects_common.object_type.signal and element == "subsidary" and
-                          len(new_objects[object_id][element]) < 3):
-                            objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
+                    elif (new_object_type == objects_common.object_type.signal and (element == "dccfeathers" or
+                          element == "dcctheatre") and len(new_objects[object_id][element]) < 8):
+                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Dark
+                        new_values[1] = new_objects[object_id][element][1] # Main
+                        new_values[2] = new_objects[object_id][element][2] # lh1
+                        new_values[3] = new_objects[object_id][element][3] # lh2
+                        new_values[5] = new_objects[object_id][element][4] # rh1
+                        new_values[6] = new_objects[object_id][element][5] # rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.signal and (element == "sigroutes" or
+                          element == "subroutes" or element == "pointinterlock" or element == "trackinterlock" or
+                          element == "siginterlock" or element == "feathers" or element == "approachcontrol" or
+                          element == "timedsequences") and len(new_objects[object_id][element]) < 7):
+                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Main
+                        new_values[1] = new_objects[object_id][element][1] # lh1
+                        new_values[2] = new_objects[object_id][element][2] # lh2
+                        new_values[4] = new_objects[object_id][element][3] # rh1
+                        new_values[5] = new_objects[object_id][element][4] # rh2
+                        # Get rid of any zero entries for each route in the "trackinterlock" element
+                        if element == "trackinterlock":
+                            new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
+                            for index1, route_entry in enumerate(new_values):
+                                for section_id in route_entry:
+                                    if section_id > 0: new_values_without_blanks[index1].append(section_id)
+                            objects_common.schematic_objects[object_id][element] = new_values_without_blanks
+                        # Get rid of any zero entries for each route in the "tracksections" element
+                        elif element == "tracksections":
+                            new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
+                            for index1, route_entry in enumerate(new_values):
+                                for index2, section_id in enumerate(route_entry):
+                                    if index2 == 0: new_values_without_blanks[1][index1][0] = section_id
+                                    elif section_id > 0: new_values_without_blanks[1][index1].append(section_id)
+                            objects_common.schematic_objects[object_id][element] = new_values_without_blanks
+                        # For the siginterlock element we also need to correct each element
+                        elif element == "siginterlock":
+                            corrected_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                            for index1, route_entry in enumerate(new_values):
+                                for signal_entry in route_entry:
+                                    if len(signal_entry[1]) < 7:
+                                        corrected_values[index1].append([signal_entry[0], [signal_entry[1][0],
+                                                            signal_entry[1][1], signal_entry[1][2], False,
+                                                            signal_entry[1][1], signal_entry[1][1], False]])
+                                    else:
+                                        corrected_values[index1].append(signal_entry)
+                            objects_common.schematic_objects[object_id][element] = corrected_values
+                        else:
+                            objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.signal and element == "tracksections"
+                                    and len(new_objects[object_id][element][1]) < 7):
+                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                        new_values[0] = new_objects[object_id][element][0]       # Section behind
+                        new_values[1][0] = new_objects[object_id][element][1][0] # section ahead - Main
+                        new_values[1][1] = new_objects[object_id][element][1][1] # section ahead - lh1
+                        new_values[1][2] = new_objects[object_id][element][1][2] # section ahead - lh2
+                        new_values[1][4] = new_objects[object_id][element][1][3] # section ahead - rh1
+                        new_values[1][5] = new_objects[object_id][element][1][4] # section ahead - rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
                     #########################################################################################################
                     # End of code to handle changes in Object data structures
                     #########################################################################################################

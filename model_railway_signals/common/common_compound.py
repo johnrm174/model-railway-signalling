@@ -165,8 +165,8 @@ class route_selections(Tk.Frame):
         # Create the Frame to hold all the elements
         super().__init__(parent_frame)
         # Create the UI Elements for each of the possible route selections
-        self.main = common_simple.state_box(self, label_off="MAIN", label_on="MAIN",
-                        width=5, tool_tip=tool_tip, read_only=read_only)
+        self.main = common_simple.state_box(self, label_off="Main", label_on="Main",
+                        width=4, tool_tip=tool_tip, read_only=read_only)
         self.main.pack(side=Tk.LEFT)
         self.lh1 = common_simple.state_box(self, label_off="LH1", label_on="LH1",
                         width=4, tool_tip=tool_tip, read_only=read_only)
@@ -174,44 +174,56 @@ class route_selections(Tk.Frame):
         self.lh2 = common_simple.state_box(self, label_off="LH2", label_on="LH2",
                         width=4, tool_tip=tool_tip, read_only=read_only)
         self.lh2.pack(side=Tk.LEFT)
+        self.lh3 = common_simple.state_box(self, label_off="LH3", label_on="LH3",
+                        width=4, tool_tip=tool_tip, read_only=read_only)
+        self.lh3.pack(side=Tk.LEFT)
         self.rh1 = common_simple.state_box(self, label_off="RH1", label_on="RH1",
                         width=4, tool_tip=tool_tip, read_only=read_only)
         self.rh1.pack(side=Tk.LEFT)
         self.rh2 = common_simple.state_box(self, label_off="RH2", label_on="RH2",
                         width=4, tool_tip=tool_tip, read_only=read_only)
         self.rh2.pack(side=Tk.LEFT)
+        self.rh3 = common_simple.state_box(self, label_off="RH3", label_on="RH3",
+                        width=4, tool_tip=tool_tip, read_only=read_only)
+        self.rh3.pack(side=Tk.LEFT)
 
-    def set_value(self, route_selections:[bool, bool, bool, bool, bool]):
-        # route_selections comprises a list of signal routes [main, lh1, lh2, rh1, rh2]
+    def set_value(self, route_selections:[bool, bool, bool, bool, bool, bool, bool]):
+        # route_selections comprises a list of signal routes [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element of the signal route a boolean (True/selected or False/deselected)
         self.main.set_value(route_selections[0])
         self.lh1.set_value(route_selections[1])
         self.lh2.set_value(route_selections[2])
-        self.rh1.set_value(route_selections[3])
-        self.rh2.set_value(route_selections[4])
+        self.lh3.set_value(route_selections[3])
+        self.rh1.set_value(route_selections[4])
+        self.rh2.set_value(route_selections[5])
+        self.rh3.set_value(route_selections[6])
 
     def get_value(self):
-        # route_selections comprises a list of signal routes [main, lh1, lh2, rh1, rh2]
+        # route_selections comprises a list of signal routes [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element of the signal route a boolean (True/selected or False/deselected)
-        return ( [self.main.get_value(), self.lh1.get_value(),self.lh2.get_value(),
-                            self.rh1.get_value(), self.rh2.get_value()] )
+        return ( [self.main.get_value(), self.lh1.get_value(), self.lh2.get_value(), self.lh3.get_value(),
+                    self.rh1.get_value(), self.rh2.get_value(), self.rh3.get_value()] )
 
     def disable(self):
         self.main.disable()
         self.lh1.disable()
         self.lh2.disable()
+        self.lh3.disable()
         self.rh1.disable()
         self.rh2.disable()
+        self.rh3.disable()
 
     def enable(self):
         self.main.enable()
         self.lh1.enable()
         self.lh2.enable()
+        self.lh3.enable()
         self.rh1.enable()
         self.rh2.enable()
+        self.rh3.enable()
 
     def reset(self):
-        self.set_value([False, False, False, False, False])
+        self.set_value([False, False, False, False, False, False, False])
 
 #------------------------------------------------------------------------------------
 # Compoind UI element for signal and route selection (signal_id EB and route_selections)
@@ -272,9 +284,9 @@ class signal_route_selections(Tk.Frame):
         self.EB.disable()
         self.eb_updated()
 
-    def set_value(self, signal_route:[int,[bool,bool,bool,bool,bool]], item_id:int=0):
+    def set_value(self, signal_route:[int,[bool,bool,bool,bool,bool,bool,bool]], item_id:int=0):
         # The signal_route comprises [signal_id, list_of_route_selections]
-        # the list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+        # the list_of_route_selections comprises [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element is a boolean (True/selected or False/deselected)
         self.EB.set_value(signal_route[0], item_id)
         self.routes.set_value(signal_route[1])
@@ -285,11 +297,11 @@ class signal_route_selections(Tk.Frame):
 
     def get_value(self):
         # The returned value comprises [signal_id, list_of_route_selections]
-        # the list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+        # the list_of_route_selections comprises [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element is a boolean (True/selected or False/deselected)
         return ( [ self.EB.get_value(), self.routes.get_value() ])
 
     def reset(self):
-        self.set_value([0,[False, False, False, False, False]])
+        self.set_value([0,[False, False, False, False, False, False, False]])
 
 ###########################################################################################

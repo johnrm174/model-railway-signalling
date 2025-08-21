@@ -368,8 +368,10 @@ def map_dcc_signal(sig_id:int,
                 flash_prelim_caution = [[0,False],],
                 LH1 = [[0,False],],
                 LH2 = [[0,False],],
+                LH3 = [[0,False],],
                 RH1 = [[0,False],],
                 RH2 = [[0,False],],
+                RH3 = [[0,False],],
                 MAIN = [[0,False],],
                 NONE = [[0,False],],
                 THEATRE = [["#", [[0,False],]],],
@@ -383,7 +385,7 @@ def map_dcc_signal(sig_id:int,
     else:
         # Create a list of DCC commands [address,state] to validate (aspects and feathers)
         list_of_commands = ( danger + proceed + caution + prelim_caution + flash_caution +
-                             flash_prelim_caution + LH1 + LH2 + RH1 + RH2 + MAIN + NONE )
+                        flash_prelim_caution + LH1 + LH2 + LH3 + RH1 + RH2 + RH3 + MAIN + NONE )
         # Add the DCC commands for the Theatre route indicator 
         list_of_commands = list_of_commands + get_list_of_theatre_dcc_commands(THEATRE)
         # Validate all DCC commands for the Colour Light Signal DCC Mapping
@@ -409,8 +411,10 @@ def map_dcc_signal(sig_id:int,
                 str(signals.signal_state_type.FLASH_PRELIM_CAUTION) : flash_prelim_caution, # Specific to Colour_Light Mappings
                 str(signals.route_type.LH1) : LH1,                                          # Specific to Colour_Light Mappings
                 str(signals.route_type.LH2) : LH2,                                          # Specific to Colour_Light Mappings
+                str(signals.route_type.LH3) : LH3,                                          # Specific to Colour_Light Mappings
                 str(signals.route_type.RH1) : RH1,                                          # Specific to Colour_Light Mappings
                 str(signals.route_type.RH2) : RH2,                                          # Specific to Colour_Light Mappings
+                str(signals.route_type.RH3) : RH3,                                          # Specific to Colour_Light Mappings
                 str(signals.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
                 str(signals.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
@@ -732,8 +736,10 @@ def delete_signal_mapping(sig_id:int):
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.MAIN)])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.LH1)])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.LH2)])
+            remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.LH3)])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.RH1)])
             remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.RH2)])
+            remove_dcc_commands_from_dcc_address_mappings(dcc_signal_mapping[str(signals.route_type.RH3)])
             remove_dcc_commands_from_dcc_address_mappings(get_list_of_theatre_dcc_commands(dcc_signal_mapping["THEATRE"]))
         elif dcc_signal_mapping["mapping_type"] == mapping_type.SEMAPHORE:
             # Remove all DCC addresses used by the semaphore signal from the dcc_address_mappings dictionary

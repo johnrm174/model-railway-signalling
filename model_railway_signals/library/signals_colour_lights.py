@@ -79,8 +79,10 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 mainfeather:bool=False,
                                 lhfeather45:bool=False,
                                 lhfeather90:bool=False,
+                                lhfeather135:bool=False,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
+                                rhfeather135:bool=False,
                                 theatre_route_indicator:bool=False,
                                 theatre_route_subsidary:bool=False,
                                 fully_automatic:bool=False,
@@ -96,7 +98,7 @@ def create_colour_light_signal (canvas, sig_id:int,
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Get some info about the signal to help validation of the parameters we have been given
-    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
+    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or lhfeather135 or rhfeather135
     # Common validation (common to all signal types)
     if not isinstance(sig_id, int) or sig_id < 1:
         logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be a positive integer")
@@ -180,23 +182,32 @@ def create_colour_light_signal (canvas, sig_id:int,
             offset = -8
         else: # its a 4 aspect signal
             offset = 0
-        # Now draw the feathers (x has been adjusted for the no of aspects)            
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+75,post_offset,orientation)
+        # Now draw the feathers (x has been adjusted for the no of aspects)
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+65,post_offset,orientation)
+        topofpost = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+76,post_offset,orientation)
         main = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset+7,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+73,post_offset+7,orientation)
         rhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset+10,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+65,post_offset+10,orientation)
         rhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset-7,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+58,post_offset+8,orientation)
+        rhf135 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+73,post_offset-7,orientation)
         lhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset-10,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+65,post_offset-10,orientation)
         lhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+58,post_offset-8,orientation)
+        lhf135 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
         # Hide any feather drawing objects we don't need for this particular signal
+        if not signal_has_feathers: canvas.itemconfigure(topofpost,state='hidden')
         if not mainfeather: canvas.itemconfigure(main,state='hidden')
         if not lhfeather45: canvas.itemconfigure(lhf45,state='hidden')
         if not lhfeather90: canvas.itemconfigure(lhf90,state='hidden')
+        if not lhfeather135: canvas.itemconfigure(lhf135,state='hidden')
         if not rhfeather45: canvas.itemconfigure(rhf45,state='hidden')
         if not rhfeather90: canvas.itemconfigure(rhf90,state='hidden')
+        if not rhfeather135: canvas.itemconfigure(rhf135,state='hidden')
         # Set the "Override" Aspect - this is the default aspect that will be displayed
         # by the signal when it is overridden - This will be RED apart from 2 aspect
         # Distant signals where it will be YELLOW
@@ -228,8 +239,10 @@ def create_colour_light_signal (canvas, sig_id:int,
         signals.signals[str(sig_id)]["mainf"] = main                              # Type-specific - drawing object
         signals.signals[str(sig_id)]["lhf45"] = lhf45                             # Type-specific - drawing object
         signals.signals[str(sig_id)]["lhf90"] = lhf90                             # Type-specific - drawing object
+        signals.signals[str(sig_id)]["lhf135"] = lhf135                           # Type-specific - drawing object
         signals.signals[str(sig_id)]["rhf45"] = rhf45                             # Type-specific - drawing object
         signals.signals[str(sig_id)]["rhf90"] = rhf90                             # Type-specific - drawing object
+        signals.signals[str(sig_id)]["rhf135"] = rhf135                           # Type-specific - drawing object
         # Create the timed sequence class instances for the signal (one per route)
         signals.signals[str(sig_id)]["timedsequence"] = []
         for route in signals.route_type:
@@ -561,8 +574,10 @@ def refresh_feathers(sig_id:int):
     # initially set all the indications to OFF - we'll then set what we need
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf45"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf90"],fill="black")
+    signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf135"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf45"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf90"],fill="black")
+    signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf135"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["mainf"],fill="black")
     # Only display the route indication if the signal is not at RED
     if signals.signals[str(sig_id)]["sigstate"] != signals.signal_state_type.DANGER:
@@ -570,10 +585,14 @@ def refresh_feathers(sig_id:int):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf45"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH2:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf90"],fill="white")
+        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH3:
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf135"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH1:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf45"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH2:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf90"],fill="white")
+        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH3:
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf135"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.MAIN:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["mainf"],fill="white")
     return()

@@ -102,7 +102,7 @@ default_point_object["dccaddress"] = 0
 default_point_object["dccreversed"] = False
 # This is the default signal interlocking table for the point
 # The Table comprises a variable length list of interlocked signals
-# Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+# Each signal entry in the list comprises [sig_id, [main, lh1, lh2, lh3, rh1, rh2, rh3]]
 # Each route element in the list of routes is a boolean value (True or False)
 default_point_object["siginterlock"] = []
 # The interlocked Sections table is a variable length list of Track Section IDs
@@ -126,11 +126,11 @@ def check_for_dcc_address_conflicts(object_to_check):
 #------------------------------------------------------------------------------------
 # Function to recalculate the point interlocking tables for all points
 # Called following update or delete of a signal object and on layout load
-# Signal 'pointinterlock' comprises: [main, lh1, lh2, rh1, rh2]
+# Signal 'pointinterlock' comprises: [main, lh1, lh2, lh3, rh1, rh2, rh3]
 # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
 # Each point element (in the list of points) comprises [point_id, point_state]
 # Point 'siginterlock' comprises a variable length list of interlocked signals
-# Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+# Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2, rh2, rh3]]
 # Each route element is a boolean value (True or False)
 #------------------------------------------------------------------------------------
 
@@ -138,19 +138,19 @@ def reset_point_interlocking_tables():
     # Iterate through the points to clear the interlocking tables
     for point_id in objects_common.point_index:
         objects_common.schematic_objects[objects_common.point(point_id)]["siginterlock"] = []
-    # Iterate through the points to re-calculate the interlocking tables
+    # Iterate through the signals to analyse their interlocking tables
     for signal_id in objects_common.signal_index:
-        # Get the object ID for the signal
+        # Get the object ID for the signal and its interlocking table
         signal_object = objects_common.signal(signal_id)
-        # Iterate through all the points on the schematic
+        interlocking_table = objects_common.schematic_objects[signal_object]["pointinterlock"]
+        # Iterate through  the points on the schematic, adding the signal to their interlocking tables 
         for point_id in objects_common.point_index:
             # Get the Object ID of the point
             point_object = objects_common.point(point_id)
             # Everything is false by default- UNLESS specifically set
             point_interlocked_by_signal = False
-            interlocked_routes = [False, False, False, False, False]
+            interlocked_routes = [False, False, False, False, False, False, False]
             # Iterate through each route in the SIGNAL interlocking table and then the points on each route
-            interlocking_table = objects_common.schematic_objects[signal_object]["pointinterlock"]
             for route_index, route_to_test in enumerate(interlocking_table):
                 list_of_points_to_test = route_to_test[0]
                 for point_to_test in list_of_points_to_test:

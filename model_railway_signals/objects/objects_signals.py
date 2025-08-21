@@ -100,21 +100,21 @@ default_signal_object["flipped"] = False
 default_signal_object["xbuttonoffset"] = 0
 default_signal_object["ybuttonoffset"] = 0
 default_signal_object["hidebuttons"] = False
-# The 'sigroutes' and 'subroutes' elements comprise a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+# The 'sigroutes' and 'subroutes' elements comprise a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each signal_route element is a flag to specify the route is 'available' for the signal/subsidary
-default_signal_object["sigroutes"] = [True,False,False,False,False]
-default_signal_object["subroutes"] = [False,False,False,False,False]
+default_signal_object["sigroutes"] = [True,False,False,False,False,False,False]
+default_signal_object["subroutes"] = [False,False,False,False,False,False,False]
 #------------------------------------------------------------------------------------
 # General Configuration - parameters specific to semaphore AND colour light signals
 #------------------------------------------------------------------------------------
 default_signal_object["theatreroute"] = False
 default_signal_object["theatresubsidary"] = False
-# The 'dcctheatre' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,RH1,RH2]
+# The 'dcctheatre' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Note that 'DARK' is a dummy signal_route to inhibit all route indications ('#')
 # Each 'signal_route' element comprises: [character_to_ display, dcc_command_sequence]
 # The 'dcc_command_sequence' comprises a variable length list of dcc_commands
 # Each 'dcc_commands' comprises: [DCC address, DCC state]
-default_signal_object["dcctheatre"] = [ ["#", [] ], ["", [] ], ["", [] ], ["", [] ], ["", [] ], ["", [] ] ]
+default_signal_object["dcctheatre"] = [ ["#",[]], ["",[]], ["",[]], ["",[]], ["",[]], ["",[]] , ["",[]], ["",[]]]
 # The 'dccautoinhibit' flag signifies that a DCC signal will inhibit route indications when at DANGER
 # If the DCC signal doesn't do this, then the flag should be set to FALSE (so the software does it instead)
 default_signal_object["dccautoinhibit"] = False
@@ -123,18 +123,18 @@ default_signal_object["dccautoinhibit"] = False
 #------------------------------------------------------------------------------------
 # The 'subsidary' element comprises a list: [has_subsidary:bool, dcc_address:int, reversed_logic:bool]
 default_signal_object["subsidary"] = [False, 0, False]
-# The 'feathers' element is a list_of_signal_routes [MAIN,LH1,LH2,RH1,RH2]
+# The 'feathers' element is a list_of_signal_routes [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each signal_route element is a boolean flag to specify a feather for the route
-default_signal_object["feathers"] = [False,False,False,False,False]
+default_signal_object["feathers"] = [False,False,False,False,False,False,False]
 # The 'dccaspects' element comprises a list_of_signal_aspects: [grn, red, ylw, dylw, fylw, fdylw]
 # Each 'list_of_signal_aspects' element comprises a variable length list_of_dcc_commands
 # Each 'dcc_command' comprises: [DCC address, DCC state]
 default_signal_object["dccaspects"] = [ [], [], [], [], [], [] ]
-# The 'dccfeathers' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,RH1,RH2]
+# The 'dccfeathers' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Note that 'DARK' is a dummy signal_route to inhibit all feather route indications
 # Each 'signal_route' element comprises a variable length list_of_dcc_commands
 # Each 'dcc_command' comprises: [DCC address, DCC state]
-default_signal_object["dccfeathers"] =  [ [], [], [], [], [], [] ]
+default_signal_object["dccfeathers"] =  [ [], [], [], [], [], [], [], [] ]
 #------------------------------------------------------------------------------------
 # General Configuration - parameters specific to Semaphore signals
 #------------------------------------------------------------------------------------
@@ -157,22 +157,22 @@ default_signal_object["slotwith"] = 0
 #------------------------------------------------------------------------------------
 # The 'interlockahead' element is a flag to interlock distant signal with all home signals ahead
 default_signal_object["interlockahead"] = False
-# The 'pointinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+# The 'pointinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each 'signal_route' element comprises: [variable length list_of_point_settings, sig_id, block_id]
 # Where Each 'point_setting' (in the list_of_point_settings) comprises [point_id, point_state]
 # The 'sig_id' is the next signal on the route ahead - A string to represent local or remote IDs
 # the 'block_id' is the ID of the LOCAL block instrument associated with the signal_route
-default_signal_object["pointinterlock"] = [ [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0] ]
-# The 'trackinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+default_signal_object["pointinterlock"] = [ [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0] ]
+# The 'trackinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each route element contains a variable length list of interlocked sections for that route [t1,]
 # Each entry is the ID of a (local) track section the signal is to be interlocked with
-default_signal_object["trackinterlock"] = [ [], [], [], [], [] ]
+default_signal_object["trackinterlock"] = [ [], [], [], [], [], [], [] ]
 # From Release 4.5.0, the default opposing signal interlocking table for a signal
-# comprises a list of route elements [MAIN, LH1, LH2, RH1, RH2]
+# comprises a list of route elements [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each route element comprises a variable length list_of_signals [sig1, etc, ]
-# Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+# Each signal element comprises [sig_id, [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]]
 # Where each route element is a boolean value (True or False)
-default_signal_object["siginterlock"] = [[],[],[],[],[]]
+default_signal_object["siginterlock"] = [ [], [], [], [], [], [], [] ]
 #------------------------------------------------------------------------------------
 # General automation settings for the signal
 #------------------------------------------------------------------------------------
@@ -181,10 +181,10 @@ default_signal_object["siginterlock"] = [[],[],[],[],[]]
 default_signal_object["passedsensor"] = [True,""]     # [button, linked track sensor]
 default_signal_object["approachsensor"] = [False,""]  # [button, linked track sensor]
 # The 'tracksections' element is a list comprising: [section_behind, lists_of_sections_ahead]
-# The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+# The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each signal_route element comprises a variable length list of track sections: [T1,]
 # Note that each signal_route element contains at least one entry (the section directly ahead)
-default_signal_object["tracksections"] = [0, [ [0], [0], [0], [0], [0]]]
+default_signal_object["tracksections"] = [ 0, [ [0], [0], [0], [0], [0], [0], [0] ] ]
 # 'fullyautomatic' (all main signals) - Signal has no control button and will always be 'OFF'
 # 'distautomatic' (associated distant signals only) - Associated distant Signal has no control button
 # 'overrideahead' (sistant signal only) - override distant to CAUTION if any home signals ahead are at DANGER
@@ -193,17 +193,19 @@ default_signal_object["fullyautomatic"] = False
 default_signal_object["distautomatic"] = False
 default_signal_object["overrideahead"] = False
 default_signal_object["overridesignal"] = False
-# The 'approachcontrol' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+# The 'approachcontrol' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each 'signal_route' element represents the approach control mode set for that route:
 # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
-default_signal_object["approachcontrol"] = [0, 0, 0, 0, 0]            
-# The 'timed_sequences' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+default_signal_object["approachcontrol"] = [0, 0, 0, 0, 0, 0, 0]            
+# The 'timed_sequences' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each 'signal_route' element comprises a list of [selected, sig_id, start_delay, time_delay)
 # 'selected is a boolean flag signifying a timed sequence is configured for the route
 # The 'sig_id' is the signal to trigged (could be this signal or another signal)
 # The 'start_delay' is the time (in seconds) before the initial signal change
 # The 'time_delay' is the time (in seconds) between each subsequent signal change
 default_signal_object["timedsequences"] = [ [False, 0, 0, 0],
+                                            [False, 0, 0, 0],
+                                            [False, 0, 0, 0],
                                             [False, 0, 0, 0],
                                             [False, 0, 0, 0],
                                             [False, 0, 0, 0],
@@ -562,8 +564,10 @@ def redraw_signal_object(object_id):
                     MAIN = objects_common.schematic_objects[object_id]["dccfeathers"][1],
                     LH1 = objects_common.schematic_objects[object_id]["dccfeathers"][2],
                     LH2 = objects_common.schematic_objects[object_id]["dccfeathers"][3],
-                    RH1 = objects_common.schematic_objects[object_id]["dccfeathers"][4],
-                    RH2 = objects_common.schematic_objects[object_id]["dccfeathers"][5],
+                    ##LH3 = objects_common.schematic_objects[object_id]["dccfeathers"][4],
+                    RH1 = objects_common.schematic_objects[object_id]["dccfeathers"][5],
+                    RH2 = objects_common.schematic_objects[object_id]["dccfeathers"][6],
+                    ##RH3 = objects_common.schematic_objects[object_id]["dccfeathers"][7],
                     subsidary = objects_common.schematic_objects[object_id]["subsidary"][1:3],
                     THEATRE = objects_common.schematic_objects[object_id]["dcctheatre"] )
     elif (sig_type == library.signal_type.semaphore or
@@ -614,8 +618,10 @@ def redraw_signal_object(object_id):
                     mainfeather = objects_common.schematic_objects[object_id]["feathers"][0],
                     lhfeather45 = objects_common.schematic_objects[object_id]["feathers"][1],
                     lhfeather90 = objects_common.schematic_objects[object_id]["feathers"][2],
-                    rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][3],
-                    rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][4],
+                    lhfeather135 = objects_common.schematic_objects[object_id]["feathers"][3],
+                    rhfeather45 = objects_common.schematic_objects[object_id]["feathers"][4],
+                    rhfeather90 = objects_common.schematic_objects[object_id]["feathers"][5],
+                    rhfeather135 = objects_common.schematic_objects[object_id]["feathers"][6],
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
                     theatre_route_subsidary = objects_common.schematic_objects[object_id]["theatresubsidary"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
