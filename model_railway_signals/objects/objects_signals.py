@@ -18,6 +18,7 @@
 #    update_references_to_section(old_id, new_id) - update section_id in the interlocking tables
 #    remove_references_to_instrument(inst_id) - remove instr references from the interlocking tables
 #    update_references_to_instrument(old_id, new_id) - update inst_id in the interlocking tables
+#    check_for_dcc_address_conflicts(object_to_check) - Check if the DCC address is currently in use
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default application styles for the object
@@ -70,6 +71,7 @@
 
 import uuid
 import copy
+import logging
 
 from . import objects_common
 from . import objects_points
@@ -206,6 +208,54 @@ default_signal_object["timedsequences"] = [ [False, 0, 0, 0],
                                             [False, 0, 0, 0],
                                             [False, 0, 0, 0],
                                             [False, 0, 0, 0] ]
+
+#------------------------------------------------------------------------------------
+# Function to check if the dcc address specified for a signal object is already
+# mapped to another schematic object (to support the Import use case)
+#------------------------------------------------------------------------------------
+
+def check_for_dcc_address_conflicts(object_to_check):
+    conflicts_detected = False
+    # Compile a list of DCC addresses used by the new signal object
+    list_of_dcc_addresses = []
+    # The 'dccaspects' element comprises a list_of_signal_aspects: [grn, red, ylw, dylw, fylw, fdylw]
+    # Each 'list_of_signal_aspects' element comprises a variable length list_of_dcc_commands
+    # Each 'dcc_command' comprises: [DCC address, DCC state]
+    for list_of_dcc_commands in object_to_check["dccaspects"]:
+        for dcc_command in list_of_dcc_commands:
+            list_of_dcc_addresses.append(dcc_command[0])
+    # The 'dccfeathers' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,RH1,RH2]
+    # Each 'signal_route' element comprises a variable length list_of_dcc_commands
+    # Each 'dcc_command' comprises: [DCC address, DCC state]
+    for list_of_dcc_commands in object_to_check["dccfeathers"]:
+        for dcc_command in list_of_dcc_commands:
+            list_of_dcc_addresses.append(dcc_command[0])
+    # The 'dcctheatre' element comprises a list_of_signal_routes: [DARK,MAIN,LH1,LH2,RH1,RH2]
+    # Each 'signal_route' element comprises: [character_to_ display, dcc_command_sequence]
+    # The 'dcc_command_sequence' comprises a variable length list of dcc_commands
+    # Each 'dcc_commands' comprises: [DCC address, DCC state]
+    for signal_route in object_to_check["dcctheatre"]:
+        list_of_dcc_commands = signal_route[1]
+        for dcc_command in list_of_dcc_commands:
+            list_of_dcc_addresses.append(dcc_command[0])
+    # The 'subsidary' element comprises a list: [has_subsidary:bool, dcc_address:int, reversed_logic:bool]
+    if object_to_check["subsidary"][0]: list_of_dcc_addresses.append(object_to_check["subsidary"][1])
+    # The 'sigarms' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+    # Each 'signal_route' element comprises a list_of_signal_arms: [sig, sub, dist]
+    # Each 'signal_arm' element comprises [enabled/disabled, associated DCC address]
+    for list_of_signal_arms in object_to_check["sigarms"]:
+        for signal_arm in list_of_signal_arms:
+            if signal_arm[0]: list_of_dcc_addresses.append(signal_arm[1])
+    # See if any of the DCC addresses are already in use
+    for dcc_address in list_of_dcc_addresses:
+        dcc_mapping = library.dcc_address_mapping(dcc_address)
+        if dcc_mapping is not None:
+            conflicts_detected = True
+            # correct the reported signal ID for secondary distant signals
+            if dcc_mapping[1] > 1000: dcc_mapping[1] = dcc_mapping[1] - 1000
+            logging.error("Import Schematic - Signal "+str(object_to_check["itemid"])+" DCC address "+
+                    str(dcc_address)+" - already mapped to "+ dcc_mapping[0]+" "+str(dcc_mapping[1]))
+    return(conflicts_detected)
 
 #------------------------------------------------------------------------------------
 # Internal Helper function to test if a semaphore has an associated distant signal

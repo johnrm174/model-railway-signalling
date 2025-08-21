@@ -15,6 +15,7 @@
 #    update_references_to_signal(old_id, new_id) - update signal_id references in the lever's configuration
 #    remove_references_to_point(point_id) - remove point_id references from the lever's configuration
 #    update_references_to_point(old_id, new_id) - update point_id references in the lever's configuration
+#    check_for_key_code_conflicts(object_to_check) - Check if the Keycode is currently in use
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default application styles for the object
@@ -38,6 +39,7 @@
 
 import uuid
 import copy
+import logging
 
 from . import objects_common
 from .. import run_layout
@@ -69,6 +71,22 @@ default_lever_object["switchpoint"] = False
 default_lever_object["switchfpl"] = False
 default_lever_object["onkeycode"] = 0
 default_lever_object["offkeycode"] = 0
+
+#------------------------------------------------------------------------------------
+# Function to check if the keycode specified for a Lever object is already
+# mapped to another schematic object (to support the Import use case)
+#------------------------------------------------------------------------------------
+
+def check_for_key_code_conflicts(object_to_check):
+    conflicts_detected = False
+    keycodes = [object_to_check["onkeycode"], object_to_check["offkeycode"]]
+    for keycode in keycodes:
+        keycode_mapping = library.get_keyboard_mapping(object_to_check["onkeycode"])
+        if keycode_mapping is not None:
+            conflicts_detected = True
+            logging.error("Import Schematic - Lever "+str(object_to_check["itemid"])+" Keycode "+
+                    str(keycode)+" - already mapped to "+ keycode_mapping[0]+" "+str(keycode_mapping[1]))
+    return(conflicts_detected)
 
 #------------------------------------------------------------------------------------
 # Function to remove references to a Point from the Lever's configuration.

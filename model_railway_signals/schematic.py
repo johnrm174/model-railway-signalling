@@ -13,7 +13,6 @@
 #
 # Makes the following external API calls to other editor packages/modules:
 #    objects.initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
-#    objects.update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    objects.create_object(obj, type, subtype) - Create a default object on the schematic
 #    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
@@ -93,6 +92,7 @@ canvas = None
 canvas_width = None
 canvas_height = None
 canvas_grid = None
+canvas_grid_colour = None
 canvas_snap_to_grid = None
 canvas_display_grid = None
 # The callback to make (for selected canvas events) - Mode change, toggle Snap to Grid etc
@@ -266,20 +266,21 @@ def deselect_all_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to delete all objects (for layout 'load' and layout 'new')
+# Internal function to hard delete all objects (for layout 'load' and layout 'new')
+# and Soft Delete all library objects for the layout 'import' use case
 #------------------------------------------------------------------------------------
 
 def delete_all_objects():
     global schematic_state
-    # Select and delete all objects (also clear the selected objects list)
+    # Select and delete all objects from the schematic
     select_all_objects()
-    # Delete the objects from the schematic
-    objects.delete_objects(schematic_state["selectedobjects"],initialise_layout_after_delete=False)
+    objects.delete_objects(schematic_state["selectedobjects"])
     # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
-    # Belt and braces delete of all canvas objects as I've seen issues when
-    # running the system tests (probably because I'm not using the mainloop)
+    # Belt and braces delete of all canvas objects as I've seen issues when running the system tests
+    # (probably because I'm not using the mainloop) - Note we re-draw the grid afterwards
     canvas.delete("all")
+    redraw_canvas_grid()
     # Set the select area box to 'None' so it gets created on first use
     schematic_state["selectareabox"] = None
     return()
@@ -807,25 +808,31 @@ def cancel_move_in_progress(event=None):
 
 def update_canvas(width:int, height:int, grid:int, snap_to_grid:bool,
                   display_grid:bool, canvas_colour:str, grid_colour:str):
-    global canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid, canvas_display_grid
+    global canvas_width, canvas_height, canvas_grid
+    global canvas_snap_to_grid, canvas_display_grid, canvas_grid_colour
     # If the size has changed then set the global variables and resize the window
     if canvas_width != width or canvas_height != height:
         canvas_width, canvas_height = width, height
         reset_window_size()
     # Set the other global variables (used by other functions)
-    canvas_grid, canvas_snap_to_grid, canvas_display_grid = grid, snap_to_grid, display_grid
-    # Work out whether we display the grid or not
-    if display_grid and edit_mode_active: grid_state = "normal"
-    else: grid_state = "hidden"
-    # Change the colour of the canvas
+    canvas_grid, canvas_snap_to_grid = grid, snap_to_grid
+    canvas_display_grid, canvas_grid_colour = display_grid, grid_colour
+    # Change the colour of the canvas and re-draw the grid
     canvas.configure(bg=canvas_colour)
-    # Redraw the grid to reflect the new settings
+    redraw_canvas_grid()
+    return()
+
+def redraw_canvas_grid():
+    # Work out whether we display the grid or not
+    if canvas_display_grid and edit_mode_active: grid_state = "normal"
+    else: grid_state = "hidden"
+    # Redraw the grid to reflect the new settings (deleting the existing grid first)
     canvas.delete("grid")
-    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline=grid_colour, fill="", tags="grid", state=grid_state)
+    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline=canvas_grid_colour, fill="", tags="grid", state=grid_state)
     for i in range(0, canvas_height, canvas_grid):
-        canvas.create_line(0, i, canvas_width, i, fill=grid_colour, tags="grid", state=grid_state)
+        canvas.create_line(0, i, canvas_width, i, fill=canvas_grid_colour, tags="grid", state=grid_state)
     for i in range(0, canvas_width, canvas_grid):
-        canvas.create_line(i, 0, i, canvas_height, fill=grid_colour, tags="grid", state=grid_state)
+        canvas.create_line(i, 0, i, canvas_height, fill=canvas_grid_colour, tags="grid", state=grid_state)
     # Push the grid to the back (behind any drawing objects)
     canvas.tag_lower("grid")
     return()

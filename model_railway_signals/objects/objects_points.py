@@ -14,6 +14,7 @@
 #    reset_point_interlocking_tables() - recalculates interlocking tables from scratch
 #    remove_references_to_section(section_id) - remove section_id references from the Point's configuration
 #    update_references_to_section(old_id, new_id) - update section_id references in the Point's configuration
+#    check_for_dcc_address_conflicts(object_to_check) - Check if the DCC address is currently in use
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default application styles for the object
@@ -60,6 +61,7 @@
 
 import uuid
 import copy
+import logging
 
 from . import objects_common
 from . import objects_signals
@@ -105,6 +107,21 @@ default_point_object["dccreversed"] = False
 default_point_object["siginterlock"] = []
 # The interlocked Sections table is a variable length list of Track Section IDs
 default_point_object["sectioninterlock"] = []
+
+#------------------------------------------------------------------------------------
+# Function to check if the dcc address specified for a point object is already
+# mapped to another schematic object (to support the Import use case)
+#------------------------------------------------------------------------------------
+
+def check_for_dcc_address_conflicts(object_to_check):
+    conflicts_detected = False
+    dcc_address = object_to_check["dccaddress"]
+    dcc_mapping = library.dcc_address_mapping(dcc_address)
+    if dcc_mapping is not None:
+        conflicts_detected = True
+        logging.error("Import Schematic - Point "+str(object_to_check["itemid"])+" DCC address "+
+            str(dcc_address)+" - already mapped to "+ dcc_mapping[0]+" "+str(dcc_mapping[1]))
+    return(conflicts_detected)
 
 #------------------------------------------------------------------------------------
 # Function to recalculate the point interlocking tables for all points

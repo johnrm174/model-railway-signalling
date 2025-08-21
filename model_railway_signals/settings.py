@@ -5,6 +5,8 @@
 #    restore_defaults() - Restores all defaults
 #    get_all() - returns dictionary of settings
 #    set_all(new_settings) - pass in dictionary of new settings
+#    extend(new_settings) - Extend the existing settings (Import Use case)
+#    check_for_import_conflicts(new_settings) - Checks for conflicts
 #    get_canvas() - Get the current canvas settings (as specified)
 #    set_canvas() - Save the new canvas settings (as specified)
 #    get_logging() - Get the current log level (as specified)
@@ -149,11 +151,69 @@ def restore_defaults():
     return()
 
 #------------------------------------------------------------------------------------
-# Functions to set/get all settings (for load and save)
+# Function to check a dict of new settings for possible GPIO settings conflicts
+# This is to support the 'import' use case where we are loading another layout
+# file into an existing schematic. Returns True if conflicts are detected.
+#------------------------------------------------------------------------------------
+
+def check_for_import_conflicts(new_settings:dict):
+    conflicts_detected = False
+    # Check that there are no duplicate GPIO Sensor IDs and there are no
+    # GPIO Port conflicts (i.e. port mapped on current and imported layout)
+    for new_gpio_mapping in new_settings["gpio"]["portmappings"]:
+        new_sensor_id, new_gpio_port = new_gpio_mapping[0], new_gpio_mapping[1]
+        for existing_gpio_mapping in settings["gpio"]["portmappings"]:
+            existing_sensor_id, existing_gpio_port = existing_gpio_mapping[0], existing_gpio_mapping[1]
+            if new_sensor_id == existing_sensor_id:
+                logging.error("Import Schematic - GPIO Sensor "+str(new_sensor_id)+" exists in both configurations")
+                conflicts_detected = True
+            if new_gpio_port == existing_gpio_port:
+                logging.error("Import Schematic - GPIO Port "+str(new_sensor_id)+" is mapped in both configurations")
+                conflicts_detected = True
+    return(conflicts_detected)
+
+#------------------------------------------------------------------------------------
+# Functions to set/get and extend all settings (for load and save)
+# The extend function is for the "Import" use case where we will already
+# have validated the imported file is the same version as the application
+# so we don't need to be as defensive as we are for the "Load" use case
 #------------------------------------------------------------------------------------
 
 def get_all():
     return(settings)
+
+def extend(new_settings):
+    global settings
+    # Extend the GPIO Mappings (if there were any duplicate GPIO Sensor IDs or
+    # port mapping conflicts then the import would have ben aborted)
+    settings["gpio"]["portmappings"].extend(new_settings["gpio"]["portmappings"])
+    # Extend the MQTT Pub/sub settings to include any new imported items
+    # Note we check if they are already subscribed to avoid duplicates
+    for subscribed_item in new_settings["mqtt"]["subsignals"]:
+        if subscribed_item not in settings["mqtt"]["subsignals"]:
+            settings["mqtt"]["subsignals"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["subsections"]:
+        if subscribed_item not in settings["mqtt"]["subsections"]:
+            settings["mqtt"]["subsections"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["subinstruments"]:
+        if subscribed_item not in settings["mqtt"]["subinstruments"]:
+            settings["mqtt"]["subinstruments"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["subsensors"]:
+        if subscribed_item not in settings["mqtt"]["subsensors"]:
+            settings["mqtt"]["subsensors"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["pubsignals"]:
+        if subscribed_item not in settings["mqtt"]["pubsignals"]:
+            settings["mqtt"]["pubsignals"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["pubsections"]:
+        if subscribed_item not in settings["mqtt"]["pubsections"]:
+            settings["mqtt"]["pubsections"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["pubinstruments"]:
+        if subscribed_item not in settings["mqtt"]["pubinstruments"]:
+            settings["mqtt"]["pubinstruments"].append(subscribed_item)
+    for subscribed_item in new_settings["mqtt"]["pubsensors"]:
+        if subscribed_item not in settings["mqtt"]["pubsensors"]:
+            settings["mqtt"]["pubsensors"].append(subscribed_item)
+    return()
 
 def set_all(new_settings):
     global settings

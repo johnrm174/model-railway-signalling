@@ -9,7 +9,9 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.save_schematic_state(reset_pointer) - Save the state following save or load
+#    objects.check_for_import_conflicts() - Check for conflicts with existing objects
 #    objects.set_all(new_objects) - Set the dict of objects following a load
+#    objects.extend(new_objects) - Add to the dict of objects following an import
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.configure_remote_gpio_sensor_event_mappings() - set up the GPIO Sensor event mappings
 #    schematic.initialise(root, callback, *canvasargs) - Create the canvas
@@ -24,8 +26,10 @@
 #    run_layout.reset_layout() - Reset the schematic back to its default state
 #    run_routes.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
+#    settings.check_for_import_conflicts() - Check for conflicts with existing settings
 #    settings.get_all() - Get all settings (for save)
-#    settings.set_all() - Set all settings (following load)
+#    settings.set_all() - Update settings (following Import)
+#    settings.extend() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
 #    settings.get_general() - Get the current general settings
 #    settings.set_general() - Set the new general settings
@@ -718,13 +722,13 @@ class main_menubar:
         if len(version)==3: version += ".0"
         return tuple(map(int,(version.split("."))))
 
-    def load_schematic(self, filename:str=None, examples:bool=False):
+    def load_schematic(self, filename:str=None, examples:bool=False, schematic_import:bool=False, xoffset:int=0, yoffset:int=0):
         # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the file selection dialog. If
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
         # The 'examples' flag tells the load_schematic function to open the file load dialog
         # in the example layout files folder (which is now part of the package)
-        logging.info("*************************************************************************************************")
+        logging.info("LOAD-LAYOUT-FILE*********************************************************************************")
         file_loaded, layout_state = library.load_schematic(filename, examples=examples)
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
@@ -738,7 +742,7 @@ class main_menubar:
                     logging.error("Load File - File was saved by "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - Upgrade application to "+sig_file_version+" or later to support this file.")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error", 
+                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
                 elif self.tuple_version(sig_file_version) < self.tuple_version("5.0.0"):
@@ -747,10 +751,17 @@ class main_menubar:
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - This version of the application only supports files saved by version 5.0.0 or later")
                     logging.error("Load File - Try loading/saving your file with version 5.0.0 first")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error", 
+                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
                         message="Layout file was saved by Application "+sig_file_version+".\n"+
                             "This version of the application only supports files saved by version 5.0.0 "+
                             "or later. Try loading/saving your file with version 5.0.0 first.")
+                elif schematic_import and self.tuple_version(sig_file_version) != self.tuple_version(application_version):
+                    # We only provide backward compatibility for a few versions - before that, fail fast
+                    logging.error("Import File - File was saved by application "+sig_file_version)
+                    logging.error("Import File - Current version of the application is "+application_version)
+                    logging.error("Import File - Version of imported file must match version of the application")
+                    Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                        message="Version of imported file does not match version of the application")
                 else:
                     # We should now be OK to attempt the load, but if the file was saved under a
                     # previous version then we still want to flag a warning message to the user
@@ -761,22 +772,49 @@ class main_menubar:
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
-                    # Delete all existing objects
-                    logging.info("*************************************************************************************************")
-                    schematic.delete_all_objects()
-                    logging.info("*************************************************************************************************")
-                    settings.set_all(layout_state["settings"])
-                    # Set the filename to reflect that actual name of the loaded file
-                    settings.set_general("filename", file_loaded)
-                    # Re-initialise the editor for the new settings to take effect
-                    self.initialise_editor()
-                    # Create the loaded layout objects then purge the loaded state information
-                    objects.set_all(layout_state["objects"])
-                    # Purge the loaded state (to stope it being erroneously inherited
-                    # when items are deleted and then new items created with the same IDs)
-                    library.purge_loaded_state_information()
-                    # Set the flag so we don't enforce a "save as" on next save
-                    self.file_has_been_saved = True
+                    # If this is an 'import' then we leave the existing objects as is, merge the MQTT Pub/sub settings
+                    # settings and just load in the new objects at the specified offset (assuming no conflicts)
+                    if schematic_import:
+                        # Purge the loaded state for all library objects (we don't use it for the import process)
+                        library.purge_loaded_state_information()
+                        logging.info("CHECKING-FOR-SETTINGS-CONFLICTS******************************************************************")
+                        if settings.check_for_import_conflicts(layout_state["settings"]):
+                            logging.error("IMPORT LAYOUT - Failed to import layout due to conflicts in layout settings")
+                            Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                                message="Failed to import layout due to conflicts in layout settings "+
+                                            "(see logs for details) - Resolve conflicts and retry" )
+                        else:
+                            logging.info("CHECKING-FOR-IMPORT-CONFLICTS********************************************************************")
+                            if objects.check_for_import_conflicts(layout_state["objects"]):
+                                logging.error("IMPORT LAYOUT - Failed to import layout due to schematic object conflicts")
+                                Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                                    message="Failed to import layout due to schematic object conflicts "+
+                                                "(see logs for details) - Resolve conflicts and retry" )
+                            else:
+                                logging.info("APPLY-NEW-SETTINGS*******************************************************************************")
+                                settings.extend(layout_state["settings"])
+                                self.reset_mqtt_pub_sub_configuration()
+                                self.apply_new_mqtt_pub_sub_configuration()
+                                self.gpio_update()
+                                logging.info("CREATE-NEW-OBJECTS*******************************************************************************")
+                                objects.extend(layout_state["objects"], xoffset=xoffset, yoffset=yoffset)
+                    else:
+                        # Delete all existing objects
+                        logging.info("DELETE-OLD-OBJECTS*******************************************************************************")
+                        schematic.delete_all_objects()
+                        logging.info("APPLY-NEW-SETTINGS*******************************************************************************")
+                        settings.set_all(layout_state["settings"])
+                        # Set the filename to reflect that actual name of the loaded file
+                        settings.set_general("filename", file_loaded)
+                        # Re-initialise the editor for the new settings to take effect
+                        self.initialise_editor()
+                        # Create the loaded layout objects then purge the loaded state information
+                        logging.info("CREATE-NEW-OBJECTS*******************************************************************************")
+                        objects.set_all(layout_state["objects"])
+                        # Purge the loaded state (to stope it being erroneously inherited when items are deleted/created with the same IDs)
+                        library.purge_loaded_state_information()
+                        # Set the flag so we don't enforce a "save as" on next save
+                        self.file_has_been_saved = True
             else:
                 logging.error("LOAD LAYOUT - File does not contain all required elements")
                 Tk.messagebox.showerror(parent=self.root, title="Load Error", 

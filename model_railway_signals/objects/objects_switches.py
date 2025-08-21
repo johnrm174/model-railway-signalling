@@ -12,6 +12,7 @@
 #    delete_switch_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_switch_object(object_id) - Redraw the object on the canvas following an update
 #    default_switch_object - The dictionary of default values for the object
+#    check_for_dcc_address_conflicts(object_to_check) - Check if the DCC address is currently in use
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_style - To retrieve the default layout styles for the object
@@ -43,6 +44,7 @@
 
 import uuid
 import copy
+import logging
 
 from . import objects_common
 from . import objects_routes
@@ -71,6 +73,29 @@ default_switch_object["dccoffcommands"] = []
 # Other object-specific parameters:
 default_switch_object["hidden"] = False
 default_switch_object["releasedelay"] = 0
+
+#------------------------------------------------------------------------------------
+# Function to check if the dcc address specified for a switch object is already
+# mapped to another schematic object (to support the Import use case)
+#------------------------------------------------------------------------------------
+
+def check_for_dcc_address_conflicts(object_to_check):
+    conflicts_detected = False
+    # Compile a list of DCC addresses used by the new switch object
+    list_of_dcc_addresses = []
+    # Each DCC command sequence comprises a variable list of DCC commands [[DCC address, DCC state],]
+    for dcc_command in object_to_check["dcconcommands"]:
+        list_of_dcc_addresses.append(dcc_command[0])
+    for dcc_command in object_to_check["dccoffcommands"]:
+        list_of_dcc_addresses.append(dcc_command[0])
+    # See if any of the DCC addresses are already in use
+    for dcc_address in list_of_dcc_addresses:
+        dcc_mapping = library.dcc_address_mapping(dcc_address)
+        if dcc_mapping is not None:
+            conflicts_detected = True
+            logging.error("Import Schematic - Switch "+str(object_to_check["itemid"])+" DCC address "+
+                    str(dcc_address)+" - already mapped to "+ dcc_mapping[0]+" "+str(dcc_mapping[1]))
+    return(conflicts_detected)
 
 #------------------------------------------------------------------------------------
 # Function to to update a Switch object following a configuration change
