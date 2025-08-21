@@ -266,8 +266,7 @@ def deselect_all_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to hard delete all objects (for layout 'load' and layout 'new')
-# and Soft Delete all library objects for the layout 'import' use case
+# Internal function to delete all objects (for layout 'load' and layout 'new')
 #------------------------------------------------------------------------------------
 
 def delete_all_objects():
