@@ -517,7 +517,7 @@ def map_dcc_switch(switch_id:int, on_commands:[[int,bool],], off_commands:[[int,
         logging.error ("DCC Control: map_dcc_switch - Switch "+str(switch_id)+" - already has a DCC mapping")
     else:
         # Create a list of DCC commands [address,state] to validate (on and off sequences)
-        list_of_commands = on_commands + on_commands
+        list_of_commands = on_commands + off_commands
         if dcc_commands_valid("map_dcc_switch", "Switch", switch_id, list_of_commands):
             logging.debug ("DCC Control - Creating DCC Address mapping for DCC Switch "+str(switch_id))
             # Create the DCC Mapping entry for the signal
