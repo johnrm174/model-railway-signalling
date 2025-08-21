@@ -200,6 +200,8 @@ class main_menubar:
                 command=lambda:menubar.bulk_renumbering(self.root))
         self.utilities_menu.add_command(label =" Application Upgrade...",
                 command=lambda:menubar.application_upgrade(self.root))
+        self.utilities_menu.add_command(label =" Import Layout...",
+                command=lambda:menubar.import_layout(self.root, self.load_schematic))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)

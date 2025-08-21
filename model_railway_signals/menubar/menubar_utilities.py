@@ -6,6 +6,7 @@
 #    dcc_mappings(root)
 #    bulk_renumbering(root)
 #    application_upgrade(root)
+#    import_layout(root, load_schematic_callback)
 #
 # Uses the following library functions:
 #    library.service_mode_read_cv(cv_to_read)
@@ -841,6 +842,77 @@ class application_upgrade():
     def close_window(self):
         global upgrade_utility_window
         upgrade_utility_window = None
+        self.window.destroy()
+
+#---------------------------------------------------------------------------------------
+# Class for the "Import Schematic" utility window (uses the classes above)
+#---------------------------------------------------------------------------------------
+
+import_utility_window = None
+
+class import_layout():
+    def __init__(self, root_window, load_layout_callback):
+        global import_utility_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if import_utility_window is not None:
+            import_utility_window.lift()
+            import_utility_window.state('normal')
+            import_utility_window.focus_force()
+        else:
+            # Create the top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Import Schematic")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            import_utility_window = self.window
+            self.load_layout_callback = load_layout_callback
+            # Create the descriptive text for the import utility window
+            self.label = Tk.Label(self.window, text=
+                "Utility to import another layout file into the current schematic.\n"+
+                "Layout file must be the same version as the application version.\n"
+                "Import will fail (with log messages) if conflicts are detected.")
+            self.label.pack(padx=5, pady=5)
+            # Create a label frame for the x and y offsets
+            self.frame1 = Tk.LabelFrame(self.window, text="Canvas offsets for imported layout")
+            self.frame1.pack(padx=5, pady=5, fill="x")
+            # Crete a subframe to center everything in
+            self.subframe1 = Tk.Frame(self.frame1)
+            self.subframe1.pack()
+            self.L1 =Tk.Label(self.subframe1, text="Import X offset:")
+            self.L1.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.EB1 = common.integer_entry_box(self.subframe1, width=3, min_value=0, max_value=7000,
+                            tool_tip="Specify any x offset (0-7000 pixels) for the imported layout")
+            self.EB1.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.L2 =Tk.Label(self.subframe1, text="     Import Y offset:")
+            self.L2.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.EB2 = common.integer_entry_box(self.subframe1, width=3, min_value=0, max_value=3000,
+                            tool_tip="Specify any y offset (0-3000 pixels) for the imported layout")
+            self.EB2.pack(side=Tk.LEFT, padx=2, pady=5)
+            # Create the buttons and tooltip
+            self.frame2=Tk.Frame(self.window)
+            self.frame2.pack(padx=5, pady=5)
+            self.B1 = Tk.Button(self.frame2, text = "Choose Layout File", command=self.load_file)
+            self.TT1 = common.CreateToolTip(self.B1, "Proceed with the upgrade")
+            self.B1.pack(padx=5, pady=5, side=Tk.LEFT)
+            self.B2 = Tk.Button(self.frame2, text = "Cancel / Close", command=self.close_window)
+            self.TT1 = common.CreateToolTip(self.B2, "Close the window")
+            self.B2.pack(padx=5, pady=5, side=Tk.LEFT)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+
+    def load_file(self):
+        if self.EB1.validate() and self.EB2.validate():
+            self.validation_error.pack_forget()
+            self.load_layout_callback(schematic_import=True, xoffset=self.EB1.get_value(), yoffset=self.EB2.get_value())
+            import_utility_window.lift()
+            import_utility_window.focus_force()
+        else:
+            # Display the validation error message
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.frame2)
+
+    def close_window(self):
+        global import_utility_window
+        import_utility_window = None
         self.window.destroy()
 
 #############################################################################################
