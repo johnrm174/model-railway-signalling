@@ -131,7 +131,7 @@ def load_schematic(requested_filename:str=None, examples:bool=False):
             path, name = ".", ""
         else:
             path, name = ".", ""
-        filename_to_load = tkinter.filedialog.askopenfilename(title='Load Layout State',
+        filename_to_load = tkinter.filedialog.askopenfilename(title='Load Layout',
                             filetypes=(('sig files','*.sig'),('all files','*.*')),
                             initialdir=path, initialfile=name)
         # If dialogue is cancelled then Filename will remain as 'None' as nothing will be loaded
@@ -145,15 +145,15 @@ def load_schematic(requested_filename:str=None, examples:bool=False):
     # We should now have a valid filename (and the file exists) unless the user has cancelled
     # the file load dialog or the specified file does not exist (in this case it will be None)
     if filename_to_load is None:
-        logging.info("Load File - No file selected - Layout will remain in its default state")
+        logging.info("Load File - No layout file selected")
     else:
-        logging.info("Load File - Loading layout configuration from '"+filename_to_load+"'")
+        logging.info("Load File - Loading layout file '"+filename_to_load+"'")
         try:
             with open (filename_to_load,'r') as file:
                 file_contents=file.read()
             file.close
         except Exception as exception:
-            logging.error("Load File - Error opening file - Layout will remain in its default state")
+            logging.error("Load File - Error opening layout file ")
             logging.error("Load File - Reported Exception: "+str(exception))
             tkinter.messagebox.showerror(parent=common.root_window,
                             title="File Load Error", message=str(exception))
@@ -164,7 +164,7 @@ def load_schematic(requested_filename:str=None, examples:bool=False):
             try:
                 loaded_state = json.loads(file_contents)
             except Exception as exception:
-                logging.error("Load File - Couldn't read file - Layout will be created in its default state")
+                logging.error("Load File - Couldn't read layout file")
                 logging.error("Load File - Reported exception: "+str(exception))
                 tkinter.messagebox.showerror(parent=common.root_window,
                             title="File Parse Error", message=str(exception))
@@ -202,7 +202,7 @@ def save_schematic(settings:dict, objects:dict, requested_filename:str, save_as:
             path, name = os.path.split(last_fully_qualified_file_name)
         else:
             path, name = ".", ""
-        filename_to_save = tkinter.filedialog.asksaveasfilename(title='Save Layout State',
+        filename_to_save = tkinter.filedialog.asksaveasfilename(title='Save Layout',
                     filetypes=(('sig files','*.sig'),('all files','*.*')),
                     initialfile=name, initialdir=path)
         # If dialogue is cancelled then Filename will remain as 'None' as nothing will be saved
@@ -214,13 +214,13 @@ def save_schematic(settings:dict, objects:dict, requested_filename:str, save_as:
     # We should now have a valid filename (and the file exists) unless the user has cancelled
     # the file save dialog or the specified file does not exist (in this case it will be None)
     if filename_to_save is None:
-        logging.info("Save File - No file selected")
+        logging.info("Save File - No layout file selected")
     else:
         # We have a valid filename - Force the ".sig" extension
         if not filename_to_save.endswith(".sig"): filename_to_save = filename_to_save+".sig"
         # Note that the asksaveasfilename dialog returns the fully qualified filename
         # (including the path) - we only need the name so strip out the path element
-        logging.info("Save File - Saving Layout Configuration as '"+filename_to_save+"'")
+        logging.info("Save File - Saving Layout file as '"+filename_to_save+"'")
         dictionary_to_save["information"] = "Model Railway Signalling Configuration File"
         # Retrieve the DEFINITION of all the data items we need to save to maintain state
         # These are defined in a single function at the top of this source file. We also
@@ -262,7 +262,7 @@ def save_schematic(settings:dict, objects:dict, requested_filename:str, save_as:
                 file.write(file_contents)
             file.close
         except Exception as exception:
-            logging.error("Save File - Error saving file - Reported exception: "+str(exception))
+            logging.error("Save File - Error saving layout file - Reported exception: "+str(exception))
             tkinter.messagebox.showerror(parent=common.root_window,
                         title="File Save Error",message=str(exception))
             filename_to_save = None
