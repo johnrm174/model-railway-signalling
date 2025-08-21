@@ -666,8 +666,8 @@ def extend(new_objects:dict, xoffset:int=0, yoffset:int=0):
     objects_points.reset_point_interlocking_tables()
     # Initialise the layout (interlocking changes, signal aspects etc)
     run_layout.initialise_layout()
-    # save the current state (for undo/redo) - deleting all previous history
-    save_schematic_state(reset_pointer=True)
+    # save the current state (for undo/redo) - retaining all previous history
+    save_schematic_state(reset_pointer=False)
     return()
 
 #------------------------------------------------------------------------------------
