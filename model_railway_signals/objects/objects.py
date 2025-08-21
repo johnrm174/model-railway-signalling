@@ -600,32 +600,37 @@ def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
 
 def check_for_import_conflicts(new_objects:dict):
     conflicts_detected = False
+    # Check for Duplicate Item IDs - Any duplicates will cause import to fail. Note that Route buttons
+    # and DCC switches share the same underlying button object - so we have to check both indexes
     for object_id in new_objects:
-        # Check for Duplicate Item IDs - Any duplicates will cause import to fail
         new_object_type = new_objects[object_id]["item"]
-        new_object_id = str(new_objects[object_id]["itemid"])
-        if ( new_object_type == objects_common.object_type.line and new_object_id in objects_common.line_index.keys() or
-             new_object_type == objects_common.object_type.signal and new_object_id in objects_common.signal_index.keys() or
-             new_object_type == objects_common.object_type.point and new_object_id in objects_common.point_index.keys() or
-             new_object_type == objects_common.object_type.section and new_object_id in objects_common.section_index.keys() or
-             new_object_type == objects_common.object_type.instrument and new_object_id in objects_common.instrument_index.keys() or
+        new_item_id = str(new_objects[object_id]["itemid"])
+        if ( new_object_type == objects_common.object_type.line and new_item_id in objects_common.line_index.keys() or
+             new_object_type == objects_common.object_type.signal and new_item_id in objects_common.signal_index.keys() or
+             new_object_type == objects_common.object_type.point and new_item_id in objects_common.point_index.keys() or
+             new_object_type == objects_common.object_type.section and new_item_id in objects_common.section_index.keys() or
+             new_object_type == objects_common.object_type.instrument and new_item_id in objects_common.instrument_index.keys() or
              new_object_type == objects_common.object_type.track_sensor and new_object_id in objects_common.track_sensor_index.keys() or
-             new_object_type == objects_common.object_type.route and new_object_id in objects_common.route_index.keys() or
-             new_object_type == objects_common.object_type.switch and new_object_id in objects_common.switch_index.keys() or
-             new_object_type == objects_common.object_type.lever and new_object_id in objects_common.lever_index.keys() ):
-            logging.error("Import Schematic - Duplicate Item ID detected for "+str(new_object_type.rpartition('.')[-1])+" "+new_object_id)
+             new_object_type == objects_common.object_type.route and new_item_id in objects_common.route_index.keys() or
+             new_object_type == objects_common.object_type.route and new_item_id in objects_common.switch_index.keys() or
+             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.route_index.keys() or
+             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.switch_index.keys() or
+             new_object_type == objects_common.object_type.lever and new_item_id in objects_common.lever_index.keys() ):
+            logging.error("Import Schematic - Duplicate Item ID detected for "+str(new_object_type.rpartition('.')[-1])+" "+new_item_id)
             conflicts_detected=True
-        else:
-            # Check for Duplicate DCC Address mappings (signals, points and DCC switches)
+    if not conflicts_detected:
+        # Check for Duplicate DCC Address mappings (signals, points and DCC switches) and Duplicate Keycode
+        # mappings (Levers). Note we do this as a second pass (only when item ID conflicts have been resolved)
+        for object_id in new_objects:
+            new_object_type = new_objects[object_id]["item"]
             if new_object_type == objects_common.object_type.point:
-                conflicts_detected = objects_points.check_for_dcc_address_conflicts(new_objects[object_id])
+                if objects_points.check_for_dcc_address_conflicts(new_objects[object_id]): conflicts_detected=True
             elif new_object_type == objects_common.object_type.signal:
-                conflicts_detected = objects_signals.check_for_dcc_address_conflicts(new_objects[object_id])
+                if objects_signals.check_for_dcc_address_conflicts(new_objects[object_id]): conflicts_detected=True
             elif new_object_type == objects_common.object_type.switch:
-                conflicts_detected = objects_switches.check_for_dcc_address_conflicts(new_objects[object_id])
-            # Check for Duplicate Keycode mappings (Levers)
+                if objects_switches.check_for_dcc_address_conflicts(new_objects[object_id]): conflicts_detected=True
             elif new_object_type == objects_common.object_type.lever:
-                conflicts_detected = objects_levers.check_for_key_code_conflicts(new_objects[object_id])
+                if objects_levers.check_for_key_code_conflicts(new_objects[object_id]): conflicts_detected=True
     return(conflicts_detected)
 
 #------------------------------------------------------------------------------------
@@ -641,8 +646,6 @@ def extend(new_objects:dict, xoffset:int=0, yoffset:int=0):
         # the Object_ID (to avoid ending up with duplicate IDs - which could happen)
         new_object_id = str(uuid.uuid4())
         objects_common.schematic_objects[new_object_id] = copy.deepcopy(new_objects[object_id])
-        # Add the object ID to the type_specific index:
-        add_schematic_index_entry(new_object_id)
         # Apply the required positional offset - posx/posy elements are mandatory for all objects
         objects_common.schematic_objects[new_object_id]["posx"] = objects_common.schematic_objects[new_object_id]["posx"] + xoffset
         objects_common.schematic_objects[new_object_id]["posy"] = objects_common.schematic_objects[new_object_id]["posy"] + yoffset
@@ -657,6 +660,8 @@ def extend(new_objects:dict, xoffset:int=0, yoffset:int=0):
             if library.text_box_exists(objects_common.schematic_objects[new_object_id]["itemid"]):
                 new_item_id = objects_common.new_item_id(exists_function=library.text_box_exists)
                 objects_common.schematic_objects[new_object_id]["itemid"] = new_item_id
+        # Add the object ID to the type_specific index:
+        add_schematic_index_entry(new_object_id)
         # Draw the imported object on the schematic
         redraw_object(new_object_id)
     # Ensure all track sections are in front of any lines

@@ -24,7 +24,7 @@
 #    dcc_mappings(root)
 #    bulk_renumbering(root)
 #    application_upgrade(root)
-#    import_layout(root, load_schematic_callback)
+#    import_layout(root, import_schematic_callback)
 #
 #------------------------------------------------------------------------------------
 
