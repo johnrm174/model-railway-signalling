@@ -801,7 +801,7 @@ def set_all(new_objects:dict):
                                     if len(signal_entry[1]) < 7:
                                         corrected_values[index1].append([signal_entry[0], [signal_entry[1][0],
                                                             signal_entry[1][1], signal_entry[1][2], False,
-                                                            signal_entry[1][1], signal_entry[1][1], False]])
+                                                            signal_entry[1][3], signal_entry[1][4], False]])
                                     else:
                                         corrected_values[index1].append(signal_entry)
                             objects_common.schematic_objects[object_id][element] = corrected_values

@@ -111,16 +111,13 @@ def update_point_in_route_table(old_point_id:int, new_point_id:int, dict_key:str
     # Iterate through all the Track Sections on the schematic
     for track_sensor_id in objects_common.track_sensor_index:
         sensor_object = objects_common.track_sensor(track_sensor_id)
-        # Create a new 'blank' list for copying the track sections (that haven't been deleted)
         route_table = objects_common.schematic_objects[sensor_object][dict_key]
-        new_route_table = []
         # Iterate through each route in the interlocking table and then the points on each route
         for index1, route in enumerate(route_table):
             list_of_points = route[0]
-            for point_entry in enumerate(list_of_points):
-                if point_entry[0] != old_point_id:
-                    new_route_table.append(point_entry)
-            objects_common.schematic_objects[sensor_object][dict_key][index1][0] = new_route_table
+            for index2, point_entry in enumerate(list_of_points):
+                if point_entry[0] == old_point_id:
+                    objects_common.schematic_objects[sensor_object][dict_key][index1][0][index2][0] = new_point_id
     return()
 
 #------------------------------------------------------------------------------------
