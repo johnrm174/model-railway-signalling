@@ -739,23 +739,24 @@ def set_all(new_objects:dict):
                             objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
                     #########################################################################################################
                     # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
-                    # The 'tracksections' element is now a list comprising: [section_behind, lists_of_sections_ahead]
-                    # The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-                    # Each signal_route element comprises a variable length list of track sections: [T1,]
-                    # Note that each signal_route element contains at least one entry (the section directly ahead)
+                    # The tracksections element was a list comprising: [section_behind, signal_routes_ahead]
+                    # The signal_routes_ahead element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                    # Each signal_route changed from a fixed-length list of 3 track sections to a variable length
+                    # list of track sections with at least one entry (the tracksection directly ahead)
                     # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
                     # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
                     #########################################################################################################
                     # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
-                    # The 'trackinterlock' element now comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-                    # Each route element contains a variable length list of interlocked sections for that route [t1,]
+                    # The trackinterlock element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                    # Each signal_route hanged from a fixed-length list of 3 track sections to a variable length
+                    # list of interlocked track sections for the route
                     # Each entry is the ID of a (local) track section the signal is to be interlocked with
                     # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
                     # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
                     #########################################################################################################
-                    # From Release 5.4.0 the application supports more Signal routes. All elements need to be extended
-                    # as appropriate and re-ordered to ensure the routes are correctly ordered after loading - i.e.
-                    # from [MAIN,LH1,LH2,RH1,RH2] to [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
+                    # From Release 5.4.0 the application supports more Signal routes. All elements (including the above)
+                    # need to be extended as appropriate and re-ordered to ensure the routes are correctly ordered after
+                    # loading - i.e. from [MAIN,LH1,LH2,RH1,RH2] to [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
                     #########################################################################################################
                     elif (new_object_type == objects_common.object_type.signal and (element == "dccfeathers" or
                           element == "dcctheatre") and len(new_objects[object_id][element]) < 8):
@@ -819,6 +820,15 @@ def set_all(new_objects:dict):
                     elif (new_object_type == objects_common.object_type.lever and element == "signalroutes"
                                                 and len(new_objects[object_id][element]) < 7):
                         new_values = copy.deepcopy(objects_levers.default_lever_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Main
+                        new_values[1] = new_objects[object_id][element][1] # lh1
+                        new_values[2] = new_objects[object_id][element][2] # lh2
+                        new_values[4] = new_objects[object_id][element][3] # rh1
+                        new_values[5] = new_objects[object_id][element][4] # rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.track_sensor and (element == "routeahead" or
+                                element == "routebehind") and len(new_objects[object_id][element]) < 7):
+                        new_values = copy.deepcopy(objects_sensors.default_track_sensor_object[element])
                         new_values[0] = new_objects[object_id][element][0] # Main
                         new_values[1] = new_objects[object_id][element][1] # lh1
                         new_values[2] = new_objects[object_id][element][2] # lh2
