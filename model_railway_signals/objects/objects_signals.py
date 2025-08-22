@@ -372,17 +372,14 @@ def remove_references_to_point(point_id:int):
         # Iterate through each route in the interlocking table
         interlocking_table = objects_common.schematic_objects[sig_object]["pointinterlock"]
         for index1, interlocked_route in enumerate(interlocking_table):
-            list_of_interlocked_points = interlocked_route[0]
             # Create a new 'blank' list for copying the points (that haven't been deleted) across
             # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by the point removal)
-            new_list_of_interlocked_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
-            index2 = 0
-            # Iterate through each point on the route in the interlocking table
-            # to build up the new list of points (that are to be retained)
+            new_list_of_interlocked_points = []
+            # Iterate through each point on the route in the interlocking table to build up the new list of points
+            list_of_interlocked_points = interlocked_route[0]
             for interlocked_point in list_of_interlocked_points:
                 if interlocked_point[0] != point_id:
-                    new_list_of_interlocked_points[index2] = interlocked_point
-                    index2 = index2 +1
+                    new_list_of_interlocked_points.append(interlocked_point)
             # Replace the list of interlocked points
             objects_common.schematic_objects[sig_object]["pointinterlock"][index1][0]= new_list_of_interlocked_points
     return()
@@ -421,17 +418,28 @@ def remove_references_to_section(section_id:int):
         # Check the track section behind the signal
         if track_sections[0] == section_id:
             track_sections[0] = 0
-        # Check the track sections in front of the signal
-        for index1, list_of_sections_ahead in enumerate(track_sections[1]):
-            for index2, section_ahead in enumerate (list_of_sections_ahead):
-                if section_ahead == section_id:
-                    objects_common.schematic_objects[sig_object]["tracksections"][1][index1][index2] = 0
+        # Check the track sections in front of the signal for each route
+        for index1, list_of_sections in enumerate(track_sections[1]):
+            # Create a new 'blank' list for copying the track sections (that haven't been deleted)
+            # The first entry is always maintained - if deletedwe just set the value to zero
+            if list_of_sections[0] == section_id:
+                new_list_of_sections = [0]
+            else:
+                new_list_of_sections = [list_of_sections[0]]
+            # We only add the other non-deleted sections to the list (i.e. remove blanks
+            for section_ahead in list_of_sections[1:]:
+                if section_ahead != section_id:
+                    new_list_of_sections.append(section_ahead)
+            objects_common.schematic_objects[sig_object]["tracksections"][1][index1] = new_list_of_sections
         # Check the track interlocking table
         track_interlocking = objects_common.schematic_objects[sig_object]["trackinterlock"]
-        for index1, route in enumerate(track_interlocking):
-            for index2, track_section in enumerate(route):
-                if track_section == section_id:
-                    objects_common.schematic_objects[sig_object]["trackinterlock"][index1][index2] = 0
+        for index1, list_of_sections in enumerate(track_interlocking):
+            # Create a new 'blank' list for copying the track sections (that haven't been deleted)
+            new_list_of_sections = []
+            for track_section in list_of_sections:
+                if track_section != section_id:
+                    new_list_of_sections.append(track_section)
+            objects_common.schematic_objects[sig_object]["trackinterlock"][index1] = new_list_of_sections
     return()
 
 #------------------------------------------------------------------------------------
