@@ -77,7 +77,7 @@ def interlocked_signals(instrument_id:int):
     for signal_id in objects.signal_index:
         # Everything is false by default- UNLESS specifically set
         signal_interlocked_by_instrument = False
-        interlocked_routes = [False, False, False, False, False]
+        interlocked_routes = [False, False, False, False, False, False, False]
         # Get the signal's interlocking table
         signal_routes = objects.schematic_objects[objects.signal(signal_id)]["pointinterlock"]
         # Iterate through each signal route in the interlocking table
