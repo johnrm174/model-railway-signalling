@@ -264,17 +264,6 @@ def test_menubar_utilities_windows():
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True))
     system_test_harness.sleep(2.0)
-    print("Testing Menubar utilities windows - APPLICATION UPGRADE")
-    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
-    # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade))
-    system_test_harness.sleep(4.0)
-    # Try the upgrade process
-    system_test_harness.run_function(lambda:test_application_upgrade())
-    system_test_harness.sleep(20.0)
-    # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(cancel=True))
-    system_test_harness.sleep(2.0)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -407,6 +396,24 @@ def test_menubar_styles_windows():
     system_test_harness.sleep(2.0)
     return()
 
+#-----------------------------------------------------------------------------------
+# Function to test the application upgrade utility. Note this does not get run as
+# part of the normal system tests as it doesn't add any real value over manual testing
+#-----------------------------------------------------------------------------------
+
+def test_application_upgrade():
+    print("Testing Menubar utilities windows - APPLICATION UPGRADE")
+    # Open the window (we then sleep twice the delay as it tests open and re-open)
+    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade))
+    system_test_harness.sleep(4.0)
+    # Try the upgrade process
+    system_test_harness.run_function(lambda:test_application_upgrade())
+    system_test_harness.sleep(20.0)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.sleep(2.0)
+    return()
+
 ######################################################################################################
 
 def run_all_menubar_window_tests():
@@ -415,6 +422,7 @@ def run_all_menubar_window_tests():
     test_menubar_help_windows()
     test_menubar_settings_windows()
     test_menubar_utilities_windows()
+    ################     test_application_upgrade()  ############################
     # Load a layout to test the style changes
     system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
     test_menubar_styles_windows()

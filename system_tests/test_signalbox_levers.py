@@ -302,17 +302,21 @@ def run_signal_lever_route_tests():
     update_object_configuration(s1,{"pointinterlock":[ [[[1,False],[2,False]],"",0],
                                                        [[[1,True],[2,False]],"",0],
                                                        [[],"",0],
+                                                       [[],"",0],
                                                        [[[1,False],[2,True]],"",0],
-                                                       [[],"",0] ],
-                                    "sigroutes": [True, True, False, True, False],
-                                    "feathers": [False, True, False, True, False] } )    
+                                                       [[],"",0],
+                                                       [[],"",0]],
+                                    "sigroutes": [True, True, False, False, True, False, False],
+                                    "feathers": [False, True, False, False, True, False, False] } )    
     update_object_configuration(s2,{"pointinterlock":[ [[[1,False],[2,False]],"",0],
                                                        [[[1,True],[2,False]],"",0],
                                                        [[],"",0],
+                                                       [[],"",0],
                                                        [[[1,False],[2,True]],"",0],
+                                                       [[],"",0],
                                                        [[],"",0] ],
-                                    "sigroutes": [True, True, False, True, False],
-                                    "subroutes": [True, True, False, True, False],
+                                    "sigroutes": [True, True, False, False, True, False, False],
+                                    "subroutes": [True, True, False, False, True, False, False],
                                     "sigarms":[ [ [True,0],[True,0],[True,0] ],
                                                 [ [True,0],[True,0],[True,0] ],
                                                 [ [False,0],[False,0],[False,0] ],
@@ -320,28 +324,28 @@ def run_signal_lever_route_tests():
                                                 [ [False,0],[False,0],[False,0] ] ]} )
     # configure the signalbox levers for signal 1
     update_object_configuration(lev1,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":1,
-                                    "switchsignal":True, "signalroutes":[True, True, True, True, True]})    
+                                    "switchsignal":True, "signalroutes":[True, True, True, True, True, True, True]})    
     # configure the signalbox levers for signal 2 - main signal
     update_object_configuration(lev11,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
-                                      "switchsignal":True, "signalroutes":[True, False, False, False, False]})    
+                                      "switchsignal":True, "signalroutes":[True, False, False, False, False, False, False]})    
     update_object_configuration(lev12,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
-                                      "switchsignal":True, "signalroutes":[False, True, False, False, False]})    
+                                      "switchsignal":True, "signalroutes":[False, True, False, False, False, False, False]})    
     update_object_configuration(lev13,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
-                                      "switchsignal":True, "signalroutes":[False, False, False, True, False]})
+                                      "switchsignal":True, "signalroutes":[False, False, False, False, True, False, False]})
     # configure the signalbox levers for signal 2 - subsidary signal    
     update_object_configuration(lev14,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
-                                      "switchsubsidary":True, "signalroutes":[True, False, False, False, False]})
+                                      "switchsubsidary":True, "signalroutes":[True, False, False, False, False, False, False]})
     update_object_configuration(lev15,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
-                                      "switchsubsidary":True, "signalroutes":[False, True, False, False, False]})
+                                      "switchsubsidary":True, "signalroutes":[False, True, False, False, False, False, False]})
     update_object_configuration(lev16,{"itemtype":levers.lever_type.stopsignal.value, "linkedsignal":2,
-                                      "switchsubsidary":True, "signalroutes":[False, False, False, True, False]})
+                                      "switchsubsidary":True, "signalroutes":[False, False, False, False, True, False, False]})
     # configure the signalbox levers for signal 2 - distant signal    
     update_object_configuration(lev17,{"itemtype":levers.lever_type.distantsignal.value, "linkedsignal":2,
-                                      "switchdistant":True, "signalroutes":[True, False, False, False, False]})
+                                      "switchdistant":True, "signalroutes":[True, False, False, False, False, False, False]})
     update_object_configuration(lev18,{"itemtype":levers.lever_type.distantsignal.value, "linkedsignal":2,
-                                      "switchdistant":True, "signalroutes":[False, True, False, False, False]})
+                                      "switchdistant":True, "signalroutes":[False, True, False, False, False, False, False]})
     update_object_configuration(lev19,{"itemtype":levers.lever_type.distantsignal.value, "linkedsignal":2,
-                                      "switchdistant":True, "signalroutes":[False, False, False, True, False]})
+                                      "switchdistant":True, "signalroutes":[False, False, False, False, True, False, False]})
     print("Test interlocking of levers with their associated signals")
     # Main Route
     assert_signals_unlocked(1,2,1002)

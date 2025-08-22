@@ -677,47 +677,59 @@ def run_signal_config_update_on_change_of_id_tests():
     # Signal is interlocked on instrument 1, section 1 and points 1/2 - Sig ahead is 4
     # Note the Signal ahead is a string as this can be local or remote
     update_object_configuration(s1,{
-        "sigroutes":[True,True,True,True,True],
+        "sigroutes":[True,True,True,True,True,True,True],
         "overridesignal": True,
         "pointinterlock":[
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],"4",1] ],
         "siginterlock":[
-             [ [2, [True, True, True, True, True]], 
-               [2, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]] ], 
-             [ [2, [True, True, True, True, True]], 
-               [2, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]] ], 
-             [ [2, [True, True, True, True, True]], 
-               [2, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]] ], 
-             [ [2, [True, True, True, True, True]], 
-               [2, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]] ], 
-             [ [2, [True, True, True, True, True]], 
-               [2, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]], 
-               [3, [True, True, True, True, True]] ] ],
-        "trackinterlock":[[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]],
-        "tracksections":[1, [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]] ],
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ], 
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ], 
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ], 
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ], 
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ], 
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ], 
+             [ [2, [True, True, True, True, True, True, True]], 
+               [2, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]], 
+               [3, [True, True, True, True, True, True, True]] ] ],
+        "trackinterlock":[[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]],
+        "tracksections":[1, [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]] ],
         "timedsequences":[ [True,2,1,1],
                            [True,2,1,1],
                            [True,3,1,1],
+                           [True,3,1,1],
+                           [True,2,1,1],
                            [True,2,1,1],
                            [True,2,1,1] ]} )
     # Assert the point interlocking tables have been configured correctly
     assert_object_configuration(p1,{
-        "siginterlock":[ [1, [True,True,True,True,True] ] ] } )
+        "siginterlock":[ [1, [True,True,True,True,True,True,True] ] ] } )
     assert_object_configuration(p2,{
-        "siginterlock":[ [1, [True,True,True,True,True] ] ] } )
+        "siginterlock":[ [1, [True,True,True,True,True,True,True] ] ] } )
     # Configure another signal for point interlocking
     update_object_configuration(s2,{
         "sigroutes":[True,True,True,True,True],
@@ -725,14 +737,16 @@ def run_signal_config_update_on_change_of_id_tests():
            [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
            [[[1,True],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
            [[[1,True],[0,False],[0,False],[0,True],[0,False],[0,False]],"",0],
+           [[[1,True],[0,False],[0,False],[0,True],[0,False],[0,False]],"",0],
+           [[[1,True],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
            [[[1,True],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
            [[[1,True],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ] } )
     # Assert the point interlocking tables have been configured correctly
     assert_object_configuration(p1,{
-        "siginterlock":[ [1, [True,True,True,True,True] ],
-                         [2, [False,True,True,True,True] ] ] } )
+        "siginterlock":[ [1, [True,True,True,True,True,True,True] ],
+                         [2, [False,True,True,True,True,True,True] ] ] } )
     assert_object_configuration(p2,{
-        "siginterlock":[ [1, [True,True,True,True,True] ] ] } )
+        "siginterlock":[ [1, [True,True,True,True,True,True,True] ] ] } )
     # Test the interlocking and override functionality before changing the item IDs
     test_interlocking_and_overrides(sig1=1,sig2=2,sig3=3,sig4=4,
             point1=1,point2=2,block1=1,block2=2,sec1=1,sec2=2,sec3=3)
@@ -752,47 +766,59 @@ def run_signal_config_update_on_change_of_id_tests():
     assert_object_configuration(i1,{"itemid":41,"linkedto":"42"})
     assert_object_configuration(i2,{"itemid":42,"linkedto":"41"})
     # Test the signal interlocking and automation tables have been updated correctly
-    assert_object_configuration(s1,{
+    assert_object_configuration(s1,{        
         "pointinterlock":[
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],"14",41] ],
         "siginterlock":[
-             [ [12, [True, True, True, True, True]], 
-               [12, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [12, [True, True, True, True, True]], 
-               [12, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [12, [True, True, True, True, True]], 
-               [12, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [12, [True, True, True, True, True]], 
-               [12, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [12, [True, True, True, True, True]], 
-               [12, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ] ],
-        "trackinterlock":[[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33]],
-        "tracksections":[31,[[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33]] ],
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [12, [True, True, True, True, True, True, True]], 
+               [12, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ] ],
+        "trackinterlock":[[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33]],
+        "tracksections":[31,[[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33]] ],
         "timedsequences":[ [True,12,1,1],
                            [True,12,1,1],
                            [True,13,1,1],
+                           [True,13,1,1],
                            [True,12,1,1],
-                           [True,12,1,1] ]} )
+                           [True,12,1,1],
+                           [True,12,1,1] ]} )    
     # Assert the point interlocking tables have been updated correctly
     assert_object_configuration(p1,{
-        "siginterlock":[ [11, [True,True,True,True,True] ],
-                         [12, [False,True,True,True,True] ] ] } )
+        "siginterlock":[ [11, [True,True,True,True,True,True,True] ],
+                         [12, [False,True,True,True,True,True,True] ] ] } )
     assert_object_configuration(p2,{
-        "siginterlock":[ [11, [True,True,True,True,True] ] ] } )
+        "siginterlock":[ [11, [True,True,True,True,True,True,True] ] ] } )
     # Test the interlocking and override functionality after changing the item IDs
     test_interlocking_and_overrides(sig1=11,sig2=12,sig3=13,sig4=14,
             point1=21,point2=22,block1=41,block2=42,sec1=31,sec2=32,sec3=33)
@@ -802,49 +828,61 @@ def run_signal_config_update_on_change_of_id_tests():
     delete_selected_objects()
     # Test the route tables have been updated correctly for Signal 11
     assert_object_configuration(s1,{
-        "pointinterlock":[
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41] ] })
+        "pointinterlock":[   
+           [[[22,True],[22,True]],"14",41],
+           [[[22,True],[22,True]],"14",41],
+           [[[22,True],[22,True]],"14",41],
+           [[[22,True],[22,True]],"14",41],
+           [[[22,True],[22,True]],"14",41],
+           [[[22,True],[22,True]],"14",41],
+           [[[22,True],[22,True]],"14",41] ] })
     # Delete Point 22 and test all references have been removed from Signal 11
     select_single_object(p2)
     delete_selected_objects()
     # Test the interlocking tables have been updated correctly for Signal 11
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41] ] })
+           [[],"14",41],
+           [[],"14",41],
+           [[],"14",41],
+           [[],"14",41],
+           [[],"14",41],
+           [[],"14",41],
+           [[],"14",41] ] })
     # Delete signal 12 and test all references have been removed from Signal 11
     select_single_object(s2)
     delete_selected_objects()
     assert_object_configuration(s1,{
         "siginterlock":[
-             [ [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ], 
-             [ [13, [True, True, True, True, True]], 
-               [13, [True, True, True, True, True]] ] ],
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ], 
+             [ [13, [True, True, True, True, True, True, True]], 
+               [13, [True, True, True, True, True, True, True]] ] ],
         "timedsequences":[ [False,0,0,0],
                            [False,0,0,0],
                            [True,13,1,1],
+                           [True,13,1,1],
+                           [False,0,0,0],
                            [False,0,0,0],
                            [False,0,0,0] ] } )
     # Delete signal 13 and test all references have been removed from Signal 11
     select_single_object(s3)
     delete_selected_objects()
     assert_object_configuration(s1,{
-        "siginterlock":[ [], [], [], [], [], ],
+        "siginterlock":[ [], [], [], [], [], [], [] ],
         "timedsequences":[ [False,0,0,0],
+                           [False,0,0,0],
+                           [False,0,0,0],
                            [False,0,0,0],
                            [False,0,0,0],
                            [False,0,0,0],
@@ -854,40 +892,44 @@ def run_signal_config_update_on_change_of_id_tests():
     delete_selected_objects()
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41] ] } )
+           [[],"",41],
+           [[],"",41],
+           [[],"",41],
+           [[],"",41],
+           [[],"",41],
+           [[],"",41],
+           [[],"",41] ] } )
     # Delete Instrument 1 and test all references have been removed from Signal 11
     select_single_object(i1)
     delete_selected_objects()
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ] })
+           [[],"",0],
+           [[],"",0],
+           [[],"",0],
+           [[],"",0],
+           [[],"",0],
+           [[],"",0],
+           [[],"",0] ] })
     # Delete Track Section 31 and test all references have been removed from Signal 11
     select_single_object(t1)
     delete_selected_objects()
     # Test the route and interlocking tables have been updated correctly for Signal 11
     assert_object_configuration(s1,{
-        "tracksections":[0,[[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33]] ],
-        "trackinterlock":[[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33]] } )
+        "tracksections":[0,[[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33]] ],
+        "trackinterlock":[[32,33],[32,33],[32,33],[32,33],[32,33],[32,33],[32,33]] } )
     # Delete Section 32 and test all references have been removed from Signal 11
     select_single_object(t2)
     delete_selected_objects()
     assert_object_configuration(s1,{
-        "tracksections":[0,[[0,0,33],[0,0,33],[0,0,33],[0,0,33],[0,0,33]] ],
-        "trackinterlock":[[0,0,33],[0,0,33],[0,0,33],[0,0,33],[0,0,33]] } )
+        "tracksections":[0,[[0,33],[0,33],[0,33],[0,33],[0,33],[0,33],[0,33]] ],
+        "trackinterlock":[[33],[33],[33],[33],[33],[33],[33]] } )
     # Delete Section 33 and test all references have been removed from Signal 11
     select_single_object(t3)
     delete_selected_objects()
     assert_object_configuration(s1,{
-        "tracksections":[0,[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] ],
-        "trackinterlock":[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] } )
+        "tracksections":[0,[[0],[0],[0],[0],[0],[0],[0]] ],
+        "trackinterlock":[ [],[],[],[],[],[],[] ] } )
     # Clean up before the next series of tests
     select_all_objects()
     delete_selected_objects()
@@ -978,8 +1020,12 @@ def run_sensor_config_update_on_change_of_id_tests():
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],1],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],1] ],
         "routebehind":[
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],2],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],2],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],2],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],2],
            [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True]],2],
@@ -997,8 +1043,12 @@ def run_sensor_config_update_on_change_of_id_tests():
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],31],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],31],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],31],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],31],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],31],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],31] ],
         "routebehind":[
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],32],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],32],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],32],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],32],
            [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True]],32],
@@ -1010,65 +1060,39 @@ def run_sensor_config_update_on_change_of_id_tests():
     delete_selected_objects()
     assert_object_configuration(ts1,{
         "routeahead":[
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],31] ],
+           [[[22,True],[22,True]],31],
+           [[[22,True],[22,True]],31],
+           [[[22,True],[22,True]],31],
+           [[[22,True],[22,True]],31],
+           [[[22,True],[22,True]],31],
+           [[[22,True],[22,True]],31],
+           [[[22,True],[22,True]],31] ],
         "routebehind":[
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],32] ] } )
+           [[[22,True],[22,True]],32],
+           [[[22,True],[22,True]],32],
+           [[[22,True],[22,True]],32],
+           [[[22,True],[22,True]],32],
+           [[[22,True],[22,True]],32],
+           [[[22,True],[22,True]],32],
+           [[[22,True],[22,True]],32] ] } )
     # Delete Point 22 and test all references have been removed from the Track Sensor
     select_single_object(p2)
     delete_selected_objects()
     assert_object_configuration(ts1,{
-        "routeahead":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],31],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],31] ],
-        "routebehind":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32] ] } )
+        "routeahead":[ [[],31], [[],31], [[],31], [[],31], [[],31], [[],31], [[],31] ],
+        "routebehind":[ [[],32], [[],32], [[],32], [[],32], [[],32], [[],32], [[],32] ] } )
     # Delete Track Section 31 and test all references have been removed from the Track Sensor
     select_single_object(t1)
     delete_selected_objects()
     assert_object_configuration(ts1,{
-        "routeahead":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ],
-        "routebehind":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],32] ] } )
+        "routeahead":[ [[],0], [[],0], [[],0], [[],0], [[],0], [[],0], [[],0] ],
+        "routebehind":[ [[],32], [[],32], [[],32], [[],32], [[],32], [[],32], [[],32] ] } )
     # Delete Track Section 32 and test all references have been removed from the Track Sensor
     select_single_object(t2)
     delete_selected_objects()
     assert_object_configuration(ts1,{
-        "routeahead":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ],
-        "routebehind":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ] } )
+        "routeahead":[ [[],0], [[],0], [[],0], [[],0], [[],0], [[],0], [[],0] ],
+        "routebehind":[ [[],0], [[],0], [[],0], [[],0], [[],0], [[],0], [[],0] ] } )
     # clean up
     select_all_objects()
     delete_selected_objects()
