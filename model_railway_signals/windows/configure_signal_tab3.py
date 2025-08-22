@@ -37,14 +37,14 @@ class signal_event_frame(Tk.Frame):
         # Create a subframe to center all the elements in
         self.subframe=Tk.Frame(self)
         self.subframe.pack()
-        self.label = Tk.Label(self.subframe, text="Signal '"+event_type+"' sensor:")
+        self.label = Tk.Label(self.subframe, text="'"+event_type+"' sensor:")
         self.label.pack(padx=2, side=Tk.LEFT)
         self.sensor = common.validated_gpio_sensor_entry_box(self.subframe, item_type="Signal", callback=callback,
                            tool_tip="Specify the ID of a GPIO Sensor to trigger the event (or leave blank) - "+
                                 "This can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
                                 "which has been subscribed to via MQTT networking")
         self.sensor.pack(padx=2, side=Tk.LEFT)
-        self.button = common.check_box(self.subframe, label="Signal '"+event_type+"' button",tool_tip="Select to "+
+        self.button = common.check_box(self.subframe, label="'"+event_type+"' button",tool_tip="Select to "+
                                 "create a small button at the base of the signal to simulate '"+event_type+
                                 "' events and provide an indication of GPIO sensor events")
         self.button.pack(padx=2, side=Tk.LEFT)
@@ -135,12 +135,13 @@ class section_ahead_element(Tk.Frame):
         self.pack()
         self.label = Tk.Label(self, text=label, width=8)
         self.label.pack(side=Tk.LEFT)
-        tool_tip1 = ("Specify the track section immediately 'ahead of' the signal (to be occupied when the signal is passed)")
-        tool_tip2 = ("Specify the track sections on the route ahead (leading up to the next signal). If enabled "+
-                     "on the right, the signal will be overridden to ON if any of these sections are occupied.")
+        tool_tip1 = ("Specify the track section immediately 'ahead of' the signal (to be occupied when the signal is passed). "+
+                     "If enabled on the right, the signal will be overridden to ON when the track section is occupied.")
+        tool_tip2 = ("Specify any other track sections on the route ahead (leading up to the next signal) which would "+
+                     "override the signal to ON if occupied (if enabled).")
         self.first_section = common.int_item_id_entry_box(self, exists_function=library.section_exists, tool_tip=tool_tip1)
         self.first_section.pack(side = Tk.LEFT, padx=2)
-        self.other_sections = common.row_of_int_item_id_entry_boxes(self, columns=2,
+        self.other_sections = common.row_of_int_item_id_entry_boxes(self, columns=3,
                                 exists_function=library.section_exists, tool_tip=tool_tip2)
         self.other_sections.pack(side = Tk.LEFT)
 
