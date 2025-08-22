@@ -293,7 +293,7 @@ def remove_references_to_signal(deleted_sig_id:int):
         list_of_interlocked_signal_routes = objects_common.schematic_objects[sig_object]["siginterlock"]
         # Iterate through the list of routes in the interlocking table
         for index1, interlocked_route in enumerate(list_of_interlocked_signal_routes):
-            # Each route contains a list of up to 4 conflicting signals
+            # Each route contains a variable length list of conflicting signals
             list_of_conflicting_signals = list_of_interlocked_signal_routes[index1]
             # Create a new 'blank' list for copying the signals (that haven't been deleted) across
             # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by signal removals)
