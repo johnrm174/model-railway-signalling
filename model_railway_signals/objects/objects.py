@@ -816,6 +816,15 @@ def set_all(new_objects:dict):
                         new_values[1][4] = new_objects[object_id][element][1][3] # section ahead - rh1
                         new_values[1][5] = new_objects[object_id][element][1][4] # section ahead - rh2
                         objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.lever and element == "signalroutes"
+                                                and len(new_objects[object_id][element]) < 7):
+                        new_values = copy.deepcopy(objects_levers.default_lever_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Main
+                        new_values[1] = new_objects[object_id][element][1] # lh1
+                        new_values[2] = new_objects[object_id][element][2] # lh2
+                        new_values[4] = new_objects[object_id][element][3] # rh1
+                        new_values[5] = new_objects[object_id][element][4] # rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
                     #########################################################################################################
                     # End of code to handle changes in Object data structures
                     #########################################################################################################

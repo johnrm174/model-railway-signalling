@@ -164,8 +164,7 @@ default_signal_object["interlockahead"] = False
 # the 'block_id' is the ID of the LOCAL block instrument associated with the signal_route
 default_signal_object["pointinterlock"] = [ [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0], [[],"",0] ]
 # The 'trackinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
-# Each route element contains a variable length list of interlocked sections for that route [t1,]
-# Each entry is the ID of a (local) track section the signal is to be interlocked with
+# Each route element contains a variable length list of interlocked Section IDs for that route
 default_signal_object["trackinterlock"] = [ [], [], [], [], [], [], [] ]
 # From Release 4.5.0, the default opposing signal interlocking table for a signal
 # comprises a list of route elements [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]

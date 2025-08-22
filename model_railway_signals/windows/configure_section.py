@@ -50,14 +50,16 @@ open_windows={}
 
 #------------------------------------------------------------------------------------
 # Function to return the read-only interlocked_signals element. This is the back-reference
-# to the signals that are configured to be interlocked with the track sections ahead
+# to the signals that have been configured to be interlocked with track sections ahead.
+# The 'trackinterlock' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
+# Each route element contains a variable length list of interlocked Section IDs for that route
 #------------------------------------------------------------------------------------
 
 def interlocked_signals(object_id):
     list_of_interlocked_signals = []
     for signal_id in objects.signal_index:
         interlocked_routes = objects.schematic_objects[objects.signal(signal_id)]["trackinterlock"]
-        signal_routes_to_set = [False, False, False, False, False]
+        signal_routes_to_set = [False, False, False, False, False, False, False]
         add_signal_to_interlock_list = False
         for index, interlocked_route in enumerate(interlocked_routes):
             for interlocked_section in interlocked_route:
@@ -72,6 +74,7 @@ def interlocked_signals(object_id):
 #------------------------------------------------------------------------------------
 # Function to return the read-only interlocked_points element. This is the back-reference
 # to the points that are configured to be interlocked with one or more track sections
+# The interlocked Sections table is a variable length list of Track Section IDs
 #------------------------------------------------------------------------------------
 
 def interlocked_points(object_id):
@@ -94,20 +97,21 @@ def get_signal_routes(object_id):
                sig_routes[1] or sub_routes[1],
                sig_routes[2] or sub_routes[2],
                sig_routes[3] or sub_routes[3],
-               sig_routes[4] or sub_routes[4] ] )
+               sig_routes[4] or sub_routes[4],
+               sig_routes[5] or sub_routes[5],
+               sig_routes[4] or sub_routes[6]] )
 
 #------------------------------------------------------------------------------------
 # Function to return the read-only "sensors ahead" and "sensors_behind" elements.
 # These are the back-references to the track sensors that are configured to either
 # set or clear the track section when the track sensor is 'passed'
+# "sensor_routes" comprises a list of routes: [main, lh1, lh2, lh3, rh1, rh2, rh3]
+# Each route element comprises: [list_of_point_settings, section_id]
 #------------------------------------------------------------------------------------
 
 def find_sensor_routes(track_section_id:int, sensor_routes:list):
-    matched_routes = [False, False, False, False, False]
+    matched_routes = [False, False, False, False, False, False, False]
     one_or_more_routes_matched = False
-    # "sensor_routes" comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-    # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-    # We need to iterate through the routes to find all matches on the section_id
     for index1, sensor_route in enumerate(sensor_routes):
         if sensor_route[1] == track_section_id:
             matched_routes[index1] = True
@@ -155,8 +159,8 @@ def signals_behind_and_overridden(object_id):
         section_id = int(objects.schematic_objects[object_id]["itemid"])
         sections_ahead_of_signal = objects.schematic_objects[objects.signal(signal_id)]["tracksections"][1]
         override_on_occupied_flag = objects.schematic_objects[objects.signal(signal_id)]["overridesignal"]
-        signal_routes_to_set_for_override = [False, False, False, False, False]
-        signal_routes_to_set_for_sig_behind = [False, False, False, False, False]
+        signal_routes_to_set_for_override = [False, False, False, False, False, False, False]
+        signal_routes_to_set_for_sig_behind = [False, False, False, False, False, False, False]
         add_signal_to_signals_behind_list = False
         add_signal_to_overriden_signals_list = False
         for index1, signal_route in enumerate(sections_ahead_of_signal):
