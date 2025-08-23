@@ -775,8 +775,8 @@ class application_upgrade():
             self.window.resizable(False, False)
             upgrade_utility_window = self.window
             # Create the main text for the upgrade window
-            self.label = Tk.Label(self.window, width=50, height=2, text="Check for and install any application updates\n"+
-                                                          "(Progress will be displayed in the Terminal window)")
+            self.label = Tk.Label(self.window, width=50, height=3, text="Check for and install any application updates\n"+
+                                                                    "(Progress will be displayed in the Terminal Window)")
             self.label.pack(padx=5, pady=5)
             self.frame=Tk.Frame(self.window)
             self.frame.pack(padx=5, pady=5)
@@ -796,7 +796,8 @@ class application_upgrade():
         self.B1.config(state="disabled")
         self.B2.config(state="disabled")
         self.window.protocol("WM_DELETE_WINDOW", self.null_function)
-        self.label.config(text="Upgrade in progress - please wait\nDo not close application until upgrade is complete")
+        self.label.config(text="Application upgrade in progress - please wait\n"+
+                            "Do not close application until upgrade is complete",fg="black")
         self.B1.update()
         self.B2.update()
         self.label.update()
@@ -808,29 +809,50 @@ class application_upgrade():
         print("----------------------------------------------------------------------------------------------------------------")
         try:
             if library.gpio_interface_enabled():
-                # Assume raspberry Pi - Install with sudo as a system package
-                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                                     "--break-system-packages", "pip"])
-                time.sleep(0.5)
-                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                                     "--break-system-packages", "model-railway-signals"])
+                # Assume raspberry Pi - Upgrade with sudo as a system package, suppressing errors/warnings
+                # Note that stdout and stderr are directed to the application's stdout and stderr
+                return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action",
+                                                        "ignore", "--break-system-packages", "pip"])
+                # Earlier versions of Pip don't support the --root-user-action or --break-system-packages flags so the
+                # above will error. We'll therefore try to upgrade pip to the latest version without these flags
+                # This is an assumption - pip might fail for other reasons (but unlikely in the big scheme of things)
+                if return_code != 0:
+                    return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "pip"])
+                # We'll only go ahead and try to install the application if we know Pip has been updated
+                if return_code == 0:
+                    return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                                                        "--break-system-packages", "model-railway-signals"])
             else:
                 # Assume Windows platform - Install as a user package
                 result = subprocess.run(["pip", "install", "--upgrade", "pip"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
-                time.sleep(0.5)
                 result= subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
-        except:
+                return_code = 999
+        except Exception as exception:
+            return_code = 2
             print("----------------------------------------------------------------------------------------------------------------")
-            print("Upgrade Error - An unhandled exception occured - Try manually upgrading from the Terminal / Command Prompt")
+            print("Upgrade Error - An unhandled exception occured during the application upgrade process:")
+            print(str(exception))
             print("----------------------------------------------------------------------------------------------------------------")
-            self.label.config(text="An unhandled exception occured\nTry manually upgrading from the Terminal / Cmd Prompt")
+        if return_code == 0:
+            self.label.config(text="Upgrade process has completed successfully\n"+
+                    "Exit and re-open the application to use the new version", fg="green4")
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Application Upgrade process completed successfully - Exit and re-open the application to use the new version")
+            print("----------------------------------------------------------------------------------------------------------------")
+        elif return_code == 999:
+            self.label.config(text="Upgrade process has completed - check logs for status\n"+
+                    "Exit and re-open the application to use the new version", fg="black")
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Application Upgrade process is now complete - check logs for success/fail status")
+            print("----------------------------------------------------------------------------------------------------------------")
         else:
+            self.label.config(text="Upgrade failed with one or more errors\nSee logs for details\n"+
+                                          "Try manually upgrading from the Terminal Window", fg="red")
             print("----------------------------------------------------------------------------------------------------------------")
-            print("Application Upgrade process is now complete - Exit and re-open the application to use the new version")
+            print("Upgrade Error - One or more errors occured during the upgrade process")
             print("----------------------------------------------------------------------------------------------------------------")
-            self.label.config(text="Upgrade process is complete\nExit and re-open the application to use the new version")
         # Re-enable the close button and window close now the upgrade process is complete
         self.B1.update()
         self.B2.update()
