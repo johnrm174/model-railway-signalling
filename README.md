@@ -74,6 +74,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * This new general setting will also increase the size of the new 'quick-scroll' buttons.
 * New 'Import' feature - to import another layout file into the current schematic:
     * Enables collaboration when developing complex layouts / signalling schemes.
+* Improvements to Application Upgrade utility:
+    * Will now report definitive success/failure in the user interface
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
