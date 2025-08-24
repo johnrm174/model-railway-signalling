@@ -164,8 +164,26 @@ class edit_canvas_settings():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             canvas_settings_window = self.window
+            # I've seen problems on later versions of Python on the Pi-5 where the buttons at the bottom
+            # of the screen disappear when the window dynamically re-sizes due to quick-scroll buttons.
+            # being added - Using grid to pack the 'buttons' / 'everything else' seems to solve this.
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for the action buttons and validation error message
+            #-----------------------------------------------------------------------------------------
+            self.button_frame=Tk.Frame(self.window)
+            self.button_frame.grid(row=1, column=0)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.button_frame, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.button_frame, text="Errors on Form need correcting", fg="red")
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for everything else
+            #-----------------------------------------------------------------------------------------
+            self.main_frame=Tk.Frame(self.window)
+            self.main_frame.grid(row=0, column=0)
             # Create a label frame for the general settings
-            self.frame1 = Tk.LabelFrame(self.window, text="General settings")
+            self.frame1 = Tk.LabelFrame(self.main_frame, text="General settings")
             self.frame1.pack(padx=2, pady=2, fill="x")
             # Create the entry box elements for the width, height and grid in a subframe
             # Pack the elements as into the subframe using 'grid' to get an aligned layout
@@ -198,22 +216,17 @@ class edit_canvas_settings():
                             tool_tip="Display/hide the grid in edit mode")
             self.displaygrid.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create another Frame to hold the colour selections
-            self.frame2 = Tk.Frame(self.window)
+            self.frame2 = Tk.Frame(self.main_frame)
             self.frame2.pack(fill="x")
             self.canvascolour = common.colour_selection(self.frame2, label="Canvas colour")
             self.canvascolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             self.gridcolour = common.colour_selection(self.frame2, label="Grid colour")
             self.gridcolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             # Create a Label frame for the quick scroll buttons
-            self.frame3 = Tk.LabelFrame(self.window, text="Quick scroll buttons (for schematics larger than the screen)")
+            self.frame3 = Tk.LabelFrame(self.main_frame, text="Quick scroll buttons (for schematics larger than the screen)")
             self.frame3.pack(padx=2, pady=2, fill="x")
             self.scrollbuttons = grid_of_quick_scroll_entries(self.frame3)
             self.scrollbuttons.pack()
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.pack(padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
             self.load_state()
 

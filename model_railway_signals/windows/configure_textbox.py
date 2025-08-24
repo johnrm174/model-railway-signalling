@@ -59,15 +59,24 @@ class edit_textbox():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             open_windows[object_id] = self.window
+            # I've seen problems on later versions of Python on the Pi-5 where the buttons at the bottom
+            # of the screen disappear when the window dynamically re-sizes due to user selections (e.g.
+            # route selections) - Using grid to pack the buttons ' everything else seems to solve this.
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for the action buttons and validation error message
+            #-----------------------------------------------------------------------------------------
+            self.button_frame=Tk.Frame(self.window)
+            self.button_frame.grid(row=1, column=0)
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.controls = common.window_controls(self.button_frame, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-            # Create a frame to hold all UI elements (so they don't expand on window resize
-            # to provide consistent behavior with the other configure object popup windows)
-            self.main_frame = Tk.Frame(self.window)
-            self.main_frame.pack(fill='both', expand=True)
+            self.validation_error = Tk.Label(self.button_frame, text="Errors on Form need correcting", fg="red")
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for everything else
+            #-----------------------------------------------------------------------------------------
+            self.main_frame=Tk.Frame(self.window)
+            self.main_frame.grid(row=0, column=0)
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the Text Entry elements (Frame 1)
             #----------------------------------------------------------------------------------

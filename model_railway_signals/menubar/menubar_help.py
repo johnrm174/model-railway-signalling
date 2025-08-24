@@ -258,21 +258,35 @@ class edit_layout_info():
             edit_layout_info_window.state('normal')
             edit_layout_info_window.focus_force()
         else:
-            # Create the top level window for application help
+            # Create the top level window for layout info
             self.window = Tk.Toplevel(root_window)
             self.window.title("Layout Info")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_layout_info_window = self.window
+            # I've seen problems on on the Pi-5 (later versions of Python?) where the buttons at
+            # the bottom of the screen disappear when the window is dynamically re-sized by the user.
+            # Using grid to pack the 'buttons' / 'everything else' seems to solve this. We give
+            # 'everything else' a weighting so this will dynamically re-size with the window.
+            self.window.columnconfigure(0, weight=1)
+            self.window.rowconfigure(0, weight=1)
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for the action buttons
+            #-----------------------------------------------------------------------------------------
+            self.button_frame = Tk.Frame(self.window)
+            self.button_frame.grid(row=1, column=0)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.button_frame, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for everything else
+            #-----------------------------------------------------------------------------------------
+            self.main_frame = Tk.Frame(self.window)
+            self.main_frame.grid(row=0, column=0, sticky="nsew")
             # Create the srollable textbox to display the text. We specify
             # the max height/width (in case the text grows in the future) and also
             # the min height/width (to give the user something to start with)
-            self.text = common.scrollable_text_frame(self.window, max_height=40,max_width=100,
+            self.text = common.scrollable_text_frame(self.main_frame, max_height=40,max_width=100,
                     min_height=10, min_width=40, editable=True, auto_resize=True)
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            # We need to pack the window buttons at the bottom and then pack the text
-            # frame - so the buttons remain visible if the user re-sizes the window
-            self.controls.pack(side=Tk.BOTTOM, padx=2, pady=2)
             self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
             # Load the initial UI state
             self.load_state()
