@@ -75,7 +75,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New 'Import' feature - to import another layout file into the current schematic:
     * Enables collaboration when developing complex layouts / signalling schemes.
 * Improvements to Application Upgrade utility:
-    * Will now report definitive success/failure in the user interface
+    * Will now report definitive success/failure in the user interface.
+* Minor UI improvements to improve the overall user experience during configuration:
+    * e.g. Point states can be set without having to 'enter'the point ID.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

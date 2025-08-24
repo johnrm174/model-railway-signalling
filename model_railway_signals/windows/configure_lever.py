@@ -79,6 +79,7 @@ def has_associated_distant(signal_object):
 class signal_configuration(Tk.LabelFrame):
     def __init__(self, parent_window):
         super().__init__(parent_window, text="Signal to switch")
+        self.disabled = False
         # Create a sub frame to center the signal ID and main selection elements in
         self.frame1 = Tk.Frame(self)
         self.frame1.pack()
@@ -86,17 +87,17 @@ class signal_configuration(Tk.LabelFrame):
         self.label1 = Tk.Label(self.frame1, text="Signal ID:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.signalid = common.int_item_id_entry_box(self.frame1, tool_tip="Enter the ID of the signal to control "+
-                            "with the lever", callback=self.signal_id_updated, exists_function=library.signal_exists)
+                            "with the lever", callback=self.updated2, exists_function=library.signal_exists)
         self.signalid.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create the Selection radio buttons
         self.signal_selection = Tk.IntVar(self, 0)
-        self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1)
+        self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1, command=self.updated1)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button1TT = common.CreateToolTip(self.button1, text="Select to control the main signal aspect/am")
-        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2)
+        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2, command=self.updated1)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button2TT = common.CreateToolTip(self.button2, text="Select to control the subsidary signal aspect/arm")
-        self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3)
+        self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3, command=self.updated1)
         self.button3.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button3TT = common.CreateToolTip(self.button3, text="Select to control the distant signal arm "+
                                               "(semaphore home signals with secondary distant arms only)")
@@ -107,9 +108,17 @@ class signal_configuration(Tk.LabelFrame):
         self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.routes = common.route_selections(self.frame2, tool_tip="Select the signal route(s) to control with the lever")
         self.routes.pack(padx=2, pady=2, fill='x')
+
+    def updated1(self):
+        # Validate and accept the entry box value
+        if self.signalid.validate(): self.updated2()
         
-    def signal_id_updated(self):
-        if self.signalid.get_value() > 0:
+    def updated2(self):
+        if self.disabled:
+            self.button1.configure(state="disabled")
+            self.button2.configure(state="disabled")
+            self.button3.configure(state="disabled")
+        elif self.signalid.get_value() > 0:
             self.button1.configure(state="normal")
             if self.signal_selection.get() == 0: self.signal_selection.set(1)
             signal_object = objects.schematic_objects[objects.signal(self.signalid.get_value())]
@@ -124,9 +133,10 @@ class signal_configuration(Tk.LabelFrame):
                 if self.signal_selection.get() == 3: self.signal_selection.set(1)
                 self.button3.configure(state="disabled")
         else:
-            self.button1.configure(state="disabled")
-            self.button2.configure(state="disabled")
-            self.button3.configure(state="disabled")
+            if self.signal_selection.get() == 0: self.signal_selection.set(1)
+            self.button1.configure(state="normal")
+            self.button2.configure(state="normal")
+            self.button3.configure(state="normal")
 
     def set_values(self, signal_id:int, signal_selection:int, signal_routes:list):
         # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
@@ -134,27 +144,30 @@ class signal_configuration(Tk.LabelFrame):
         self.signalid.set_value(signal_id)
         self.signal_selection.set(signal_selection)
         self.routes.set_value(signal_routes)
-        self.signal_id_updated()
+        if signal_id > 0: self.updated2()
 
     def get_values(self):
-         # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        self.updated2()
+        # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
         # Where each element is a bool (TRUE/FALSE)
-       return(self.signalid.get_value(), self.signal_selection.get(), self.routes.get_value())
+        return(self.signalid.get_value(), self.signal_selection.get(), self.routes.get_value())
     
     def validate(self):
+        self.updated2()
         valid = self.signalid.validate()
-        self.signal_id_updated()
         return(valid)
     
     def enable(self):
+        self.disabled = False
         self.signalid.enable()
         self.routes.enable()
-        self.signal_id_updated()
+        self.updated2()
     
     def disable(self):
+        self.disabled = True
         self.signalid.disable()
         self.routes.disable()
-        self.signal_id_updated()
+        self.updated2()
 
 #------------------------------------------------------------------------------------
 # Class for the point configuration subframe
@@ -163,6 +176,7 @@ class signal_configuration(Tk.LabelFrame):
 class point_configuration(Tk.LabelFrame):
     def __init__(self, parent_window):
         super().__init__(parent_window, text="Point to switch")
+        self.disabled = False
         # Create a subframe to center everything in
         self.frame = Tk.Frame(self)
         self.frame.pack()
@@ -170,24 +184,32 @@ class point_configuration(Tk.LabelFrame):
         self.label1 = Tk.Label(self.frame, text="Point ID:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.pointid = common.int_item_id_entry_box(self.frame, tool_tip="Enter the ID of the point to control "+
-                        "with this lever", callback=self.point_id_updated, exists_function=library.point_exists)
+                        "with this lever", callback=self.updated2, exists_function=library.point_exists)
         self.pointid.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create the Selection radio buttons
         self.point_selection = Tk.IntVar(self, 0)
-        self.button1 = Tk.Radiobutton(self.frame, text="Point", variable=self.point_selection, value=1)
+        self.button1 = Tk.Radiobutton(self.frame, text="Point", variable=self.point_selection, value=1, command=self.updated1)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button1TT = common.CreateToolTip(self.button1, text="Select to control the switching of the point")
-        self.button2 = Tk.Radiobutton(self.frame, text="FPL", variable=self.point_selection, value=2)
+        self.button2 = Tk.Radiobutton(self.frame, text="FPL", variable=self.point_selection, value=2, command=self.updated1)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button2TT = common.CreateToolTip(self.button2, text="Select to control the Facing Point Lock "+
                                                     "(if the FPL is to be controlled seperately to the point)")
-        self.button3 = Tk.Radiobutton(self.frame, text="Point/FPL", variable=self.point_selection, value=3)
+        self.button3 = Tk.Radiobutton(self.frame, text="Point/FPL", variable=self.point_selection, value=3, command=self.updated1)
         self.button3.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button3TT = common.CreateToolTip(self.button3, text="Select to control the point switching and "+
                                              "Facing Point Lock together (points with Facing Point Locks only)")
-                                                     
-    def point_id_updated(self):
-        if self.pointid.get_value() > 0:
+
+    def updated1(self):
+        # Validate and accept the entry box value
+        if self.pointid.validate(): self.updated2()
+
+    def updated2(self):
+        if self.disabled:
+            self.button1.configure(state="disabled")
+            self.button2.configure(state="disabled")
+            self.button3.configure(state="disabled")
+        elif self.pointid.get_value() > 0:
             self.button1.configure(state="normal")
             if self.point_selection.get() == 0: self.point_selection.set(1)
             if objects.schematic_objects[objects.point(self.pointid.get_value())]["hasfpl"]:
@@ -198,30 +220,34 @@ class point_configuration(Tk.LabelFrame):
                 self.button3.configure(state="disabled")
                 if self.point_selection.get() in (2, 3): self.point_selection.set(1)
         else:
-            self.button1.configure(state="disabled")
-            self.button2.configure(state="disabled")
-            self.button3.configure(state="disabled")
+            if self.point_selection.get() == 0: self.point_selection.set(1)
+            self.button1.configure(state="normal")
+            self.button2.configure(state="normal")
+            self.button3.configure(state="normal")
 
     def set_values(self, point_id:int, point_selection:int):
         self.pointid.set_value(point_id)
         self.point_selection.set(point_selection)
-        self.point_id_updated()
+        if point_id > 0: self.updated2()
 
     def get_values(self):
+        self.updated2()
         return(self.pointid.get_value(), self.point_selection.get())
     
     def validate(self):
+        self.updated2()
         valid = self.pointid.validate()
-        self.point_id_updated()
         return(valid)
     
     def enable(self):
+        self.disabled = False
         self.pointid.enable()
-        self.point_id_updated()
+        self.updated2()
     
     def disable(self):
+        self.disabled = True
         self.pointid.disable()
-        self.point_id_updated()
+        self.updated2()
 
 #------------------------------------------------------------------------------------
 # Class for the Keycode configuration subframe

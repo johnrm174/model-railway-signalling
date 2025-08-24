@@ -66,8 +66,7 @@ class quick_scroll_entry(Tk.Frame):
         self.subframe1.pack()
         self.label1 = Tk.Label(self.subframe1, text="Button label:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.buttonname = common.entry_box(self.subframe1, width=29, callback=self.button_name_updated,
-                                           tool_tip="Enter a name for the quick-scroll button")
+        self.buttonname = common.entry_box(self.subframe1, width=29, tool_tip="Enter a name for the quick-scroll button")
         self.buttonname.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create another subframe for all the other elements
         self.subframe2 = Tk.Frame(self.frame)
@@ -79,35 +78,20 @@ class quick_scroll_entry(Tk.Frame):
         self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
         self.label3 = Tk.Label(self.subframe2, text="Scroll x:")
         self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.xscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=8000, allow_empty=False,
-                empty_equals_zero=False, tool_tip="Specify the 'scroll to' X coordinate (for the top left corner of the window)")
+        self.xscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=8000, empty_equals_zero=True,
+                   tool_tip="Specify the 'scroll to' X coordinate (for the top left corner of the window)")
         self.xscroll.pack(padx=2, pady=2, side=Tk.LEFT)
         self.label3 = Tk.Label(self.subframe2, text="Scroll y:")
         self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.yscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=4000, allow_empty=False,
-                empty_equals_zero=False, tool_tip="Specify the 'scroll to' Y coordinate (for the top left corner of the window)")
+        self.yscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=4000, empty_equals_zero=True,
+                   tool_tip="Specify the 'scroll to' Y coordinate (for the top left corner of the window)")
         self.yscroll.pack(padx=2, pady=2, side=Tk.LEFT)
-        # Update the state for the 'empty' button definition
-        self.button_name_updated()
-
-    def button_name_updated(self):
-        if len(self.buttonname.get_value()) > 0:
-            self.buttonwidth.enable()
-            self.xscroll.enable()
-            self.yscroll.enable()
-            if self.xscroll.get_value()==None: self.xscroll.set_value(0)
-            if self.yscroll.get_value()==None: self.yscroll.set_value(0)
-        else:
-            self.buttonwidth.disable()
-            self.xscroll.disable()
-            self.yscroll.disable()
 
     def set_value(self, button_entry:list):
         self.buttonname.set_value(button_entry[0])
         self.buttonwidth.set_value(button_entry[1])
         self.xscroll.set_value(button_entry[2])
         self.yscroll.set_value(button_entry[3])
-        self.button_name_updated()
 
     def get_value(self):
         # Deal with empty boxes (convert to zero)

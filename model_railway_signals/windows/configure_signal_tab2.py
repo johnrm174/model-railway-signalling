@@ -248,7 +248,7 @@ class conflicting_signals_frame():
     def __init__(self, parent_frame, parent_object):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = Tk.LabelFrame(parent_frame, text="Conflicting signals not locked by the above point selections")
-        tool_tip = "Specify any signals/routes that would conflict with this signal route"
+        tool_tip = "Specify any signals (and their routes) that would cause this signal to be locked for this route"
         self.main_frame = Tk.LabelFrame(self.frame, text="MAIN Route - interlocking with conflicting signals")
         self.main_frame.pack(padx=2, pady=2, fill='x')
         self.main = common.grid_of_widgets(self.main_frame, base_class=common.signal_route_selections,

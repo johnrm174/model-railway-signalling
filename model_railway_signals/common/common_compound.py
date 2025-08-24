@@ -4,7 +4,7 @@
 # Provides the following 'compound' UI elements for the application
 #    validated_dcc_command_entry(Tk.Frame) - combines int_entry_box and state_box
 #    point_settings_entry(Tk.Frame) - combines int_item_id_entry_box and state_box
-#    route_selections(Tk.Frame) - A fixed row of FIVE state_boxes representing possible signal routes
+#    route_selections(Tk.Frame) - A fixed row of SEVERN state_boxes representing possible signal routes
 #    signal_route_selections(Tk.Frame) - combines int_item_id_entry_box and route selections (above)
 #
 # Makes the following external API calls to the library package
@@ -44,36 +44,28 @@ class validated_dcc_command_entry(Tk.Frame):
         super().__init__(parent_frame)
         # Create the address entry box and the associated dcc state box
         self.EB = common_simple.validated_dcc_entry_box(self, item_type=item_type,
-                                        callback=self.eb_updated, tool_tip=tool_tip)
+                                        tool_tip=tool_tip)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common_simple.state_box(self, label_off="OFF", label_on="ON",
-                    width=4, tool_tip="Set the DCC logic for the command")
+                    width=4, tool_tip="Set the DCC logic for the command: ON (ASON) or OFF (ASOF)")
         self.CB.pack(side=Tk.LEFT)
-        # Disable the checkbox (default state when no address is entered)
-        self.CB.disable()
     
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else:
-            self.CB.enable()
 
     def validate(self):
         return (self.EB.validate())
 
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
+        self.CB.enable()
         
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
+        self.CB.disable()
         
     def set_value(self, dcc_command:list[int,bool], item_id:int=0):
         # The dcc_command comprises a 2 element list of [DCC_Address, DCC_State]
         self.EB.set_value(dcc_command[0], item_id)
         self.CB.set_value(dcc_command[1])
-        self.eb_updated()
 
     def set_item_id(self, item_id:int):
         self.EB.set_item_id(item_id)
@@ -109,36 +101,27 @@ class point_settings_entry(Tk.Frame):
         super().__init__(parent_frame)
         # Create the point ID entry box and associated state box (packed in the parent frame)
         self.EB = common_simple.int_item_id_entry_box(self, exists_function=library.point_exists,
-                                    tool_tip = tool_tip, callback=self.eb_updated)
+                                    tool_tip = tool_tip)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common_simple.state_box(self, label_off=u"\u2192", label_on="\u2191", width=2,
-                    tool_tip="Select the required state for the point (normal or switched)")
+                    tool_tip="Select the required state for the point: \u2192 (normal) or \u2191 (switched)")
         self.CB.pack(side=Tk.LEFT)
-        # Disable the checkbox (default state when no address is entered)
-        self.CB.disable()
-
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else:
-            self.CB.enable()
 
     def validate(self):
         return (self.EB.validate())
 
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
+        self.CB.enable()
         
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
+        self.CB.disable()
 
     def set_value(self, point:[int, bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
         self.EB.set_value(point[0])
         self.CB.set_value(point[1])
-        self.eb_updated()
 
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
@@ -254,7 +237,7 @@ class signal_route_selections(Tk.Frame):
         self.label1.pack(side=Tk.LEFT)
         # Call the common base class init function to create the EB
         self.EB = common_simple.int_item_id_entry_box(self, tool_tip=tool_tip,
-                    callback=self.eb_updated, exists_function=exists_function)
+                    exists_function=exists_function)
         self.EB.pack(side=Tk.LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value)
         if self.read_only: self.EB.configure(state="disabled")
@@ -263,26 +246,17 @@ class signal_route_selections(Tk.Frame):
         # Add a spacer to improve the UI appearnace when used in a grid
         self.label2 = Tk.Label(self, width=1)
         self.label2.pack(side=Tk.LEFT)
-        # Set the initial state of the widget
-        self.eb_updated()
-
-    def eb_updated(self):
-        # Enable/disable the checkboxes depending on the EB state
-        if not self.read_only:
-            if self.EB.entry.get() == "": self.routes.disable()
-            else: self.routes.enable()
 
     def validate(self):
-        self.eb_updated()
         return(self.EB.validate())
     
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
+        self.routes.enable()
         
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
+        self.routes.disable()
 
     def set_value(self, signal_route:[int,[bool,bool,bool,bool,bool,bool,bool]], item_id:int=0):
         # The signal_route comprises [signal_id, list_of_route_selections]
@@ -290,7 +264,6 @@ class signal_route_selections(Tk.Frame):
         # Each element is a boolean (True/selected or False/deselected)
         self.EB.set_value(signal_route[0], item_id)
         self.routes.set_value(signal_route[1])
-        self.eb_updated()
 
     def set_item_id(self, item_id:int):
         self.EB.set_item_id(item_id)
