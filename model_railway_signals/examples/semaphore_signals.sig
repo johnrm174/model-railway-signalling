@@ -10,13 +10,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16915,
+            "bbox": 17606,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -28,6 +30,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -59,10 +63,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -85,6 +99,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -191,6 +215,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -198,10 +224,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -252,9 +282,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -264,6 +308,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -290,13 +340,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13183,
+            "bbox": 17654,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -308,6 +360,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -339,10 +393,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -365,6 +429,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -471,6 +545,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -478,10 +554,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -532,9 +612,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -544,6 +638,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -570,13 +670,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17130,
+            "bbox": 17684,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -588,6 +690,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -619,10 +723,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -645,6 +759,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -751,6 +875,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -758,10 +884,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -812,9 +942,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -824,6 +968,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -850,13 +1000,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13319,
+            "bbox": 17734,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -868,6 +1020,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -899,10 +1053,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -925,6 +1089,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -1031,6 +1205,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -1038,10 +1214,14 @@
                 true,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1092,9 +1272,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1104,6 +1298,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -1130,13 +1330,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18557,
+            "bbox": 17762,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1148,6 +1350,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1179,10 +1383,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1205,6 +1419,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -1311,6 +1535,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -1318,10 +1544,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1372,9 +1602,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1384,6 +1628,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -1410,13 +1660,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 27386,
+            "bbox": 17793,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1428,6 +1680,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1459,10 +1713,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1485,6 +1749,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -1591,6 +1865,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -1598,10 +1874,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1652,9 +1932,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1664,6 +1958,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -1690,13 +1990,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13349,
+            "bbox": 17823,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1708,6 +2010,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1739,10 +2043,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1765,6 +2079,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -1871,6 +2195,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -1878,10 +2204,14 @@
                 true,
                 true,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1932,9 +2262,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1944,6 +2288,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -1970,13 +2320,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13406,
+            "bbox": 17852,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1988,6 +2340,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2019,10 +2373,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2045,6 +2409,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -2151,10 +2525,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2164,6 +2542,8 @@
             "subroutes": [
                 false,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -2212,9 +2592,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2224,6 +2618,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -2250,13 +2650,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 22209,
+            "bbox": 17904,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2268,6 +2670,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2299,10 +2703,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2325,6 +2739,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -2431,6 +2855,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -2438,10 +2864,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2492,9 +2922,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2504,6 +2948,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -2530,13 +2980,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21245,
+            "bbox": 17956,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2548,6 +3000,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2579,10 +3033,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2605,6 +3069,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -2711,6 +3185,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -2718,10 +3194,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2772,9 +3252,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2784,6 +3278,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -2810,13 +3310,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13461,
+            "bbox": 17982,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2828,6 +3330,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2859,10 +3363,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2885,6 +3399,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -2991,6 +3515,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -2998,10 +3524,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3052,9 +3582,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3064,6 +3608,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -3090,13 +3640,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13492,
+            "bbox": 18013,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3108,6 +3660,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3139,10 +3693,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3165,6 +3729,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -3271,13 +3845,17 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -3285,7 +3863,9 @@
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "subsidary": [
@@ -3332,9 +3912,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3344,6 +3938,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -3370,13 +3970,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20695,
+            "bbox": 18044,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3388,6 +3990,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3419,10 +4023,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3445,6 +4059,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -3551,6 +4175,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -3558,10 +4184,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3612,9 +4242,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3624,6 +4268,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -3650,13 +4300,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13526,
+            "bbox": 18078,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3668,6 +4320,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3699,10 +4353,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3725,6 +4389,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -3831,17 +4505,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3892,9 +4572,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3904,6 +4598,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -3930,13 +4630,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20486,
+            "bbox": 18109,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3948,6 +4650,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3979,10 +4683,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4005,6 +4719,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4111,6 +4835,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -4118,10 +4844,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4172,9 +4902,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4184,6 +4928,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -4210,13 +4960,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 27355,
+            "bbox": 18140,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4228,6 +4980,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4259,10 +5013,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4285,6 +5049,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4391,6 +5165,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -4398,10 +5174,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4452,9 +5232,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4464,6 +5258,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -4490,13 +5290,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13579,
+            "bbox": 18193,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4508,6 +5310,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4539,10 +5343,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4565,6 +5379,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4671,12 +5495,16 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -4685,6 +5513,8 @@
                 true,
                 true,
                 true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -4732,9 +5562,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4744,6 +5588,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -4771,7 +5621,7 @@
                 0,
                 0
             ],
-            "bbox": 25983,
+            "bbox": 18199,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 550.0,
@@ -4790,13 +5640,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26680,
+            "bbox": 18230,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4808,6 +5660,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4839,10 +5693,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4865,6 +5729,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4971,6 +5845,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -4978,10 +5854,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5032,9 +5912,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5044,6 +5938,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -5070,13 +5970,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13610,
+            "bbox": 18261,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5088,6 +5990,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5119,10 +6023,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5145,6 +6059,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -5251,6 +6175,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -5258,10 +6184,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5312,9 +6242,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5324,6 +6268,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -5350,13 +6300,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13670,
+            "bbox": 18292,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5368,6 +6320,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5399,10 +6353,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5425,6 +6389,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -5531,10 +6505,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5545,8 +6523,10 @@
                 false,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "subsidary": [
                 false,
@@ -5592,9 +6572,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5604,6 +6598,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -5630,13 +6630,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26837,
+            "bbox": 18321,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5648,6 +6650,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5679,10 +6683,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5705,6 +6719,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -5811,6 +6835,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -5818,10 +6844,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5872,9 +6902,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5884,6 +6928,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -5911,7 +6961,7 @@
                 0,
                 0
             ],
-            "bbox": 19561,
+            "bbox": 18327,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 275.0,
@@ -5930,13 +6980,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 25903,
+            "bbox": 18335,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5948,6 +7000,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5979,10 +7033,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6005,6 +7069,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -6111,6 +7185,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -6118,10 +7194,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6172,9 +7252,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6184,6 +7278,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -6210,13 +7310,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21853,
+            "bbox": 18387,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6228,6 +7330,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6259,10 +7363,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6285,6 +7399,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -6391,6 +7515,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -6398,10 +7524,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6452,9 +7582,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6464,6 +7608,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -6490,13 +7640,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13720,
+            "bbox": 18437,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6508,6 +7660,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6539,10 +7693,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6565,6 +7729,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -6671,17 +7845,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6732,9 +7912,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6744,6 +7938,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -6770,13 +7970,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24694,
+            "bbox": 18487,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -6788,6 +7990,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -6819,10 +8023,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6845,6 +8059,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -6951,10 +8175,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -6963,6 +8191,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7012,9 +8242,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7024,6 +8268,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -7050,13 +8300,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24798,
+            "bbox": 18514,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7068,6 +8320,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7099,10 +8353,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7125,6 +8389,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -7231,6 +8505,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -7238,10 +8514,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7292,9 +8572,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7304,6 +8598,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -7330,13 +8630,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13755,
+            "bbox": 18549,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7348,6 +8650,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7379,10 +8683,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7405,6 +8719,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -7511,22 +8835,28 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "subsidary": [
                 false,
@@ -7572,9 +8902,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7584,6 +8928,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -7610,13 +8960,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17276,
+            "bbox": 18577,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7628,6 +8980,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7659,10 +9013,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7685,6 +9049,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -7791,6 +9165,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -7798,10 +9174,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7852,9 +9232,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7864,6 +9258,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -7890,13 +9290,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21143,
+            "bbox": 18627,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -7908,6 +9310,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -7939,10 +9343,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -7965,6 +9379,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -8071,6 +9495,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -8078,10 +9504,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8132,9 +9562,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8144,6 +9588,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -8170,13 +9620,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26808,
+            "bbox": 18658,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -8188,6 +9640,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8219,10 +9673,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8245,6 +9709,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -8351,6 +9825,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -8358,10 +9834,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8412,9 +9892,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8424,6 +9918,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -8450,13 +9950,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18529,
+            "bbox": 18688,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -8468,6 +9970,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8499,10 +10003,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8525,6 +10039,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -8631,6 +10155,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -8638,10 +10164,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8692,9 +10222,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8704,6 +10248,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -8730,13 +10280,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18759,
+            "bbox": 18718,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -8748,6 +10300,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8779,10 +10333,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8805,6 +10369,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -8911,6 +10485,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -8918,10 +10494,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -8972,9 +10552,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -8984,6 +10578,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -9010,13 +10610,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 22005,
+            "bbox": 18766,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9028,6 +10630,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9059,10 +10663,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9085,6 +10699,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -9191,6 +10815,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -9198,10 +10824,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9252,9 +10882,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9264,6 +10908,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -9290,13 +10940,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13789,
+            "bbox": 18800,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9308,6 +10960,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9339,10 +10993,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9365,6 +11029,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -9471,6 +11145,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -9478,10 +11154,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9532,9 +11212,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9544,6 +11238,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -9571,7 +11271,7 @@
                 0,
                 0
             ],
-            "bbox": 21653,
+            "bbox": 18806,
             "colour": "Black",
             "endx": 850.0,
             "endy": 675.0,
@@ -9591,7 +11291,7 @@
                 0,
                 0
             ],
-            "bbox": 26523,
+            "bbox": 18812,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 650.0,
@@ -9610,13 +11310,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24467,
+            "bbox": 18861,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9628,6 +11330,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9659,10 +11363,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9685,6 +11399,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -9791,6 +11515,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -9798,10 +11524,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9852,9 +11582,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9864,6 +11608,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -9890,13 +11640,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26614,
+            "bbox": 18890,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -9908,6 +11660,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -9939,10 +11693,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -9965,6 +11729,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -10071,6 +11845,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -10078,10 +11854,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10132,9 +11912,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10144,6 +11938,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -10170,13 +11970,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13906,
+            "bbox": 18920,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -10188,6 +11990,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10219,10 +12023,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10245,6 +12059,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -10351,17 +12175,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10412,9 +12242,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10424,6 +12268,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -10450,13 +12300,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13934,
+            "bbox": 18948,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -10468,6 +12320,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10499,10 +12353,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10525,6 +12389,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -10631,6 +12505,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -10638,10 +12514,14 @@
                 true,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10692,9 +12572,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10704,6 +12598,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -10730,13 +12630,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 13964,
+            "bbox": 18978,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -10748,6 +12650,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10779,10 +12683,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10805,6 +12719,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -10911,17 +12835,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -10972,9 +12902,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -10984,6 +12928,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -11010,13 +12960,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 23798,
+            "bbox": 19031,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11028,6 +12980,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11059,10 +13013,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11085,6 +13049,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -11191,6 +13165,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -11198,10 +13174,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11252,9 +13232,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11264,6 +13258,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -11290,13 +13290,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 25933,
+            "bbox": 19039,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11308,6 +13310,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11339,10 +13343,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11365,6 +13379,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -11471,6 +13495,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -11478,10 +13504,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11532,9 +13562,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11544,6 +13588,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -11570,13 +13620,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14016,
+            "bbox": 19091,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11588,6 +13640,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11619,10 +13673,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11645,6 +13709,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -11751,17 +13825,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11812,9 +13892,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11824,6 +13918,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -11850,13 +13950,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20517,
+            "bbox": 19122,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -11868,6 +13970,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -11899,10 +14003,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -11925,6 +14039,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -12031,6 +14155,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -12038,10 +14164,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12092,9 +14222,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12104,6 +14248,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -12130,13 +14280,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14070,
+            "bbox": 19150,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -12148,6 +14300,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12179,10 +14333,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12205,6 +14369,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -12311,6 +14485,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -12318,10 +14494,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12372,9 +14552,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12384,6 +14578,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -12410,13 +14610,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16824,
+            "bbox": 19207,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -12428,6 +14630,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12459,10 +14663,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12485,6 +14699,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -12591,6 +14815,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -12598,10 +14824,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12652,9 +14882,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12678,6 +14922,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -12686,7 +14936,7 @@
         },
         "3a54447c-36e0-430b-8887-9af2ffb251b9": {
             "background": "",
-            "bbox": 14073,
+            "bbox": 19210,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -12709,13 +14959,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20606,
+            "bbox": 19239,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -12727,6 +14979,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12758,10 +15012,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12784,6 +15048,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -12890,6 +15164,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -12897,10 +15173,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -12951,9 +15231,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -12963,6 +15257,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -12989,13 +15289,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21905,
+            "bbox": 19291,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13007,6 +15309,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13038,10 +15342,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13064,6 +15378,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -13170,6 +15494,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -13177,10 +15503,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13231,9 +15561,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13243,6 +15587,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -13270,7 +15620,7 @@
                 0,
                 0
             ],
-            "bbox": 16766,
+            "bbox": 19297,
             "colour": "Black",
             "endx": 875.0,
             "endy": 75.0,
@@ -13289,13 +15639,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24925,
+            "bbox": 19346,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13307,6 +15659,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13338,10 +15692,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13364,6 +15728,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -13470,6 +15844,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -13477,10 +15853,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13531,9 +15911,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13543,6 +15937,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -13569,13 +15969,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21193,
+            "bbox": 19396,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13587,6 +15989,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13618,10 +16022,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13644,6 +16058,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -13750,6 +16174,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -13757,10 +16183,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13811,9 +16241,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13823,6 +16267,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -13849,13 +16299,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 23900,
+            "bbox": 19447,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -13867,6 +16319,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -13898,10 +16352,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -13924,6 +16388,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -14030,6 +16504,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -14037,10 +16513,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -14091,9 +16571,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14103,6 +16597,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -14129,13 +16629,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19430,
+            "bbox": 19504,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -14147,6 +16649,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14178,10 +16682,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -14204,6 +16718,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -14310,6 +16834,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -14317,10 +16843,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -14371,9 +16901,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14383,6 +16927,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -14409,13 +16959,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14102,
+            "bbox": 19533,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -14427,6 +16979,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14458,10 +17012,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -14484,6 +17048,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -14590,13 +17164,17 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -14604,7 +17182,9 @@
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "subsidary": [
@@ -14651,9 +17231,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14663,6 +17257,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -14690,7 +17290,7 @@
                 0,
                 0
             ],
-            "bbox": 18441,
+            "bbox": 19539,
             "colour": "Black",
             "endx": 850.0,
             "endy": 275.0,
@@ -14709,13 +17309,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26585,
+            "bbox": 19570,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -14727,6 +17329,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14758,10 +17362,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -14784,6 +17398,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -14890,6 +17514,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -14897,10 +17523,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -14951,9 +17581,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -14963,6 +17607,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -14989,13 +17639,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20099,
+            "bbox": 19597,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -15007,6 +17659,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15038,10 +17692,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15064,6 +17728,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -15170,6 +17844,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -15177,10 +17853,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15231,9 +17911,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15243,6 +17937,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -15269,13 +17969,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16983,
+            "bbox": 19631,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -15287,6 +17989,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15318,10 +18022,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15344,6 +18058,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -15450,6 +18174,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -15457,10 +18183,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15511,9 +18241,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15523,6 +18267,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -15549,13 +18299,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20577,
+            "bbox": 19660,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -15567,6 +18319,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15598,10 +18352,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15624,6 +18388,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -15730,6 +18504,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -15737,10 +18513,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15791,9 +18571,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15803,6 +18597,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -15830,7 +18630,7 @@
                 0,
                 0
             ],
-            "bbox": 27537,
+            "bbox": 19666,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 875.0,
@@ -15849,13 +18649,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14218,
+            "bbox": 19697,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -15867,6 +18669,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -15898,10 +18702,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -15924,6 +18738,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -16030,6 +18854,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -16037,10 +18863,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16091,9 +18921,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16103,6 +18947,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -16129,13 +18979,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26777,
+            "bbox": 19728,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16147,6 +18999,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16178,10 +19032,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16204,6 +19068,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -16310,6 +19184,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -16317,10 +19193,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16371,9 +19251,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16383,6 +19277,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -16409,13 +19309,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24722,
+            "bbox": 19756,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16427,6 +19329,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16458,10 +19362,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16484,6 +19398,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -16590,10 +19514,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16602,6 +19530,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16651,9 +19581,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16663,6 +19607,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -16689,13 +19639,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19192,
+            "bbox": 19791,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16707,6 +19659,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16738,10 +19692,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16764,6 +19728,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -16870,6 +19844,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -16877,10 +19853,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -16931,9 +19911,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -16943,6 +19937,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -16969,13 +19969,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14306,
+            "bbox": 19820,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -16987,6 +19989,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17018,10 +20022,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -17044,6 +20058,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -17150,6 +20174,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -17157,10 +20183,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -17211,9 +20241,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17223,6 +20267,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -17249,13 +20299,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14335,
+            "bbox": 19849,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -17267,6 +20319,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17298,10 +20352,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -17324,6 +20388,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -17430,11 +20504,15 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -17443,6 +20521,8 @@
             "subroutes": [
                 true,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -17491,9 +20571,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17503,6 +20597,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -17529,13 +20629,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14365,
+            "bbox": 19879,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -17547,6 +20649,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17578,10 +20682,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -17604,6 +20718,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -17710,17 +20834,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -17771,9 +20901,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17783,6 +20927,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -17809,13 +20959,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18729,
+            "bbox": 19907,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -17827,6 +20979,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -17858,10 +21012,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -17884,6 +21048,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -17990,6 +21164,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -17997,10 +21173,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18051,9 +21231,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18063,6 +21257,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -18089,13 +21289,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26489,
+            "bbox": 19936,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18107,6 +21309,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18138,10 +21342,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18164,6 +21378,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -18270,6 +21494,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -18277,10 +21503,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18331,9 +21561,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18343,6 +21587,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -18369,13 +21619,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17100,
+            "bbox": 19964,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18387,6 +21639,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18418,10 +21672,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18444,6 +21708,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -18550,6 +21824,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -18557,10 +21833,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18611,9 +21891,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18623,6 +21917,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -18649,13 +21949,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 25941,
+            "bbox": 19972,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18667,6 +21969,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18698,10 +22002,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18724,6 +22038,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -18830,6 +22154,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -18837,10 +22163,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -18891,9 +22221,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18903,6 +22247,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -18929,13 +22279,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19282,
+            "bbox": 20028,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -18947,6 +22299,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -18978,10 +22332,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -19004,6 +22368,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -19110,6 +22484,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -19117,10 +22493,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -19171,9 +22551,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -19183,6 +22577,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -19209,13 +22609,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14447,
+            "bbox": 20081,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19227,6 +22629,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -19258,10 +22662,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -19284,6 +22698,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -19390,22 +22814,28 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "subsidary": [
                 false,
@@ -19451,9 +22881,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -19463,6 +22907,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -19489,13 +22939,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21701,
+            "bbox": 20129,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19507,6 +22959,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -19538,10 +22992,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -19564,6 +23028,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -19670,6 +23144,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -19677,10 +23153,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -19731,9 +23211,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -19743,6 +23237,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -19769,13 +23269,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14501,
+            "bbox": 20156,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -19787,6 +23289,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -19812,16 +23316,26 @@
                     []
                 ],
                 [
+                    "",
+                    []
+                ],
+                [
                     "3",
                     []
                 ],
                 [
                     "4",
                     []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -19844,6 +23358,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -19950,17 +23474,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20011,9 +23541,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20023,6 +23567,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -20049,13 +23599,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14536,
+            "bbox": 20191,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -20067,6 +23619,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20098,10 +23652,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20124,6 +23688,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -20230,10 +23804,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20244,8 +23822,10 @@
                 false,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "subsidary": [
                 false,
@@ -20291,9 +23871,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20303,6 +23897,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -20329,13 +23929,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 22105,
+            "bbox": 20241,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -20347,6 +23949,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20378,10 +23982,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20404,6 +24018,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -20510,6 +24134,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -20517,10 +24143,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20571,9 +24201,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20583,6 +24227,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -20609,13 +24259,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26649,
+            "bbox": 20276,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -20627,6 +24279,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20658,10 +24312,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20684,6 +24348,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -20790,6 +24464,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -20797,10 +24473,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20851,9 +24531,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20863,6 +24557,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -20889,13 +24589,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14564,
+            "bbox": 20304,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -20907,6 +24609,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -20938,10 +24642,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -20964,6 +24678,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -21070,17 +24794,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21131,9 +24861,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21143,6 +24887,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -21169,13 +24919,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 27208,
+            "bbox": 20335,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -21187,6 +24939,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21218,10 +24972,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21244,6 +25008,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -21350,6 +25124,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -21357,10 +25133,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21411,9 +25191,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21423,6 +25217,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -21449,13 +25249,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14594,
+            "bbox": 20365,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -21467,6 +25269,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21498,10 +25302,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21524,6 +25338,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -21630,6 +25454,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -21637,10 +25463,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21691,9 +25521,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21703,6 +25547,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -21729,13 +25579,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14696,
+            "bbox": 20415,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -21747,6 +25599,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21772,16 +25626,26 @@
                     []
                 ],
                 [
+                    "",
+                    []
+                ],
+                [
                     "3",
                     []
                 ],
                 [
                     "4",
                     []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21804,6 +25668,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -21910,18 +25784,24 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -21971,9 +25851,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -21983,6 +25877,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -22009,13 +25909,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21751,
+            "bbox": 20465,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -22027,6 +25929,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22058,10 +25962,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22084,6 +25998,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -22190,6 +26114,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -22197,10 +26123,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22251,9 +26181,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22263,6 +26207,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -22289,13 +26239,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20130,
+            "bbox": 20496,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -22307,6 +26259,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22338,10 +26292,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22364,6 +26328,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -22470,6 +26444,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -22477,10 +26453,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22531,9 +26511,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22543,6 +26537,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -22569,13 +26569,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17190,
+            "bbox": 20526,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -22587,6 +26589,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22618,10 +26622,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22644,6 +26658,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -22750,6 +26774,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -22757,10 +26783,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22811,9 +26841,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22823,6 +26867,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -22849,13 +26899,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 27324,
+            "bbox": 20555,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -22867,6 +26919,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -22898,10 +26952,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -22924,6 +26988,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -23030,6 +27104,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -23037,10 +27113,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23091,9 +27171,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23103,6 +27197,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -23129,13 +27229,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20633,
+            "bbox": 20582,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23147,6 +27249,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23178,10 +27282,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23204,6 +27318,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -23310,6 +27434,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -23317,10 +27443,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23371,9 +27501,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23383,6 +27527,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -23409,13 +27559,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19373,
+            "bbox": 20639,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23427,6 +27579,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23458,10 +27612,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23484,6 +27648,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -23590,6 +27764,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -23597,10 +27773,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23651,9 +27831,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23663,6 +27857,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -23689,13 +27889,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14745,
+            "bbox": 20688,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23707,6 +27909,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23738,10 +27942,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23764,6 +27978,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -23870,10 +28094,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23882,6 +28110,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -23931,9 +28161,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -23943,6 +28187,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -23969,13 +28219,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14801,
+            "bbox": 20744,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -23987,6 +28239,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24018,10 +28272,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24044,6 +28308,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -24150,17 +28424,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24211,9 +28491,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24223,6 +28517,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -24249,13 +28549,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20455,
+            "bbox": 20771,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -24267,6 +28569,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24298,10 +28602,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24324,6 +28638,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -24430,6 +28754,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -24437,10 +28763,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24491,9 +28821,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24503,6 +28847,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -24530,7 +28880,7 @@
                 0,
                 0
             ],
-            "bbox": 20339,
+            "bbox": 20777,
             "colour": "Black",
             "endx": 850.0,
             "endy": 475.0,
@@ -24549,13 +28899,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20370,
+            "bbox": 20808,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -24567,6 +28919,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24598,10 +28952,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24624,6 +28988,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -24730,6 +29104,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -24737,10 +29113,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24791,9 +29171,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24803,6 +29197,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -24830,7 +29230,7 @@
                 0,
                 0
             ],
-            "bbox": 22267,
+            "bbox": 20814,
             "colour": "Black",
             "endx": 850.0,
             "endy": 775.0,
@@ -24849,13 +29249,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18701,
+            "bbox": 20844,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -24867,6 +29269,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -24898,10 +29302,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -24924,6 +29338,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -25030,6 +29454,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -25037,10 +29463,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25091,9 +29521,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25103,6 +29547,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -25129,13 +29579,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14916,
+            "bbox": 20874,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25147,6 +29599,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25178,10 +29632,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25204,6 +29668,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -25310,6 +29784,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -25317,10 +29793,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25371,9 +29851,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25383,6 +29877,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -25409,13 +29909,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17072,
+            "bbox": 20900,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25427,6 +29929,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25458,10 +29962,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25484,6 +29998,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -25590,6 +30114,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -25597,10 +30123,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25651,9 +30181,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25663,6 +30207,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -25689,13 +30239,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18269,
+            "bbox": 20926,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25707,6 +30259,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25738,10 +30292,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25764,6 +30328,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -25870,6 +30444,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -25877,10 +30453,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -25931,9 +30511,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -25943,6 +30537,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -25969,13 +30569,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14946,
+            "bbox": 20956,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -25987,6 +30589,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26018,10 +30622,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26044,6 +30658,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -26150,6 +30774,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -26157,10 +30783,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26211,9 +30841,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26223,6 +30867,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -26249,13 +30899,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24644,
+            "bbox": 20983,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -26267,6 +30919,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26298,10 +30952,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26324,6 +30988,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -26430,6 +31104,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -26437,10 +31113,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26491,9 +31171,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26503,6 +31197,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -26529,13 +31229,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18499,
+            "bbox": 21011,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -26547,6 +31249,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26578,10 +31282,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26604,6 +31318,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -26710,6 +31434,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -26717,10 +31443,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26771,9 +31501,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26783,6 +31527,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -26809,13 +31559,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 14973,
+            "bbox": 21038,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -26827,6 +31579,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -26858,10 +31612,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -26884,6 +31648,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -26990,10 +31764,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27002,6 +31780,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27051,9 +31831,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27063,6 +31857,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -27090,7 +31890,7 @@
                 0,
                 0
             ],
-            "bbox": 25231,
+            "bbox": 21044,
             "colour": "Black",
             "endx": 1500.0,
             "endy": 400.0,
@@ -27109,13 +31909,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15007,
+            "bbox": 21078,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -27127,6 +31929,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27158,10 +31962,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27184,6 +31998,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -27290,17 +32114,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27351,9 +32181,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27363,6 +32207,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -27389,13 +32239,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21093,
+            "bbox": 21126,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -27407,6 +32259,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27438,10 +32292,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27464,6 +32328,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -27570,6 +32444,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -27577,10 +32453,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27631,9 +32511,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27643,6 +32537,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -27670,7 +32570,7 @@
                 0,
                 0
             ],
-            "bbox": 17925,
+            "bbox": 21132,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 100.0,
@@ -27689,13 +32589,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19465,
+            "bbox": 21167,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -27707,6 +32609,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27738,10 +32642,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27764,6 +32678,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -27870,6 +32794,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -27877,10 +32803,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -27931,9 +32861,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -27943,6 +32887,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -27969,13 +32919,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24418,
+            "bbox": 21195,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -27987,6 +32939,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28018,10 +32972,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28044,6 +33008,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -28150,10 +33124,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28162,6 +33140,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28211,9 +33191,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28223,6 +33217,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -28249,13 +33249,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24876,
+            "bbox": 21223,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -28267,6 +33269,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28298,10 +33302,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28324,6 +33338,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -28430,10 +33454,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28442,6 +33470,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28491,9 +33521,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28503,6 +33547,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -28529,13 +33579,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24848,
+            "bbox": 21273,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -28547,6 +33599,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28578,10 +33632,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28604,6 +33668,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -28710,10 +33784,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28722,6 +33800,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28771,9 +33851,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28783,6 +33877,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -28809,13 +33909,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20072,
+            "bbox": 21302,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -28827,6 +33929,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -28858,10 +33962,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -28884,6 +33998,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -28990,6 +34114,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -28997,10 +34123,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29051,9 +34181,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29063,6 +34207,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -29089,13 +34239,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26402,
+            "bbox": 21333,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -29107,6 +34259,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29138,10 +34292,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29164,6 +34328,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -29270,6 +34444,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -29277,10 +34453,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29331,9 +34511,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29343,6 +34537,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -29369,13 +34569,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19499,
+            "bbox": 21367,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -29387,6 +34589,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29418,10 +34622,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29444,6 +34658,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -29550,6 +34774,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -29557,10 +34783,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29611,9 +34841,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29623,6 +34867,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -29650,7 +34900,7 @@
                 0,
                 0
             ],
-            "bbox": 25237,
+            "bbox": 21373,
             "colour": "Black",
             "endx": 1500.0,
             "endy": 475.0,
@@ -29669,13 +34919,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17754,
+            "bbox": 21429,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -29687,6 +34939,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29718,10 +34972,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29744,6 +35008,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -29850,6 +35124,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -29857,10 +35133,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -29911,9 +35191,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29923,6 +35217,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -29949,13 +35249,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18213,
+            "bbox": 21457,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -29967,6 +35269,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -29998,10 +35302,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30024,6 +35338,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -30130,6 +35454,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -30137,10 +35463,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30191,9 +35521,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -30203,6 +35547,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -30229,13 +35579,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 23745,
+            "bbox": 21506,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -30247,6 +35599,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -30278,10 +35632,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30304,6 +35668,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -30410,6 +35784,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -30417,10 +35793,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30471,9 +35851,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -30483,6 +35877,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -30509,13 +35909,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24771,
+            "bbox": 21555,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -30527,6 +35929,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -30558,10 +35962,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30584,6 +35998,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -30690,6 +36114,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -30697,10 +36123,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30751,9 +36181,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -30763,6 +36207,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -30789,13 +36239,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15180,
+            "bbox": 21583,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -30807,6 +36259,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -30838,10 +36292,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -30864,6 +36328,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -30970,6 +36444,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -30977,10 +36453,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31031,9 +36511,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31043,6 +36537,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -31069,13 +36569,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 23643,
+            "bbox": 21636,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -31087,6 +36589,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31118,10 +36622,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31144,6 +36658,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -31250,6 +36774,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -31257,10 +36783,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31311,9 +36841,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31323,6 +36867,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -31349,13 +36899,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18185,
+            "bbox": 21666,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -31367,6 +36919,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31398,10 +36952,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31424,6 +36988,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -31530,6 +37104,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -31537,10 +37113,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31591,9 +37171,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31603,6 +37197,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -31629,13 +37229,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20161,
+            "bbox": 21697,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -31647,6 +37249,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31678,10 +37282,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31704,6 +37318,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -31810,6 +37434,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -31817,10 +37443,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31871,9 +37501,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31883,6 +37527,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -31909,13 +37559,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15208,
+            "bbox": 21725,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -31927,6 +37579,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -31958,10 +37612,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -31984,6 +37648,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -32090,6 +37764,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -32097,10 +37773,14 @@
                 true,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32151,9 +37831,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -32163,6 +37857,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -32189,13 +37889,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26086,
+            "bbox": 21760,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -32207,6 +37909,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -32238,10 +37942,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32264,6 +37978,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -32370,6 +38094,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -32377,10 +38103,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32431,9 +38161,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -32443,6 +38187,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -32469,13 +38219,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19226,
+            "bbox": 21794,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -32487,6 +38239,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -32518,10 +38272,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32544,6 +38308,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -32650,6 +38424,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -32657,10 +38433,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32711,9 +38491,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -32723,6 +38517,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -32749,13 +38549,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26746,
+            "bbox": 21825,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -32767,6 +38569,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -32798,10 +38602,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32824,6 +38638,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -32930,6 +38754,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -32937,10 +38763,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -32991,9 +38821,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33003,6 +38847,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -33029,13 +38879,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21297,
+            "bbox": 21877,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -33047,6 +38899,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33078,10 +38932,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33104,6 +38968,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -33210,6 +39084,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -33217,10 +39093,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33271,9 +39151,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33283,6 +39177,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -33309,13 +39209,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15447,
+            "bbox": 21905,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -33327,6 +39229,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33352,16 +39256,26 @@
                     []
                 ],
                 [
+                    "",
+                    []
+                ],
+                [
                     "3",
                     []
                 ],
                 [
                     "4",
                     []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33384,6 +39298,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -33490,18 +39414,24 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33551,9 +39481,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33563,6 +39507,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -33589,13 +39539,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18785,
+            "bbox": 21931,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -33607,6 +39559,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33638,10 +39592,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33664,6 +39628,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -33770,6 +39744,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -33777,10 +39753,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33831,9 +39811,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33843,6 +39837,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -33869,13 +39869,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15500,
+            "bbox": 21984,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -33887,6 +39889,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -33918,10 +39922,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -33944,6 +39958,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -34050,13 +40074,17 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -34064,7 +40092,9 @@
                 true,
                 true,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "subsidary": [
@@ -34111,9 +40141,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34123,6 +40167,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -34149,13 +40199,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15552,
+            "bbox": 22036,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -34167,6 +40219,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34198,10 +40252,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -34224,6 +40288,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -34330,17 +40404,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -34391,9 +40471,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34403,6 +40497,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -34429,13 +40529,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17330,
+            "bbox": 22064,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -34447,6 +40549,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34478,10 +40582,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -34504,6 +40618,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -34610,6 +40734,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -34617,10 +40743,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -34671,9 +40801,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34683,6 +40827,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -34709,13 +40859,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15613,
+            "bbox": 22072,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -34727,6 +40879,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34758,10 +40912,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -34784,6 +40948,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -34890,6 +41064,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -34897,10 +41073,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -34951,9 +41131,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -34963,6 +41157,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -34990,7 +41190,7 @@
                 0,
                 0
             ],
-            "bbox": 17366,
+            "bbox": 22078,
             "colour": "Black",
             "endx": 850.0,
             "endy": 175.0,
@@ -35009,13 +41209,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18471,
+            "bbox": 22108,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -35027,6 +41229,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35058,10 +41262,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35084,6 +41298,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -35190,6 +41414,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -35197,10 +41423,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35251,9 +41481,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35263,6 +41507,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -35289,13 +41539,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26250,
+            "bbox": 22139,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -35307,6 +41559,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35338,10 +41592,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35364,6 +41628,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -35470,6 +41744,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -35477,10 +41753,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35531,9 +41811,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35543,6 +41837,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -35569,13 +41869,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20428,
+            "bbox": 22168,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -35587,6 +41889,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35618,10 +41922,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35644,6 +41958,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -35750,6 +42074,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -35757,10 +42083,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35811,9 +42141,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35823,6 +42167,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -35849,13 +42199,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15670,
+            "bbox": 22225,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -35867,6 +42219,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -35898,10 +42252,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -35924,6 +42288,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -36030,22 +42404,28 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "subsidary": [
                 false,
@@ -36091,9 +42471,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36103,6 +42497,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -36129,13 +42529,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 25925,
+            "bbox": 22233,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -36147,6 +42549,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36178,10 +42582,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -36204,6 +42618,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -36310,6 +42734,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -36317,10 +42743,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -36371,9 +42801,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36383,6 +42827,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -36409,13 +42859,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 22261,
+            "bbox": 22285,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -36427,6 +42879,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36458,10 +42912,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -36484,6 +42948,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -36590,6 +43064,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -36597,10 +43073,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -36651,9 +43131,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36663,6 +43157,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -36689,13 +43189,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17046,
+            "bbox": 22315,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -36707,6 +43209,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36738,10 +43242,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -36764,6 +43278,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -36870,6 +43394,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -36877,10 +43403,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -36931,9 +43461,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -36943,6 +43487,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -36969,13 +43519,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21349,
+            "bbox": 22367,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -36987,6 +43539,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37018,10 +43572,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -37044,6 +43608,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -37150,6 +43724,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -37157,10 +43733,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -37211,9 +43791,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37223,6 +43817,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -37249,13 +43849,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15834,
+            "bbox": 22398,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -37267,6 +43869,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37298,10 +43902,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -37324,6 +43938,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -37430,11 +44054,15 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -37444,7 +44072,9 @@
                 false,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "subsidary": [
@@ -37491,9 +44121,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37503,6 +44147,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -37529,13 +44179,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20014,
+            "bbox": 22429,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -37547,6 +44199,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37578,10 +44232,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -37604,6 +44268,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -37710,6 +44384,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -37717,10 +44393,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -37771,9 +44451,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37783,6 +44477,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -37809,13 +44509,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15865,
+            "bbox": 22460,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -37827,6 +44529,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -37858,10 +44562,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -37884,6 +44598,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -37990,12 +44714,16 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -38004,6 +44732,8 @@
                 true,
                 true,
                 true,
+                false,
+                false,
                 false,
                 false
             ],
@@ -38051,9 +44781,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38063,6 +44807,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -38089,13 +44839,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26715,
+            "bbox": 22495,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -38107,6 +44859,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38138,10 +44892,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -38164,6 +44928,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -38270,6 +45044,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -38277,10 +45053,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -38331,9 +45111,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38343,6 +45137,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -38369,13 +45169,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 15914,
+            "bbox": 22544,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -38387,6 +45189,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38412,16 +45216,26 @@
                     []
                 ],
                 [
+                    "",
+                    []
+                ],
+                [
                     "3",
                     []
                 ],
                 [
                     "4",
                     []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -38444,6 +45258,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -38550,17 +45374,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
                 true,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -38611,9 +45441,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38623,6 +45467,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -38650,7 +45500,7 @@
                 0,
                 0
             ],
-            "bbox": 20701,
+            "bbox": 22550,
             "colour": "Black",
             "endx": 850.0,
             "endy": 575.0,
@@ -38669,13 +45519,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21957,
+            "bbox": 22602,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -38687,6 +45539,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38718,10 +45572,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -38744,6 +45608,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -38850,6 +45724,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -38857,10 +45733,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -38911,9 +45791,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38923,6 +45817,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -38949,13 +45849,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26554,
+            "bbox": 22633,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -38967,6 +45869,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -38998,10 +45902,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -39024,6 +45938,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -39130,6 +46054,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -39137,10 +46063,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -39191,9 +46121,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -39203,6 +46147,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -39229,13 +46179,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16054,
+            "bbox": 22664,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -39247,6 +46199,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -39278,10 +46232,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -39304,6 +46268,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -39410,22 +46384,28 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "subsidary": [
                 false,
@@ -39471,9 +46451,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -39483,6 +46477,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -39509,13 +46509,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16106,
+            "bbox": 22716,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -39527,6 +46529,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -39558,10 +46562,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -39584,6 +46598,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -39690,6 +46714,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -39697,10 +46723,14 @@
                 true,
                 true,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -39751,9 +46781,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -39763,6 +46807,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -39789,13 +46839,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20548,
+            "bbox": 22747,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -39807,6 +46859,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -39838,10 +46892,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -39864,6 +46928,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -39970,6 +47044,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -39977,10 +47053,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40031,9 +47111,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40043,6 +47137,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -40069,13 +47169,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17160,
+            "bbox": 22777,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -40087,6 +47189,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40118,10 +47222,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40144,6 +47258,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -40250,6 +47374,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -40257,10 +47383,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40311,9 +47441,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40323,6 +47467,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -40349,13 +47499,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17360,
+            "bbox": 22807,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -40367,6 +47519,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40398,10 +47552,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40424,6 +47588,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -40530,6 +47704,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -40537,10 +47713,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40591,9 +47771,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40603,6 +47797,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -40629,13 +47829,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16114,
+            "bbox": 22815,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -40647,6 +47849,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40678,10 +47882,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40704,6 +47918,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -40810,6 +48034,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -40817,10 +48043,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40871,9 +48101,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40883,6 +48127,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -40909,13 +48159,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 27237,
+            "bbox": 22844,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -40927,6 +48179,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -40958,10 +48212,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -40984,6 +48248,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -41090,6 +48364,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -41097,10 +48373,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41151,9 +48431,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -41163,6 +48457,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -41189,13 +48489,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17248,
+            "bbox": 22872,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -41207,6 +48509,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -41238,10 +48542,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41264,6 +48578,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -41370,6 +48694,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -41377,10 +48703,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41431,9 +48761,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -41443,6 +48787,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -41469,13 +48819,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19316,
+            "bbox": 22906,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -41487,6 +48839,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -41518,10 +48872,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41544,6 +48908,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -41650,6 +49024,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -41657,10 +49033,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41711,9 +49091,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -41723,6 +49117,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -41749,13 +49149,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18671,
+            "bbox": 22934,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -41767,6 +49169,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -41798,10 +49202,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41824,6 +49238,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -41930,6 +49354,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -41937,10 +49363,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -41991,9 +49421,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42003,6 +49447,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -42029,13 +49479,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 22055,
+            "bbox": 22984,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -42047,6 +49499,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42078,10 +49532,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42104,6 +49568,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -42210,6 +49684,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -42217,10 +49693,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42271,9 +49751,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42283,6 +49777,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -42309,13 +49809,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 23849,
+            "bbox": 23035,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -42327,6 +49829,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42358,10 +49862,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42384,6 +49898,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -42490,6 +50014,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -42497,10 +50023,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42551,9 +50081,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42563,6 +50107,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -42589,13 +50139,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 21801,
+            "bbox": 23085,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -42607,6 +50159,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42638,10 +50192,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42664,6 +50228,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -42770,6 +50344,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -42777,10 +50353,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42831,9 +50411,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42843,6 +50437,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -42869,13 +50469,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18127,
+            "bbox": 23115,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -42887,6 +50489,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -42918,10 +50522,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -42944,6 +50558,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -43050,6 +50674,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -43057,10 +50683,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -43111,9 +50741,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -43123,6 +50767,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -43149,13 +50799,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16343,
+            "bbox": 23166,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -43167,6 +50819,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -43198,10 +50852,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -43224,6 +50888,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -43330,13 +51004,17 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -43344,7 +51022,9 @@
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "subsidary": [
@@ -43391,9 +51071,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -43403,6 +51097,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -43429,13 +51129,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16369,
+            "bbox": 23192,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -43447,6 +51149,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -43478,10 +51182,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -43504,6 +51218,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -43610,6 +51334,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -43617,10 +51343,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -43671,9 +51401,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -43683,6 +51427,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -43710,7 +51460,7 @@
                 0,
                 0
             ],
-            "bbox": 26843,
+            "bbox": 23198,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 775.0,
@@ -43730,7 +51480,7 @@
                 0,
                 0
             ],
-            "bbox": 24210,
+            "bbox": 23204,
             "colour": "Black",
             "endx": 950.0,
             "endy": 875.0,
@@ -43750,7 +51500,7 @@
                 0,
                 0
             ],
-            "bbox": 18791,
+            "bbox": 23210,
             "colour": "Black",
             "endx": 850.0,
             "endy": 375.0,
@@ -43769,13 +51519,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 26341,
+            "bbox": 23241,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -43787,6 +51539,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -43818,10 +51572,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -43844,6 +51608,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -43950,6 +51724,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -43957,10 +51733,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44011,9 +51791,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44023,6 +51817,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -44049,13 +51849,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18643,
+            "bbox": 23271,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -44067,6 +51869,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44098,10 +51902,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44124,6 +51938,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -44230,6 +52054,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -44237,10 +52063,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44291,9 +52121,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44303,6 +52147,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -44329,13 +52179,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20399,
+            "bbox": 23300,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -44347,6 +52199,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44378,10 +52232,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44404,6 +52268,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -44510,6 +52384,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -44517,10 +52393,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44571,9 +52451,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44583,6 +52477,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -44609,13 +52509,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16431,
+            "bbox": 23328,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -44627,6 +52529,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44658,10 +52562,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44684,6 +52598,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -44790,17 +52714,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44851,9 +52781,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44863,6 +52807,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -44889,13 +52839,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18613,
+            "bbox": 23354,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -44907,6 +52859,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -44938,10 +52892,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -44964,6 +52928,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -45070,6 +53044,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -45077,10 +53053,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45131,9 +53111,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45143,6 +53137,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -45169,13 +53169,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16461,
+            "bbox": 23384,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -45187,6 +53189,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45218,10 +53222,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45244,6 +53258,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -45350,6 +53374,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -45357,10 +53383,14 @@
                 true,
                 true,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45411,9 +53441,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45423,6 +53467,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -45449,13 +53499,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18587,
+            "bbox": 23414,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -45467,6 +53519,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45498,10 +53552,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45524,6 +53588,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -45630,6 +53704,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -45637,10 +53713,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45691,9 +53771,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45703,6 +53797,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -45729,13 +53829,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 25895,
+            "bbox": 23422,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -45747,6 +53849,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45778,10 +53882,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45804,6 +53918,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -45910,6 +54034,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -45917,10 +54043,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -45971,9 +54101,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -45983,6 +54127,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -46009,13 +54159,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17302,
+            "bbox": 23448,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -46027,6 +54179,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46058,10 +54212,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46084,6 +54248,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -46190,6 +54364,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -46197,10 +54373,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46251,9 +54431,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46263,6 +54457,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -46289,13 +54489,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 23696,
+            "bbox": 23501,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -46307,6 +54509,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46338,10 +54542,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46364,6 +54578,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -46470,6 +54694,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -46477,10 +54703,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46531,9 +54761,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46543,6 +54787,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -46569,13 +54819,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 22157,
+            "bbox": 23553,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -46587,6 +54839,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46618,10 +54872,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46644,6 +54908,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -46750,6 +55024,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -46757,10 +55033,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46811,9 +55091,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46823,6 +55117,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -46849,13 +55149,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16600,
+            "bbox": 23604,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -46867,6 +55169,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -46898,10 +55202,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -46924,6 +55238,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -47030,11 +55354,15 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -47043,6 +55371,8 @@
             "subroutes": [
                 true,
                 true,
+                false,
+                false,
                 false,
                 false,
                 false
@@ -47091,9 +55421,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47103,6 +55447,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -47129,13 +55479,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19555,
+            "bbox": 23660,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -47147,6 +55499,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47178,10 +55532,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -47204,6 +55568,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -47310,6 +55684,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -47317,10 +55693,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -47371,9 +55751,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47383,6 +55777,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -47409,13 +55809,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 27415,
+            "bbox": 23689,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -47427,6 +55829,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47458,10 +55862,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -47484,6 +55898,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -47590,6 +56014,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -47597,10 +56023,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -47651,9 +56081,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47663,6 +56107,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -47689,13 +56139,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16661,
+            "bbox": 23719,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -47707,6 +56159,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47738,10 +56192,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -47764,6 +56228,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -47870,17 +56344,23 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
-                true
+                true,
+                false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -47931,9 +56411,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -47943,6 +56437,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -47969,13 +56469,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18243,
+            "bbox": 23749,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -47987,6 +56489,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48018,10 +56522,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48044,6 +56558,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -48150,6 +56674,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -48157,10 +56683,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48211,9 +56741,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48223,6 +56767,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -48249,13 +56799,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24390,
+            "bbox": 23799,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -48267,6 +56819,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48298,10 +56852,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48324,6 +56888,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -48430,10 +57004,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48442,6 +57020,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48491,9 +57071,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48503,6 +57097,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -48529,13 +57129,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20664,
+            "bbox": 23830,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -48547,6 +57149,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48578,10 +57182,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48604,6 +57218,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -48710,6 +57334,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -48717,10 +57343,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48771,9 +57401,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48783,6 +57427,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -48809,13 +57459,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 19157,
+            "bbox": 23864,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -48827,6 +57479,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -48858,10 +57512,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -48884,6 +57548,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -48990,6 +57664,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -48997,10 +57673,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49051,9 +57731,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49063,6 +57757,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -49089,13 +57789,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 24340,
+            "bbox": 23891,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -49107,6 +57809,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49138,10 +57842,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49164,6 +57878,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -49270,6 +57994,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -49277,10 +58003,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49331,9 +58061,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49343,6 +58087,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -49369,13 +58119,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 16687,
+            "bbox": 23917,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -49387,6 +58139,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49418,10 +58172,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49444,6 +58208,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -49550,6 +58324,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -49557,10 +58333,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49611,9 +58391,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49623,6 +58417,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -49649,13 +58449,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 25949,
+            "bbox": 23925,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -49667,6 +58469,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49698,10 +58502,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49724,6 +58538,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -49830,6 +58654,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -49837,10 +58663,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -49891,9 +58721,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49903,6 +58747,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -49929,13 +58779,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 20043,
+            "bbox": 23954,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -49947,6 +58799,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -49978,10 +58832,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -50004,6 +58868,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -50110,6 +58984,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -50117,10 +58993,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -50171,9 +59051,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -50183,6 +59077,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -50209,13 +59109,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 17220,
+            "bbox": 23984,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -50227,6 +59129,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -50258,10 +59162,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -50284,6 +59198,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -50390,6 +59314,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -50397,10 +59323,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -50451,9 +59381,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -50463,6 +59407,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -50489,13 +59439,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 18155,
+            "bbox": 24012,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -50507,6 +59459,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -50538,10 +59492,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -50564,6 +59528,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -50670,6 +59644,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -50677,10 +59653,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -50731,9 +59711,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -50743,6 +59737,12 @@
             "tracksections": [
                 0,
                 [
+                    [
+                        0
+                    ],
+                    [
+                        0
+                    ],
                     [
                         0
                     ],
@@ -50773,6 +59773,7 @@
             "grid": 25,
             "gridcolour": "#999",
             "height": 950,
+            "scrollbuttons": [],
             "snaptogrid": true,
             "width": 1600
         },
@@ -50783,9 +59784,10 @@
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
+            "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.3.0"
+            "version": "Version 5.4.0"
         },
         "gpio": {
             "maxevents": 100,

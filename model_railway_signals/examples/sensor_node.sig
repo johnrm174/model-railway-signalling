@@ -6,7 +6,7 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 15825,
+            "bbox": 24179,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -33,6 +33,7 @@
             "grid": 25,
             "gridcolour": "#999",
             "height": 500,
+            "scrollbuttons": [],
             "snaptogrid": true,
             "width": 1000
         },
@@ -43,9 +44,10 @@
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
+            "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.3.0"
+            "version": "Version 5.4.0"
         },
         "gpio": {
             "maxevents": 100,

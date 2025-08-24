@@ -10,13 +10,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10519,
+            "bbox": 15478,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -28,6 +30,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -59,10 +63,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -85,6 +99,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -191,10 +215,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -203,6 +231,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -252,9 +282,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -278,6 +322,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -286,7 +336,7 @@
         },
         "0c32cf66-0f69-4759-aa0a-f297bc829b34": {
             "background": "",
-            "bbox": 10522,
+            "bbox": 15481,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -305,7 +355,7 @@
         },
         "1209fc79-192a-445a-95a8-eaea7b693790": {
             "background": "",
-            "bbox": 10525,
+            "bbox": 15484,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -324,7 +374,7 @@
         },
         "14a6c526-a66e-4c87-a3fb-8c41bd33bea7": {
             "background": "",
-            "bbox": 10528,
+            "bbox": 15487,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -348,7 +398,7 @@
                 20,
                 5
             ],
-            "bbox": 10534,
+            "bbox": 15493,
             "colour": "#690000",
             "endx": 225.0,
             "endy": 125.0,
@@ -362,7 +412,7 @@
             "tags": "line21"
         },
         "1710c14e-e5ef-41ae-b0ca-3cd6c2946303": {
-            "bbox": 10538,
+            "bbox": 15497,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -386,7 +436,7 @@
             ]
         },
         "179fab0f-8bcb-4bf4-b230-b4af25fe5d72": {
-            "bbox": 10542,
+            "bbox": 15501,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -416,7 +466,7 @@
                 20,
                 5
             ],
-            "bbox": 10548,
+            "bbox": 15507,
             "colour": "#690000",
             "endx": 625.0,
             "endy": 281.0,
@@ -431,7 +481,7 @@
         },
         "1c027661-d93f-46e0-83a5-1b2df116f155": {
             "background": "",
-            "bbox": 10551,
+            "bbox": 15510,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -454,13 +504,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10570,
+            "bbox": 15532,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -472,6 +524,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -503,10 +557,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -529,6 +593,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -639,10 +713,14 @@
                             false,
                             false,
                             false,
+                            false,
+                            false,
                             false
                         ]
                     ]
                 ],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -653,11 +731,15 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -707,9 +789,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -721,6 +817,12 @@
                 [
                     [
                         18
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ],
                     [
                         0
@@ -746,7 +848,7 @@
                 20,
                 5
             ],
-            "bbox": 10576,
+            "bbox": 15538,
             "colour": "#690000",
             "endx": 600.0,
             "endy": 631.0,
@@ -766,7 +868,7 @@
                 20,
                 5
             ],
-            "bbox": 10582,
+            "bbox": 15544,
             "colour": "#690000",
             "endx": 763.0,
             "endy": 188.0,
@@ -781,7 +883,7 @@
         },
         "20708f06-dfdc-49c8-936f-40584c44bcf2": {
             "background": "",
-            "bbox": 10585,
+            "bbox": 15547,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -804,13 +906,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10604,
+            "bbox": 15569,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -822,6 +926,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -853,10 +959,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -879,6 +995,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -985,10 +1111,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -997,6 +1127,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1046,9 +1178,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1072,6 +1218,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -1080,7 +1232,7 @@
         },
         "24c82ad8-320e-4ab5-92ec-33b00ac1876c": {
             "background": "",
-            "bbox": 10607,
+            "bbox": 15572,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1104,7 +1256,7 @@
                 20,
                 5
             ],
-            "bbox": 10613,
+            "bbox": 15578,
             "colour": "#690000",
             "endx": 226.0,
             "endy": 506.0,
@@ -1124,7 +1276,7 @@
                 20,
                 5
             ],
-            "bbox": 10619,
+            "bbox": 15584,
             "colour": "#690000",
             "endx": 674.0,
             "endy": 154.0,
@@ -1139,7 +1291,7 @@
         },
         "2a92d383-8628-4e49-876a-cadb76b27d1c": {
             "background": "",
-            "bbox": 10622,
+            "bbox": 15587,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1163,7 +1315,7 @@
                 0,
                 0
             ],
-            "bbox": 10628,
+            "bbox": 15593,
             "colour": "Black",
             "endx": 375.0,
             "endy": 375.0,
@@ -1183,7 +1335,7 @@
                 0,
                 0
             ],
-            "bbox": 10634,
+            "bbox": 15599,
             "colour": "Black",
             "endx": 649.0,
             "endy": 625.0,
@@ -1197,7 +1349,7 @@
             "tags": "line40"
         },
         "38131c1d-5b38-469f-b654-32c142e9f349": {
-            "bbox": 10638,
+            "bbox": 15603,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -1222,7 +1374,7 @@
         },
         "389c8a7b-fabb-48ff-953c-f9cb2375f216": {
             "background": "",
-            "bbox": 10641,
+            "bbox": 15606,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1240,7 +1392,7 @@
             ]
         },
         "3cdeb66c-45e6-4ce4-b2d9-13071e66b83c": {
-            "bbox": 10645,
+            "bbox": 15610,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -1269,13 +1421,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10664,
+            "bbox": 15632,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1287,6 +1441,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1318,10 +1474,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1344,6 +1510,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -1450,10 +1626,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1462,6 +1642,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -1511,9 +1693,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1537,6 +1733,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -1545,7 +1747,7 @@
         },
         "40ab7ecc-e218-41de-b2c5-6e9d0f501cc4": {
             "background": "",
-            "bbox": 10667,
+            "bbox": 15635,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1563,7 +1765,7 @@
             ]
         },
         "419bcea7-ca14-48ed-9bad-11991369ff47": {
-            "bbox": 10671,
+            "bbox": 15639,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -1588,7 +1790,7 @@
         },
         "443e7365-eada-4b3d-9811-b2e2f5116e5a": {
             "background": "",
-            "bbox": 10674,
+            "bbox": 15642,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1606,7 +1808,7 @@
             ]
         },
         "4854ec29-19b8-467d-b012-ea37ccad42a3": {
-            "bbox": 10678,
+            "bbox": 15646,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -1631,7 +1833,7 @@
         },
         "4a9a7b24-a463-4c41-8f8b-f48bb1ced3be": {
             "background": "",
-            "bbox": 10681,
+            "bbox": 15649,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1654,13 +1856,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10700,
+            "bbox": 15671,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -1672,6 +1876,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1703,6 +1909,14 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
@@ -1710,7 +1924,9 @@
                 false,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "flipped": false,
@@ -1750,12 +1966,22 @@
                     0
                 ],
                 [
+                    [],
+                    "",
+                    0
+                ],
+                [
                     [
                         [
                             5,
                             true
                         ]
                     ],
+                    "",
+                    0
+                ],
+                [
+                    [],
                     "",
                     0
                 ],
@@ -1845,13 +2071,17 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "slotwith": 0,
@@ -1859,7 +2089,9 @@
                 true,
                 false,
                 false,
+                false,
                 true,
+                false,
                 false
             ],
             "subsidary": [
@@ -1906,9 +2138,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -1928,7 +2174,13 @@
                         0
                     ],
                     [
+                        0
+                    ],
+                    [
                         21
+                    ],
+                    [
+                        0
                     ],
                     [
                         0
@@ -1940,7 +2192,7 @@
         },
         "4fafe0c9-dc58-4139-8b86-129b975c831e": {
             "background": "",
-            "bbox": 10703,
+            "bbox": 15674,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1959,7 +2211,7 @@
         },
         "5111bbe4-9194-47ae-a4d0-34b8616fa54c": {
             "background": "",
-            "bbox": 10706,
+            "bbox": 15677,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1978,7 +2230,7 @@
         },
         "552a1041-0cfa-47fe-8fdf-f64d38f7d4e6": {
             "background": "",
-            "bbox": 10709,
+            "bbox": 15680,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2002,7 +2254,7 @@
                 20,
                 5
             ],
-            "bbox": 10715,
+            "bbox": 15686,
             "colour": "#690000",
             "endx": 314.0,
             "endy": 413.0,
@@ -2022,7 +2274,7 @@
                 20,
                 5
             ],
-            "bbox": 10721,
+            "bbox": 15692,
             "colour": "#690000",
             "endx": 847.0,
             "endy": 325.0,
@@ -2037,7 +2289,7 @@
         },
         "59fc38aa-ff48-426d-a355-722b5d84dc8e": {
             "background": "",
-            "bbox": 10724,
+            "bbox": 15695,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2055,7 +2307,7 @@
             ]
         },
         "5ea1c8d5-9e14-420d-a5f3-8867e391b00d": {
-            "bbox": 10728,
+            "bbox": 15699,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -2085,7 +2337,7 @@
                 0,
                 0
             ],
-            "bbox": 10734,
+            "bbox": 15705,
             "colour": "Black",
             "endx": 375.0,
             "endy": 625.0,
@@ -2100,7 +2352,7 @@
         },
         "65f0285b-4626-4c95-b197-2123c85adad6": {
             "background": "",
-            "bbox": 10737,
+            "bbox": 15708,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2119,7 +2371,7 @@
         },
         "68963ab3-0c64-4b57-ae10-fcedaf325369": {
             "background": "",
-            "bbox": 10740,
+            "bbox": 15711,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2138,7 +2390,7 @@
         },
         "6959a90a-5705-4ddb-984d-e3da91ec011b": {
             "background": "",
-            "bbox": 10743,
+            "bbox": 15714,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2162,7 +2414,7 @@
                 20,
                 5
             ],
-            "bbox": 10749,
+            "bbox": 15720,
             "colour": "#690000",
             "endx": 624.0,
             "endy": 426.0,
@@ -2182,7 +2434,7 @@
                 20,
                 5
             ],
-            "bbox": 10755,
+            "bbox": 15726,
             "colour": "#690000",
             "endx": 226.0,
             "endy": 630.0,
@@ -2202,7 +2454,7 @@
                 20,
                 5
             ],
-            "bbox": 10761,
+            "bbox": 15732,
             "colour": "#690000",
             "endx": 224.0,
             "endy": 255.0,
@@ -2222,7 +2474,7 @@
                 20,
                 5
             ],
-            "bbox": 10767,
+            "bbox": 15738,
             "colour": "#690000",
             "endx": 314.0,
             "endy": 159.0,
@@ -2238,7 +2490,7 @@
         "72c7814e-929e-4bd4-b082-ad418a4fd11d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 10773,
+            "bbox": 15744,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -2263,7 +2515,9 @@
                         true,
                         false,
                         false,
+                        false,
                         true,
+                        false,
                         false
                     ]
                 ],
@@ -2271,6 +2525,8 @@
                     12,
                     [
                         true,
+                        false,
+                        false,
                         false,
                         false,
                         false,
@@ -2294,13 +2550,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10792,
+            "bbox": 15766,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2312,6 +2570,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2343,10 +2603,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2369,6 +2639,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -2479,10 +2759,14 @@
                             false,
                             false,
                             false,
+                            false,
+                            false,
                             false
                         ]
                     ]
                 ],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2493,11 +2777,15 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2547,9 +2835,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2573,6 +2875,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -2581,7 +2889,7 @@
         },
         "78c0466a-0b88-4136-be4a-db85299c28f0": {
             "background": "",
-            "bbox": 10795,
+            "bbox": 15769,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2605,7 +2913,7 @@
                 20,
                 5
             ],
-            "bbox": 10801,
+            "bbox": 15775,
             "colour": "#690000",
             "endx": 726.0,
             "endy": 293.0,
@@ -2620,7 +2928,7 @@
         },
         "7cc4fe53-6100-4607-a879-513ceec2d0c2": {
             "background": "",
-            "bbox": 10804,
+            "bbox": 15778,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2644,7 +2952,7 @@
                 0,
                 0
             ],
-            "bbox": 10810,
+            "bbox": 15784,
             "colour": "Black",
             "endx": 850.0,
             "endy": 275.0,
@@ -2658,7 +2966,7 @@
             "tags": "line18"
         },
         "809b22bd-8fe0-4377-8a30-43579de8a9f5": {
-            "bbox": 10814,
+            "bbox": 15788,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -2682,7 +2990,7 @@
             ]
         },
         "849b20e8-9e5a-4d94-9744-3672ed02b2f1": {
-            "bbox": 10818,
+            "bbox": 15792,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -2706,7 +3014,7 @@
             ]
         },
         "8502f570-43a6-4897-b025-8dbd9cbeff4b": {
-            "bbox": 10822,
+            "bbox": 15796,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -2735,13 +3043,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10841,
+            "bbox": 15818,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -2753,6 +3063,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -2784,10 +3096,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2810,6 +3132,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -2916,10 +3248,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2928,6 +3264,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -2977,9 +3315,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3003,6 +3355,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -3011,7 +3369,7 @@
         },
         "871cc749-5039-4225-93db-1ededd446dd7": {
             "background": "",
-            "bbox": 10844,
+            "bbox": 15821,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3035,7 +3393,7 @@
                 0,
                 0
             ],
-            "bbox": 10850,
+            "bbox": 15827,
             "colour": "Black",
             "endx": 475.0,
             "endy": 575.0,
@@ -3055,7 +3413,7 @@
                 20,
                 5
             ],
-            "bbox": 10856,
+            "bbox": 15833,
             "colour": "#690000",
             "endx": 849.0,
             "endy": 475.0,
@@ -3075,7 +3433,7 @@
                 20,
                 5
             ],
-            "bbox": 10862,
+            "bbox": 15839,
             "colour": "#690000",
             "endx": 726.0,
             "endy": 442.0,
@@ -3089,7 +3447,7 @@
             "tags": "line39"
         },
         "8db54f36-2fab-4edf-887a-12a925a4c924": {
-            "bbox": 10866,
+            "bbox": 15843,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3114,7 +3472,7 @@
         },
         "8fc02fa0-9cde-4813-abd4-893efcf65217": {
             "background": "",
-            "bbox": 10869,
+            "bbox": 15846,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3133,7 +3491,7 @@
         },
         "90240f89-a2a8-4a87-bf43-a6c8a02df1e5": {
             "background": "",
-            "bbox": 10872,
+            "bbox": 15849,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3157,7 +3515,7 @@
                 0,
                 0
             ],
-            "bbox": 10878,
+            "bbox": 15855,
             "colour": "Black",
             "endx": 825.0,
             "endy": 150.0,
@@ -3177,7 +3535,7 @@
                 20,
                 5
             ],
-            "bbox": 10884,
+            "bbox": 15861,
             "colour": "#690000",
             "endx": 313.0,
             "endy": 289.0,
@@ -3191,7 +3549,7 @@
             "tags": "line22"
         },
         "98b4dec3-c053-4d76-8733-793e9af686c9": {
-            "bbox": 10888,
+            "bbox": 15865,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3216,7 +3574,7 @@
         },
         "99c323af-d712-4397-bbbf-b7e5497460d5": {
             "background": "",
-            "bbox": 10891,
+            "bbox": 15868,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3235,7 +3593,7 @@
         },
         "99d0e9e1-8934-4996-8c72-730bbac5cfc6": {
             "background": "",
-            "bbox": 10894,
+            "bbox": 15871,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3253,7 +3611,7 @@
             ]
         },
         "9c6c216c-24b8-4e2b-be60-58118fec19be": {
-            "bbox": 10898,
+            "bbox": 15875,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3278,7 +3636,7 @@
         },
         "9d27069d-ccf8-4211-9078-410d1cb25f27": {
             "background": "",
-            "bbox": 10901,
+            "bbox": 15878,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3302,7 +3660,7 @@
                 0,
                 0
             ],
-            "bbox": 10907,
+            "bbox": 15884,
             "colour": "Black",
             "endx": 850.0,
             "endy": 424.0,
@@ -3317,7 +3675,7 @@
         },
         "a1f5b719-6364-4544-a0d9-d8ab9f9eebda": {
             "background": "",
-            "bbox": 10910,
+            "bbox": 15887,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3341,7 +3699,7 @@
                 0,
                 0
             ],
-            "bbox": 10916,
+            "bbox": 15893,
             "colour": "Black",
             "endx": 899.0,
             "endy": 625.0,
@@ -3356,7 +3714,7 @@
         },
         "a510e010-6f31-4af1-9fd7-9bff08af4540": {
             "background": "",
-            "bbox": 10919,
+            "bbox": 15896,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3379,13 +3737,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 10938,
+            "bbox": 15918,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -3397,6 +3757,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3428,10 +3790,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3454,6 +3826,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -3560,10 +3942,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3572,6 +3958,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -3621,9 +4009,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -3647,6 +4049,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -3654,7 +4062,7 @@
             "ybuttonoffset": 0
         },
         "a87139b3-f200-44be-acb8-a5fc5894afb3": {
-            "bbox": 10942,
+            "bbox": 15922,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3678,7 +4086,7 @@
             ]
         },
         "a8ae87a8-d146-4a23-83d9-37f79d49d9a2": {
-            "bbox": 10946,
+            "bbox": 15926,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3703,7 +4111,7 @@
         },
         "a987f298-a2b9-4bc2-9c00-14511c70dc1d": {
             "background": "",
-            "bbox": 10949,
+            "bbox": 15929,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3727,7 +4135,7 @@
                 0,
                 0
             ],
-            "bbox": 10955,
+            "bbox": 15935,
             "colour": "Black",
             "endx": 375.0,
             "endy": 125.0,
@@ -3742,7 +4150,7 @@
         },
         "aa8f47a6-4682-4e0f-88f9-fbd5e49e34bc": {
             "background": "",
-            "bbox": 10958,
+            "bbox": 15938,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3760,7 +4168,7 @@
             ]
         },
         "ae9f00e0-93ce-449f-bd22-9e4050f9cea0": {
-            "bbox": 10962,
+            "bbox": 15942,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3784,7 +4192,7 @@
             ]
         },
         "b3b79263-445b-48af-9e58-c0606f456b07": {
-            "bbox": 10966,
+            "bbox": 15946,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3814,7 +4222,7 @@
                 20,
                 5
             ],
-            "bbox": 10972,
+            "bbox": 15952,
             "colour": "#690000",
             "endx": 225.0,
             "endy": 379.0,
@@ -3828,7 +4236,7 @@
             "tags": "line25"
         },
         "b77e2d4f-4c8d-4c7a-a925-318f865b663b": {
-            "bbox": 10976,
+            "bbox": 15956,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3858,7 +4266,7 @@
                 20,
                 5
             ],
-            "bbox": 10982,
+            "bbox": 15962,
             "colour": "#690000",
             "endx": 225.0,
             "endy": 753.0,
@@ -3878,7 +4286,7 @@
                 20,
                 5
             ],
-            "bbox": 10988,
+            "bbox": 15968,
             "colour": "#690000",
             "endx": 834.0,
             "endy": 663.0,
@@ -3898,7 +4306,7 @@
                 0,
                 0
             ],
-            "bbox": 10994,
+            "bbox": 15974,
             "colour": "Black",
             "endx": 375.0,
             "endy": 750.0,
@@ -3912,7 +4320,7 @@
             "tags": "line6"
         },
         "ca3b500b-66c5-4c34-a5fc-d16e42c75237": {
-            "bbox": 10998,
+            "bbox": 15978,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3942,7 +4350,7 @@
                 0,
                 0
             ],
-            "bbox": 11004,
+            "bbox": 15984,
             "colour": "Black",
             "endx": 375.0,
             "endy": 250.0,
@@ -3956,7 +4364,7 @@
             "tags": "line2"
         },
         "ccb782e6-8d2a-4901-98a6-c75ed464b86d": {
-            "bbox": 11008,
+            "bbox": 15988,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -3985,13 +4393,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 11027,
+            "bbox": 16010,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4003,6 +4413,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4034,10 +4446,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4060,6 +4482,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4170,10 +4602,14 @@
                             false,
                             false,
                             false,
+                            false,
+                            false,
                             false
                         ]
                     ]
                 ],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4184,11 +4620,15 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4238,9 +4678,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4252,6 +4706,12 @@
                 [
                     [
                         17
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ],
                     [
                         0
@@ -4276,13 +4736,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 11046,
+            "bbox": 16032,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4294,6 +4756,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4325,10 +4789,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4351,6 +4825,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4461,10 +4945,14 @@
                             false,
                             false,
                             false,
+                            false,
+                            false,
                             false
                         ]
                     ]
                 ],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4475,11 +4963,15 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4529,9 +5021,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4555,6 +5061,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -4563,7 +5075,7 @@
         },
         "d30cde88-4d59-4ace-b9b0-29da5530cd82": {
             "background": "",
-            "bbox": 11049,
+            "bbox": 16035,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4587,7 +5099,7 @@
                 0,
                 0
             ],
-            "bbox": 11055,
+            "bbox": 16041,
             "colour": "Black",
             "endx": 375.0,
             "endy": 500.0,
@@ -4602,7 +5114,7 @@
         },
         "d78cf00c-bb0e-423c-ad97-07fa422ddaa6": {
             "background": "",
-            "bbox": 11058,
+            "bbox": 16044,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4625,13 +5137,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 11077,
+            "bbox": 16066,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4643,6 +5157,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4674,10 +5190,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4700,6 +5226,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -4806,10 +5342,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4818,6 +5358,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4867,9 +5409,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4893,6 +5449,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -4901,7 +5463,7 @@
         },
         "dcefab16-072c-410b-b316-9fe7653f17f7": {
             "background": "",
-            "bbox": 11080,
+            "bbox": 16069,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4924,13 +5486,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 11099,
+            "bbox": 16091,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -4942,6 +5506,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -4973,10 +5539,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -4999,6 +5575,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -5105,6 +5691,8 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
@@ -5112,10 +5700,14 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5166,9 +5758,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5180,6 +5786,12 @@
                 [
                     [
                         20
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ],
                     [
                         0
@@ -5205,7 +5817,7 @@
                 20,
                 5
             ],
-            "bbox": 11105,
+            "bbox": 16097,
             "colour": "#690000",
             "endx": 315.0,
             "endy": 664.0,
@@ -5220,7 +5832,7 @@
         },
         "e61cf9be-3214-4053-b034-a05938a4667f": {
             "background": "",
-            "bbox": 11108,
+            "bbox": 16100,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -5244,7 +5856,7 @@
                 0,
                 0
             ],
-            "bbox": 11114,
+            "bbox": 16106,
             "colour": "Black",
             "endx": 650.0,
             "endy": 575.0,
@@ -5259,7 +5871,7 @@
         },
         "e86a171d-d7e4-4fd9-aece-abe878e0d1d5": {
             "background": "",
-            "bbox": 11117,
+            "bbox": 16109,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -5283,7 +5895,7 @@
                 20,
                 5
             ],
-            "bbox": 11123,
+            "bbox": 16115,
             "colour": "#690000",
             "endx": 315.0,
             "endy": 540.0,
@@ -5298,7 +5910,7 @@
         },
         "ebcd5bac-272a-4c63-af0b-771371f761bc": {
             "background": "",
-            "bbox": 11126,
+            "bbox": 16118,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -5316,7 +5928,7 @@
             ]
         },
         "f4f58ef3-0409-4c06-8699-882070dc8613": {
-            "bbox": 11130,
+            "bbox": 16122,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "TRAIN",
@@ -5341,7 +5953,7 @@
         },
         "f64e92cf-07a5-457b-83ab-2bc7b73edde3": {
             "background": "",
-            "bbox": 11133,
+            "bbox": 16125,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -5364,13 +5976,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 11152,
+            "bbox": 16147,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5382,6 +5996,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5413,10 +6029,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5446,6 +6072,16 @@
                             false
                         ]
                     ],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
                     "",
                     0
                 ],
@@ -5554,10 +6190,14 @@
                             false,
                             false,
                             false,
+                            false,
+                            false,
                             false
                         ]
                     ]
                 ],
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5568,11 +6208,15 @@
                 false,
                 false,
                 false,
+                false,
+                false,
                 false
             ],
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5622,9 +6266,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5636,6 +6294,12 @@
                 [
                     [
                         20
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ],
                     [
                         0
@@ -5661,7 +6325,7 @@
                 20,
                 5
             ],
-            "bbox": 11158,
+            "bbox": 16153,
             "colour": "#690000",
             "endx": 314.0,
             "endy": 787.0,
@@ -5680,13 +6344,15 @@
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
             "approachsensor": [
                 false,
                 ""
             ],
-            "bbox": 11177,
+            "bbox": 16175,
             "buttoncolour": "Grey85",
             "dccaspects": [
                 [],
@@ -5698,6 +6364,8 @@
             ],
             "dccautoinhibit": false,
             "dccfeathers": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5729,10 +6397,20 @@
                 [
                     "",
                     []
+                ],
+                [
+                    "",
+                    []
+                ],
+                [
+                    "",
+                    []
                 ]
             ],
             "distautomatic": false,
             "feathers": [
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5755,6 +6433,16 @@
                 ""
             ],
             "pointinterlock": [
+                [
+                    [],
+                    "",
+                    0
+                ],
+                [
+                    [],
+                    "",
+                    0
+                ],
                 [
                     [],
                     "",
@@ -5861,10 +6549,14 @@
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ],
             "sigroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5873,6 +6565,8 @@
             "slotwith": 0,
             "subroutes": [
                 true,
+                false,
+                false,
                 false,
                 false,
                 false,
@@ -5922,9 +6616,23 @@
                     0,
                     0,
                     0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
                 ]
             ],
             "trackinterlock": [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -5948,6 +6656,12 @@
                     ],
                     [
                         0
+                    ],
+                    [
+                        0
+                    ],
+                    [
+                        0
                     ]
                 ]
             ],
@@ -5956,7 +6670,7 @@
         },
         "fd0eca6a-b5b2-4776-8d0b-99b09aba8ba6": {
             "background": "",
-            "bbox": 11180,
+            "bbox": 16178,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6074,6 +6788,7 @@
             "grid": 25,
             "gridcolour": "#999",
             "height": 825,
+            "scrollbuttons": [],
             "snaptogrid": false,
             "width": 1000
         },
@@ -6084,9 +6799,10 @@
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
+            "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.3.0"
+            "version": "Version 5.4.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -6256,7 +6972,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 4,
+            "routeset": 5,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
