@@ -610,7 +610,7 @@ def check_for_import_conflicts(new_objects:dict):
              new_object_type == objects_common.object_type.point and new_item_id in objects_common.point_index.keys() or
              new_object_type == objects_common.object_type.section and new_item_id in objects_common.section_index.keys() or
              new_object_type == objects_common.object_type.instrument and new_item_id in objects_common.instrument_index.keys() or
-             new_object_type == objects_common.object_type.track_sensor and new_object_id in objects_common.track_sensor_index.keys() or
+             new_object_type == objects_common.object_type.track_sensor and new_item_id in objects_common.track_sensor_index.keys() or
              new_object_type == objects_common.object_type.route and new_item_id in objects_common.route_index.keys() or
              new_object_type == objects_common.object_type.route and new_item_id in objects_common.switch_index.keys() or
              new_object_type == objects_common.object_type.switch and new_item_id in objects_common.route_index.keys() or
