@@ -437,7 +437,7 @@ def trigger_timed_signal_sequence(int_signal_id:int):
             # would then trigger another timed signal sequence and so on and so on
             if int_sig_id_to_trigger == int_signal_id: start_delay = 0
             # Trigger the timed sequence
-            library.trigger_timed_signal(int_sig_id_to_trigger, start_delay, time_delay)                
+            library.trigger_timed_signal(int_sig_id_to_trigger, start_delay, time_delay)
     return()
 
 #------------------------------------------------------------------------------------
@@ -572,7 +572,9 @@ def update_track_occupancy_for_signal(item_id:int):
     else:
         signal_clear = False
     if route is not None and not is_secondary_event:
-        process_track_occupancy(section_ahead, section_behind, item_text, signal_clear)
+        library.set_signal_override(item_id)
+        clearance_delay = schematic_object["clearancedelay"]*1000
+        root.after(clearance_delay, lambda:process_track_occupancy(section_ahead, section_behind, item_text, item_id, signal_clear))
     return()
 
 # Track Sensor specific logic for track occupancy updates
@@ -598,15 +600,18 @@ def update_track_occupancy_for_track_sensor(item_id:int):
     else:
         section_behind = schematic_object["routebehind"][route_behind.value-1][1]
     if route_ahead is not None and route_behind is not None:
-        process_track_occupancy(section_ahead, section_behind, item_text)
+        clearance_delay = schematic_object["clearancedelay"]*1000
+        root.after(clearance_delay, lambda:process_track_occupancy(section_ahead, section_behind, item_text))
     return()
 
 #------------------------------------------------------------------------------------
-# Common Track Occupancy logic - Track Sensors and Signals. If this function is
-# called for a track sensor then the sig_clear will default to None
+# Common Track Occupancy logic - Track Sensors and Signals. If this function is called for
+# a track sensor then the sig_clear will default to None and sig_id will default to zero.
+# Note that this function is scheduled to run AFTER the signal or sensor passed event that
+# triggered it - this is to simulate the 'clearing delay' after the signal/sensor is passed.
 #------------------------------------------------------------------------------------
 
-def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str, sig_clear:bool=None):
+def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str, sig_id:int=0, sig_clear:bool=None):
     if ( section_ahead > 0 and library.section_occupied(section_ahead) and
          section_behind > 0 and not library.section_occupied(section_behind) ):
         # Section AHEAD = OCCUPIED and section BEHIND = CLEAR - Pass train from AHEAD to BEHIND
@@ -647,7 +652,6 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
         log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both CLEAR)"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: library.display_warning(canvas, log_text)
-
     elif ( section_ahead > 0 and library.section_occupied(section_ahead) and
            section_behind > 0 and library.section_occupied(section_behind) ):
         # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
@@ -665,6 +669,16 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
             log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both OCCUPIED)"
             logging.warning("RUN LAYOUT: "+log_text)
             if spad_popups: library.display_warning(canvas, log_text)
+    # Process any other layout changes that could be affected by changes in track occupancy.
+    update_route_highlighting_for_sections()
+    if sig_id > 0: library.clear_signal_override(sig_id)
+    if automation_enabled:
+        override_signals_based_on_track_sections_ahead()
+        update_approach_control_status_for_all_signals()
+        override_distant_signals_based_on_signals_ahead()
+    process_all_signal_interlocking()
+    process_all_point_interlocking()
+    run_routes.enable_disable_schematic_routes()
     return()
 
 #-------------------------------------------------------------------------------------
@@ -1221,18 +1235,26 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     update_all_signalbox_levers()
     return()
 
+# Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
+# sensor passed events before the train is passed from one track section to the next.
+# The update_track_occupancy_for_signal function now works out what the track occupancy
+# changes will be and schedules the actual update for after the clearance delay.
+# During this period the signal is overridden to DANGER.
 def signal_passed_callback(signal_id:int):
     if enhanced_debugging: print("########## signal_passed_callback "+str(signal_id))
-    if run_mode:
-        update_track_occupancy_for_signal(signal_id)
-        update_route_highlighting_for_sections()
-        if automation_enabled:
-            trigger_timed_signal_sequence(signal_id)
-            override_signals_based_on_track_sections_ahead()
-            update_approach_control_status_for_all_signals()    
-            override_distant_signals_based_on_signals_ahead()
-    process_all_signal_interlocking()
-    run_routes.enable_disable_schematic_routes()
+    # Work out what the track occupancy changes will be and schedule an event to update them.
+    # Any timed signal sequences are triggered immediately after the signal is passed
+    if run_mode: update_track_occupancy_for_signal(signal_id)
+    # Even though schematic updates resulting from track occupancy changes are scheduled
+    # for the future, this callback could also represent the start of a timed signal
+    # sequence. We therefore need to trigger this and then process any other layout
+    # changes that could be affected by a change to a signal aspect
+    if run_mode and automation_enabled:
+        trigger_timed_signal_sequence(signal_id)
+        update_approach_control_status_for_all_signals()
+        override_distant_signals_based_on_signals_ahead()
+    else:
+        process_signal_aspect_update(signal_id)
     return()
 
 def signal_released_callback(signal_id:int):
@@ -1246,16 +1268,15 @@ def signal_released_callback(signal_id:int):
     run_routes.enable_disable_schematic_routes()
     return()
 
+# Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
+# sensor passed events before the train is passed from one track section to the next.
+# The update_track_occupancy_for_signal function now works out what the track occupancy
+# changes will be and schedules the actual update for after the clearance delay.
 def sensor_passed_callback(sensor_id:int):
     if enhanced_debugging: print("########## sensor_passed_callback "+str(sensor_id))
-    if run_mode:
-        update_track_occupancy_for_track_sensor(sensor_id)
-        update_route_highlighting_for_sections()
-        if automation_enabled:
-            override_signals_based_on_track_sections_ahead()
-            update_approach_control_status_for_all_signals()    
-            override_distant_signals_based_on_signals_ahead()
-    process_all_signal_interlocking()
+    # Work out what the track occupancy changes will be and schedule an event to update them.
+    # Any timed signal sequences are triggered immediately after the signal is passed
+    if run_mode: update_track_occupancy_for_track_sensor(sensor_id)
     run_routes.trigger_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
     return()

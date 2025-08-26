@@ -217,12 +217,23 @@ class track_occupancy_frame(Tk.LabelFrame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         super().__init__(parent_frame, text="Track occupancy changes")
         # Create a subframe to center everything in
-        self.frame = Tk.Frame(self)
-        self.frame.pack()
-        self.section_behind = section_behind_frame(self.frame)
+        self.frame1 = Tk.Frame(self)
+        self.frame1.pack()
+        self.section_behind = section_behind_frame(self.frame1)
         self.section_behind.pack(side=Tk.LEFT)
-        self.section_ahead = section_ahead_frame(self.frame)
+        self.section_ahead = section_ahead_frame(self.frame1)
         self.section_ahead.pack(side=Tk.LEFT)
+        self.frame2 = Tk.Frame(self)
+        self.frame2.pack()
+        # Create a subframe to center everything in
+        self.subframe=Tk.Frame(self.frame2)
+        self.subframe.pack()
+        self.label = Tk.Label(self.subframe, text="'Clearance' delay:")
+        self.label.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.clearance = common.integer_entry_box(self.subframe, width=3, min_value=0, max_value=10,
+                        tool_tip="Enter the delay (in seconds) between the signal being 'passed' and any "+
+                        "track occupancy changes being triggered", empty_equals_zero=False, allow_empty=False)
+        self.clearance.pack(padx=2, pady=2, side=Tk.LEFT)
 
     def set_values(self, sections):
         # Sections is a list comprising: [section_behind, list_of_routes_ahead]
@@ -778,9 +789,9 @@ class signal_automation_tab():
         self.frame2 = Tk.Frame(self.frame1)
         self.frame2.pack(side=Tk.LEFT, fill='both', expand=True)
         self.general_settings = general_settings_frame(self.frame2)
-        self.general_settings.pack(padx=2, pady=2, fill='both')
+        self.general_settings.pack(padx=2, pady=2, fill='both', expand=True)
         self.signal_events = signal_events_frame(self.frame2)
-        self.signal_events.pack(padx=2, pady=2, fill='both')
+        self.signal_events.pack(padx=2, pady=2, fill='both', expand=True)
         # Create a Frame for the timed signal configuration (packed according to signal type)
         self.timed_signal = timed_signal_frame(parent_tab)
         # Create a Frame for the Signal Approach control (packed according to signal type)

@@ -54,6 +54,7 @@ default_track_sensor_object = copy.deepcopy(objects_common.default_object)
 default_track_sensor_object["item"] = objects_common.object_type.track_sensor
 default_track_sensor_object["passedsensor"] = ""
 default_track_sensor_object["hidden"] = False
+default_track_sensor_object["clearancedelay"] = 0
 # The "route" elements comprises a list of routes: [main, lh1, lh2, lh3, rh1, rh2, rh3]
 # Each route in the list comprises: [variable_length_list_of_point_settings, section_id]
 # Each point element in the list_of_point_settings comprises [point_id, point_state]

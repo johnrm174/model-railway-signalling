@@ -96,6 +96,7 @@ default_signal_object["buttoncolour"] = settings.get_style("signals", "buttoncol
 default_signal_object["textcolourtype"] = settings.get_style("signals", "textcolourtype")
 default_signal_object["textfonttuple"] = settings.get_style("signals", "textfonttuple")
 default_signal_object["orientation"] = 0 
+default_signal_object["clearancedelay"] = 0
 default_signal_object["flipped"] = False
 default_signal_object["xbuttonoffset"] = 0
 default_signal_object["ybuttonoffset"] = 0

@@ -983,6 +983,7 @@ class edit_signal:
             self.automation.signal_events.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"], item_id)
             self.automation.signal_events.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
+            self.automation.track_occupancy.clearance.set_value(objects.schematic_objects[self.object_id]["clearancedelay"])
             override = objects.schematic_objects[self.object_id]["overridesignal"]
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
             dist_auto = objects.schematic_objects[self.object_id]["distautomatic"]
@@ -1046,6 +1047,7 @@ class edit_signal:
             if not self.locking.conflicting_sigs.validate(): valid = False
             if not self.automation.signal_events.validate(): valid = False
             if not self.automation.track_occupancy.validate(): valid = False
+            if not self.automation.track_occupancy.clearance.validate(): valid = False
             if not self.automation.timed_signal.validate(): valid = False
             if valid:
                 # Copy the original signal Configuration (elements get overwritten as required)
@@ -1100,6 +1102,7 @@ class edit_signal:
                 new_object_configuration["passedsensor"] = self.automation.signal_events.passed.get_value()
                 new_object_configuration["approachsensor"] = self.automation.signal_events.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
+                new_object_configuration["clearancedelay"] = self.automation.track_occupancy.clearance.get_value()
                 override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
                 new_object_configuration["fullyautomatic"] = main_auto
                 new_object_configuration["distautomatic"] = dist_auto

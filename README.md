@@ -55,9 +55,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 ## What's new for Release 5.x.x:
 
 > [!IMPORTANT]
-> Release 5.x.x will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.4.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.x.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.4.0.
 > You have been warned!
 
 * Additional routes for signals (giving up to 7 routes ahead of each signal):
@@ -74,6 +74,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * This new general setting will also increase the size of the new 'quick-scroll' buttons.
 * New 'Import' feature - to import another layout file into the current schematic:
     * Enables collaboration when developing complex layouts / signalling schemes.
+* Able to specify a 'clearance delay' after signals/sensors are 'passed':
+    * Signals will turn red as soon as the signal is passed (representing the first wheelset).
+    * Track occupancy changes will be delayed until the train has 'cleared' the section.
 * Improvements to Application Upgrade utility:
     * Will now report definitive success/failure in the user interface.
 * Minor UI improvements to improve the overall user experience during configuration:

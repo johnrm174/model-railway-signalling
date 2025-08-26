@@ -1177,9 +1177,11 @@ def trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int):
         logging.error("Signal "+str(sig_id)+": trigger_timed_signal - time delay is not a positive int")
     elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
         logging.info("Signal "+str(sig_id)+": Triggering Timed Signal")
+        signals[str(sig_id)]["override"] = False
         signals_colour_lights.trigger_timed_colour_light_signal(sig_id, start_delay, time_delay)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         logging.info("Signal "+str(sig_id)+": Triggering Timed Signal")
+        signals[str(sig_id)]["override"] = False
         signals_semaphores.trigger_timed_semaphore_signal(sig_id, start_delay, time_delay)
     else:
         logging.error("Signal "+str(sig_id)+": trigger_timed_signal - Function not supported by signal type")
