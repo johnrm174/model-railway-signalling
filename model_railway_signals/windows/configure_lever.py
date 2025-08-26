@@ -87,20 +87,19 @@ class signal_configuration(Tk.LabelFrame):
         self.label1 = Tk.Label(self.frame1, text="Signal ID:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.signalid = common.int_item_id_entry_box(self.frame1, tool_tip="Enter the ID of the signal to control "+
-                            "with the lever", callback=self.updated2, exists_function=library.signal_exists)
+                            "with the lever", callback = self.sig_id_updated, exists_function=library.signal_exists)
         self.signalid.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create the Selection radio buttons
-        self.signal_selection = Tk.IntVar(self, 0)
-        self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1, command=self.updated1)
+        self.signal_selection = Tk.IntVar(self, 1)
+        self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1, command=self.validate_buttons)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.button1TT = common.CreateToolTip(self.button1, text="Select to control the main signal aspect/am")
-        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2, command=self.updated1)
+        self.button1TT = common.CreateToolTip(self.button1, text="Select to control the main signal aspect/arm")
+        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2, command=self.validate_buttons)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.button2TT = common.CreateToolTip(self.button2, text="Select to control the subsidary signal aspect/arm")
-        self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3, command=self.updated1)
+        self.button2TT = common.CreateToolTip(self.button2)
+        self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3, command=self.validate_buttons)
         self.button3.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.button3TT = common.CreateToolTip(self.button3, text="Select to control the distant signal arm "+
-                                              "(semaphore home signals with secondary distant arms only)")
+        self.button3TT = common.CreateToolTip(self.button3)
         # Create the route selection elements (in another subframe to center everything)
         self.frame2 = Tk.Frame(self)
         self.frame2.pack()
@@ -108,66 +107,73 @@ class signal_configuration(Tk.LabelFrame):
         self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.routes = common.route_selections(self.frame2, tool_tip="Select the signal route(s) to control with the lever")
         self.routes.pack(padx=2, pady=2, fill='x')
+        self.validate_buttons()
 
-    def updated1(self):
-        # Validate and accept the entry box value
-        if self.signalid.validate(): self.updated2()
+    def sig_id_updated(self):
+        self.validate_buttons(validate_sig_id=False)
         
-    def updated2(self):
-        if self.disabled:
-            self.button1.configure(state="disabled")
-            self.button2.configure(state="disabled")
-            self.button3.configure(state="disabled")
-        elif self.signalid.get_value() > 0:
-            self.button1.configure(state="normal")
-            if self.signal_selection.get() == 0: self.signal_selection.set(1)
+    def validate_buttons(self, validate_sig_id:bool=True):
+        # Validate the signal ID entry box value to accept it
+        self.signalid.validate()
+        # Validate and the buttons (updating the tool tips as required)    
+        button2_default_tt = "Select to control the subsidary signal aspect/arm"
+        button3_default_tt = "Select to control the secondary distant arm (semaphore home signals with secondary distant arms only)"
+        valid = True
+        if self.signalid.get_value() > 0:
             signal_object = objects.schematic_objects[objects.signal(self.signalid.get_value())]
-            if has_subsidary(signal_object):
-                self.button2.configure(state="normal")
+            if self.signal_selection.get() == 2 and not has_subsidary(signal_object):
+                self.button2.configure(fg="red")
+                self.button2TT.text = "Signal does not have a subsidary"
+                self.button3.configure(fg="black")
+                self.button3TT.text = button3_default_tt
+                valid = False
+            elif self.signal_selection.get() == 3 and not has_associated_distant(signal_object):
+                self.button3.configure(fg="red")
+                self.button3TT.text = "Signal does not have a secondary distant arm"
+                self.button2.configure(fg="black")
+                self.button2TT.text = button2_default_tt
+                valid = False
             else:
-                if self.signal_selection.get() == 2: self.signal_selection.set(1)
-                self.button2.configure(state="disabled")
-            if has_associated_distant(signal_object):
-                self.button3.configure(state="normal")
-            else:
-                if self.signal_selection.get() == 3: self.signal_selection.set(1)
-                self.button3.configure(state="disabled")
+                self.button2.configure(fg="black")
+                self.button3.configure(fg="black")
+                self.button2TT.text = button2_default_tt
+                self.button3TT.text = button3_default_tt
         else:
-            if self.signal_selection.get() == 0: self.signal_selection.set(1)
-            self.button1.configure(state="normal")
-            self.button2.configure(state="normal")
-            self.button3.configure(state="normal")
-
+            self.button2.configure(fg="black")
+            self.button3.configure(fg="black")
+            self.button2TT.text = button2_default_tt
+            self.button3TT.text = button3_default_tt
+        return(valid)
+        
     def set_values(self, signal_id:int, signal_selection:int, signal_routes:list):
         # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
         # Where each element is a bool (TRUE/FALSE)
         self.signalid.set_value(signal_id)
         self.signal_selection.set(signal_selection)
         self.routes.set_value(signal_routes)
-        if signal_id > 0: self.updated2()
+        self.validate_buttons()
 
     def get_values(self):
-        self.updated2()
         # signal routes is a list of routes [MAIN, LH1, LH2, RH1, RH2]
         # Where each element is a bool (TRUE/FALSE)
         return(self.signalid.get_value(), self.signal_selection.get(), self.routes.get_value())
     
     def validate(self):
-        self.updated2()
-        valid = self.signalid.validate()
-        return(valid)
+        return(self.signalid.validate() and self.validate_buttons() )
     
     def enable(self):
-        self.disabled = False
         self.signalid.enable()
         self.routes.enable()
-        self.updated2()
+        self.button1.configure(state="normal")
+        self.button2.configure(state="normal")
+        self.button3.configure(state="normal")
     
     def disable(self):
-        self.disabled = True
         self.signalid.disable()
         self.routes.disable()
-        self.updated2()
+        self.button1.configure(state="disabled")
+        self.button2.configure(state="disabled")
+        self.button3.configure(state="disabled")
 
 #------------------------------------------------------------------------------------
 # Class for the point configuration subframe
@@ -184,70 +190,82 @@ class point_configuration(Tk.LabelFrame):
         self.label1 = Tk.Label(self.frame, text="Point ID:")
         self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.pointid = common.int_item_id_entry_box(self.frame, tool_tip="Enter the ID of the point to control "+
-                        "with this lever", callback=self.updated2, exists_function=library.point_exists)
+                        "with this lever", callback=self.point_id_updated, exists_function=library.point_exists)
         self.pointid.pack(padx=2, pady=2, side=Tk.LEFT)
         # Create the Selection radio buttons
         self.point_selection = Tk.IntVar(self, 0)
-        self.button1 = Tk.Radiobutton(self.frame, text="Point", variable=self.point_selection, value=1, command=self.updated1)
+        self.button1 = Tk.Radiobutton(self.frame, text="Point", variable=self.point_selection, value=1, command=self.validate_buttons)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button1TT = common.CreateToolTip(self.button1, text="Select to control the switching of the point")
-        self.button2 = Tk.Radiobutton(self.frame, text="FPL", variable=self.point_selection, value=2, command=self.updated1)
+        self.button2 = Tk.Radiobutton(self.frame, text="FPL", variable=self.point_selection, value=2, command=self.validate_buttons)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button2TT = common.CreateToolTip(self.button2, text="Select to control the Facing Point Lock "+
                                                     "(if the FPL is to be controlled seperately to the point)")
-        self.button3 = Tk.Radiobutton(self.frame, text="Point/FPL", variable=self.point_selection, value=3, command=self.updated1)
+        self.button3 = Tk.Radiobutton(self.frame, text="Point/FPL", variable=self.point_selection, value=3, command=self.validate_buttons)
         self.button3.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button3TT = common.CreateToolTip(self.button3, text="Select to control the point switching and "+
                                              "Facing Point Lock together (points with Facing Point Locks only)")
+        self.validate_buttons()
 
-    def updated1(self):
-        # Validate and accept the entry box value
-        if self.pointid.validate(): self.updated2()
-
-    def updated2(self):
-        if self.disabled:
-            self.button1.configure(state="disabled")
-            self.button2.configure(state="disabled")
-            self.button3.configure(state="disabled")
-        elif self.pointid.get_value() > 0:
-            self.button1.configure(state="normal")
-            if self.point_selection.get() == 0: self.point_selection.set(1)
-            if objects.schematic_objects[objects.point(self.pointid.get_value())]["hasfpl"]:
-                self.button2.configure(state="normal")
-                self.button3.configure(state="normal")
+    def point_id_updated(self):
+        # Validate the Point ID entry box value to accept it
+        self.validate_buttons(validate_point_id=False)
+        
+    def validate_buttons(self, validate_point_id:bool=True):
+        # Validate the Point ID entry box value to accept it
+        self.pointid.validate()
+        # Validate and the buttons (updating the tool tips as required)    
+        button2_default_tt = "Select to control the Facing Point Lock (if the FPL is to be controlled seperately to the point)"
+        button3_default_tt = "Select to control the point switching and Facing Point Lock together (points with FPLs only)"
+        valid = True
+        if self.pointid.get_value() > 0:
+            point_object = objects.schematic_objects[objects.point(self.pointid.get_value())]
+            if self.point_selection.get() == 2 and not point_object["hasfpl"]:
+                self.button2.configure(fg="red")
+                self.button2TT.text = "Point does not have a Facing Point Lock"
+                self.button3.configure(fg="black")
+                self.button3TT.text = button3_default_tt
+                valid = False
+            elif self.point_selection.get() == 3 and not point_object["hasfpl"]:
+                self.button3.configure(fg="red")
+                self.button3TT.text = "Point does not have a Facing Point Lock"
+                self.button2.configure(fg="black")
+                self.button2TT.text = button2_default_tt
+                valid = False
             else:
-                self.button2.configure(state="disabled")
-                self.button3.configure(state="disabled")
-                if self.point_selection.get() in (2, 3): self.point_selection.set(1)
+                self.button2.configure(fg="black")
+                self.button3.configure(fg="black")
+                self.button2TT.text = button2_default_tt
+                self.button3TT.text = button3_default_tt
         else:
-            if self.point_selection.get() == 0: self.point_selection.set(1)
-            self.button1.configure(state="normal")
-            self.button2.configure(state="normal")
-            self.button3.configure(state="normal")
+            self.button2.configure(fg="black")
+            self.button3.configure(fg="black")
+            self.button2TT.text = button2_default_tt
+            self.button3TT.text = button3_default_tt
+        return(valid)
 
     def set_values(self, point_id:int, point_selection:int):
         self.pointid.set_value(point_id)
         self.point_selection.set(point_selection)
-        if point_id > 0: self.updated2()
+        self.validate_buttons()
 
     def get_values(self):
-        self.updated2()
         return(self.pointid.get_value(), self.point_selection.get())
     
     def validate(self):
-        self.updated2()
-        valid = self.pointid.validate()
-        return(valid)
+        return(self.pointid.validate() and self.validate_buttons() )
     
     def enable(self):
-        self.disabled = False
         self.pointid.enable()
-        self.updated2()
+        self.button1.configure(state="normal")
+        self.button2.configure(state="normal")
+        self.button3.configure(state="normal")
     
     def disable(self):
-        self.disabled = True
         self.pointid.disable()
-        self.updated2()
+        self.button1.configure(state="disabled")
+        self.button2.configure(state="disabled")
+        self.button3.configure(state="disabled")
 
 #------------------------------------------------------------------------------------
 # Class for the Keycode configuration subframe
