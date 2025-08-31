@@ -636,6 +636,7 @@ def validate_occupancy_changes(section_ahead:int, section_behind:int, item_text:
         if spad_popups: library.display_warning(canvas, log_text)
     elif sig_clear == False and section_behind > 0 and section_ahead == 0 and library.section_occupied(section_behind):
         # Section BEHIND = OCCUPIED - section AHEAD doesn't exist - but signal at danger
+        train_descriptor = library.section_label(section_behind)
         log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: library.display_warning(canvas, log_text)
