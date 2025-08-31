@@ -1030,7 +1030,7 @@ def lock_subsidary(sig_id:int, tooltip:str="Locked"):
     else:
         # Only generate log messages if the subsidary is not yet locked. If signal/point locking has been
         # correctly implemented it should only be possible to lock a subsidary that is "ON" (i.e. at DANGER)
-        if not signals[str(sig_id)]["siglocked"]:
+        if not signals[str(sig_id)]["sublocked"]:
             if signals[str(sig_id)]["subclear"]:
                 logging.warning("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")
             else:
@@ -1177,11 +1177,11 @@ def trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int):
         logging.error("Signal "+str(sig_id)+": trigger_timed_signal - time delay is not a positive int")
     elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
         logging.info("Signal "+str(sig_id)+": Triggering Timed Signal")
-        signals[str(sig_id)]["override"] = False
+        clear_signal_override(sig_id)
         signals_colour_lights.trigger_timed_colour_light_signal(sig_id, start_delay, time_delay)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         logging.info("Signal "+str(sig_id)+": Triggering Timed Signal")
-        signals[str(sig_id)]["override"] = False
+        clear_signal_override(sig_id)
         signals_semaphores.trigger_timed_semaphore_signal(sig_id, start_delay, time_delay)
     else:
         logging.error("Signal "+str(sig_id)+": trigger_timed_signal - Function not supported by signal type")
