@@ -593,7 +593,7 @@ def run_timed_signal_tests():
     assert signals.signal_state(6) == signals.signal_state_type.PROCEED
     assert signals.signal_state(7) == signals.signal_state_type.PROCEED
     print("Library Tests - trigger_timed_signal (no start delay) - no errors")
-    # First test that timed sequences in progressare correctly aborted
+    # First test that timed sequences in progress are correctly aborted
     signals.trigger_timed_signal(1, 0, 1)
     signals.trigger_timed_signal(6, 0, 1)
     time.sleep(0.2)
@@ -605,6 +605,7 @@ def run_timed_signal_tests():
     signals.trigger_timed_signal(5, 0, 1)
     signals.trigger_timed_signal(6, 0, 1)
     signals.trigger_timed_signal(7, 0, 1)
+    time.sleep(0.1)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -638,6 +639,7 @@ def run_timed_signal_tests():
     signals.trigger_timed_signal(5, 1, 1)
     signals.trigger_timed_signal(6, 1, 1)
     signals.trigger_timed_signal(7, 1, 1)
+    time.sleep(0.1)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
