@@ -610,11 +610,14 @@ class main_menubar:
                                 display_grid=settings.get_canvas("displaygrid"),
                                 canvas_colour=settings.get_canvas("canvascolour"),
                                 grid_colour=settings.get_canvas("gridcolour"))
-        # Destroy the old quick-scroll buttons
+        # Destroy the old quick-scroll buttons (in the quickscrollframe).
         for scroll_button in self.scroll_buttons: scroll_button.destroy()
         self.scroll_buttons = []
-        # create the new quick scroll buttons
+        # For some reason, the quickscrollframe doesn't shrink back to nothing when all the buttons
+        # are deleted so we have to force this by setting the height of the frame to 1 (the minimum).
         quick_scroll_buttons = settings.get_canvas("scrollbuttons")
+        if len(quick_scroll_buttons) == 0 : self.quickscrollframe.configure(height=1)
+        # Create the new quick scroll buttons in the quickscrollframe (which will re-size as required)
         for new_button in quick_scroll_buttons:
             label, width, xscroll, yscroll = new_button[0], new_button[1], new_button[2], new_button[3]
             self.scroll_buttons.append(self.quickscroll_button(self.quickscrollframe, label, width, xscroll, yscroll))
