@@ -6,6 +6,7 @@
 #    dcc_mappings(root)
 #    bulk_renumbering(root)
 #    application_upgrade(root)
+#    import_layout(root, import_schematic_callback)
 #
 # Uses the following library functions:
 #    library.service_mode_read_cv(cv_to_read)
@@ -774,8 +775,8 @@ class application_upgrade():
             self.window.resizable(False, False)
             upgrade_utility_window = self.window
             # Create the main text for the upgrade window
-            self.label = Tk.Label(self.window, width=50, height=2, text="Check for and install any application updates\n"+
-                                                          "(Progress will be displayed in the Terminal window)")
+            self.label = Tk.Label(self.window, width=50, height=3, text="Check for and install any application updates\n"+
+                                                                    "(Progress will be displayed in the Terminal Window)")
             self.label.pack(padx=5, pady=5)
             self.frame=Tk.Frame(self.window)
             self.frame.pack(padx=5, pady=5)
@@ -795,7 +796,8 @@ class application_upgrade():
         self.B1.config(state="disabled")
         self.B2.config(state="disabled")
         self.window.protocol("WM_DELETE_WINDOW", self.null_function)
-        self.label.config(text="Upgrade in progress - please wait\nDo not close application until upgrade is complete")
+        self.label.config(text="Application upgrade in progress - please wait\n"+
+                            "Do not close application until upgrade is complete",fg="black")
         self.B1.update()
         self.B2.update()
         self.label.update()
@@ -807,29 +809,50 @@ class application_upgrade():
         print("----------------------------------------------------------------------------------------------------------------")
         try:
             if library.gpio_interface_enabled():
-                # Assume raspberry Pi - Install with sudo as a system package
-                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                                     "--break-system-packages", "pip"])
-                time.sleep(0.5)
-                subprocess.run(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                                     "--break-system-packages", "model-railway-signals"])
+                # Assume raspberry Pi - Upgrade with sudo as a system package, suppressing errors/warnings
+                # Note that stdout and stderr are directed to the application's stdout and stderr
+                return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action",
+                                                        "ignore", "--break-system-packages", "pip"])
+                # Earlier versions of Pip don't support the --root-user-action or --break-system-packages flags so the
+                # above will error. We'll therefore try to upgrade pip to the latest version without these flags
+                # This is an assumption - pip might fail for other reasons (but unlikely in the big scheme of things)
+                if return_code != 0:
+                    return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "pip"])
+                # We'll only go ahead and try to install the application if we know Pip has been updated
+                if return_code == 0:
+                    return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
+                                                        "--break-system-packages", "model-railway-signals"])
             else:
                 # Assume Windows platform - Install as a user package
                 result = subprocess.run(["pip", "install", "--upgrade", "pip"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
-                time.sleep(0.5)
                 result= subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
-        except:
+                return_code = 999
+        except Exception as exception:
+            return_code = 2
             print("----------------------------------------------------------------------------------------------------------------")
-            print("Upgrade Error - An unhandled exception occured - Try manually upgrading from the Terminal / Command Prompt")
+            print("Upgrade Error - An unhandled exception occured during the application upgrade process:")
+            print(str(exception))
             print("----------------------------------------------------------------------------------------------------------------")
-            self.label.config(text="An unhandled exception occured\nTry manually upgrading from the Terminal / Cmd Prompt")
+        if return_code == 0:
+            self.label.config(text="Upgrade process has completed successfully\n"+
+                    "Exit and re-open the application to use the new version", fg="green4")
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Application Upgrade process completed successfully - Exit and re-open the application to use the new version")
+            print("----------------------------------------------------------------------------------------------------------------")
+        elif return_code == 999:
+            self.label.config(text="Upgrade process has completed - check logs for status\n"+
+                    "Exit and re-open the application to use the new version", fg="black")
+            print("----------------------------------------------------------------------------------------------------------------")
+            print("Application Upgrade process is now complete - check logs for success/fail status")
+            print("----------------------------------------------------------------------------------------------------------------")
         else:
+            self.label.config(text="Upgrade failed with one or more errors\nSee logs for details\n"+
+                                          "Try manually upgrading from the Terminal Window", fg="red")
             print("----------------------------------------------------------------------------------------------------------------")
-            print("Application Upgrade process is now complete - Exit and re-open the application to use the new version")
+            print("Upgrade Error - One or more errors occured during the upgrade process")
             print("----------------------------------------------------------------------------------------------------------------")
-            self.label.config(text="Upgrade process is complete\nExit and re-open the application to use the new version")
         # Re-enable the close button and window close now the upgrade process is complete
         self.B1.update()
         self.B2.update()
@@ -841,6 +864,77 @@ class application_upgrade():
     def close_window(self):
         global upgrade_utility_window
         upgrade_utility_window = None
+        self.window.destroy()
+
+#---------------------------------------------------------------------------------------
+# Class for the "Import Schematic" utility window (uses the classes above)
+#---------------------------------------------------------------------------------------
+
+import_utility_window = None
+
+class import_layout():
+    def __init__(self, root_window, import_schematic_callback):
+        global import_utility_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if import_utility_window is not None:
+            import_utility_window.lift()
+            import_utility_window.state('normal')
+            import_utility_window.focus_force()
+        else:
+            # Create the top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Import Schematic")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            import_utility_window = self.window
+            self.import_schematic_callback = import_schematic_callback
+            # Create the descriptive text for the import utility window
+            self.label = Tk.Label(self.window, text=
+                "Utility to import another layout file into the current schematic.\n"+
+                "Layout file must be the same version as the application version.\n"
+                "Import will fail (with log messages) if conflicts are detected.")
+            self.label.pack(padx=5, pady=5)
+            # Create a label frame for the x and y offsets
+            self.frame1 = Tk.LabelFrame(self.window, text="Canvas offsets for imported layout")
+            self.frame1.pack(padx=5, pady=5, fill="x")
+            # Crete a subframe to center everything in
+            self.subframe1 = Tk.Frame(self.frame1)
+            self.subframe1.pack()
+            self.L1 =Tk.Label(self.subframe1, text="Import X offset:")
+            self.L1.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.EB1 = common.integer_entry_box(self.subframe1, width=4, min_value=0, max_value=7000,
+                            tool_tip="Specify any x offset (0-7000 pixels) for the imported layout")
+            self.EB1.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.L2 =Tk.Label(self.subframe1, text="     Import Y offset:")
+            self.L2.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.EB2 = common.integer_entry_box(self.subframe1, width=4, min_value=0, max_value=3000,
+                            tool_tip="Specify any y offset (0-3000 pixels) for the imported layout")
+            self.EB2.pack(side=Tk.LEFT, padx=2, pady=5)
+            # Create the buttons and tooltip
+            self.frame2=Tk.Frame(self.window)
+            self.frame2.pack(padx=5, pady=5)
+            self.B1 = Tk.Button(self.frame2, text = "Choose Layout File", command=self.load_file)
+            self.TT1 = common.CreateToolTip(self.B1, "Proceed with the upgrade")
+            self.B1.pack(padx=5, pady=5, side=Tk.LEFT)
+            self.B2 = Tk.Button(self.frame2, text = "Cancel / Close", command=self.close_window)
+            self.TT1 = common.CreateToolTip(self.B2, "Close the window")
+            self.B2.pack(padx=5, pady=5, side=Tk.LEFT)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+
+    def load_file(self):
+        if self.EB1.validate() and self.EB2.validate():
+            self.validation_error.pack_forget()
+            self.import_schematic_callback(xoffset=self.EB1.get_value(), yoffset=self.EB2.get_value())
+            import_utility_window.lift()
+            import_utility_window.focus_force()
+        else:
+            # Display the validation error message
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.frame2)
+
+    def close_window(self):
+        global import_utility_window
+        import_utility_window = None
         self.window.destroy()
 
 #############################################################################################

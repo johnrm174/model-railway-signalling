@@ -6,6 +6,8 @@
 # External API functions / objects intended for use by other editor modules:
 #    save_schematic_state(reset_pointer=False) - save the current snapshot ('load' or 'new')
 #    undo() / redo() - Undo and re-do functions as you would expect
+#    check_for_import_conflicts(new_objects) - checks for Import conflicts
+#    extend(new_objects) - Adds new objects to the dictionary (following an Import)
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
 #    create_object(obj_type, item_type, item_subtype) - create a new object on the canvas
@@ -49,6 +51,7 @@
 #    objects_points.redraw_point_object(object_id) - Redraw the object on the canvas following an update
 #    objects_points.default_point_object - The dictionary of default values for the object
 #    objects_points.reset_point_interlocking_tables() - recalculates interlocking tables from scratch
+#    objects_points.check_for_dcc_address_conflicts(object_to_check) - Check if the DCC address is currently in use
 #    objects_sections.create_section(type) - Create a default object on the schematic
 #    objects_sections.delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_sections.update_section(obj_id,new_obj) - Update the configuration of an existing section object
@@ -64,6 +67,7 @@
 #    objects_signals.delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_signals.redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    objects_signals.default_signal_object - The dictionary of default values for the object
+#    objects_signals.check_for_dcc_address_conflicts(object_to_check) - Check if the DCC address is currently in use
 #    objects_routes.create_route() - Create a default object on the schematic
 #    objects_routes.delete_route(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_routes.update_route(obj_id,new_obj) - Update the configuration of an existing object
@@ -80,6 +84,7 @@
 #    objects_switches.delete_switch_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_switches.redraw_switch_object(object_id) - Redraw the object on the canvas following an update
 #    objects_switches.default_switch_object - The dictionary of default values for the object
+#    objects_switches.check_for_dcc_address_conflicts(object_to_check) - Check if the DCC address is currently in use
 #    objects_levers.create_lever() - Create a default object on the schematic
 #    objects_levers.delete_lever(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_levers.update_lever(obj_id,new_obj) - Update the configuration of an existing object
@@ -88,11 +93,13 @@
 #    objects_levers.delete_lever_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_levers.redraw_lever_object(object_id) - Redraw the object on the canvas following an update
 #    objects_levers.default_lever_object - The dictionary of default values for the object
+#    objects_levers.check_for_key_code_conflicts(object_to_check) - Check if the keycode is currently in use
 #
 #------------------------------------------------------------------------------------
 
 import copy 
 import logging
+import uuid
 
 from . import objects_signals
 from . import objects_common
@@ -124,35 +131,40 @@ def bring_track_sections_to_the_front():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal Function to set (re-create) all schematic objects
-# Called following a file load or re-drawing for undo/redo
+# Internal Function to redraw (re-create) all objects on the schematic with a new
+# boundary box. Called following a file load or undo/redo. Note that in both cases
+# all existing schematic objects will have been deleted prior to the re-draw
 #------------------------------------------------------------------------------------
 
-def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
+def redraw_object(object_id):
+    # Set the bbox reference to 'None' so it will be created on redraw
+    objects_common.schematic_objects[object_id]["bbox"] = None
+    this_object_type = objects_common.schematic_objects[object_id]["item"]
+    if this_object_type == objects_common.object_type.line:
+        objects_lines.redraw_line_object(object_id)
+    elif this_object_type == objects_common.object_type.textbox:
+        objects_textboxes.redraw_textbox_object(object_id)
+    elif this_object_type == objects_common.object_type.signal:
+        objects_signals.redraw_signal_object(object_id)
+    elif this_object_type == objects_common.object_type.point:
+        objects_points.redraw_point_object(object_id)
+    elif this_object_type == objects_common.object_type.section:
+        objects_sections.redraw_section_object(object_id)
+    elif this_object_type == objects_common.object_type.instrument:
+        objects_instruments.redraw_instrument_object(object_id)
+    elif this_object_type == objects_common.object_type.track_sensor:
+        objects_sensors.redraw_track_sensor_object(object_id)
+    elif this_object_type == objects_common.object_type.route:
+        objects_routes.redraw_route_object(object_id)
+    elif this_object_type == objects_common.object_type.switch:
+        objects_switches.redraw_switch_object(object_id)
+    elif this_object_type == objects_common.object_type.lever:
+        objects_levers.redraw_lever_object(object_id)
+    return()
+
+def redraw_all_objects():
     for object_id in objects_common.schematic_objects:
-        # Set the bbox reference to none so it will be created on redraw
-        if create_new_bbox: objects_common.schematic_objects[object_id]["bbox"] = None
-        this_object_type = objects_common.schematic_objects[object_id]["item"]
-        if this_object_type == objects_common.object_type.line:
-            objects_lines.redraw_line_object(object_id)
-        elif this_object_type == objects_common.object_type.textbox:
-            objects_textboxes.redraw_textbox_object(object_id)
-        elif this_object_type == objects_common.object_type.signal:                
-            objects_signals.redraw_signal_object(object_id)
-        elif this_object_type == objects_common.object_type.point:
-            objects_points.redraw_point_object(object_id)
-        elif this_object_type == objects_common.object_type.section:
-            objects_sections.redraw_section_object(object_id)
-        elif this_object_type == objects_common.object_type.instrument:
-            objects_instruments.redraw_instrument_object(object_id)
-        elif this_object_type == objects_common.object_type.track_sensor:
-            objects_sensors.redraw_track_sensor_object(object_id)
-        elif this_object_type == objects_common.object_type.route:
-            objects_routes.redraw_route_object(object_id)
-        elif this_object_type == objects_common.object_type.switch:
-            objects_switches.redraw_switch_object(object_id)
-        elif this_object_type == objects_common.object_type.lever:
-            objects_levers.redraw_lever_object(object_id)
+        redraw_object(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -162,31 +174,34 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
 # objects were selected then deleted as part of the undo/redo or load layout
 #------------------------------------------------------------------------------------
 
+def add_schematic_index_entry(object_id):
+    this_object_type = objects_common.schematic_objects[object_id]["item"]
+    this_object_item_id = objects_common.schematic_objects[object_id]["itemid"]
+    if this_object_type == objects_common.object_type.line:
+        objects_common.line_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.signal:
+        objects_common.signal_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.point:
+        objects_common.point_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.section:
+        objects_common.section_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.instrument:
+        objects_common.instrument_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.track_sensor:
+        objects_common.track_sensor_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.route:
+        objects_common.route_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.switch:
+        objects_common.switch_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.textbox:
+        objects_common.textbox_index[str(this_object_item_id)] = object_id
+    elif this_object_type == objects_common.object_type.lever:
+        objects_common.lever_index[str(this_object_item_id)] = object_id
+    return()
+
 def reset_all_schematic_indexes():
     for object_id in objects_common.schematic_objects:
-        this_object_type = objects_common.schematic_objects[object_id]["item"]
-        this_object_item_id = objects_common.schematic_objects[object_id]["itemid"]
-        if this_object_type == objects_common.object_type.line:
-            objects_common.line_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.signal:                
-            objects_common.signal_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.point:
-            objects_common.point_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.section:
-            objects_common.section_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.instrument:
-            objects_common.instrument_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.track_sensor:
-            objects_common.track_sensor_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.route:
-            objects_common.route_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.switch:
-            objects_common.switch_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.textbox:
-            objects_common.textbox_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.lever:
-            objects_common.lever_index[str(this_object_item_id)] = object_id
-        # Note that textboxes don't have an index as we don't track their IDs
+        add_schematic_index_entry(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -249,8 +264,8 @@ def restore_schematic_state():
         objects_common.schematic_objects[object_id] = copy.deepcopy(snapshot_objects[object_id])
     # Set the seperate schematic dictionary indexes from the restored schematic objects dict
     reset_all_schematic_indexes()
-    # Re-draw all objects, ensuring a new bbox is created for each object. This function
-    redraw_all_objects(create_new_bbox=True, reset_state=False)
+    # Re-draw all objects on the schematic.
+    redraw_all_objects()
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # Initialise the layout (interlocking changes, signal aspects etc)
@@ -299,12 +314,10 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
 #------------------------------------------------------------------------------------
 
 def finalise_object_updates():
-    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    # Ensure all track sections are brought forward on the schematic (in front of any
+    # lines), save the current state (for undo/redo) and Process any layout changes
     bring_track_sections_to_the_front()
-    # save the current state (for undo/redo)
     save_schematic_state()
-    # Process any layout changes (interlocking, signal ahead etc)
-    # that might be dependent on the object configuration change(s)
     run_layout.initialise_layout()
     return()
 
@@ -349,8 +362,9 @@ def update_object(object_id, new_object, update_schematic_state:bool=True, creat
     return()
 
 #------------------------------------------------------------------------------------
-# Common Internal Function to permanently Delete an objects from the schematic
-# Called from the delete_objects and also the undo/redo functions
+# Common Internal Function to hard Delete an object. This function deletes the library
+# object from the schematic and also permanently deletes the object from the dictionary
+# of schematic objects - Called from the delete_objects and also the undo/redo functions
 #------------------------------------------------------------------------------------
 
 def delete_object(object_id):
@@ -378,18 +392,16 @@ def delete_object(object_id):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to permanently Delete one or more objects from the schematic
-# Called from the Schematic Module when selected objects are deleted
+# Function to permanently Delete one or more objects from the schematic. Called from
+# the Schematic Module when selected objects are deleted or when all objects are deleted
 #------------------------------------------------------------------------------------
 
-def delete_objects(list_of_object_ids:list, initialise_layout_after_delete:bool=True):
+def delete_objects(list_of_object_ids:list):
     for object_id in list_of_object_ids:
         delete_object(object_id)
-    # save the current state (for undo/redo)
+    # Save the schematic state (for undo/redo) and initialise the layout
     save_schematic_state()
-    # Process any layout changes (interlocking, signal ahead etc)
-    # that might need to change following object deletion
-    if initialise_layout_after_delete: run_layout.initialise_layout()
+    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -579,12 +591,99 @@ def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to set (re-create) all schematic objects (following a file load)
-# Note that there is a dependancy that the main schematic objects dict is empty
-# i.e. any legacy objects existing prior to the load will have been deleted first
+# Function to check a dict of new schematic objects for item-id conflicts.
+# This is to support the 'import' use case where we are loading another layout
+# file into an existing schematic. Returns True if conflicts are detected.
+# Note we don't check for duplicate Textbox IDs as the application doesn't
+# really use them - these are resolved during the import process
 #------------------------------------------------------------------------------------
 
-def set_all(new_objects):
+def check_for_import_conflicts(new_objects:dict):
+    conflicts_detected = False
+    # Check for Duplicate Item IDs - Any duplicates will cause import to fail. Note that Route buttons
+    # and DCC switches share the same underlying button object - so we have to check both indexes
+    for object_id in new_objects:
+        new_object_type = new_objects[object_id]["item"]
+        new_item_id = str(new_objects[object_id]["itemid"])
+        if ( new_object_type == objects_common.object_type.line and new_item_id in objects_common.line_index.keys() or
+             new_object_type == objects_common.object_type.signal and new_item_id in objects_common.signal_index.keys() or
+             new_object_type == objects_common.object_type.point and new_item_id in objects_common.point_index.keys() or
+             new_object_type == objects_common.object_type.section and new_item_id in objects_common.section_index.keys() or
+             new_object_type == objects_common.object_type.instrument and new_item_id in objects_common.instrument_index.keys() or
+             new_object_type == objects_common.object_type.track_sensor and new_item_id in objects_common.track_sensor_index.keys() or
+             new_object_type == objects_common.object_type.route and new_item_id in objects_common.route_index.keys() or
+             new_object_type == objects_common.object_type.route and new_item_id in objects_common.switch_index.keys() or
+             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.route_index.keys() or
+             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.switch_index.keys() or
+             new_object_type == objects_common.object_type.lever and new_item_id in objects_common.lever_index.keys() ):
+            logging.error("Import Schematic - Duplicate Item ID detected for "+str(new_object_type.rpartition('.')[-1])+" "+new_item_id)
+            conflicts_detected=True
+    if not conflicts_detected:
+        # Check for Duplicate DCC Address mappings (signals, points and DCC switches) and Duplicate Keycode
+        # mappings (Levers). Note we do this as a second pass (only when item ID conflicts have been resolved)
+        for object_id in new_objects:
+            new_object_type = new_objects[object_id]["item"]
+            if new_object_type == objects_common.object_type.point:
+                if objects_points.check_for_dcc_address_conflicts(new_objects[object_id]): conflicts_detected=True
+            elif new_object_type == objects_common.object_type.signal:
+                if objects_signals.check_for_dcc_address_conflicts(new_objects[object_id]): conflicts_detected=True
+            elif new_object_type == objects_common.object_type.switch:
+                if objects_switches.check_for_dcc_address_conflicts(new_objects[object_id]): conflicts_detected=True
+            elif new_object_type == objects_common.object_type.lever:
+                if objects_levers.check_for_key_code_conflicts(new_objects[object_id]): conflicts_detected=True
+    return(conflicts_detected)
+
+#------------------------------------------------------------------------------------
+# The extend function is for the "Import" use case where we will already
+# have validated the imported file is the same version as the application
+# so we don't need to be as defensive as we are for the "Load" use case.
+# New Objects are added to the list of schematic objects and created.
+#------------------------------------------------------------------------------------
+
+def extend(new_objects:dict, xoffset:int=0, yoffset:int=0):
+    for object_id in new_objects:
+        # Add the new object to the master dictonary of objects using a new UUID for
+        # the Object_ID (to avoid ending up with duplicate IDs - which could happen)
+        new_object_id = str(uuid.uuid4())
+        objects_common.schematic_objects[new_object_id] = copy.deepcopy(new_objects[object_id])
+        # Apply the required positional offset - posx/posy elements are mandatory for all objects
+        objects_common.schematic_objects[new_object_id]["posx"] = objects_common.schematic_objects[new_object_id]["posx"] + xoffset
+        objects_common.schematic_objects[new_object_id]["posy"] = objects_common.schematic_objects[new_object_id]["posy"] + yoffset
+        # Apply the required positional offsets for the other end of lines
+        if objects_common.schematic_objects[new_object_id]["item"] == objects_common.object_type.line:
+            objects_common.schematic_objects[new_object_id]["endx"] = objects_common.schematic_objects[new_object_id]["endx"] + xoffset
+            objects_common.schematic_objects[new_object_id]["endy"] = objects_common.schematic_objects[new_object_id]["endy"] + yoffset
+        # We don't really care what the Item ID of the textbox is - this just gets used for iterating
+        # through the textboxes when applying style updates. For the 'Import' use case we therefore
+        # want to resolve any Item ID conflicts automatically
+        elif objects_common.schematic_objects[new_object_id]["item"] == objects_common.object_type.textbox:
+            if library.text_box_exists(objects_common.schematic_objects[new_object_id]["itemid"]):
+                new_item_id = objects_common.new_item_id(exists_function=library.text_box_exists)
+                objects_common.schematic_objects[new_object_id]["itemid"] = new_item_id
+        # Add the object ID to the type_specific index:
+        add_schematic_index_entry(new_object_id)
+        # Draw the imported object on the schematic
+        redraw_object(new_object_id)
+    # Ensure all track sections are in front of any lines
+    bring_track_sections_to_the_front()
+    # Recalculate point interlocking tables as a 'belt and braces' measure (they should
+    # have been loaded with the rest of the configuration but we do this just in case)
+    objects_points.reset_point_interlocking_tables()
+    # Initialise the layout (interlocking changes, signal aspects etc)
+    run_layout.initialise_layout()
+    # save the current state (for undo/redo) - retaining all previous history
+    save_schematic_state(reset_pointer=False)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to set (re-create) schematic objects (following a file load). This function
+# supports load of a new schematic (where all existing schematic objects will have been
+# deleted first, leaving the main schematic objects dictionary empty and 'import' of
+# a schematic into an existing schematic (where the new schematic will have been
+# checked to ensure there are no conflicts in Item Ids or Object IDs beforehand.
+#------------------------------------------------------------------------------------
+
+def set_all(new_objects:dict):
     # For each loaded object, create a new default object of the same type
     # and then copy across each element in turn. This is defensive programming
     # to populate the objects gracefully whilst handling changes to an object
@@ -632,43 +731,110 @@ def set_all(new_objects):
                     if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
                         objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
                     #########################################################################################################
-                    # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
-                    # The 'tracksections' element is now a list comprising: [section_behind, lists_of_sections_ahead]
-                    # The 'lists_of_sections_ahead' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-                    # Each signal_route element comprises a variable length list of track sections: [T1,]
-                    # Note that each signal_route element contains at least one entry (the section directly ahead)
-                    # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
-                    # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
-                    #########################################################################################################
-                    elif new_object_type == objects_common.object_type.signal and element == "tracksections":
-                        new_structure = [0, [ [0], [0], [0], [0], [0]]]
-                        new_structure[0] = new_objects[object_id][element][0]
-                        for index1, route_entry in enumerate(new_objects[object_id][element][1]):
-                            for index2, section in enumerate(route_entry):
-                                if index2 == 0: new_structure[1][index1][0] = section
-                                elif section > 0: new_structure[1][index1].append(section)
-                        objects_common.schematic_objects[object_id][element] = new_structure
-                    #########################################################################################################
-                    # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
-                    # The 'trackinterlock' element now comprises a list_of_signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-                    # Each route element contains a variable length list of interlocked sections for that route [t1,]
-                    # Each entry is the ID of a (local) track section the signal is to be interlocked with
-                    # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
-                    # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
-                    #########################################################################################################
-                    elif new_object_type == objects_common.object_type.signal and element == "trackinterlock":
-                        new_structure = [[], [], [], [], []]
-                        for index1, route_entry in enumerate(new_objects[object_id][element]):
-                            for index2, section in enumerate(route_entry):
-                                if section > 0: new_structure[index1].append(section)
-                        objects_common.schematic_objects[object_id][element] = new_structure
-                    #########################################################################################################
                     # From Release 5.2.2 the 'subsidary' element in the signal object configuration changed from
                     # [has_sub:bool, dcc_address:int] to [has:sub:bool, dcc_address:int, reversed_command_logic:bool]
                     #########################################################################################################
                     elif (new_object_type == objects_common.object_type.signal and element == "subsidary" and
                           len(new_objects[object_id][element]) < 3):
                             objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
+                    #########################################################################################################
+                    # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
+                    # The tracksections element was a list comprising: [section_behind, signal_routes_ahead]
+                    # The signal_routes_ahead element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                    # Each signal_route changed from a fixed-length list of 3 track sections to a variable length
+                    # list of track sections with at least one entry (the tracksection directly ahead)
+                    # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
+                    # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
+                    #########################################################################################################
+                    # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
+                    # The trackinterlock element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                    # Each signal_route hanged from a fixed-length list of 3 track sections to a variable length
+                    # list of interlocked track sections for the route
+                    # Each entry is the ID of a (local) track section the signal is to be interlocked with
+                    # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+                    # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
+                    #########################################################################################################
+                    # From Release 5.4.0 the application supports more Signal routes. All elements (including the above)
+                    # need to be extended as appropriate and re-ordered to ensure the routes are correctly ordered after
+                    # loading - i.e. from [MAIN,LH1,LH2,RH1,RH2] to [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
+                    #########################################################################################################
+                    elif (new_object_type == objects_common.object_type.signal and (element == "dccfeathers" or
+                          element == "dcctheatre") and len(new_objects[object_id][element]) < 8):
+                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Dark
+                        new_values[1] = new_objects[object_id][element][1] # Main
+                        new_values[2] = new_objects[object_id][element][2] # lh1
+                        new_values[3] = new_objects[object_id][element][3] # lh2
+                        new_values[5] = new_objects[object_id][element][4] # rh1
+                        new_values[6] = new_objects[object_id][element][5] # rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.signal and (element == "sigroutes" or
+                          element == "subroutes" or element == "pointinterlock" or element == "trackinterlock" or
+                          element == "siginterlock" or element == "feathers" or element == "approachcontrol" or
+                          element == "timedsequences") and len(new_objects[object_id][element]) < 7):
+                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Main
+                        new_values[1] = new_objects[object_id][element][1] # lh1
+                        new_values[2] = new_objects[object_id][element][2] # lh2
+                        new_values[4] = new_objects[object_id][element][3] # rh1
+                        new_values[5] = new_objects[object_id][element][4] # rh2
+                        # Get rid of any zero entries for each route in the "trackinterlock" element
+                        if element == "trackinterlock":
+                            new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
+                            for index1, route_entry in enumerate(new_values):
+                                for section_id in route_entry:
+                                    if section_id > 0: new_values_without_blanks[index1].append(section_id)
+                            objects_common.schematic_objects[object_id][element] = new_values_without_blanks
+                        # Get rid of any zero entries for each route in the "tracksections" element
+                        elif element == "tracksections":
+                            new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
+                            for index1, route_entry in enumerate(new_values):
+                                for index2, section_id in enumerate(route_entry):
+                                    if index2 == 0: new_values_without_blanks[1][index1][0] = section_id
+                                    elif section_id > 0: new_values_without_blanks[1][index1].append(section_id)
+                            objects_common.schematic_objects[object_id][element] = new_values_without_blanks
+                        # For the siginterlock element we also need to correct each element
+                        elif element == "siginterlock":
+                            corrected_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                            for index1, route_entry in enumerate(new_values):
+                                for signal_entry in route_entry:
+                                    if len(signal_entry[1]) < 7:
+                                        corrected_values[index1].append([signal_entry[0], [signal_entry[1][0],
+                                                            signal_entry[1][1], signal_entry[1][2], False,
+                                                            signal_entry[1][3], signal_entry[1][4], False]])
+                                    else:
+                                        corrected_values[index1].append(signal_entry)
+                            objects_common.schematic_objects[object_id][element] = corrected_values
+                        else:
+                            objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.signal and element == "tracksections"
+                                    and len(new_objects[object_id][element][1]) < 7):
+                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                        new_values[0] = new_objects[object_id][element][0]       # Section behind
+                        new_values[1][0] = new_objects[object_id][element][1][0] # section ahead - Main
+                        new_values[1][1] = new_objects[object_id][element][1][1] # section ahead - lh1
+                        new_values[1][2] = new_objects[object_id][element][1][2] # section ahead - lh2
+                        new_values[1][4] = new_objects[object_id][element][1][3] # section ahead - rh1
+                        new_values[1][5] = new_objects[object_id][element][1][4] # section ahead - rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.lever and element == "signalroutes"
+                                                and len(new_objects[object_id][element]) < 7):
+                        new_values = copy.deepcopy(objects_levers.default_lever_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Main
+                        new_values[1] = new_objects[object_id][element][1] # lh1
+                        new_values[2] = new_objects[object_id][element][2] # lh2
+                        new_values[4] = new_objects[object_id][element][3] # rh1
+                        new_values[5] = new_objects[object_id][element][4] # rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
+                    elif (new_object_type == objects_common.object_type.track_sensor and (element == "routeahead" or
+                                element == "routebehind") and len(new_objects[object_id][element]) < 7):
+                        new_values = copy.deepcopy(objects_sensors.default_track_sensor_object[element])
+                        new_values[0] = new_objects[object_id][element][0] # Main
+                        new_values[1] = new_objects[object_id][element][1] # lh1
+                        new_values[2] = new_objects[object_id][element][2] # lh2
+                        new_values[4] = new_objects[object_id][element][3] # rh1
+                        new_values[5] = new_objects[object_id][element][4] # rh2
+                        objects_common.schematic_objects[object_id][element] = new_values
                     #########################################################################################################
                     # End of code to handle changes in Object data structures
                     #########################################################################################################
@@ -684,7 +850,7 @@ def set_all(new_objects):
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
-    redraw_all_objects(create_new_bbox=True, reset_state=False)
+    redraw_all_objects()
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
     # Recalculate point interlocking tables as a 'belt and braces' measure (they should

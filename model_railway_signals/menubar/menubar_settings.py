@@ -50,6 +50,81 @@ from .. import settings
 from .. import library
 
 #------------------------------------------------------------------------------------
+# Class for a quick scroll button entry This is for large layouts, with a bigger
+# canvas area than the visible screen. These buttons provide a quick mechanism for
+# changing the current view without the scroll bars or dragging/nudging the screen.
+#------------------------------------------------------------------------------------
+
+class quick_scroll_entry(Tk.Frame):
+    def __init__(self, parent_frame):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame)
+        self.frame = Tk.LabelFrame(self, borderwidth=1)
+        self.frame.pack(padx=5,pady=2)
+        # Create a frame for the button name elements
+        self.subframe1 = Tk.Frame(self.frame)
+        self.subframe1.pack()
+        self.label1 = Tk.Label(self.subframe1, text="Button label:")
+        self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.buttonname = common.entry_box(self.subframe1, width=29, tool_tip="Enter a name for the quick-scroll button")
+        self.buttonname.pack(padx=2, pady=2, side=Tk.LEFT)
+        # Create another subframe for all the other elements
+        self.subframe2 = Tk.Frame(self.frame)
+        self.subframe2.pack()
+        self.label2 = Tk.Label(self.subframe2, text="Button width:")
+        self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.buttonwidth = common.integer_entry_box(self.subframe2, width=3, min_value=0, max_value=25,
+                   tool_tip="Specify the button width (or leave blank to size the button to the label)")
+        self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.label3 = Tk.Label(self.subframe2, text="Scroll x:")
+        self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.xscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=8000, empty_equals_zero=True,
+                   tool_tip="Specify the 'scroll to' X coordinate (for the top left corner of the window)")
+        self.xscroll.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.label3 = Tk.Label(self.subframe2, text="Scroll y:")
+        self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.yscroll = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=4000, empty_equals_zero=True,
+                   tool_tip="Specify the 'scroll to' Y coordinate (for the top left corner of the window)")
+        self.yscroll.pack(padx=2, pady=2, side=Tk.LEFT)
+
+    def set_value(self, button_entry:list):
+        self.buttonname.set_value(button_entry[0])
+        self.buttonwidth.set_value(button_entry[1])
+        self.xscroll.set_value(button_entry[2])
+        self.yscroll.set_value(button_entry[3])
+
+    def get_value(self):
+        # Deal with empty boxes (convert to zero)
+        return( [ self.buttonname.get_value(), self.buttonwidth.get_value(),
+                  self.xscroll.get_value(), self.yscroll.get_value() ] )
+
+    def reset(self):
+        self.set_value(button_entry=["", 0, 0, 0])
+
+    def validate(self):
+        valid = True
+        if not self.buttonname.validate(): valid=False
+        if not self.buttonwidth.validate(): valid=False
+        if not self.xscroll.validate(): valid=False
+        if not self.yscroll.validate(): valid=False
+        return(valid)
+
+class grid_of_quick_scroll_entries(common.grid_of_widgets):
+    def __init__(self, parent_frame, **kwargs):
+        # Use the parent class frame to pack everything into
+        super().__init__(parent_frame, quick_scroll_entry, columns=1, **kwargs)
+
+    def get_values(self):
+        # Get a list of currently entered values
+        entered_values = super().get_values()
+        # Compile a list of values to return removing any blanks (button name is blank)
+        values_to_return = []
+        for entered_value in entered_values:
+            if entered_value[0] != "" :
+                values_to_return.append(entered_value)
+        return(values_to_return)
+
+#------------------------------------------------------------------------------------
 # Class for the Canvas configuration toolbar window. Note the init function takes
 # in a callback so it can apply the updated settings in the main editor application.
 # Note also that if a window is already open then we just raise it and exit.
@@ -73,8 +148,26 @@ class edit_canvas_settings():
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             canvas_settings_window = self.window
+            # I've seen problems on later versions of Python on the Pi-5 where the buttons at the bottom
+            # of the screen disappear when the window dynamically re-sizes due to quick-scroll buttons.
+            # being added - Using grid to pack the 'buttons' / 'everything else' seems to solve this.
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for the action buttons and validation error message
+            #-----------------------------------------------------------------------------------------
+            self.button_frame=Tk.Frame(self.window)
+            self.button_frame.grid(row=1, column=0)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.button_frame, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.button_frame, text="Errors on Form need correcting", fg="red")
+            #-----------------------------------------------------------------------------------------
+            # Create a frame (packed using Grid) for everything else
+            #-----------------------------------------------------------------------------------------
+            self.main_frame=Tk.Frame(self.window)
+            self.main_frame.grid(row=0, column=0)
             # Create a label frame for the general settings
-            self.frame1 = Tk.LabelFrame(self.window, text="General settings")
+            self.frame1 = Tk.LabelFrame(self.main_frame, text="General settings")
             self.frame1.pack(padx=2, pady=2, fill="x")
             # Create the entry box elements for the width, height and grid in a subframe
             # Pack the elements as into the subframe using 'grid' to get an aligned layout
@@ -97,7 +190,7 @@ class edit_canvas_settings():
             self.gridsize = common.integer_entry_box(self.subframe1, width=5, min_value=5, max_value=25,
                             allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
             self.gridsize.grid(row=2, column=1)
-            # Create the elements for the other settings in a second subframe (within the labelframe
+            # Create the elements for the other settings in a second subframe (within the labelframe)
             self.subframe2 = Tk.Frame(self.frame1)
             self.subframe2.pack()
             self.snaptogrid = common.check_box (self.subframe2, label="Snap to grid",
@@ -107,17 +200,17 @@ class edit_canvas_settings():
                             tool_tip="Display/hide the grid in edit mode")
             self.displaygrid.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create another Frame to hold the colour selections
-            self.frame2 = Tk.Frame(self.window)
+            self.frame2 = Tk.Frame(self.main_frame)
             self.frame2.pack(fill="x")
             self.canvascolour = common.colour_selection(self.frame2, label="Canvas colour")
             self.canvascolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
             self.gridcolour = common.colour_selection(self.frame2, label="Grid colour")
             self.gridcolour.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=True)
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.pack(padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # Create a Label frame for the quick scroll buttons
+            self.frame3 = Tk.LabelFrame(self.main_frame, text="Quick scroll buttons (for schematics larger than the screen)")
+            self.frame3.pack(padx=2, pady=2, fill="x")
+            self.scrollbuttons = grid_of_quick_scroll_entries(self.frame3)
+            self.scrollbuttons.pack()
             # Load the initial UI state
             self.load_state()
 
@@ -130,10 +223,11 @@ class edit_canvas_settings():
         self.displaygrid.set_value(settings.get_canvas("displaygrid"))
         self.canvascolour.set_value(settings.get_canvas("canvascolour"))
         self.gridcolour.set_value(settings.get_canvas("gridcolour"))
+        self.scrollbuttons.set_values(settings.get_canvas("scrollbuttons"))
         
     def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
-        if self.width.validate() and self.height.validate() and self.gridsize.validate():
+        if self.width.validate() and self.height.validate() and self.gridsize.validate() and self.scrollbuttons.validate():
             self.validation_error.pack_forget()
             settings.set_canvas("width", self.width.get_value())
             settings.set_canvas("height", self.height.get_value())
@@ -142,10 +236,12 @@ class edit_canvas_settings():
             settings.set_canvas("displaygrid", self.displaygrid.get_value())
             settings.set_canvas("canvascolour", self.canvascolour.get_value())
             settings.set_canvas("gridcolour", self.gridcolour.get_value())
+            settings.set_canvas("scrollbuttons", self.scrollbuttons.get_values())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
             if close_window: self.close_window()
+            else:self.load_state()
         else:
             # Display the validation error message
             self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
@@ -1024,29 +1120,41 @@ class edit_general_settings():
             self.window.resizable(False, False)
             edit_general_settings_window = self.window
             #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Application settings
+            #----------------------------------------------------------------------------------
+            self.frame1 = Tk.LabelFrame(self.window, text = "Application appearance settings")
+            self.frame1.pack(padx=2, pady=2, fill=Tk.BOTH)
+            # Create the reset delay settings elements
+            self.frame1subframe1 = Tk.Frame(self.frame1)
+            self.frame1subframe1.pack()
+            self.label1 = Tk.Label(self.frame1subframe1, text="Menubar Font Size:")
+            self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.fontsize = common.integer_entry_box(self.frame1subframe1, width=3, min_value=10, max_value=20,
+                        allow_empty=False, tool_tip="Specify the font size for the menubar items (10-20 pixels)")
+            self.fontsize.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------------
             # Create a Label Frame for the Run Layout settings
             #----------------------------------------------------------------------------------
-            # Create a labelframe for the run Layout Settings
-            self.frame1 = Tk.LabelFrame(self.window, text = "Run Layout settings")
-            self.frame1.pack(padx=2, pady=2, fill=Tk.BOTH)
+            self.frame2 = Tk.LabelFrame(self.window, text = "Run Layout settings")
+            self.frame2.pack(padx=2, pady=2, fill=Tk.BOTH)
             # Create the "SPAD Popups" selection element
-            self.enablespadpopups = common.check_box(self.frame1, label="Enable popup SPAD warnings",
+            self.enablespadpopups = common.check_box(self.frame2, label="Enable popup SPAD warnings",
                     tool_tip="Select to enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.enablespadpopups.pack(padx=2, pady=2)
-            self.enableleverpopups = common.check_box(self.frame1, label="Enable popup Lever warnings",
+            self.enableleverpopups = common.check_box(self.frame2, label="Enable popup Lever warnings",
                                 tool_tip="Select to enable popup interlocking warnings (when Signalbox Levers "+
                                      "are switched by external lever frame events events whilst locked)")
             self.enableleverpopups.pack(padx=2, pady=2)
-            self.leverinterlocking = common.check_box(self.frame1, label="Ignore Lever interlocking",
+            self.leverinterlocking = common.check_box(self.frame2, label="Ignore Lever interlocking",
                                 tool_tip="Select to ignore interlocking when Signalbox Levers are "+
                                      "switched by external lever frame events events")
             self.leverinterlocking.pack(padx=2, pady=2)
             # Create the reset delay settings elements
-            self.frame1subframe1 = Tk.Frame(self.frame1)
-            self.frame1subframe1.pack()
-            self.label1 = Tk.Label(self.frame1subframe1, text="Reset switching delay:")
+            self.frame2subframe1 = Tk.Frame(self.frame2)
+            self.frame2subframe1.pack()
+            self.label1 = Tk.Label(self.frame2subframe1, text="Reset switching delay:")
             self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
-            self.resetdelay = common.integer_entry_box(self.frame1subframe1, width=5, min_value=0, max_value= 5000,
+            self.resetdelay = common.integer_entry_box(self.frame2subframe1, width=5, min_value=0, max_value= 5000,
                         allow_empty=False, tool_tip="Specify the time delay between signal and/or point "+
                         "switching events when resetting the layout back to its default state (0-5000ms)")
             self.resetdelay.pack(padx=2, pady=2)
@@ -1066,14 +1174,16 @@ class edit_general_settings():
         self.enableleverpopups.set_value(settings.get_general("leverpopupwarnings"))
         self.leverinterlocking.set_value(settings.get_general("leverinterlocking"))
         self.resetdelay.set_value(settings.get_general("resetdelay"))
+        self.fontsize.set_value(settings.get_general("menubarfontsize"))
 
     def save_state(self, close_window:bool):
-        if self.resetdelay.validate():
+        if self.resetdelay.validate() and self.fontsize.validate():
             self.validation_error.pack_forget()
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
             settings.set_general("leverpopupwarnings", self.enableleverpopups.get_value())
             settings.set_general("leverinterlocking", self.leverinterlocking.get_value())
             settings.set_general("resetdelay", self.resetdelay.get_value())
+            settings.set_general("menubarfontsize", self.fontsize.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )

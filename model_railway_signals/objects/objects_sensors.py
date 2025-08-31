@@ -54,11 +54,12 @@ default_track_sensor_object = copy.deepcopy(objects_common.default_object)
 default_track_sensor_object["item"] = objects_common.object_type.track_sensor
 default_track_sensor_object["passedsensor"] = ""
 default_track_sensor_object["hidden"] = False
-# The "route" elements comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-# Each route in the list comprises: [list_of_point_settings, section_id]
+default_track_sensor_object["clearancedelay"] = 0
+# The "route" elements comprises a list of routes: [main, lh1, lh2, lh3, rh1, rh2, rh3]
+# Each route in the list comprises: [variable_length_list_of_point_settings, section_id]
 # Each point element in the list_of_point_settings comprises [point_id, point_state]
-default_track_sensor_object["routeahead"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
-default_track_sensor_object["routebehind"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
+default_track_sensor_object["routeahead"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
+default_track_sensor_object["routebehind"] = [ [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0], [ [], 0] ]
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from both of the Track Sensor's
@@ -80,19 +81,18 @@ def remove_points_from_route_table(point_id:int, dict_key:str):
         sensor_object = objects_common.track_sensor(track_sensor_id)
         # Iterate through each route in the route table
         route_table = objects_common.schematic_objects[sensor_object][dict_key]
-        for index1, route in enumerate(route_table):
-            list_of_points = route[0]
+        for index1, route_element in enumerate(route_table):
+            list_of_points = route_element[0]
             # Create a new 'blank' list for copying the points (that haven't been deleted) across
-            # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by the point removal)
-            new_list_of_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
-            index2 = 0
+            # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by point removals)
+            new_list_of_points = []
             # Iterate through each point in the route to build up the new list of (retained) points
             for point_entry in list_of_points:
                 if point_entry[0] != point_id:
-                    new_list_of_points[index2] = point_entry
-                    index2 = index2 +1
+                    new_list_of_points.append(point_entry)
             # Replace the list of points for the route
             objects_common.schematic_objects[sensor_object][dict_key][index1][0] = new_list_of_points
+            objects_common.schematic_objects[sensor_object][dict_key][index1][1] = route_element[1]
     return()
 
 #------------------------------------------------------------------------------------
@@ -111,10 +111,9 @@ def update_references_to_point(old_point_id:int, new_point_id:int):
 def update_point_in_route_table(old_point_id:int, new_point_id:int, dict_key:str):
     # Iterate through all the Track Sections on the schematic
     for track_sensor_id in objects_common.track_sensor_index:
-        # Get the Object ID of the signal
         sensor_object = objects_common.track_sensor(track_sensor_id)
-        # Iterate through each route in the interlocking table and then the points on each route
         route_table = objects_common.schematic_objects[sensor_object][dict_key]
+        # Iterate through each route in the interlocking table and then the points on each route
         for index1, route in enumerate(route_table):
             list_of_points = route[0]
             for index2, point_entry in enumerate(list_of_points):

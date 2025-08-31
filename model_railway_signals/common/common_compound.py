@@ -4,7 +4,7 @@
 # Provides the following 'compound' UI elements for the application
 #    validated_dcc_command_entry(Tk.Frame) - combines int_entry_box and state_box
 #    point_settings_entry(Tk.Frame) - combines int_item_id_entry_box and state_box
-#    route_selections(Tk.Frame) - A fixed row of FIVE state_boxes representing possible signal routes
+#    route_selections(Tk.Frame) - A fixed row of SEVERN state_boxes representing possible signal routes
 #    signal_route_selections(Tk.Frame) - combines int_item_id_entry_box and route selections (above)
 #
 # Makes the following external API calls to the library package
@@ -44,36 +44,28 @@ class validated_dcc_command_entry(Tk.Frame):
         super().__init__(parent_frame)
         # Create the address entry box and the associated dcc state box
         self.EB = common_simple.validated_dcc_entry_box(self, item_type=item_type,
-                                        callback=self.eb_updated, tool_tip=tool_tip)
+                                        tool_tip=tool_tip)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common_simple.state_box(self, label_off="OFF", label_on="ON",
-                    width=4, tool_tip="Set the DCC logic for the command")
+                    width=4, tool_tip="Set the DCC logic for the command: ON (ASON) or OFF (ASOF)")
         self.CB.pack(side=Tk.LEFT)
-        # Disable the checkbox (default state when no address is entered)
-        self.CB.disable()
     
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else:
-            self.CB.enable()
 
     def validate(self):
         return (self.EB.validate())
 
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
+        self.CB.enable()
         
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
+        self.CB.disable()
         
     def set_value(self, dcc_command:list[int,bool], item_id:int=0):
         # The dcc_command comprises a 2 element list of [DCC_Address, DCC_State]
         self.EB.set_value(dcc_command[0], item_id)
         self.CB.set_value(dcc_command[1])
-        self.eb_updated()
 
     def set_item_id(self, item_id:int):
         self.EB.set_item_id(item_id)
@@ -109,36 +101,27 @@ class point_settings_entry(Tk.Frame):
         super().__init__(parent_frame)
         # Create the point ID entry box and associated state box (packed in the parent frame)
         self.EB = common_simple.int_item_id_entry_box(self, exists_function=library.point_exists,
-                                    tool_tip = tool_tip, callback=self.eb_updated)
+                                    tool_tip = tool_tip)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common_simple.state_box(self, label_off=u"\u2192", label_on="\u2191", width=2,
-                    tool_tip="Select the required state for the point (normal or switched)")
+                    tool_tip="Select the required state for the point: \u2192 (normal) or \u2191 (switched)")
         self.CB.pack(side=Tk.LEFT)
-        # Disable the checkbox (default state when no address is entered)
-        self.CB.disable()
-
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else:
-            self.CB.enable()
 
     def validate(self):
         return (self.EB.validate())
 
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
+        self.CB.enable()
         
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
+        self.CB.disable()
 
     def set_value(self, point:[int, bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
         self.EB.set_value(point[0])
         self.CB.set_value(point[1])
-        self.eb_updated()
 
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
@@ -165,8 +148,8 @@ class route_selections(Tk.Frame):
         # Create the Frame to hold all the elements
         super().__init__(parent_frame)
         # Create the UI Elements for each of the possible route selections
-        self.main = common_simple.state_box(self, label_off="MAIN", label_on="MAIN",
-                        width=5, tool_tip=tool_tip, read_only=read_only)
+        self.main = common_simple.state_box(self, label_off="Main", label_on="Main",
+                        width=4, tool_tip=tool_tip, read_only=read_only)
         self.main.pack(side=Tk.LEFT)
         self.lh1 = common_simple.state_box(self, label_off="LH1", label_on="LH1",
                         width=4, tool_tip=tool_tip, read_only=read_only)
@@ -174,44 +157,56 @@ class route_selections(Tk.Frame):
         self.lh2 = common_simple.state_box(self, label_off="LH2", label_on="LH2",
                         width=4, tool_tip=tool_tip, read_only=read_only)
         self.lh2.pack(side=Tk.LEFT)
+        self.lh3 = common_simple.state_box(self, label_off="LH3", label_on="LH3",
+                        width=4, tool_tip=tool_tip, read_only=read_only)
+        self.lh3.pack(side=Tk.LEFT)
         self.rh1 = common_simple.state_box(self, label_off="RH1", label_on="RH1",
                         width=4, tool_tip=tool_tip, read_only=read_only)
         self.rh1.pack(side=Tk.LEFT)
         self.rh2 = common_simple.state_box(self, label_off="RH2", label_on="RH2",
                         width=4, tool_tip=tool_tip, read_only=read_only)
         self.rh2.pack(side=Tk.LEFT)
+        self.rh3 = common_simple.state_box(self, label_off="RH3", label_on="RH3",
+                        width=4, tool_tip=tool_tip, read_only=read_only)
+        self.rh3.pack(side=Tk.LEFT)
 
-    def set_value(self, route_selections:[bool, bool, bool, bool, bool]):
-        # route_selections comprises a list of signal routes [main, lh1, lh2, rh1, rh2]
+    def set_value(self, route_selections:[bool, bool, bool, bool, bool, bool, bool]):
+        # route_selections comprises a list of signal routes [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element of the signal route a boolean (True/selected or False/deselected)
         self.main.set_value(route_selections[0])
         self.lh1.set_value(route_selections[1])
         self.lh2.set_value(route_selections[2])
-        self.rh1.set_value(route_selections[3])
-        self.rh2.set_value(route_selections[4])
+        self.lh3.set_value(route_selections[3])
+        self.rh1.set_value(route_selections[4])
+        self.rh2.set_value(route_selections[5])
+        self.rh3.set_value(route_selections[6])
 
     def get_value(self):
-        # route_selections comprises a list of signal routes [main, lh1, lh2, rh1, rh2]
+        # route_selections comprises a list of signal routes [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element of the signal route a boolean (True/selected or False/deselected)
-        return ( [self.main.get_value(), self.lh1.get_value(),self.lh2.get_value(),
-                            self.rh1.get_value(), self.rh2.get_value()] )
+        return ( [self.main.get_value(), self.lh1.get_value(), self.lh2.get_value(), self.lh3.get_value(),
+                    self.rh1.get_value(), self.rh2.get_value(), self.rh3.get_value()] )
 
     def disable(self):
         self.main.disable()
         self.lh1.disable()
         self.lh2.disable()
+        self.lh3.disable()
         self.rh1.disable()
         self.rh2.disable()
+        self.rh3.disable()
 
     def enable(self):
         self.main.enable()
         self.lh1.enable()
         self.lh2.enable()
+        self.lh3.enable()
         self.rh1.enable()
         self.rh2.enable()
+        self.rh3.enable()
 
     def reset(self):
-        self.set_value([False, False, False, False, False])
+        self.set_value([False, False, False, False, False, False, False])
 
 #------------------------------------------------------------------------------------
 # Compoind UI element for signal and route selection (signal_id EB and route_selections)
@@ -242,7 +237,7 @@ class signal_route_selections(Tk.Frame):
         self.label1.pack(side=Tk.LEFT)
         # Call the common base class init function to create the EB
         self.EB = common_simple.int_item_id_entry_box(self, tool_tip=tool_tip,
-                    callback=self.eb_updated, exists_function=exists_function)
+                    exists_function=exists_function)
         self.EB.pack(side=Tk.LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value)
         if self.read_only: self.EB.configure(state="disabled")
@@ -251,45 +246,35 @@ class signal_route_selections(Tk.Frame):
         # Add a spacer to improve the UI appearnace when used in a grid
         self.label2 = Tk.Label(self, width=1)
         self.label2.pack(side=Tk.LEFT)
-        # Set the initial state of the widget
-        self.eb_updated()
-
-    def eb_updated(self):
-        # Enable/disable the checkboxes depending on the EB state
-        if not self.read_only:
-            if self.EB.entry.get() == "": self.routes.disable()
-            else: self.routes.enable()
 
     def validate(self):
-        self.eb_updated()
         return(self.EB.validate())
     
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
+        self.routes.enable()
         
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
+        self.routes.disable()
 
-    def set_value(self, signal_route:[int,[bool,bool,bool,bool,bool]], item_id:int=0):
+    def set_value(self, signal_route:[int,[bool,bool,bool,bool,bool,bool,bool]], item_id:int=0):
         # The signal_route comprises [signal_id, list_of_route_selections]
-        # the list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+        # the list_of_route_selections comprises [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element is a boolean (True/selected or False/deselected)
         self.EB.set_value(signal_route[0], item_id)
         self.routes.set_value(signal_route[1])
-        self.eb_updated()
 
     def set_item_id(self, item_id:int):
         self.EB.set_item_id(item_id)
 
     def get_value(self):
         # The returned value comprises [signal_id, list_of_route_selections]
-        # the list_of_route_selections comprises [main, lh1, lh2, rh1, rh2]
+        # the list_of_route_selections comprises [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element is a boolean (True/selected or False/deselected)
         return ( [ self.EB.get_value(), self.routes.get_value() ])
 
     def reset(self):
-        self.set_value([0,[False, False, False, False, False]])
+        self.set_value([0,[False, False, False, False, False, False, False]])
 
 ###########################################################################################

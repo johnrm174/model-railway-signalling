@@ -60,7 +60,7 @@ class track_sensor_route_group():
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify the points that need to be configured for the route"
-        self.points = common.row_of_point_settings(self.frame, columns=6, tool_tip=tool_tip)
+        self.points = common.row_of_point_settings(self.frame, columns=8, tool_tip=tool_tip)
         self.points.pack (side=Tk.LEFT)
         # Create the Track Section element (always packed)
         self.label = Tk.Label(self.frame, text="  Section:")
@@ -106,8 +106,10 @@ class track_sensor_route_frame():
         self.main = track_sensor_route_group(self.frame, "  Main")
         self.lh1 = track_sensor_route_group(self.frame, "  LH1")
         self.lh2 = track_sensor_route_group(self.frame, "  LH2")
+        self.lh3 = track_sensor_route_group(self.frame, "  LH3")
         self.rh1 = track_sensor_route_group(self.frame, "  RH1")
         self.rh2 = track_sensor_route_group(self.frame, "  RH2")
+        self.rh3 = track_sensor_route_group(self.frame, "  RH3")
 
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
@@ -115,29 +117,35 @@ class track_sensor_route_frame():
         if not self.main.validate(): valid = False
         if not self.lh1.validate(): valid = False
         if not self.lh2.validate(): valid = False
+        if not self.lh3.validate(): valid = False
         if not self.rh1.validate(): valid = False
         if not self.rh2.validate(): valid = False
+        if not self.rh3.validate(): valid = False
         return(valid)
 
     def set_routes(self, track_section_routes:[[[[int,bool],],int]]):
-        # A track_section_routes table comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-        # Each point element in the point list comprises [point_id, point_state]
+        # track_section_routes comprises a list of routes: [main,lh1,lh2,lh3,rh1,rh2,rh3]
+        # Each route comprises: [[list_of_point_settings], section_id]
+        # Each point_setting in the list_of_point_settings comprises [point_id, point_state]
         self.main.set_route(track_section_routes[0])
         self.lh1.set_route(track_section_routes[1])
         self.lh2.set_route(track_section_routes[2])
-        self.rh1.set_route(track_section_routes[3])
-        self.rh2.set_route(track_section_routes[4])
+        self.lh3.set_route(track_section_routes[3])
+        self.rh1.set_route(track_section_routes[4])
+        self.rh2.set_route(track_section_routes[5])
+        self.rh3.set_route(track_section_routes[6])
         
     def get_routes(self):
-        # An track_section_routes table comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-        # Each point element in the point list comprises [point_id, point_state]
+        # track_section_routes comprises a list of routes: [main,lh1,lh2,lh3,rh1,rh2,rh3]
+        # Each route comprises: [[list_of_point_settings], section_id]
+        # Each point_setting in the list_of_point_settings comprises [point_id, point_state]
         return ( [ self.main.get_route(),
                    self.lh1.get_route(),
                    self.lh2.get_route(),
+                   self.lh3.get_route(),
                    self.rh1.get_route(),
-                   self.rh2.get_route() ] )
+                   self.rh2.get_route(),
+                   self.rh3.get_route()] )
 
 #####################################################################################
 # Top level Class for the Edit Track Sensor window
@@ -165,7 +173,7 @@ class edit_track_sensor():
             self.frame = Tk.Frame(self.window)
             self.frame.pack(fill='x')
             # Create the Label Frame UI Element for Item ID
-            self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
+            self.sensorid = common.object_id_selection(self.frame, "Sensor ID",
                                 exists_function = library.track_sensor_exists)
             self.sensorid.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             # Create the GPIO Sensor selection in a labelframe
@@ -174,17 +182,24 @@ class edit_track_sensor():
             # Create a Frame to center everything in
             self.subframe1a = Tk.Frame(self.subframe1)
             self.subframe1a.pack()
-            self.label = Tk.Label(self.subframe1a, text="Sensor 'passed' sensor:")
+            self.label = Tk.Label(self.subframe1a, text="'Passed' sensor:")
             self.label.pack(side=Tk.LEFT, padx=2, pady=2)
             self.gpiosensor = common.validated_gpio_sensor_entry_box(self.subframe1a, item_type="Sensor",
                     tool_tip="Specify the ID of a GPIO Sensor to trigger 'passed' events - This "+
                     "can be a local sensor ID (integer) or a remote sensor ID (in the form 'Node-ID') "+
                     "which has been subscribed to via MQTT networking")
             self.gpiosensor.pack(side=Tk.LEFT, padx=2, pady=2)
-            # Create the UI Element for the general settings
-            self.subframe2 = Tk.LabelFrame(self.frame, text="General Settings")
+            # Create a subframe to center everything in
+            self.subframe2=Tk.LabelFrame(self.frame, text="'Clearance' delay:")
             self.subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            self.hidden = common.check_box(self.subframe2, label="Hidden",
+            self.clearance = common.integer_entry_box(self.subframe2, width=3, min_value=0, max_value=10,
+                            tool_tip="Enter the delay (in seconds) between the sensor being 'passed' and any "+
+                            "track occupancy changes being triggered", empty_equals_zero=False, allow_empty=False)
+            self.clearance.pack(padx=2, pady=2)
+            # Create the UI Element for the general settings
+            self.subframe3 = Tk.LabelFrame(self.frame, text="General Settings")
+            self.subframe3.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.hidden = common.check_box(self.subframe3, label="Hidden",
                      tool_tip= "Select to hide the Track Sensor in Run Mode")
             self.hidden.pack(padx=2, pady=2)
             #---------------------------------------------------------------------
@@ -220,6 +235,7 @@ class edit_track_sensor():
             # Set the Initial UI state (note the gpiosensor element needs the track sensor id for validation)
             self.sensorid.set_value(item_id)
             self.gpiosensor.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
+            self.clearance.set_value(objects.schematic_objects[self.object_id]["clearancedelay"])
             self.ahead.set_routes(objects.schematic_objects[self.object_id]["routeahead"])
             self.behind.set_routes(objects.schematic_objects[self.object_id]["routebehind"])
             self.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
@@ -234,13 +250,14 @@ class edit_track_sensor():
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
-        elif ( self.sensorid.validate() and self.gpiosensor.validate() and
-                       self.ahead.validate() and self.behind.validate() ):
+        elif ( self.sensorid.validate() and self.gpiosensor.validate() and self.ahead.validate()
+                       and self.behind.validate() and self.clearance.validate()):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.sensorid.get_value()
             new_object_configuration["passedsensor"] = self.gpiosensor.get_value()
+            new_object_configuration["clearancedelay"] = self.clearance.get_value()
             new_object_configuration["routeahead"] = self.ahead.get_routes()
             new_object_configuration["routebehind"] = self.behind.get_routes()
             new_object_configuration["hidden"] = self.hidden.get_value()

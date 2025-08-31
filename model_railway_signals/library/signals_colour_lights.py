@@ -79,8 +79,10 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 mainfeather:bool=False,
                                 lhfeather45:bool=False,
                                 lhfeather90:bool=False,
+                                lhfeather135:bool=False,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
+                                rhfeather135:bool=False,
                                 theatre_route_indicator:bool=False,
                                 theatre_route_subsidary:bool=False,
                                 fully_automatic:bool=False,
@@ -96,7 +98,7 @@ def create_colour_light_signal (canvas, sig_id:int,
     # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
     canvas_tag = "signal"+str(sig_id)
     # Get some info about the signal to help validation of the parameters we have been given
-    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
+    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or lhfeather135 or rhfeather135
     # Common validation (common to all signal types)
     if not isinstance(sig_id, int) or sig_id < 1:
         logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be a positive integer")
@@ -180,23 +182,32 @@ def create_colour_light_signal (canvas, sig_id:int,
             offset = -8
         else: # its a 4 aspect signal
             offset = 0
-        # Now draw the feathers (x has been adjusted for the no of aspects)            
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+75,post_offset,orientation)
+        # Now draw the feathers (x has been adjusted for the no of aspects)
+        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+65,post_offset,orientation)
+        topofpost = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+76,post_offset,orientation)
         main = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset+7,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+73,post_offset+7,orientation)
         rhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset+10,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+65,post_offset+10,orientation)
         rhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+71,post_offset-7,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+58,post_offset+8,orientation)
+        rhf135 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+73,post_offset-7,orientation)
         lhf45 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
-        line_coords = common.rotate_line (x,y,offset+63,post_offset,offset+63,post_offset-10,orientation)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+65,post_offset-10,orientation)
         lhf90 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
+        line_coords = common.rotate_line (x,y,offset+65,post_offset,offset+58,post_offset-8,orientation)
+        lhf135 = canvas.create_line (line_coords,width=2,fill="black",tags=canvas_tag)
         # Hide any feather drawing objects we don't need for this particular signal
+        if not signal_has_feathers: canvas.itemconfigure(topofpost,state='hidden')
         if not mainfeather: canvas.itemconfigure(main,state='hidden')
         if not lhfeather45: canvas.itemconfigure(lhf45,state='hidden')
         if not lhfeather90: canvas.itemconfigure(lhf90,state='hidden')
+        if not lhfeather135: canvas.itemconfigure(lhf135,state='hidden')
         if not rhfeather45: canvas.itemconfigure(rhf45,state='hidden')
         if not rhfeather90: canvas.itemconfigure(rhf90,state='hidden')
+        if not rhfeather135: canvas.itemconfigure(rhf135,state='hidden')
         # Set the "Override" Aspect - this is the default aspect that will be displayed
         # by the signal when it is overridden - This will be RED apart from 2 aspect
         # Distant signals where it will be YELLOW
@@ -228,8 +239,10 @@ def create_colour_light_signal (canvas, sig_id:int,
         signals.signals[str(sig_id)]["mainf"] = main                              # Type-specific - drawing object
         signals.signals[str(sig_id)]["lhf45"] = lhf45                             # Type-specific - drawing object
         signals.signals[str(sig_id)]["lhf90"] = lhf90                             # Type-specific - drawing object
+        signals.signals[str(sig_id)]["lhf135"] = lhf135                           # Type-specific - drawing object
         signals.signals[str(sig_id)]["rhf45"] = rhf45                             # Type-specific - drawing object
         signals.signals[str(sig_id)]["rhf90"] = rhf90                             # Type-specific - drawing object
+        signals.signals[str(sig_id)]["rhf135"] = rhf135                           # Type-specific - drawing object
         # Create the timed sequence class instances for the signal (one per route)
         signals.signals[str(sig_id)]["timedsequence"] = []
         for route in signals.route_type:
@@ -561,8 +574,10 @@ def refresh_feathers(sig_id:int):
     # initially set all the indications to OFF - we'll then set what we need
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf45"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf90"],fill="black")
+    signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf135"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf45"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf90"],fill="black")
+    signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf135"],fill="black")
     signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["mainf"],fill="black")
     # Only display the route indication if the signal is not at RED
     if signals.signals[str(sig_id)]["sigstate"] != signals.signal_state_type.DANGER:
@@ -570,10 +585,14 @@ def refresh_feathers(sig_id:int):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf45"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH2:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf90"],fill="white")
+        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH3:
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["lhf135"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH1:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf45"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH2:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf90"],fill="white")
+        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH3:
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["rhf135"],fill="white")
         elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.MAIN:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["mainf"],fill="white")
     return()
@@ -588,7 +607,7 @@ class timed_sequence():
     def __init__(self, sig_id:int, route, start_delay:int=0, time_delay:int=0):
         self.sig_id = sig_id
         self.sig_route = route
-        self.aspect = signals.signals[str(sig_id)]["overriddenaspect"]
+        self.aspect = None
         self.start_delay = start_delay
         self.time_delay = time_delay
         self.sequence_abort_flag = False
@@ -598,20 +617,26 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id):
+        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
             self.sequence_in_progress = False
         else:
             self.sequence_in_progress = True
-            # For a start delay of zero we assume the intention is not to make a callback (on the basis
-            # that the user has triggered the timed signal in the first place). For start delays > 0 the 
-            # sequence is initiated after the specified delay and this will trigger a callback
-            # Note that we only change the aspect and generate the callback if the same route is set
+            # The Aspect will initially be set to the most restrictive aspect of the signal
+            # (DANGER in most cases, but CAUTION for 2 aspect distant signals)
+            self.aspect = signals.signals[str(self.sig_id)]["overriddenaspect"]
+            # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                # If the start delay is greater than zero then this is the case of one signal
+                # 'passed'event triggering a timed sequence for another signal. In this case we
+                # generate a 'passed' callback for signal rather than an 'updated' callback.
                 if self.start_delay > 0: 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
+                    update_colour_light_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
-                update_colour_light_signal(self.sig_id)
+                else:
+                    logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
+                    update_colour_light_signal(self.sig_id)
+                    signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
             # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
             if signals.signals[str(self.sig_id)]["subtype"] in (signal_subtype.three_aspect, signal_subtype.four_aspect):
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_yellow())
@@ -622,7 +647,7 @@ class timed_sequence():
         if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
             self.sequence_in_progress = False
         else:
-            # This sequence step only applicable to 3 and 4 aspect signals
+            # This sequence step is only applicable to 3 and 4 aspect signals
             self.aspect = signals.signal_state_type.CAUTION
             # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
@@ -671,11 +696,6 @@ class timed_sequence():
 # -------------------------------------------------------------------------
 
 def trigger_timed_colour_light_signal(sig_id:int,start_delay:int=0,time_delay:int=5):
-    
-    def delayed_sequence_start(sig_id:int, sig_route):
-        if signals.signal_exists(sig_id) and not common.shutdown_initiated:
-            signals.signals[str(sig_id)]["timedsequence"][route.value].start()
-            
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
     if common.shutdown_initiated:
         logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
@@ -686,11 +706,8 @@ def trigger_timed_colour_light_signal(sig_id:int,start_delay:int=0,time_delay:in
         # Create a new instnce of the time signal class - this should have the effect of "destroying"
         # the old instance when it goes out of scope, leaving us with the newly created instance
         signals.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
-        # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
-        # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
-        if start_delay > 0:
-            common.root_window.after(start_delay*1000,lambda:delayed_sequence_start(sig_id,route))
-        else:
-            signals.signals[str(sig_id)]["timedsequence"][route.value].start()
+        # Schedule the start of the sequence (i.e. signal to danger)
+        common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    return()
 
 ###############################################################################

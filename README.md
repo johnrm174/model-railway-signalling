@@ -52,26 +52,35 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.3.0:
+## What's new for Release 5.x.x:
 
 > [!IMPORTANT]
-> Release 5.3.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 5.4.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.3.0.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.4.0.
 > You have been warned!
 
-* The next signal can now be specified as a "STOP" for any route ahead (signal interlocking tab):
-    * This supports the case of signals controlling routes into 'dead ends' such as bay platforms.
-    * 3/4 aspect Colour light signals will then display CAUTION when the route is selected.
-* Theatre route indications can now be used with the subsidary signal (as well as the main signal).
-* Signals can now be 'flipped' around their horizontal axis (move to the other side of the track).
-* New 'f' shortcut key to 'flip' selected signals/points around their horizontal axis (edit-mode).
-* New tooltips for points, signals and levers in edit/run modes to report the interlocking state.
-* Added display of hostname on MQTT status tab (MQTT heartbeat messages) to ease configuration.
-* Added ability to 'reverse' the DCC command logic for subsidary aspects of colour light signals.
-* Bugfix for route highlighting through points (Y Points, single slips and double slips).
-* Bugfix for DCC control of shunt agead ground position signals (commands were not being sent out).
-* Bugfix for MQTT heartbeats (broker disconnect/reconnect would stop messages being sent out).
+* Additional routes for signals (giving up to 7 routes ahead of each signal):
+    * New LH3 and RH3 routes are available for selection in the signal configuration.
+    * Colour Light Signals support additional feathers for LH3 & RH3 route indications.
+    * Theatre route indicators also support these additional route indications.
+    * Semaphore route arms remain limited to MAIN, LH1, LH2, RH1 and RH2 indications.
+* Ability to define 'quick-scroll' buttons under canvas settings:
+    * Buttons are displayed on a new 'quick-scroll' bar (underneath the main menubar).
+    * Buttons will scroll the canvas to specified coordinates (within the displayed window).
+    * Provided as an alternative to the existing scroll-bars and drag-screen functionality.
+    * To improve user operation of larger schematics (especially where touchscreens are used).
+* Allow menubar font size to be increased (for improved operation with touchscreens):
+    * This new general setting will also increase the size of the new 'quick-scroll' buttons.
+* New 'Import' feature - to import another layout file into the current schematic:
+    * Enables collaboration when developing complex layouts / signalling schemes.
+* Able to specify a 'clearance delay' after signals/sensors are 'passed':
+    * Signals will turn red as soon as the signal is passed (representing the first wheelset).
+    * Track occupancy changes will be delayed until the train has 'cleared' the section.
+* Improvements to Application Upgrade utility:
+    * Will now report definitive success/failure in the user interface.
+* Minor UI improvements to improve the overall user experience during configuration:
+    * e.g. Point states can be set without having to 'enter'the point ID.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

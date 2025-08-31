@@ -24,6 +24,7 @@
 #    dcc_mappings(root)
 #    bulk_renumbering(root)
 #    application_upgrade(root)
+#    import_layout(root, import_schematic_callback)
 #
 #------------------------------------------------------------------------------------
 
@@ -52,6 +53,7 @@ from .menubar_utilities import dcc_programming
 from .menubar_utilities import dcc_mappings
 from .menubar_utilities import bulk_renumbering
 from .menubar_utilities import application_upgrade
+from .menubar_utilities import import_layout
 
 __all__ = [
     'display_help',
@@ -75,6 +77,7 @@ __all__ = [
     'dcc_programming',
     'dcc_mappings',
     'bulk_renumbering',
-    'application_upgrade' ]
+    'application_upgrade',
+    'import_layout' ]
 
 ##############################################################################################################

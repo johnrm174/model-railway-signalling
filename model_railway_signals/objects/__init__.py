@@ -3,9 +3,7 @@
 #------------------------------------------------------------------------------------
 #
 # Externalised API functions intended for use by other editor modules:
-#    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
-#    update_canvas(width,height,grid) - update the attributes (on load and re-size)
-#
+#    initialise (root, canvas) - Initialise the objects package
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
@@ -22,6 +20,8 @@
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
 #    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
 #
+#    check_for_import_conflicts(new_objects) - checks for Import conflicts
+#    extend(new_objects) - Adds new objects to the dictionary (following an Import)
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
 #    save_schematic_state(reset_pointer:bool) - save a snapshot of the schematic objects
@@ -57,8 +57,10 @@
 #
 #------------------------------------------------------------------------------------
 
+from .objects import check_for_import_conflicts
 from .objects import set_all
 from .objects import get_all
+from .objects import extend
 from .objects import undo
 from .objects import redo
 from .objects import create_object
@@ -105,13 +107,14 @@ from .objects_gpio import configure_local_gpio_sensor_event_mappings
 __all__ = [
     # Initialisation and update functions
     'initialise',
-    'update_canvas',
     'save_schematic_state',
     # Enumeration of the object type
     'object_type',
     # Save and load functions
+    'check_for_import_conflicts',
     'set_all',
     'get_all',
+    'extend',
     # Schematic editor functions
     'undo',
     'redo',

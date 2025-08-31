@@ -9,13 +9,16 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.save_schematic_state(reset_pointer) - Save the state following save or load
+#    objects.check_for_import_conflicts() - Check for conflicts with existing objects
 #    objects.set_all(new_objects) - Set the dict of objects following a load
+#    objects.extend(new_objects) - Add to the dict of objects following an import
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.configure_remote_gpio_sensor_event_mappings() - set up the GPIO Sensor event mappings
 #    schematic.initialise(root, callback, *canvasargs) - Create the canvas
 #    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
 #    schematic.update_canvas(*canvasargs) - Update the canvas following reload/resizing
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
+#    schematic.scroll_canvas(x:int,y:int) - Scroll the viewable area of the canvas to the given coords
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
@@ -23,8 +26,10 @@
 #    run_layout.reset_layout() - Reset the schematic back to its default state
 #    run_routes.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
+#    settings.check_for_import_conflicts() - Check for conflicts with existing settings
 #    settings.get_all() - Get all settings (for save)
-#    settings.set_all() - Set all settings (following load)
+#    settings.set_all() - Update settings (following Import)
+#    settings.extend() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
 #    settings.get_general() - Get the current general settings
 #    settings.set_general() - Set the new general settings
@@ -124,6 +129,10 @@ class main_menubar:
         self.root = root
         self.mainmenubar = Tk.Menu(self.root)
         self.root.configure(menu=self.mainmenubar)
+        # Crete a frame underneath the menubar to hold any "quick scroll" buttons
+        self.quickscrollframe = Tk.Frame(self.root)
+        self.quickscrollframe.pack()
+        self.scroll_buttons = []
         # Create a dummy menubar item for the application Logo
         resource_folder = 'model_railway_signals.resources'
         logo_filename = 'dcc_signalling_logo.png'
@@ -151,6 +160,7 @@ class main_menubar:
         self.mode_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
+        self.mode_menu.add_separator()
         self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
         # Create the various menubar items for the Automation  Dropdown
@@ -188,8 +198,10 @@ class main_menubar:
                 command=lambda:menubar.dcc_mappings(self.root))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
-        self.utilities_menu.add_command(label =" Application Upgrade",
+        self.utilities_menu.add_command(label =" Application Upgrade...",
                 command=lambda:menubar.application_upgrade(self.root))
+        self.utilities_menu.add_command(label =" Import Layout...",
+                command=lambda:menubar.import_layout(self.root, self.import_schematic))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -362,7 +374,6 @@ class main_menubar:
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
     # --------------------------------------------------------------------------------------
-
     def handle_canvas_event(self, event=None):
         # Note that event.keysym returns the character (event.state would be 'Control')
         if event.keysym == 'm':
@@ -581,8 +592,15 @@ class main_menubar:
         objects.configure_remote_gpio_sensor_event_mappings()
 
     #------------------------------------------------------------------------------------------
-    # OTHER menubar functions
+    # OTHER menubar function update callbacks
     #------------------------------------------------------------------------------------------
+
+    class quickscroll_button(Tk.Button):
+        def __init__(self, parent, label:str, width:int, xscroll:int, yscroll:int):
+            self.xscroll, self.yscroll = xscroll, yscroll
+            super().__init__(parent, text=label, width=width, command=self.clicked)
+        def clicked(self):
+            schematic.scroll_canvas(self.xscroll, self.yscroll)
 
     def canvas_update(self):
         schematic.update_canvas(width=settings.get_canvas("width"),
@@ -592,7 +610,19 @@ class main_menubar:
                                 display_grid=settings.get_canvas("displaygrid"),
                                 canvas_colour=settings.get_canvas("canvascolour"),
                                 grid_colour=settings.get_canvas("gridcolour"))
-        
+        # Destroy the old quick-scroll buttons (in the quickscrollframe).
+        for scroll_button in self.scroll_buttons: scroll_button.destroy()
+        self.scroll_buttons = []
+        # For some reason, the quickscrollframe doesn't shrink back to nothing when all the buttons
+        # are deleted so we have to force this by setting the height of the frame to 1 (the minimum).
+        quick_scroll_buttons = settings.get_canvas("scrollbuttons")
+        if len(quick_scroll_buttons) == 0 : self.quickscrollframe.configure(height=1)
+        # Create the new quick scroll buttons in the quickscrollframe (which will re-size as required)
+        for new_button in quick_scroll_buttons:
+            label, width, xscroll, yscroll = new_button[0], new_button[1], new_button[2], new_button[3]
+            self.scroll_buttons.append(self.quickscroll_button(self.quickscrollframe, label, width, xscroll, yscroll))
+            self.scroll_buttons[-1].pack(padx=5, pady=2, side=Tk.LEFT)
+
     def logging_update(self):
         log_level = settings.get_logging("level")
         if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
@@ -616,10 +646,27 @@ class main_menubar:
         objects.configure_local_gpio_sensor_event_mappings()
         
     def general_settings_update(self):
+        # Run Layout Settings
         run_layout.configure_spad_popups(settings.get_general("spadpopups"))
         ignore_interlocking = settings.get_general("leverinterlocking")
         lever_warnings = settings.get_general("leverpopupwarnings")
         library.set_lever_switching_behaviour(ignore_interlocking, lever_warnings)
+        # Application Settings - Menubar
+        font_size = settings.get_general("menubarfontsize")
+        self.mainmenubar.config(font=("", font_size))
+        self.file_menu.config(font=("", font_size))
+        self.mode_menu.config(font=("", font_size))
+        self.auto_menu.config(font=("", font_size))
+        self.sprog_menu.config(font=("", font_size))
+        self.power_menu.config(font=("", font_size))
+        self.mqtt_menu.config(font=("", font_size))
+        self.utilities_menu.config(font=("", font_size))
+        self.settings_menu.config(font=("", font_size))
+        self.styles_menu.config(font=("", font_size))
+        self.help_menu.config(font=("", font_size))
+        # Application settings - quick scroll buttons
+        for scroll_button in self.scroll_buttons:
+            scroll_button.config(font=("", font_size))
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
@@ -686,7 +733,7 @@ class main_menubar:
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
         # The 'examples' flag tells the load_schematic function to open the file load dialog
         # in the example layout files folder (which is now part of the package)
-        logging.info("*************************************************************************************************")
+        logging.info("LOAD-LAYOUT-FILE*********************************************************************************")
         file_loaded, layout_state = library.load_schematic(filename, examples=examples)
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
@@ -700,7 +747,7 @@ class main_menubar:
                     logging.error("Load File - File was saved by "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - Upgrade application to "+sig_file_version+" or later to support this file.")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error", 
+                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
                 elif self.tuple_version(sig_file_version) < self.tuple_version("5.0.0"):
@@ -709,7 +756,7 @@ class main_menubar:
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - This version of the application only supports files saved by version 5.0.0 or later")
                     logging.error("Load File - Try loading/saving your file with version 5.0.0 first")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error", 
+                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
                         message="Layout file was saved by Application "+sig_file_version+".\n"+
                             "This version of the application only supports files saved by version 5.0.0 "+
                             "or later. Try loading/saving your file with version 5.0.0 first.")
@@ -724,21 +771,68 @@ class main_menubar:
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
                     # Delete all existing objects
-                    logging.info("*************************************************************************************************")
+                    logging.info("DELETING-OLD-OBJECTS*****************************************************************************")
                     schematic.delete_all_objects()
-                    logging.info("*************************************************************************************************")
+                    logging.info("APPLYING-NEW-SETTINGS****************************************************************************")
                     settings.set_all(layout_state["settings"])
                     # Set the filename to reflect that actual name of the loaded file
                     settings.set_general("filename", file_loaded)
                     # Re-initialise the editor for the new settings to take effect
                     self.initialise_editor()
                     # Create the loaded layout objects then purge the loaded state information
+                    logging.info("CREATING-NEW-OBJECTS*****************************************************************************")
                     objects.set_all(layout_state["objects"])
-                    # Purge the loaded state (to stope it being erroneously inherited
-                    # when items are deleted and then new items created with the same IDs)
+                    # Purge the loaded state (to stope it being erroneously inherited when items are deleted/created with the same IDs)
                     library.purge_loaded_state_information()
                     # Set the flag so we don't enforce a "save as" on next save
                     self.file_has_been_saved = True
+            else:
+                logging.error("LOAD LAYOUT - File does not contain all required elements")
+                Tk.messagebox.showerror(parent=self.root, title="Load Error", 
+                    message="File does not contain\nall required elements")
+        return()
+
+    def import_schematic(self, xoffset:int=0, yoffset:int=0):
+        logging.info("IMPORT-LAYOUT-FILE*********************************************************************************")
+        file_loaded, layout_state = library.load_schematic()
+        # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
+        if file_loaded is not None:
+            # Do some basic validation that the file has the elements we need
+            if "settings" in layout_state.keys() and "objects" in layout_state.keys():
+                # Compare the version of the application to the version the file was saved under
+                sig_file_version = layout_state["settings"]["general"]["version"]
+                application_version = settings.get_general("version")
+                if self.tuple_version(sig_file_version) != self.tuple_version(application_version):
+                    # We only allow imports if the imported file matches the application version
+                    logging.error("Import File - File was saved by application "+sig_file_version)
+                    logging.error("Import File - Current version of the application is "+application_version)
+                    logging.error("Import File - Version of imported file must match version of the application")
+                    Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                        message="Version of imported file does not match version of the application")
+                else:
+                    # Purge the loaded state for all library objects (we don't use it for the import process)
+                    library.purge_loaded_state_information()
+                    logging.info("CHECKING-FOR-SETTINGS-CONFLICTS******************************************************************")
+                    if settings.check_for_import_conflicts(layout_state["settings"]):
+                        logging.error("IMPORT LAYOUT - Failed to import layout due to conflicts in layout settings")
+                        Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                            message="Failed to import layout due to conflicts in layout settings "+
+                                        "(see logs for details) - Resolve conflicts and retry" )
+                    else:
+                        logging.info("CHECKING-FOR-IMPORT-CONFLICTS********************************************************************")
+                        if objects.check_for_import_conflicts(layout_state["objects"]):
+                            logging.error("IMPORT LAYOUT - Failed to import layout due to schematic object conflicts")
+                            Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                                message="Failed to import layout due to schematic object conflicts "+
+                                            "(see logs for details) - Resolve conflicts and retry" )
+                        else:
+                            logging.info("APPLYING-NEW-SETTINGS****************************************************************************")
+                            settings.extend(layout_state["settings"])
+                            self.reset_mqtt_pub_sub_configuration()
+                            self.apply_new_mqtt_pub_sub_configuration()
+                            self.gpio_update()
+                            logging.info("CREATING-NEW-OBJECTS*****************************************************************************")
+                            objects.extend(layout_state["objects"], xoffset=xoffset, yoffset=yoffset)
             else:
                 logging.error("LOAD LAYOUT - File does not contain all required elements")
                 Tk.messagebox.showerror(parent=self.root, title="Load Error", 

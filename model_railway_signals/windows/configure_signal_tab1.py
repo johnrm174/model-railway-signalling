@@ -539,7 +539,7 @@ class theatre_route_element(common.row_of_validated_dcc_commands):
         self.EB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
-        super().__init__(self.frame, columns=6, item_type="Signal",
+        super().__init__(self.frame, columns=7, item_type="Signal",
                     tool_tip="Enter the DCC Address for the command (1-2047)")
         self.pack(side=Tk.LEFT)
         
@@ -613,9 +613,13 @@ class theatre_route_indications:
                     callback=callback, enable_addresses_on_selection=True)
         self.lh2 = theatre_route_element(self.frame, label="LH2", width=5,
                     callback=callback, enable_addresses_on_selection=True)
+        self.lh3 = theatre_route_element(self.frame, label="LH3", width=5,
+                    callback=callback, enable_addresses_on_selection=True)
         self.rh1 = theatre_route_element(self.frame, label="RH1", width=5,
                     callback=callback, enable_addresses_on_selection=True)
         self.rh2 = theatre_route_element(self.frame, label="RH2", width=5,
+                    callback=callback, enable_addresses_on_selection=True)
+        self.rh3 = theatre_route_element(self.frame, label="RH3", width=5,
                     callback=callback, enable_addresses_on_selection=True)
         # The EB for DARK (signal at red - no route indications displyed) is always
         # disabled so it can never be selected (not really a route indication as such)
@@ -642,27 +646,31 @@ class theatre_route_indications:
         if not self.main.validate(): valid = False
         if not self.lh1.validate(): valid = False
         if not self.lh2.validate(): valid = False
+        if not self.lh3.validate(): valid = False
         if not self.rh1.validate(): valid = False
         if not self.rh2.validate(): valid = False
+        if not self.rh3.validate(): valid = False
         return(valid)
                 
     def set_theatre(self, theatre:[[str,[[int,bool],],],], item_id:int):
-        # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
+        # The Theatre route list comprises: [dark, main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each route element comprises: [character, DCC_command_sequence]
-        # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+        # Each DCC command sequence comprises a variable length list of dcc commands
         # Each DCC command comprises: [dcc_address, dcc_state]
         self.dark.set_theatre(theatre[0], item_id)
         self.main.set_theatre(theatre[1], item_id)
         self.lh1.set_theatre(theatre[2], item_id)
         self.lh2.set_theatre(theatre[3], item_id)
-        self.rh1.set_theatre(theatre[4], item_id)
-        self.rh2.set_theatre(theatre[5], item_id)
+        self.lh3.set_theatre(theatre[4], item_id)
+        self.rh1.set_theatre(theatre[5], item_id)
+        self.rh2.set_theatre(theatre[6], item_id)
+        self.rh3.set_theatre(theatre[7], item_id)
         self.auto_inhibit_update()
 
     def get_theatre(self):
-        # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
+        # The Theatre route list comprises: [dark, main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each route element comprises: [character, DCC_command_sequence]
-        # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+        # Each DCC command sequence comprises a variable length list of dcc commands
         # Each DCC command comprises: [dcc_address, dcc_state]
         # Note that the DARK aspect character is always present in the configuration
         dark_theatre_configuration_enabled = self.dark.get_theatre()
@@ -671,15 +679,19 @@ class theatre_route_indications:
                  self.main.get_theatre(),
                  self.lh1.get_theatre(),
                  self.lh2.get_theatre(),
+                 self.lh3.get_theatre(),
                  self.rh1.get_theatre(),
-                 self.rh2.get_theatre() ] )
+                 self.rh2.get_theatre(),
+                 self.rh3.get_theatre() ] )
     
     def enable_selection(self, enable_subsidary_selection:bool=True):
         # Enable the Theatre EBs for diverging routes (will also enable the address EBs)        
         self.lh1.enable_selection()
         self.lh2.enable_selection()
+        self.lh3.enable_selection()
         self.rh1.enable_selection()
         self.rh2.enable_selection()
+        self.rh3.enable_selection()
         # The DCC Address EBs for MAIN are enabled even if no theatre character is selected
         self.main.enable()
         self.main.enable_selection()
@@ -699,8 +711,10 @@ class theatre_route_indications:
         self.main.disable_selection()
         self.lh1.disable_selection()
         self.lh2.disable_selection()
+        self.lh3.disable_selection()
         self.rh1.disable_selection()
         self.rh2.disable_selection()
+        self.rh3.disable_selection()
         # Disable the "auto inhibit route" and enable theatre for subsidary CBs
         self.CB1.disable()
         self.CB2.disable()
@@ -755,7 +769,7 @@ class feather_route_element(common.row_of_validated_dcc_commands):
         self.CB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
-        super().__init__(self.frame, columns=6, item_type="Signal",
+        super().__init__(self.frame, columns=7, item_type="Signal",
                     tool_tip="Enter the DCC Address for the command (1-2047)")
         self.pack(side=Tk.LEFT)
         
@@ -818,9 +832,13 @@ class feather_route_indications:
                             callback=callback, enable_addresses_on_selection=True)
         self.lh2 = feather_route_element(self.frame, label="LH2", width=5,
                             callback=callback, enable_addresses_on_selection=True)
+        self.lh3 = feather_route_element(self.frame, label="LH3", width=5,
+                            callback=callback, enable_addresses_on_selection=True)
         self.rh1 = feather_route_element(self.frame, label="RH1", width=5,
                             callback=callback, enable_addresses_on_selection=True)
         self.rh2 = feather_route_element(self.frame, label="RH2", width=5,
+                            callback=callback, enable_addresses_on_selection=True)
+        self.rh3 = feather_route_element(self.frame, label="RH3", width=5,
                             callback=callback, enable_addresses_on_selection=True)
         # The CB for DARK (signal at red - no route indications displyed) is always
         # disabled so it can never be selected (not really a route indication as such)
@@ -843,59 +861,71 @@ class feather_route_indications:
         if not self.main.validate(): valid = False
         if not self.lh1.validate(): valid = False
         if not self.lh2.validate(): valid = False
+        if not self.lh3.validate(): valid = False
         if not self.rh1.validate(): valid = False
         if not self.rh2.validate(): valid = False
+        if not self.rh3.validate(): valid = False
         return(valid)
     
     def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
-        # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
+        # The Feather Route address list comprises: [dark, main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each route element comprises: [DCC_command_sequence]
-        # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+        # Each DCC command sequence comprises a variable length list of dcc commands
         # Each DCC command comprises: [dcc_address, dcc_state]
         self.dark.set_values(addresses[0], item_id)
         self.main.set_values(addresses[1], item_id)
         self.lh1.set_values(addresses[2], item_id)
         self.lh2.set_values(addresses[3], item_id)
-        self.rh1.set_values(addresses[4], item_id)
-        self.rh2.set_values(addresses[5], item_id)
+        self.lh3.set_values(addresses[4], item_id)
+        self.rh1.set_values(addresses[5], item_id)
+        self.rh2.set_values(addresses[6], item_id)
+        self.rh3.set_values(addresses[7], item_id)
         
     def get_addresses(self):
-        # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
+        # The Feather Route address list comprises: [dark, main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each route element comprises: [DCC_command_sequence]
-        # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
+        # Each DCC command sequence comprises a variable length list of dcc commands
         # Each DCC command comprises: [dcc_address, dcc_state]
         return( [self.dark.get_values(),
                  self.main.get_values(),
                  self.lh1.get_values(),
                  self.lh2.get_values(),
+                 self.lh3.get_values(),
                  self.rh1.get_values(),
-                 self.rh2.get_values() ] )
+                 self.rh2.get_values(),
+                 self.rh3.get_values() ] )
                 
     def set_feathers(self,feathers:[bool,bool,bool,bool,bool]):
-        # Feather Route list comprises: [main, lh1, lh2, rh1, rh2]
+        # Feather Route list comprises: [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element comprises a single boolean value
         self.main.set_feather(feathers[0])
         self.lh1.set_feather(feathers[1])
         self.lh2.set_feather(feathers[2])
-        self.rh1.set_feather(feathers[3])
-        self.rh2.set_feather(feathers[4])
+        self.lh3.set_feather(feathers[3])
+        self.rh1.set_feather(feathers[4])
+        self.rh2.set_feather(feathers[5])
+        self.rh3.set_feather(feathers[6])
         self.auto_inhibit_update()
     
     def get_feathers(self):
-        # Feather Route list comprises: [main, lh1, lh2, rh1, rh2]
+        # Feather Route list comprises: [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each element comprises a single boolean value
         return( [ self.main.get_feather(),
                   self.lh1.get_feather(),
                   self.lh2.get_feather(),
+                  self.lh3.get_feather(),
                   self.rh1.get_feather(),
-                  self.rh2.get_feather() ] )
+                  self.rh2.get_feather(),
+                  self.rh3.get_feather() ] )
     
     def enable_selection(self):
         # Enable the CBs for diverging routes (will also enable the address EBs)        
         self.lh1.enable_selection()
         self.lh2.enable_selection()
+        self.lh3.enable_selection()
         self.rh1.enable_selection()
         self.rh2.enable_selection()
+        self.rh3.enable_selection()
         # The DCC Address EBs for MAIN are enabled even if no feather is selected
         self.main.enable_selection()
         self.main.enable()
@@ -912,8 +942,10 @@ class feather_route_indications:
         self.main.disable_selection()
         self.lh1.disable_selection()
         self.lh2.disable_selection()
+        self.lh3.disable_selection()
         self.rh1.disable_selection()
         self.rh2.disable_selection()
+        self.rh3.disable_selection()
         # Disable the "auto inhibit route" CB
         self.CB.disable()
 
@@ -951,43 +983,55 @@ class route_selections():
         self.lh1.pack(side=Tk.LEFT)
         self.lh2 = common.check_box(self.subframe, label="LH2", tool_tip=tool_tip, callback=callback)
         self.lh2.pack(side=Tk.LEFT)
+        self.lh3 = common.check_box(self.subframe, label="LH3", tool_tip=tool_tip, callback=callback)
+        self.lh3.pack(side=Tk.LEFT)
         self.rh1 = common.check_box(self.subframe, label="RH1", tool_tip=tool_tip, callback=callback)
         self.rh1.pack(side=Tk.LEFT)
         self.rh2 = common.check_box(self.subframe, label="RH2", tool_tip=tool_tip, callback=callback)        
         self.rh2.pack(side=Tk.LEFT)
+        self.rh3 = common.check_box(self.subframe, label="RH3", tool_tip=tool_tip, callback=callback)        
+        self.rh3.pack(side=Tk.LEFT)
         if self.main_signal: self.main.config(disabledforeground="Black", state="disabled")
 
     def enable_selection(self):
         if not self.main_signal: self.main.enable()
         self.lh1.enable()
         self.lh2.enable()
+        self.lh3.enable()
         self.rh1.enable()
         self.rh2.enable()
+        self.rh3.enable()
         
     def disable_selection(self):
         if not self.main_signal: self.main.disable()
         self.lh1.disable()
         self.lh2.disable()
+        self.lh3.disable()
         self.rh1.disable()
         self.rh2.disable()
+        self.rh3.disable()
 
-    def set_values(self, routes:[bool,bool,bool,bool,bool]):
-        # Route list comprises: [main, lh1, lh2, rh1, rh2]
+    def set_values(self, routes:[bool,bool,bool,bool,bool,bool,bool]):
+        # Route list comprises: [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each  element comprises a single boolean value
         self.main.set_value(routes[0])
         self.lh1.set_value(routes[1])
         self.lh2.set_value(routes[2])
-        self.rh1.set_value(routes[3])
-        self.rh2.set_value(routes[4])
+        self.lh3.set_value(routes[3])
+        self.rh1.set_value(routes[4])
+        self.rh2.set_value(routes[5])
+        self.rh3.set_value(routes[6])
 
     def get_values(self):
-        # Route list comprises: [main, lh1, lh2, rh1, rh2]
+        # Route list comprises: [main, lh1, lh2, lh3, rh1, rh2, rh3]
         # Each  element comprises a single boolean value
         return ([ self.main.get_value(),
                   self.lh1.get_value(),
                   self.lh2.get_value(),
+                  self.lh3.get_value(),
                   self.rh1.get_value(),
-                  self.rh2.get_value() ] )
+                  self.rh2.get_value(),
+                  self.rh3.get_value() ] )
 
 #------------------------------------------------------------------------------------
 # Class for a "slotted signals" UI element for ground signals only. This allows ground

@@ -437,7 +437,7 @@ def trigger_timed_signal_sequence(int_signal_id:int):
             # would then trigger another timed signal sequence and so on and so on
             if int_sig_id_to_trigger == int_signal_id: start_delay = 0
             # Trigger the timed sequence
-            library.trigger_timed_signal(int_sig_id_to_trigger, start_delay, time_delay)                
+            library.trigger_timed_signal(int_sig_id_to_trigger, start_delay, time_delay)
     return()
 
 #------------------------------------------------------------------------------------
@@ -571,8 +571,13 @@ def update_track_occupancy_for_signal(item_id:int):
         signal_clear = True
     else:
         signal_clear = False
+    # Validate the track occupancy change arising from the signal 'passed' event, raising any
+    # warnings as required. If there is a change to process, then schedule this for later
     if route is not None and not is_secondary_event:
-        process_track_occupancy(section_ahead, section_behind, item_text, signal_clear)
+        if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
+            library.set_signal_override(item_id)
+            clearance_delay = schematic_object["clearancedelay"]*1000
+            root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, item_id))
     return()
 
 # Track Sensor specific logic for track occupancy updates
@@ -597,16 +602,80 @@ def update_track_occupancy_for_track_sensor(item_id:int):
         if spad_popups: library.display_warning(canvas, log_text)
     else:
         section_behind = schematic_object["routebehind"][route_behind.value-1][1]
+    # Validate the track occupancy change arising from the signal 'passed' event, raising any
+    # warnings as required. If there is a change to process, then schedule this for later
     if route_ahead is not None and route_behind is not None:
-        process_track_occupancy(section_ahead, section_behind, item_text)
+        if validate_occupancy_changes(section_ahead, section_behind, item_text):
+            clearance_delay = schematic_object["clearancedelay"]*1000
+            root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind))
     return()
 
 #------------------------------------------------------------------------------------
-# Common Track Occupancy logic - Track Sensors and Signals. If this function is
-# called for a track sensor then the sig_clear will default to None
+# Common function to validate track occupancy changes for either Track Sensor or Signal
+# 'passed' events. This function will return 'True' if there is a track occupancy change
+# to process or 'False if there isn't. It will also raise any warnings as required
+# (if the track occupancy change cannot be determined or if it represents a SPAD event.
+# This function is run immediately after the 'passed' event so any warnings are
+# raised straight away - even if the actual track occupancy change is to be delayed.
+# If this function is called for a track sensor then sig_clear will default to None.
 #------------------------------------------------------------------------------------
 
-def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str, sig_clear:bool=None):
+def validate_occupancy_changes(section_ahead:int, section_behind:int, item_text:str, sig_clear:bool=None):
+    occupancy_change = True
+    if ( sig_clear == False and section_ahead > 0 and not library.section_occupied(section_ahead) and
+         section_behind > 0 and library.section_occupied(section_behind) ):
+        # Section BEHIND = OCCUPIED and section AHEAD = CLEAR - but signal at danger
+        train_descriptor = library.section_label(section_behind)
+        log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: library.display_warning(canvas, log_text)
+    elif sig_clear == False and section_ahead > 0 and section_behind == 0 and not library.section_occupied(section_ahead):
+        # Section AHEAD = CLEAR - section BEHIND doesn't exist - but signal at danger
+        log_text = "SPAD alert - "+item_text+" has been Passed at Danger by an unknown train"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: library.display_warning(canvas, log_text)
+    elif sig_clear == False and section_behind > 0 and section_ahead == 0 and library.section_occupied(section_behind):
+        # Section BEHIND = OCCUPIED - section AHEAD doesn't exist - but signal at danger
+        train_descriptor = library.section_label(section_behind)
+        log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: library.display_warning(canvas, log_text)
+    elif ( section_ahead > 0 and not library.section_occupied(section_ahead) and
+           section_behind > 0 and not library.section_occupied(section_behind) ):
+        # Section BEHIND = CLEAR and section AHEAD = CLEAR - No idea
+        occupancy_change = False
+        log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both CLEAR)"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: library.display_warning(canvas, log_text)
+    elif ( section_ahead > 0 and library.section_occupied(section_ahead) and
+           section_behind > 0 and library.section_occupied(section_behind) ):
+        # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
+        if sig_clear == True:
+            # Assume that the train BEHIND the signal will move into the section AHEAD
+            train_descriptor = library.section_label(section_behind)
+            train_ahead_descriptor = library.section_label(section_ahead)
+            log_text = ( item_text+" 'passed' - "+train_descriptor+"'  has entered Section occupied by '"+
+                                        train_ahead_descriptor+"' - Check and update descriptor")
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups: library.display_warning(canvas, log_text)
+        else:
+            # We have no idea what train has passed the Signal / Track Section
+            occupancy_change = False
+            log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both OCCUPIED)"
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups: library.display_warning(canvas, log_text)
+    return(occupancy_change)
+
+#------------------------------------------------------------------------------------
+# Common function to process track occupancy changes arising from either Track Sensor
+# or Signal'passed' events. This function will only get called if there is a valid track
+# occupancy change to process (as previously validated by the function above). If this
+# function is called for a track sensor then the sig_id will default to zero. Note that
+# this function is scheduled to run AFTER the signal or sensor passed event that triggered
+# it - this is to simulate the 'clearing delay' after the signal/sensor is passed.
+#------------------------------------------------------------------------------------
+
+def process_occupancy_changes(section_ahead:int, section_behind:int, sig_id:int=0):
     if ( section_ahead > 0 and library.section_occupied(section_ahead) and
          section_behind > 0 and not library.section_occupied(section_behind) ):
         # Section AHEAD = OCCUPIED and section BEHIND = CLEAR - Pass train from AHEAD to BEHIND
@@ -617,17 +686,9 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
         # Section BEHIND = OCCUPIED and section AHEAD = CLEAR - Pass train from BEHIND to AHEAD
         train_descriptor = library.clear_section_occupied(section_behind)
         library.set_section_occupied (section_ahead, train_descriptor)
-        if sig_clear == False:
-            log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
-            logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
     elif section_ahead > 0 and section_behind == 0 and not library.section_occupied(section_ahead):
         # Section AHEAD = CLEAR - section BEHIND doesn't exist - set section ahead to OCCUPIED
         library.set_section_occupied(section_ahead)
-        if sig_clear == False:
-            log_text = "SPAD alert - "+item_text+" has been Passed at Danger by an unknown train"
-            logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
     elif section_behind > 0 and section_ahead == 0 and not library.section_occupied(section_behind):
         # Section BEHIND = CLEAR - section AHEAD doesn't exist - set section behind to OCCUPIED
        library.set_section_occupied(section_behind)
@@ -637,34 +698,24 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
     elif section_behind > 0 and section_ahead == 0 and library.section_occupied(section_behind):
         # Section BEHIND = OCCUPIED - section AHEAD doesn't exist -set section behind to CLEAR
         train_descriptor = library.clear_section_occupied(section_behind)
-        if sig_clear == False:
-            log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
-            logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
-    elif ( section_ahead > 0 and not library.section_occupied(section_ahead) and
-           section_behind > 0 and not library.section_occupied(section_behind) ):
-        # Section BEHIND = CLEAR and section AHEAD = CLEAR - No idea
-        log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both CLEAR)"
-        logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
-
     elif ( section_ahead > 0 and library.section_occupied(section_ahead) and
            section_behind > 0 and library.section_occupied(section_behind) ):
-        # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
-        if sig_clear == True:
-            # Assume that the train BEHIND the signal will move into the section AHEAD
-            train_descriptor = library.clear_section_occupied(section_behind)
-            train_ahead_descriptor = library.section_label(section_ahead)
-            library.set_section_occupied (section_ahead, train_descriptor)
-            log_text = ( item_text+" 'passed' - "+train_descriptor+"'  has entered Section occupied by '"+
-                                        train_ahead_descriptor+"' - Check and update descriptor")
-            logging.info("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
-        else:
-            # We have no idea what train has passed the Signal / Track Section
-            log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both OCCUPIED)"
-            logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
+        # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED - As this function
+        # only gets called if there is a change to process, this will be a signal
+        # passed event where the signal is clear - We therefore assume that the
+        # train BEHIND the signal will move into the section AHEAD.
+        train_descriptor = library.clear_section_occupied(section_behind)
+        library.set_section_occupied (section_ahead, train_descriptor)
+    # Process any other layout changes that could be affected by changes in track occupancy.
+    update_route_highlighting_for_sections()
+    if sig_id > 0: library.clear_signal_override(sig_id)
+    if automation_enabled:
+        override_signals_based_on_track_sections_ahead()
+        update_approach_control_status_for_all_signals()
+        override_distant_signals_based_on_signals_ahead()
+    process_all_signal_interlocking()
+    process_all_point_interlocking()
+    run_routes.enable_disable_schematic_routes()
     return()
 
 #-------------------------------------------------------------------------------------
@@ -1221,18 +1272,26 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     update_all_signalbox_levers()
     return()
 
+# Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
+# sensor passed events before the train is passed from one track section to the next.
+# The update_track_occupancy_for_signal function now works out what the track occupancy
+# changes will be and schedules the actual update for after the clearance delay.
+# During this period the signal is overridden to DANGER.
 def signal_passed_callback(signal_id:int):
     if enhanced_debugging: print("########## signal_passed_callback "+str(signal_id))
-    if run_mode:
-        update_track_occupancy_for_signal(signal_id)
-        update_route_highlighting_for_sections()
-        if automation_enabled:
-            trigger_timed_signal_sequence(signal_id)
-            override_signals_based_on_track_sections_ahead()
-            update_approach_control_status_for_all_signals()    
-            override_distant_signals_based_on_signals_ahead()
-    process_all_signal_interlocking()
-    run_routes.enable_disable_schematic_routes()
+    # Work out what the track occupancy changes will be and schedule an event to update them.
+    # Any timed signal sequences are triggered immediately after the signal is passed
+    if run_mode: update_track_occupancy_for_signal(signal_id)
+    # Even though schematic updates resulting from track occupancy changes are scheduled
+    # for the future, this callback could also represent the start of a timed signal
+    # sequence. We therefore need to trigger this and then process any other layout
+    # changes that could be affected by a change to a signal aspect
+    if run_mode and automation_enabled:
+        trigger_timed_signal_sequence(signal_id)
+        update_approach_control_status_for_all_signals()
+        override_distant_signals_based_on_signals_ahead()
+    else:
+        process_signal_aspect_update(signal_id)
     return()
 
 def signal_released_callback(signal_id:int):
@@ -1246,16 +1305,15 @@ def signal_released_callback(signal_id:int):
     run_routes.enable_disable_schematic_routes()
     return()
 
+# Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
+# sensor passed events before the train is passed from one track section to the next.
+# The update_track_occupancy_for_signal function now works out what the track occupancy
+# changes will be and schedules the actual update for after the clearance delay.
 def sensor_passed_callback(sensor_id:int):
     if enhanced_debugging: print("########## sensor_passed_callback "+str(sensor_id))
-    if run_mode:
-        update_track_occupancy_for_track_sensor(sensor_id)
-        update_route_highlighting_for_sections()
-        if automation_enabled:
-            override_signals_based_on_track_sections_ahead()
-            update_approach_control_status_for_all_signals()    
-            override_distant_signals_based_on_signals_ahead()
-    process_all_signal_interlocking()
+    # Work out what the track occupancy changes will be and schedule an event to update them.
+    # Any timed signal sequences are triggered immediately after the signal is passed
+    if run_mode: update_track_occupancy_for_track_sensor(sensor_id)
     run_routes.trigger_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
     return()
