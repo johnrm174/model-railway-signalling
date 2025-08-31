@@ -607,7 +607,7 @@ class timed_sequence():
     def __init__(self, sig_id:int, route, start_delay:int=0, time_delay:int=0):
         self.sig_id = sig_id
         self.sig_route = route
-        self.aspect = signals.signals[str(sig_id)]["overriddenaspect"]
+        self.aspect = None
         self.start_delay = start_delay
         self.time_delay = time_delay
         self.sequence_abort_flag = False
@@ -617,20 +617,26 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id):
+        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
             self.sequence_in_progress = False
         else:
             self.sequence_in_progress = True
-            # For a start delay of zero we assume the intention is not to make a callback (on the basis
-            # that the user has triggered the timed signal in the first place). For start delays > 0 the 
-            # sequence is initiated after the specified delay and this will trigger a callback
-            # Note that we only change the aspect and generate the callback if the same route is set
+            # The Aspect will initially be set to the most restrictive aspect of the signal
+            # (DANGER in most cases, but CAUTION for 2 aspect distant signals)
+            self.aspect = signals.signals[str(self.sig_id)]["overriddenaspect"]
+            # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                # If the start delay is greater than zero then this is the case of one signal
+                # 'passed'event triggering a timed sequence for another signal. In this case we
+                # generate a 'passed' callback for signal rather than an 'updated' callback.
                 if self.start_delay > 0: 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
+                    update_colour_light_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
-                update_colour_light_signal(self.sig_id)
+                else:
+                    logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
+                    update_colour_light_signal(self.sig_id)
+                    signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
             # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
             if signals.signals[str(self.sig_id)]["subtype"] in (signal_subtype.three_aspect, signal_subtype.four_aspect):
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_yellow())
@@ -641,7 +647,7 @@ class timed_sequence():
         if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
             self.sequence_in_progress = False
         else:
-            # This sequence step only applicable to 3 and 4 aspect signals
+            # This sequence step is only applicable to 3 and 4 aspect signals
             self.aspect = signals.signal_state_type.CAUTION
             # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
@@ -690,11 +696,6 @@ class timed_sequence():
 # -------------------------------------------------------------------------
 
 def trigger_timed_colour_light_signal(sig_id:int,start_delay:int=0,time_delay:int=5):
-    
-    def delayed_sequence_start(sig_id:int, sig_route):
-        if signals.signal_exists(sig_id) and not common.shutdown_initiated:
-            signals.signals[str(sig_id)]["timedsequence"][route.value].start()
-            
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
     if common.shutdown_initiated:
         logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
@@ -705,11 +706,8 @@ def trigger_timed_colour_light_signal(sig_id:int,start_delay:int=0,time_delay:in
         # Create a new instnce of the time signal class - this should have the effect of "destroying"
         # the old instance when it goes out of scope, leaving us with the newly created instance
         signals.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
-        # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
-        # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
-        if start_delay > 0:
-            common.root_window.after(start_delay*1000,lambda:delayed_sequence_start(sig_id,route))
-        else:
-            signals.signals[str(sig_id)]["timedsequence"][route.value].start()
+        # Schedule the start of the sequence (i.e. signal to danger)
+        common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    return()
 
 ###############################################################################
