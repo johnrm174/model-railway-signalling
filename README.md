@@ -60,8 +60,11 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.0.
 > You have been warned!
 
-* The base Item ID (for creation of new objects) can now be specified under general settings.
-* TBD
+* The base Item ID (for creation of new objects) can now be specified under general settings:
+    * Making it easier to use different Item ID 'ranges' for different areas of the layout.
+* New Point Motor Excersising utility to continuously toggle all points on the layout:
+    * Some older slow-acting point motors can get a bit 'sticky' after periods of disuse.
+    * This utility can be used to exercise them for a period of time to 'free them up'
 * TBD
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
