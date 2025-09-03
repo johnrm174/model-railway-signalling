@@ -58,7 +58,6 @@ import json
 import os
 import pathlib
 import subprocess
-import time
 
 from .. import common
 from .. import library
