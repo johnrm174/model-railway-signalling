@@ -410,7 +410,7 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
 # the tasks were scheduled and when they actually get run, we always test to see if the
 # change is still possible (e.g. not possible if the signal or point has been locked)
 # The schedule_task class is used to schedule the other functions at a point in the
-# futurewhen the set_schematic_route and clear_schematic route functions are run.
+# future when the set_schematic_route and clear_schematic route functions are run.
 # Note we only run the tasks if we are still in RUN MODE. The exception to this is
 # complete_route_cleardown where we could be doing this after switching to EDIT Mode
 #
@@ -439,15 +439,20 @@ def set_switch_state(route_id:int, switch_id:int, state:bool):
     return()
 
 def set_signal_state(route_id:int, signal_id:int, state:bool):
-    if library.signal_clear(signal_id) != state and not library.signal_locked(signal_id):
-        library.toggle_signal(signal_id)
-        run_layout.signal_switched_callback(signal_id, route_id)
-        root.update_idletasks()
+    if library.signal_clear(signal_id) != state:
+        # Note if the signal is OFF and LOCKED then we always change it (Layout Reset use case)
+        # Just in case the layout has got into a weird, erroneous interlocking state.
+        if not library.signal_locked(signal_id) or library.signal_clear(signal_id):
+            library.toggle_signal(signal_id)
+            run_layout.signal_switched_callback(signal_id, route_id)
+            root.update_idletasks()
     return()
 
 def set_subsidary_state(route_id:int, signal_id:int, state:bool):
-    if run_layout.has_subsidary(signal_id):
-        if library.subsidary_clear(signal_id) != state and not library.subsidary_locked(signal_id):
+    if run_layout.has_subsidary(signal_id) and library.subsidary_clear(signal_id) != state:
+        # Note if the subsidary is OFF and LOCKED then we always change it (Layout Reset use case)
+        # Just in case the layout has got into a weird, erroneous interlocking state.
+        if not library.subsidary_locked(signal_id) or library.subsidary_clear(signal_id):
             library.toggle_subsidary(signal_id)
             run_layout.subsidary_switched_callback(signal_id, route_id)
             root.update_idletasks()
