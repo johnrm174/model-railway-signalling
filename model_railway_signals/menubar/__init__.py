@@ -25,6 +25,7 @@
 #    bulk_renumbering(root)
 #    application_upgrade(root)
 #    import_layout(root, import_schematic_callback)
+#    exercise_points(root, reset_layout_callback)
 #
 #------------------------------------------------------------------------------------
 
@@ -54,6 +55,7 @@ from .menubar_utilities import dcc_mappings
 from .menubar_utilities import bulk_renumbering
 from .menubar_utilities import application_upgrade
 from .menubar_utilities import import_layout
+from .menubar_utilities import exercise_points
 
 __all__ = [
     'display_help',
@@ -78,6 +80,7 @@ __all__ = [
     'dcc_mappings',
     'bulk_renumbering',
     'application_upgrade',
-    'import_layout' ]
+    'import_layout',
+    'exercise_points' ]
 
 ##############################################################################################################

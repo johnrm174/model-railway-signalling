@@ -192,17 +192,19 @@ class main_menubar:
         self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
         # Create the various menubar items for the Utilities Dropdown
         self.utilities_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.utilities_menu.add_command(label =" Application Upgrade...",
+                command=lambda:menubar.application_upgrade(self.root))
         self.utilities_menu.add_command(label =" DCC Programming...",
                 command=lambda:menubar.dcc_programming(self.root, self.dcc_programming_enabled,
                                                          self.dcc_power_off, self.dcc_power_on))
         self.utilities_menu.add_command(label =" DCC Mappings...",
                 command=lambda:menubar.dcc_mappings(self.root))
-        self.utilities_menu.add_command(label =" Item Renumbering...",
-                command=lambda:menubar.bulk_renumbering(self.root))
-        self.utilities_menu.add_command(label =" Application Upgrade...",
-                command=lambda:menubar.application_upgrade(self.root))
+        self.utilities_menu.add_command(label =" Exercise Points...",
+                command=lambda:menubar.exercise_points(self.root, self.reset_layout))
         self.utilities_menu.add_command(label =" Import Layout...",
                 command=lambda:menubar.import_layout(self.root, self.import_schematic))
+        self.utilities_menu.add_command(label =" Item Renumbering...",
+                command=lambda:menubar.bulk_renumbering(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -221,22 +223,22 @@ class main_menubar:
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
         # Create the various menubar items for the Styles Dropdown
         self.styles_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.styles_menu.add_command(label =" Route buttons...",
-                command=lambda:menubar.edit_route_styles(self.root))
         self.styles_menu.add_command(label =" DCC switches...",
                 command=lambda:menubar.edit_switch_styles(self.root))
-        self.styles_menu.add_command(label =" Track sections...",
-                command=lambda:menubar.edit_section_styles(self.root))
         self.styles_menu.add_command(label =" Point/Route lines...",
                 command=lambda:menubar.edit_route_line_styles(self.root))
         self.styles_menu.add_command(label =" Points...",
                 command=lambda:menubar.edit_point_styles(self.root))
+        self.styles_menu.add_command(label =" Route buttons...",
+                command=lambda:menubar.edit_route_styles(self.root))
         self.styles_menu.add_command(label =" Signals...",
                 command=lambda:menubar.edit_signal_styles(self.root))
         self.styles_menu.add_command(label =" Signalbox levers...",
                 command=lambda:menubar.edit_lever_styles(self.root))
         self.styles_menu.add_command(label =" Text boxes...",
                 command=lambda:menubar.edit_textbox_styles(self.root))
+        self.styles_menu.add_command(label =" Track sections...",
+                command=lambda:menubar.edit_section_styles(self.root))
         self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -454,9 +456,12 @@ class main_menubar:
             if Tk.messagebox.askokcancel(parent=self.root, title="Reset Schematic",
                     message="Are you sure you want to reset all signals, points, switches and "
                     +"instruments back to their default states (Note that track occupancy will be retained)"):
-                run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+                delay = run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+            else:
+                delay = None
         else:
-            run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+            delay = run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+        return(delay)
             
     #------------------------------------------------------------------------------------------
     # SPROG menubar functions
