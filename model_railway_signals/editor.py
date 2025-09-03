@@ -14,6 +14,7 @@
 #    objects.extend(new_objects) - Add to the dict of objects following an import
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.configure_remote_gpio_sensor_event_mappings() - set up the GPIO Sensor event mappings
+#    objects.set_base_item_id(item_id) - Set the base item ID (for creating new objects)
 #    schematic.initialise(root, callback, *canvasargs) - Create the canvas
 #    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
 #    schematic.update_canvas(*canvasargs) - Update the canvas following reload/resizing
@@ -667,6 +668,8 @@ class main_menubar:
         # Application settings - quick scroll buttons
         for scroll_button in self.scroll_buttons:
             scroll_button.config(font=("", font_size))
+        # Base item ID settings
+        objects.set_base_item_id(settings.get_general("baseitemid"))
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions

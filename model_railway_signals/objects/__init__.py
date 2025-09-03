@@ -4,6 +4,7 @@
 #
 # Externalised API functions intended for use by other editor modules:
 #    initialise (root, canvas) - Initialise the objects package
+#    set_base_item_id(item_id) - Set the base value for creating new item IDs
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
@@ -75,6 +76,7 @@ from .objects import save_schematic_state
 from .objects import finalise_object_updates
 
 from .objects_common import initialise
+from .objects_common import set_base_item_id
 from .objects_common import signal 
 from .objects_common import point 
 from .objects_common import section
@@ -108,6 +110,7 @@ __all__ = [
     # Initialisation and update functions
     'initialise',
     'save_schematic_state',
+    'set_base_item_id',
     # Enumeration of the object type
     'object_type',
     # Save and load functions

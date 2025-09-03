@@ -35,6 +35,7 @@ default_settings["general"]["filename"] = "new_layout.sig"
 default_settings["general"]["version"] = "Version 5.4.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["menubarfontsize"] = 10
+default_settings["general"]["baseitemid"] = 1
 default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False

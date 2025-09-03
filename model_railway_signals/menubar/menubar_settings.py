@@ -1159,6 +1159,19 @@ class edit_general_settings():
                         "switching events when resetting the layout back to its default state (0-5000ms)")
             self.resetdelay.pack(padx=2, pady=2)
             #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Edit Layout settings
+            #----------------------------------------------------------------------------------
+            self.frame3 = Tk.LabelFrame(self.window, text = "Edit Layout settings")
+            self.frame3.pack(padx=2, pady=2, fill=Tk.BOTH)
+            self.frame3subframe1 = Tk.Frame(self.frame3)
+            self.frame3subframe1.pack()
+            self.label2 = Tk.Label(self.frame3subframe1, text="Base ID for new objects:")
+            self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.baseitemid = common.integer_entry_box(self.frame3subframe1, width=4, min_value=1, max_value= 901,
+                        allow_empty=False, tool_tip="Specify the base Item ID (for generating new unique "+
+                        "item IDs on creation of new schematic objects)")
+            self.baseitemid.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             #----------------------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -1175,15 +1188,17 @@ class edit_general_settings():
         self.leverinterlocking.set_value(settings.get_general("leverinterlocking"))
         self.resetdelay.set_value(settings.get_general("resetdelay"))
         self.fontsize.set_value(settings.get_general("menubarfontsize"))
+        self.baseitemid.set_value(settings.get_general("baseitemid"))
 
     def save_state(self, close_window:bool):
-        if self.resetdelay.validate() and self.fontsize.validate():
+        if self.resetdelay.validate() and self.fontsize.validate() and self.baseitemid.validate():
             self.validation_error.pack_forget()
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
             settings.set_general("leverpopupwarnings", self.enableleverpopups.get_value())
             settings.set_general("leverinterlocking", self.leverinterlocking.get_value())
             settings.set_general("resetdelay", self.resetdelay.get_value())
             settings.set_general("menubarfontsize", self.fontsize.get_value())
+            settings.set_general("baseitemid", self.baseitemid.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )
