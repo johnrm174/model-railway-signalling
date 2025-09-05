@@ -138,6 +138,8 @@ from .buttons import disable_button
 from .buttons import lock_button
 from .buttons import unlock_button
 from .buttons import button_state
+from .buttons import set_button_value
+from .buttons import get_button_value
 from .buttons import update_button_styles
 
 from .dcc_control import get_dcc_address_mappings
@@ -356,6 +358,8 @@ __all__ = [
         'lock_button',
         'unlock_button',
         'button_state',
+        'get_button_value',
+        'set_button_value',
       # Public file interface functions
         'save_schematic',
         'load_schematic',

@@ -101,13 +101,16 @@ def switch(ID:int): return (switch_index[str(ID)])
 def lever(ID:int): return (lever_index[str(ID)])
 
 #------------------------------------------------------------------------------------
-# Externally used functions to see if a DCC Switch exists. We need to have a specific
-# Function here rather than use the Library function 'button_exists' as both Routes
-# and DCC Switches use the common button library objects
+# Externally used functions to see if a DCC Switch or route exists. We need to have
+# a specific Function here rather than use the Library function 'button_exists' as
+# both Route Buttons and DCC Switches use the common button library objects
 #------------------------------------------------------------------------------------
 
 def switch_exists(ID:int):
     return (str(ID) in switch_index.keys())
+
+def route_exists(ID:int):
+    return (str(ID) in route_index.keys())
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)

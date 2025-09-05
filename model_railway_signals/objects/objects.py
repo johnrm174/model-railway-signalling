@@ -721,125 +721,158 @@ def set_all(new_objects:dict):
         # Populate each element at a time and report any elements not recognised
         if default_object != {}:
             objects_common.schematic_objects[object_id] = copy.deepcopy(default_object)
-            for element in new_objects[object_id]:
-                if element not in default_object.keys():
-                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
-                            " - Unexpected element: '"+element+"' - DISCARDED")
-                else:
-                    # Tuples are converted to lists by the json.dumps function on layout save
-                    # We convert them back to tuples (primarily to stop the system tests breaking)
-                    if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
-                        objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
-                    #########################################################################################################
-                    # From Release 5.2.2 the 'subsidary' element in the signal object configuration changed from
-                    # [has_sub:bool, dcc_address:int] to [has:sub:bool, dcc_address:int, reversed_command_logic:bool]
-                    #########################################################################################################
-                    elif (new_object_type == objects_common.object_type.signal and element == "subsidary" and
-                          len(new_objects[object_id][element]) < 3):
-                            objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
-                    #########################################################################################################
-                    # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
-                    # The tracksections element was a list comprising: [section_behind, signal_routes_ahead]
-                    # The signal_routes_ahead element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-                    # Each signal_route changed from a fixed-length list of 3 track sections to a variable length
-                    # list of track sections with at least one entry (the tracksection directly ahead)
-                    # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
-                    # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
-                    #########################################################################################################
-                    # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
-                    # The trackinterlock element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
-                    # Each signal_route hanged from a fixed-length list of 3 track sections to a variable length
-                    # list of interlocked track sections for the route
-                    # Each entry is the ID of a (local) track section the signal is to be interlocked with
-                    # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
-                    # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
-                    #########################################################################################################
-                    # From Release 5.4.0 the application supports more Signal routes. All elements (including the above)
-                    # need to be extended as appropriate and re-ordered to ensure the routes are correctly ordered after
-                    # loading - i.e. from [MAIN,LH1,LH2,RH1,RH2] to [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
-                    #########################################################################################################
-                    elif (new_object_type == objects_common.object_type.signal and (element == "dccfeathers" or
-                          element == "dcctheatre") and len(new_objects[object_id][element]) < 8):
-                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
-                        new_values[0] = new_objects[object_id][element][0] # Dark
-                        new_values[1] = new_objects[object_id][element][1] # Main
-                        new_values[2] = new_objects[object_id][element][2] # lh1
-                        new_values[3] = new_objects[object_id][element][3] # lh2
-                        new_values[5] = new_objects[object_id][element][4] # rh1
-                        new_values[6] = new_objects[object_id][element][5] # rh2
-                        objects_common.schematic_objects[object_id][element] = new_values
-                    elif (new_object_type == objects_common.object_type.signal and (element == "sigroutes" or
-                          element == "subroutes" or element == "pointinterlock" or element == "trackinterlock" or
-                          element == "siginterlock" or element == "feathers" or element == "approachcontrol" or
-                          element == "timedsequences") and len(new_objects[object_id][element]) < 7):
-                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
-                        new_values[0] = new_objects[object_id][element][0] # Main
-                        new_values[1] = new_objects[object_id][element][1] # lh1
-                        new_values[2] = new_objects[object_id][element][2] # lh2
-                        new_values[4] = new_objects[object_id][element][3] # rh1
-                        new_values[5] = new_objects[object_id][element][4] # rh2
-                        # Get rid of any zero entries for each route in the "trackinterlock" element
-                        if element == "trackinterlock":
-                            new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
-                            for index1, route_entry in enumerate(new_values):
-                                for section_id in route_entry:
-                                    if section_id > 0: new_values_without_blanks[index1].append(section_id)
-                            objects_common.schematic_objects[object_id][element] = new_values_without_blanks
-                        # Get rid of any zero entries for each route in the "tracksections" element
-                        elif element == "tracksections":
-                            new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
-                            for index1, route_entry in enumerate(new_values):
-                                for index2, section_id in enumerate(route_entry):
-                                    if index2 == 0: new_values_without_blanks[1][index1][0] = section_id
-                                    elif section_id > 0: new_values_without_blanks[1][index1].append(section_id)
-                            objects_common.schematic_objects[object_id][element] = new_values_without_blanks
-                        # For the siginterlock element we also need to correct each element
-                        elif element == "siginterlock":
-                            corrected_values = copy.deepcopy(objects_signals.default_signal_object[element])
-                            for index1, route_entry in enumerate(new_values):
-                                for signal_entry in route_entry:
-                                    if len(signal_entry[1]) < 7:
-                                        corrected_values[index1].append([signal_entry[0], [signal_entry[1][0],
-                                                            signal_entry[1][1], signal_entry[1][2], False,
-                                                            signal_entry[1][3], signal_entry[1][4], False]])
-                                    else:
-                                        corrected_values[index1].append(signal_entry)
-                            objects_common.schematic_objects[object_id][element] = corrected_values
-                        else:
-                            objects_common.schematic_objects[object_id][element] = new_values
-                    elif (new_object_type == objects_common.object_type.signal and element == "tracksections"
-                                    and len(new_objects[object_id][element][1]) < 7):
-                        new_values = copy.deepcopy(objects_signals.default_signal_object[element])
-                        new_values[0] = new_objects[object_id][element][0]       # Section behind
-                        new_values[1][0] = new_objects[object_id][element][1][0] # section ahead - Main
-                        new_values[1][1] = new_objects[object_id][element][1][1] # section ahead - lh1
-                        new_values[1][2] = new_objects[object_id][element][1][2] # section ahead - lh2
-                        new_values[1][4] = new_objects[object_id][element][1][3] # section ahead - rh1
-                        new_values[1][5] = new_objects[object_id][element][1][4] # section ahead - rh2
-                        objects_common.schematic_objects[object_id][element] = new_values
-                    elif (new_object_type == objects_common.object_type.lever and element == "signalroutes"
-                                                and len(new_objects[object_id][element]) < 7):
-                        new_values = copy.deepcopy(objects_levers.default_lever_object[element])
-                        new_values[0] = new_objects[object_id][element][0] # Main
-                        new_values[1] = new_objects[object_id][element][1] # lh1
-                        new_values[2] = new_objects[object_id][element][2] # lh2
-                        new_values[4] = new_objects[object_id][element][3] # rh1
-                        new_values[5] = new_objects[object_id][element][4] # rh2
-                        objects_common.schematic_objects[object_id][element] = new_values
-                    elif (new_object_type == objects_common.object_type.track_sensor and (element == "routeahead" or
-                                element == "routebehind") and len(new_objects[object_id][element]) < 7):
-                        new_values = copy.deepcopy(objects_sensors.default_track_sensor_object[element])
-                        new_values[0] = new_objects[object_id][element][0] # Main
-                        new_values[1] = new_objects[object_id][element][1] # lh1
-                        new_values[2] = new_objects[object_id][element][2] # lh2
-                        new_values[4] = new_objects[object_id][element][3] # rh1
-                        new_values[5] = new_objects[object_id][element][4] # rh2
-                        objects_common.schematic_objects[object_id][element] = new_values
-                    #########################################################################################################
-                    # End of code to handle changes in Object data structures
-                    #########################################################################################################
+            #########################################################################################################
+            # From Release 5.5.0 the structure of the route button object changed to support NX type operation.
+            # The 'Route' object dictionary now contains a 'routedefinitions' element, which comprises a list of
+            # one or more route definitions. If loading files from previous versions, we need to create this new
+            # structure and populate a single route definition from the legacy route definition dictionary elements.
+            #########################################################################################################
+            if new_object_type == objects_common.object_type.route and "routedefinitions" not in new_objects[object_id].keys():
+                for element in new_objects[object_id]:
+                    if ( element == "signalsonroute" or element == "subsidariesonroute" or element == "pointsonroute" or
+                         element == "switchesonroute" or element == "linestohighlight" or element == "pointstohighlight" ):
+                        objects_common.schematic_objects[object_id]["routedefinitions"][0][element] = new_objects[object_id][element]
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Re-structuring route definition element: '"+element+"'")
+                    elif element == "tracksensor":
+                        objects_common.schematic_objects[object_id]["routedefinitions"][0]["exitsensor"] = new_objects[object_id][element]
+                    elif element not in default_object.keys():
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Unexpected element: '"+element+"' - DISCARDED")
                     else:
                         objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
+                # Now delete the elements we have moved into the new structure to prevent warnings later
+                del new_objects[object_id]["signalsonroute"]
+                del new_objects[object_id]["subsidariesonroute"]
+                del new_objects[object_id]["pointsonroute"]
+                del new_objects[object_id]["switchesonroute"]
+                del new_objects[object_id]["linestohighlight"]
+                del new_objects[object_id]["pointstohighlight"]
+                del new_objects[object_id]["tracksensor"]
+                new_objects[object_id]["routedefinitions"] = objects_common.schematic_objects[object_id]["routedefinitions"]
+            else:
+            #########################################################################################################
+            # End of code to handle the changes in the route object structure introduced in Release 5.5.0
+            #########################################################################################################
+                for element in new_objects[object_id]:
+                    if element not in default_object.keys():
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Unexpected element: '"+element+"' - DISCARDED")
+                    else:
+                        # Tuples are converted to lists by the json.dumps function on layout save
+                        # We convert them back to tuples (primarily to stop the system tests breaking)
+                        if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
+                            objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
+                        #########################################################################################################
+                        # From Release 5.2.2 the 'subsidary' element in the signal object configuration changed from
+                        # [has_sub:bool, dcc_address:int] to [has:sub:bool, dcc_address:int, reversed_command_logic:bool]
+                        #########################################################################################################
+                        elif (new_object_type == objects_common.object_type.signal and element == "subsidary" and
+                              len(new_objects[object_id][element]) < 3):
+                                objects_common.schematic_objects[object_id][element] = new_objects[object_id][element] + [False]
+                        #########################################################################################################
+                        # From Release 5.2.0 the 'tracksections' element in the signal object configuration changed:
+                        # The tracksections element was a list comprising: [section_behind, signal_routes_ahead]
+                        # The signal_routes_ahead element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                        # Each signal_route changed from a fixed-length list of 3 track sections to a variable length
+                        # list of track sections with at least one entry (the tracksection directly ahead)
+                        # For example, from: [12, [[4, 0, 0], [13, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]]
+                        # To: [12, [[4], [13], [0], [0], [0]]] - The 2nd and 3rd elelents are discarded if zero
+                        #########################################################################################################
+                        # From Release 5.2.0 the 'trackinterlock' element in the signal object configuration changed:
+                        # The trackinterlock element comprised a list of 5 signal_routes: [MAIN,LH1,LH2,RH1,RH2]
+                        # Each signal_route hanged from a fixed-length list of 3 track sections to a variable length
+                        # list of interlocked track sections for the route
+                        # Each entry is the ID of a (local) track section the signal is to be interlocked with
+                        # For example, from: [[1, 0, 0], [1, 2, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+                        # To: [[1], [1,2], [], [], []] - Elements that have a zero value are discarded
+                        #########################################################################################################
+                        # From Release 5.4.0 the application supports more Signal routes. All elements (including the above)
+                        # need to be extended as appropriate and re-ordered to ensure the routes are correctly ordered after
+                        # loading - i.e. from [MAIN,LH1,LH2,RH1,RH2] to [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
+                        #########################################################################################################
+                        elif (new_object_type == objects_common.object_type.signal and (element == "dccfeathers" or
+                              element == "dcctheatre") and len(new_objects[object_id][element]) < 8):
+                            new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                            new_values[0] = new_objects[object_id][element][0] # Dark
+                            new_values[1] = new_objects[object_id][element][1] # Main
+                            new_values[2] = new_objects[object_id][element][2] # lh1
+                            new_values[3] = new_objects[object_id][element][3] # lh2
+                            new_values[5] = new_objects[object_id][element][4] # rh1
+                            new_values[6] = new_objects[object_id][element][5] # rh2
+                            objects_common.schematic_objects[object_id][element] = new_values
+                        elif (new_object_type == objects_common.object_type.signal and (element == "sigroutes" or
+                              element == "subroutes" or element == "pointinterlock" or element == "trackinterlock" or
+                              element == "siginterlock" or element == "feathers" or element == "approachcontrol" or
+                              element == "timedsequences") and len(new_objects[object_id][element]) < 7):
+                            new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                            new_values[0] = new_objects[object_id][element][0] # Main
+                            new_values[1] = new_objects[object_id][element][1] # lh1
+                            new_values[2] = new_objects[object_id][element][2] # lh2
+                            new_values[4] = new_objects[object_id][element][3] # rh1
+                            new_values[5] = new_objects[object_id][element][4] # rh2
+                            # Get rid of any zero entries for each route in the "trackinterlock" element
+                            if element == "trackinterlock":
+                                new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
+                                for index1, route_entry in enumerate(new_values):
+                                    for section_id in route_entry:
+                                        if section_id > 0: new_values_without_blanks[index1].append(section_id)
+                                objects_common.schematic_objects[object_id][element] = new_values_without_blanks
+                            # Get rid of any zero entries for each route in the "tracksections" element
+                            elif element == "tracksections":
+                                new_values_without_blanks = copy.deepcopy(objects_signals.default_signal_object[element])
+                                for index1, route_entry in enumerate(new_values):
+                                    for index2, section_id in enumerate(route_entry):
+                                        if index2 == 0: new_values_without_blanks[1][index1][0] = section_id
+                                        elif section_id > 0: new_values_without_blanks[1][index1].append(section_id)
+                                objects_common.schematic_objects[object_id][element] = new_values_without_blanks
+                            # For the siginterlock element we also need to correct each element
+                            elif element == "siginterlock":
+                                corrected_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                                for index1, route_entry in enumerate(new_values):
+                                    for signal_entry in route_entry:
+                                        if len(signal_entry[1]) < 7:
+                                            corrected_values[index1].append([signal_entry[0], [signal_entry[1][0],
+                                                                signal_entry[1][1], signal_entry[1][2], False,
+                                                                signal_entry[1][3], signal_entry[1][4], False]])
+                                        else:
+                                            corrected_values[index1].append(signal_entry)
+                                objects_common.schematic_objects[object_id][element] = corrected_values
+                            else:
+                                objects_common.schematic_objects[object_id][element] = new_values
+                        elif (new_object_type == objects_common.object_type.signal and element == "tracksections"
+                                        and len(new_objects[object_id][element][1]) < 7):
+                            new_values = copy.deepcopy(objects_signals.default_signal_object[element])
+                            new_values[0] = new_objects[object_id][element][0]       # Section behind
+                            new_values[1][0] = new_objects[object_id][element][1][0] # section ahead - Main
+                            new_values[1][1] = new_objects[object_id][element][1][1] # section ahead - lh1
+                            new_values[1][2] = new_objects[object_id][element][1][2] # section ahead - lh2
+                            new_values[1][4] = new_objects[object_id][element][1][3] # section ahead - rh1
+                            new_values[1][5] = new_objects[object_id][element][1][4] # section ahead - rh2
+                            objects_common.schematic_objects[object_id][element] = new_values
+                        elif (new_object_type == objects_common.object_type.lever and element == "signalroutes"
+                                                    and len(new_objects[object_id][element]) < 7):
+                            new_values = copy.deepcopy(objects_levers.default_lever_object[element])
+                            new_values[0] = new_objects[object_id][element][0] # Main
+                            new_values[1] = new_objects[object_id][element][1] # lh1
+                            new_values[2] = new_objects[object_id][element][2] # lh2
+                            new_values[4] = new_objects[object_id][element][3] # rh1
+                            new_values[5] = new_objects[object_id][element][4] # rh2
+                            objects_common.schematic_objects[object_id][element] = new_values
+                        elif (new_object_type == objects_common.object_type.track_sensor and (element == "routeahead" or
+                                    element == "routebehind") and len(new_objects[object_id][element]) < 7):
+                            new_values = copy.deepcopy(objects_sensors.default_track_sensor_object[element])
+                            new_values[0] = new_objects[object_id][element][0] # Main
+                            new_values[1] = new_objects[object_id][element][1] # lh1
+                            new_values[2] = new_objects[object_id][element][2] # lh2
+                            new_values[4] = new_objects[object_id][element][3] # rh1
+                            new_values[5] = new_objects[object_id][element][4] # rh2
+                            objects_common.schematic_objects[object_id][element] = new_values
+                        #########################################################################################################
+                        # End of code to handle changes in Object data structures
+                        #########################################################################################################
+                        else:
+                            objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:

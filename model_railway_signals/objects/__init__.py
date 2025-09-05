@@ -88,6 +88,7 @@ from .objects_common import switch
 from .objects_common import lever
 
 from .objects_common import switch_exists
+from .objects_common import route_exists
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -142,6 +143,7 @@ __all__ = [
     'lever',
     # Helper functions to See if a DCC switch of a given ID exists
     'switch_exists',
+    'route_exists',
     # Main schematic object dict and the type-specific indexes
     'schematic_objects',
     'signal_index',

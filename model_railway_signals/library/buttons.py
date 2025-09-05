@@ -48,12 +48,13 @@
 #   toggle_button(button_id:int) - toggle the state of the button
 #
 #   enable_button(button_id:int) - enable the button (and revert to the standard tooltip)
-#
 #   disable_button(button_id:int, tooltip:str) - disable the button (with a new toottip)
 #
 #   lock_button(button_id:int) - lock the button (to prevent it being enabled)
-#
 #   unlock_button(button_id:int, tooltip:str) - unlock the button (to allow it to be enabled)
+#
+#   get_button_value(button_id:int) - retrieve the button object's value
+#   set_button_value(button_id:int, value:int) - set a value for the button object
 #
 # External API - classes and functions (used by the other library modules):
 #
@@ -263,6 +264,35 @@ def lock_button(button_id:int):
     return()
 
 #---------------------------------------------------------------------------------------------
+# API functions to lock / unlock a button whilst external processing is taking place.
+# Whilst a button is locked, it can't be enabled via the enable_button function call.
+#---------------------------------------------------------------------------------------------
+
+def set_button_value(button_id:int, value:int):
+    global buttons
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": set_button_value - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": set_button_value - Button ID does not exist")
+    else:
+        buttons[str(button_id)]["buttonvalue"] = value
+    return()
+
+def get_button_value(button_id:int):
+    global buttons
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": get_button_value - Button ID must be an int")
+        value_to_return = None
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": get_button_value - Button ID does not exist")
+        value_to_return = None
+    else:
+        value_to_return = buttons[str(button_id)]["buttonvalue"]
+    return(value_to_return)
+
+#---------------------------------------------------------------------------------------------
 # API function to get the current state of a Button (selected or unselected)
 #---------------------------------------------------------------------------------------------
 
@@ -354,6 +384,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["buttonlabel"] = label                        # The label for the button (string)
+        buttons[str(button_id)]["buttonvalue"] = 0                            # The 'value' of the button (integer)
         buttons[str(button_id)]["tooltiptext"] = tooltip                      # The default tooltip text to display
         buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
         buttons[str(button_id)]["deselectedcolour"] = button_colour           # button colour in its normal/unselected state
