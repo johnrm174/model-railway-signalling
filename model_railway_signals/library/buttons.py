@@ -53,8 +53,8 @@
 #   lock_button(button_id:int) - lock the button (to prevent it being enabled)
 #   unlock_button(button_id:int, tooltip:str) - unlock the button (to allow it to be enabled)
 #
-#   get_button_value(button_id:int) - retrieve the button object's value
-#   set_button_value(button_id:int, value:int) - set a value for the button object
+#   get_button_data(button_id:int) - retrieve the button object's data
+#   set_button_data(button_id:int, data) - set a value for the button object
 #
 # External API - classes and functions (used by the other library modules):
 #
@@ -264,33 +264,33 @@ def lock_button(button_id:int):
     return()
 
 #---------------------------------------------------------------------------------------------
-# API functions to lock / unlock a button whilst external processing is taking place.
-# Whilst a button is locked, it can't be enabled via the enable_button function call.
+# API functions to store / retrieve additional state data to be associated with a button.
+# Used primarily for NX route buttons, to store the route index and associated NX button.
 #---------------------------------------------------------------------------------------------
 
-def set_button_value(button_id:int, value:int):
+def set_button_data(button_id:int, data):
     global buttons
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(button_id, int) :
-        logging.error("Button "+str(button_id)+": set_button_value - Button ID must be an int")
+        logging.error("Button "+str(button_id)+": set_button_data - Button ID must be an int")
     elif not button_exists(button_id):
-        logging.error("Button "+str(button_id)+": set_button_value - Button ID does not exist")
+        logging.error("Button "+str(button_id)+": set_button_data - Button ID does not exist")
     else:
-        buttons[str(button_id)]["buttonvalue"] = value
+        buttons[str(button_id)]["buttondata"] = data
     return()
 
-def get_button_value(button_id:int):
+def get_button_data(button_id:int):
     global buttons
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(button_id, int) :
-        logging.error("Button "+str(button_id)+": get_button_value - Button ID must be an int")
-        value_to_return = None
+        logging.error("Button "+str(button_id)+": get_button_data - Button ID must be an int")
+        data_to_return = None
     elif not button_exists(button_id):
-        logging.error("Button "+str(button_id)+": get_button_value - Button ID does not exist")
-        value_to_return = None
+        logging.error("Button "+str(button_id)+": get_button_data - Button ID does not exist")
+        data_to_return = None
     else:
-        value_to_return = buttons[str(button_id)]["buttonvalue"]
-    return(value_to_return)
+        data_to_return = buttons[str(button_id)]["buttondata"]
+    return(data_to_return)
 
 #---------------------------------------------------------------------------------------------
 # API function to get the current state of a Button (selected or unselected)
@@ -314,7 +314,7 @@ def button_state(button_id:int):
 
 def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, selected_callback,
                    deselected_callback, width:int=10, label:str="Button", tooltip="Tooltip", hidden:bool=False,
-                   release_delay:int=0, button_colour:str="SeaGreen3", active_colour:str="SeaGreen2",
+                   button_data=None, release_delay:int=0, button_colour:str="SeaGreen3", active_colour:str="SeaGreen2",
                    selected_colour:str="SeaGreen1", text_colour:str="black", font=("TkFixedFont", 8 ,"normal")):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
@@ -384,7 +384,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["buttonlabel"] = label                        # The label for the button (string)
-        buttons[str(button_id)]["buttonvalue"] = 0                            # The 'value' of the button (integer)
+        buttons[str(button_id)]["buttondata"] = button_data                   # Additional state data to be associated with button
         buttons[str(button_id)]["tooltiptext"] = tooltip                      # The default tooltip text to display
         buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
         buttons[str(button_id)]["deselectedcolour"] = button_colour           # button colour in its normal/unselected state
@@ -396,6 +396,8 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         if loaded_state["selected"]:
             buttons[str(button_id)]["selected"] = True
             buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+        if loaded_state["buttondata"]:
+             buttons[str(button_id)]["buttondata"] = loaded_state["buttondata"]
         # Send out any DCC commands associated with the initial state of the button
         # Note that commands will only be sent out if a mapping exists
         dcc_control.update_dcc_switch(button_id, buttons[str(button_id)]["selected"])

@@ -76,7 +76,7 @@ def get_sig_file_config(get_sig_file_data:bool = False):
     point_elements = ( ("switched","bool"),("fpllock","bool"),("locked","bool") )
     section_elements = ( ("occupied","bool"),("labeltext","str") )
     instrument_elements = ( ("sectionstate","bool"),("repeaterstate","bool") )
-    button_elements = ( ("selected","bool"), )
+    button_elements = ( ("selected","bool"), ("buttondata", "generic") )
     lever_elements = ( ("switched","bool"),("locked","bool"))
 
     layout_elements = { "signals"    : {"elements" : signal_elements},

@@ -31,7 +31,6 @@
 #    common.check_box
 #
 #------------------------------------------------------------------------------------
-model_railway_signals/windows/configure_route.py
 import copy
 
 import tkinter as Tk

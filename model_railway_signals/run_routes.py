@@ -5,8 +5,8 @@
 #    initialise(root, canvas) - sets a global reference to the tkinter canvas object
 #    configure_edit_mode(edit_mode) - Set the mode - True for Edit Mode, False for Run Mode
 #    configure_automation(auto_enabled) - Call to set automation mode (from Editor Module)
-#    set_schematic_route_callback(item_id) - the callback for a change in library object state
-#    clear_schematic_route_callback(item_id) - the callback for a change in library object state
+#    route_button_selected_callback(item_id) - the callback for a change in library object state
+#    route_button_deselected_callback(item_id) - the callback for a change in library object state
 #    check_routes_valid_after_point_change(point_id) - Clears down route highlighting if compromised
 #    check_routes_valid_after_signal_change(signal_id) - Clears down route highlighting if compromised
 #    check_routes_valid_after_subsidary_change(subsidary_id) - Clears down route highlighting if compromised
@@ -27,7 +27,7 @@
 #
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
 #    objects.point(point_id) - To get the object_id for a given point_id
-#    objects.route(route_id) - To get the object_id for a given sensor_id
+#    objects.route(route_button_id) - To get the object_id for a given sensor_id
 #    
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -232,11 +232,7 @@ def check_conflicting_points(route_object:dict, route_tooltip:str, route_viable:
 # of the points and signals on the layout do not prevent the route being set up)
 #------------------------------------------------------------------------------------
 
-def check_route_viable(str_route_id:str):
-    # Find the applicable route definition for the button (index stored as the button 'value')
-    route_object = objects.schematic_objects[objects.route(str_route_id)]
-    route_definition_index = library.get_button_value(route_object["itemid"])
-    route_definition = route_object["routedefinitions"][route_definition_index]
+def check_route_viable(route_definition:dict):
     route_tooltip, route_viable = "", True
     # See if any points that need to be set for the route are locked by a signal at OFF
     # Note that automatic signals are ignored (manual points should have been specified))
@@ -255,31 +251,42 @@ def check_route_viable(str_route_id:str):
 
 def enable_disable_schematic_routes():
     # Iterate through all the schematic routes
-    for str_route_id in objects.route_index.keys():
-        route_object = objects.schematic_objects[objects.route(str_route_id)]
-        # If it is a 'one click' button we just enable/disable based on the first route
+    for str_route_button_id in objects.route_index.keys():
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
         if not route_object["entrybutton"] and not route_object["exitbutton"]:
-            route_tooltip, route_viable = check_route_viable(str_route_id)
+            # If it is a 'one click' button we just enable/disable based on the first route
+            route_definition = route_object["routedefinitions"][0]
+            route_tooltip, button_can_be_unlocked = check_route_viable(route_definition)
         else:
-            ###########################################################################################
+            # If it is an Entry button we enable/disable based on ALL outgoing routes
+            # If it is an Exit Button (or an Exit Button we also test to see if there is
+            # an activated entry button with a valid route associated with the exit button
+            button_can_be_unlocked = False
             if route_object["entrybutton"]:
-                route_viable, route_tooltip = False, "\nNX Buttons are not yet supported"
-            elif route_object["exitbutton"]:
-                route_viable, route_tooltip = False, "\nNX Buttons are not yet supported"
-            ###########################################################################################
+                for route_definition in route_object["routedefinitions"]:
+                    route_tooltip, route_viable = check_route_viable(route_definition)
+                    if route_viable: button_can_be_unlocked = True
+            if route_object["exitbutton"] and activated_entry_button_id > 0:
+                other_route_object = objects.schematic_objects[objects.route(activated_entry_button_id)]
+                for other_route_definition in other_route_object["routedefinitions"]:
+                    if other_route_definition["exitbutton"] == int(str_route_button_id):
+                        route_tooltip, route_viable = check_route_viable(other_route_definition)
+                        if route_viable: button_can_be_unlocked = True
+            if not button_can_be_unlocked:
+                route_tooltip = "\nNo NX routes are currently viable"
         # Enable/disable the route button as required. Note that selected route buttons
         # always remain enabled (unless locked) so they can be deselected as required
-        if route_viable or library.button_state(int(str_route_id)):
-            library.enable_button(int(str_route_id))
+        if button_can_be_unlocked or library.button_state(int(str_route_button_id)):
+            library.enable_button(int(str_route_button_id))
         else:
             route_tooltip = "Route cannot be set because:"+route_tooltip
-            library.disable_button(int(str_route_id), route_tooltip)
+            library.disable_button(int(str_route_button_id), route_tooltip)
     return()
 
 #------------------------------------------------------------------------------------
 # Common function to clear down the highlighting for a route (point and line colours)
 # Called whenever a route is reset - from the initialise_all_schematic_routes
-# function (when entering edit mode), the clear_schematic_route_callback function
+# function (when entering edit mode), the route_button_deselected_callback function
 # (when a route has been deseled by the user or reset by a sensor passed event), the
 # various check_routes_valid_after_* functions (if the route is invalidated by the
 # change and needs to be shown as de-selected) and the schedule_tasks_to_reset_routes
@@ -288,12 +295,13 @@ def enable_disable_schematic_routes():
 
 def reset_route_highlighting(route_button_id:int):
     route_object = objects.schematic_objects[objects.route(route_button_id)]
-    route_definition_index = library.get_button_value(route_object["itemid"])
-    route_definition = route_object["routedefinitions"][route_definition_index]
-    for point_id in route_definition["pointstohighlight"]:
-        library.reset_point_colour(point_id)
-    for line_id in route_definition["linestohighlight"]:
-        library.reset_line_colour(line_id)
+    [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
+    if route_definition_index is not None:
+        route_definition = route_object["routedefinitions"][route_definition_index]
+        for point_id in route_definition["pointstohighlight"]:
+            library.reset_point_colour(point_id)
+        for line_id in route_definition["linestohighlight"]:
+            library.reset_line_colour(line_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -319,21 +327,21 @@ def initialise_all_schematic_routes():
     # If we are in EDIT Mode then Reset all buttons and route highlighting
     # All the signals and points get left in their current states
     if not run_mode:
-        for str_route_id in objects.route_index.keys():
-            if library.button_state(int(str_route_id)):
-                library.toggle_button(int(str_route_id))
-                reset_route_highlighting(int(str_route_id))
-                complete_route_cleardown(int(str_route_id))
+        for str_route_button_id in objects.route_index.keys():
+            if library.button_state(int(str_route_button_id)):
+                library.toggle_button(int(str_route_button_id))
+                reset_route_highlighting(int(str_route_button_id))
+                complete_route_cleardown(int(str_route_button_id))
     # If we are in RUN Mode then we reset all unselected routes back to their default colours
     # and highlight any routes that are still selected (use cases - 'load' and 'reset')
     else:
-        for str_route_id in objects.route_index.keys():
-            if not library.button_state(int(str_route_id)):
-                reset_route_highlighting(int(str_route_id))
-                complete_route_cleardown(int(str_route_id))
-        for str_route_id in objects.route_index.keys():
-            if library.button_state(int(str_route_id)):
-                complete_route_setup(int(str_route_id))
+        for str_route_button_id in objects.route_index.keys():
+            if not library.button_state(int(str_route_button_id)):
+                reset_route_highlighting(int(str_route_button_id))
+                complete_route_cleardown(int(str_route_button_id))
+        for str_route_button_id in objects.route_index.keys():
+            if library.button_state(int(str_route_button_id)):
+                complete_route_setup(int(str_route_button_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -342,71 +350,75 @@ def initialise_all_schematic_routes():
 # toggled to 'unselected' and the route highlighting cleared down. All other points,
 # signals and subsidaries on the route are left in their current states.
 # If the change was associated by setting up or clearing down a route rather than
-# a user initiated event then we will get a route_id passed into the function.
+# a user initiated event then we will get a route_button_id passed into the function.
 #------------------------------------------------------------------------------------
 
-def check_routes_valid_after_signal_change(signal_id:int, route_id:int):
-    for str_route_id in objects.route_index:
+def check_routes_valid_after_signal_change(signal_id:int, route_button_id:int):
+    for str_route_button_id in objects.route_index:
         # Find the applicable route definition for the button (index stored as the button 'value')
-        route_object = objects.schematic_objects[objects.route(str_route_id)]
-        route_definition_index = library.get_button_value(route_object["itemid"])
-        route_definition = route_object["routedefinitions"][route_definition_index]
-        # Reset the route if any signals on the route have been returned to danger
-        if int(str_route_id) != route_id and library.button_state(int(str_route_id)):
-            if signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id):
-                reset_route_highlighting(int(str_route_id))
-                library.toggle_button(int(str_route_id))
-                complete_route_cleardown(int(str_route_id))
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+        [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
+        if route_definition_index is not None:
+            route_definition = route_object["routedefinitions"][route_definition_index]
+            # Reset the route if any signals on the route have been returned to danger
+            if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+                if signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id):
+                    reset_route_highlighting(int(str_route_button_id))
+                    library.toggle_button(int(str_route_button_id))
+                    complete_route_cleardown(int(str_route_button_id))
     return()
 
-def check_routes_valid_after_subsidary_change(signal_id:int, route_id:int):
-    for str_route_id in objects.route_index:
+def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int):
+    for str_route_button_id in objects.route_index:
         # Find the applicable route definition for the button (index stored as the button 'value')
-        route_object = objects.schematic_objects[objects.route(str_route_id)]
-        route_definition_index = library.get_button_value(route_object["itemid"])
-        route_definition = route_object["routedefinitions"][route_definition_index]
-        # Reset the route if any subsidaries on the route have been returned to danger
-        if int(str_route_id) != route_id and library.button_state(int(str_route_id)):
-            if signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id):
-                reset_route_highlighting(int(str_route_id))
-                library.toggle_button(int(str_route_id))
-                complete_route_cleardown(int(str_route_id))
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+        [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
+        if route_definition_index is not None:
+            route_definition = route_object["routedefinitions"][route_definition_index]
+            # Reset the route if any subsidaries on the route have been returned to danger
+            if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+                if signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id):
+                    reset_route_highlighting(int(str_route_button_id))
+                    library.toggle_button(int(str_route_button_id))
+                    complete_route_cleardown(int(str_route_button_id))
     return()
 
-def check_routes_valid_after_point_change(point_id:int, route_id:int):
-    for str_route_id in objects.route_index:
+def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
+    for str_route_button_id in objects.route_index:
         # Find the applicable route definition for the button (index stored as the button 'value')
-        route_object = objects.schematic_objects[objects.route(str_route_id)]
-        route_definition_index = library.get_button_value(route_object["itemid"])
-        route_definition = route_object["routedefinitions"][route_definition_index]
-        # Reset the route if any points on the route have been unlocked or changed
-        if int(str_route_id) != route_id and library.button_state(int(str_route_id)):
-            if str(point_id) in route_definition["pointsonroute"].keys():
-                required_state = route_definition["pointsonroute"][str(point_id)]
-                # Note the fpl_active function will return True if the point does not have a FPL
-                if library.point_switched(point_id) != required_state or not library.fpl_active(point_id):
-                    reset_route_highlighting(int(str_route_id))
-                    library.toggle_button(int(str_route_id))
-                    complete_route_cleardown(int(str_route_id))
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+        [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
+        if route_definition_index is not None:
+            route_definition = route_object["routedefinitions"][route_definition_index]
+            # Reset the route if any points on the route have been unlocked or changed
+            if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+                if str(point_id) in route_definition["pointsonroute"].keys():
+                    required_state = route_definition["pointsonroute"][str(point_id)]
+                    # Note the fpl_active function will return True if the point does not have a FPL
+                    if library.point_switched(point_id) != required_state or not library.fpl_active(point_id):
+                        reset_route_highlighting(int(str_route_button_id))
+                        library.toggle_button(int(str_route_button_id))
+                        complete_route_cleardown(int(str_route_button_id))
     return()
 
-def check_routes_valid_after_switch_change(switch_id:int, route_id:int):
+def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
     # We only really care about latching switches - not momentary switches
     switch_type = objects.schematic_objects[objects.switch(switch_id)]["itemtype"]
     if switch_type == library.button_type.switched.value:
-        for str_route_id in objects.route_index:
+        for str_route_button_id in objects.route_index:
             # Find the applicable route definition for the button (index stored as the button 'value')
-            route_object = objects.schematic_objects[objects.route(str_route_id)]
-            route_definition_index = library.get_button_value(route_object["itemid"])
-            route_definition = route_object["routedefinitions"][route_definition_index]
-            # Reset the route if any points on the route have been unlocked or changed
-            if int(str_route_id) != route_id and library.button_state(int(str_route_id)):
-                if str(switch_id) in route_definition["switchesonroute"].keys():
-                    required_state = route_definition["switchesonroute"][str(switch_id)]
-                    if library.button_state(switch_id) != required_state:
-                        reset_route_highlighting(int(str_route_id))
-                        library.toggle_button(int(str_route_id))
-                        complete_route_cleardown(int(str_route_id))
+            route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+            [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
+            if route_definition_index is not None:
+                route_definition = route_object["routedefinitions"][route_definition_index]
+                # Reset the route if any points on the route have been unlocked or changed
+                if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+                    if str(switch_id) in route_definition["switchesonroute"].keys():
+                        required_state = route_definition["switchesonroute"][str(switch_id)]
+                        if library.button_state(switch_id) != required_state:
+                            reset_route_highlighting(int(str_route_button_id))
+                            library.toggle_button(int(str_route_button_id))
+                            complete_route_cleardown(int(str_route_button_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -414,28 +426,32 @@ def check_routes_valid_after_switch_change(switch_id:int, route_id:int):
 #------------------------------------------------------------------------------------
 
 def trigger_routes_after_sensor_passed(sensor_id:int):
-    for str_route_id in objects.route_index:
+    for str_route_button_id in objects.route_index:
         # Find the applicable route definition for the button (index stored as the button 'value')
-        route_object = objects.schematic_objects[objects.route(str_route_id)]
-        route_definition_index = library.get_button_value(route_object["itemid"])
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+        [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
         route_definition = route_object["routedefinitions"][route_definition_index]
         # Process the clear down of any routes (button is always enabled if active)
-        if library.button_state(int(str_route_id)) and route_definition["exitsensor"] == sensor_id:
+        if library.button_state(int(str_route_button_id)) and route_definition["exitsensor"] == sensor_id:
             # Deselect the button
-            library.toggle_button(int(str_route_id))
+            library.toggle_button(int(str_route_button_id))
             # Schedule all the events to clear down the route
-            clear_schematic_route_callback(int(str_route_id))
+            route_button_deselected_callback(int(str_route_button_id))
         # Process the set up of any routes (button may be enabled or disabled)
-        if not library.button_state(int(str_route_id)) and route_object["setupsensor"] == sensor_id:
+        if not library.button_state(int(str_route_button_id)) and route_object["setupsensor"] == sensor_id:
+            # Find the applicable route definition for the button (index stored as the button 'value')
+            route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+            [route_definition_index, associated_button_id] = library.get_button_data(route_object["itemid"])
+            route_definition = route_object["routedefinitions"][route_definition_index]
             # Only trigger the route setup if the route can be set up (i.e. route is viable)
-            route_tooltip, route_viable = check_route_viable(str_route_id)
+            route_tooltip, route_viable = check_route_viable(route_definition)
             if route_viable:
                 # Set the button to show the route has been selected
-                library.toggle_button(int(str_route_id))
+                library.toggle_button(int(str_route_button_id))
                 # Schedule all the events to set up the route
-                set_schematic_route_callback(int(str_route_id))
+                route_button_selected_callback(int(str_route_button_id))
             else:
-                logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+str_route_id+" set-up because:"+route_tooltip)
+                logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+str_route_button_id+" set-up because:"+route_tooltip)
     return()
 
 #-------------------------------------------------------------------------------------------------
@@ -451,7 +467,7 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
 #
 # After each change, we call the appropriate event callback function in run layout to
 # complete the required processing (interlocking, aspect updates etc) to preserve the
-# overall integrity of the layout configuration. We pass the optional 'route_id' into
+# overall integrity of the layout configuration. We pass the optional 'route_button_id' into
 # these functions so this can be forwarded to the various "check routes are still valid"
 # functions in this module - This is so any changes required to set up or clear down a
 # route won't trigger a route re-set - eg set FPL off before changing a point
@@ -466,137 +482,245 @@ class schedule_task():
     def __init__(self, delay:int, function, *args):
         root.after(delay, lambda:function(*args))
 
-def set_switch_state(route_id:int, switch_id:int, state:bool):
+def set_switch_state(route_button_id:int, switch_id:int, state:bool):
     if library.button_state(switch_id) != state:
         library.toggle_button(switch_id)
-        run_layout.switch_updated_callback(switch_id, route_id)
+        run_layout.switch_updated_callback(switch_id, route_button_id)
         root.update_idletasks()
     return()
 
-def set_signal_state(route_id:int, signal_id:int, state:bool):
+def set_signal_state(route_button_id:int, signal_id:int, state:bool):
     if library.signal_clear(signal_id) != state:
         # Note if the signal is OFF and LOCKED then we always change it (Layout Reset use case)
         # Just in case the layout has got into a weird, erroneous interlocking state.
         if not library.signal_locked(signal_id) or library.signal_clear(signal_id):
             library.toggle_signal(signal_id)
-            run_layout.signal_switched_callback(signal_id, route_id)
+            run_layout.signal_switched_callback(signal_id, route_button_id)
             root.update_idletasks()
     return()
 
-def set_subsidary_state(route_id:int, signal_id:int, state:bool):
+def set_subsidary_state(route_button_id:int, signal_id:int, state:bool):
     if run_layout.has_subsidary(signal_id) and library.subsidary_clear(signal_id) != state:
         # Note if the subsidary is OFF and LOCKED then we always change it (Layout Reset use case)
         # Just in case the layout has got into a weird, erroneous interlocking state.
         if not library.subsidary_locked(signal_id) or library.subsidary_clear(signal_id):
             library.toggle_subsidary(signal_id)
-            run_layout.subsidary_switched_callback(signal_id, route_id)
+            run_layout.subsidary_switched_callback(signal_id, route_button_id)
             root.update_idletasks()
     return()
 
-def set_fpl_state(route_id:int, point_id:int, state:bool):
+def set_fpl_state(route_button_id:int, point_id:int, state:bool):
     if objects.schematic_objects[objects.point(point_id)]["hasfpl"]:
         if library.fpl_active(point_id) != state and not library.point_locked(point_id):
             library.toggle_fpl(point_id)
-            run_layout.fpl_switched_callback(point_id, route_id)
+            run_layout.fpl_switched_callback(point_id, route_button_id)
             root.update_idletasks()
     return()
 
-def set_point_state(route_id:int, point_id:int, state:bool):
+def set_point_state(route_button_id:int, point_id:int, state:bool):
     # If a point does not have a FPL then the 'has_fpl' function will return True
     point_has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
     if not point_has_fpl or not library.fpl_active(point_id):
         if library.point_switched(point_id) != state and not library.point_locked(point_id):
             library.toggle_point(point_id)
-            run_layout.point_switched_callback(point_id, route_id)
+            run_layout.point_switched_callback(point_id, route_button_id)
             root.update_idletasks()
     return()
 
-def complete_route_setup(route_id:int):
-    # Find the applicable route definition for the button (index stored as the button 'value')
-    route_object = objects.schematic_objects[objects.route(route_id)]
-    route_definition_index = library.get_button_value(route_object["itemid"])
-    route_definition = route_object["routedefinitions"][route_definition_index]
-    # Confirm the route has been set up correctly - just in case there have been any other events
-    # that invalidate the route whilst we have been working through the scheduled tasks to set it up
-    route_set_up_and_locked = True
-    for str_point_id in route_definition["pointsonroute"].keys():
-        required_state = route_definition["pointsonroute"][str_point_id]
-        # If a point does not have a FPL then the 'has_fpl' function will return True
-        if library.point_switched(int(str_point_id)) != required_state or not library.fpl_active(int(str_point_id)):
-            route_set_up_and_locked = False
-    for str_switch_id in route_definition["switchesonroute"].keys():
-        # We only care about the state of latching switches
-        switch_type = objects.schematic_objects[objects.switch(str_switch_id)]["itemtype"]
-        if switch_type == library.button_type.switched.value:
-            required_state = route_definition["switchesonroute"][str_switch_id]
-            if library.button_state(int(str_switch_id)) != required_state:
+def complete_route_setup(route_button_id:int):
+    # Find the applicable route definition for the button (index stored as the button 'data')
+    [route_definition_index, associated_button_id] = library.get_button_data(route_button_id)
+    # Only set up the route if this is not an exit button (no route definition)
+    if route_definition_index is not None:
+        route_object = objects.schematic_objects[objects.route(route_button_id)]
+        route_definition = route_object["routedefinitions"][route_definition_index]
+        # Confirm the route has been set up correctly - just in case there have been any other events
+        # that invalidate the route whilst we have been working through the scheduled tasks to set it up
+        route_set_up_and_locked = True
+        for str_point_id in route_definition["pointsonroute"].keys():
+            required_state = route_definition["pointsonroute"][str_point_id]
+            # If a point does not have a FPL then the 'has_fpl' function will return True
+            if library.point_switched(int(str_point_id)) != required_state or not library.fpl_active(int(str_point_id)):
                 route_set_up_and_locked = False
-    for int_signal_id in route_definition["signalsonroute"]:
-        if not library.signal_clear(int_signal_id):
-            route_set_up_and_locked = False
-    for int_signal_id in route_definition["subsidariesonroute"]:
-        if not library.subsidary_clear(int_signal_id):
-            route_set_up_and_locked = False
-    # If successful we update the point and line colours to highlight the route (Run Mode only)
-    # If unsuccessful we de-select the button (to show the route was not set up)
-    if run_mode and route_set_up_and_locked:
-        colour = route_object["routecolour"]
-        for point_id in route_definition["pointstohighlight"]:
-            library.set_point_colour(point_id, colour)
-        for line_id in route_definition["linestohighlight"]:
-            library.set_line_colour(line_id, colour)
-    else:
-        if library.button_state(route_id): library.toggle_button(route_id)
-    # Unlock the route button now processing is complete
-    library.unlock_button(route_id)
-    # Enable/disable all route buttons (including this one) as required
-    enable_disable_schematic_routes()
-    logging.info("RUN ROUTES - Set-up of Route "+str(route_id)+" is now complete **************************************")
+        for str_switch_id in route_definition["switchesonroute"].keys():
+            # We only care about the state of latching switches
+            switch_type = objects.schematic_objects[objects.switch(str_switch_id)]["itemtype"]
+            if switch_type == library.button_type.switched.value:
+                required_state = route_definition["switchesonroute"][str_switch_id]
+                if library.button_state(int(str_switch_id)) != required_state:
+                    route_set_up_and_locked = False
+        for int_signal_id in route_definition["signalsonroute"]:
+            if not library.signal_clear(int_signal_id):
+                route_set_up_and_locked = False
+        for int_signal_id in route_definition["subsidariesonroute"]:
+            if not library.subsidary_clear(int_signal_id):
+                route_set_up_and_locked = False
+        # If successful we update the point and line colours to highlight the route (Run Mode only)
+        # If unsuccessful we de-select the button (to show the route was not set up)
+        if run_mode and route_set_up_and_locked:
+            colour = route_object["routecolour"]
+            for point_id in route_definition["pointstohighlight"]:
+                library.set_point_colour(point_id, colour)
+            for line_id in route_definition["linestohighlight"]:
+                library.set_line_colour(line_id, colour)
+        else:
+            if library.button_state(route_button_id): library.toggle_button(route_button_id)
+        # Unlock the route button(s) now processing is complete
+        library.unlock_button(route_button_id)
+        if associated_button_id > 0:
+            library.unlock_button(associated_button_id)
+        # Enable/disable all route buttons (including this one) as required
+        enable_disable_schematic_routes()
+        logging.info("RUN ROUTES - Set-up of Route "+str(route_button_id)+" is now complete **************************************")
     return()
 
-def complete_route_cleardown(route_id:int):
+def complete_route_cleardown(route_button_id:int):
+    # Find the applicable route definition for the button (index stored as the button 'data')
+    [route_definition_index, associated_button_id] = library.get_button_data(route_button_id)
     # Unlock the route button now processing is complete
     # Note that this function will get executed in both EDIT and RUN Modes
-    library.unlock_button(route_id)
+    library.unlock_button(route_button_id)
+    if associated_button_id > 0:
+        library.unlock_button(associated_button_id)
     # Re-enable the button if the route remains viable (as something might have changed in the interim).
     # Enable/disable all route buttons (including this one) as required
     enable_disable_schematic_routes()
-    logging.info("RUN ROUTES - Clear-down of Route "+str(route_id)+" is now complete **********************************")
+    logging.info("RUN ROUTES - Clear-down of Route "+str(route_button_id)+" is now complete **********************************")
     return()
 
 #------------------------------------------------------------------------------------
-# Callback function to configure a route on the schematic. First any signals along the route
-# that are locking any points along the route (which need switching) are set to ON. Next, all
-# points are set to the correct state (unlocking/relocking FPLs before/after as required).
-# Then, all the signals along the route which are currently 'ON' are toggled to 'OFF'.
-# All these events are scheduled, to provide a realistic delay between each change. Note
-# that after each change, the layout state is re-processed to ensure all appropriate override
-# and approach control settings are applied to maintain the overall integrity of the schematic.
+# Common functions to schedule the tasks needed to reset all signals, points and DCC
+# switches back to their default states - used by the route_button_deselected_callback
+# function. Also by the reset_layout function in run_layout
+#------------------------------------------------------------------------------------
+
+def schedule_tasks_to_reset_signals(list_of_signals:list, switch_delay:int, route_button_id:int, delay:int):
+    for signal_id in list_of_signals:
+        # Note we only reset the signal to ON if not an automatic signal
+        automatic_signal = objects.schematic_objects[objects.signal(signal_id)]["fullyautomatic"]
+        if library.signal_clear(int(signal_id)) and not automatic_signal:
+            schedule_task(delay, set_signal_state, route_button_id, int(signal_id), False)
+            delay = delay + switch_delay
+    return(delay)
+
+def schedule_tasks_to_reset_subsidaries(list_of_subsidaries:list, switch_delay:int, route_button_id:int, delay:int):
+    for signal_id in list_of_subsidaries:
+        if run_layout.has_subsidary(int(signal_id)) and library.subsidary_clear(int(signal_id)):
+            schedule_task(delay, set_subsidary_state, route_button_id, int(signal_id), False)
+            delay = delay + switch_delay
+    return(delay)
+
+def schedule_tasks_to_reset_points(list_of_points:list, switch_delay:int, route_button_id:int, delay:int):
+    for point_id in list_of_points:
+        point_has_fpl = objects.schematic_objects[objects.point(str(point_id))]["hasfpl"]
+        automatic_point = objects.schematic_objects[objects.point(str(point_id))]["automatic"]
+        if not automatic_point:
+            if library.point_switched(int(point_id)):
+                if point_has_fpl and library.fpl_active(int(point_id)):
+                    schedule_task(delay, set_fpl_state, route_button_id, int(point_id), False)
+                    delay = delay + switch_delay
+                schedule_task(delay, set_point_state, route_button_id, int(point_id), False)
+                delay = delay + switch_delay
+                if point_has_fpl:
+                    schedule_task(delay, set_fpl_state, route_button_id, int(point_id), True)
+                    delay = delay + switch_delay
+            elif point_has_fpl and not library.fpl_active(int(point_id)):
+                schedule_task(delay, set_fpl_state, route_button_id, int(point_id), True)
+                delay = delay + switch_delay
+    return(delay)
+
+def schedule_tasks_to_reset_switches(list_of_switches:list, switch_delay:int, route_button_id:int, delay:int):
+    for switch_id in list_of_switches:
+        if library.button_state(int(switch_id)):
+            schedule_task(delay, set_switch_state, route_button_id, int(switch_id), False)
+            delay = delay + switch_delay
+    return(delay)
+
+#------------------------------------------------------------------------------------
+# Callback function for when a route button is SELECTED.
+#------------------------------------------------------------------------------------
+
+activated_entry_button_id = 0
+
+def route_button_selected_callback(route_button_id:int):
+    global activated_entry_button_id
+    # Retrieve the object configuration for the Route
+    route_object_id = objects.route(route_button_id)
+    route_object = objects.schematic_objects[route_object_id]
+    # Process the callback depending on the type of the route
+    if not route_object["entrybutton"] and not route_object["exitbutton"]:
+        # The state data we save to the button object is [route_index, associated_route_button_id]
+        # For 'one click' buttons we use the first route definition (index=0). There is no
+        # associated button for these routes, so we set the associated_route_button_id to 0.
+        # We can then set up the route straight away (locking the button until complete).
+        logging.info("RUN ROUTES - Initiating set-up of one-click Route "+str(route_button_id)+" *********************************")
+        library.lock_button(route_button_id)
+        library.disable_button(route_button_id, tooltip="Route set up in progress")
+        library.set_button_data(route_object["itemid"], [0, 0])
+        schedule_tasks_to_setup_schematic_route(route_button_id, 0)
+    elif route_object["exitbutton"] and activated_entry_button_id > 0:
+        # If an exit button has been activated following an entry button event then
+        # We find the index of the route definition in the entry button configuration
+        # and store this to the entry button object so it can be easily retrieved later.
+        entry_route_object = objects.schematic_objects[objects.route(activated_entry_button_id)]
+        for index, route_definition in enumerate(entry_route_object["routedefinitions"]):
+            if route_definition["exitbutton"] == route_button_id:
+                logging.info("RUN ROUTES - Initiating set-up of NX route "+str(activated_entry_button_id)+
+                                 " -> "+str(route_button_id)+" ***********************************")
+                # Lock both buttons whilst route setup in progress.
+                library.lock_button(route_button_id)
+                library.disable_button(route_button_id, tooltip="Route set up in progress")
+                library.lock_button(activated_entry_button_id)
+                library.disable_button(activated_entry_button_id, tooltip="Route set up in progress")
+                # Associate the buttons with each other and set the route definition index for the entry button
+                # The state data we save to button objects is [route_index, associated_route_button_id].
+                library.set_button_data(route_button_id, [None, activated_entry_button_id])
+                library.set_button_data(activated_entry_button_id, [index, route_button_id])
+                # Proceed to set up the route (from the entry button route definition.
+                # The activated_entry_button_id is then set to zero for the next event.
+                schedule_tasks_to_setup_schematic_route(activated_entry_button_id, index)
+                activated_entry_button_id = 0
+                break
+        # If we haven't found an entry button associated with this exit button then we need to
+        # check if the button is an entry/exit button. In this case we need to cancel down the  
+        # current route selection sequence and start a new route selection sequence.
+        # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
+        if activated_entry_button_id > 0:
+            library.toggle_button(activated_entry_button_id)
+            if route_object["entrybutton"]:
+                activated_entry_button_id = route_button_id
+                enable_disable_schematic_routes()
+            else:
+                activated_entry_button_id = 0
+    elif route_object["entrybutton"]:
+        # If an Entry button has been activated then we need to cancel down the current
+        # route selection sequence and start a new route selection sequence.
+        # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
+        if activated_entry_button_id > 0 and activated_entry_button_id != route_object["itemid"]:
+            library.toggle_button(activated_entry_button_id)
+        activated_entry_button_id = route_button_id
+        enable_disable_schematic_routes()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to configure a route on the schematic. First all Points are set to their correct
+# state (unlocking/relocking FPLs before/after as required). Secondly, all DCC Switches are
+# set to their required states. Thirdly, all the signals/subsidaries along the route which
+# are currently 'ON' are toggled to 'OFF'. Finally, all route lines are highlighted.
+# All these events are scheduled, to provide a realistic delay between each change. After
+# each change, the layout state is re-processed to ensure all appropriate override and
+# approach control settings are applied to maintain the overall integrity of the schematic.
 # Note that this function assumes the route changes are 'feasable' in that none of the points and
 # signals along the route will be locked by other points, signals or sections on the schematic.
 #------------------------------------------------------------------------------------
 
-def set_schematic_route_callback(route_id:int):
-    logging.info("RUN ROUTES - Initiating set-up of Route "+str(route_id)+" *******************************************")
-    # Lock and disable the route button (to prevent further clicks before we have finished setting up the route)
-    library.lock_button(route_id)
-    library.disable_button(route_id, tooltip="Route set up in progress")
-    # Retrieve the object configuration for the Route
-    route_object = objects.schematic_objects[objects.route(route_id)]
-    # Process the callback depending on the type of the route
-    if not route_object["entrybutton"] and not route_object["exitbutton"]:
-        # For one click buttons we just use the first route definition and store
-        # the index to this as the button 'value' so it can be retrieved later
-        route_definition = route_object["routedefinitions"][0]
-        library.set_button_value(route_object["itemid"], 0)
-    else:
-        ###########################################################################
-        route_definition = route_object["routes"][0]
-        library.set_button_value(route_object["itemid"], 0)
-        ###########################################################################
-    # Iterate through all the required point settings and schedule the tasks to change the points
-    # (disabling/enabling the FPLs as required). All the points we need to change should be unlocked
-    # (as the route setting button would have been inhibited otherwise)
+def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definition_index:int):
+    # Find the applicable route definition for the button (index stored as the button 'value')
+    route_object = objects.schematic_objects[objects.route(route_button_id)]
+    route_definition = route_object["routedefinitions"][route_definition_index]
+    # Iterate through all the required point settings and schedule the tasks to change the
+    # points(disabling/enabling the FPLs as required). All the points we need to change should
+    # be unlocked (as the route setting button would have been inhibited otherwise).
     # Note that we ignore any automatic points (i.e. points switched by another point)
     delay = route_object["switchdelay"]
     for str_point_id in route_definition["pointsonroute"].keys():
@@ -607,16 +731,16 @@ def set_schematic_route_callback(route_id:int):
         if not automatic_point and library.point_switched(int_point_id) != required_point_state:
             # We've found a point that needs changing
             if point_has_fpl and library.fpl_active(int_point_id):
-                schedule_task(delay, set_fpl_state, route_id, int_point_id, False)
+                schedule_task(delay, set_fpl_state, route_button_id, int_point_id, False)
                 delay = delay + route_object["switchdelay"]
-            schedule_task(delay, set_point_state, route_id, int_point_id, required_point_state)
+            schedule_task(delay, set_point_state, route_button_id, int_point_id, required_point_state)
             delay = delay + route_object["switchdelay"]
             if point_has_fpl:
-                schedule_task(delay, set_fpl_state, route_id, int_point_id, True)
+                schedule_task(delay, set_fpl_state, route_button_id, int_point_id, True)
                 delay = delay + route_object["switchdelay"]
         # Finally - even if the point does not require switching, we toggle the FPL on
         elif not automatic_point and point_has_fpl and not library.fpl_active(int_point_id):
-            schedule_task(delay, set_fpl_state, route_id, int_point_id, True)
+            schedule_task(delay, set_fpl_state, route_button_id, int_point_id, True)
             delay = delay + route_object["switchdelay"]
     # Iterate through all the required DCC Switch settings and schedule the tasks to change them
     for str_switch_id in route_definition["switchesonroute"].keys():
@@ -624,7 +748,7 @@ def set_schematic_route_callback(route_id:int):
         int_switch_id = int(str_switch_id)
         if library.button_state(int_switch_id) != required_switch_state:
             # We've found a switch that needs changing
-            schedule_task(delay, set_switch_state, route_id, int_switch_id, required_switch_state)
+            schedule_task(delay, set_switch_state, route_button_id, int_switch_id, required_switch_state)
             delay = delay + route_object["switchdelay"]
     # Iterate through all the signals/subsidaries in the route definition and schedule the tasks to set them OFF,
     # ensuring that we change the associated subsidary/signal to ON first (so they don't interlock each other)
@@ -633,71 +757,88 @@ def set_schematic_route_callback(route_id:int):
     for signal_id in route_definition["signalsonroute"]:
         if not library.signal_clear(signal_id):
             if run_layout.has_subsidary(signal_id) and library.subsidary_clear(signal_id):
-                schedule_task(delay, set_subsidary_state, route_id, signal_id, False)
+                schedule_task(delay, set_subsidary_state, route_button_id, signal_id, False)
                 delay = delay + route_object["switchdelay"]
-            schedule_task(delay, set_signal_state, route_id, signal_id, True)
+            schedule_task(delay, set_signal_state, route_button_id, signal_id, True)
             delay = delay + route_object["switchdelay"]
     for signal_id in route_definition["subsidariesonroute"]:
         if signal_id not in route_definition["signalsonroute"]:
             if run_layout.has_subsidary(signal_id) and not library.subsidary_clear(signal_id):
                 if library.signal_clear(signal_id):
-                    schedule_task(delay, set_signal_state, route_id, signal_id, False)
+                    schedule_task(delay, set_signal_state, route_button_id, signal_id, False)
                     delay = delay + route_object["switchdelay"]
-                schedule_task(delay, set_subsidary_state, route_id, signal_id, True)
+                schedule_task(delay, set_subsidary_state, route_button_id, signal_id, True)
                 delay = delay + route_object["switchdelay"]
     # Schedule the final task to update the colour of all points/lines to highlight the
     # route and unlock the route button so it can be selected/deselected by the user
     # This function also locks/unlocks other route buttons as required
-    schedule_task(delay, complete_route_setup, route_id)
+    schedule_task(delay, complete_route_setup, route_button_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Common functions to schedule the tasks needed to reset all signals, points and DCC
-# switches back to their default states - used by the clear_schematic_route_callback
-# function. Also by the reset_layout function in run_layout
+# Callback function for when a route button is DESELECTED.
 #------------------------------------------------------------------------------------
 
-def schedule_tasks_to_reset_signals(list_of_signals:list, switch_delay:int, route_id:int, delay:int):
-    for signal_id in list_of_signals:
-        # Note we only reset the signal to ON if not an automatic signal
-        automatic_signal = objects.schematic_objects[objects.signal(signal_id)]["fullyautomatic"]
-        if library.signal_clear(int(signal_id)) and not automatic_signal:
-            schedule_task(delay, set_signal_state, route_id, int(signal_id), False)
-            delay = delay + switch_delay
-    return(delay)
+def route_button_deselected_callback(route_button_id:int):
+    global activated_entry_button_id
+    # If this is an activated entry button (which means that an exit button has not yet been selected)
+    # then we just need need to reset the activated_entry_button_id (so the user can make a new selection)
+    if activated_entry_button_id == route_button_id:
+        activated_entry_button_id = 0
+    else:
+        # The state data we retrieve from button objects is [route_index, associated_route_button_id].
+        [route_definition_index, associated_route_button_id] = library.get_button_data(route_button_id)
+        # Lock the button(s) during route clear-down (Note 'one-click' routes only use a single button)
+        library.lock_button(route_button_id)
+        library.disable_button(route_button_id, tooltip="Route clear down in progress")
+        if associated_route_button_id > 0:
+            library.toggle_button(associated_route_button_id)
+            library.lock_button(associated_route_button_id)
+            library.disable_button(associated_route_button_id, tooltip="Route clear down in progress")
+        # If the Exit button has been de-selected we get the route definition from the entry button
+        if route_definition_index is None:
+            [route_definition_index, route_button_id] = library.get_button_data(associated_route_button_id)
+            route_button_id = associated_route_button_id
+        # Clear down the route
+        schedule_tasks_to_clear_down_schematic_route(route_button_id, route_definition_index)
+    return()
 
-def schedule_tasks_to_reset_subsidaries(list_of_subsidaries:list, switch_delay:int, route_id:int, delay:int):
-    for signal_id in list_of_subsidaries:
-        if run_layout.has_subsidary(int(signal_id)) and library.subsidary_clear(int(signal_id)):
-            schedule_task(delay, set_subsidary_state, route_id, int(signal_id), False)
-            delay = delay + switch_delay
-    return(delay)
+#------------------------------------------------------------------------------------
+# Internal function 'clear down' a route on the schematic. First all all the signals along
+# the route are toggled to 'ON'. Next, the points on the route are set to their default state
+# (unlocking/relocking FPLs before/after as required). All these events are scheduled,
+# to provide a realistic delay between each change. Note that after each change, the layout
+# state is re-processed to ensure all override and approach control settings are applied.
+#------------------------------------------------------------------------------------
 
-def schedule_tasks_to_reset_points(list_of_points:list, switch_delay:int, route_id:int, delay:int):
-    for point_id in list_of_points:
-        point_has_fpl = objects.schematic_objects[objects.point(str(point_id))]["hasfpl"]
-        automatic_point = objects.schematic_objects[objects.point(str(point_id))]["automatic"]
-        if not automatic_point:
-            if library.point_switched(int(point_id)):
-                if point_has_fpl and library.fpl_active(int(point_id)):
-                    schedule_task(delay, set_fpl_state, route_id, int(point_id), False)
-                    delay = delay + switch_delay
-                schedule_task(delay, set_point_state, route_id, int(point_id), False)
-                delay = delay + switch_delay
-                if point_has_fpl:
-                    schedule_task(delay, set_fpl_state, route_id, int(point_id), True)
-                    delay = delay + switch_delay
-            elif point_has_fpl and not library.fpl_active(int(point_id)):
-                schedule_task(delay, set_fpl_state, route_id, int(point_id), True)
-                delay = delay + switch_delay
-    return(delay)
-
-def schedule_tasks_to_reset_switches(list_of_switches:list, switch_delay:int, route_id:int, delay:int):
-    for switch_id in list_of_switches:
-        if library.button_state(int(switch_id)):
-            schedule_task(delay, set_switch_state, route_id, int(switch_id), False)
-            delay = delay + switch_delay
-    return(delay)
+def schedule_tasks_to_clear_down_schematic_route(route_button_id:int, route_definition_index:int):
+    # Find the applicable route definition for the route button. The state data
+    # we retrieve the button object is [route_index, associated_route_button_id]
+    route_object = objects.schematic_objects[objects.route(route_button_id)]
+    route_definition = route_object["routedefinitions"][route_definition_index]
+    switch_delay = route_object["switchdelay"]
+    # Unhighlight the route to show it has been de-selected
+    reset_route_highlighting(route_button_id)
+    # Schedule tasks to set all the signals along the route to ON. The "signalsonroute" and
+    # "subsidariesonroute" elements of the route object comprise a list of signal_ids.
+    delay = schedule_tasks_to_reset_signals(route_definition["signalsonroute"],
+                                            switch_delay, route_button_id, delay=0)
+    delay = schedule_tasks_to_reset_subsidaries(route_definition["subsidariesonroute"],
+                                            switch_delay, route_button_id, delay=delay)
+    # Schedule tasks to reset all the points along the route back to their default state
+    # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
+    # Note that we ignore any automatic points (i.e. points switched by another point)
+    if route_object["resetpoints"]:
+        delay = schedule_tasks_to_reset_points(route_definition["pointsonroute"].keys(),
+                                            switch_delay, route_button_id, delay=delay)
+    # Schedule tasks to reset all the DCC Switches back to "OFF"
+    if route_object["resetswitches"]:
+        delay = schedule_tasks_to_reset_switches(route_definition["switchesonroute"].keys(),
+                                            switch_delay, route_button_id, delay=delay)
+    # Schedule the final task to unlock the route button so it can be selected/deselected
+    # by the user. This function also locks/unlocks other route buttons as required
+    schedule_task(delay, complete_route_cleardown, route_button_id)
+    return()
 
 #------------------------------------------------------------------------------------
 # Functions to schedule/execute the tasks needed to reset all Route buttons back to their
@@ -707,10 +848,10 @@ def schedule_tasks_to_reset_switches(list_of_switches:list, switch_delay:int, ro
 #------------------------------------------------------------------------------------
 
 def reset_remaining_routes():
-    for route_id in objects.route_index.keys():
-        if library.button_state(int(route_id)):
-            reset_route_highlighting(int(route_id))
-            library.toggle_button(int(route_id))
+    for route_button_id in objects.route_index.keys():
+        if library.button_state(int(route_button_id)):
+            reset_route_highlighting(int(route_button_id))
+            library.toggle_button(int(route_button_id))
     enable_disable_schematic_routes()
     return()
 
@@ -718,47 +859,6 @@ def schedule_tasks_to_reset_remaining_routes(switch_delay:int, delay:int):
     schedule_task(delay, reset_remaining_routes)
     delay = delay + switch_delay
     return(delay)
-
-#------------------------------------------------------------------------------------
-# Callback function to 'clear down' a route on the schematic. First all all the signals along
-# the route are toggled to 'ON'. Next, the points on the route are set to their default state
-# (unlocking/relocking FPLs before/after as required). All these events are scheduled,
-# to provide a realistic delay between each change. Note that after each change, the layout
-# state is re-processed to ensure all override and approach control settings are applied.
-#------------------------------------------------------------------------------------
-
-def clear_schematic_route_callback(route_id:int):
-    logging.info("RUN ROUTES - Initiating clear-down of Route "+str(route_id)+" ***************************************")
-    # Lock and disable the route button (to prevent further clicks before we have finished clearing down the route)
-    library.lock_button(route_id)
-    library.disable_button(route_id, tooltip="Route clear down in progress")
-    # Find the applicable route definition for the button (index stored as the button 'value')
-    route_object = objects.schematic_objects[objects.route(route_id)]
-    route_definition_index = library.get_button_value(route_object["itemid"])
-    route_definition = route_object["routedefinitions"][route_definition_index]
-    switch_delay = route_object["switchdelay"]
-    # Unhighlight the route to show it has been de-selected
-    reset_route_highlighting(route_id)
-    # Schedule tasks to set all the signals along the route to ON. The "signalsonroute" and
-    # "subsidariesonroute" elements of the route object comprise a list of signal_ids.
-    delay = schedule_tasks_to_reset_signals(route_definition["signalsonroute"],
-                                            switch_delay, route_id, delay=0)
-    delay = schedule_tasks_to_reset_subsidaries(route_definition["subsidariesonroute"],
-                                            switch_delay, route_id, delay=delay)
-    # Schedule tasks to reset all the points along the route back to their default state
-    # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
-    # Note that we ignore any automatic points (i.e. points switched by another point)
-    if route_object["resetpoints"]:
-        delay = schedule_tasks_to_reset_points(route_definition["pointsonroute"].keys(),
-                                            switch_delay, route_id, delay=delay)
-    # Schedule tasks to reset all the DCC Switches back to "OFF"
-    if route_object["resetswitches"]:
-        delay = schedule_tasks_to_reset_switches(route_definition["switchesonroute"].keys(),
-                                            switch_delay, route_id, delay=delay)
-    # Schedule the final task to unlock the route button so it can be selected/deselected
-    # by the user. This function also locks/unlocks other route buttons as required
-    schedule_task(delay, complete_route_cleardown, route_id)
-    return()
 
 ##################################################################################################
 
