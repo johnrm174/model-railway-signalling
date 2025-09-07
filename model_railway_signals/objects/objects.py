@@ -730,7 +730,8 @@ def set_all(new_objects:dict):
             if new_object_type == objects_common.object_type.route and "routedefinitions" not in new_objects[object_id].keys():
                 for element in new_objects[object_id]:
                     if ( element == "signalsonroute" or element == "subsidariesonroute" or element == "pointsonroute" or
-                         element == "switchesonroute" or element == "linestohighlight" or element == "pointstohighlight" ):
+                         element == "switchesonroute" or element == "linestohighlight" or element == "pointstohighlight" or
+                         element == "routecolour"):
                         objects_common.schematic_objects[object_id]["routedefinitions"][0][element] = new_objects[object_id][element]
                         logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                                 " - Re-structuring route definition element: '"+element+"'")
@@ -749,6 +750,7 @@ def set_all(new_objects:dict):
                 del new_objects[object_id]["linestohighlight"]
                 del new_objects[object_id]["pointstohighlight"]
                 del new_objects[object_id]["tracksensor"]
+                del new_objects[object_id]["routecolour"]
                 new_objects[object_id]["routedefinitions"] = objects_common.schematic_objects[object_id]["routedefinitions"]
             else:
             #########################################################################################################

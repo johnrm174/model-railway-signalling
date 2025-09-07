@@ -220,13 +220,13 @@ class route_configuration_tab():
         self.frame1subframe4.pack(fill="y", expand=True)
         self.frame1subframe4label1 = Tk.Label(self.frame1subframe4, text="Chars:")
         self.frame1subframe4label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.buttonwidth = common.integer_entry_box(self.frame1subframe4, width=3, min_value=5,
-                    max_value= 25, tool_tip="Specify the width of the button (5 to 25 characters)")
+        self.buttonwidth = common.integer_entry_box(self.frame1subframe4, width=3, min_value=2,
+                    max_value= 25, tool_tip="Specify the width of the button (2 to 25 characters)")
         self.buttonwidth.pack(side=Tk.LEFT, padx=2, pady=2)
         #----------------------------------------------------------------------------------
         # Create a Label Frame for the Button information elements (Frame 2)
         #----------------------------------------------------------------------------------
-        self.frame2 = Tk.LabelFrame(self.main_frame, text="Route button information")
+        self.frame2 = Tk.LabelFrame(self.main_frame, text="Route button information (Run Mode Tooltip)")
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.description = common.scrollable_text_frame(self.frame2, max_height=4, max_width=28,
                 min_height=2, min_width=28, editable=True, auto_resize=False)
@@ -274,39 +274,31 @@ class route_configuration_tab():
         #----------------------------------------------------------------------------------
         # Create the general Route settings UI Elements (frame 11)
         #----------------------------------------------------------------------------------
-        self.frame11 = Tk.Frame(self.main_frame)
+        self.frame11 = Tk.LabelFrame(self.main_frame, text="Route settings")
         self.frame11.pack(padx=2, pady=2, fill='x')
-        # Left hand Frame to hold route colour and switching delay
-        self.frame11a = Tk.Frame(self.frame11)
-        self.frame11a.pack(side=Tk.LEFT, fill="both", expand=True)
-        self.routecolour = common.colour_selection(self.frame11a, label="Route highlighting")
-        self.routecolour.pack(padx=2, pady=2, fill='both', expand=True)
-        self.frame11asubframe1 = Tk.LabelFrame(self.frame11a, text="Switch delay (ms):")
-        self.frame11asubframe1.pack(padx=2, pady=2, fill="both", expand=True)
-        self.delay = common.integer_entry_box(self.frame11asubframe1, width=5, min_value=0, max_value= 5000,
+        # Create a subframe for the switching delay II Elements
+        self.frame11subframe1 = Tk.Frame(self.frame11)
+        self.frame11subframe1.pack(padx=2, pady=0)
+        self.frame11label1 = Tk.Label(self.frame11subframe1, text="Set-up / clear-down switching delay (ms):")
+        self.frame11label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.delay = common.integer_entry_box(self.frame11subframe1, width=5, min_value=0, max_value= 5000,
                     tool_tip="Specify the time delay between signal and/or point switching events when "+
                                               "setting up and clearing down the route (0-5000ms)")
-        self.delay.pack(padx=2, pady=2)
-        # Right hand Frame to hold other route settings
-        self.frame11b = Tk.LabelFrame(self.frame11, text="Route settings")
-        self.frame11b.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
-        # Create a subframe to center everything horizontally and vertically
-        self.frame11bsubframe1 = Tk.Frame(self.frame11b)
-        self.frame11bsubframe1.pack()
+        self.delay.pack(side=Tk.LEFT, padx=2, pady=0)
         # Track Sensor for route set up
-        self.frame11bsubframe2 = Tk.Frame(self.frame11bsubframe1)
-        self.frame11bsubframe2.pack()
-        self.frame11bsubframe2label1 = Tk.Label(self.frame11bsubframe2, text="Track Sensor for route setup:")
-        self.frame11bsubframe2label1.pack(padx=2, side=Tk.LEFT)
-        self.setupsensor = common.int_item_id_entry_box(self.frame11bsubframe2, exists_function=library.track_sensor_exists,
+        self.frame11subframe2 = Tk.Frame(self.frame11)
+        self.frame11subframe2.pack()
+        self.frame11label2 = Tk.Label(self.frame11subframe2, text="Track Sensor to trigger route setup:")
+        self.frame11label2.pack(padx=2, side=Tk.LEFT)
+        self.setupsensor = common.int_item_id_entry_box(self.frame11subframe2, exists_function=library.track_sensor_exists,
                 tool_tip="Enter the ID of a track sensor to automatically trigger the setup of the route when the sensor "+
                     "is passed ('one-click' routes only). The route will only be setup if it is 'unlocked'.")
         self.setupsensor.pack(padx=2, side=Tk.LEFT)
         # Reset Points and switches on Route Deselection
-        self.resetpoints = common.check_box(self.frame11bsubframe1, label="Reset points on deselection",
+        self.resetpoints = common.check_box(self.frame11, label="Reset points on route deselection  ",
                 tool_tip="Select to reset all points back to their default state when route is deselected")
         self.resetpoints.pack(padx=2, pady=0)
-        self.resetswitches = common.check_box(self.frame11bsubframe1, label="Reset Switches on deselection",
+        self.resetswitches = common.check_box(self.frame11, label="Reset switches on routedeselection",
                 tool_tip="Select to reset all DCC Switches back to 'OFF' when route is deselected")
         self.resetswitches.pack(padx=2, pady=0)
 
@@ -327,24 +319,37 @@ class route_definition_tab(Tk.Frame):
         #----------------------------------------------------------------------------------
         # Create the mroute type-specific configuration elements
         #----------------------------------------------------------------------------------
-        self.frame1 = Tk.LabelFrame(self, text="NX route configuration")
-        self.frame1.pack(padx=2, pady=2, fill='x')
-        self.frame1subframe = Tk.Frame(self.frame1)
-        self.frame1subframe.pack()
-        self.exitbuttonlabel = Tk.Label(self.frame1subframe, text="Exit (X) button:")
+        self.frame1 = Tk.Frame(self)
+        self.frame1.pack(fill='x')
+        self.frame1subframe1 = Tk.LabelFrame(self.frame1, text="NX route configuration")
+        self.frame1subframe1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.exitbuttonlabel = Tk.Label(self.frame1subframe1, text="Exit (X) button:")
         self.exitbuttonlabel.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.exitbutton = common.int_item_id_entry_box(self.frame1subframe, tool_tip="Enter the ID of the exit "+
+        self.exitbutton = common.int_item_id_entry_box(self.frame1subframe1, tool_tip="Enter the ID of the exit "+
                "button (or entry / exit button) associated with this route", exists_function=objects.route_exists)
         self.exitbutton.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.frame1Label2 = Tk.Label(self.frame1subframe, text="     ")
+        self.frame1Label2 = Tk.Label(self.frame1subframe1, text="     ")
         self.frame1Label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.addbutton = Tk.Button(self.frame1subframe, text="New NX route", command=lambda:add_route_callback(tab_id))
+        self.addbutton = Tk.Button(self.frame1subframe1, text="+", command=lambda:add_route_callback(tab_id))
         self.addbutton.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.addbutton, text="Select to add a new NX route definition tab")
-        if tab_id > 0:
-            self.deletebutton = Tk.Button(self.frame1subframe, text="Delete route", command=lambda:delete_route_callback(tab_id))
-            self.deletebutton.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.TT2 = common.CreateToolTip(self.deletebutton, text="Select to delete the current NX route definition tab")
+        self.deletebutton = Tk.Button(self.frame1subframe1, text="-", command=lambda:delete_route_callback(tab_id))
+        self.deletebutton.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = common.CreateToolTip(self.deletebutton, text="Select to delete the current NX route definition tab")
+        if tab_id == 0: self.deletebutton.config(state="disabled")
+        #----------------------------------------------------------------------------------
+        # Create a Label Frame for the Route Colour chooser (Frame 3)
+        #----------------------------------------------------------------------------------
+        self.routecolour = common.colour_selection(self.frame1, label="Route highlighting")
+        self.routecolour.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        #----------------------------------------------------------------------------------
+        # Create a Label Frame for the Route information elements (Frame 2)
+        #----------------------------------------------------------------------------------
+        self.frame2 = Tk.LabelFrame(self, text="Route definition notes")
+        self.frame2.pack(padx=2, pady=2, fill='x')
+        self.routenotes = common.scrollable_text_frame(self.frame2, max_height=4, max_width=28,
+                min_height=2, min_width=28, editable=True, auto_resize=False)
+        self.routenotes.pack(padx=2, pady=2, fill='both', expand=True)
         #----------------------------------------------------------------------------------
         # Create the point, signal, subsidary and switch entry lists (frames 5,6,7,8)
         #----------------------------------------------------------------------------------
@@ -435,7 +440,7 @@ class route_definition_tab(Tk.Frame):
         self.addbutton.config(state="disabled")
         self.exitbuttonlabel.config(state="disabled")
 
-    def reset_values(self):
+    def reset_values(self, colour:str="Black"):
         self.exitbutton.set_value(0)
         self.exitsensor.set_value(0)
         self.signals.set_values([])
@@ -444,9 +449,12 @@ class route_definition_tab(Tk.Frame):
         self.highlightpoints.set_values([])
         self.points.set_values([])
         self.switches.set_values([])
+        self.routecolour.set_value(colour)
 
     def set_values(self, route_definition:dict, ):
         # Set the tab heading
+        self.routecolour.set_value(route_definition["routecolour"])
+        self.routenotes.set_value(route_definition["routenotes"])
         self.exitbutton.set_value(route_definition["exitbutton"])
         self.exitsensor.set_value(route_definition["exitsensor"])
         self.signals.set_values(route_definition["signalsonroute"])
@@ -473,6 +481,8 @@ class route_definition_tab(Tk.Frame):
         # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
         # as it simplifies processing in run_layout. However, the UI element returns a list of lists along
         # the lines of [[1:True], [3:False]] so we have to convert it before saving in the configuration.
+        route_definition["routecolour"] = self.routecolour.get_value()
+        route_definition["routenotes"] = self.routenotes.get_value()
         route_definition["exitbutton"] = self.exitbutton.get_value()
         route_definition["exitsensor"] = self.exitsensor.get_value()
         route_definition["signalsonroute"] = self.signals.get_values()
@@ -517,7 +527,7 @@ class route_definition_tabs():
     def add_route(self, after_tab:int):
         self.list_of_routes.append(route_definition_tab(self.notebook_object,len(self.list_of_routes),
                                                          self.add_route, self.delete_route))
-        self.list_of_routes[-1].reset_values()
+        self.list_of_routes[-1].reset_values(colour=self.list_of_routes[0].routecolour.get_value())
         if self.entry_button or self.exit_button: self.list_of_routes[-1].enable()
         else: self.list_of_routes[-1].disable()
 
@@ -543,6 +553,13 @@ class route_definition_tabs():
         for route in self.list_of_routes:
             if route is not None and not route.validate() : valid = False
         return(valid)
+
+    def colour_chooser_is_open(self):
+        colour_chooser_open = False
+        for route in self.list_of_routes:
+            if route is not None and route.routecolour.is_open():
+                colour_chooser_open = True
+        return(colour_chooser_open)
 
     def route_type_updated(self, entry_button:bool, exit_button:bool):
         self.entry_button = entry_button
@@ -623,7 +640,6 @@ class edit_route():
             exit_button = objects.schematic_objects[self.object_id]["exitbutton"]
             self.config.routetype.set_values(entry_button, exit_button)
             # General route button settings
-            self.config.routecolour.set_value(objects.schematic_objects[self.object_id]["routecolour"])
             self.config.buttonname.set_value(objects.schematic_objects[self.object_id]["routename"])
             self.config.description.set_value(objects.schematic_objects[self.object_id]["routedescription"])
             self.config.delay.set_value(objects.schematic_objects[self.object_id]["switchdelay"])
@@ -664,7 +680,6 @@ class edit_route():
             new_object_configuration["exitbutton"] = exit_button
             # General route button settings
             new_object_configuration["itemid"] = self.config.routeid.get_value()
-            new_object_configuration["routecolour"] = self.config.routecolour.get_value()
             new_object_configuration["routename"] = self.config.buttonname.get_value()
             new_object_configuration["routedescription"] = self.config.description.get_value()
             new_object_configuration["switchdelay"] = self.config.delay.get_value()
@@ -692,7 +707,7 @@ class edit_route():
     def close_window(self):
         # Prevent the dialog being closed if the colour chooser is still open as
         # for some reason this doesn't get destroyed when the parent is destroyed
-        if not self.config.routecolour.is_open() and not self.config.buttoncolour.is_open():
+        if not self.routes.colour_chooser_is_open() and not self.config.buttoncolour.is_open():
             self.window.destroy()
             del open_windows[self.object_id]
 

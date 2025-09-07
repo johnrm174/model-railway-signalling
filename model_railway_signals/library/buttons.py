@@ -53,6 +53,9 @@
 #   lock_button(button_id:int) - lock the button (to prevent it being enabled)
 #   unlock_button(button_id:int, tooltip:str) - unlock the button (to allow it to be enabled)
 #
+#   set_button_flashing(button_id:int) - Start flashing the button
+#   reset_button_flashing(button_id:int) - stop flashing the button
+#
 #   get_button_data(button_id:int) - retrieve the button object's data
 #   set_button_data(button_id:int, data) - set a value for the button object
 #
@@ -291,6 +294,59 @@ def get_button_data(button_id:int):
     else:
         data_to_return = buttons[str(button_id)]["buttondata"]
     return(data_to_return)
+
+#---------------------------------------------------------------------------------------------
+# API functions to store / retrieve additional state data to be associated with a button.
+# Used primarily for NX route buttons, to store the route index and associated NX button.
+#---------------------------------------------------------------------------------------------
+
+def flash_button1(button_id:int):
+    if button_exists(button_id):
+        if buttons[str(button_id)]["flashbutton"]:
+            buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["selectedcolour"])
+            common.root_window.after(250, lambda:flash_button2(button_id))
+        else:
+            reset_button_colour_according_to_state(button_id)
+    return()
+
+def flash_button2(button_id:int):
+    if button_exists(button_id):
+        if buttons[str(button_id)]["flashbutton"]:
+            buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["deselectedcolour"])
+            common.root_window.after(250, lambda:flash_button1(button_id))
+        else:
+            reset_button_colour_according_to_state(button_id)
+    return()
+
+def reset_button_colour_according_to_state(button_id:int):
+    if buttons[str(button_id)]["selected"]:
+        buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["selectedcolour"])
+    else:
+        buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["deselectedcolour"])
+    return()
+
+def set_button_flashing(button_id:int):
+    global buttons
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": set_button_flashing - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": set_button_flashing - Button ID does not exist")
+    else:
+        buttons[str(button_id)]["flashbutton"] = True
+        flash_button1(button_id)
+    return()
+
+def reset_button_flashing(button_id:int):
+    global buttons
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": reset_button_flashing - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": reset_button_flashing - Button ID does not exist")
+    else:
+        buttons[str(button_id)]["flashbutton"] = False
+    return()
 
 #---------------------------------------------------------------------------------------------
 # API function to get the current state of a Button (selected or unselected)

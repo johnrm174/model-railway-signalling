@@ -140,6 +140,8 @@ from .buttons import unlock_button
 from .buttons import button_state
 from .buttons import set_button_data
 from .buttons import get_button_data
+from .buttons import set_button_flashing
+from .buttons import reset_button_flashing
 from .buttons import update_button_styles
 
 from .dcc_control import get_dcc_address_mappings
@@ -360,6 +362,8 @@ __all__ = [
         'button_state',
         'get_button_data',
         'set_button_data',
+        'set_button_flashing',
+        'reset_button_flashing',
       # Public file interface functions
         'save_schematic',
         'load_schematic',

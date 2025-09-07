@@ -69,7 +69,7 @@ default_route_object = copy.deepcopy(objects_common.default_object)
 #------------------------------------------------------------------------------------
 default_route_object["item"] = objects_common.object_type.route
 default_route_object["routename"] = "Route"
-default_route_object["routedescription"] = "Route description (Run Mode tooltip)"
+default_route_object["routedescription"] = "Route Button description (Run Mode tooltip)"
 # Styles are initially set to the default styles (defensive programming)
 default_route_object["buttonwidth"] = settings.get_style("routebuttons", "buttonwidth")
 default_route_object["buttoncolour"] = settings.get_style("routebuttons", "buttoncolour")
@@ -82,7 +82,6 @@ default_route_object["textfonttuple"] = settings.get_style("routebuttons", "text
 default_route_object["entrybutton"] = False
 default_route_object["exitbutton"] = False
 # Other object-specific parameters
-default_route_object["routecolour"] = "black"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
 default_route_object["resetswitches"] = False
@@ -92,6 +91,8 @@ default_route_object["setupsensor"] = 0
 # definitions stored as a list (the default is a single 'normal' route definition).
 #------------------------------------------------------------------------------------
 default_route_definition = {}
+default_route_definition["routenotes"] = "Notes related to the route"
+default_route_definition["routecolour"] = "black"
 # The "exitbutton" defines the exit button associated with an 'entry' route button
 # A value of zero (no exit button) means that the route button is for a 'normal' route
 default_route_definition["exitbutton"] = 0
@@ -392,7 +393,7 @@ def create_route(xpos:int, ypos:int):
     item_id = objects_common.new_item_id(exists_function=library.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["routename"] = "Route "+str(item_id)
+    objects_common.schematic_objects[object_id]["routename"] = str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
@@ -417,7 +418,6 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=library.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
-    objects_common.schematic_objects[new_object_id]["routename"] = "Route "+str(new_id)
     objects_common.route_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax

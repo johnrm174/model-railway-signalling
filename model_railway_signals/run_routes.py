@@ -329,6 +329,7 @@ def initialise_all_schematic_routes():
     if not run_mode:
         for str_route_button_id in objects.route_index.keys():
             if library.button_state(int(str_route_button_id)):
+                unhighlight_possible_routes(int(str_route_button_id))
                 library.toggle_button(int(str_route_button_id))
                 reset_route_highlighting(int(str_route_button_id))
                 complete_route_cleardown(int(str_route_button_id))
@@ -337,6 +338,7 @@ def initialise_all_schematic_routes():
     else:
         for str_route_button_id in objects.route_index.keys():
             if not library.button_state(int(str_route_button_id)):
+                unhighlight_possible_routes(int(str_route_button_id))
                 reset_route_highlighting(int(str_route_button_id))
                 complete_route_cleardown(int(str_route_button_id))
         for str_route_button_id in objects.route_index.keys():
@@ -451,7 +453,8 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
                 # Schedule all the events to set up the route
                 route_button_selected_callback(int(str_route_button_id))
             else:
-                logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+str_route_button_id+" set-up because:"+route_tooltip)
+                logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+
+                                   str_route_button_id+" set-up because:"+route_tooltip)
     return()
 
 #-------------------------------------------------------------------------------------------------
@@ -558,7 +561,7 @@ def complete_route_setup(route_button_id:int):
         # If successful we update the point and line colours to highlight the route (Run Mode only)
         # If unsuccessful we de-select the button (to show the route was not set up)
         if run_mode and route_set_up_and_locked:
-            colour = route_object["routecolour"]
+            colour = route_definition["routecolour"]
             for point_id in route_definition["pointstohighlight"]:
                 library.set_point_colour(point_id, colour)
             for line_id in route_definition["linestohighlight"]:
@@ -678,6 +681,7 @@ def route_button_selected_callback(route_button_id:int):
                 library.set_button_data(activated_entry_button_id, [index, route_button_id])
                 # Proceed to set up the route (from the entry button route definition.
                 # The activated_entry_button_id is then set to zero for the next event.
+                unhighlight_possible_routes(activated_entry_button_id)
                 schedule_tasks_to_setup_schematic_route(activated_entry_button_id, index)
                 activated_entry_button_id = 0
                 break
@@ -686,20 +690,46 @@ def route_button_selected_callback(route_button_id:int):
         # current route selection sequence and start a new route selection sequence.
         # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
         if activated_entry_button_id > 0:
-            library.toggle_button(activated_entry_button_id)
+            unhighlight_possible_routes(activated_entry_button_id)
+            if library.button_state(activated_entry_button_id):
+                library.toggle_button(activated_entry_button_id)
             if route_object["entrybutton"]:
                 activated_entry_button_id = route_button_id
-                enable_disable_schematic_routes()
+                highlight_possible_routes(route_button_id)
             else:
                 activated_entry_button_id = 0
+            enable_disable_schematic_routes()
     elif route_object["entrybutton"]:
         # If an Entry button has been activated then we need to cancel down the current
         # route selection sequence and start a new route selection sequence.
         # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
-        if activated_entry_button_id > 0 and activated_entry_button_id != route_object["itemid"]:
-            library.toggle_button(activated_entry_button_id)
+        if activated_entry_button_id > 0 and activated_entry_button_id != route_button_id:
+            unhighlight_possible_routes(activated_entry_button_id)
+            if library.button_state(activated_entry_button_id):
+                library.toggle_button(activated_entry_button_id)
         activated_entry_button_id = route_button_id
+        highlight_possible_routes(route_button_id)
         enable_disable_schematic_routes()
+    return()
+
+def highlight_possible_routes(route_button_id:int):
+    # Find the applicable route definition
+    route_object = objects.schematic_objects[objects.route(route_button_id)]
+    # Find out what routes are viable and set them to flash
+    for route_definition in route_object["routedefinitions"]:
+        route_tooltip, route_viable = check_route_viable(route_definition)
+        if route_viable and route_definition["exitbutton"] > 0:
+            library.set_button_flashing(route_definition["exitbutton"])
+    return()
+
+def unhighlight_possible_routes(route_button_id:int):
+    # Find the applicable route definition
+    route_object = objects.schematic_objects[objects.route(route_button_id)]
+    # Find out what routes are viable and set them to flash
+    for route_definition in route_object["routedefinitions"]:
+        route_tooltip, route_viable = check_route_viable(route_definition)
+        if route_viable and route_definition["exitbutton"] > 0:
+            library.reset_button_flashing(route_definition["exitbutton"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -715,7 +745,7 @@ def route_button_selected_callback(route_button_id:int):
 #------------------------------------------------------------------------------------
 
 def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definition_index:int):
-    # Find the applicable route definition for the button (index stored as the button 'value')
+    # Find the applicable route definition
     route_object = objects.schematic_objects[objects.route(route_button_id)]
     route_definition = route_object["routedefinitions"][route_definition_index]
     # Iterate through all the required point settings and schedule the tasks to change the
@@ -785,6 +815,8 @@ def route_button_deselected_callback(route_button_id:int):
     # then we just need need to reset the activated_entry_button_id (so the user can make a new selection)
     if activated_entry_button_id == route_button_id:
         activated_entry_button_id = 0
+        unhighlight_possible_routes(route_button_id)
+        enable_disable_schematic_routes()
     else:
         # The state data we retrieve from button objects is [route_index, associated_route_button_id].
         [route_definition_index, associated_route_button_id] = library.get_button_data(route_button_id)
@@ -792,7 +824,8 @@ def route_button_deselected_callback(route_button_id:int):
         library.lock_button(route_button_id)
         library.disable_button(route_button_id, tooltip="Route clear down in progress")
         if associated_route_button_id > 0:
-            library.toggle_button(associated_route_button_id)
+            if library.button_state(associated_route_button_id):
+                library.toggle_button(associated_route_button_id)
             library.lock_button(associated_route_button_id)
             library.disable_button(associated_route_button_id, tooltip="Route clear down in progress")
         # If the Exit button has been de-selected we get the route definition from the entry button
@@ -812,8 +845,7 @@ def route_button_deselected_callback(route_button_id:int):
 #------------------------------------------------------------------------------------
 
 def schedule_tasks_to_clear_down_schematic_route(route_button_id:int, route_definition_index:int):
-    # Find the applicable route definition for the route button. The state data
-    # we retrieve the button object is [route_index, associated_route_button_id]
+    # Find the applicable route definition.
     route_object = objects.schematic_objects[objects.route(route_button_id)]
     route_definition = route_object["routedefinitions"][route_definition_index]
     switch_delay = route_object["switchdelay"]

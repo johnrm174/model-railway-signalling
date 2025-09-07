@@ -1198,10 +1198,10 @@ def reset_layout(switch_delay:int=0):
         library.set_instrument_blocked(int(instrument_id))
     # Everything else needs to be scheduled with the specified delay so for large layouts with lots
     # of points, signals and DCC accessories we don't overload the bus by changing everything at once.
-    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_id=0, delay=0)
-    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index, switch_delay, route_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index, switch_delay, route_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index, switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_button_id=0, delay=0)
+    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index, switch_delay, route_button_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index, switch_delay, route_button_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index, switch_delay, route_button_id=0, delay=delay)
     # Finally, we schedule the task to clear down any routes that do not get automatically cleared down
     # as they are invalidated by the reset of the points, signals and switches in the route configuration
     delay = run_routes.schedule_tasks_to_reset_remaining_routes(switch_delay, delay=delay)
