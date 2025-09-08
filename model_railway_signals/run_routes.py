@@ -78,7 +78,6 @@ root = None
 canvas = None
 run_mode = None
 automation_enabled = None
-spad_popups = False
 
 #------------------------------------------------------------------------------------
 # The initialise function is called at application startup (on canvas creation)
@@ -363,7 +362,7 @@ def check_routes_valid_after_signal_change(signal_id:int, route_button_id:int):
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any signals on the route have been returned to danger
-            if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+            if int(str_route_button_id) != route_button_id:
                 if signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id):
                     reset_route_highlighting(int(str_route_button_id))
                     library.toggle_button(int(str_route_button_id))
@@ -378,7 +377,7 @@ def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any subsidaries on the route have been returned to danger
-            if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+            if int(str_route_button_id) != route_button_id:
                 if signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id):
                     reset_route_highlighting(int(str_route_button_id))
                     library.toggle_button(int(str_route_button_id))
@@ -393,7 +392,7 @@ def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any points on the route have been unlocked or changed
-            if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+            if int(str_route_button_id) != route_button_id:
                 if str(point_id) in route_definition["pointsonroute"].keys():
                     required_state = route_definition["pointsonroute"][str(point_id)]
                     # Note the fpl_active function will return True if the point does not have a FPL
@@ -414,7 +413,7 @@ def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
             if route_definition_index is not None:
                 route_definition = route_object["routedefinitions"][route_definition_index]
                 # Reset the route if any points on the route have been unlocked or changed
-                if int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id)):
+                if int(str_route_button_id) != route_button_id:
                     if str(switch_id) in route_definition["switchesonroute"].keys():
                         required_state = route_definition["switchesonroute"][str(switch_id)]
                         if library.button_state(switch_id) != required_state:
@@ -661,6 +660,7 @@ def route_button_selected_callback(route_button_id:int):
         library.disable_button(route_button_id, tooltip="Route set up in progress")
         library.set_button_data(route_object["itemid"], [0, 0])
         schedule_tasks_to_setup_schematic_route(route_button_id, 0)
+        activated_entry_button_id = 0
     elif route_object["exitbutton"] and activated_entry_button_id > 0:
         # If an exit button has been activated following an entry button event then
         # We find the index of the route definition in the entry button configuration
@@ -718,7 +718,10 @@ def highlight_possible_routes(route_button_id:int):
     # Find out what routes are viable and set them to flash
     for route_definition in route_object["routedefinitions"]:
         route_tooltip, route_viable = check_route_viable(route_definition)
-        if route_viable and route_definition["exitbutton"] > 0:
+        # If the Exit button is already active then this is the case of a user trying to set up a 'sub-route'
+        # of a route (or vice-versa), where both routes will share the same Exit Button. In this case we don't
+        # want to flash the exit button as a viable route option
+        if route_viable and route_definition["exitbutton"] > 0 and not library.button_state(route_definition["exitbutton"]):
             library.set_button_flashing(route_definition["exitbutton"])
     return()
 
@@ -811,12 +814,20 @@ def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definitio
 
 def route_button_deselected_callback(route_button_id:int):
     global activated_entry_button_id
-    # If this is an activated entry button (which means that an exit button has not yet been selected)
+    # If this is the activated entry button (which means that an exit button has not yet been selected)
     # then we just need need to reset the activated_entry_button_id (so the user can make a new selection)
     if activated_entry_button_id == route_button_id:
-        activated_entry_button_id = 0
         unhighlight_possible_routes(route_button_id)
         enable_disable_schematic_routes()
+        activated_entry_button_id = 0
+    elif activated_entry_button_id > 0:
+        # If a route selection sequence is still in progress then we ignore any other button deselections
+        # Thids mean we need to toggle the deselected button back to ON and the activated entry button to OFF
+        library.toggle_button(route_button_id)
+        library.toggle_button(activated_entry_button_id)
+        unhighlight_possible_routes(activated_entry_button_id)
+        enable_disable_schematic_routes()
+        activated_entry_button_id = 0
     else:
         # The state data we retrieve from button objects is [route_index, associated_route_button_id].
         [route_definition_index, associated_route_button_id] = library.get_button_data(route_button_id)
@@ -824,8 +835,7 @@ def route_button_deselected_callback(route_button_id:int):
         library.lock_button(route_button_id)
         library.disable_button(route_button_id, tooltip="Route clear down in progress")
         if associated_route_button_id > 0:
-            if library.button_state(associated_route_button_id):
-                library.toggle_button(associated_route_button_id)
+            library.toggle_button(associated_route_button_id)
             library.lock_button(associated_route_button_id)
             library.disable_button(associated_route_button_id, tooltip="Route clear down in progress")
         # If the Exit button has been de-selected we get the route definition from the entry button
@@ -881,6 +891,7 @@ def schedule_tasks_to_clear_down_schematic_route(route_button_id:int, route_defi
 
 def reset_remaining_routes():
     for route_button_id in objects.route_index.keys():
+        library.reset_button_flashing(int(route_button_id))
         if library.button_state(int(route_button_id)):
             reset_route_highlighting(int(route_button_id))
             library.toggle_button(int(route_button_id))
