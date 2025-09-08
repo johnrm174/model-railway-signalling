@@ -362,11 +362,11 @@ def check_routes_valid_after_signal_change(signal_id:int, route_button_id:int):
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any signals on the route have been returned to danger
-            if int(str_route_button_id) != route_button_id:
-                if signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id):
-                    reset_route_highlighting(int(str_route_button_id))
-                    library.toggle_button(int(str_route_button_id))
-                    complete_route_cleardown(int(str_route_button_id))
+            if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
+                    and signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id) ):
+                reset_route_highlighting(int(str_route_button_id))
+                library.toggle_button(int(str_route_button_id))
+                complete_route_cleardown(int(str_route_button_id))
     return()
 
 def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int):
@@ -377,11 +377,11 @@ def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any subsidaries on the route have been returned to danger
-            if int(str_route_button_id) != route_button_id:
-                if signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id):
-                    reset_route_highlighting(int(str_route_button_id))
-                    library.toggle_button(int(str_route_button_id))
-                    complete_route_cleardown(int(str_route_button_id))
+            if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
+                    and signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id) ):
+                reset_route_highlighting(int(str_route_button_id))
+                library.toggle_button(int(str_route_button_id))
+                complete_route_cleardown(int(str_route_button_id))
     return()
 
 def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
@@ -392,14 +392,14 @@ def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any points on the route have been unlocked or changed
-            if int(str_route_button_id) != route_button_id:
-                if str(point_id) in route_definition["pointsonroute"].keys():
-                    required_state = route_definition["pointsonroute"][str(point_id)]
-                    # Note the fpl_active function will return True if the point does not have a FPL
-                    if library.point_switched(point_id) != required_state or not library.fpl_active(point_id):
-                        reset_route_highlighting(int(str_route_button_id))
-                        library.toggle_button(int(str_route_button_id))
-                        complete_route_cleardown(int(str_route_button_id))
+            if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
+                     and str(point_id) in route_definition["pointsonroute"].keys() ):
+                required_state = route_definition["pointsonroute"][str(point_id)]
+                # Note the fpl_active function will return True if the point does not have a FPL
+                if library.point_switched(point_id) != required_state or not library.fpl_active(point_id):
+                    reset_route_highlighting(int(str_route_button_id))
+                    library.toggle_button(int(str_route_button_id))
+                    complete_route_cleardown(int(str_route_button_id))
     return()
 
 def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
@@ -413,13 +413,13 @@ def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
             if route_definition_index is not None:
                 route_definition = route_object["routedefinitions"][route_definition_index]
                 # Reset the route if any points on the route have been unlocked or changed
-                if int(str_route_button_id) != route_button_id:
-                    if str(switch_id) in route_definition["switchesonroute"].keys():
-                        required_state = route_definition["switchesonroute"][str(switch_id)]
-                        if library.button_state(switch_id) != required_state:
-                            reset_route_highlighting(int(str_route_button_id))
-                            library.toggle_button(int(str_route_button_id))
-                            complete_route_cleardown(int(str_route_button_id))
+                if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
+                        and str(switch_id) in route_definition["switchesonroute"].keys() ):
+                    required_state = route_definition["switchesonroute"][str(switch_id)]
+                    if library.button_state(switch_id) != required_state:
+                        reset_route_highlighting(int(str_route_button_id))
+                        library.toggle_button(int(str_route_button_id))
+                        complete_route_cleardown(int(str_route_button_id))
     return()
 
 #------------------------------------------------------------------------------------
