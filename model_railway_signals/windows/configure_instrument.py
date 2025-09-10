@@ -29,7 +29,7 @@
 
 import os
 import copy
-import importlib.resources
+import pathlib
 
 import tkinter as Tk
 from tkinter import ttk
@@ -159,24 +159,25 @@ class sound_file_element(common.entry_box):
         self.child_windows_open = True
         # Use the library resources folder for the initial path for the file dialog
         # But the user can navigate away and use another sound file from somewhere else
-        with importlib.resources.files('model_railway_signals.library') / 'resources' as initial_path:
-            filename = Tk.filedialog.askopenfilename(title='Select Audio File', initialdir = initial_path,
-                    filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self.frame)
-            # Try loading/playing the selected file - with an error popup if it fails
-            if filename != () and filename != "":
-                try:
-                    simpleaudio.WaveObject.from_wave_file(filename).play()
-                except:
-                    Tk.messagebox.showerror(parent=self.frame, title="Load Error",
-                                message="Error loading audio file '"+str(filename)+"'")
-                else:
-                    # Set the filename entry to the name of the current file (split from the dir path)
-                    self.set_value(os.path.split(filename)[1])
-                    # If a resources file has been chosen then strip off the path to aid cross-platform
-                    # transfer of layout files (where the path to the resource folder may be different)
-                    if os.path.split(filename)[0] == str(initial_path):
-                        filename = os.path.split(filename)[1]
-                    self.full_filename = filename
+        current_folder = pathlib.Path(__file__).parent
+        library_resources_folder = current_folder.parent / 'library/resources'
+        filename = Tk.filedialog.askopenfilename(title='Select Audio File', initialdir = library_resources_folder,
+                        filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self.frame)
+        # Try loading/playing the selected file - with an error popup if it fails
+        if filename != () and filename != "":
+            try:
+                simpleaudio.WaveObject.from_wave_file(filename).play()
+            except:
+                Tk.messagebox.showerror(parent=self.frame, title="Load Error",
+                            message="Error loading audio file '"+str(filename)+"'")
+            else:
+                # Set the filename entry to the name of the current file (split from the dir path)
+                self.set_value(os.path.split(filename)[1])
+                # If a resources file has been chosen then strip off the path to aid cross-platform
+                # transfer of layout files (where the path to the resource folder may be different)
+                if os.path.split(filename)[0] == str(library_resources_folder):
+                    filename = os.path.split(filename)[1]
+                self.full_filename = filename
         self.child_windows_open = False
 
     def is_open(self):

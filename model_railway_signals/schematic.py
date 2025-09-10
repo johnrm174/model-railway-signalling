@@ -54,7 +54,7 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
-import importlib.resources
+import pathlib
 import math
 import copy
 
@@ -1098,17 +1098,16 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                                         library.lever_type.spare.value)] ]
     # Create the buttons we need (Note that the button images are added to a global
     # list so they remain in scope (otherwise the buttons won't work)
-    resource_folder = 'model_railway_signals.resources'
+    current_folder = pathlib.Path(__file__). parent
     for index, button in enumerate (selections):
-        file_name = selections[index][0]
+        fully_qualified_file_name = current_folder / 'resources' / (selections[index][0]+".png")
         try:
             # Load the image file for the button if there is one
-            with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                button_image = Tk.PhotoImage(file=file_path)
-                button_images.append(button_image)
-                button = Tk.Button (button_frame, image=button_image,command=selections[index][1])
-                button.pack(padx=2, pady=2, fill='x')
-        except:
+            button_image = Tk.PhotoImage(file=fully_qualified_file_name)
+            button_images.append(button_image)
+            button = Tk.Button (button_frame, image=button_image,command=selections[index][1])
+            button.pack(padx=2, pady=2, fill='x')
+        except Exception as exception:
             # Else fall back to using a text label (filename) for the button
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')

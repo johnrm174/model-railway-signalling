@@ -17,7 +17,7 @@
 #
 #------------------------------------------------------------------------------------
 
-import importlib.resources
+import pathlib
 import tkinter as Tk
 import webbrowser
 import logging
@@ -230,9 +230,10 @@ class display_docs():
             self.TT1 = common.CreateToolTip(self.close, "Close window")
 
     def open_doc(self,file_name:str):
+        current_folder = pathlib.Path(__file__). parent
+        fully_qualified_file_name = current_folder.parent / 'docs' / file_name
         try:
-            with importlib.resources.path('model_railway_signals.docs', file_name) as file_path:
-                webbrowser.open_new_tab(str(file_path))
+            webbrowser.open_new_tab(str(fully_qualified_file_name))
         except Exception as exception:
             logging.error("Error opening documentation file '"+file_name+"'")
             logging.error("Reported exception :"+str(exception))

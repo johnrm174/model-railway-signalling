@@ -16,7 +16,7 @@
 
 import tkinter as Tk
 from tkinter import colorchooser
-import importlib.resources
+import pathlib
 
 from . import common_simple
 
@@ -373,19 +373,18 @@ class line_styles(Tk.LabelFrame):
         self.tooltips = []
         self.images = []
         tooltip = " Select the style to apply to one or both line ends"
-        resource_folder = 'model_railway_signals.resources'
+        current_folder = pathlib.Path(__file__). parent
         for index, button in enumerate (self.selections):
-            file_name = button[0]
+            fully_qualified_file_name = current_folder.parent / 'resources' / (button[0]+".png")
             try:
                 # Load the image file for the button if there is one
-                with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                    self.images.append(Tk.PhotoImage(file=file_path))
-                    self.buttons.append(Tk.Radiobutton(self.subframe2, anchor='w',
-                            indicatoron=0, variable=self.selection, value=index))
-                    self.buttons[-1].config(image=self.images[-1])
+                self.images.append(Tk.PhotoImage(file=fully_qualified_file_name))
+                self.buttons.append(Tk.Radiobutton(self.subframe2, anchor='w',
+                        indicatoron=0, variable=self.selection, value=index))
+                self.buttons[-1].config(image=self.images[-1])
             except:
                 # Else fall back to using a text label (and use a standard radio button)
-                self.buttons.append(Tk.Radiobutton(self.subframe2, text=file_name,
+                self.buttons.append(Tk.Radiobutton(self.subframe2, text=button[0],
                                  anchor='w', variable=self.selection, value=index))
             self.buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
             self.tooltips.append(common_simple.CreateToolTip(self.buttons[-1], tooltip))

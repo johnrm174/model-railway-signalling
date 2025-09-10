@@ -76,7 +76,7 @@
 import enum
 import os
 import logging
-import importlib.resources
+import pathlib
 import tkinter as Tk
 from typing import Union
 
@@ -540,9 +540,10 @@ def create_block_indicator(canvas:int, x:int, y:int, canvas_tag):
 def load_audio_file(audio_filename):
     audio_object = None
     if os.path.split(audio_filename)[1] == audio_filename:
+        current_folder = pathlib.Path(__file__).parent
+        fully_qualified_file_name = current_folder / 'resources' / audio_filename
         try:
-            with importlib.resources.path ('model_railway_signals.library.resources',audio_filename) as audio_file:
-                audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_file))
+            audio_object = simpleaudio.WaveObject.from_wave_file(str(fully_qualified_file_name))
         except Exception as exception:
             Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
                             message="Error loading audio resource file '"+str(audio_filename)+"'")
