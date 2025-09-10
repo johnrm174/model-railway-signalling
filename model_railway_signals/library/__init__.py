@@ -186,6 +186,9 @@ from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import send_accessory_short_event
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
+from .pi_sprog_interface import add_dcc_sound_mapping
+from .pi_sprog_interface import reset_dcc_sound_mappings
+from .pi_sprog_interface import play_dcc_sound_file
 
 __all__ = [
       # Public common functions
@@ -319,6 +322,9 @@ __all__ = [
         'send_accessory_short_event',
         'request_dcc_power_on',
         'request_dcc_power_off',
+        'add_dcc_sound_mapping',
+        'reset_dcc_sound_mappings',
+        'play_dcc_sound_file',
       # Public DCC control functions
         'get_dcc_address_mappings',
         'dcc_address_mapping',

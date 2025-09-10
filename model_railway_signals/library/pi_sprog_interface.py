@@ -595,6 +595,8 @@ def send_accessory_short_event(address:int, active:bool):
             if active: log_string ="Discarding ASON command to DCC address: "+ str(address)+offset_text
             else: log_string = "Discarding ASOF command to DCC address: "+ str(address)+offset_text
             logging.debug("Pi-SPROG: "+log_string+" - SPROG is disconnected")
+        # Play any sound files that are triggered by the DCC command
+        play_dcc_sound_file(address, active)
     return ()
 
 #------------------------------------------------------------------------------
@@ -857,6 +859,52 @@ def service_mode_write_cv(cv:int, value:int):
 #     qnn_response = True
 #     return()
 #
+
+#------------------------------------------------------------------------------
+# Functions to Play sound files, triggered by DCC commands. As these are triggered
+# from DCC commands, the code is included here rather than in a seperate module.
+#------------------------------------------------------------------------------
+
+# The global dictionary to hold the sound file mappings. The key is the DCC
+# address. Each entry comprises a list of [state:bool, sound_file:str]
+dcc_sound_mappings
+# The global flag to indicate if audio is enabled or not
+audio_enabled = is_simpleaudio_installed()
+
+# Internal function (run at initialisation) to determine if audoi is enabled
+def is_simpleaudio_installed():
+    global simpleaudio
+    try:
+        import simpleaudio
+        return (True)
+    except Exception: pass
+    return (False)
+
+# API function to add a new DCC sound file mapping
+def add_dcc_sound_mapping(address:int, state:bool, sound_file:str):
+    global dcc_sound_mappings
+    dcc_sound_mappings[address] = [state, sound_file]
+    return()
+
+# API function to delete all DCC sound file mappings
+def reset_dcc_sound_mappings():
+    global dcc_sound_mappings
+    dcc_sound_mappings = {}
+    return()
+
+# Internal function to play a sound file if a mapping exists for the DCC command
+def play_dcc_sound_file(address:int, active:bool):
+    if audio_enabled and address in dcc_sound_mappings.keys():
+        if active == dcc_sound_mappings[address][0]:
+            dcc_sound_file_to_play = dcc_sound_mappings[address][1]
+            logging.debug("Pi-SPROG: Triggering sound file: "+dcc_sound_file_to_play)
+            try:
+                audio_object = simpleaudio.WaveObject.from_wave_file(dcc_sound_file_to_play)
+                audio_object.play()
+            except Exception as exception:
+                logging.debug("Pi-SPROG: Error playing file - reported exception: "+str(exception))
+    return()
+
 ######################################################################################
 
 
