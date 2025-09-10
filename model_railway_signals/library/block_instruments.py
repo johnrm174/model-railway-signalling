@@ -92,14 +92,11 @@ from . import file_interface
 # package as a whole - its up to the user to install if required
 # -------------------------------------------------------------------------
 
-def is_simpleaudio_installed():
-    global simpleaudio
-    try:
-        import simpleaudio
-        return (True)
-    except Exception: pass
-    return (False)
-audio_enabled = is_simpleaudio_installed()
+try:
+    import simpleaudio
+    audio_enabled = True
+except Exception:
+    pass
 
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling create_instrument

@@ -13,6 +13,7 @@
 #    int_item_id_entry_box (integer_entry_box)
 #    str_item_id_entry_box(entry_box)
 #    str_int_item_id_entry_box(entry_box)
+#    sound_file_entry_box(entry_box)
 #    scrollable_text_frame(Tk.Frame)
 #    validated_dcc_entry_box(dcc_entry_box)
 #    validated_keycode_entry_box(integer_entry_box)
@@ -75,6 +76,7 @@ from .common_compound import validated_dcc_command_entry
 from .common_compound import point_settings_entry
 from .common_compound import route_selections
 from .common_compound import signal_route_selections
+from .common_compound import sound_file_entry
 
 from .common_extensible import signal_route_frame
 from .common_extensible import row_of_widgets
@@ -113,11 +115,12 @@ __all__ = [
     'validated_dcc_entry_box',
     'validated_keycode_entry_box',
     'validated_gpio_sensor_entry_box',
-    # Compoind UI Elements
+    # Compound UI Elements
     'validated_dcc_command_entry',
     'point_settings_entry',
     'route_selections',
     'signal_route_selections',
+    'sound_file_entry',
     # Extensible UI Elements
     'signal_route_frame',
     'row_of_widgets',
