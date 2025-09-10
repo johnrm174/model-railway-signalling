@@ -68,7 +68,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Some older slow-acting point motors can get a bit 'sticky' after periods of disuse.
     * This utility can be used to exercise them for a period of time to 'free them up'
 * New feature to trigger the playing of audio files by specified DCC commands:
+    * Uses audio output of the Signalling System and/or Remote Signalling Nodes
     * Enables audio such as station announcements to be triggered by DCC switches
+
 
 
 
