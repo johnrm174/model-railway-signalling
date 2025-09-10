@@ -865,12 +865,6 @@ def service_mode_write_cv(cv:int, value:int):
 # from DCC commands, the code is included here rather than in a seperate module.
 #------------------------------------------------------------------------------
 
-# The global dictionary to hold the sound file mappings. The key is the DCC
-# address. Each entry comprises a list of [state:bool, sound_file:str]
-dcc_sound_mappings
-# The global flag to indicate if audio is enabled or not
-audio_enabled = is_simpleaudio_installed()
-
 # Internal function (run at initialisation) to determine if audoi is enabled
 def is_simpleaudio_installed():
     global simpleaudio
@@ -879,6 +873,12 @@ def is_simpleaudio_installed():
         return (True)
     except Exception: pass
     return (False)
+
+# The global dictionary to hold the sound file mappings. The key is the DCC
+# address. Each entry comprises a list of [state:bool, sound_file:str]
+dcc_sound_mappings = {}
+# The global flag to indicate if audio is enabled or not
+audio_enabled = is_simpleaudio_installed()
 
 # API function to add a new DCC sound file mapping
 def add_dcc_sound_mapping(address:int, state:bool, sound_file:str):
