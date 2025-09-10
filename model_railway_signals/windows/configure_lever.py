@@ -94,7 +94,7 @@ class signal_configuration(Tk.LabelFrame):
         self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1, command=self.validate_buttons)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button1TT = common.CreateToolTip(self.button1, text="Select to control the main signal aspect/arm")
-        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2, command=self.validate_buttons)
+        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidiary", variable=self.signal_selection, value=2, command=self.validate_buttons)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button2TT = common.CreateToolTip(self.button2)
         self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3, command=self.validate_buttons)
@@ -116,14 +116,14 @@ class signal_configuration(Tk.LabelFrame):
         # Validate the signal ID entry box value to accept it
         self.signalid.validate()
         # Validate and the buttons (updating the tool tips as required)    
-        button2_default_tt = "Select to control the subsidary signal aspect/arm"
+        button2_default_tt = "Select to control the subsidiary signal aspect/arm"
         button3_default_tt = "Select to control the secondary distant arm (semaphore home signals with secondary distant arms only)"
         valid = True
         if self.signalid.get_value() > 0:
             signal_object = objects.schematic_objects[objects.signal(self.signalid.get_value())]
             if self.signal_selection.get() == 2 and not has_subsidary(signal_object):
                 self.button2.configure(fg="red")
-                self.button2TT.text = "Signal does not have a subsidary"
+                self.button2TT.text = "Signal does not have a subsidiary"
                 self.button3.configure(fg="black")
                 self.button3TT.text = button3_default_tt
                 valid = False

@@ -351,7 +351,7 @@ class route_definition_tab(Tk.Frame):
                 min_height=2, min_width=28, editable=True, auto_resize=False)
         self.routenotes.pack(padx=2, pady=2, fill='both', expand=True)
         #----------------------------------------------------------------------------------
-        # Create the point, signal, subsidary and switch entry lists (frames 5,6,7,8)
+        # Create the point, signal, subsidiary and switch entry lists (frames 5,6,7,8)
         #----------------------------------------------------------------------------------
         self.frame5 = Tk.LabelFrame(self, text="Points to set")
         self.frame5.pack(padx=2, pady=2, fill='x')
@@ -369,11 +369,11 @@ class route_definition_tab(Tk.Frame):
                         columns=12, width=3, exists_function = library.signal_exists, tool_tip=
                         "Specify the main signals that need "+ "to be cleared for the route")
         self.signals.pack(padx=2, pady=2, fill='x')
-        self.frame8 = Tk.LabelFrame(self, text="Subsidary signals to clear")
+        self.frame8 = Tk.LabelFrame(self, text="Subsidiary signals to clear")
         self.frame8.pack(padx=2, pady=2, fill='x')
         self.subsidaries = common.grid_of_generic_entry_boxes(self.frame8, base_class=common.int_item_id_entry_box,
                         columns=12, width=3, exists_function = library.signal_exists, tool_tip="Specify the "+
-                        "subsidary signals (associated with a main signal) that need to be cleared for the route")
+                        "subsidiary signals (associated with a main signal) that need to be cleared for the route")
         self.subsidaries.pack(padx=2, pady=2, fill='x')
         #----------------------------------------------------------------------------------
         # Create the point and line to highlight lists (frames 9,10)
