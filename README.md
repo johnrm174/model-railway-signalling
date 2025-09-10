@@ -60,12 +60,17 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.0.
 > You have been warned!
 
+* New Entry/Exit (NX) route setting feature for true prototypical operation of the schematic:
+    * 'One-click' route setting is also retained - use whatever works best for your layout.
 * The base Item ID (for creation of new objects) can now be specified under general settings:
     * Making it easier to use different Item ID 'ranges' for different areas of the layout.
 * New Point Motor Excersising utility to continuously toggle all points on the layout:
     * Some older slow-acting point motors can get a bit 'sticky' after periods of disuse.
     * This utility can be used to exercise them for a period of time to 'free them up'
-* TBD
+* New feature to trigger the playing of audio files by specified DCC commands:
+    * Enables audio such as station announcements to be triggered by DCC switches
+
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
