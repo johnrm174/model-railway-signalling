@@ -6,6 +6,7 @@
 #    point_settings_entry(Tk.Frame) - combines int_item_id_entry_box and state_box
 #    route_selections(Tk.Frame) - A fixed row of SEVERN state_boxes representing possible signal routes
 #    signal_route_selections(Tk.Frame) - combines int_item_id_entry_box and route selections (above)
+#    sound_file_entry(Tk.Frame) - combines a read only entry box showing the filename and open button
 #
 # Makes the following external API calls to the library package
 #    library.point_exists(point_id)
@@ -32,13 +33,15 @@ try:
     import simpleaudio
     audio_enabled = True
 except Exception:
-    audio_enabled = True
+    audio_enabled = False
 
 #------------------------------------------------------------------------------------
 # Class for the Sound file selection element (builds on the entry_box class)
 # Class instance methods inherited by this class are:
 #    "set_value" - will set the current value of the entry box (str)
 #    "get_value" - will return the current value of the entry box (str)
+# The file chooser dialog will open in the folder of the fully qualified filename
+# provided to set_value(). Or if there is no path then the base folder will be used.
 #------------------------------------------------------------------------------------
 
 class sound_file_entry(Tk.Frame):
@@ -57,8 +60,8 @@ class sound_file_entry(Tk.Frame):
         # Create the various UI elements
         self.label = Tk.Label(self, text=label)
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.EB = common_simple.entry_box(self, width=20, callback=None, tool_tip=tool_tip)
-        self.EB.configure(state="disabled", fg="Black")
+        self.EB = common_simple.entry_box(self, width=30, callback=None, tool_tip=tool_tip)
+        self.EB.configure(state="disabled", disabledforeground="Black")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.B1 = Tk.Button(self, text="Browse",command=self.load, state=control_state)
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
@@ -81,7 +84,7 @@ class sound_file_entry(Tk.Frame):
                             message="Error loading audio file '"+str(filename)+"'")
             else:
                 self.full_filename = filename
-                self.set_value(os.path.split(filename)[1])
+                self.EB.set_value(os.path.split(filename)[1])
         self.child_windows_open = False
 
     def is_open(self):
@@ -89,7 +92,9 @@ class sound_file_entry(Tk.Frame):
 
     def set_value(self, full_filename:str):
         self.full_filename = full_filename
-        self.EB.set_value(os.path.split(full_filename)[1])
+        file_path, file_name = os.path.split(full_filename)
+        if len(file_path) > 0: self.base_folder = file_path
+        self.EB.set_value(file_name)
 
     def get_value(self):
         return(self.full_filename)

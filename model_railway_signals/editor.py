@@ -218,6 +218,8 @@ class main_menubar:
                 command=lambda:menubar.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
                 command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_update))
+        self.settings_menu.add_command(label =" Sounds...",
+                command=lambda:menubar.edit_sounds_settings(self.root, self.sounds_update))
         self.settings_menu.add_command(label =" SPROG...",
                 command=lambda:menubar.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
@@ -373,6 +375,7 @@ class main_menubar:
         self.gpio_update()
         # Apply any other general settings
         self.general_settings_update()
+        self.sounds_update()
         
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
@@ -628,6 +631,13 @@ class main_menubar:
             label, width, xscroll, yscroll = new_button[0], new_button[1], new_button[2], new_button[3]
             self.scroll_buttons.append(self.quickscroll_button(self.quickscrollframe, label, width, xscroll, yscroll))
             self.scroll_buttons[-1].pack(padx=5, pady=2, side=Tk.LEFT)
+
+    def sounds_update(self):
+        sound_mappings = settings.get_control("dccsoundmappings")
+        library.reset_dcc_sound_mappings()
+        for sound_mapping in sound_mappings:
+            # value_to_set is a list comprising [filename:str, [dcc_address:int, dcc_state:bool]]
+            library.add_dcc_sound_mapping(sound_mapping[1][0], sound_mapping[1][1], sound_mapping[0])
 
     def logging_update(self):
         log_level = settings.get_logging("level")

@@ -86,6 +86,9 @@ default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
 default_settings["mqtt"]["pubsensors"] = []
 
+default_settings["control"] = {}
+default_settings["control"]["dccsoundmappings"] = []
+
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
 default_settings["gpio"]["timeoutperiod"] = 1.000
@@ -345,6 +348,16 @@ def set_mqtt(parameter:str, value):
     settings["mqtt"][parameter] = value
     return()
 
+#------------------------------------------------------------------------------------
+# Functions to set/get the direct control (of the layout) settings
+#------------------------------------------------------------------------------------
+
+def get_control(parameter:str):
+    return(settings["control"][parameter])
+
+def set_control(parameter:str, value):
+    settings["control"][parameter] = value
+    return()
 
 ######################################################################################
     

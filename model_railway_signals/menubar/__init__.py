@@ -12,6 +12,7 @@
 #    edit_logging_settings(root, logging_update_callback)
 #    edit_canvas_settings(root, canvas_update_callback)
 #    edit_gpio_settings(root, gpio_update_callback)
+#    edit_sounds_settings(root, sounds_update_callback)
 #    edit_section_styles(root)
 #    edit_route_styles(root)
 #    edit_switch_styles(root)
@@ -40,6 +41,7 @@ from .menubar_settings import edit_sprog_settings
 from .menubar_settings import edit_logging_settings
 from .menubar_settings import edit_canvas_settings
 from .menubar_settings import edit_gpio_settings
+from .menubar_settings import edit_sounds_settings
 
 from .menubar_styles import edit_section_styles
 from .menubar_styles import edit_route_styles
@@ -65,6 +67,7 @@ __all__ = [
     'edit_general_settings',
     'edit_mqtt_settings',
     'edit_sprog_settings',
+    'edit_sounds_settings',
     'edit_logging_settings',
     'edit_canvas_settings',
     'edit_gpio_settings',

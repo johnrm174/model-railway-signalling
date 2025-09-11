@@ -48,7 +48,6 @@ from .. import library
 
 open_windows={}
 
-
 #------------------------------------------------------------------------------------
 # Function to return a read-only list of "interlocked signals". This is the back
 # reference to any signals configured to be interlocked with the Block Section ahead
@@ -117,14 +116,14 @@ class sound_file_selections():
     def __init__(self, parent_frame):
         # Create the Label Frame for the audio file selections
         self.frame = Tk.LabelFrame(parent_frame, text="Sound Files")
-        current_folder = pathlib.Path(__file__).parent
-        resources_folder = current_folder.parent / 'library/resources'
+        self.current_folder = pathlib.Path(__file__).parent
+        self.resources_folder = str(self.current_folder.parent / 'library/resources')
         # Create the selection elements
         self.bell = common.sound_file_entry(self.frame, label="Bell:",
-                tool_tip="Audio file for the bell", base_folder=resources_folder)
+                tool_tip="Audio file for the bell", base_folder=self.resources_folder)
         self.bell.pack(padx=2, pady=2)
         self.key = common.sound_file_entry(self.frame, label="Key:",
-                tool_tip="Audio file for telegraph key",base_folder=resources_folder)
+                tool_tip="Audio file for telegraph key",base_folder=self.resources_folder)
         self.key.pack(padx=2, pady=2)
 
     def set_values(self, bell_sound:str,key_sound:str):
@@ -132,7 +131,14 @@ class sound_file_selections():
         self.key.set_value(key_sound)
         
     def get_values(self):
-        return(self.bell.get_value(), self.key.get_value())
+        # If these are files in the application's resource folder then we remove the path
+        # from the full filename to make the configuration portable between platforms.
+        bell_sound_file, key_sound_file = self.bell.get_value(), self.key.get_value()
+        folder, filename = os.path.split(bell_sound_file)
+        if folder == self.resources_folder: bell_sound_file = filename
+        folder, filename = os.path.split(key_sound_file)
+        if folder == self.resources_folder: key_sound_file = filename
+        return(bell_sound_file, key_sound_file)
 
     def is_open(self):
         child_windows_open = self.bell.is_open() or self.key.is_open()
