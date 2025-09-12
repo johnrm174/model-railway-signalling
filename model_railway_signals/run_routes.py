@@ -705,7 +705,6 @@ def route_button_selected_callback(route_button_id:int):
                 entry_button_data["exitbutton"] = route_button_id
                 library.set_button_data(activated_entry_button_id, entry_button_data)
                 exit_button_data = library.get_button_data(route_button_id)
-                exit_button_data["route"] = None
                 exit_button_data["entrybutton"] = activated_entry_button_id
                 library.set_button_data(route_button_id, exit_button_data)
                 # Proceed to set up the route (from the entry button route definition.
@@ -854,53 +853,65 @@ def route_button_deselected_callback(route_button_id:int):
     route_object = objects.schematic_objects[route_object_id]
     # Retrieve the information about the route {"route", "entrybutton", "exitbutton"}
     button_data = library.get_button_data(route_button_id)
+    print(route_button_id, button_data)
     # If this is the activated entry button (which means that an exit button has not yet been selected)
     # then we just need to reset the activated_entry_button_id (so the user can make a new selection).
-    # However, if it is the Exit button of a currently active route, we need to toggle it bak to ON
+    # However, if it is the Exit button of a currently active route, we need to toggle it back to ON
     if activated_entry_button_id == route_button_id:
+        print("here1")
         unhighlight_possible_routes(route_button_id)
         enable_disable_schematic_routes()
         activated_entry_button_id = 0
         if button_data["entrybutton"] > 0 and library.button_state(button_data["entrybutton"]):
+            print("here1a")
             library.toggle_button(route_button_id)
     # If there is another activated entry button (where an exit button has not yet been selected)
     # then this could be the user setting up a new route. We therefore toggle the button back to ON
     # and call the selected function to initiate a new route setup sequence
     elif activated_entry_button_id > 0:
+        print("here2")
         library.toggle_button(route_button_id)
         route_button_selected_callback(route_button_id)
     # If the de-selected button is an Exit Button of a currently active route and the
     # deselected button is also an Entry button then this is the start of a new NX
     # route activation sequence. We re-select the button and call the selected function
     elif ( button_data["entrybutton"] > 0 and library.button_state(button_data["entrybutton"]) and
-             (button_data["exitbutton"] == 0 or not library.button_state(button_data["exitbutton"]))):
+         ( button_data["exitbutton"] == 0 or not library.button_state(button_data["exitbutton"])) ):
+        print("here3")
         library.toggle_button(route_button_id)
         route_button_selected_callback(route_button_id)
     # If the de-selected button is an Entry Button then we want to clear down the route
     # However - if it is also an Exit Button of a currently active route we leave it selected
-    elif activated_entry_button_id == 0 and button_data["route"] is not None:
+    elif button_data["route"] is not None:
+        print("here4")
         # Lock the one-click Button / Entry Button during route clear-down 
         library.lock_button(route_button_id)
         library.disable_button(route_button_id, tooltip="Route clear down in progress")
         # If this is an ENTRY Button with an associated EXIT Button then we also need to deselect
         # the EXIT button - as long as it is not also an ENTRY button on another active route
         if button_data["exitbutton"] > 0:
+            print("here4a")
             exit_button_data = library.get_button_data(button_data["exitbutton"])
             if library.button_state(button_data["exitbutton"]) and exit_button_data["route"] is None:
+                print("here4b")
                 # Lock the Exit Button during route clear-down 
                 library.toggle_button(button_data["exitbutton"])
                 library.lock_button(button_data["exitbutton"])
                 library.disable_button(button_data["exitbutton"], tooltip="Route clear down in progress")
         if button_data["entrybutton"] > 0:
+            print("here4c")
             entry_button_data = library.get_button_data(button_data["entrybutton"])
             if library.button_state(button_data["entrybutton"]) and entry_button_data["route"] is not None:
+                print("here4d")
                 library.toggle_button(route_button_id)
         # Schedule the tasks to clear down the route 
         schedule_tasks_to_clear_down_schematic_route(route_button_id, button_data["route"])
     else:
+        # The route retrieved from the button data must be None
+        # This means it is an exit button that has been de-selected
+        print("here5")
         library.toggle_button(route_button_id)
-        unhighlight_possible_routes(route_button_id)
-        enable_disable_schematic_routes()
+    enable_disable_schematic_routes()
     return()
 
 #------------------------------------------------------------------------------------
