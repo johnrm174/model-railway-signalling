@@ -371,7 +371,7 @@ def redraw_route_object(object_id):
                 label = objects_common.schematic_objects[object_id]["routename"],
                 tooltip = objects_common.schematic_objects[object_id]["routedescription"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
-                button_data = [0, 0],
+                button_data = {"route": None, "entrybutton": 0, "exitbutton": 0},
                 button_colour = button_colour,
                 active_colour = active_colour,
                 selected_colour = selected_colour,
