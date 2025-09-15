@@ -48,9 +48,10 @@ Schematic editor functions (Edit Mode):
 13) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
 14) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
 15) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
-16) <Esc> will deselect all objects (or cancel the move of selected objects)
-17) Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
-18) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+16) <cntl-l> will toggle on/off the display of line IDs (to aid identification)
+17) <Esc> will deselect all objects (or cancel the move of selected objects)
+18) Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
+19) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Schematic editor functions (Run Mode):
 

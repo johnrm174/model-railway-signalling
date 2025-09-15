@@ -65,11 +65,13 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * The base Item ID (for creation of new objects) can now be specified under general settings:
     * Making it easier to use different Item ID 'ranges' for different areas of the layout.
 * New Point Motor Excersising utility to continuously toggle all points on the layout:
-    * Some older slow-acting point motors can get a bit 'sticky' after periods of disuse.
+    * My older slow-acting point motors get a bit 'sticky' after periods of disuse.
     * This utility can be used to exercise them for a period of time to 'free them up'
 * New feature to trigger the playing of audio files by specified DCC commands:
-    * Uses audio output of the Signalling System and/or Remote Signalling Nodes
-    * Enables audio such as station announcements to be triggered by DCC switches
+    * Uses audio output of the Signalling System and/or Remote Signalling Nodes.
+    * Enables audio such as station announcements to be triggered by DCC switches.
+* The display of Line IDs can now be toggled on/off in edit mode by <Cntl-l>
+    * Aids identification when configuring routes and occupancy highlighting.
 
 
 

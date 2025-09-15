@@ -871,6 +871,13 @@ def schematic_redo(event=None):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to toggle on/off the display of line IDs
+#------------------------------------------------------------------------------------
+
+def toggle_line_ids(event=None):
+    library.toggle_line_ids()
+
+#------------------------------------------------------------------------------------
 # Internal Functions to enable/disable canvas keypress events during an object move,
 # line edit or area selection (edit mode) or a canvas scroll operation (run mode) to
 # ensure deterministic behavior. Note that when an object move, line edit or area selection
@@ -930,6 +937,7 @@ def enable_edit_mode_event_bindings():
     canvas.bind('<Control-Key-c>', copy_selected_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
+    canvas.bind('<Control-Key-l>', toggle_line_ids)
     canvas.bind('<Control-Key-s>', canvas_event_callback)
     canvas.bind('r', rotate_selected_objects)
     canvas.bind('f', flip_selected_objects)
@@ -951,6 +959,7 @@ def disable_edit_mode_event_bindings():
     canvas.unbind('<Control-Key-c>')
     canvas.unbind('<Control-Key-z>')
     canvas.unbind('<Control-Key-y>')
+    canvas.unbind('<Control-Key-l>')
     canvas.unbind('<Control-Key-s>')
     canvas.unbind('r')
     canvas.unbind('f')
