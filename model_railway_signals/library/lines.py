@@ -172,7 +172,7 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
                                         fill="white", tags=canvas_tag)
         bbox = canvas.bbox(label1_object)
         label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
-                                        tags=canvas_tag, fill="black", width=0)
+                                        tags=canvas_tag, fill="purple3", width=0)
         canvas.itemconfig(label1_object, state="hidden")
         canvas.itemconfig(label2_object, state="hidden")
         # Compile a dictionary of everything we need to track
