@@ -438,7 +438,7 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
         # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
         route_object = objects.schematic_objects[objects.route(str_route_button_id)]
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
-        if route_definition is not None:
+        if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Process the clear down of any routes (button is always enabled if active)
             if library.button_state(int(str_route_button_id)) and route_definition["exitsensor"] == sensor_id:
@@ -675,6 +675,7 @@ def route_button_selected_callback(route_button_id:int):
     route_object = objects.schematic_objects[route_object_id]
     # Process the callback depending on the type of the route
     if not route_object["entrybutton"] and not route_object["exitbutton"]:
+        print("Selected1")
         logging.info("RUN ROUTES - Initiating set-up of one-click Route "+str(route_button_id)+" *********************************")
         # For 'one click' buttons we use the first route definition (index=0). There is no
         # Exit button for these routes, so we set the exit button ID to 0.
@@ -686,12 +687,14 @@ def route_button_selected_callback(route_button_id:int):
         schedule_tasks_to_setup_schematic_route(route_button_id, route_definition_index=0)
         activated_entry_button_id = 0
     elif route_object["exitbutton"] and activated_entry_button_id > 0:
+        print("Selected2")
         # If an exit button has been activated following an entry button event then
         # We find the index of the route definition in the entry button configuration
         # and store this to the entry button object so it can be easily retrieved later.
         entry_route_object = objects.schematic_objects[objects.route(activated_entry_button_id)]
         for index, route_definition in enumerate(entry_route_object["routedefinitions"]):
             if route_definition["exitbutton"] == route_button_id:
+                print("Selected2a")
                 logging.info("RUN ROUTES - Initiating set-up of NX route "+str(activated_entry_button_id)+
                                  " > "+str(route_button_id)+" ***********************************")
                 # Lock both buttons whilst route setup in progress.
@@ -718,22 +721,27 @@ def route_button_selected_callback(route_button_id:int):
         # current route selection sequence and start a new route selection sequence.
         # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
         if activated_entry_button_id > 0:
+            print("Selected3")
             unhighlight_possible_routes(activated_entry_button_id)
-            if library.button_state(activated_entry_button_id):
-                library.toggle_button(activated_entry_button_id)
             if route_object["entrybutton"]:
+                print("Selected3b")
                 activated_entry_button_id = route_button_id
                 highlight_possible_routes(route_button_id)
             else:
+                print("Selected3c")
                 activated_entry_button_id = 0
             enable_disable_schematic_routes()
     elif route_object["entrybutton"]:
+        print("Selected4")
         # If an Entry button has been activated then we need to cancel down the current
         # route selection sequence and start a new route selection sequence.
         # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
         if activated_entry_button_id > 0:
+            print("Selected4a")
             unhighlight_possible_routes(activated_entry_button_id)
-            if library.button_state(activated_entry_button_id):
+            entry_button_data = library.get_button_data(activated_entry_button_id)
+            if entry_button_data["entrybutton"] == 0 and library.button_state(activated_entry_button_id):
+                print("Selected4b")
                 library.toggle_button(activated_entry_button_id)
         activated_entry_button_id = route_button_id
         highlight_possible_routes(route_button_id)

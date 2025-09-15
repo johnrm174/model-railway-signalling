@@ -183,8 +183,8 @@ class button_style_selections(common_style_settings):
         self.frame2asubframe2.pack()
         self.frame2asubframe1label1 = Tk.Label(self.frame2asubframe2, text="Chars:")
         self.frame2asubframe1label1.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.buttonwidth = common.integer_entry_box(self.frame2asubframe2, width=3, min_value=5, max_value=25,
-               tool_tip="Select the button width (between 5 and 25 characters)", allow_empty=False)
+        self.buttonwidth = common.integer_entry_box(self.frame2asubframe2, width=3, min_value=2, max_value=25,
+               tool_tip="Select the button width (between 2 and 25 characters)", allow_empty=False)
         self.buttonwidth.pack(padx=2, pady=2, fill='x', side=Tk.LEFT)
 
     def set_defaults(self):
