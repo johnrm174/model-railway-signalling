@@ -96,8 +96,8 @@ class edit_switch():
             self.frame1subframe4.pack(fill="y", expand=True)
             self.frame1subframe4label1 = Tk.Label(self.frame1subframe4, text="Chars:")
             self.frame1subframe4label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.buttonwidth = common.integer_entry_box(self.frame1subframe4, width=3, min_value=5,
-                        max_value= 25, tool_tip="Specify the width of the button (5 to 25 characters)")
+            self.buttonwidth = common.integer_entry_box(self.frame1subframe4, width=3, min_value=2,
+                        max_value= 25, tool_tip="Specify the width of the button (2 to 25 characters)")
             self.buttonwidth.pack(side=Tk.LEFT, padx=2, pady=2)
             #----------------------------------------------------------------------------------
             # Create a Label Frame for the Button information elements (Frame 2)
