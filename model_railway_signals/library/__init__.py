@@ -105,6 +105,7 @@ from .lines import create_line
 from .lines import line_exists
 from .lines import delete_line
 from .lines import toggle_line_ids
+from .lines import bring_line_ids_to_front
 from .lines import move_line_end_1
 from .lines import move_line_end_2
 from .lines import set_line_colour
@@ -242,6 +243,7 @@ __all__ = [
         'move_line_end_1',
         'move_line_end_2',
         'toggle_line_ids',
+        'bring_line_ids_to_front',
       # public track sensor types/functions
         'create_track_sensor',
         'delete_track_sensor',

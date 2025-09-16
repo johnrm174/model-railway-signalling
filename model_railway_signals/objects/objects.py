@@ -128,6 +128,8 @@ def bring_track_sections_to_the_front():
              objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.switch or
              objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.textbox):
             objects_common.canvas.tag_raise(objects_common.schematic_objects[object_id]["tags"])
+        # Now bring all Line ID labels to the front
+        library.bring_line_ids_to_front()
     return()
 
 #------------------------------------------------------------------------------------
