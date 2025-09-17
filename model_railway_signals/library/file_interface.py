@@ -300,7 +300,7 @@ def get_initial_item_state(layout_element:str,item_id:int):
         # See if the specified ITEM (for the LAYOUT ELEMENT) exists in the loaded file
         elif str(item_id) not in layout_state[layout_element].keys():
             # We know a file is loaded - therefore this is a valid error to report
-            logging.warning("File Interface - Data missing for '"+layout_element+"-"
+            logging.debug("File Interface - Data missing for '"+layout_element+"-"
                                                 +str(item_id)+"' - Default values will be set")
         else:
             # Iterate through the ITEM ELEMENTS we are interested in for the LAYOUT ELEMENT
@@ -310,7 +310,7 @@ def get_initial_item_state(layout_element:str,item_id:int):
                 element_type = item_element[1]
                 # Test to see if the required ITEM ELEMENT is present for the ITEM
                 if element_name not in layout_state[layout_element][str(item_id)]:
-                    logging.warning("File Interface - Data missing for '"+layout_element +"-"
+                    logging.debug("File Interface - Data missing for '"+layout_element +"-"
                             +str(item_id)+"-"+element_name+"' - Default value will be set")
                 else:
                     # Retrieve the ITEM ELEMENT Value from the loaded data
