@@ -179,8 +179,7 @@ def publish_heartbeat_message():
         try: mqtt_client.publish(topic,payload,retain=False,qos=1)
         except: pass
     # The heartbeat_frequency is an integer in seconds. The root.after() function uses milliseconds
-    if not common.shutdown_initiated:
-        common.root_window.after(node_config["heartbeat_frequency"]*1000,publish_heartbeat_message)
+    common.root_window.after(node_config["heartbeat_frequency"]*1000,publish_heartbeat_message)
     return()
 
 # ---------------------------------------------------------------------------------------------

@@ -41,7 +41,6 @@
 
 import math
 import logging
-import time
 import queue
 import tkinter as Tk
 
@@ -66,7 +65,7 @@ from . import signals
 
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
-# Global variable to signal (to other modules) that application is closing
+# Global flag to indicate that the application is closing
 shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
@@ -293,19 +292,11 @@ def shutdown_step4():
     return()
 
 def shutdown_step5():
-    # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
-    # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
-    # (although its unlikely the user would initiate a shut down until these have finished)
-    timeout_start = time.time()
-    while time.time() < timeout_start + 30:
-        if root_window.tk.call('after','info') != "":
-            root_window.update()
-            time.sleep(0.01)
-        else:
-            logging.info ("Exiting Application")
-            break
-    if time.time() >= timeout_start + 30:
-        logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+    # Cancel any tasks we have scheduled via the tkinter 'after' method
+    scheduled_after_events = root_window.tk.call('after','info')
+    for scheduled_after_event in scheduled_after_events:
+        root_window.after_cancel(scheduled_after_event)
+    # Kill the application by destroying the main root window
     root_window.destroy()
     return()
 
@@ -357,19 +348,18 @@ def handle_callback_in_tkinter_thread(*args):
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
-    if not shutdown_initiated:
-        event_queue.put(callback_function)
-        # When loading a layout file on startup, there were a number of possible edge cases that could cause
-        # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
-        # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
-        # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
-        # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
-        # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
-        try:
-            root_window.event_generate("<<ExtCallback>>", when="tail")
-        except Exception as exception:
-            logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
-            logging.error(str(exception))
+    event_queue.put(callback_function)
+    # When loading a layout file on startup, there were a number of possible edge cases that could cause
+    # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
+    # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
+    # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
+    # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
+    # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
+    try:
+        root_window.event_generate("<<ExtCallback>>", when="tail")
+    except Exception as exception:
+        logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
+        logging.error(str(exception))
     return()
 
 ##################################################################################################

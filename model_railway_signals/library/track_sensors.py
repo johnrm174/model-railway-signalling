@@ -99,10 +99,9 @@ def track_sensor_triggered (sensor_id:int, callback_type=None):
         logging.error("Track Sensor "+str(sensor_id)+": track_sensor_triggered - Sensor ID does not exist")
     else:
         logging.info("Track Sensor "+str(sensor_id)+": Track Sensor Passed Event ****************************************")
-        # Pulse the button to provide a visual indication (but not if a shutdown has been initiated)
-        if not common.shutdown_initiated:
-            track_sensors[str(sensor_id)]["button"].config(bg="red")
-            common.root_window.after(1000,lambda:reset_sensor_button(sensor_id))
+        # Pulse the button to provide a visual indication
+        track_sensors[str(sensor_id)]["button"].config(bg="red")
+        common.root_window.after(1000,lambda:reset_sensor_button(sensor_id))
         # Make the external callback specified for the track sensor
         callback = track_sensors[str(sensor_id)]["callback"]
         callback(sensor_id)

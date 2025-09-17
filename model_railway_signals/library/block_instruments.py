@@ -243,14 +243,13 @@ def telegraph_key_button(inst_id:int):
 def ring_section_bell(inst_id:int):
     logging.debug ("Instrument "+str(inst_id)+": Ringing Bell")
     # Provide a visual indication and sound the bell (not if shutdown has been initiated)
-    if not common.shutdown_initiated:
-        instruments[str(inst_id)]["bellbutton"].config(bg="yellow")
-        common.root_window.after(100,lambda:reset_telegraph_button(inst_id))
-        # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
-        # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
-        if instruments[str(inst_id)]["bellsound"] is not None:
-            try: instruments[str(inst_id)]["bellsound"].play()
-            except: pass
+    instruments[str(inst_id)]["bellbutton"].config(bg="yellow")
+    common.root_window.after(100,lambda:reset_telegraph_button(inst_id))
+    # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
+    # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
+    if instruments[str(inst_id)]["bellsound"] is not None:
+        try: instruments[str(inst_id)]["bellsound"].play()
+        except: pass
     return()
 
 def reset_telegraph_button(inst_id:int):

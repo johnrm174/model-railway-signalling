@@ -445,7 +445,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
 # -------------------------------------------------------------------------
 
 def flash_aspect_off(sig_id:int):
-    if not common.shutdown_initiated and signals.signal_exists(sig_id):
+    if signals.signal_exists(sig_id):
         if (signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION
             or signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.FLASH_PRELIM_CAUTION):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["yel"],fill="grey")
@@ -454,7 +454,7 @@ def flash_aspect_off(sig_id:int):
     return()
 
 def flash_aspect_on(sig_id:int):
-    if not common.shutdown_initiated and signals.signal_exists(sig_id):
+    if signals.signal_exists(sig_id):
         if signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["yel"],fill="yellow")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["yel2"],fill="grey")
@@ -617,7 +617,7 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
+        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             self.sequence_in_progress = True
@@ -644,7 +644,7 @@ class timed_sequence():
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
 
     def timed_signal_sequence_yellow(self):
-        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
+        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             # This sequence step is only applicable to 3 and 4 aspect signals
@@ -661,7 +661,7 @@ class timed_sequence():
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
     
     def timed_signal_sequence_double_yellow(self):
-        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id) or common.shutdown_initiated:
+        if self.sequence_abort_flag or not signals.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             # This sequence step only applicable to 4 aspect signals
@@ -696,18 +696,14 @@ class timed_sequence():
 # -------------------------------------------------------------------------
 
 def trigger_timed_colour_light_signal(sig_id:int,start_delay:int=0,time_delay:int=5):
-    # Don't initiate a timed signal sequence if a shutdown has already been initiated
-    if common.shutdown_initiated:
-        logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
-    else:
-        # Abort any timed signal sequences already in progess
-        route = signals.signals[str(sig_id)]["routeset"]
-        signals.signals[str(sig_id)]["timedsequence"][route.value].abort()
-        # Create a new instnce of the time signal class - this should have the effect of "destroying"
-        # the old instance when it goes out of scope, leaving us with the newly created instance
-        signals.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
-        # Schedule the start of the sequence (i.e. signal to danger)
-        common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    # Abort any timed signal sequences already in progess
+    route = signals.signals[str(sig_id)]["routeset"]
+    signals.signals[str(sig_id)]["timedsequence"][route.value].abort()
+    # Create a new instnce of the time signal class - this should have the effect of "destroying"
+    # the old instance when it goes out of scope, leaving us with the newly created instance
+    signals.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
+    # Schedule the start of the sequence (i.e. signal to danger)
+    common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
     return()
 
 ###############################################################################

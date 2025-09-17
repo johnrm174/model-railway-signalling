@@ -360,10 +360,9 @@ def sig_passed_button_event(sig_id:int):
         logging.error("Signal "+str(sig_id)+": sig_passed_button_event - signal does not exist")
     else:
         logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-        # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
-        if not common.shutdown_initiated:
-            signals[str(sig_id)]["passedbutton"].config(bg="red")
-            common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
+        # Pulse the signal passed button to provide a visual indication
+        signals[str(sig_id)]["passedbutton"].config(bg="red")
+        common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
         # Reset the approach control 'released' state (if the signal supports approach control).
         # We don't reset the approach control mode  - this needs to be reset from the calling application.
         if "released" in signals[str(sig_id)].keys(): signals[str(sig_id)]["released"] = False
@@ -379,10 +378,9 @@ def approach_release_button_event(sig_id:int):
         logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not support approach control")
     else:
         logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-        # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
-        if not common.shutdown_initiated:
-            signals[str(sig_id)]["releasebutton"].config(bg="red")
-            common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
+        # Pulse the approach release button to provide a visual indication
+        signals[str(sig_id)]["releasebutton"].config(bg="red")
+        common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
         # Set the approach control 'released' state (if the signal supports approach control).
         # We also clear down the approach control mode and update the displayed signal aspects.
         signals[str(sig_id)]["released"] = True
