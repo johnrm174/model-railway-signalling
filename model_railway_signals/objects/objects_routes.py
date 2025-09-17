@@ -86,6 +86,10 @@ default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
 default_route_object["resetswitches"] = False
 default_route_object["setupsensor"] = 0
+# Routes are normally 'reset' if signals, points or switches along the route are changed
+# If required, 'reset' of routes for signal and switch changes can be inhibited
+default_route_object["ignoresignalchanges"] = False
+default_route_object["ignoreswitchchanges"] = False
 #------------------------------------------------------------------------------------
 # To support NX panel type operation, each route button can now hold multiple route
 # definitions stored as a list (the default is a single 'normal' route definition).
