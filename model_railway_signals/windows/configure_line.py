@@ -72,7 +72,6 @@ class line_end_styles(Tk.LabelFrame):
         self.tooltips = []
         self.images = []
         tooltip = " Select the style to apply to one or both line ends"
-        resource_folder = 'model_railway_signals.resources'
         current_folder = pathlib.Path(__file__). parent
         for index, button in enumerate (self.selections):
             fully_qualified_file_name = current_folder.parent / 'resources' / (button[0]+".png")

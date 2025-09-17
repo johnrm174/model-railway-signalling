@@ -47,6 +47,7 @@ from tkinter import ttk
 
 import time
 import datetime
+import logging
 
 from .. import common
 from .. import settings

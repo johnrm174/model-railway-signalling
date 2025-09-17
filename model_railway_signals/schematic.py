@@ -1116,7 +1116,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             button_images.append(button_image)
             button = Tk.Button (button_frame, image=button_image,command=selections[index][1])
             button.pack(padx=2, pady=2, fill='x')
-        except Exception as exception:
+        except:
             # Else fall back to using a text label (filename) for the button
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')
