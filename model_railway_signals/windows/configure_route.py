@@ -185,6 +185,28 @@ class route_type_selection(Tk.LabelFrame):
     def get_values(self):
         return(self.entry.get_value(), self.exit.get_value())
 
+#------------------------------------------------------------------------------------
+# Class for a the NX Button Name selections Label Frame
+#------------------------------------------------------------------------------------
+class button_name_selections(Tk.LabelFrame):
+    def __init__(self, parent_frame, callback):
+        super().__init__(parent_frame, text="Set standard NX button labels")
+        # Crewate a subframe to center everything in
+        self.subframe=Tk.Frame(self)
+        self.subframe.pack()
+        button_data=[ ["\u25c0", lambda:callback("\u25c0")],
+                      ["\u25c1", lambda:callback("\u25c1")],
+                      ["\u25c0\u25c1", lambda:callback("\u25c0\u25c1")],
+                      ["\u25c0\u25b7", lambda:callback("\u25c0\u25b7")],
+                      ["\u25c1\u25b6", lambda:callback("\u25c1\u25b6")],
+                      ["\u25b7\u25b6", lambda:callback("\u25b7\u25b6")],
+                      ["\u25b7", lambda:callback("\u25b7")],
+                      ["\u25b6", lambda:callback("\u25b6")] ]
+        self.list_of_buttons = []
+        for data in button_data:
+            self.list_of_buttons.append(Tk.Button(self.subframe, text=data[0], command=data[1], justify=Tk.CENTER))
+            self.list_of_buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+
 #####################################################################################
 # Top level Class for the general route button configuration tab
 #####################################################################################
@@ -223,6 +245,11 @@ class route_configuration_tab():
         self.buttonwidth = common.integer_entry_box(self.frame1subframe4, width=3, min_value=2,
                     max_value= 25, tool_tip="Specify the width of the button (2 to 25 characters)")
         self.buttonwidth.pack(side=Tk.LEFT, padx=2, pady=2)
+        #----------------------------------------------------------------------------------
+        # Create a Label Frame for the NX Button name selections
+        #----------------------------------------------------------------------------------
+        self.buttonnameselections = button_name_selections(self.main_frame, callback=self.button_name_selected)
+        self.buttonnameselections.pack(padx=2, pady=2, fill="x")
         #----------------------------------------------------------------------------------
         # Create a Label Frame for the Button information elements (Frame 2)
         #----------------------------------------------------------------------------------
@@ -301,6 +328,10 @@ class route_configuration_tab():
         self.resetswitches = common.check_box(self.frame11, label="Reset switches on routedeselection",
                 tool_tip="Select to reset all DCC Switches back to 'OFF' when route is deselected")
         self.resetswitches.pack(padx=2, pady=0)
+
+    def button_name_selected(self, new_label:str):
+        self.buttonname.set_value(new_label)
+        self.buttonwidth.set_value(2)
 
     def route_type_updated(self):
         entry_button, exit_button = self.routetype.get_values()
