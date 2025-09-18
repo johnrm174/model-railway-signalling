@@ -24,6 +24,8 @@
 #                        reported exceptions caused by subsequent MQTT and GPIO events)
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#   toggle_item_ids() - toggles the display of Item IDs on/of (in Edit Mode)
+#   bring_item_ids_to_front() - brings Item IDs to the front (in Edit Mode)
 #
 # External API - classes and functions (used by the other library modules):
 #
@@ -70,7 +72,7 @@ shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
 # Global flag to track the mode (set via the configure_edit_mode function)
-run_mode = False
+editing_enabled = False
 # Global Flag to enable or disable the processing of keypress events
 keypresses_enabled = True
 
@@ -150,7 +152,7 @@ def display_warning(canvas, message:str):
 keyboard_mappings= {}
 
 def keyboard_handler(event):
-    if run_mode and keypresses_enabled:
+    if not editing_enabled and keypresses_enabled:
         debug_string = "Schematic Keypress event: Keycode="+str(event.keycode)
         if len(event.char) == 1: debug_string = debug_string + " - Character="+repr(event.char)
         logging.debug(debug_string)
@@ -305,8 +307,9 @@ def shutdown_step5():
 #------------------------------------------------------------------------------------
 
 def configure_edit_mode(edit_mode:bool):
-    global run_mode
-    run_mode = not edit_mode
+    global editing_enabled
+    editing_enabled = edit_mode
+    # Configure each library module that needs to know the mode
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)
@@ -314,6 +317,44 @@ def configure_edit_mode(edit_mode:bool):
     points.configure_edit_mode(edit_mode)
     lines.configure_edit_mode(edit_mode)
     signals.configure_edit_mode(edit_mode)
+    # Toggle the hiding/display of item IDs as appropriate
+    if edit_mode and item_ids_displayed: show_item_ids()
+    else: hide_item_ids()
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Library function to show/hide Item IDs in edit mode
+#---------------------------------------------------------------------------------------------
+
+item_ids_displayed = False
+
+def show_item_ids():
+    lines.show_line_ids()
+    buttons.show_button_ids()
+    points.show_point_ids()
+    bring_item_ids_to_front()
+    return()
+
+def hide_item_ids():
+    lines.hide_line_ids()
+    buttons.hide_button_ids()
+    points.hide_point_ids()
+    return()
+
+def toggle_item_ids():
+    global item_ids_displayed
+    if not item_ids_displayed:
+        item_ids_displayed = True
+        show_item_ids()
+    else:
+        item_ids_displayed = False
+        hide_item_ids()
+    return()
+
+def bring_item_ids_to_front():
+    lines.bring_line_ids_to_front()
+    buttons.bring_button_ids_to_front()
+    points.bring_point_ids_to_front()
     return()
 
 # -------------------------------------------------------------------------

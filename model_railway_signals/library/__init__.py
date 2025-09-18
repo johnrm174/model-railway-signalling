@@ -13,6 +13,8 @@ from .common import instant_shutdown
 from .common import configure_edit_mode
 from .common import get_keyboard_mapping
 from .common import display_warning
+from .common import toggle_item_ids
+from .common import bring_item_ids_to_front
 
 from .signals import signal_type
 from .signals import signal_subtype
@@ -104,8 +106,6 @@ from .track_sensors import delete_track_sensor
 from .lines import create_line
 from .lines import line_exists
 from .lines import delete_line
-from .lines import toggle_line_ids
-from .lines import bring_line_ids_to_front
 from .lines import move_line_end_1
 from .lines import move_line_end_2
 from .lines import set_line_colour
@@ -200,6 +200,8 @@ __all__ = [
         'configure_edit_mode',
         'get_keyboard_mapping',
         'display_warning',
+        'toggle_item_ids',
+        'bring_item_ids_to_front',
       # Public point types/functions
         'point_type',
         'point_subtype',
@@ -242,8 +244,6 @@ __all__ = [
         'reset_line_colour_override',
         'move_line_end_1',
         'move_line_end_2',
-        'toggle_line_ids',
-        'bring_line_ids_to_front',
       # public track sensor types/functions
         'create_track_sensor',
         'delete_track_sensor',

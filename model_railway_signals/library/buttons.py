@@ -62,6 +62,9 @@
 # External API - classes and functions (used by the other library modules):
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#   show_buttone_ids() - Displays the line IDs
+#   hide_button_ids() - Hides the line IDs
+#   bring_button_ids_to_front() - Brings the IDs to the front
 #
 #---------------------------------------------------------------------------------------------
 
@@ -116,6 +119,35 @@ def configure_edit_mode(edit_mode:bool):
                 button["canvas"].itemconfig(button["buttonwindow"], state='normal')
             button["canvas"].itemconfig(button["placeholder1"], state='hidden')
             button["canvas"].itemconfig(button["placeholder2"], fill='', width=0)
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Library functions to show/hide Button IDs in edit mode
+#---------------------------------------------------------------------------------------------
+
+button_ids_displayed = False
+
+def show_button_ids():
+    global button_ids_displayed
+    for button_id in buttons:
+        buttons[str(button_id)]["canvas"].itemconfig(buttons[str(button_id)]["label1"], state="normal")
+        buttons[str(button_id)]["canvas"].itemconfig(buttons[str(button_id)]["label2"], state="normal")
+    bring_button_ids_to_front()
+    button_ids_displayed = True
+    return()
+
+def hide_button_ids():
+    global button_ids_displayed
+    for button_id in buttons:
+        buttons[str(button_id)]["canvas"].itemconfig(buttons[str(button_id)]["label1"], state="hidden")
+        buttons[str(button_id)]["canvas"].itemconfig(buttons[str(button_id)]["label2"], state="hidden")
+    button_ids_displayed = False
+    return()
+
+def bring_button_ids_to_front():
+    for button_id in buttons:
+        buttons[str(button_id)]["canvas"].tag_raise(buttons[str(button_id)]["label2"])
+        buttons[str(button_id)]["canvas"].tag_raise(buttons[str(button_id)]["label1"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -425,6 +457,15 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
             else: canvas.itemconfig(button_window, state='normal')
             canvas.itemconfig(placeholder1, state='hidden')
             canvas.itemconfig(placeholder2, fill='', width=0)
+        # Create the Button ID labels
+        label1_object = canvas.create_text(x, y, text=str(button_id),
+                            font=("Courier",9,"bold"),fill="white", tags=canvas_tag)
+        bbox = canvas.bbox(label1_object)
+        label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
+                            tags=canvas_tag, fill="purple3", width=0)
+        if not editing_enabled or not button_ids_displayed:
+            canvas.itemconfig(label1_object, state="hidden")
+            canvas.itemconfig(label2_object, state="hidden")
         # Compile a dictionary of everything we need to track
         buttons[str(button_id)] = {}
         buttons[str(button_id)]["canvas"] = canvas                            # Tkinter canvas object
@@ -439,6 +480,8 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
         buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
+        buttons[str(button_id)]["label1"] = label1_object                     # Reference to the Tkinter drawing object
+        buttons[str(button_id)]["label2"] = label2_object                     # Reference to the Tkinter drawing object
         buttons[str(button_id)]["buttonlabel"] = label                        # The label for the button (string)
         buttons[str(button_id)]["buttondata"] = button_data                   # Additional state data to be associated with button
         buttons[str(button_id)]["tooltiptext"] = tooltip                      # The default tooltip text to display

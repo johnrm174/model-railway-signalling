@@ -42,12 +42,12 @@
 #
 #   move_line_end_2(line_id:int, xdiff:int, ydiff:int) - Move the line end by the specified deltas
 #
-#   toggle_line_ids() - toggles the display of line IDs on/of (in Edit Mode)
-#   bring_line_ids_to_front() - brings line IDs to the front (in Edit Mode)
-#
 # External API - classes and functions (used by the other library modules):
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#   show_line_ids() - Displays the line IDs
+#   hide_line_ids() - Hides the line IDs
+#   bring_line_ids_to_front() - Brings the IDs to the front
 #
 #---------------------------------------------------------------------------------------------
 
@@ -71,37 +71,29 @@ def configure_edit_mode(edit_mode:bool):
     global editing_enabled
     # Maintain a global flag (for creating new library objects)
     editing_enabled = edit_mode
-    if edit_mode and line_ids_displayed: show_line_ids()
-    else: hide_line_ids()
     return()
 
 #---------------------------------------------------------------------------------------------
-# Library function to show/hide line IDs in edit mode
+# Library functions to show/hide Line IDs in edit mode
 #---------------------------------------------------------------------------------------------
 
 line_ids_displayed = False
 
 def show_line_ids():
+    global line_ids_displayed
     for line_id in lines:
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label1"], state="normal")
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label2"], state="normal")
     bring_line_ids_to_front()
+    line_ids_displayed = True
     return()
 
 def hide_line_ids():
+    global line_ids_displayed
     for line_id in lines:
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label1"], state="hidden")
         lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label2"], state="hidden")
-    return()
-
-def toggle_line_ids():
-    global line_ids_displayed
-    if not line_ids_displayed:
-        line_ids_displayed = True
-        show_line_ids()
-    else:
-        line_ids_displayed = False
-        hide_line_ids()
+    line_ids_displayed = False
     return()
 
 def bring_line_ids_to_front():
@@ -174,11 +166,11 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         canvas.itemconfig(stop1_object, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(stop2_object, fill=colour, width=line_width, dash=tuple(line_style))
         # Create the line ID labels
-        label1_object = canvas.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=str(line_id), font=("Courier", 9, "bold"),
-                                        fill="white", tags=canvas_tag)
+        label1_object = canvas.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=str(line_id),
+                                    font=("Courier",9,"bold"), fill="white", tags=canvas_tag)
         bbox = canvas.bbox(label1_object)
         label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
-                                        tags=canvas_tag, fill="purple3", width=0)
+                                    tags=canvas_tag, fill="purple3", width=0)
         if not editing_enabled or not line_ids_displayed:
             canvas.itemconfig(label1_object, state="hidden")
             canvas.itemconfig(label2_object, state="hidden")

@@ -70,8 +70,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New feature to trigger the playing of audio files by specified DCC commands:
     * Uses audio output of the Signalling System and/or Remote Signalling Nodes.
     * Enables audio such as station announcements to be triggered by DCC switches.
-* The display of Line IDs can now be toggled on/off in edit mode by <Cntl-l>
-    * Aids identification when configuring routes and occupancy highlighting.
+* The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>
+    * Aids identification to take the pain out of configuring routes.
 
 
 
