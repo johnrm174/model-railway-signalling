@@ -797,14 +797,16 @@ def route_button_selected_callback(route_button_id:int):
     return()
 
 def highlight_possible_routes(route_button_id:int):
+    global activated_entry_button_id
     # Find the applicable route definition
+    one_or_more_viable_routes = False
     route_object = objects.schematic_objects[objects.route(route_button_id)]
-    # Find out what routes are viable and set them to flash
     for route_definition in route_object["routedefinitions"]:
         route_tooltip, route_viable = check_route_viable(route_definition)
         if route_viable and route_definition["exitbutton"] > 0:
             library.set_button_flashing(route_definition["exitbutton"])
-    return()
+            one_or_more_viable_routes = True
+    return(one_or_more_viable_routes)
 
 def unhighlight_possible_routes(route_button_id:int):
     # Find the applicable route definition
@@ -983,9 +985,13 @@ def route_button_deselected_callback(route_button_id:int):
             unhighlight_possible_routes(activated_entry_button_id)
             activated_entry_button_id = 0
         if route_object["entrybutton"]:
-            logging.debug("RUN ROUTES - Setting Button "+str(route_button_id)+" as the Activated Entry Button")
             activated_entry_button_id = route_button_id
-            highlight_possible_routes(route_button_id)
+            if highlight_possible_routes(route_button_id):
+                logging.debug("RUN ROUTES - Setting Button "+str(route_button_id)+" as the Activated Entry Button")
+                activated_entry_button_id = route_button_id
+            else:
+                logging.debug("RUN ROUTES - Clearing Activated Entry Button "+str(activated_entry_button_id)+" as no viable NX routes")
+                activated_entry_button_id = 0
     enable_disable_schematic_routes()
     return()
 
