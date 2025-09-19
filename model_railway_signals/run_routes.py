@@ -392,7 +392,7 @@ def check_routes_valid_after_signal_change(signal_id:int, route_button_id:int):
             # Reset the route if any signals on the route have been returned to danger
             if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                     and signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id)
-                    and not route_object["ignoresignalchanges"] ):
+                    and route_object["resetonsignalchanges"] ):
                 logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by change to Signal "
                                 +str(signal_id)+" - Clearing down route highlighting and deselecting route")
                 library.toggle_button(int(str_route_button_id))
@@ -411,7 +411,7 @@ def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int
             # Reset the route if any subsidaries on the route have been returned to danger
             if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                     and signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id)
-                    and not route_object["ignoresignalchanges"] ):
+                    and route_object["resetonsignalchanges"] ):
                 logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by change to Subsidiary "
                                 +str(signal_id)+" - Clearing down route highlighting and deselecting route")
                 library.toggle_button(int(str_route_button_id))
@@ -455,8 +455,7 @@ def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
                 if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                         and str(switch_id) in route_definition["switchesonroute"].keys() ):
                     required_state = route_definition["switchesonroute"][str(switch_id)]
-                    print(route_object["ignoreswitchchanges"])
-                    if not route_object["ignoreswitchchanges"] and library.button_state(switch_id) != required_state:
+                    if route_object["resetonswitchchanges"] and library.button_state(switch_id) != required_state:
                         logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by change to DCC Switch "
                                 +str(switch_id)+" - Clearing down route highlighting and deselecting route")
                         library.toggle_button(int(str_route_button_id))

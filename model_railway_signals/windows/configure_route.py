@@ -69,37 +69,25 @@ class switch_state_entry(Tk.Frame):
         super().__init__(parent_frame)
         # Note the use of the 'objects.switch_exists' function rather than using the library 'exists'
         # function as DCC Switches and Routes both use the same common 'button' library objects
-        self.EB = common.int_item_id_entry_box(self, exists_function=objects.switch_exists,
-                                    tool_tip = tool_tip, callback=self.eb_updated)
+        self.EB = common.int_item_id_entry_box(self, exists_function=objects.switch_exists, tool_tip = tool_tip)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common.state_box(self, label_off="OFF", label_on="ON", width=4,
                     tool_tip="Select the required state for the switch (On or Off)")
         self.CB.pack(side=Tk.LEFT)
-        # Disable the checkbox (default state when no Switch ID is entered)
-        self.CB.disable()
-
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else:
-            self.CB.enable()
 
     def validate(self):
         return (self.EB.validate())
 
     def enable(self):
         self.EB.enable()
-        self.eb_updated()
 
     def disable(self):
         self.EB.disable()
-        self.eb_updated()
 
     def set_value(self, switch:[int, bool]):
         # A Switch comprises a 2 element list of [Switch_id, Switch_state]
         self.EB.set_value(switch[0])
         self.CB.set_value(switch[1])
-        self.eb_updated()
 
     def get_value(self):
         # Returns a 2 element list of [Switch_id, Switch_state]
@@ -188,24 +176,26 @@ class route_type_selection(Tk.LabelFrame):
 #------------------------------------------------------------------------------------
 # Class for a the NX Button Name selections Label Frame
 #------------------------------------------------------------------------------------
+
 class button_name_selections(Tk.LabelFrame):
     def __init__(self, parent_frame, callback):
-        super().__init__(parent_frame, text="Set standard NX button labels")
+        super().__init__(parent_frame, text="Select standard NX button Types")
         # Crewate a subframe to center everything in
         self.subframe=Tk.Frame(self)
         self.subframe.pack()
-        button_data=[ ["\u25c0", lambda:callback("\u25c0")],
-                      ["\u25c1", lambda:callback("\u25c1")],
-                      ["\u25c0\u25c1", lambda:callback("\u25c0\u25c1")],
-                      ["\u25c0\u25b7", lambda:callback("\u25c0\u25b7")],
-                      ["\u25c1\u25b6", lambda:callback("\u25c1\u25b6")],
-                      ["\u25b7\u25b6", lambda:callback("\u25b7\u25b6")],
-                      ["\u25b7", lambda:callback("\u25b7")],
-                      ["\u25b6", lambda:callback("\u25b6")] ]
+        button_data=[ ["\u25c0", "Entry", lambda:callback("\u25c0", True, False)],
+                      ["\u25c1", "Exit", lambda:callback("\u25c1", False, True)],
+                      ["\u25c0\u25c1", "Entry/Exit", lambda:callback("\u25c0\u25c1", True, True)],
+                      ["\u25c0\u25b7", "Entry/Exit",lambda:callback("\u25c0\u25b7", True, True)],
+                      ["\u25c1\u25b6", "Entry/Exit",lambda:callback("\u25c1\u25b6", True, True)],
+                      ["\u25b7\u25b6", "Entry/Exit",lambda:callback("\u25b7\u25b6", True, True)],
+                      ["\u25b7", "Exit", lambda:callback("\u25b7", False, True)],
+                      ["\u25b6", "Entry", lambda:callback("\u25b6", True, False)] ]
         self.list_of_buttons = []
         for data in button_data:
-            self.list_of_buttons.append(Tk.Button(self.subframe, text=data[0], command=data[1], justify=Tk.CENTER))
+            self.list_of_buttons.append(Tk.Button(self.subframe, text=data[0], command=data[2], justify=Tk.CENTER))
             self.list_of_buttons[-1].pack(side=Tk.LEFT, padx=2, pady=2)
+            common.CreateToolTip(self.list_of_buttons[-1], text=data[1])
 
 #####################################################################################
 # Top level Class for the general route button configuration tab
@@ -325,13 +315,23 @@ class route_configuration_tab():
         self.resetpoints = common.check_box(self.frame11, label="Reset points on route deselection  ",
                 tool_tip="Select to reset all points back to their default state when route is deselected")
         self.resetpoints.pack(padx=2, pady=0)
-        self.resetswitches = common.check_box(self.frame11, label="Reset switches on routedeselection",
+        self.resetswitches = common.check_box(self.frame11, label="Reset switches on route deselection",
                 tool_tip="Select to reset all DCC Switches back to 'OFF' when route is deselected")
         self.resetswitches.pack(padx=2, pady=0)
+        self.resetonsignalchanges = common.check_box(self.frame11, label="Invalidate route if signals are returned to ON",
+                                    tool_tip="Select to automatically reset route buttons and route highlighting if "+
+                                    "signals or subsidiaries in the route configuration route are manually returned to ON")
+        self.resetonsignalchanges.pack(padx=2, pady=0)
+        self.resetonswitchchanges = common.check_box(self.frame11, label="Invalidate route if DCC switch states are changed",
+                                    tool_tip="Select to automatically reset route buttons and route highlighting if DCC "+
+                                    "switches in the route configuration are are changed from their required state")
+        self.resetonswitchchanges.pack(padx=2, pady=0)
 
-    def button_name_selected(self, new_label:str):
+    def button_name_selected(self, new_label:str, entry_button:bool, exit_button:bool):
+        self.routetype.set_values(entry_button,exit_button)
         self.buttonname.set_value(new_label)
         self.buttonwidth.set_value(2)
+        self.route_type_updated()
 
     def route_type_updated(self):
         entry_button, exit_button = self.routetype.get_values()
@@ -677,6 +677,8 @@ class edit_route():
             self.config.setupsensor.set_value(objects.schematic_objects[self.object_id]["setupsensor"])
             self.config.resetpoints.set_value(objects.schematic_objects[self.object_id]["resetpoints"])
             self.config.resetswitches.set_value(objects.schematic_objects[self.object_id]["resetswitches"])
+            self.config.resetonsignalchanges.set_value(objects.schematic_objects[self.object_id]["resetonsignalchanges"])
+            self.config.resetonswitchchanges.set_value(objects.schematic_objects[self.object_id]["resetonswitchchanges"])
             # route button appearance elements
             self.config.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.config.buttoncolour.set_value(objects.schematic_objects[self.object_id]["buttoncolour"])
@@ -717,13 +719,15 @@ class edit_route():
             new_object_configuration["setupsensor"] = self.config.setupsensor.get_value()
             new_object_configuration["resetpoints"] = self.config.resetpoints.get_value()
             new_object_configuration["resetswitches"] = self.config.resetswitches.get_value()
+            new_object_configuration["resetonsignalchanges"] = self.config.resetonsignalchanges.get_value()
+            new_object_configuration["resetonswitchchanges"] = self.config.resetonswitchchanges.get_value()
             # route button appearance elements
             text_font_tuple = (self.config.font.get_value(), self.config.fontsize.get_value(), self.config.fontstyle.get_value())
             new_object_configuration["buttonwidth"] = self.config.buttonwidth.get_value()
             new_object_configuration["buttoncolour"] = self.config.buttoncolour.get_value()
             new_object_configuration["textcolourtype"] = self.config.textcolourtype.get_value()
             new_object_configuration["textfonttuple"] = text_font_tuple
-            # Get the route definitions #######################
+            # Get the route definitions
             new_object_configuration["routedefinitions"] = self.routes.get_values()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
