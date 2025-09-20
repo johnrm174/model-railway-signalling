@@ -766,44 +766,51 @@ def route_button_selected_callback(route_button_id:int):
                 library.toggle_button(activated_entry_button_id)
                 logging.debug("RUN ROUTES - Deselecting Activated Entry Button: "+str(activated_entry_button_id))
             # Check to see if this could be the start of a new NXroute setup sequence
-            if route_object["entrybutton"] and library.get_button_data(route_button_id)["route"] is None:
-                highlight_possible_routes(route_button_id)
+            if (route_object["entrybutton"] and library.get_button_data(route_button_id)["route"] is None
+                                        and highlight_possible_routes(route_button_id)):
                 activated_entry_button_id = route_button_id
                 logging.debug("RUN ROUTES - Initiating a new NX route setup sequence as Button "+
                               str(route_button_id)+" is also an ENTRY Button")
             else:
+                logging.debug("RUN ROUTES - No available routes - Clearing down current NX route setup sequence")
                 activated_entry_button_id = 0
-                logging.debug("RUN ROUTES - Clearing down NX route setup sequence")
             enable_disable_schematic_routes()
     elif route_object["entrybutton"]:
+        entry_button_data = library.get_button_data(route_button_id)
         logging.debug("RUN ROUTES - ENTRY Button "+str(route_button_id)+" has been selected")
         # If an Entry button has been activated then we need to cancel down the current
         # route selection sequence and start a new route selection sequence.
         # We also call 'enable_disable_schematic_routes' to unlock any exit buttons.
         if activated_entry_button_id > 0:
-            logging.debug("RUN ROUTES - Clearing down NX route setup sequence")
+            logging.debug("RUN ROUTES - Clearing down current NX route setup sequence")
             unhighlight_possible_routes(activated_entry_button_id)
             entry_button_data = library.get_button_data(activated_entry_button_id)
             if entry_button_data["entrybutton"] == 0 and library.button_state(activated_entry_button_id):
                 logging.debug("RUN ROUTES - Deselecting Activated Entry Button: "+str(activated_entry_button_id))
                 library.toggle_button(activated_entry_button_id)
-        activated_entry_button_id = route_button_id
-        highlight_possible_routes(route_button_id)
-        enable_disable_schematic_routes()
-        logging.debug("RUN ROUTES - Initiating a new NX route setup sequence from Button "+str(route_button_id))
+        if highlight_possible_routes(route_button_id):
+            logging.debug("RUN ROUTES - Initiating a new NX route setup sequence from Button "+str(route_button_id))
+            activated_entry_button_id = route_button_id
+            enable_disable_schematic_routes()
+        elif entry_button_data["entrybutton"] == 0 and library.button_state(entry_button_data):
+            logging.debug("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
+            library.toggle_button(activated_entry_button_id)
     else:
         logging.debug("RUN ROUTES - Button "+str(route_button_id), " has been Selected")
     return()
 
 def highlight_possible_routes(route_button_id:int):
-    library.set_button_flashing(route_button_id)
+    one_or_more_possible_routes = False
     # Find the applicable route definition
     route_object = objects.schematic_objects[objects.route(route_button_id)]
     for route_definition in route_object["routedefinitions"]:
         route_tooltip, route_viable = check_route_viable(route_definition)
         if route_viable and route_definition["exitbutton"] > 0:
             library.set_button_flashing(route_definition["exitbutton"])
-    return()
+            one_or_more_possible_routes = True
+    if one_or_more_possible_routes:
+        library.set_button_flashing(route_button_id)
+    return(one_or_more_possible_routes)
 
 def unhighlight_possible_routes(route_button_id:int):
     library.reset_button_flashing(route_button_id)
