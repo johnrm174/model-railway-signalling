@@ -173,7 +173,7 @@ def create_switch(xpos:int, ypos:int):
     item_id = objects_common.new_item_id(exists_function=library.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["switchname"] = "Switch "+str(item_id)
+    objects_common.schematic_objects[object_id]["switchname"] = str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
@@ -198,7 +198,6 @@ def paste_switch(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=library.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
-    objects_common.schematic_objects[new_object_id]["switchname"] = "Switch "+str(new_id)
     objects_common.switch_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
