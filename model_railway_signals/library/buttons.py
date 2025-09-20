@@ -334,27 +334,17 @@ def get_button_data(button_id:int):
 
 def flash_button1(button_id:int):
     if button_exists(button_id):
-        if buttons[str(button_id)]["flashbutton"]:
-            buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["selectedcolour"])
-            common.root_window.after(250, lambda:flash_button2(button_id))
-        else:
-            reset_button_colour_according_to_state(button_id)
+        buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["selectedcolour"])
+        buttons[str(button_id)]["flashevent"] = common.root_window.after(250, lambda:flash_button2(button_id))
     return()
 
 def flash_button2(button_id:int):
     if button_exists(button_id):
-        if buttons[str(button_id)]["flashbutton"]:
-            buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["deselectedcolour"])
-            common.root_window.after(250, lambda:flash_button1(button_id))
-        else:
-            reset_button_colour_according_to_state(button_id)
+        buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["deselectedcolour"])
+        buttons[str(button_id)]["flashevent"] = common.root_window.after(250, lambda:flash_button1(button_id))
     return()
 
 def reset_button_colour_according_to_state(button_id:int):
-    if buttons[str(button_id)]["selected"]:
-        buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["selectedcolour"])
-    else:
-        buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["deselectedcolour"])
     return()
 
 def set_button_flashing(button_id:int):
@@ -365,7 +355,6 @@ def set_button_flashing(button_id:int):
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": set_button_flashing - Button ID does not exist")
     else:
-        buttons[str(button_id)]["flashbutton"] = True
         flash_button1(button_id)
     return()
 
@@ -377,7 +366,14 @@ def reset_button_flashing(button_id:int):
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": reset_button_flashing - Button ID does not exist")
     else:
-        buttons[str(button_id)]["flashbutton"] = False
+        if buttons[str(button_id)]["flashevent"] is not None:
+            flash_event = buttons[str(button_id)]["flashevent"]
+            buttons[str(button_id)]["flashevent"] = None
+            if flash_event: common.root_window.after_cancel(flash_event)
+        if buttons[str(button_id)]["selected"]:
+            buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["selectedcolour"])
+        else:
+            buttons[str(button_id)]["button"].config(bg=buttons[str(button_id)]["deselectedcolour"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -476,6 +472,7 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["hidden"] = hidden                            # True if the button should be hidden in run mode
         buttons[str(button_id)]["releasedelay"] = release_delay               # Delay in ms before momentary buttons are 'released'
         buttons[str(button_id)]["buttontype"] = buttontype                    # Type of the button (route, switch or button)
+        buttons[str(button_id)]["flashevent"] = None                          # Tkinter next 'after' event for button flashing
         buttons[str(button_id)]["button"] = button                            # Tkinter button object (for run mode)
         buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
         buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
