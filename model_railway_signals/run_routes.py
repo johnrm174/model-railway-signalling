@@ -797,8 +797,9 @@ def route_button_selected_callback(route_button_id:int):
             logging.debug("RUN ROUTES - Initiating a new NX route setup sequence from Button "+str(route_button_id))
             activated_entry_button_id = route_button_id
             enable_disable_schematic_routes()
-        elif entry_button_data["entrybutton"] == 0 and library.button_state(route_button_id):
-            logging.debug("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
+        # Deselect the button (only if not part of an active route)
+        elif library.button_state(route_button_id) and entry_button_data["entrybutton"] == 0 and entry_button_data["exitbutton"] == 0:
+            logging.debug("RUN ROUTES - Deselecting Button "+str(route_button_id)+" as no available routes")
             library.toggle_button(route_button_id)
     else:
         logging.debug("RUN ROUTES - Button "+str(route_button_id)+" has been Selected")
