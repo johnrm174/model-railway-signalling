@@ -556,11 +556,12 @@ class route_definition_tabs():
             self.list_of_routes[-1].set_values(route_definition)
 
     def add_route(self, after_tab:int):
-        self.list_of_routes.append(route_definition_tab(self.notebook_object,len(self.list_of_routes),
+        self.list_of_routes.append(route_definition_tab(self.notebook_object, len(self.list_of_routes),
                                                          self.add_route, self.delete_route))
         self.list_of_routes[-1].reset_values(colour=self.list_of_routes[0].routecolour.get_value())
         if self.entry_button or self.exit_button: self.list_of_routes[-1].enable()
         else: self.list_of_routes[-1].disable()
+        self.notebook_object.select(self.list_of_routes[-1])
 
     def delete_route(self, tab_id:int):
         self.list_of_routes[tab_id].destroy()
