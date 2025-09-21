@@ -774,6 +774,11 @@ def route_button_selected_callback(route_button_id:int):
             else:
                 logging.debug("RUN ROUTES - No available routes - Clearing down current NX route setup sequence")
                 activated_entry_button_id = 0
+                # Deselect the button (only if not part of an active route)
+                button_data = library.get_button_data(route_button_id)
+                if library.button_state(route_button_id) and button_data["entrybutton"] == 0 and button_data["exitbutton"] == 0:
+                    logging.debug("RUN ROUTES - Deselecting Button "+str(route_button_id)+" as no available routes")
+                    library.toggle_button(route_button_id)
             enable_disable_schematic_routes()
     elif route_object["entrybutton"]:
         entry_button_data = library.get_button_data(route_button_id)
@@ -792,11 +797,11 @@ def route_button_selected_callback(route_button_id:int):
             logging.debug("RUN ROUTES - Initiating a new NX route setup sequence from Button "+str(route_button_id))
             activated_entry_button_id = route_button_id
             enable_disable_schematic_routes()
-        elif entry_button_data["entrybutton"] == 0 and library.button_state(entry_button_data):
+        elif entry_button_data["entrybutton"] == 0 and library.button_state(route_button_id):
             logging.debug("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
-            library.toggle_button(activated_entry_button_id)
+            library.toggle_button(route_button_id)
     else:
-        logging.debug("RUN ROUTES - Button "+str(route_button_id), " has been Selected")
+        logging.debug("RUN ROUTES - Button "+str(route_button_id)+" has been Selected")
     return()
 
 def highlight_possible_routes(route_button_id:int):
@@ -805,9 +810,13 @@ def highlight_possible_routes(route_button_id:int):
     route_object = objects.schematic_objects[objects.route(route_button_id)]
     for route_definition in route_object["routedefinitions"]:
         route_tooltip, route_viable = check_route_viable(route_definition)
+        # If the route is viable and there is an exit button, then set it flashing
         if route_viable and route_definition["exitbutton"] > 0:
-            library.set_button_flashing(route_definition["exitbutton"])
-            one_or_more_possible_routes = True
+            exit_button_id = route_definition["exitbutton"]
+            # But only if it is not already the exit button of an active route
+            if library.get_button_data(exit_button_id)["entrybutton"] == 0:
+                library.set_button_flashing(route_definition["exitbutton"])
+                one_or_more_possible_routes = True
     if one_or_more_possible_routes:
         library.set_button_flashing(route_button_id)
     return(one_or_more_possible_routes)
