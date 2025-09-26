@@ -475,22 +475,25 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
-            # Process the clear down of any routes (button is always enabled if active)
+            # Process the clear down of any one-click or NX routes (button is always enabled if active)
             if library.button_state(int(str_route_button_id)) and route_definition["exitsensor"] == sensor_id:
                 # Deselect the button and schedule all required events to clear down the route
                 library.toggle_button(int(str_route_button_id))
                 route_button_deselected_callback(int(str_route_button_id))
-            # Process the set up of any routes (button may be enabled or disabled)
-            if not library.button_state(int(str_route_button_id)) and route_object["setupsensor"] == sensor_id:
-                # Only trigger the route setup if the route can be set up (i.e. route is viable)
-                route_tooltip, route_viable = check_route_viable(route_definition)
-                if route_viable:
-                    # Select the button and schedule all required events to set up the route
-                    library.toggle_button(int(str_route_button_id))
-                    route_button_selected_callback(int(str_route_button_id))
-                else:
-                    logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+
-                                       str_route_button_id+" set-up because:"+route_tooltip)
+        # Process the set up of any one-touch routes (button may be enabled or disabled)
+        # One-touch routes use the route index of zero - This feature is not enabled for NX routes
+        elif not library.button_state(int(str_route_button_id)) and route_object["setupsensor"] == sensor_id:
+            # Only trigger the route setup if the route can be set up (i.e. route is viable)
+            route_tooltip, route_viable = check_route_viable(route_object["routedefinitions"][0])
+            if route_viable:
+                logging.debug("RUN ROUTES - Triggering ONE-CLICK route "+str_route_button_id+" from Track Sensor "+str(sensor_id) )
+                # Select the button and schedule all required events to set up the route
+                # If the route is viable then the button should be unlocked and selectable
+                library.toggle_button(int(str_route_button_id))
+                route_button_selected_callback(int(str_route_button_id))
+            else:
+                logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+
+                                   str_route_button_id+" set-up because:"+route_tooltip)
     return()
 
 #-------------------------------------------------------------------------------------------------
