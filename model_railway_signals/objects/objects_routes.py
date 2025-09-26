@@ -96,7 +96,7 @@ default_route_object["resetonswitchchanges"] = True
 #------------------------------------------------------------------------------------
 default_route_definition = {}
 default_route_definition["routenotes"] = "Notes related to the route"
-default_route_definition["routecolour"] = "black"
+default_route_definition["routecolour"] = "white"
 # The "exitbutton" defines the exit button associated with an 'entry' route button
 # A value of zero (no exit button) means that the route button is for a 'normal' route
 default_route_definition["exitbutton"] = 0
