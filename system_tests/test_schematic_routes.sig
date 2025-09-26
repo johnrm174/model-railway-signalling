@@ -1,42 +1,87 @@
 {
     "buttons": {
         "1": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "10": {
+            "buttondata": null,
             "selected": false
         },
         "11": {
+            "buttondata": null,
             "selected": true
         },
         "12": {
+            "buttondata": null,
             "selected": false
         },
         "13": {
+            "buttondata": null,
             "selected": false
         },
         "2": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "3": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "4": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "5": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": 0
+            },
             "selected": true
         },
         "6": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "7": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "8": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "9": {
+            "buttondata": null,
             "selected": false
         }
     },
@@ -54,7 +99,8 @@
     "levers": {},
     "objects": {
         "0912ab77-bc8a-47d7-9334-7ac4cf3732b5": {
-            "bbox": 2210,
+            "bbox": 191,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 3,
@@ -124,7 +170,7 @@
             "tags": "sensor3"
         },
         "0924c57d-1f88-4c4f-9a85-88c502e9aedd": {
-            "bbox": 2214,
+            "bbox": 195,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -154,7 +200,7 @@
                 0,
                 0
             ],
-            "bbox": 2220,
+            "bbox": 203,
             "colour": "black",
             "endx": 400.0,
             "endy": 400.0,
@@ -168,7 +214,7 @@
             "tags": "line8"
         },
         "12db2eb4-7d45-452e-ae19-47b8532b48ef": {
-            "bbox": 2224,
+            "bbox": 207,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -198,7 +244,7 @@
                 0,
                 0
             ],
-            "bbox": 2230,
+            "bbox": 215,
             "colour": "black",
             "endx": 275.0,
             "endy": 175.0,
@@ -225,8 +271,9 @@
                 false,
                 ""
             ],
-            "bbox": 2252,
+            "bbox": 237,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -573,8 +620,9 @@
                 false,
                 ""
             ],
-            "bbox": 2274,
+            "bbox": 259,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -912,49 +960,59 @@
             "ybuttonoffset": 0
         },
         "280d74dc-dffb-402d-a51d-1e80f29a3a10": {
-            "bbox": 2278,
+            "bbox": 265,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 10,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 7,
-            "linestohighlight": [
-                9,
-                7
-            ],
-            "pointsonroute": {
-                "3": true
-            },
-            "pointstohighlight": [
-                3
-            ],
             "posx": 450.0,
             "posy": 375.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": true,
-            "routecolour": "#00ff00",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 0,
+                    "linestohighlight": [
+                        9,
+                        7
+                    ],
+                    "pointsonroute": {
+                        "3": true
+                    },
+                    "pointstohighlight": [
+                        3
+                    ],
+                    "routecolour": "#00ff00",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        5
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {
+                        "12": true
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Branch",
             "setupsensor": 0,
-            "signalsonroute": [
-                5
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {
-                "12": true
-            },
             "tags": "button7",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 0
+            ]
         },
         "2b303012-d183-4dc8-8ebb-967980c5420b": {
             "background": "",
-            "bbox": 2281,
+            "bbox": 268,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -978,7 +1036,7 @@
                 0,
                 0
             ],
-            "bbox": 2287,
+            "bbox": 276,
             "colour": "black",
             "endx": 775.0,
             "endy": 125.0,
@@ -992,7 +1050,7 @@
             "tags": "line4"
         },
         "372e382f-2dad-44b3-b825-e174d4cdb259": {
-            "bbox": 2302,
+            "bbox": 291,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1017,8 +1075,9 @@
                 false,
                 ""
             ],
-            "bbox": 2324,
+            "bbox": 313,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1353,7 +1412,7 @@
                 0,
                 0
             ],
-            "bbox": 2330,
+            "bbox": 321,
             "colour": "black",
             "endx": 775.0,
             "endy": 175.0,
@@ -1373,7 +1432,7 @@
                 0,
                 0
             ],
-            "bbox": 2336,
+            "bbox": 329,
             "colour": "black",
             "endx": 775.0,
             "endy": 75.0,
@@ -1388,7 +1447,7 @@
         },
         "420c4fa6-0479-4e63-85b6-32c16cfcce4a": {
             "background": "grey85",
-            "bbox": 2339,
+            "bbox": 332,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1406,51 +1465,62 @@
             ]
         },
         "43dc9897-b2c9-419c-98c7-0fce8c3179af": {
-            "bbox": 2343,
+            "bbox": 338,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 2,
-            "linestohighlight": [
-                1,
-                2,
-                3
-            ],
-            "pointsonroute": {
-                "1": true
-            },
-            "pointstohighlight": [
-                1
-            ],
             "posx": 300.0,
             "posy": 275.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#00ff00",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 4,
+                    "linestohighlight": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "pointsonroute": {
+                        "1": true
+                    },
+                    "pointstohighlight": [
+                        1
+                    ],
+                    "routecolour": "#00ff00",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [],
+                    "subsidariesonroute": [
+                        1
+                    ],
+                    "switchesonroute": {
+                        "10": false,
+                        "11": false,
+                        "9": true
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 1 Shunt",
             "setupsensor": 7,
-            "signalsonroute": [],
-            "subsidariesonroute": [
-                1
-            ],
             "switchdelay": 500,
-            "switchesonroute": {
-                "10": false,
-                "11": false,
-                "9": true
-            },
             "tags": "button2",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 4
+            ]
         },
         "445b70a5-fb3d-44e5-91b1-d72a0d139211": {
-            "bbox": 2347,
+            "bbox": 342,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 4,
@@ -1520,7 +1590,7 @@
             "tags": "sensor4"
         },
         "462b2667-f649-4486-b7a2-2679d7599a22": {
-            "bbox": 2351,
+            "bbox": 346,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1546,7 +1616,7 @@
         "466fdbb1-49a5-4389-ba22-b56e86e3a59b": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 2357,
+            "bbox": 354,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1613,7 +1683,8 @@
             "ybuttonoffset": 0
         },
         "49d49b5b-20d1-4be3-89b0-cebb49a8cda9": {
-            "bbox": 2361,
+            "bbox": 358,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 5,
@@ -1689,7 +1760,7 @@
                 0,
                 0
             ],
-            "bbox": 2367,
+            "bbox": 366,
             "colour": "black",
             "endx": 300.0,
             "endy": 400.0,
@@ -1703,7 +1774,7 @@
             "tags": "line9"
         },
         "534b717b-b266-45e5-9c0f-51ca2e6eeef3": {
-            "bbox": 2371,
+            "bbox": 372,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 12,
             "dccoffcommands": [],
@@ -1739,8 +1810,9 @@
                 false,
                 ""
             ],
-            "bbox": 2391,
+            "bbox": 392,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2062,7 +2134,7 @@
                 0,
                 0
             ],
-            "bbox": 2397,
+            "bbox": 400,
             "colour": "black",
             "endx": 400.0,
             "endy": 375.0,
@@ -2076,48 +2148,58 @@
             "tags": "line7"
         },
         "6925181f-7e58-4997-b225-794c2d3324cd": {
-            "bbox": 2401,
+            "bbox": 406,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 10,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 8,
-            "linestohighlight": [
-                9,
-                8
-            ],
-            "pointsonroute": {
-                "3": false
-            },
-            "pointstohighlight": [
-                3
-            ],
             "posx": 450.0,
             "posy": 400.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": true,
-            "routecolour": "#00ff00",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 0,
+                    "linestohighlight": [
+                        9,
+                        8
+                    ],
+                    "pointsonroute": {
+                        "3": false
+                    },
+                    "pointstohighlight": [
+                        3
+                    ],
+                    "routecolour": "#00ff00",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        5
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {
+                        "13": true
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Main",
             "setupsensor": 0,
-            "signalsonroute": [
-                5
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {
-                "13": true
-            },
             "tags": "button8",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 0
+            ]
         },
         "6e2f661b-6b6c-4d80-a545-95b834b458ea": {
-            "bbox": 2405,
+            "bbox": 412,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 12,
             "dccoffcommands": [],
@@ -2140,49 +2222,59 @@
             ]
         },
         "704ba590-fd9e-4cb0-9175-32af75278e82": {
-            "bbox": 2409,
+            "bbox": 418,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 3,
-            "linestohighlight": [
-                1,
-                4
-            ],
-            "pointsonroute": {
-                "1": false,
-                "2": false
-            },
-            "pointstohighlight": [
-                1,
-                2
-            ],
             "posx": 425.0,
             "posy": 250.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": true,
-            "routecolour": "#ff0000",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 5,
+                    "linestohighlight": [
+                        1,
+                        4
+                    ],
+                    "pointsonroute": {
+                        "1": false,
+                        "2": false
+                    },
+                    "pointstohighlight": [
+                        1,
+                        2
+                    ],
+                    "routecolour": "#ff0000",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        1
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {
+                        "10": true,
+                        "11": false,
+                        "9": false
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 2 Main",
             "setupsensor": 2,
-            "signalsonroute": [
-                1
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {
-                "10": true,
-                "11": false,
-                "9": false
-            },
             "tags": "button3",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 5
+            ]
         },
         "75307be4-51e9-46e7-b7e9-6c5ff8fbee03": {
             "arrowends": 0,
@@ -2191,7 +2283,7 @@
                 0,
                 0
             ],
-            "bbox": 2415,
+            "bbox": 426,
             "colour": "black",
             "endx": 175.0,
             "endy": 125.0,
@@ -2205,7 +2297,7 @@
             "tags": "line1"
         },
         "78fcedfd-6cc5-4c7d-96ce-32e62459c420": {
-            "bbox": 2419,
+            "bbox": 432,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 12,
             "dccoffcommands": [],
@@ -2241,8 +2333,9 @@
                 false,
                 ""
             ],
-            "bbox": 2441,
+            "bbox": 454,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2571,7 +2664,8 @@
             "ybuttonoffset": 0
         },
         "8710e041-1c1e-45a9-b06d-19b08446e60f": {
-            "bbox": 2445,
+            "bbox": 458,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 2,
@@ -2641,7 +2735,7 @@
             "tags": "sensor2"
         },
         "87f3f4a6-5fce-4ec3-ad51-7dfddf217e1b": {
-            "bbox": 2460,
+            "bbox": 473,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -2655,7 +2749,7 @@
         "88495a44-2ae1-478e-a569-1fcc3e5752d5": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 2466,
+            "bbox": 481,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2685,7 +2779,8 @@
             "ybuttonoffset": 0
         },
         "8b963207-bc64-4994-884b-a80c6acb7399": {
-            "bbox": 2470,
+            "bbox": 485,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 7,
@@ -2755,7 +2850,8 @@
             "tags": "sensor7"
         },
         "8cec8dc0-d59f-4804-92f7-5199536e9eb1": {
-            "bbox": 2474,
+            "bbox": 489,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 1,
@@ -2825,50 +2921,60 @@
             "tags": "sensor1"
         },
         "918adc91-218c-457c-a775-1ee41f83cc68": {
-            "bbox": 2478,
+            "bbox": 495,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 6,
-            "linestohighlight": [
-                1,
-                5,
-                6
-            ],
-            "pointsonroute": {
-                "1": false,
-                "2": true
-            },
-            "pointstohighlight": [
-                1,
-                2
-            ],
             "posx": 550.0,
             "posy": 275.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#00ff00",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 6,
+                    "linestohighlight": [
+                        1,
+                        5,
+                        6
+                    ],
+                    "pointsonroute": {
+                        "1": false,
+                        "2": true
+                    },
+                    "pointstohighlight": [
+                        1,
+                        2
+                    ],
+                    "routecolour": "#00ff00",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [],
+                    "subsidariesonroute": [
+                        1
+                    ],
+                    "switchesonroute": {
+                        "10": false,
+                        "11": true,
+                        "9": false
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 3 Shunt",
             "setupsensor": 9,
-            "signalsonroute": [],
-            "subsidariesonroute": [
-                1
-            ],
             "switchdelay": 500,
-            "switchesonroute": {
-                "10": false,
-                "11": true,
-                "9": false
-            },
             "tags": "button6",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 6
+            ]
         },
         "93e4afa2-bf1e-4d24-95ba-15dd11acbb68": {
             "approachcontrol": [
@@ -2884,8 +2990,9 @@
                 false,
                 ""
             ],
-            "bbox": 2500,
+            "bbox": 517,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3223,7 +3330,7 @@
             "ybuttonoffset": 0
         },
         "9547b313-2571-4ea6-a026-7d9434e05137": {
-            "bbox": 2504,
+            "bbox": 521,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3247,49 +3354,59 @@
             ]
         },
         "971da1aa-52b9-42dd-b2ca-40db4c8a513b": {
-            "bbox": 2508,
+            "bbox": 527,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 4,
-            "linestohighlight": [
-                1,
-                4
-            ],
-            "pointsonroute": {
-                "1": false,
-                "2": false
-            },
-            "pointstohighlight": [
-                1,
-                2
-            ],
             "posx": 425.0,
             "posy": 275.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#00ff00",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 5,
+                    "linestohighlight": [
+                        1,
+                        4
+                    ],
+                    "pointsonroute": {
+                        "1": false,
+                        "2": false
+                    },
+                    "pointstohighlight": [
+                        1,
+                        2
+                    ],
+                    "routecolour": "#00ff00",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [],
+                    "subsidariesonroute": [
+                        1
+                    ],
+                    "switchesonroute": {
+                        "10": true,
+                        "11": false,
+                        "9": false
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 2 Shunt",
             "setupsensor": 8,
-            "signalsonroute": [],
-            "subsidariesonroute": [
-                1
-            ],
             "switchdelay": 500,
-            "switchesonroute": {
-                "10": true,
-                "11": false,
-                "9": false
-            },
             "tags": "button4",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 5
+            ]
         },
         "984119d5-aafc-45f8-9203-b0ff939d41c0": {
             "arrowends": 0,
@@ -3298,7 +3415,7 @@
                 0,
                 0
             ],
-            "bbox": 2514,
+            "bbox": 535,
             "colour": "black",
             "endx": 225.0,
             "endy": 75.0,
@@ -3325,8 +3442,9 @@
                 false,
                 ""
             ],
-            "bbox": 2536,
+            "bbox": 557,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3655,7 +3773,8 @@
             "ybuttonoffset": 0
         },
         "a92e8ca3-c130-4ad9-8ecb-f0a8047eb3b7": {
-            "bbox": 2540,
+            "bbox": 561,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 9,
@@ -3725,7 +3844,7 @@
             "tags": "sensor9"
         },
         "acd3eb63-6cfe-42f3-a2c7-dc1eafb0d38e": {
-            "bbox": 2544,
+            "bbox": 567,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 12,
             "dccoffcommands": [],
@@ -3748,7 +3867,7 @@
             ]
         },
         "ad6c5d81-9864-4204-afc9-5c47ca23937e": {
-            "bbox": 2548,
+            "bbox": 571,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3772,7 +3891,8 @@
             ]
         },
         "b7d608ad-5feb-44c7-aba2-eae71ede0561": {
-            "bbox": 2552,
+            "bbox": 575,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 8,
@@ -3855,8 +3975,9 @@
                 false,
                 ""
             ],
-            "bbox": 2574,
+            "bbox": 597,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4284,7 +4405,7 @@
         "c066da43-4a4e-4839-8e88-d65e842f1195": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 2580,
+            "bbox": 605,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -4364,7 +4485,7 @@
         },
         "c25738d9-8763-45a3-b4d4-0d22959570f8": {
             "background": "grey85",
-            "bbox": 2583,
+            "bbox": 608,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4382,7 +4503,7 @@
             ]
         },
         "c2d0102b-7032-4fa3-92b5-a9698485399f": {
-            "bbox": 2587,
+            "bbox": 612,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4406,7 +4527,7 @@
             ]
         },
         "c6ee6d5e-87fd-4685-bf52-559af959aa45": {
-            "bbox": 2591,
+            "bbox": 616,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4430,7 +4551,8 @@
             ]
         },
         "c949d7d6-199b-40e4-9026-1e04385cf973": {
-            "bbox": 2595,
+            "bbox": 620,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 6,
@@ -4500,7 +4622,7 @@
             "tags": "sensor6"
         },
         "c97f55e2-d1f8-4da5-92e1-31e75fe35337": {
-            "bbox": 2599,
+            "bbox": 626,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 12,
             "dccoffcommands": [],
@@ -4524,7 +4646,7 @@
         },
         "dd7d818f-2841-424a-98e7-bc49581cbdc7": {
             "background": "",
-            "bbox": 2602,
+            "bbox": 629,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4542,7 +4664,7 @@
             ]
         },
         "e2f14aba-d776-4f1e-91f0-ea653bb150fa": {
-            "bbox": 2606,
+            "bbox": 633,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4566,7 +4688,7 @@
             ]
         },
         "eecbdb5e-04c4-4fc8-97f7-b0b7ebfce322": {
-            "bbox": 2610,
+            "bbox": 637,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4590,94 +4712,114 @@
             ]
         },
         "f9d2ee11-4010-46e4-948e-0a4e1c062b33": {
-            "bbox": 2614,
+            "bbox": 643,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 1,
-            "linestohighlight": [
-                1,
-                2,
-                3
-            ],
-            "pointsonroute": {
-                "1": true
-            },
-            "pointstohighlight": [
-                1
-            ],
             "posx": 300.0,
             "posy": 250.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": true,
-            "routecolour": "#ff0000",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 4,
+                    "linestohighlight": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "pointsonroute": {
+                        "1": true
+                    },
+                    "pointstohighlight": [
+                        1
+                    ],
+                    "routecolour": "#ff0000",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        1
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {
+                        "10": false,
+                        "11": false,
+                        "9": true
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 1 Main",
             "setupsensor": 1,
-            "signalsonroute": [
-                1
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {
-                "10": false,
-                "11": false,
-                "9": true
-            },
             "tags": "button1",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 4
+            ]
         },
         "fdb9c32e-4cee-4264-b5d3-5d30da73ee8b": {
-            "bbox": 2618,
+            "bbox": 649,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 5,
-            "linestohighlight": [
-                1,
-                5,
-                6
-            ],
-            "pointsonroute": {
-                "1": false,
-                "2": true
-            },
-            "pointstohighlight": [
-                1,
-                2
-            ],
             "posx": 550.0,
             "posy": 250.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": true,
-            "routecolour": "#ff0000",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 6,
+                    "linestohighlight": [
+                        1,
+                        5,
+                        6
+                    ],
+                    "pointsonroute": {
+                        "1": false,
+                        "2": true
+                    },
+                    "pointstohighlight": [
+                        1,
+                        2
+                    ],
+                    "routecolour": "#ff0000",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        1
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {
+                        "10": false,
+                        "11": true,
+                        "9": false
+                    }
+                }
+            ],
             "routedescription": "Route description (Run Mode tooltip)",
             "routename": "Route 3 Main",
             "setupsensor": 3,
-            "signalsonroute": [
-                1
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {
-                "10": false,
-                "11": true,
-                "9": false
-            },
             "tags": "button5",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 6
+            ]
         }
     },
     "points": {
@@ -4746,8 +4888,12 @@
             "snaptogrid": true,
             "width": 1100
         },
+        "control": {
+            "dccsoundmappings": []
+        },
         "general": {
             "automation": true,
+            "baseitemid": 1,
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/system_tests/test_schematic_routes.sig",
             "info": "Document your layout here",

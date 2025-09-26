@@ -55,24 +55,28 @@ def run_change_of_item_id_tests():
     assert_object_configuration(rb1,{"itemid":4})
     assert_object_configuration(rb2,{"itemid":5})
     # Configure the routes
-    update_object_configuration(rb1,{
-        "signalsonroute": [1,2,3],
-        "subsidariesonroute": [1,2,3],
-        "pointsonroute":{"1":True, "2":False, "3":True},
-        "switchesonroute":{"1":True, "2":False, "3":True},
-        "linestohighlight":[1,2,3],
-        "pointstohighlight":[1,2,3],
-        "tracksensor":1,
-        "setupsensor":2} )
-    update_object_configuration(rb2,{
-        "signalsonroute": [1,2,4],
-        "subsidariesonroute": [1,2,4],
-        "pointsonroute":{"1":False, "2":True, "4":False},
-        "switchesonroute":{"1":False, "2":True, "3":False},
-        "linestohighlight":[1,2,4],
-        "pointstohighlight":[1,2,4],
-        "tracksensor":2,
-        "setupsensor":1} )
+    route_definition1 = { "signalsonroute": [1,2,3],
+                          "subsidariesonroute": [1,2,3],
+                          "pointsonroute":{"1":True, "2":False, "3":True},
+                          "switchesonroute":{"1":True, "2":False, "3":True},
+                          "linestohighlight":[1,2,3],
+                          "pointstohighlight":[1,2,3],
+                          "exitsensor":1,
+                          "exitbutton":5,
+                          "routenotes":"",
+                          "routecolour":"Red"}
+    route_definition2 = { "signalsonroute": [1,2,4],
+                          "subsidariesonroute": [1,2,4],
+                          "pointsonroute":{"1":False, "2":True, "4":False},
+                          "switchesonroute":{"1":False, "2":True, "3":False},
+                          "linestohighlight":[1,2,4],
+                          "pointstohighlight":[1,2,4],
+                          "exitsensor":2,
+                          "exitbutton":4,
+                          "routenotes":"",
+                          "routecolour":"Red"}
+    update_object_configuration(rb1, {"routedefinitions": [route_definition1,], "setupsensor": 2 })
+    update_object_configuration(rb2, {"routedefinitions": [route_definition2,], "setupsensor": 1 })
     # Update the IDs of the signals, lines, points and track sensors
     update_object_configuration(l1,{"itemid":11})
     update_object_configuration(l2,{"itemid":12})
@@ -92,6 +96,8 @@ def run_change_of_item_id_tests():
     update_object_configuration(sw1,{"itemid":51})
     update_object_configuration(sw2,{"itemid":52})
     update_object_configuration(sw3,{"itemid":53})
+    update_object_configuration(rb1,{"itemid":64})
+    update_object_configuration(rb2,{"itemid":65})
     # Test the Item IDs have been successfully changed
     assert_object_configuration(l1,{"itemid":11})
     assert_object_configuration(l2,{"itemid":12})
@@ -110,92 +116,123 @@ def run_change_of_item_id_tests():
     assert_object_configuration(sw1,{"itemid":51})
     assert_object_configuration(sw2,{"itemid":52})
     assert_object_configuration(sw3,{"itemid":53})
+    assert_object_configuration(rb1,{"itemid":64})
+    assert_object_configuration(rb2,{"itemid":65})
     # Test the Route configurations have been successfully updated
-    assert_object_configuration(rb1,{
-        "signalsonroute": [31,32,33],
-        "subsidariesonroute": [31,32,33],
-        "pointsonroute":{"21":True, "22":False, "23":True},
-        "switchesonroute":{"51":True, "52":False, "53":True},
-        "linestohighlight":[11,12,13],
-        "pointstohighlight":[21,22,23],
-        "tracksensor":41,
-        "setupsensor":42} )
-    assert_object_configuration(rb2,{
-        "signalsonroute": [31,32,34],
-        "subsidariesonroute": [31,32,34],
-        "pointsonroute":{"21":False, "22":True, "24":False},
-        "switchesonroute":{"51":False, "52":True, "53":False},
-        "linestohighlight":[11,12,14],
-        "pointstohighlight":[21,22,24],
-        "tracksensor":42,
-        "setupsensor":41} )
+    new_route_definition1 = { "signalsonroute": [31,32,33],
+                              "subsidariesonroute": [31,32,33],
+                              "pointsonroute":{"21":True, "22":False, "23":True},
+                              "switchesonroute":{"51":True, "52":False, "53":True},
+                              "linestohighlight":[11,12,13],
+                              "pointstohighlight":[21,22,23],
+                              "exitsensor":41,
+                              "exitbutton":65,
+                              "routenotes":"",
+                              "routecolour":"Red"}
+    new_route_definition2 = { "signalsonroute": [31,32,34],
+                              "subsidariesonroute": [31,32,34],
+                              "pointsonroute":{"21":False, "22":True, "24":False},
+                              "switchesonroute":{"51":False, "52":True, "53":False},
+                              "linestohighlight":[11,12,14],
+                              "pointstohighlight":[21,22,24],
+                              "exitsensor":42,
+                              "exitbutton":64,
+                              "routenotes":"",
+                              "routecolour":"Red"}
+    assert_object_configuration(rb1,{"routedefinitions": [new_route_definition1,], "setupsensor": 42 } )
+    assert_object_configuration(rb2,{"routedefinitions": [new_route_definition2,], "setupsensor": 41 } )
     # Test Item deletion ( i.e items are removed from the route configuration
     deselect_all_objects()
     select_or_deselect_objects(sw1, p1, s2, l3, ts1)
     delete_selected_objects()
     # Test the Route configurations have been successfully updated
-    assert_object_configuration(rb1,{
-        "signalsonroute": [31,33],
-        "subsidariesonroute": [31,33],
-        "pointsonroute":{"22":False, "23":True},
-        "switchesonroute":{"52":False, "53":True},
-        "linestohighlight":[11,12],
-        "pointstohighlight":[22,23],
-        "tracksensor":0,
-        "setupsensor":42} )
-    assert_object_configuration(rb2,{
-        "signalsonroute": [31,34],
-        "subsidariesonroute": [31,34],
-        "pointsonroute":{"22":True, "24":False},
-        "switchesonroute":{"52":True, "53":False},
-        "linestohighlight":[11,12,14],
-        "pointstohighlight":[22,24],
-        "tracksensor":42,
-        "setupsensor":0} )
+    new_route_definition1 = { "signalsonroute": [31,33],
+                              "subsidariesonroute": [31,33],
+                              "pointsonroute":{"22":False, "23":True},
+                              "switchesonroute":{"52":False, "53":True},
+                              "linestohighlight":[11,12],
+                              "pointstohighlight":[22,23],
+                              "exitsensor":0,
+                              "exitbutton":65,
+                              "routenotes":"",
+                              "routecolour":"Red"}
+    new_route_definition2 = { "signalsonroute": [31,34],
+                              "subsidariesonroute": [31,34],
+                              "pointsonroute":{"22":True, "24":False},
+                              "switchesonroute":{"52":True, "53":False},
+                              "linestohighlight":[11,12,14],
+                              "pointstohighlight":[22,24],
+                              "exitsensor":42,
+                              "exitbutton":64,
+                              "routenotes":"",
+                              "routecolour":"Red"}
+    assert_object_configuration(rb1,{"routedefinitions":[new_route_definition1,], "setupsensor":42 } )
+    assert_object_configuration(rb2,{"routedefinitions":[new_route_definition2,], "setupsensor":0 })
     # Test deletion again - just for the hell of it
     select_or_deselect_objects(sw3, p4, s4, l4, ts2)
     delete_selected_objects()
     # Test the Route configurations have been successfully updated
-    assert_object_configuration(rb1,{
-        "signalsonroute": [31,33],
-        "subsidariesonroute": [31,33],
-        "pointsonroute":{"22":False, "23":True},
-        "switchesonroute":{"52":False},
-        "linestohighlight":[11,12],
-        "pointstohighlight":[22,23],
-        "tracksensor":0,
-        "setupsensor":0 } )
-    assert_object_configuration(rb2,{
-        "signalsonroute": [31],
-        "subsidariesonroute": [31],
-        "pointsonroute":{"22":True},
-        "switchesonroute":{"52":True},
-        "linestohighlight":[11,12],
-        "pointstohighlight":[22],
-        "tracksensor":0,
-        "setupsensor":0 } )
+    new_route_definition1 = { "signalsonroute": [31,33],
+                              "subsidariesonroute": [31,33],
+                              "pointsonroute":{"22":False, "23":True},
+                              "switchesonroute":{"52":False},
+                              "linestohighlight":[11,12],
+                              "pointstohighlight":[22,23],
+                              "exitsensor":0,
+                              "exitbutton":65,
+                              "routenotes":"",
+                              "routecolour":"Red"}
+    new_route_definition2 = { "signalsonroute": [31],
+                              "subsidariesonroute": [31],
+                              "pointsonroute":{"22":True},
+                              "switchesonroute":{"52":True},
+                              "linestohighlight":[11,12],
+                              "pointstohighlight":[22],
+                              "exitsensor":0,
+                              "exitbutton":64,
+                              "routenotes":"",
+                              "routecolour":"Red"}
+    assert_object_configuration(rb1,{"routedefinitions":[new_route_definition1,], "setupsensor":0 } )
+    assert_object_configuration(rb2,{"routedefinitions":[new_route_definition2,], "setupsensor":0 })
     # Test Copy and Paste of a route
-    update_object_configuration(rb1,{"tracksensor":43, "setupsensor":43})
-    assert_object_configuration(rb1,{
-        "signalsonroute": [31,33],
-        "subsidariesonroute": [31,33],
-        "pointsonroute":{"22":False, "23":True},
-        "switchesonroute":{"52":False},
-        "linestohighlight":[11,12],
-        "pointstohighlight":[22,23],
-        "tracksensor":43,
-        "setupsensor":43 } )
+    route_definition1 = { "signalsonroute": [31,33],
+                          "subsidariesonroute": [31,33],
+                          "pointsonroute":{"22":True, "23":False},
+                          "switchesonroute":{"2":True},
+                          "linestohighlight":[11,12],
+                          "pointstohighlight":[22,23],
+                          "exitsensor":43,
+                          "exitbutton":65,
+                          "routenotes":"ABC",
+                          "routecolour":"Red"}
+    update_object_configuration(rb1, {"routedefinitions": [route_definition1,], "setupsensor": 43 })
     select_single_object(rb1)
     [rb3] = copy_selected_objects(0,50)
-    assert_object_configuration(rb3,{
-        "signalsonroute": [],
-        "subsidariesonroute": [],
-        "pointsonroute":{},
-        "switchesonroute":{},
-        "linestohighlight":[],
-        "pointstohighlight":[],
-        "tracksensor":0,
-        "setupsensor":0 } )
+    route_definition3 = { "signalsonroute": [],
+                          "subsidariesonroute": [],
+                          "pointsonroute":{},
+                          "switchesonroute":{},
+                          "linestohighlight":[],
+                          "pointstohighlight":[],
+                          "exitsensor":0,
+                          "exitbutton":0,
+                          "routenotes":"Notes related to the route",
+                          "routecolour":"white"}
+    assert_object_configuration(rb3,{"routedefinitions":[route_definition3,], "setupsensor":0 } )
+    # Finally test the deletion of an exit button
+    select_single_object(rb2)
+    delete_selected_objects()
+    route_definition1 = { "signalsonroute": [31,33],
+                          "subsidariesonroute": [31,33],
+                          "pointsonroute":{"22":True, "23":False},
+                          "switchesonroute":{"2":True},
+                          "linestohighlight":[11,12],
+                          "pointstohighlight":[22,23],
+                          "exitsensor":43,
+                          "exitbutton":0,
+                          "routenotes":"ABC",
+                          "routecolour":"Red"}    
+    assert_object_configuration(rb1, {"routedefinitions": [route_definition1,], "setupsensor": 43 })
     # Clean up
     select_all_objects()
     delete_selected_objects()
@@ -211,8 +248,8 @@ def run_initial_state_tests():
     # Route 5 should be active with Point 2 switched and Signal 1 OFF
     # Instrument is BLOCKED so Route 1 will not be viable (when Route 5 de-selected)
     assert_buttons_selected(5)          # Route 3 Main
-    assert_buttons_disabled(1,2,3,4)
-    assert_buttons_enabled(5,6)
+    assert_buttons_disabled(1,2,3,4,6)
+    assert_buttons_enabled(5)
     assert_points_switched(2)
     assert_points_normal(1)
     assert_signals_PROCEED(1)
@@ -325,8 +362,8 @@ def run_schematic_routes_tests():
     sleep(2.0)
     assert_buttons_selected(5)
     assert_buttons_deselected(1,2,3,4,6)
-    assert_buttons_disabled(1,2,3,4)
-    assert_buttons_enabled(5,6)
+    assert_buttons_disabled(1,2,3,4,6)
+    assert_buttons_enabled(5)
     assert_buttons_selected(11)           # Switch 11
     assert_buttons_deselected(9,10)       # Switch 9,10
     assert_points_normal(1)
@@ -345,8 +382,8 @@ def run_schematic_routes_tests():
     sleep(2.0)
     assert_buttons_selected(2)
     assert_buttons_deselected(1,3,4,5,6)
-    assert_buttons_enabled(1,2)
-    assert_buttons_disabled(3,4,5,6)
+    assert_buttons_enabled(2)
+    assert_buttons_disabled(1, 3,4,5,6)
     assert_buttons_selected(9)            # Switch 9
     assert_buttons_deselected(10,11)      # Switch 10,11
     assert_points_normal(2)
@@ -365,8 +402,8 @@ def run_schematic_routes_tests():
     sleep(3.0)
     assert_buttons_selected(6)
     assert_buttons_deselected(1,2,3,4,5)
-    assert_buttons_enabled(5,6)
-    assert_buttons_disabled(1,2,3,4)
+    assert_buttons_enabled(6)
+    assert_buttons_disabled(1,2,3,4,5)
     assert_buttons_selected(11)           # Switch 11
     assert_buttons_deselected(9,10)       # Switch 9,10
     assert_points_normal(1)
@@ -383,8 +420,8 @@ def run_schematic_routes_tests():
     # Note we need to put the points back to normal first
     set_points_normal(2)
     set_signals_off(1)
-    assert_buttons_enabled(3,4)
-    assert_buttons_disabled(1,2,5,6)
+    assert_buttons_enabled(3)
+    assert_buttons_disabled(1,2,4,5,6)
     simulate_buttons_clicked(3)
     sleep(1.5)
     assert_buttons_selected(3)
@@ -394,8 +431,8 @@ def run_schematic_routes_tests():
     assert_buttons_enabled(1,2,3,4,5,6)
     # Test Basic setup and cleardown of Subsidary Routes - where subsidaries are already clear
     set_subsidaries_off(1)
-    assert_buttons_enabled(3,4)
-    assert_buttons_disabled(1,2,5,6)
+    assert_buttons_enabled(4)
+    assert_buttons_disabled(1,2,3,5,6)
     simulate_buttons_clicked(4)
     sleep(1.5)
     assert_buttons_selected(4)
@@ -405,8 +442,8 @@ def run_schematic_routes_tests():
     assert_buttons_enabled(1,2,3,4,5,6)
     # Test Reset of Main Signal if Subsidary Route Selected and vice versa
     set_signals_off(1)
-    assert_buttons_enabled(3,4)
-    assert_buttons_disabled(1,2,5,6)
+    assert_buttons_enabled(3)
+    assert_buttons_disabled(1,2,4,5,6)
     simulate_buttons_clicked(4)
     sleep(2)
     assert_buttons_selected(4)
@@ -640,19 +677,15 @@ def run_schematic_routes_example_tests():
     sleep(0.1)
     assert_buttons_enabled(20)    
     # Test setting up a route that includes a main signal when the Subsidary is OFF
-    # For this test we use Route 15 (Platform 3 to Branch)
+    # For this test we use Route 15 (Platform 3 to Branch) - The button should be disabled
     set_fpls_off(9,14)
     set_points_normal(9,14)
     set_fpls_on(9,14)
     assert_buttons_enabled(15)    
     set_subsidaries_off(7)
+    assert_buttons_disabled(15)    
+    set_subsidaries_on(7)
     assert_buttons_enabled(15)    
-    simulate_buttons_clicked(15)
-    sleep(2)
-    assert_buttons_selected(15)    
-    simulate_buttons_clicked(15)
-    sleep(2)
-    assert_buttons_deselected(15)
     # Test setting up a route where the points are correctly set but the FPL is OFF
     set_fpls_off(9)
     assert_buttons_enabled(15)    
@@ -674,6 +707,10 @@ def run_all_schematic_routes_tests():
     # Run the Tests for "test_schematic_routes.sig" - Note this layout File should  
     # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_configuration_windows.test_all_object_edit_windows()
+    set_run_mode()
     print("Schematic Route Tests - Initial State Tests")
     run_initial_state_tests()
     print("Schematic Route Tests - Run Mode, Automation Off")
@@ -682,22 +719,19 @@ def run_all_schematic_routes_tests():
     print("Schematic Route Tests - Run Mode, Automation On")
     set_automation_on()
     run_schematic_routes_tests()
+    # Run the Tests for the example layout
+    initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
-    # Run the Tests for the example layout
-    initialise_test_harness(filename="../model_railway_signals/examples/schematic_routes_example.sig")
-    reset_layout()
     print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
+    reset_layout()
     set_run_mode()
     set_automation_off()
     run_schematic_routes_example_tests()
     print("Schematic Route Example Layout Tests - Run Mode, Automation On")
     set_automation_on()
     run_schematic_routes_example_tests()
-    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    set_edit_mode()
-    test_configuration_windows.test_all_object_edit_windows()
     report_results()
     
 if __name__ == "__main__":
