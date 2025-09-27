@@ -707,10 +707,6 @@ def run_all_schematic_routes_tests():
     # Run the Tests for "test_schematic_routes.sig" - Note this layout File should  
     # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
-    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    set_edit_mode()
-    test_configuration_windows.test_all_object_edit_windows()
-    set_run_mode()
     print("Schematic Route Tests - Initial State Tests")
     run_initial_state_tests()
     print("Schematic Route Tests - Run Mode, Automation Off")
@@ -719,6 +715,9 @@ def run_all_schematic_routes_tests():
     print("Schematic Route Tests - Run Mode, Automation On")
     set_automation_on()
     run_schematic_routes_tests()
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_configuration_windows.test_all_object_edit_windows()
     # Run the Tests for the example layout
     initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
