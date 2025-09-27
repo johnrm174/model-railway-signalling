@@ -29,6 +29,9 @@
 #       text_colour:str - the colour to use for the button text (default='black')
 #       frame_colour:str - the colour to use for the lever body colour (default='Grey40')
 #       font:(str,int,str) - the font to apply - default=("TkFixedFont", 8, "bold")
+#       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
+#       button_yoffset:int - Position offset for the point buttons (from default) - default = 0
+#       hide_buttons:bool - Point is configured to have the control buttons hidden in Run Mode - Default = False.
 #
 #   update_lever_styles - updates the styles of a lever object 
 #     Mandatory Parameters:
@@ -97,6 +100,28 @@ def set_lever_switching_behaviour(ignore_locking:bool, display_popups:bool):
     global display_warnings
     ignore_interlocking = ignore_locking
     display_warnings = display_popups
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Library function to set/clear Edit Mode (called by the editor on mode change)
+# Point buttons will be hidden in Run Mode if the 'hidden' flag is set
+#---------------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    # Update all existing library objects (according to the current mode)
+    for lever_id in levers:
+        lever = levers[lever_id]
+        if editing_enabled:
+            # In Edit mode the button windows are always displayed (if they exist)
+            lever["canvas"].itemconfig(lever["window"], state="normal")
+        elif lever["hidebuttons"]:
+            # In Run Mode - If the buttons are configured as 'hidden' then hide the button windows
+            lever["canvas"].itemconfig(lever["window"], state="hidden")
     return()
 
 #-------------------------------------------------------------------------
@@ -210,7 +235,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                  button_colour:str="Grey85", active_colour:str="Grey95",
                  selected_colour:str="White", text_colour:str="Black",
                  frame_colour:str="Grey40", lock_text_colour:str="White",
-                 font=("TkFixedFont", 8 ,"bold")):
+                 font=("TkFixedFont", 8 ,"bold"), button_xoffset:int=0,
+                 button_yoffset:int=0, hide_buttons:bool=False):
     global levers
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "lever"+str(lever_id)
@@ -260,7 +286,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         lever_button_tooltip.text = "Unlocked"
         # Create the Tkinter drawing objects for the schematic object
         rectangle = canvas.create_rectangle(x-12,y,x+12,y+30 ,fill=frame_colour, width=1, tags=canvas_tag)
-        canvas.create_window(x, y+33, window=button, anchor=Tk.N, tags=canvas_tag)
+        lever_button_window = canvas.create_window(x+button_xoffset, y+button_yoffset+33, window=button, anchor=Tk.N, tags=canvas_tag)
         lever1a = canvas.create_line(x, y-12, x, y-25, fill=colour1, width=5, state="normal", tags=canvas_tag)
         lever1b = canvas.create_line(x, y+5, x, y-12, fill=colour2, width=5, state="normal", tags=canvas_tag)
         lever2a = canvas.create_line(x, y, x, y-10, fill=colour1, width=5, state="hidden", tags=canvas_tag)
@@ -271,10 +297,16 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         # Bind the canvas keypress events (if specified)
         if on_keycode > 0: common.add_keyboard_event(on_keycode, "Lever", lever_id, lever_on_keypress_event)
         if off_keycode >0: common.add_keyboard_event(off_keycode, "Lever", lever_id, lever_off_keypress_event)
+        # hide the button if we are in Run Mode and the "hide_buttons" flag is set
+        if not editing_enabled and hide_buttons:
+            canvas.itemconfig(lever_button_window, state="hidden")
+        else:
+            canvas.itemconfig(lever_button_window, state="normal")
         # Compile a dictionary of everything we need to track
         levers[str(lever_id)] = {}
         levers[str(lever_id)]["canvas"] = canvas                   # Tkinter canvas object
         levers[str(lever_id)]["button"] = button                   # Tkinter button object
+        levers[str(lever_id)]["window"] = lever_button_window      # Tkinter window object
         levers[str(lever_id)]["tooltip"] = lever_button_tooltip    # button tooltip object
         levers[str(lever_id)]["rectangle"] = rectangle             # Tkinter drawing object
         levers[str(lever_id)]["lever1a"] = lever1a                 # Tkinter drawing object
@@ -290,6 +322,7 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         levers[str(lever_id)]["offkeycode"] = off_keycode          # Keycode for setting the lever OFF
         levers[str(lever_id)]["selectedcolour"] = selected_colour  # the default colour for the change button
         levers[str(lever_id)]["deselectedcolour"] = button_colour  # the default colour for the change button
+        levers[str(lever_id)]["hidebuttons"] = hide_buttons        # Whether the lever buttons should be hidden in Run Mode
         levers[str(lever_id)]["tags"] = canvas_tag                 # Canvas Tags for all drawing objects
         # Get the initial state for the lever (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied

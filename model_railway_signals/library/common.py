@@ -58,6 +58,7 @@ from . import block_instruments
 from . import dcc_control
 from . import buttons
 from . import points
+from . import levers
 from . import lines
 from . import signals
 
@@ -317,6 +318,7 @@ def configure_edit_mode(edit_mode:bool):
     points.configure_edit_mode(edit_mode)
     lines.configure_edit_mode(edit_mode)
     signals.configure_edit_mode(edit_mode)
+    levers.configure_edit_mode(edit_mode)
     # Toggle the hiding/display of item IDs as appropriate
     if edit_mode and item_ids_displayed: show_item_ids()
     else: hide_item_ids()

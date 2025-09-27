@@ -70,10 +70,10 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New feature to trigger the playing of audio files by specified DCC commands:
     * Uses audio output of the Signalling System and/or Remote Signalling Nodes.
     * Enables audio such as station announcements to be triggered by DCC switches.
-* The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>
+* The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>:
     * Aids identification to take the pain out of configuring routes.
-
-
+* Added ability to apply offsets for Signalbox Lever buttons and/or hide them in Run Mode:
+    * Can be used to provide better seperation of buttons when using touchscreens.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

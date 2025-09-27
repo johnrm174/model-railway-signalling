@@ -29,6 +29,7 @@
 #    common.selection_buttons
 #    common.validated_keycode_entry_box
 #    common.window_controls
+#    common.button_configuration
 #
 #------------------------------------------------------------------------------------
 
@@ -343,6 +344,9 @@ class edit_lever():
                                         "Select the type of signalbox lever", callback=self.lever_type_changed,
                                      button_labels=("Spare", "Signal", "Point"))
             self.levertype.pack(padx=2, pady=2, fill='x')
+            # Create the button offset Selections
+            self.buttonoffsets = common.button_configuration(self.main_frame)
+            self.buttonoffsets.pack(padx=2, pady=2, fill='x')
             # Create the signal and point selection elements
             self.signal = signal_configuration(self.main_frame)
             self.signal.pack(padx=2, pady=2, fill='x')
@@ -394,6 +398,11 @@ class edit_lever():
             self.window.title("Signalbox Lever "+str(item_id))
             linked_signal = objects.schematic_objects[self.object_id]["linkedsignal"]
             linked_point = objects.schematic_objects[self.object_id]["linkedpoint"] 
+            # These are the lever button position offsets:
+            hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
+            xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
+            yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
+            self.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
             # Work out the lever type selection to set(signal, point or spare)
             lever_type = objects.schematic_objects[self.object_id]["itemtype"]
             if  lever_type in (2, 3): lever_selection = 2
@@ -430,13 +439,17 @@ class edit_lever():
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
         elif ( self.leverid.validate() and self.point.validate() and self.signal.validate() and
-               self.keycodes.validate() ):
+               self.keycodes.validate() and self.buttonoffsets.validate() ):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.leverid.get_value()
             new_object_configuration["onkeycode"] = self.keycodes.onkeycode.get_value()
             new_object_configuration["offkeycode"] = self.keycodes.offkeycode.get_value()
+            hidden, xoffset, yoffset = self.buttonoffsets.get_values()
+            new_object_configuration["hidebuttons"] = hidden
+            new_object_configuration["xbuttonoffset"] = xoffset
+            new_object_configuration["ybuttonoffset"] = yoffset
             point_id, point_lever_subtype = self.point.get_values()
             new_object_configuration["linkedpoint"] = point_id
             new_object_configuration["switchpoint"] = (point_lever_subtype == 1)
