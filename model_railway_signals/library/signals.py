@@ -390,14 +390,20 @@ def approach_release_button_event(sig_id:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Internal functions for "resetting" the released/passed buttons after the timeout 
+# Internal functions for "resetting" the released/passed buttons after the timeout
+# For both functions we test to see if the signal still exists to prevent exceptions
+# if the functions are run AFTER the signal has been deleted. For the Approach button,
+# we additionally check that the signal supports approach control (in case the signal
+# has been deleted and a new signal of the same ID created prior to the function being
+# called - This is primarily to prevent errors when running the automated system tests.
 # -------------------------------------------------------------------------
 
 def reset_sig_passed_button(sig_id:int):
     if signal_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg="grey85")
 
 def reset_sig_released_button(sig_id:int):
-    if signal_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg="grey85")
+    if signal_exists(sig_id) and "releasebutton" in signals[str(sig_id)].keys():
+        signals[str(sig_id)]["releasebutton"].config(bg="grey85")
 
 # -------------------------------------------------------------------------
 # Internal Function to create all the mandatory signal elements that will apply
