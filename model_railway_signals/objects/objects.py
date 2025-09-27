@@ -739,6 +739,10 @@ def set_all(new_objects:dict):
                                 " - Re-structuring route definition element: '"+element+"'")
                     elif element == "tracksensor":
                         objects_common.schematic_objects[object_id]["routedefinitions"][0]["exitsensor"] = new_objects[object_id][element]
+                    # Tuples are converted to lists by the json.dumps function on layout save
+                    # We convert them back to tuples (primarily to stop the system tests breaking)
+                    elif element == "textfonttuple" and type(new_objects[object_id][element]) is list:
+                        objects_common.schematic_objects[object_id][element] = tuple(new_objects[object_id][element])
                     elif element not in default_object.keys():
                         logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                                 " - Unexpected element: '"+element+"' - DISCARDED")
