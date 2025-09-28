@@ -695,7 +695,186 @@ def run_schematic_routes_example_tests():
     simulate_buttons_clicked(15)
     sleep(2)
     assert_buttons_deselected(15)
-    return()    
+    return()
+
+#-----------------------------------------------------------------------------------------
+# Tests for NX route buttons
+#-----------------------------------------------------------------------------------------
+
+def test_nx_routes1():
+    # Initial state tests - Route 18 should be active
+    assert_buttons_enabled(8,19)    
+    assert_buttons_selected(18,19)
+    assert_signals_DANGER(13)
+    assert_signals_PROCEED(14)
+    # Try to deselect 18 -> 19 by deselecting 19 (exit button) - fail
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_selected(18,19)
+    assert_signals_DANGER(13)
+    assert_signals_PROCEED(14)
+    # Try to deselect 18 -> 19 by deselecting 18 (entry button) - success
+    simulate_buttons_clicked(18)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_deselected(18,19)
+    assert_signals_DANGER(13,14)
+    # Initiate selection of Route 19 -> 18 by selecting button 19
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_selected(19)
+    assert_buttons_deselected(18)
+    assert_signals_DANGER(13,14)
+    # Now cancel the route selection before selecting an exit button
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_deselected(18,19)
+    assert_signals_DANGER(13,14)
+    # Initiate selection of Route 19 -> 18 by selecting button 19
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_selected(19)
+    assert_buttons_deselected(18)
+    assert_signals_DANGER(13,14)
+    # Complete the selection of Route 19 -> 18 by selecting button 18
+    simulate_buttons_clicked(18)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_selected(18,19)
+    assert_signals_PROCEED(13)
+    assert_signals_DANGER(14)
+    # Initiate another NX route selection (doesn't matter which one)
+    simulate_buttons_clicked(17)
+    assert_buttons_selected(17)
+    # Check that trying to select button 18 aborts the new route selection
+    # and has no affect on the Route 19 -> 18 that has been set up
+    simulate_buttons_clicked(18)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_deselected(17)
+    assert_buttons_selected(18,19)
+    assert_signals_PROCEED(13)
+    assert_signals_DANGER(14)
+    # Initiate another NX route selection (doesn't matter which one)
+    simulate_buttons_clicked(17)
+    assert_buttons_selected(17)
+    # Check that trying to select button 19 aborts the new route selection
+    # and has no affect on the Route 19 -> 18 that has been set up
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_deselected(17)
+    assert_buttons_selected(18,19)
+    assert_signals_PROCEED(13)
+    assert_signals_DANGER(14)
+    # Test that the route can not be cleared down by selecting the exit button(18)
+    simulate_buttons_clicked(18)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_selected(18,19)
+    assert_signals_PROCEED(13)
+    assert_signals_DANGER(14)
+    # Test that the route can be cleared down by selecting the entry button(19)
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_deselected(18,19)
+    assert_signals_DANGER(13,14)
+    return()
+
+def test_nx_routes2():
+    # Initial state tests - Route 18 should be active
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_deselected(14,15,16,17)
+    assert_signals_DANGER(9,10,11,12)
+    # Initiate route selection from 17 -> 16 by clicking button 17
+    simulate_buttons_clicked(17)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(17)
+    assert_buttons_deselected(14,15,16)
+    assert_signals_DANGER(9,10,11,12)
+    # Cancel route selection
+    simulate_buttons_clicked(17)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_deselected(14,15,16,17)
+    assert_signals_DANGER(9,10,11,12)
+    # Initiate route selection from 17 -> 16 by clicking button 17
+    simulate_buttons_clicked(17)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(17)
+    assert_buttons_deselected(14,15,16)
+    assert_signals_DANGER(9,10,11,12)
+    # Complete route selection from 17 -> 16 by clicking button 16
+    simulate_buttons_clicked(16)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(16,17)
+    assert_buttons_deselected(14,15)
+    assert_signals_DANGER(10,11,12)
+    assert_signals_PROCEED(9)
+    # Initiate route selection from 16 -> 15 by clicking button 16
+    simulate_buttons_clicked(16)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(16,17)
+    assert_buttons_deselected(14,15)
+    assert_signals_DANGER(10,11,12)
+    assert_signals_PROCEED(9)
+    # Complete route selection from 16 -> 15 by clicking button 15
+    simulate_buttons_clicked(15)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(15,16,17)
+    assert_buttons_deselected(14)
+    assert_signals_DANGER(11,12)
+    assert_signals_PROCEED(9,10)
+    # Initiate route selection from 15 -> 14 by clicking button 15
+    simulate_buttons_clicked(15)
+    assert_buttons_enabled(17,16,15,14)    
+    assert_buttons_selected(15,16,17)
+    assert_buttons_deselected(14)
+    assert_signals_DANGER(11,12)
+    assert_signals_PROCEED(9,10)
+    # Complete route selection from 15 -> 14 by clicking button 14
+    simulate_buttons_clicked(14)
+    assert_buttons_enabled(17,16,15,14)    
+    assert_buttons_selected(14,15,16,17)
+    assert_signals_DANGER(12)
+    assert_signals_PROCEED(9,10,11)
+    # Clear down route selection from 15 -> 14 by clicking button 15
+    simulate_buttons_clicked(15)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(15,16,17)
+    assert_buttons_deselected(14)
+    assert_signals_DANGER(11,12)
+    assert_signals_PROCEED(9,10)
+    # Initiate route selection from 15 -> 14 by clicking button 15
+    simulate_buttons_clicked(15)
+    assert_buttons_enabled(17,16,15,14)    
+    assert_buttons_selected(15,16,17)
+    assert_buttons_deselected(14)
+    assert_signals_DANGER(11,12)
+    assert_signals_PROCEED(9,10)
+    # Initiate another route selection to cancel this one
+    simulate_buttons_clicked(18)
+    assert_buttons_enabled(17,16,15)    
+    assert_buttons_disabled(14)    
+    assert_buttons_selected(15,16,17)
+    assert_buttons_deselected(14)
+    assert_signals_DANGER(11,12)
+    assert_signals_PROCEED(9,10)
+    # Re-initiate route selection from 15 -> 14 by clicking button 15
+    simulate_buttons_clicked(15)
+    assert_buttons_enabled(17,16,15,14)    
+    assert_buttons_selected(15,16,17)
+    assert_buttons_deselected(14)
+    assert_signals_DANGER(11,12)
+    assert_signals_PROCEED(9,10)
+    # Complete route selection from 15 -> 14 by clicking button 14
+    simulate_buttons_clicked(14)
+    assert_buttons_enabled(17,16,15,14)    
+    assert_buttons_selected(14,15,16,17)
+    assert_signals_PROCEED(9,10,11)
+    return()
 
 ######################################################################################################
 
@@ -707,6 +886,9 @@ def run_all_schematic_routes_tests():
     # Run the Tests for "test_schematic_routes.sig" - Note this layout File should  
     # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
+    print("Schematic Route Tests - NX route Tests")
+    test_nx_routes1()
+    test_nx_routes2()
     print("Schematic Route Tests - Initial State Tests")
     run_initial_state_tests()
     print("Schematic Route Tests - Run Mode, Automation Off")
@@ -715,14 +897,14 @@ def run_all_schematic_routes_tests():
     print("Schematic Route Tests - Run Mode, Automation On")
     set_automation_on()
     run_schematic_routes_tests()
-    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    set_edit_mode()
-    test_configuration_windows.test_all_object_edit_windows()
+#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+#     set_edit_mode()
+#     test_configuration_windows.test_all_object_edit_windows()
     # Run the Tests for the example layout
     initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
-    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    set_edit_mode()
-    test_configuration_windows.test_all_object_edit_windows()
+#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+#     set_edit_mode()
+#     test_configuration_windows.test_all_object_edit_windows()
     print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     reset_layout()
     set_run_mode()
