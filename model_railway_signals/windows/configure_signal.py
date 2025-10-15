@@ -502,13 +502,13 @@ def update_tab2_available_signal_routes(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
-    # Note that the MAIN route is always enabled for all signal types
-    signal.locking.interlocking.main.enable_route()
+    # Note that the MAIN route will always enabled for all signal types
+    signal.locking.interlocking.main.enable_route(sig_routes[0],sub_routes[0])
     signal.locking.interlocked_sections.main.enable()
     signal.locking.conflicting_sigs.main.enable()
     # Other routes are enabled if either the main signal or subsidary signal supports them
     if sig_routes[1] or sub_routes[1]:
-        signal.locking.interlocking.lh1.enable_route()
+        signal.locking.interlocking.lh1.enable_route(sig_routes[1], sub_routes[1])
         signal.locking.interlocked_sections.lh1.enable()
         signal.locking.conflicting_sigs.lh1.enable()
         signal.locking.conflicting_sigs.lh1_frame.pack(padx=2, pady=2, fill='x')
@@ -517,7 +517,7 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocked_sections.lh1.disable()
         signal.locking.conflicting_sigs.lh1.disable()
     if sig_routes[2] or sub_routes[2]:
-        signal.locking.interlocking.lh2.enable_route()
+        signal.locking.interlocking.lh2.enable_route(sig_routes[2], sub_routes[2])
         signal.locking.interlocked_sections.lh2.enable()
         signal.locking.conflicting_sigs.lh2.enable()
         signal.locking.conflicting_sigs.lh2_frame.pack(padx=2, pady=2, fill='x')
@@ -526,7 +526,7 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocked_sections.lh2.disable()
         signal.locking.conflicting_sigs.lh2.disable()
     if sig_routes[3] or sub_routes[3]:
-        signal.locking.interlocking.lh3.enable_route()
+        signal.locking.interlocking.lh3.enable_route(sig_routes[3], sub_routes[3])
         signal.locking.interlocked_sections.lh3.enable()
         signal.locking.conflicting_sigs.lh3.enable()
         signal.locking.conflicting_sigs.lh3_frame.pack(padx=2, pady=2, fill='x')
@@ -535,7 +535,7 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocked_sections.lh3.disable()
         signal.locking.conflicting_sigs.lh3.disable()
     if sig_routes[4] or sub_routes[4]:
-        signal.locking.interlocking.rh1.enable_route()
+        signal.locking.interlocking.rh1.enable_route(sig_routes[4], sub_routes[4])
         signal.locking.interlocked_sections.rh1.enable()
         signal.locking.conflicting_sigs.rh1.enable()
         signal.locking.conflicting_sigs.rh1_frame.pack(padx=2, pady=2, fill='x')
@@ -544,7 +544,7 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocked_sections.rh1.disable()
         signal.locking.conflicting_sigs.rh1.disable()
     if sig_routes[5] or sub_routes[5]:
-        signal.locking.interlocking.rh2.enable_route()
+        signal.locking.interlocking.rh2.enable_route(sig_routes[5], sub_routes[5])
         signal.locking.interlocked_sections.rh2.enable()
         signal.locking.conflicting_sigs.rh2.enable()
         signal.locking.conflicting_sigs.rh2_frame.pack(padx=2, pady=2, fill='x')
@@ -553,7 +553,7 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocked_sections.rh2.disable()
         signal.locking.conflicting_sigs.rh2.disable()
     if sig_routes[6] or sub_routes[6]:
-        signal.locking.interlocking.rh3.enable_route()
+        signal.locking.interlocking.rh3.enable_route(sig_routes[6], sub_routes[6])
         signal.locking.interlocked_sections.rh3.enable()
         signal.locking.conflicting_sigs.rh3.enable()
         signal.locking.conflicting_sigs.rh3_frame.pack(padx=2, pady=2, fill='x')
@@ -667,36 +667,36 @@ def update_tab3_track_section_ahead_routes(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
-    # MAIN Route (sig or sub)
-    signal.automation.track_occupancy.section_ahead.main.enable()
+    # MAIN Route (sig or sub) - will always be enabled for the signal
+    signal.automation.track_occupancy.section_ahead.main.enable(sig_routes[0], sub_routes[0])
     # LH1 Route (sig or sub)
     if sig_routes[1] or sub_routes[1]:
-        signal.automation.track_occupancy.section_ahead.lh1.enable()
+        signal.automation.track_occupancy.section_ahead.lh1.enable(sig_routes[1], sub_routes[1])
     else:
         signal.automation.track_occupancy.section_ahead.lh1.disable()
     # LH2 Route (sig or sub)
     if sig_routes[2] or sub_routes[2]:
-        signal.automation.track_occupancy.section_ahead.lh2.enable()
+        signal.automation.track_occupancy.section_ahead.lh2.enable(sig_routes[2], sub_routes[2])
     else:
         signal.automation.track_occupancy.section_ahead.lh2.disable()
     # LH3 Route (sig or sub)
     if sig_routes[3] or sub_routes[3]:
-        signal.automation.track_occupancy.section_ahead.lh3.enable()
+        signal.automation.track_occupancy.section_ahead.lh3.enable(sig_routes[3], sub_routes[3])
     else:
         signal.automation.track_occupancy.section_ahead.lh3.disable()
     # RH1 Route (sig or sub)
     if sig_routes[4] or sub_routes[4]:
-        signal.automation.track_occupancy.section_ahead.rh1.enable()
+        signal.automation.track_occupancy.section_ahead.rh1.enable(sig_routes[4], sub_routes[4])
     else: 
         signal.automation.track_occupancy.section_ahead.rh1.disable()
     # RH2 Route (sig or sub)
     if sig_routes[5] or sub_routes[5]:
-        signal.automation.track_occupancy.section_ahead.rh2.enable()
+        signal.automation.track_occupancy.section_ahead.rh2.enable(sig_routes[5], sub_routes[5])
     else:
         signal.automation.track_occupancy.section_ahead.rh2.disable()
     # RH3 Route (sig or sub)
     if sig_routes[6] or sub_routes[6]:
-        signal.automation.track_occupancy.section_ahead.rh3.enable()
+        signal.automation.track_occupancy.section_ahead.rh3.enable(sig_routes[6], sub_routes[6])
     else:
         signal.automation.track_occupancy.section_ahead.rh3.disable()
     return()

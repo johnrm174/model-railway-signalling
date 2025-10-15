@@ -61,22 +61,28 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * New Entry/Exit (NX) route setting feature for true prototypical operation of the schematic:
+    * Entry, exit or entry/exit buttons are supported with correct symbology.
+    * Track occupancy can be shown (with changes to signal routes as described below).
     * 'One-click' route setting is also retained - use whatever works best for your layout.
 * The base Item ID (for creation of new objects) can now be specified under general settings:
     * Making it easier to use different Item ID 'ranges' for different areas of the layout.
 * New Point Motor Excersising utility to continuously toggle all points on the layout:
     * My older slow-acting point motors get a bit 'sticky' after periods of disuse.
-    * This utility can be used to exercise them for a period of time to 'free them up'
+    * This utility can be used to exercise them for a period of time to 'free them up'.
 * New feature to trigger the playing of audio files by specified DCC commands:
     * Uses audio output of the Signalling System and/or Remote Signalling Nodes.
     * Enables audio such as station announcements to be triggered by DCC switches.
 * The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>:
-    * Aids identification to take the pain out of configuring routes.
+    * Aids identification of objects to take the pain out of configuring routes.
 * Ability to apply offsets for Signalbox Lever buttons and/or hide them in Run Mode:
     * Can be used to provide better seperation of buttons when using touchscreens.
+    * Can be hidden completely if you are using external levers for your layout.
 * Ability to easily configure multiple objects to be 'hidden' or 'unhidden':
     * In Edit Mode - Use'h' and 'u' to configure objects to be 'hidden' or 'unhidden'.
     * In Run Mode - The re-configured objects will be hidden or displayed as required.
+* Minor changes to allow 'non-signalled' routes to be defined for signals:
+    * These are routes for trains passing the signal in the opposite direction.
+    * Enables more prototypical track circuit highlighting for NX panels
 
 selected sections/textboxes/sensors/switcheshide/unhide selected hide them in Run Mode:
     * Can be used to provide better seperation of buttons when using touchscreens.
