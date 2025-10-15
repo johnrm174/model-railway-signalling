@@ -33,55 +33,74 @@ from .. import settings
 help_text = """
 Schematic editor functions (Edit Mode):
  
-1) Use the buttons on the left to add objects to the schematic (left-click to place)
-2) Left-click to select objects (shift-left-click will add/remove from the selection)
-3) Left-click/release when over an object to drag/drop selected objects
-4) Left-click/release when not over an object to seleact an 'area'
-5) Left-click/release on the 'end' of a selected line to move the line end.
-6) Double-left-click on a schematic object to open the object configuraton window
-7) Right-click on an object or the canvas to bring up additional options
-8) <r> will rotate all selected point and signal objects by 180 degrees
-9) <f> will 'flip' all selected point and signal objects around their horizontal axis
-10) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
-11) <backspace> will delete all currently selected objects from the schematic
-12) <cntl-c> will copy all currently selected objects (to be moved/placed as required)
-13) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
-14) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
-15) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
-16) <cntl-i> will toggle on/off the display of item IDs (to aid identification)
-17) <Esc> will deselect all objects (or cancel the move of selected objects)
-18) Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
-19) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+\u2022 Use the buttons on the left to add objects to the schematic (left-click to place)
+\u2022 Left-click to select objects (shift-left-click will add/remove from the selection)
+\u2022 Left-click/release when over an object to drag/drop selected objects
+\u2022 Left-click/release when not over an object to seleact an 'area'
+\u2022 Left-click/release on the 'end' of a selected line to move the line end.
+\u2022 Double-left-click on a schematic object to open the object configuraton window
+\u2022 Right-click on an object or the canvas to bring up additional options
+\u2022 <r> will rotate all selected point and signal objects by 180 degrees
+\u2022 <f> will 'flip' all selected point and signal objects around their horizontal axis
+\u2022 <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
+\u2022 <h> will configure selected sections/sensors/textboxes/switches as 'hidden' (run mode)
+\u2022 <u> will configure selected sections/sensors/textboxes/switches as 'unhidden' (run mode)
+\u2022 <backspace> will delete all currently selected objects from the schematic
+\u2022 <cntl-c> will copy all currently selected objects (to be moved/placed as required)
+\u2022 <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
+\u2022 <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
+\u2022 <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
+\u2022 <cntl-i> will toggle on/off the display of item IDs (to aid identification)
+\u2022 <Esc> will deselect all objects (or cancel the move of selected objects)
+\u2022 Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
+\u2022 <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Schematic editor functions (Run Mode):
 
-1) <cntl-a> will toggle the signal automation on / off when in Run Mode
-2) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
-3) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
-4) Arrow keys will scroll the canvas area (if the canvas is bigger than the window)
-5) The mouse (left click) can also be used to scroll (drag and drop) the canvas area
+\u2022 <cntl-a> will toggle the signal automation on / off when in Run Mode
+\u2022 <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
+\u2022 <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+\u2022 Arrow keys will scroll the canvas area (if the canvas is bigger than the window)
+\u2022 The mouse (left click) can also be used to scroll (drag and drop) the canvas area
 
 Menubar Options
 
-1) File => New/Open/Save/Save-as - choose 'examples' to access the example layout files
-2) Mode => Edit/Run/Reset - Select Edit or Run Mode (also Reset layout to default state)
-3) Automation => Enable/Disable - Toggle signal automation functions (in Run Mode)
-4) SPROG => Connect/Disconnect - Toggle the connection to the SPROG DCC Command Station
-5) DCC Power => ON/OFF - Toggle the DCC bus supply (SPROG must be connected)
-6) MQTT => Connect/disconnect - Toggle connection to an external MQTT broker
-7) Utilities => DCC Programmming - One touch and CV programming of signals/points
-8) Utilities => DCC Mapping - To view the assigned DCC addresses for your layout
-9) Utilities => Item Renumbering - To 'bulk renumber' your schematic objects
-10) Settings => Canvas - Change the layout display size and grid configuration
-11) Settings => General - Change the general settings for RUN MODE
-12) Settings => MQTT - Configure the MQTT broker and signalling networking
-13) Settings => SPROG - Configure the serial port and SPROG behavior
-14) Settings => Logging - Set the log level for running the layout
-15) Settings => GPIO - Define the Ri-Pi GPIO port to track sensor mappings
-16) Styles => Change the default and applied styles of layout drawing objects
-17) Help => About - Application version and licence information
-18) Help => Docs - Access the user documentation packaged with the application
-19) Help => Info - Add user notes to document your layout configuration
+\u2022 File:
+  \u2022 New/Open/Save/Save-as/Quit - all the usual commands you would expect
+  \u2022 Examples - to access the example layout files (packaged with the application)
+\u2022 Mode:
+  \u2022 Edit/Run - Select Edit or Run Mode (some features only work in Run Mode)
+  \u2022 Reset - Reset all points/signals/instruments/switches to their default state
+\u2022 Automation:
+  \u2022 Enable/Disable - Toggle signal automation functions on/off (in Run Mode)
+\u2022 SPROG:
+   \u2022 Connect/Disconnect - Toggle the connection to the SPROG DCC Command Station
+\u2022 DCC Power
+  \u2022 ON/OFF - Toggle the DCC bus supply on/off(SPROG must be connected)
+\u2022 MQTT
+  \u2022 Connect/disconnect - Toggle connection to an external MQTT broker
+\u2022 Utilities:
+  \u2022 Application Upgrade - Upgrade to the latest version of the application
+  \u2022 DCC Programmming - One touch and CV programming of signals/points
+  \u2022 DCC Mappings - To view the assigned DCC addresses for your layout
+  \u2022 Exercise Points - To continually exercise all points on the schematic
+  \u2022 Import Layout - To 'import' another schematic into the current schematic
+  \u2022 Item Renumbering - To 'bulk renumber' your schematic objects
+\u2022 Settings:
+  \u2022 Canvas - Change the schematic size and grid configuration
+  \u2022 General - General application settings and RUN MODE settings
+  \u2022 GPIO - Define the Ri-Pi GPIO port to 'gpio sensor' mappings
+  \u2022 Logging - Change the log level (for debugging layout configurations)
+  \u2022 MQTT - Configure the MQTT broker and signalling networking
+  \u2022 Sounds - Trigger sound files when DCC commands are sent out
+  \u2022 SPROG - Configure the serial port and SPROG behavior
+\u2022 Styles:
+  \u2022 Change the default and applied styles of selected schematic objects
+\u2022 Help:
+  \u2022 Help - Display this summary of application controls/hotkeys
+  \u2022 About - Application version and licence information
+  \u2022 Docs - Access the user documentation packaged with the application
+  \u2022 Info - Add user notes to document your layout configuration
 
 """
 

@@ -14,6 +14,7 @@
 #    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
 #    flip_objects(list of obj IDs) - Flip the selected objects on the canvas
+#    hide_objects(list of obj IDs, hide:bool) - Hide or unhide the selected objects (for run mode)
 #    move_objects(list of obj IDs) - Finalises the move of selected objects
 #    copy_objects(list of obj IDs) - Copy the selected objects (returns list of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
@@ -434,6 +435,50 @@ def rotate_objects(list_of_object_ids:list):
     save_schematic_state()
     # As we are deleting/re-creating objects we still need to process layout changes as the
     # signals may need to be locked depending on the state of the points and vice versa
+    run_layout.initialise_layout()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to Hide/unhide one or more objects on the schematic.
+#------------------------------------------------------------------------------------
+
+def hide_objects(list_of_object_ids:list, hide:bool=True):
+    # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
+    # processing a load of intermixed deletes/creates when it returns to the main loop
+    for object_id in list_of_object_ids:
+        if ("hidden" in objects_common.schematic_objects[object_id].keys() and
+                    objects_common.schematic_objects[object_id]["hidden"] != hide):
+            # Call the appropriate functions to delete the object according to type
+            type_of_object = objects_common.schematic_objects[object_id]["item"]
+            if type_of_object == objects_common.object_type.section:
+                objects_sections.delete_section_object(object_id)
+            elif type_of_object == objects_common.object_type.textbox:
+                objects_textboxes.delete_textbox_object(object_id)
+            elif type_of_object == objects_common.object_type.switch:
+                objects_switches.delete_textbox_object(object_id)
+            elif type_of_object == objects_common.object_type.track_sensor:
+                objects_sensors.delete_textbox_object(object_id)
+    # Update idletasks to provide a 'flash' - giving the user an indication of the change
+    objects_common.root.update_idletasks()
+    # Re-draw the drawing objects on the canvas in their new state
+    for object_id in list_of_object_ids:
+        if ("hidden" in objects_common.schematic_objects[object_id].keys() and
+                    objects_common.schematic_objects[object_id]["hidden"] != hide):
+            objects_common.schematic_objects[object_id]["hidden"] = hide
+            # Call the appropriate functions to delete the object according to type
+            type_of_object = objects_common.schematic_objects[object_id]["item"]
+            if type_of_object == objects_common.object_type.section:
+                objects_sections.redraw_section_object(object_id)
+            elif type_of_object == objects_common.object_type.textbox:
+                objects_textboxes.redraw_textbox_object(object_id)
+            elif type_of_object == objects_common.object_type.switch:
+                objects_switches.redraw_textbox_object(object_id)
+            elif type_of_object == objects_common.object_type.track_sensor:
+                objects_sensors.redraw_textbox_object(object_id)
+    # save the current state (for undo/redo)
+    save_schematic_state()
+    # As we are deleting/re-creating objects we still need to process layout changes as the
+    # points may need need to be un locked depending on the state of the sections
     run_layout.initialise_layout()
     return()
 

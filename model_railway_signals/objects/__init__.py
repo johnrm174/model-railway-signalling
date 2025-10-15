@@ -32,6 +32,7 @@
 #    delete_objects([object_IDs]) - Delete the selected objects from the canvas
 #    rotate_objects([object_IDs]) - Rotate the selected objects on the canvas
 #    flip_objects([object_IDs]) - Flip the selected objects on the canvas
+#    hide_objects(list of obj IDs, hide:bool) - Hide or unhide the selected objects (for run mode)
 #    move_objects([object_IDs]) - Finalises the move of selected objects
 #    copy_objects([object_IDs]) - Copy the selected objects (returns list of new IDs)
 #    update_object(object_ID, new_object) - update the config of an existing object
@@ -68,6 +69,7 @@ from .objects import create_object
 from .objects import delete_objects
 from .objects import rotate_objects
 from .objects import flip_objects
+from .objects import hide_objects
 from .objects import move_objects
 from .objects import copy_objects
 from .objects import update_object
@@ -126,6 +128,7 @@ __all__ = [
     'delete_objects',
     'rotate_objects',
     'flip_objects',
+    'hide_objects',
     'move_objects',
     'copy_objects',
     'update_object',

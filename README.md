@@ -72,9 +72,14 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Enables audio such as station announcements to be triggered by DCC switches.
 * The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>:
     * Aids identification to take the pain out of configuring routes.
-* Added ability to apply offsets for Signalbox Lever buttons and/or hide them in Run Mode:
+* Ability to apply offsets for Signalbox Lever buttons and/or hide them in Run Mode:
     * Can be used to provide better seperation of buttons when using touchscreens.
+* Ability to easily configure multiple objects to be 'hidden' or 'unhidden':
+    * In Edit Mode - Use'h' and 'u' to configure objects to be 'hidden' or 'unhidden'.
+    * In Run Mode - The re-configured objects will be hidden or displayed as required.
 
+selected sections/textboxes/sensors/switcheshide/unhide selected hide them in Run Mode:
+    * Can be used to provide better seperation of buttons when using touchscreens.
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
