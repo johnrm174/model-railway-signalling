@@ -104,7 +104,7 @@ import os
 import tkinter as Tk
 import logging
 import argparse
-import importlib.resources
+import pathlib
 
 from . import objects
 from . import settings
@@ -137,12 +137,13 @@ class main_menubar:
         # Create a dummy menubar item for the application Logo
         resource_folder = 'model_railway_signals.resources'
         logo_filename = 'dcc_signalling_logo.png'
+        current_folder = pathlib.Path(__file__). parent
+        fully_qualified_filename = current_folder / 'resources' / 'dcc_signalling_logo.png'
         try:
-            with importlib.resources.path(resource_folder, logo_filename) as fully_qualified_filename:
-                self.logo_image = Tk.PhotoImage(file=fully_qualified_filename)
-                self.dummy_menu = Tk.Menu(self.mainmenubar, tearoff=False)
-                self.mainmenubar.add_cascade(menu=self.dummy_menu, image=self.logo_image,
-                                             background="white",activebackground="white")
+            self.logo_image = Tk.PhotoImage(file=fully_qualified_filename)
+            self.dummy_menu = Tk.Menu(self.mainmenubar, tearoff=False)
+            self.mainmenubar.add_cascade(menu=self.dummy_menu, image=self.logo_image,
+                                         background="white",activebackground="white")
         except:
             pass
         # Create the various menubar items for the File Dropdown
