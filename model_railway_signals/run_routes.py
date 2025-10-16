@@ -86,7 +86,7 @@ dict_of_route_setup_flags = {}
 
 def set_setup_in_progress_flag(route_button_id:int, flag:bool):
     dict_of_route_setup_flags[str(route_button_id)] = flag
-    
+
 def is_setup_in_progress(route_button_id:int):
     return(str(route_button_id) in dict_of_route_setup_flags.keys() and dict_of_route_setup_flags[str(route_button_id)])
 
@@ -347,7 +347,7 @@ def initialise_all_schematic_routes():
     global activated_entry_button_id
     # In both EDIT and RUN modes any route selection sequences are cleared down:
     # Wwe check the activated entry button exists to handle the edge case of layout
-    # loadwhen a route selection has been initiated (where the old schematic is deleted, 
+    # load when a route selection has been initiated (where the old schematic is deleted,
     # this function is run, the new schematic is loaded, and this function is run again)
     if activated_entry_button_id > 0 and library.button_exists(activated_entry_button_id):
         unhighlight_possible_routes(activated_entry_button_id)
