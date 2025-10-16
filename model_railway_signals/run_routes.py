@@ -80,6 +80,17 @@ run_mode = None
 automation_enabled = None
 
 #------------------------------------------------------------------------------------
+# The following Dictionary holds information as to whether a route_setup is in progress or not
+#------------------------------------------------------------------------------------
+dict_of_route_setup_flags = {}
+
+def set_setup_in_progress_flag(route_button_id:int, flag:bool):
+    dict_of_route_setup_flags[str(route_button_id)] = flag
+    
+def is_setup_in_progress(route_button_id:int):
+    return(str(route_button_id) in dict_of_route_setup_flags.keys() and dict_of_route_setup_flags[str(route_button_id)])
+
+#------------------------------------------------------------------------------------
 # The initialise function is called at application startup (on canvas creation)
 #------------------------------------------------------------------------------------
 
@@ -333,12 +344,17 @@ def reset_route_highlighting(route_button_id:int):
 #------------------------------------------------------------------------------------
 
 def initialise_all_schematic_routes():
+    global activated_entry_button_id
     # In both EDIT and RUN modes any route selection sequences are cleared down:
-    if activated_entry_button_id > 0:
+    # Wwe check the activated entry button exists to handle the edge case of layout
+    # loadwhen a route selection has been initiated (where the old schematic is deleted, 
+    # this function is run, the new schematic is loaded, and this function is run again)
+    if activated_entry_button_id > 0 and library.button_exists(activated_entry_button_id):
         unhighlight_possible_routes(activated_entry_button_id)
         if library.button_state(activated_entry_button_id):
             library.toggle_button(activated_entry_button_id)
             route_button_deselected_callback(activated_entry_button_id)
+    activated_entry_button_id = 0
     # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
     if run_mode:
         for str_route_button_id in objects.route_index.keys():
@@ -349,7 +365,7 @@ def initialise_all_schematic_routes():
             if library.button_state(int(str_route_button_id)):
                 complete_route_setup(int(str_route_button_id))
     # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
-    # We also clear down all signals along the route (otherwise NX routes can get into a funny state
+    # We also clear down all signals along the route (otherwise NX routes can get into a funny state)
     else:
         for str_route_button_id in objects.route_index.keys():
             if library.button_state(int(str_route_button_id)):
@@ -387,17 +403,16 @@ def check_routes_valid_after_signal_change(signal_id:int, route_button_id:int):
         # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
         route_object = objects.schematic_objects[objects.route(str_route_button_id)]
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
-        if route_definition_index is not None:
+        if route_definition_index is not None and not is_setup_in_progress(int(str_route_button_id)):
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any signals on the route have been returned to danger
             if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                     and signal_id in route_definition["signalsonroute"] and not library.signal_clear(signal_id)
                     and route_object["resetonsignalchanges"] ):
-                logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by change to Signal "
-                                +str(signal_id)+" - Clearing down route highlighting and deselecting route")
+                logging.warning("RUN ROUTES - Route "+str_route_button_id+
+                    " has been invalidated by change to Signal "+str(signal_id)+" - Clearing down route")
                 library.toggle_button(int(str_route_button_id))
-                reset_route_highlighting(int(str_route_button_id))
-                complete_route_cleardown(int(str_route_button_id))
+                route_button_deselected_callback(int(str_route_button_id))
     return()
 
 def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int):
@@ -406,17 +421,16 @@ def check_routes_valid_after_subsidary_change(signal_id:int, route_button_id:int
         # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
         route_object = objects.schematic_objects[objects.route(str_route_button_id)]
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
-        if route_definition_index is not None:
+        if route_definition_index is not None and not is_setup_in_progress(int(str_route_button_id)):
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any subsidaries on the route have been returned to danger
             if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                     and signal_id in route_definition["subsidariesonroute"] and not library.subsidary_clear(signal_id)
                     and route_object["resetonsignalchanges"] ):
-                logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by change to Subsidiary "
-                                +str(signal_id)+" - Clearing down route highlighting and deselecting route")
+                logging.warning("RUN ROUTES - Route "+str_route_button_id+
+                    " has been invalidated by change to Subsidiary "+str(signal_id)+" - Clearing down route")
                 library.toggle_button(int(str_route_button_id))
-                reset_route_highlighting(int(str_route_button_id))
-                complete_route_cleardown(int(str_route_button_id))
+                route_button_deselected_callback(int(str_route_button_id))
     return()
 
 def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
@@ -425,7 +439,7 @@ def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
         # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
         route_object = objects.schematic_objects[objects.route(str_route_button_id)]
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
-        if route_definition_index is not None:
+        if route_definition_index is not None and not is_setup_in_progress(int(str_route_button_id)):
             route_definition = route_object["routedefinitions"][route_definition_index]
             # Reset the route if any points on the route have been unlocked or changed
             if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
@@ -433,34 +447,10 @@ def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
                 required_state = route_definition["pointsonroute"][str(point_id)]
                 # Note the fpl_active function will return True if the point does not have a FPL
                 if library.point_switched(point_id) != required_state or not library.fpl_active(point_id):
-                    logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by changing Point "
-                                +str(point_id)+" - Clearing down route highlighting and deselecting route")
+                    logging.warning("RUN ROUTES - Route "+str_route_button_id+
+                        " has been invalidated by changing Point "+str(point_id)+" - Clearing down route")
                     library.toggle_button(int(str_route_button_id))
-                    reset_route_highlighting(int(str_route_button_id))
-                    complete_route_cleardown(int(str_route_button_id))
-    return()
-
-def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
-    # We only really care about latching switches - not momentary switches
-    switch_type = objects.schematic_objects[objects.switch(switch_id)]["itemtype"]
-    if switch_type == library.button_type.switched.value:
-        for str_route_button_id in objects.route_index:
-            # Find the applicable route definition for the button (stored as the route button data)
-            # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
-            route_object = objects.schematic_objects[objects.route(str_route_button_id)]
-            route_definition_index = library.get_button_data(route_object["itemid"])["route"]
-            if route_definition_index is not None:
-                route_definition = route_object["routedefinitions"][route_definition_index]
-                # Reset the route if any points on the route have been unlocked or changed
-                if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
-                        and str(switch_id) in route_definition["switchesonroute"].keys() ):
-                    required_state = route_definition["switchesonroute"][str(switch_id)]
-                    if route_object["resetonswitchchanges"] and library.button_state(switch_id) != required_state:
-                        logging.warning("RUN ROUTES - Route "+str_route_button_id+" has been invalidated by change to DCC Switch "
-                                +str(switch_id)+" - Clearing down route highlighting and deselecting route")
-                        library.toggle_button(int(str_route_button_id))
-                        reset_route_highlighting(int(str_route_button_id))
-                        complete_route_cleardown(int(str_route_button_id))
+                    route_button_deselected_callback(int(str_route_button_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -570,6 +560,8 @@ def set_point_state(route_button_id:int, point_id:int, state:bool):
     return()
 
 def complete_route_setup(route_button_id:int):
+    # Signify that the route setup is now progress
+    set_setup_in_progress_flag(route_button_id, False)
     # Find the applicable route definition and exit button ID (stored as the route button data)
     # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
     route_definition_index = library.get_button_data(route_button_id)["route"]
@@ -580,19 +572,13 @@ def complete_route_setup(route_button_id:int):
         route_definition = route_object["routedefinitions"][route_definition_index]
         # Confirm the route has been set up correctly - just in case there have been any other events
         # that invalidate the route whilst we have been working through the scheduled tasks to set it up
+        # Note that we don't care about the state of any DCC switches in the route definition
         route_set_up_and_locked = True
         for str_point_id in route_definition["pointsonroute"].keys():
             required_state = route_definition["pointsonroute"][str_point_id]
             # If a point does not have a FPL then the 'has_fpl' function will return True
             if library.point_switched(int(str_point_id)) != required_state or not library.fpl_active(int(str_point_id)):
                 route_set_up_and_locked = False
-        for str_switch_id in route_definition["switchesonroute"].keys():
-            # We only care about the state of latching switches
-            switch_type = objects.schematic_objects[objects.switch(str_switch_id)]["itemtype"]
-            if switch_type == library.button_type.switched.value:
-                required_state = route_definition["switchesonroute"][str_switch_id]
-                if library.button_state(int(str_switch_id)) != required_state:
-                    route_set_up_and_locked = False
         for int_signal_id in route_definition["signalsonroute"]:
             if not library.signal_clear(int_signal_id):
                 route_set_up_and_locked = False
@@ -608,7 +594,10 @@ def complete_route_setup(route_button_id:int):
             for line_id in route_definition["linestohighlight"]:
                 library.set_line_colour(line_id, colour)
         elif library.button_state(route_button_id):
+            logging.warning("RUN ROUTES - Route "+str(route_button_id)+
+                " has been invalidated during route setup - Clearing down route")
             library.toggle_button(route_button_id)
+            route_button_deselected_callback(route_button_id)
         # Unlock the route button(s) now processing is complete
         library.unlock_button(route_button_id)
         if exit_button_id > 0: library.unlock_button(exit_button_id)
@@ -718,7 +707,7 @@ def route_button_selected_callback(route_button_id:int):
         # For 'one click' buttons we use the first route definition (index=0). There is no
         # Exit button for these routes, so we set the exit button ID to 0.
         one_click_button_data = {"route": 0, "entrybutton": 0, "exitbutton": 0}
-        library.set_button_data(route_object["itemid"], one_click_button_data)
+        library.set_button_data(route_button_id, one_click_button_data)
         # We can then set up the route straight away (locking the button until complete).
         library.lock_button(route_button_id)
         library.disable_button(route_button_id, tooltip="Route set up in progress")
@@ -849,6 +838,8 @@ def unhighlight_possible_routes(route_button_id:int):
 #------------------------------------------------------------------------------------
 
 def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definition_index:int, delay:int):
+    # Signify that the route setup is in progress
+    set_setup_in_progress_flag(route_button_id, True)
     # Find the applicable route definition
     route_object = objects.schematic_objects[objects.route(route_button_id)]
     route_definition = route_object["routedefinitions"][route_definition_index]
