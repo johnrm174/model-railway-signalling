@@ -84,9 +84,6 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * These are routes for trains passing the signal in the opposite direction.
     * Enables more prototypical track circuit highlighting for NX panels
 
-selected sections/textboxes/sensors/switcheshide/unhide selected hide them in Run Mode:
-    * Can be used to provide better seperation of buttons when using touchscreens.
-
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
 Bug reports and feedback is welcome and appreciated:
