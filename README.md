@@ -83,6 +83,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Minor changes to allow 'non-signalled' routes to be defined for signals:
     * These are routes for trains passing the signal in the opposite direction.
     * Enables more prototypical track circuit highlighting for NX panels
+* Minor improvements to File => Open and File => New:
+    * Any open configuration windows are closed to avoid confusion
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

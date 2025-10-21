@@ -710,6 +710,10 @@ class main_menubar:
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="New Schematic",
                 message="Are you sure you want to discard all changes and create a new blank schematic"):
+            # Destroy any open configutation or settings windows (or it gets confusing)
+            for widget in self.root.winfo_children():
+                if isinstance(widget, Tk.Toplevel):
+                    widget.destroy()
             # Delete all existing objects, restore the default settings and re-initialise the editor
             schematic.delete_all_objects()
             settings.restore_defaults()
@@ -789,6 +793,10 @@ class main_menubar:
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
+                    # Destroy any open configutation or settings windows (or it gets confusing)
+                    for widget in self.root.winfo_children():
+                        if isinstance(widget, Tk.Toplevel):
+                            widget.destroy()
                     # Delete all existing objects
                     logging.info("DELETING-OLD-OBJECTS*****************************************************************************")
                     schematic.delete_all_objects()
