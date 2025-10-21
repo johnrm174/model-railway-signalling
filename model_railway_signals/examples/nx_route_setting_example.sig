@@ -192,7 +192,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 31,
@@ -289,7 +289,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 22,
@@ -575,7 +575,7 @@
             "background": "",
             "bbox": 290,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 8,
             "justification": 2,
@@ -594,7 +594,7 @@
             "background": "",
             "bbox": 293,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 31,
             "justification": 2,
@@ -1598,7 +1598,7 @@
             "background": "",
             "bbox": 369,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 39,
             "justification": 2,
@@ -1640,7 +1640,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 25,
@@ -2139,7 +2139,7 @@
             "background": "",
             "bbox": 411,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 41,
             "justification": 2,
@@ -2828,7 +2828,7 @@
             "background": "",
             "bbox": 472,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 17,
             "justification": 2,
@@ -2876,7 +2876,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 33,
@@ -3507,7 +3507,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 13,
@@ -3613,7 +3613,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 26,
@@ -3883,7 +3883,20 @@
                     0
                 ],
                 [
-                    [],
+                    [
+                        [
+                            9,
+                            false
+                        ],
+                        [
+                            14,
+                            true
+                        ],
+                        [
+                            11,
+                            false
+                        ]
+                    ],
                     "",
                     0
                 ],
@@ -4129,7 +4142,7 @@
                         6
                     ],
                     [
-                        0
+                        28
                     ],
                     [
                         0
@@ -4341,7 +4354,7 @@
             "background": "",
             "bbox": 664,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 29,
             "justification": 2,
@@ -4392,7 +4405,7 @@
             "background": "",
             "bbox": 675,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 37,
             "justification": 2,
@@ -5140,7 +5153,7 @@
                     [
                         true,
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false,
@@ -5189,7 +5202,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 29,
@@ -5284,7 +5297,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 9,
@@ -5444,7 +5457,7 @@
             "background": "",
             "bbox": 800,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 40,
             "justification": 2,
@@ -5577,7 +5590,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 23,
@@ -5899,7 +5912,7 @@
             "background": "",
             "bbox": 920,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 27,
             "justification": 2,
@@ -5918,7 +5931,7 @@
             "background": "",
             "bbox": 923,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 34,
             "justification": 2,
@@ -6350,7 +6363,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 14,
@@ -6843,7 +6856,7 @@
             "routeahead": [
                 [
                     [],
-                    0
+                    8
                 ],
                 [
                     [],
@@ -6872,8 +6885,17 @@
             ],
             "routebehind": [
                 [
-                    [],
-                    0
+                    [
+                        [
+                            8,
+                            false
+                        ],
+                        [
+                            3,
+                            false
+                        ]
+                    ],
+                    15
                 ],
                 [
                     [],
@@ -6888,12 +6910,38 @@
                     0
                 ],
                 [
-                    [],
-                    0
+                    [
+                        [
+                            8,
+                            false
+                        ],
+                        [
+                            3,
+                            true
+                        ],
+                        [
+                            5,
+                            false
+                        ]
+                    ],
+                    16
                 ],
                 [
-                    [],
-                    0
+                    [
+                        [
+                            8,
+                            false
+                        ],
+                        [
+                            3,
+                            true
+                        ],
+                        [
+                            5,
+                            true
+                        ]
+                    ],
+                    13
                 ],
                 [
                     [],
@@ -7167,7 +7215,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 16,
@@ -8050,7 +8098,7 @@
             "background": "",
             "bbox": 1160,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 30,
             "justification": 2,
@@ -8101,7 +8149,7 @@
             "background": "",
             "bbox": 1170,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 36,
             "justification": 2,
@@ -8596,7 +8644,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 24,
@@ -8661,7 +8709,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 30,
@@ -8689,7 +8737,7 @@
             "background": "",
             "bbox": 1223,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 35,
             "justification": 2,
@@ -8919,7 +8967,7 @@
             "background": "",
             "bbox": 1251,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 43,
             "justification": 2,
@@ -9159,7 +9207,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 32,
@@ -9339,7 +9387,7 @@
             "background": "",
             "bbox": 1341,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 33,
             "justification": 2,
@@ -9401,7 +9449,7 @@
             "background": "",
             "bbox": 1358,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 32,
             "justification": 2,
@@ -9482,7 +9530,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 35,
@@ -9559,7 +9607,7 @@
                     [
                         false,
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false,
@@ -10822,7 +10870,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 18,
@@ -11843,7 +11891,7 @@
             "background": "",
             "bbox": 1617,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 12,
             "justification": 2,
@@ -11865,7 +11913,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 28,
@@ -11895,7 +11943,7 @@
             "background": "",
             "bbox": 1624,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 28,
             "justification": 2,
@@ -12448,7 +12496,7 @@
                     [
                         true,
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false,
@@ -13873,7 +13921,7 @@
             "background": "",
             "bbox": 1821,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 38,
             "justification": 2,
@@ -13967,7 +14015,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 15,
@@ -13999,7 +14047,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 34,
@@ -14036,7 +14084,7 @@
             "defaultlabel": "XXXXX",
             "editable": true,
             "gpiosensor": "",
-            "hidden": true,
+            "hidden": false,
             "highlightcolour": "Red",
             "item": "section",
             "itemid": 27,
@@ -14611,7 +14659,7 @@
             "background": "",
             "bbox": 1898,
             "borderwidth": 0,
-            "hidden": true,
+            "hidden": false,
             "item": "textbox",
             "itemid": 42,
             "justification": 2,
@@ -14685,12 +14733,12 @@
         "13": {
             "fpllock": false,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "14": {
             "fpllock": true,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "15": {
             "fpllock": true,
@@ -14800,7 +14848,7 @@
         "5": {
             "fpllock": true,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "6": {
             "fpllock": false,
@@ -14810,7 +14858,7 @@
         "7": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "8": {
             "fpllock": true,
@@ -15169,7 +15217,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": ""
@@ -15180,7 +15228,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -15200,7 +15248,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 5,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
@@ -15211,7 +15259,7 @@
             "override": false,
             "releaseonred": null,
             "releaseonyel": null,
-            "routeset": 5,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
@@ -15268,9 +15316,9 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": ""
         },
         "3": {
@@ -15279,9 +15327,9 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
-            "sublocked": true,
+            "sublocked": false,
             "theatretext": ""
         },
         "4": {
@@ -15310,7 +15358,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 1,
+            "routeset": 2,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
@@ -15321,9 +15369,9 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 1,
+            "routeset": 3,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": ""
