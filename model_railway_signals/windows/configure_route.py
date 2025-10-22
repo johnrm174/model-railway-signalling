@@ -690,7 +690,7 @@ class edit_route():
             # Set the route definitions
             self.routes.set_values(objects.schematic_objects[self.object_id]["routedefinitions"])
             # Update the UI elements depending on the route type
-            self.route_type_updated()
+            self.config.route_type_updated()
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
