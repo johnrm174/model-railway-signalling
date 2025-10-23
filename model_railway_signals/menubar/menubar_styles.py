@@ -290,7 +290,7 @@ class edit_section_styles():
     def __init__(self, root_window):
         global edit_section_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_section_styles_window is not None:
+        if edit_section_styles_window is not None and edit_section_styles_window.winfo_exists():
             edit_section_styles_window.lift()
             edit_section_styles_window.state('normal')
             edit_section_styles_window.focus_force()
@@ -335,7 +335,7 @@ class edit_route_styles():
     def __init__(self, root_window):
         global edit_route_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_route_styles_window is not None:
+        if edit_route_styles_window is not None and edit_route_styles_window.winfo_exists():
             edit_route_styles_window.lift()
             edit_route_styles_window.state('normal')
             edit_route_styles_window.focus_force()
@@ -380,7 +380,7 @@ class edit_switch_styles():
     def __init__(self, root_window):
         global edit_switch_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_switch_styles_window is not None:
+        if edit_switch_styles_window is not None and edit_switch_styles_window.winfo_exists():
             edit_switch_styles_window.lift()
             edit_switch_styles_window.state('normal')
             edit_switch_styles_window.focus_force()
@@ -425,7 +425,7 @@ class edit_route_line_styles():
     def __init__(self, root_window):
         global edit_route_line_styles_window
         # If there is already a window open then we just make it jump to the top and exit
-        if edit_route_line_styles_window is not None:
+        if edit_route_line_styles_window is not None and edit_route_line_styles_window.winfo_exists():
             edit_route_line_styles_window.lift()
             edit_route_line_styles_window.state('normal')
             edit_route_line_styles_window.focus_force()
@@ -509,7 +509,7 @@ class edit_point_styles():
     def __init__(self, root_window):
         global edit_point_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_point_styles_window is not None:
+        if edit_point_styles_window is not None and edit_point_styles_window.winfo_exists():
             edit_point_styles_window.lift()
             edit_point_styles_window.state('normal')
             edit_point_styles_window.focus_force()
@@ -554,7 +554,7 @@ class edit_signal_styles():
     def __init__(self, root_window):
         global edit_signal_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_signal_styles_window is not None:
+        if edit_signal_styles_window is not None and edit_signal_styles_window.winfo_exists():
             edit_signal_styles_window.lift()
             edit_signal_styles_window.state('normal')
             edit_signal_styles_window.focus_force()
@@ -599,7 +599,7 @@ class edit_textbox_styles():
     def __init__(self, root_window):
         global edit_textbox_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_textbox_styles_window is not None:
+        if edit_textbox_styles_window is not None and edit_textbox_styles_window.winfo_exists():
             edit_textbox_styles_window.lift()
             edit_textbox_styles_window.state('normal')
             edit_textbox_styles_window.focus_force()
@@ -734,7 +734,7 @@ class edit_lever_styles():
     def __init__(self, root_window):
         global edit_lever_styles_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_lever_styles_window is not None:
+        if edit_lever_styles_window is not None and edit_lever_styles_window.winfo_exists():
             edit_lever_styles_window.lift()
             edit_lever_styles_window.state('normal')
             edit_lever_styles_window.focus_force()

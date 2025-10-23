@@ -398,7 +398,7 @@ class dcc_programming():
     def __init__(self, root_window, dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function):
         global dcc_programming_window
         # If there is already a dcc programming window open then we just make it jump to the top and exit
-        if dcc_programming_window is not None:
+        if dcc_programming_window is not None and dcc_programming_window.winfo_exists():
             dcc_programming_window.lift()
             dcc_programming_window.state('normal')
             dcc_programming_window.focus_force()
@@ -440,7 +440,7 @@ class dcc_mappings():
     def __init__(self, root_window):
         global dcc_mappings_window
         # If there is already a window open then we just make it jump to the top and exit
-        if dcc_mappings_window is not None:
+        if dcc_mappings_window is not None and dcc_mappings_window.winfo_exists():
             dcc_mappings_window.lift()
             dcc_mappings_window.state('normal')
             dcc_mappings_window.focus_force()
@@ -543,7 +543,7 @@ class bulk_renumbering():
     def __init__(self, root_window):
         global renumbering_utility_window
         # If there is already a window open then we just make it jump to the top and exit
-        if renumbering_utility_window is not None:
+        if renumbering_utility_window is not None and renumbering_utility_window.winfo_exists():
             renumbering_utility_window.lift()
             renumbering_utility_window.state('normal')
             renumbering_utility_window.focus_force()
@@ -763,7 +763,7 @@ class application_upgrade():
     def __init__(self, root_window):
         global upgrade_utility_window
         # If there is already a window open then we just make it jump to the top and exit
-        if upgrade_utility_window is not None:
+        if upgrade_utility_window is not None and upgrade_utility_window.winfo_exists():
             upgrade_utility_window.lift()
             upgrade_utility_window.state('normal')
             upgrade_utility_window.focus_force()
@@ -876,7 +876,7 @@ class import_layout():
     def __init__(self, root_window, import_schematic_callback):
         global import_utility_window
         # If there is already a window open then we just make it jump to the top and exit
-        if import_utility_window is not None:
+        if import_utility_window is not None and import_utility_window.winfo_exists():
             import_utility_window.lift()
             import_utility_window.state('normal')
             import_utility_window.focus_force()
@@ -947,7 +947,7 @@ class exercise_points():
     def __init__(self, root_window, reset_function):
         global exercise_points_window
         # If there is already a window open then we just make it jump to the top and exit
-        if exercise_points_window is not None:
+        if exercise_points_window is not None and exercise_points_window.winfo_exists():
             exercise_points_window.lift()
             exercise_points_window.state('normal')
             exercise_points_window.focus_force()

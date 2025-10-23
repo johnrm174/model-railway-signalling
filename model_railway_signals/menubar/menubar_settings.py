@@ -140,7 +140,7 @@ class edit_canvas_settings():
     def __init__(self, root_window, update_function):
         global canvas_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if canvas_settings_window is not None:
+        if canvas_settings_window is not None and canvas_settings_window.winfo_exists():
             canvas_settings_window.lift()
             canvas_settings_window.state('normal')
             canvas_settings_window.focus_force()
@@ -292,7 +292,7 @@ class sprog_addressing_information():
     def __init__(self, parent_window):
         global sprog_settings_learn_more_window
         # Only create the window if one doesn't already exist
-        if sprog_settings_learn_more_window is not None:
+        if sprog_settings_learn_more_window is not None and sprog_settings_learn_more_window.winfo_exists():
             sprog_settings_learn_more_window.lift()
             sprog_settings_learn_more_window.state('normal')
             sprog_settings_learn_more_window.focus_force()
@@ -327,7 +327,7 @@ class edit_sprog_settings():
     def __init__(self, root_window, connect_function, update_function):
         global edit_sprog_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_sprog_settings_window is not None:
+        if edit_sprog_settings_window is not None and edit_sprog_settings_window.winfo_exists():
             edit_sprog_settings_window.lift()
             edit_sprog_settings_window.state('normal')
             edit_sprog_settings_window.focus_force()
@@ -487,7 +487,7 @@ class edit_logging_settings():
     def __init__(self, root_window, update_function):
         global edit_logging_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_logging_settings_window is not None:
+        if edit_logging_settings_window is not None and edit_logging_settings_window.winfo_exists():
             edit_logging_settings_window.lift()
             edit_logging_settings_window.state('normal')
             edit_logging_settings_window.focus_force()
@@ -758,7 +758,7 @@ class edit_mqtt_settings():
     def __init__(self, root_window, update_function):
         global edit_mqtt_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_mqtt_settings_window is not None:
+        if edit_mqtt_settings_window is not None and edit_mqtt_settings_window.winfo_exists():
             edit_mqtt_settings_window.lift()
             edit_mqtt_settings_window.state('normal')
             edit_mqtt_settings_window.focus_force()
@@ -1004,7 +1004,7 @@ class edit_gpio_settings():
     def __init__(self, root_window, update_function):
         global edit_gpio_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_gpio_settings_window is not None:
+        if edit_gpio_settings_window is not None and edit_gpio_settings_window.winfo_exists():
             edit_gpio_settings_window.lift()
             edit_gpio_settings_window.state('normal')
             edit_gpio_settings_window.focus_force()
@@ -1111,7 +1111,7 @@ class edit_general_settings():
     def __init__(self, root_window, update_function):
         global edit_general_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_general_settings_window is not None:
+        if edit_general_settings_window is not None and edit_general_settings_window.winfo_exists():
             edit_general_settings_window.lift()
             edit_general_settings_window.state('normal')
             edit_general_settings_window.focus_force()
@@ -1280,7 +1280,7 @@ class edit_sounds_settings():
     def __init__(self, root_window, update_function):
         global edit_sounds_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_sounds_settings_window is not None:
+        if edit_sounds_settings_window is not None and edit_sounds_settings_window.winfo_exists():
             edit_sounds_settings_window.lift()
             edit_sounds_settings_window.state('normal')
             edit_sounds_settings_window.focus_force()

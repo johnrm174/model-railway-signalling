@@ -110,7 +110,7 @@ class display_help():
     def __init__(self, root_window):
         global help_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if help_window is not None:
+        if help_window is not None and help_window.winfo_exists():
             help_window.lift()
             help_window.state('normal')
             help_window.focus_force()
@@ -172,7 +172,7 @@ class display_about():
     def __init__(self, root_window):
         global about_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if about_window is not None:
+        if about_window is not None and about_window.winfo_exists():
             about_window.lift()
             about_window.state('normal')
             about_window.focus_force()
@@ -215,7 +215,7 @@ class display_docs():
     def __init__(self, root_window):
         global documentation_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if documentation_window is not None:
+        if documentation_window is not None and documentation_window.winfo_exists():
             documentation_window.lift()
             documentation_window.state('normal')
             documentation_window.focus_force()
@@ -274,7 +274,7 @@ class edit_layout_info():
     def __init__(self, root_window):
         global edit_layout_info_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_layout_info_window is not None:
+        if edit_layout_info_window is not None and edit_layout_info_window.winfo_exists():
             edit_layout_info_window.lift()
             edit_layout_info_window.state('normal')
             edit_layout_info_window.focus_force()
