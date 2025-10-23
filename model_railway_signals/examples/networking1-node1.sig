@@ -20,7 +20,7 @@
                 20,
                 5
             ],
-            "bbox": 12583,
+            "bbox": 3710,
             "colour": "black",
             "endx": 600.0,
             "endy": 125.0,
@@ -40,7 +40,7 @@
                 20,
                 5
             ],
-            "bbox": 12589,
+            "bbox": 3718,
             "colour": "black",
             "endx": 125.0,
             "endy": 125.0,
@@ -67,8 +67,9 @@
                 false,
                 ""
             ],
-            "bbox": 12615,
+            "bbox": 3744,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -397,7 +398,7 @@
             "ybuttonoffset": 0
         },
         "5119d487-7752-469d-addb-5aa3be1bedb6": {
-            "bbox": 12619,
+            "bbox": 3748,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -434,8 +435,9 @@
                 false,
                 ""
             ],
-            "bbox": 12645,
+            "bbox": 3774,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -777,7 +779,7 @@
         },
         "6408cbee-f763-41ad-8fca-3130f53d2519": {
             "background": "grey85",
-            "bbox": 12648,
+            "bbox": 3777,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -808,8 +810,9 @@
                 false,
                 ""
             ],
-            "bbox": 12668,
+            "bbox": 3797,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1131,7 +1134,7 @@
                 20,
                 5
             ],
-            "bbox": 12674,
+            "bbox": 3805,
             "colour": "black",
             "endx": 475.0,
             "endy": 300.0,
@@ -1145,7 +1148,7 @@
             "tags": "line3"
         },
         "70194f30-ef69-484a-b947-66951acf8a72": {
-            "bbox": 12678,
+            "bbox": 3809,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1182,8 +1185,9 @@
                 false,
                 ""
             ],
-            "bbox": 12698,
+            "bbox": 3829,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1499,7 +1503,7 @@
             "ybuttonoffset": 0
         },
         "73be5b7a-289a-4a48-959b-0f06dc39c0e9": {
-            "bbox": 12702,
+            "bbox": 3833,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1524,7 +1528,7 @@
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
-            "bbox": 12705,
+            "bbox": 3836,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1543,7 +1547,7 @@
         },
         "9a8b2db4-dadb-4a28-bf0f-5ce1baaa363f": {
             "background": "grey85",
-            "bbox": 12708,
+            "bbox": 3839,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1561,7 +1565,7 @@
             ]
         },
         "a271c006-6796-436a-b85f-c805554d8237": {
-            "bbox": 12723,
+            "bbox": 3854,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1574,7 +1578,7 @@
         },
         "aad6451e-e1e2-4a4d-8f93-064d331acafd": {
             "background": "grey85",
-            "bbox": 12726,
+            "bbox": 3857,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1605,8 +1609,9 @@
                 false,
                 ""
             ],
-            "bbox": 12752,
+            "bbox": 3883,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1963,10 +1968,14 @@
             "height": 500,
             "scrollbuttons": [],
             "snaptogrid": true,
-            "width": 800
+            "width": 1000
+        },
+        "control": {
+            "dccsoundmappings": []
         },
         "general": {
             "automation": true,
+            "baseitemid": 1,
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/networking1-node1.sig",
             "info": "Document your layout here",

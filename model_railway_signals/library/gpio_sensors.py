@@ -58,6 +58,7 @@
 #
 #   subscribe_to_gpio_port_status(gpio_port:int/str, callback) - to get real-time status updates
 #   unsubscribe_from_gpio_port_status (gpio_port:int/str) - to stop getting real-time status updates
+#   unsubscribe_from_all_gpio_port_status(): - to reset all subscriptions (use case layout load or new)
 # 
 # External API - classes and functions (used by the other library modules):
 #
@@ -217,6 +218,10 @@ def unsubscribe_from_gpio_port_status(gpio_port:Union[int,str]):
         del gpio_port_subscriptions[str(gpio_port)]
     return()
 
+def unsubscribe_from_all_gpio_port_status():
+    global gpio_port_subscriptions
+    gpio_port_subscriptions = {}
+    
 def report_gpio_port_status(gpio_port:Union[int,str], status:int):
     if str(gpio_port) in gpio_port_subscriptions.keys():
         # We test the 'tripped' flag AND the status code that we are given to cope with event timing edge cases

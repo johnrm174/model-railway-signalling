@@ -710,6 +710,8 @@ class main_menubar:
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="New Schematic",
                 message="Are you sure you want to discard all changes and create a new blank schematic"):
+            # Delete any GPIO status subscriptions (if the GPIO settings window is still open)
+            library.unsubscribe_from_all_gpio_port_status()
             # Destroy any open configutation or settings windows (or it gets confusing)
             for widget in self.root.winfo_children():
                 if isinstance(widget, Tk.Toplevel):
@@ -793,6 +795,8 @@ class main_menubar:
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
+                    # Delete any GPIO status subscriptions (if the GPIO settings window is still open)
+                    library.unsubscribe_from_all_gpio_port_status()
                     # Destroy any open configutation or settings windows (or it gets confusing)
                     for widget in self.root.winfo_children():
                         if isinstance(widget, Tk.Toplevel):
