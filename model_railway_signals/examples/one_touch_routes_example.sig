@@ -1,69 +1,179 @@
 {
     "buttons": {
         "1": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "10": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "11": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "12": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "13": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "14": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "15": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "16": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "17": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "18": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "19": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "2": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "20": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "21": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "22": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "3": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "4": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "5": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "6": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "7": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "8": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         },
         "9": {
+            "buttondata": {
+                "entrybutton": 0,
+                "exitbutton": 0,
+                "route": null
+            },
             "selected": false
         }
     },
@@ -72,51 +182,61 @@
     "levers": {},
     "objects": {
         "010e5fa1-fd7a-4068-a751-d214c9950ae4": {
-            "bbox": 16351,
+            "bbox": 10812,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 3,
-            "linestohighlight": [
-                33,
-                14,
-                12,
-                31
-            ],
-            "pointsonroute": {
-                "11": false,
-                "16": true
-            },
-            "pointstohighlight": [
-                16,
-                17,
-                11
-            ],
             "posx": 400.0,
             "posy": 500.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 5,
+                    "linestohighlight": [
+                        33,
+                        14,
+                        12,
+                        31
+                    ],
+                    "pointsonroute": {
+                        "11": false,
+                        "16": true
+                    },
+                    "pointstohighlight": [
+                        16,
+                        17,
+                        11
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        8
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Platform 1 departure to Down Main",
             "routename": "Platform 1 to Down",
             "setupsensor": 0,
-            "signalsonroute": [
-                8
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button3",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 5
+            ]
         },
         "0148c4d4-8a20-45c2-9a32-a1eb5e532d9f": {
-            "bbox": 16355,
+            "bbox": 10816,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -146,7 +266,7 @@
                 0,
                 0
             ],
-            "bbox": 16361,
+            "bbox": 10824,
             "colour": "black",
             "endx": 900.0,
             "endy": 425.0,
@@ -161,7 +281,7 @@
         },
         "02aaa6bf-c249-45ed-965f-047262cad8a5": {
             "background": "grey85",
-            "bbox": 16364,
+            "bbox": 10827,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -185,7 +305,7 @@
                 20,
                 5
             ],
-            "bbox": 16370,
+            "bbox": 10835,
             "colour": "black",
             "endx": 150.0,
             "endy": 275.0,
@@ -201,7 +321,7 @@
         "058012a1-4cb8-40e0-9c67-55c0139c064a": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 16377,
+            "bbox": 10844,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -305,8 +425,9 @@
                 false,
                 ""
             ],
-            "bbox": 16397,
+            "bbox": 10864,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -624,7 +745,7 @@
         "05daf194-7943-4c0b-8540-b574716ce9ca": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 16404,
+            "bbox": 10873,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -709,7 +830,7 @@
                 0,
                 0
             ],
-            "bbox": 16410,
+            "bbox": 10881,
             "colour": "black",
             "endx": 1725.0,
             "endy": 325.0,
@@ -736,8 +857,9 @@
                 false,
                 ""
             ],
-            "bbox": 16430,
+            "bbox": 10901,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1171,52 +1293,62 @@
             "ybuttonoffset": 0
         },
         "0950163c-9b77-46c1-84c9-5ad56088c55a": {
-            "bbox": 16434,
+            "bbox": 10907,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 1,
-            "linestohighlight": [
-                6,
-                16,
-                15,
-                13,
-                25
-            ],
-            "pointsonroute": {
-                "15": true,
-                "8": false
-            },
-            "pointstohighlight": [
-                8,
-                15
-            ],
             "posx": 1600.0,
             "posy": 500.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 12,
+                    "linestohighlight": [
+                        6,
+                        16,
+                        15,
+                        13,
+                        25
+                    ],
+                    "pointsonroute": {
+                        "15": true,
+                        "8": false
+                    },
+                    "pointstohighlight": [
+                        8,
+                        15
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        5
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Down Main arrival into Platform 1",
             "routename": "Down to Platform 1",
             "setupsensor": 0,
-            "signalsonroute": [
-                5
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button1",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 12
+            ]
         },
         "0981c3fb-63d1-4cc4-bcdb-c89612f58ed6": {
             "background": "grey85",
-            "bbox": 16437,
+            "bbox": 10910,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1234,7 +1366,8 @@
             ]
         },
         "0add39ae-8bc2-44ca-adb4-d2a8794adcc4": {
-            "bbox": 16441,
+            "bbox": 10914,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 7,
@@ -1304,7 +1437,7 @@
             "tags": "sensor7"
         },
         "0bcc8fee-02a4-485d-a1f4-b8b935e35504": {
-            "bbox": 16445,
+            "bbox": 10918,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -1328,7 +1461,7 @@
             ]
         },
         "0f2a2cb4-f289-4874-992d-4e53cc1498a7": {
-            "bbox": 16449,
+            "bbox": 10922,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -1365,8 +1498,9 @@
                 false,
                 ""
             ],
-            "bbox": 16461,
+            "bbox": 10934,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1728,60 +1862,70 @@
             "ybuttonoffset": 0
         },
         "1625ee65-272d-41ec-a9ec-2832f28fbbe7": {
-            "bbox": 16465,
+            "bbox": 10940,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 17,
-            "linestohighlight": [
-                35,
-                8,
-                10,
-                12,
-                31
-            ],
-            "pointsonroute": {
-                "10": false,
-                "11": true,
-                "14": true,
-                "9": true
-            },
-            "pointstohighlight": [
-                4,
-                6,
-                9,
-                13,
-                14,
-                12,
-                11
-            ],
             "posx": 400.0,
             "posy": 425.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 5,
+                    "linestohighlight": [
+                        35,
+                        8,
+                        10,
+                        12,
+                        31
+                    ],
+                    "pointsonroute": {
+                        "10": false,
+                        "11": true,
+                        "14": true,
+                        "9": true
+                    },
+                    "pointstohighlight": [
+                        4,
+                        6,
+                        9,
+                        13,
+                        14,
+                        12,
+                        11
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        1
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Goods loop departure to Down Main",
             "routename": "Goods to Down",
             "setupsensor": 0,
-            "signalsonroute": [
-                1
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button17",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 5
+            ]
         },
         "1ab8c048-bc7a-4a3b-a14c-b02afcafcaa4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 16470,
+            "bbox": 10947,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -1824,8 +1968,9 @@
                 false,
                 ""
             ],
-            "bbox": 16490,
+            "bbox": 10967,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2242,48 +2387,58 @@
             "ybuttonoffset": 0
         },
         "1f8a59e9-5c19-4a50-a9ec-c9fac51c71c1": {
-            "bbox": 16494,
+            "bbox": 10973,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 12,
-            "linestohighlight": [
-                3,
-                1,
-                7,
-                28
-            ],
-            "pointsonroute": {
-                "3": false,
-                "5": false
-            },
-            "pointstohighlight": [
-                5,
-                3
-            ],
             "posx": 1425.0,
             "posy": 225.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 2,
+                    "linestohighlight": [
+                        3,
+                        1,
+                        7,
+                        28
+                    ],
+                    "pointsonroute": {
+                        "3": false,
+                        "5": false
+                    },
+                    "pointstohighlight": [
+                        5,
+                        3
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        3,
+                        22
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Platform 2 departure to branch",
             "routename": "Platform 3 to Branch",
             "setupsensor": 0,
-            "signalsonroute": [
-                3,
-                22
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button12",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 2
+            ]
         },
         "1fb4a1ba-73cf-4a10-929e-da26a7958c87": {
             "approachcontrol": [
@@ -2299,8 +2454,9 @@
                 false,
                 ""
             ],
-            "bbox": 16516,
+            "bbox": 10995,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2766,7 +2922,7 @@
                 1,
                 1
             ],
-            "bbox": 16522,
+            "bbox": 11003,
             "colour": "black",
             "endx": 1325.0,
             "endy": 200.0,
@@ -2780,7 +2936,7 @@
             "tags": "line17"
         },
         "204a676c-058b-43ed-bc79-46fd8ca770cb": {
-            "bbox": 16526,
+            "bbox": 11007,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -2804,7 +2960,7 @@
             ]
         },
         "22a63804-92ab-4d6a-89fb-c5b3eed7e475": {
-            "bbox": 16530,
+            "bbox": 11011,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -2830,7 +2986,7 @@
         "25bde8e4-dc58-4917-b214-70b236a0e316": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 16536,
+            "bbox": 11019,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2923,7 +3079,7 @@
         "2660e87b-743d-4bf5-b5c9-33eb079c533c": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 16541,
+            "bbox": 11026,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2953,7 +3109,7 @@
             "ybuttonoffset": 0
         },
         "280ffb82-b4eb-49d3-96d3-9de9160072b7": {
-            "bbox": 16545,
+            "bbox": 11030,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -2983,7 +3139,7 @@
                 1,
                 1
             ],
-            "bbox": 16551,
+            "bbox": 11038,
             "colour": "black",
             "endx": 650.0,
             "endy": 200.0,
@@ -3003,7 +3159,7 @@
                 20,
                 5
             ],
-            "bbox": 16557,
+            "bbox": 11046,
             "colour": "black",
             "endx": 100.0,
             "endy": 375.0,
@@ -3017,55 +3173,65 @@
             "tags": "line31"
         },
         "2bead2aa-671c-4699-9f91-4f2ec453fe9f": {
-            "bbox": 16561,
+            "bbox": 11052,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 6,
-            "linestohighlight": [
-                1,
-                2,
-                5,
-                24
-            ],
-            "pointsonroute": {
-                "3": true,
-                "5": true,
-                "8": false
-            },
-            "pointstohighlight": [
-                1,
-                2,
-                3,
-                5,
-                7
-            ],
             "posx": 1425.0,
             "posy": 450.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#c800ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 3,
+                    "linestohighlight": [
+                        1,
+                        2,
+                        5,
+                        24
+                    ],
+                    "pointsonroute": {
+                        "3": true,
+                        "5": true,
+                        "8": false
+                    },
+                    "pointstohighlight": [
+                        1,
+                        2,
+                        3,
+                        5,
+                        7
+                    ],
+                    "routecolour": "#c800ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        2
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Goods loop departure to Up Main",
             "routename": "Goods to Up",
             "setupsensor": 0,
-            "signalsonroute": [
-                2
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button6",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 3
+            ]
         },
         "2ea41ff5-d1c7-4c38-bb25-53eeadc25735": {
             "background": "grey85",
-            "bbox": 16564,
+            "bbox": 11055,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3084,7 +3250,7 @@
         },
         "2fcbbfe6-7a94-4913-b572-8ddad96c76a3": {
             "background": "grey85",
-            "bbox": 16567,
+            "bbox": 11058,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3102,56 +3268,66 @@
             ]
         },
         "333315c4-06d2-4914-bfcb-48af3597e851": {
-            "bbox": 16571,
+            "bbox": 11064,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 7,
-            "linestohighlight": [
-                6,
-                1,
-                2,
-                25
-            ],
-            "pointsonroute": {
-                "3": true,
-                "5": true,
-                "8": true
-            },
-            "pointstohighlight": [
-                2,
-                1,
-                3,
-                5,
-                7,
-                8
-            ],
             "posx": 1600.0,
             "posy": 425.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 6,
+                    "linestohighlight": [
+                        6,
+                        1,
+                        2,
+                        25
+                    ],
+                    "pointsonroute": {
+                        "3": true,
+                        "5": true,
+                        "8": true
+                    },
+                    "pointstohighlight": [
+                        2,
+                        1,
+                        3,
+                        5,
+                        7,
+                        8
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        5
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Down Main arrival into goods loop",
             "routename": "Down to Goods",
             "setupsensor": 0,
-            "signalsonroute": [
-                5
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button7",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 6
+            ]
         },
         "359d1564-4a52-49ef-81e0-a72df0f02220": {
             "background": "grey85",
-            "bbox": 16574,
+            "bbox": 11067,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3175,7 +3351,7 @@
                 0,
                 0
             ],
-            "bbox": 16580,
+            "bbox": 11075,
             "colour": "black",
             "endx": 575.0,
             "endy": 325.0,
@@ -3189,7 +3365,7 @@
             "tags": "line10"
         },
         "37716476-045e-4efc-a8d0-dc30b5f9ccbb": {
-            "bbox": 16584,
+            "bbox": 11079,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -3215,7 +3391,7 @@
         "37fbb878-e6fd-4629-96f8-5912ec2ab8d3": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 16591,
+            "bbox": 11088,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3271,8 +3447,9 @@
                 false,
                 ""
             ],
-            "bbox": 16613,
+            "bbox": 11110,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3666,7 +3843,7 @@
                 20,
                 5
             ],
-            "bbox": 16619,
+            "bbox": 11118,
             "colour": "black",
             "endx": 500.0,
             "endy": 375.0,
@@ -3686,7 +3863,7 @@
                 0,
                 0
             ],
-            "bbox": 16625,
+            "bbox": 11126,
             "colour": "black",
             "endx": 1125.0,
             "endy": 425.0,
@@ -3700,57 +3877,67 @@
             "tags": "line13"
         },
         "3b5c8ec9-898a-4724-8b45-fb33b6158df6": {
-            "bbox": 16629,
+            "bbox": 11132,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 20,
-            "linestohighlight": [
-                30,
-                11,
-                8,
-                35,
-                10
-            ],
-            "pointsonroute": {
-                "10": false,
-                "11": false,
-                "14": true,
-                "9": true
-            },
-            "pointstohighlight": [
-                12,
-                14,
-                13,
-                9,
-                6,
-                4
-            ],
             "posx": 225.0,
             "posy": 425.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#c800ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 7,
+                    "linestohighlight": [
+                        30,
+                        11,
+                        8,
+                        35,
+                        10
+                    ],
+                    "pointsonroute": {
+                        "10": false,
+                        "11": false,
+                        "14": true,
+                        "9": true
+                    },
+                    "pointstohighlight": [
+                        12,
+                        14,
+                        13,
+                        9,
+                        6,
+                        4
+                    ],
+                    "routecolour": "#c800ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        6
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Up Main arrival into goods loop",
             "routename": "Up to Goods",
             "setupsensor": 0,
-            "signalsonroute": [
-                6
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button20",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 7
+            ]
         },
         "3b9c9266-3dfe-4349-84a3-c7b9b9185cae": {
-            "bbox": 16633,
+            "bbox": 11136,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -3774,48 +3961,58 @@
             ]
         },
         "3ed6eb67-18ea-4f66-b2f0-e12664a6d90f": {
-            "bbox": 16637,
+            "bbox": 11142,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 19,
-            "linestohighlight": [
-                26,
-                19,
-                8,
-                34
-            ],
-            "pointsonroute": {
-                "14": false,
-                "9": false
-            },
-            "pointstohighlight": [
-                13,
-                9
-            ],
             "posx": 225.0,
             "posy": 200.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 9,
+                    "linestohighlight": [
+                        26,
+                        19,
+                        8,
+                        34
+                    ],
+                    "pointsonroute": {
+                        "14": false,
+                        "9": false
+                    },
+                    "pointstohighlight": [
+                        13,
+                        9
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        11,
+                        10
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Branch Arrival into Platform 3",
             "routename": "Branch to Platform 3",
             "setupsensor": 0,
-            "signalsonroute": [
-                11,
-                10
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button19",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 9
+            ]
         },
         "40b26cb0-d796-439c-8fdf-5591ece95ccb": {
             "arrowends": 2,
@@ -3824,7 +4021,7 @@
                 20,
                 5
             ],
-            "bbox": 16643,
+            "bbox": 11150,
             "colour": "black",
             "endx": 1650.0,
             "endy": 375.0,
@@ -3838,7 +4035,7 @@
             "tags": "line25"
         },
         "41798b7f-8f72-4a52-9aa0-8c13ac1f7292": {
-            "bbox": 16647,
+            "bbox": 11154,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -3868,7 +4065,7 @@
                 0,
                 0
             ],
-            "bbox": 16653,
+            "bbox": 11162,
             "colour": "black",
             "endx": 575.0,
             "endy": 275.0,
@@ -3895,8 +4092,9 @@
                 false,
                 ""
             ],
-            "bbox": 16675,
+            "bbox": 11184,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4290,7 +4488,7 @@
                 0,
                 0
             ],
-            "bbox": 16681,
+            "bbox": 11192,
             "colour": "black",
             "endx": 1075.0,
             "endy": 200.0,
@@ -4306,7 +4504,7 @@
         "47a9ea55-623c-48d0-af0d-6a4be22cc19f": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 16688,
+            "bbox": 11201,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -4403,7 +4601,7 @@
                 0,
                 0
             ],
-            "bbox": 16694,
+            "bbox": 11209,
             "colour": "black",
             "endx": 1125.0,
             "endy": 375.0,
@@ -4423,7 +4621,7 @@
                 0,
                 0
             ],
-            "bbox": 16700,
+            "bbox": 11217,
             "colour": "black",
             "endx": 650.0,
             "endy": 375.0,
@@ -4437,7 +4635,8 @@
             "tags": "line14"
         },
         "5424f96f-2ac5-49c0-9ea4-f8c51e696e02": {
-            "bbox": 16704,
+            "bbox": 11221,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 4,
@@ -4507,7 +4706,7 @@
             "tags": "sensor4"
         },
         "550b7d1a-fb0a-47f1-8361-9699e60514e9": {
-            "bbox": 16708,
+            "bbox": 11225,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -4531,51 +4730,61 @@
             ]
         },
         "55da5108-9de2-4e68-ab11-d0dd6e32a222": {
-            "bbox": 16712,
+            "bbox": 11231,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 5,
-            "linestohighlight": [
-                6,
-                3,
-                1,
-                25
-            ],
-            "pointsonroute": {
-                "3": true,
-                "5": false,
-                "8": true
-            },
-            "pointstohighlight": [
-                8,
-                2,
-                1,
-                3,
-                5
-            ],
             "posx": 1600.0,
             "posy": 450.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 8,
+                    "linestohighlight": [
+                        6,
+                        3,
+                        1,
+                        25
+                    ],
+                    "pointsonroute": {
+                        "3": true,
+                        "5": false,
+                        "8": true
+                    },
+                    "pointstohighlight": [
+                        8,
+                        2,
+                        1,
+                        3,
+                        5
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        5
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Down Main arrival into Platform 3",
             "routename": "Down to Platform 3",
             "setupsensor": 0,
-            "signalsonroute": [
-                5
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button5",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 8
+            ]
         },
         "576e13a0-37f2-4510-8c20-c3d42f12756b": {
             "arrowends": 0,
@@ -4584,7 +4793,7 @@
                 0,
                 0
             ],
-            "bbox": 16718,
+            "bbox": 11239,
             "colour": "black",
             "endx": 1150.0,
             "endy": 275.0,
@@ -4599,7 +4808,7 @@
         },
         "58ab1e60-0f14-4c1a-b97c-63a46790c987": {
             "background": "#d9d9b1",
-            "bbox": 16721,
+            "bbox": 11242,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -4617,54 +4826,65 @@
             ]
         },
         "5b638f9c-8e40-4fa7-ae68-ff0b9c8d16bf": {
-            "bbox": 16725,
+            "bbox": 11248,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 21,
-            "linestohighlight": [
-                30,
-                11,
-                8,
-                34,
-                10
-            ],
-            "pointsonroute": {
-                "11": false,
-                "14": true,
-                "9": false
-            },
-            "pointstohighlight": [
-                12,
-                14,
-                13,
-                9
-            ],
             "posx": 225.0,
             "posy": 450.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#c800ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 9,
+                    "linestohighlight": [
+                        30,
+                        11,
+                        8,
+                        34,
+                        10
+                    ],
+                    "pointsonroute": {
+                        "11": false,
+                        "14": true,
+                        "9": false
+                    },
+                    "pointstohighlight": [
+                        12,
+                        14,
+                        13,
+                        9
+                    ],
+                    "routecolour": "#c800ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        6
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Up Main arrival into platform 3",
             "routename": "Up to Platform 3",
             "setupsensor": 0,
-            "signalsonroute": [
-                6
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button21",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 9
+            ]
         },
         "5c14b604-4602-4fd7-8128-449eba7dea46": {
-            "bbox": 16729,
+            "bbox": 11252,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 1,
@@ -4746,7 +4966,7 @@
         "5e8f3ed5-e412-4861-a3d8-499d7f467e80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 16735,
+            "bbox": 11260,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -4789,8 +5009,9 @@
                 false,
                 ""
             ],
-            "bbox": 16747,
+            "bbox": 11272,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -5168,7 +5389,7 @@
         "5fd84d01-3fc8-4592-923c-968e38f13c80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 16752,
+            "bbox": 11279,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -5211,8 +5432,9 @@
                 false,
                 ""
             ],
-            "bbox": 16772,
+            "bbox": 11299,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -5534,7 +5756,7 @@
                 1,
                 1
             ],
-            "bbox": 16778,
+            "bbox": 11307,
             "colour": "black",
             "endx": 700.0,
             "endy": 150.0,
@@ -5548,49 +5770,59 @@
             "tags": "line23"
         },
         "67046282-f9b4-4d33-9c90-0a23531fc6b2": {
-            "bbox": 16782,
+            "bbox": 11313,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 11,
-            "linestohighlight": [
-                2,
-                1,
-                7,
-                29
-            ],
-            "pointsonroute": {
-                "3": false,
-                "5": true
-            },
-            "pointstohighlight": [
-                7,
-                5,
-                3
-            ],
             "posx": 1600.0,
             "posy": 200.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 6,
+                    "linestohighlight": [
+                        2,
+                        1,
+                        7,
+                        29
+                    ],
+                    "pointsonroute": {
+                        "3": false,
+                        "5": true
+                    },
+                    "pointstohighlight": [
+                        7,
+                        5,
+                        3
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        14,
+                        13
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Branch arrival into Goods loop",
             "routename": "Branch to Goods",
             "setupsensor": 0,
-            "signalsonroute": [
-                14,
-                13
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button11",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 6
+            ]
         },
         "682c634b-e097-4fb8-b22c-72335533ad87": {
             "arrowends": 0,
@@ -5599,7 +5831,7 @@
                 0,
                 0
             ],
-            "bbox": 16788,
+            "bbox": 11321,
             "colour": "black",
             "endx": 900.0,
             "endy": 200.0,
@@ -5619,7 +5851,7 @@
                 0,
                 0
             ],
-            "bbox": 16794,
+            "bbox": 11329,
             "colour": "black",
             "endx": 1725.0,
             "endy": 375.0,
@@ -5639,7 +5871,7 @@
                 0,
                 0
             ],
-            "bbox": 16800,
+            "bbox": 11337,
             "colour": "black",
             "endx": 1150.0,
             "endy": 400.0,
@@ -5666,8 +5898,9 @@
                 false,
                 ""
             ],
-            "bbox": 16822,
+            "bbox": 11359,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -6105,7 +6338,7 @@
                 20,
                 5
             ],
-            "bbox": 16828,
+            "bbox": 11367,
             "colour": "black",
             "endx": 125.0,
             "endy": 325.0,
@@ -6119,7 +6352,7 @@
             "tags": "line30"
         },
         "7189da3b-f611-493b-b453-4c18190325b3": {
-            "bbox": 16832,
+            "bbox": 11371,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -6143,7 +6376,8 @@
             ]
         },
         "71aa37e6-dd5f-402d-a676-bc25644633b1": {
-            "bbox": 16836,
+            "bbox": 11375,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 9,
@@ -6219,7 +6453,7 @@
                 0,
                 0
             ],
-            "bbox": 16842,
+            "bbox": 11383,
             "colour": "black",
             "endx": 500.0,
             "endy": 325.0,
@@ -6235,7 +6469,7 @@
         "771fd5da-2c58-423c-9b29-d181501dca9b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 16847,
+            "bbox": 11390,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -6271,7 +6505,7 @@
                 20,
                 5
             ],
-            "bbox": 16853,
+            "bbox": 11398,
             "colour": "black",
             "endx": 1675.0,
             "endy": 325.0,
@@ -6285,7 +6519,7 @@
             "tags": "line5"
         },
         "78c8911f-a18a-41bf-961d-3a43893854d4": {
-            "bbox": 16857,
+            "bbox": 11402,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -6309,7 +6543,8 @@
             ]
         },
         "7a30db34-8614-4de1-b459-1440f11ef0b7": {
-            "bbox": 16861,
+            "bbox": 11406,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 11,
@@ -6380,7 +6615,7 @@
         },
         "7aa34fb1-3039-4be1-b71a-9d85fa38f112": {
             "background": "grey85",
-            "bbox": 16864,
+            "bbox": 11409,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6398,7 +6633,7 @@
             ]
         },
         "7e4470b9-8e8f-4790-b607-298c970fee30": {
-            "bbox": 16868,
+            "bbox": 11413,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -6424,7 +6659,7 @@
         "7f925596-94a5-43a6-b260-ce4bd63caaad": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 16873,
+            "bbox": 11420,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -6454,7 +6689,8 @@
             "ybuttonoffset": 0
         },
         "819aa2e8-aca4-4f1a-b08a-0c81429e32da": {
-            "bbox": 16877,
+            "bbox": 11424,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 10,
@@ -6530,7 +6766,7 @@
                 0,
                 0
             ],
-            "bbox": 16883,
+            "bbox": 11432,
             "colour": "black",
             "endx": 900.0,
             "endy": 325.0,
@@ -6545,7 +6781,7 @@
         },
         "846b5450-3bb8-443d-9552-644e650b10dd": {
             "background": "#d9d9b1",
-            "bbox": 16886,
+            "bbox": 11435,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -6564,7 +6800,7 @@
         },
         "84a2cb6e-79ed-42c2-ae61-55e5c92be7db": {
             "background": "grey85",
-            "bbox": 16889,
+            "bbox": 11438,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6595,8 +6831,9 @@
                 false,
                 ""
             ],
-            "bbox": 16901,
+            "bbox": 11450,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -6976,7 +7213,7 @@
             "ybuttonoffset": 0
         },
         "857bc7b3-6dd9-4fe8-a800-04b0845c77f2": {
-            "bbox": 16905,
+            "bbox": 11454,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -7013,8 +7250,9 @@
                 false,
                 ""
             ],
-            "bbox": 16925,
+            "bbox": 11474,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -7349,7 +7587,7 @@
                 0,
                 0
             ],
-            "bbox": 16931,
+            "bbox": 11482,
             "colour": "black",
             "endx": 1725.0,
             "endy": 275.0,
@@ -7369,7 +7607,7 @@
                 20,
                 5
             ],
-            "bbox": 16937,
+            "bbox": 11490,
             "colour": "black",
             "endx": 100.0,
             "endy": 275.0,
@@ -7383,7 +7621,8 @@
             "tags": "line27"
         },
         "91d508bf-88f0-4324-a6f6-0a704e20fdb5": {
-            "bbox": 16941,
+            "bbox": 11494,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 2,
@@ -7459,7 +7698,7 @@
                 20,
                 5
             ],
-            "bbox": 16947,
+            "bbox": 11502,
             "colour": "black",
             "endx": 1700.0,
             "endy": 275.0,
@@ -7474,7 +7713,7 @@
         },
         "93d61cb6-a272-45a4-be73-7fcd8ae70932": {
             "background": "grey85",
-            "bbox": 16950,
+            "bbox": 11505,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -7492,7 +7731,8 @@
             ]
         },
         "946fe314-a71f-404a-86a8-98d27a10966d": {
-            "bbox": 16954,
+            "bbox": 11509,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 12,
@@ -7562,7 +7802,8 @@
             "tags": "sensor12"
         },
         "98f3e500-24e3-477b-b8de-8d0625da443d": {
-            "bbox": 16958,
+            "bbox": 11513,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 3,
@@ -7632,99 +7873,119 @@
             "tags": "sensor3"
         },
         "99bd153e-9f0c-4134-9611-853fa6740f25": {
-            "bbox": 16962,
+            "bbox": 11519,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 2,
-            "linestohighlight": [
-                6,
-                16,
-                9,
-                25
-            ],
-            "pointsonroute": {
-                "15": false,
-                "8": false
-            },
-            "pointstohighlight": [
-                8,
-                15
-            ],
             "posx": 1600.0,
             "posy": 475.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 11,
+                    "linestohighlight": [
+                        6,
+                        16,
+                        9,
+                        25
+                    ],
+                    "pointsonroute": {
+                        "15": false,
+                        "8": false
+                    },
+                    "pointstohighlight": [
+                        8,
+                        15
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        5
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Down Main arrival into Down Avoiding loop",
             "routename": "Down to Avoiding",
             "setupsensor": 0,
-            "signalsonroute": [
-                5
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button2",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 11
+            ]
         },
         "9aec57b5-85f1-4118-b3e2-4c145e6ffaa8": {
-            "bbox": 16966,
+            "bbox": 11525,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 18,
-            "linestohighlight": [
-                26,
-                19,
-                8,
-                35
-            ],
-            "pointsonroute": {
-                "10": false,
-                "14": false,
-                "9": true
-            },
-            "pointstohighlight": [
-                13,
-                9,
-                6,
-                4
-            ],
             "posx": 225.0,
             "posy": 175.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 7,
+                    "linestohighlight": [
+                        26,
+                        19,
+                        8,
+                        35
+                    ],
+                    "pointsonroute": {
+                        "10": false,
+                        "14": false,
+                        "9": true
+                    },
+                    "pointstohighlight": [
+                        13,
+                        9,
+                        6,
+                        4
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        11,
+                        10
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Branch arrival into goods loop",
             "routename": "Branch to Goods",
             "setupsensor": 0,
-            "signalsonroute": [
-                11,
-                10
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button18",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 7
+            ]
         },
         "9dcab729-9273-4ede-9329-f6adc2ff05fb": {
             "alsoswitch": 17,
             "automatic": false,
-            "bbox": 16973,
+            "bbox": 11534,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -7779,48 +8040,58 @@
             "ybuttonoffset": 0
         },
         "9f2c0ce4-5515-4591-944c-b719fe662513": {
-            "bbox": 16977,
+            "bbox": 11540,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 15,
-            "linestohighlight": [
-                34,
-                8,
-                19,
-                27
-            ],
-            "pointsonroute": {
-                "14": false,
-                "9": false
-            },
-            "pointstohighlight": [
-                9,
-                13
-            ],
             "posx": 400.0,
             "posy": 200.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 4,
+                    "linestohighlight": [
+                        34,
+                        8,
+                        19,
+                        27
+                    ],
+                    "pointsonroute": {
+                        "14": false,
+                        "9": false
+                    },
+                    "pointstohighlight": [
+                        9,
+                        13
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        7,
+                        21
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Platform 3 departure to branch",
             "routename": "Platform 3 to Branch",
             "setupsensor": 0,
-            "signalsonroute": [
-                7,
-                21
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button15",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 4
+            ]
         },
         "a81352c2-65c1-4026-b811-23abc97ea0be": {
             "arrowends": 1,
@@ -7829,7 +8100,7 @@
                 1,
                 1
             ],
-            "bbox": 16983,
+            "bbox": 11548,
             "colour": "black",
             "endx": 650.0,
             "endy": 425.0,
@@ -7844,7 +8115,7 @@
         },
         "a824704b-6fde-49ba-ba05-933b6f7fe189": {
             "background": "grey85",
-            "bbox": 16986,
+            "bbox": 11551,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -7863,7 +8134,7 @@
         },
         "a8308a75-1fa0-4bb8-af17-e8405b20ed0d": {
             "background": "",
-            "bbox": 16989,
+            "bbox": 11554,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -7881,7 +8152,8 @@
             ]
         },
         "abc9a055-2106-4b89-8de5-f4ce4e1df22f": {
-            "bbox": 16993,
+            "bbox": 11558,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 5,
@@ -7953,7 +8225,7 @@
         "b0f29657-f391-457d-85b7-6a5ec41b0d13": {
             "alsoswitch": 12,
             "automatic": false,
-            "bbox": 17000,
+            "bbox": 11567,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -8044,51 +8316,61 @@
             "ybuttonoffset": 0
         },
         "b118ca35-20db-4e0e-881a-e22db97c1b66": {
-            "bbox": 17004,
+            "bbox": 11573,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 14,
-            "linestohighlight": [
-                35,
-                8,
-                19,
-                27
-            ],
-            "pointsonroute": {
-                "10": false,
-                "14": false,
-                "9": true
-            },
-            "pointstohighlight": [
-                4,
-                6,
-                9,
-                13
-            ],
             "posx": 400.0,
             "posy": 175.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 4,
+                    "linestohighlight": [
+                        35,
+                        8,
+                        19,
+                        27
+                    ],
+                    "pointsonroute": {
+                        "10": false,
+                        "14": false,
+                        "9": true
+                    },
+                    "pointstohighlight": [
+                        4,
+                        6,
+                        9,
+                        13
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        1,
+                        21
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Goods Loop departure to branch",
             "routename": "Goods to Branch",
             "setupsensor": 0,
-            "signalsonroute": [
-                1,
-                21
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button14",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 4
+            ]
         },
         "b174f13d-c0c6-4f4e-9d67-5a3cd8828f7e": {
             "approachcontrol": [
@@ -8104,8 +8386,9 @@
                 false,
                 ""
             ],
-            "bbox": 17024,
+            "bbox": 11593,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -8434,7 +8717,7 @@
             "ybuttonoffset": 0
         },
         "b17fb551-2bfe-4d2a-9429-d2d94005c0c5": {
-            "bbox": 17028,
+            "bbox": 11597,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -8458,7 +8741,8 @@
             ]
         },
         "b20e0671-cd3e-440f-b7de-2af556846bc7": {
-            "bbox": 17032,
+            "bbox": 11601,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 8,
@@ -8530,7 +8814,7 @@
         "b34426dc-7315-4c73-b36a-b2c97b9c94c7": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 17039,
+            "bbox": 11610,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -8573,8 +8857,9 @@
                 false,
                 ""
             ],
-            "bbox": 17059,
+            "bbox": 11630,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -8912,8 +9197,9 @@
                 false,
                 ""
             ],
-            "bbox": 17079,
+            "bbox": 11650,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -9238,183 +9524,223 @@
             "ybuttonoffset": 0
         },
         "b7d81f2a-7d03-42f7-9125-a3559433f934": {
-            "bbox": 17083,
+            "bbox": 11656,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 22,
-            "linestohighlight": [
-                30,
-                11,
-                36,
-                10
-            ],
-            "pointsonroute": {
-                "11": false,
-                "14": false
-            },
-            "pointstohighlight": [
-                12,
-                14
-            ],
             "posx": 225.0,
             "posy": 475.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#c800ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 10,
+                    "linestohighlight": [
+                        30,
+                        11,
+                        36,
+                        10
+                    ],
+                    "pointsonroute": {
+                        "11": false,
+                        "14": false
+                    },
+                    "pointstohighlight": [
+                        12,
+                        14
+                    ],
+                    "routecolour": "#c800ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        6
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Up Main arrival into Platform 2",
             "routename": "Up to Platform 2",
             "setupsensor": 0,
-            "signalsonroute": [
-                6
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button22",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 10
+            ]
         },
         "b7f5f250-60f7-4678-95b8-0c8e50417a04": {
-            "bbox": 17087,
+            "bbox": 11662,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 13,
-            "linestohighlight": [
-                3,
-                1,
-                7,
-                27,
-                29
-            ],
-            "pointsonroute": {
-                "3": false,
-                "5": false
-            },
-            "pointstohighlight": [
-                5,
-                3
-            ],
             "posx": 1600.0,
             "posy": 225.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 8,
+                    "linestohighlight": [
+                        3,
+                        1,
+                        7,
+                        27,
+                        29
+                    ],
+                    "pointsonroute": {
+                        "3": false,
+                        "5": false
+                    },
+                    "pointstohighlight": [
+                        5,
+                        3
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        14,
+                        13
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Branch line arrival into Platform 2",
             "routename": "Branch to Platform 3",
             "setupsensor": 0,
-            "signalsonroute": [
-                14,
-                13
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button13",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 8
+            ]
         },
         "b9e52658-031c-49c8-a7c1-c18c6bf6d8e1": {
-            "bbox": 17091,
+            "bbox": 11668,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 4,
-            "linestohighlight": [
-                32,
-                14,
-                12,
-                31
-            ],
-            "pointsonroute": {
-                "11": false,
-                "16": false
-            },
-            "pointstohighlight": [
-                17,
-                11
-            ],
             "posx": 400.0,
             "posy": 475.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 5,
+                    "linestohighlight": [
+                        32,
+                        14,
+                        12,
+                        31
+                    ],
+                    "pointsonroute": {
+                        "11": false,
+                        "16": false
+                    },
+                    "pointstohighlight": [
+                        17,
+                        11
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        9
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Avoiding Loop departure to Down Main",
             "routename": "Avoiding to Down",
             "setupsensor": 0,
-            "signalsonroute": [
-                9
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button4",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 5
+            ]
         },
         "bc306663-e528-4e0e-b65b-a32754ee91d5": {
-            "bbox": 17095,
+            "bbox": 11674,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 10,
-            "linestohighlight": [
-                2,
-                1,
-                7,
-                28
-            ],
-            "pointsonroute": {
-                "3": false,
-                "5": true
-            },
-            "pointstohighlight": [
-                7,
-                5,
-                3
-            ],
             "posx": 1425.0,
             "posy": 200.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#0000ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 2,
+                    "linestohighlight": [
+                        2,
+                        1,
+                        7,
+                        28
+                    ],
+                    "pointsonroute": {
+                        "3": false,
+                        "5": true
+                    },
+                    "pointstohighlight": [
+                        7,
+                        5,
+                        3
+                    ],
+                    "routecolour": "#0000ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        2,
+                        22
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Goods Loop departure to branch",
             "routename": "Goods to Branch",
             "setupsensor": 0,
-            "signalsonroute": [
-                2,
-                22
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button10",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 2
+            ]
         },
         "bc6fbf64-cd5a-418a-98b7-2e0beeb7c64e": {
-            "bbox": 17099,
+            "bbox": 11678,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -9438,7 +9764,7 @@
             ]
         },
         "bf63c705-72aa-4cc3-8d20-bbb1c69bb297": {
-            "bbox": 17103,
+            "bbox": 11682,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -9468,7 +9794,7 @@
                 0,
                 0
             ],
-            "bbox": 17109,
+            "bbox": 11690,
             "colour": "black",
             "endx": 900.0,
             "endy": 250.0,
@@ -9484,7 +9810,7 @@
         "c867d2f6-3d89-490c-a3f9-b8cdd535ae99": {
             "alsoswitch": 18,
             "automatic": false,
-            "bbox": 17115,
+            "bbox": 11698,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -9539,7 +9865,7 @@
             "ybuttonoffset": 0
         },
         "c9d70646-364e-454c-95de-978d995c6c8e": {
-            "bbox": 17119,
+            "bbox": 11702,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -9576,8 +9902,9 @@
                 false,
                 ""
             ],
-            "bbox": 17139,
+            "bbox": 11722,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -9936,7 +10263,7 @@
                 0,
                 0
             ],
-            "bbox": 17145,
+            "bbox": 11730,
             "colour": "black",
             "endx": 1175.0,
             "endy": 325.0,
@@ -9956,7 +10283,7 @@
                 20,
                 5
             ],
-            "bbox": 17151,
+            "bbox": 11738,
             "colour": "black",
             "endx": 1650.0,
             "endy": 275.0,
@@ -9971,7 +10298,7 @@
         },
         "cc0ad700-89e3-486c-8ad0-e9a05ea0556d": {
             "background": "grey85",
-            "bbox": 17154,
+            "bbox": 11741,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -9995,7 +10322,7 @@
                 0,
                 0
             ],
-            "bbox": 17160,
+            "bbox": 11749,
             "colour": "black",
             "endx": 650.0,
             "endy": 250.0,
@@ -10009,7 +10336,7 @@
             "tags": "line8"
         },
         "ce380375-14c3-464d-a468-bf9a0b7a0f10": {
-            "bbox": 17164,
+            "bbox": 11753,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -10033,7 +10360,7 @@
             ]
         },
         "ceebbc85-e329-4185-a57f-e9230865a45c": {
-            "bbox": 17168,
+            "bbox": 11757,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -10057,7 +10384,8 @@
             ]
         },
         "d3df1397-1978-4d8d-9999-a561d4d321de": {
-            "bbox": 17172,
+            "bbox": 11761,
+            "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
             "itemid": 6,
@@ -10129,7 +10457,7 @@
         "d433fb55-7016-4bc9-ac60-9cf142605fa8": {
             "alsoswitch": 13,
             "automatic": false,
-            "bbox": 17179,
+            "bbox": 11770,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -10208,7 +10536,7 @@
             "ybuttonoffset": 0
         },
         "d4a3a8dc-b0f1-4ada-b934-36b9646a17b7": {
-            "bbox": 17183,
+            "bbox": 11774,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -10245,8 +10573,9 @@
                 false,
                 ""
             ],
-            "bbox": 17203,
+            "bbox": 11794,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -10562,7 +10891,7 @@
             "ybuttonoffset": 0
         },
         "d93793ac-8990-4f68-ae7a-7a17c80043bc": {
-            "bbox": 17207,
+            "bbox": 11798,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXXxxx",
@@ -10587,7 +10916,7 @@
         },
         "ddb09cbe-5c7d-4810-b27b-0b64e588e56b": {
             "background": "grey85",
-            "bbox": 17210,
+            "bbox": 11801,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -10607,7 +10936,7 @@
         "dec5f273-15d3-4ba7-a029-16028a9936e9": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 17215,
+            "bbox": 11808,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -10643,7 +10972,7 @@
                 0,
                 0
             ],
-            "bbox": 17221,
+            "bbox": 11816,
             "colour": "black",
             "endx": 1125.0,
             "endy": 150.0,
@@ -10657,51 +10986,61 @@
             "tags": "line21"
         },
         "e2c437bb-ec9b-46d1-bf27-0a9b5467f77d": {
-            "bbox": 17225,
+            "bbox": 11822,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 16,
-            "linestohighlight": [
-                10,
-                12,
-                31,
-                8
-            ],
-            "pointsonroute": {
-                "11": true,
-                "14": true,
-                "9": false
-            },
-            "pointstohighlight": [
-                9,
-                13,
-                14,
-                12,
-                11
-            ],
             "posx": 400.0,
             "posy": 450.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#ff6100",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 5,
+                    "linestohighlight": [
+                        10,
+                        12,
+                        31,
+                        8
+                    ],
+                    "pointsonroute": {
+                        "11": true,
+                        "14": true,
+                        "9": false
+                    },
+                    "pointstohighlight": [
+                        9,
+                        13,
+                        14,
+                        12,
+                        11
+                    ],
+                    "routecolour": "#ff6100",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        7
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Platform 3 departure to Down Main",
             "routename": "Platform 3 to Down",
             "setupsensor": 0,
-            "signalsonroute": [
-                7
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button16",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 5
+            ]
         },
         "e3aee691-dce7-4fac-b07a-258c99712401": {
             "arrowends": 2,
@@ -10710,7 +11049,7 @@
                 1,
                 1
             ],
-            "bbox": 17231,
+            "bbox": 11830,
             "colour": "black",
             "endx": 1325.0,
             "endy": 150.0,
@@ -10726,7 +11065,7 @@
         "e5eea518-6f34-47d9-8a17-ca314e06a52d": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 17236,
+            "bbox": 11837,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -10769,8 +11108,9 @@
                 false,
                 ""
             ],
-            "bbox": 17258,
+            "bbox": 11859,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -11195,8 +11535,9 @@
                 false,
                 ""
             ],
-            "bbox": 17278,
+            "bbox": 11879,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -11523,7 +11864,7 @@
         "eaed2508-4646-46cc-83fa-b9ef8ee2848b": {
             "alsoswitch": 7,
             "automatic": false,
-            "bbox": 17285,
+            "bbox": 11888,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -11627,8 +11968,9 @@
                 false,
                 ""
             ],
-            "bbox": 17305,
+            "bbox": 11908,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -11950,7 +12292,7 @@
                 0,
                 0
             ],
-            "bbox": 17311,
+            "bbox": 11916,
             "colour": "black",
             "endx": 900.0,
             "endy": 375.0,
@@ -11970,7 +12312,7 @@
                 0,
                 0
             ],
-            "bbox": 17317,
+            "bbox": 11924,
             "colour": "black",
             "endx": 1075.0,
             "endy": 250.0,
@@ -11984,50 +12326,60 @@
             "tags": "line3"
         },
         "f4875d39-1482-47d9-a37d-3b58035e94ad": {
-            "bbox": 17321,
+            "bbox": 11930,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 8,
-            "linestohighlight": [
-                3,
-                1,
-                24,
-                5
-            ],
-            "pointsonroute": {
-                "3": true,
-                "5": false,
-                "8": false
-            },
-            "pointstohighlight": [
-                5,
-                3,
-                1,
-                2
-            ],
             "posx": 1425.0,
             "posy": 475.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": true,
             "resetswitches": false,
-            "routecolour": "#c800ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 3,
+                    "linestohighlight": [
+                        3,
+                        1,
+                        24,
+                        5
+                    ],
+                    "pointsonroute": {
+                        "3": true,
+                        "5": false,
+                        "8": false
+                    },
+                    "pointstohighlight": [
+                        5,
+                        3,
+                        1,
+                        2
+                    ],
+                    "routecolour": "#c800ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        3
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Platform 3 departure to Up Main",
             "routename": "Platform 3 to Up",
             "setupsensor": 0,
-            "signalsonroute": [
-                3
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button8",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 3
+            ]
         },
         "f4e2660a-dff3-49c3-a1dd-357bc154cae8": {
             "approachcontrol": [
@@ -12043,8 +12395,9 @@
                 false,
                 ""
             ],
-            "bbox": 17341,
+            "bbox": 11950,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -12397,46 +12750,56 @@
             "ybuttonoffset": 0
         },
         "f85bced4-b684-4738-a166-c8b978efeb6d": {
-            "bbox": 17345,
+            "bbox": 11956,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 20,
+            "entrybutton": false,
+            "exitbutton": false,
             "item": "route",
             "itemid": 9,
-            "linestohighlight": [
-                4,
-                24,
-                5
-            ],
-            "pointsonroute": {
-                "3": false,
-                "8": false
-            },
-            "pointstohighlight": [
-                1,
-                2
-            ],
             "posx": 1425.0,
             "posy": 425.0,
+            "resetonsignalchanges": true,
+            "resetonswitchchanges": true,
             "resetpoints": false,
             "resetswitches": false,
-            "routecolour": "#c800ff",
+            "routedefinitions": [
+                {
+                    "exitbutton": 0,
+                    "exitsensor": 3,
+                    "linestohighlight": [
+                        4,
+                        24,
+                        5
+                    ],
+                    "pointsonroute": {
+                        "3": false,
+                        "8": false
+                    },
+                    "pointstohighlight": [
+                        1,
+                        2
+                    ],
+                    "routecolour": "#c800ff",
+                    "routenotes": "Notes related to the route",
+                    "signalsonroute": [
+                        4
+                    ],
+                    "subsidariesonroute": [],
+                    "switchesonroute": {}
+                }
+            ],
             "routedescription": "Platform 2 departure to Up Main",
             "routename": "Platform 2 to Up",
             "setupsensor": 0,
-            "signalsonroute": [
-                4
-            ],
-            "subsidariesonroute": [],
             "switchdelay": 500,
-            "switchesonroute": {},
             "tags": "button9",
             "textcolourtype": 1,
             "textfonttuple": [
                 "Courier",
                 9,
                 ""
-            ],
-            "tracksensor": 3
+            ]
         },
         "fbae853c-2e16-42f6-b604-43b116a58269": {
             "approachcontrol": [
@@ -12452,8 +12815,9 @@
                 false,
                 ""
             ],
-            "bbox": 17367,
+            "bbox": 11978,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -12881,7 +13245,7 @@
                 0,
                 0
             ],
-            "bbox": 17373,
+            "bbox": 11986,
             "colour": "black",
             "endx": 1200.0,
             "endy": 375.0,
@@ -13093,17 +13457,21 @@
             "snaptogrid": true,
             "width": 1800
         },
+        "control": {
+            "dccsoundmappings": []
+        },
         "general": {
             "automation": true,
+            "baseitemid": 1,
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/schematic_routes_example.sig",
+            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/one_touch_routes_example.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,

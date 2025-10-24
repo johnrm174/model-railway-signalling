@@ -52,12 +52,12 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.x.x:
+## What's new for Release 6.0.0:
 
 > [!IMPORTANT]
-> Release 5.x.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 6.0.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.x.0.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 6.0.0.
 > You have been warned!
 
 * New Entry/Exit (NX) route setting feature for true prototypical operation of the schematic:
@@ -85,6 +85,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Enables more prototypical track circuit highlighting for NX panels
 * Minor improvements to File => Open and File => New:
     * Any open configuration windows are closed to avoid confusion
+* A full documentation refresh
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

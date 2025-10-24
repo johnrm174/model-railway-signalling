@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "model-railway-signals"
-version = "5.4.0"
+version = "6.0.0"
 authors = [ { name="johnrm174", email="johnrm17418@gmail.com" }, ]
 maintainers = [ { name="johnrm174", email="johnrm17418@gmail.com" }, ]
 description = "Create your own DCC model railway signalling scheme"
@@ -18,7 +18,7 @@ classifiers = [
 dependencies = [ "pyserial", "paho-mqtt", ]
 
 [tool.hatch.build.targets.sdist]
-include = [ "/model_railway_signals", "/user_guide", "/configuration_examples", "/system_tests", ]
+include = [ "/model_railway_signals", ]
 
 [project.urls]
 Homepage = "https://github.com/johnrm174/model-railway-signalling"

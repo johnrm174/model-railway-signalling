@@ -27,7 +27,7 @@
                 false,
                 ""
             ],
-            "bbox": 2291,
+            "bbox": 8606,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -351,7 +351,7 @@
                 20,
                 5
             ],
-            "bbox": 2299,
+            "bbox": 8614,
             "colour": "black",
             "endx": 625.0,
             "endy": 300.0,
@@ -366,7 +366,7 @@
         },
         "3992df93-f016-42e7-a710-f0bddf9b1627": {
             "background": "grey85",
-            "bbox": 2302,
+            "bbox": 8617,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -390,7 +390,7 @@
                 20,
                 5
             ],
-            "bbox": 2310,
+            "bbox": 8625,
             "colour": "black",
             "endx": 625.0,
             "endy": 125.0,
@@ -404,7 +404,7 @@
             "tags": "line1"
         },
         "6085fa37-fea7-42cd-a7a9-f15aeb1ec731": {
-            "bbox": 2325,
+            "bbox": 8640,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -416,7 +416,7 @@
             "tags": "instrument2"
         },
         "6e4f0867-155b-4ed8-ae84-38e1cc667131": {
-            "bbox": 2329,
+            "bbox": 8644,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -441,7 +441,7 @@
         },
         "70238cfa-4556-4ed9-9a92-46ac169573de": {
             "background": "grey85",
-            "bbox": 2332,
+            "bbox": 8647,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -465,7 +465,7 @@
                 20,
                 5
             ],
-            "bbox": 2340,
+            "bbox": 8655,
             "colour": "black",
             "endx": 225.0,
             "endy": 125.0,
@@ -492,7 +492,7 @@
                 false,
                 ""
             ],
-            "bbox": 2366,
+            "bbox": 8681,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -824,7 +824,7 @@
         },
         "9ac66673-362c-4529-a451-6dba32782869": {
             "background": "grey85",
-            "bbox": 2369,
+            "bbox": 8684,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -855,7 +855,7 @@
                 false,
                 ""
             ],
-            "bbox": 2389,
+            "bbox": 8704,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1173,7 +1173,7 @@
             "ybuttonoffset": 0
         },
         "e26bc73f-b67e-4fed-ae67-8971af1d7b92": {
-            "bbox": 2393,
+            "bbox": 8708,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1198,7 +1198,7 @@
         },
         "e497d420-ad7a-4cb5-877c-6dbd0d849296": {
             "background": "grey85",
-            "bbox": 2396,
+            "bbox": 8711,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1229,7 +1229,7 @@
                 false,
                 ""
             ],
-            "bbox": 2422,
+            "bbox": 8737,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1573,7 +1573,7 @@
                 false,
                 ""
             ],
-            "bbox": 2448,
+            "bbox": 8763,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1956,7 +1956,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,

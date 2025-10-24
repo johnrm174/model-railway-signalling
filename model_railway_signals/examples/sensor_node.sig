@@ -6,7 +6,7 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 24179,
+            "bbox": 22655,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -37,8 +37,12 @@
             "snaptogrid": true,
             "width": 1000
         },
+        "control": {
+            "dccsoundmappings": []
+        },
         "general": {
             "automation": true,
+            "baseitemid": 1,
             "editmode": true,
             "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/sensor_node.sig",
             "info": "Document your layout here",
@@ -47,7 +51,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,

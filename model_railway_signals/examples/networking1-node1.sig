@@ -20,7 +20,7 @@
                 20,
                 5
             ],
-            "bbox": 3710,
+            "bbox": 8291,
             "colour": "black",
             "endx": 600.0,
             "endy": 125.0,
@@ -40,7 +40,7 @@
                 20,
                 5
             ],
-            "bbox": 3718,
+            "bbox": 8299,
             "colour": "black",
             "endx": 125.0,
             "endy": 125.0,
@@ -67,7 +67,7 @@
                 false,
                 ""
             ],
-            "bbox": 3744,
+            "bbox": 8325,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -398,7 +398,7 @@
             "ybuttonoffset": 0
         },
         "5119d487-7752-469d-addb-5aa3be1bedb6": {
-            "bbox": 3748,
+            "bbox": 8329,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -435,7 +435,7 @@
                 false,
                 ""
             ],
-            "bbox": 3774,
+            "bbox": 8355,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -779,7 +779,7 @@
         },
         "6408cbee-f763-41ad-8fca-3130f53d2519": {
             "background": "grey85",
-            "bbox": 3777,
+            "bbox": 8358,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -810,7 +810,7 @@
                 false,
                 ""
             ],
-            "bbox": 3797,
+            "bbox": 8378,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1134,7 +1134,7 @@
                 20,
                 5
             ],
-            "bbox": 3805,
+            "bbox": 8386,
             "colour": "black",
             "endx": 475.0,
             "endy": 300.0,
@@ -1148,7 +1148,7 @@
             "tags": "line3"
         },
         "70194f30-ef69-484a-b947-66951acf8a72": {
-            "bbox": 3809,
+            "bbox": 8390,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1185,7 +1185,7 @@
                 false,
                 ""
             ],
-            "bbox": 3829,
+            "bbox": 8410,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1503,7 +1503,7 @@
             "ybuttonoffset": 0
         },
         "73be5b7a-289a-4a48-959b-0f06dc39c0e9": {
-            "bbox": 3833,
+            "bbox": 8414,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1528,7 +1528,7 @@
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
-            "bbox": 3836,
+            "bbox": 8417,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1547,7 +1547,7 @@
         },
         "9a8b2db4-dadb-4a28-bf0f-5ce1baaa363f": {
             "background": "grey85",
-            "bbox": 3839,
+            "bbox": 8420,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1565,7 +1565,7 @@
             ]
         },
         "a271c006-6796-436a-b85f-c805554d8237": {
-            "bbox": 3854,
+            "bbox": 8435,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1578,7 +1578,7 @@
         },
         "aad6451e-e1e2-4a4d-8f93-064d331acafd": {
             "background": "grey85",
-            "bbox": 3857,
+            "bbox": 8438,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1609,7 +1609,7 @@
                 false,
                 ""
             ],
-            "bbox": 3883,
+            "bbox": 8464,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1955,7 +1955,7 @@
             "occupied": false
         },
         "Node2-4": {
-            "labeltext": "",
+            "labeltext": "XXXXX",
             "occupied": false
         }
     },
@@ -1984,7 +1984,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,

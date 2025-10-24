@@ -18,8 +18,9 @@
                 false,
                 ""
             ],
-            "bbox": 17606,
+            "bbox": 16048,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -348,8 +349,9 @@
                 false,
                 ""
             ],
-            "bbox": 17654,
+            "bbox": 16096,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -678,8 +680,9 @@
                 false,
                 ""
             ],
-            "bbox": 17684,
+            "bbox": 16126,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1008,8 +1011,9 @@
                 false,
                 ""
             ],
-            "bbox": 17734,
+            "bbox": 16176,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1338,8 +1342,9 @@
                 false,
                 ""
             ],
-            "bbox": 17762,
+            "bbox": 16204,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1668,8 +1673,9 @@
                 false,
                 ""
             ],
-            "bbox": 17793,
+            "bbox": 16235,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1998,8 +2004,9 @@
                 false,
                 ""
             ],
-            "bbox": 17823,
+            "bbox": 16265,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2328,8 +2335,9 @@
                 false,
                 ""
             ],
-            "bbox": 17852,
+            "bbox": 16294,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2658,8 +2666,9 @@
                 false,
                 ""
             ],
-            "bbox": 17904,
+            "bbox": 16346,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2988,8 +2997,9 @@
                 false,
                 ""
             ],
-            "bbox": 17956,
+            "bbox": 16398,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3318,8 +3328,9 @@
                 false,
                 ""
             ],
-            "bbox": 17982,
+            "bbox": 16424,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3648,8 +3659,9 @@
                 false,
                 ""
             ],
-            "bbox": 18013,
+            "bbox": 16455,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3978,8 +3990,9 @@
                 false,
                 ""
             ],
-            "bbox": 18044,
+            "bbox": 16486,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4308,8 +4321,9 @@
                 false,
                 ""
             ],
-            "bbox": 18078,
+            "bbox": 16520,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4638,8 +4652,9 @@
                 false,
                 ""
             ],
-            "bbox": 18109,
+            "bbox": 16551,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4968,8 +4983,9 @@
                 false,
                 ""
             ],
-            "bbox": 18140,
+            "bbox": 16582,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -5298,8 +5314,9 @@
                 false,
                 ""
             ],
-            "bbox": 18193,
+            "bbox": 16635,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -5621,7 +5638,7 @@
                 0,
                 0
             ],
-            "bbox": 18199,
+            "bbox": 16643,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 550.0,
@@ -5648,8 +5665,9 @@
                 false,
                 ""
             ],
-            "bbox": 18230,
+            "bbox": 16674,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -5978,8 +5996,9 @@
                 false,
                 ""
             ],
-            "bbox": 18261,
+            "bbox": 16705,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -6308,8 +6327,9 @@
                 false,
                 ""
             ],
-            "bbox": 18292,
+            "bbox": 16736,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -6638,8 +6658,9 @@
                 false,
                 ""
             ],
-            "bbox": 18321,
+            "bbox": 16765,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -6961,7 +6982,7 @@
                 0,
                 0
             ],
-            "bbox": 18327,
+            "bbox": 16773,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 275.0,
@@ -6988,8 +7009,9 @@
                 false,
                 ""
             ],
-            "bbox": 18335,
+            "bbox": 16781,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -7318,8 +7340,9 @@
                 false,
                 ""
             ],
-            "bbox": 18387,
+            "bbox": 16833,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -7648,8 +7671,9 @@
                 false,
                 ""
             ],
-            "bbox": 18437,
+            "bbox": 16883,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -7978,8 +8002,9 @@
                 false,
                 ""
             ],
-            "bbox": 18487,
+            "bbox": 16933,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -8308,8 +8333,9 @@
                 false,
                 ""
             ],
-            "bbox": 18514,
+            "bbox": 16960,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -8638,8 +8664,9 @@
                 false,
                 ""
             ],
-            "bbox": 18549,
+            "bbox": 16995,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -8968,8 +8995,9 @@
                 false,
                 ""
             ],
-            "bbox": 18577,
+            "bbox": 17023,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -9298,8 +9326,9 @@
                 false,
                 ""
             ],
-            "bbox": 18627,
+            "bbox": 17073,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -9628,8 +9657,9 @@
                 false,
                 ""
             ],
-            "bbox": 18658,
+            "bbox": 17104,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -9958,8 +9988,9 @@
                 false,
                 ""
             ],
-            "bbox": 18688,
+            "bbox": 17134,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -10288,8 +10319,9 @@
                 false,
                 ""
             ],
-            "bbox": 18718,
+            "bbox": 17164,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -10618,8 +10650,9 @@
                 false,
                 ""
             ],
-            "bbox": 18766,
+            "bbox": 17212,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -10948,8 +10981,9 @@
                 false,
                 ""
             ],
-            "bbox": 18800,
+            "bbox": 17246,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -11271,7 +11305,7 @@
                 0,
                 0
             ],
-            "bbox": 18806,
+            "bbox": 17254,
             "colour": "Black",
             "endx": 850.0,
             "endy": 675.0,
@@ -11291,7 +11325,7 @@
                 0,
                 0
             ],
-            "bbox": 18812,
+            "bbox": 17262,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 650.0,
@@ -11318,8 +11352,9 @@
                 false,
                 ""
             ],
-            "bbox": 18861,
+            "bbox": 17311,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -11648,8 +11683,9 @@
                 false,
                 ""
             ],
-            "bbox": 18890,
+            "bbox": 17340,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -11978,8 +12014,9 @@
                 false,
                 ""
             ],
-            "bbox": 18920,
+            "bbox": 17370,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -12308,8 +12345,9 @@
                 false,
                 ""
             ],
-            "bbox": 18948,
+            "bbox": 17398,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -12638,8 +12676,9 @@
                 false,
                 ""
             ],
-            "bbox": 18978,
+            "bbox": 17428,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -12968,8 +13007,9 @@
                 false,
                 ""
             ],
-            "bbox": 19031,
+            "bbox": 17481,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -13298,8 +13338,9 @@
                 false,
                 ""
             ],
-            "bbox": 19039,
+            "bbox": 17489,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -13628,8 +13669,9 @@
                 false,
                 ""
             ],
-            "bbox": 19091,
+            "bbox": 17541,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -13958,8 +14000,9 @@
                 false,
                 ""
             ],
-            "bbox": 19122,
+            "bbox": 17572,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -14288,8 +14331,9 @@
                 false,
                 ""
             ],
-            "bbox": 19150,
+            "bbox": 17600,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -14618,8 +14662,9 @@
                 false,
                 ""
             ],
-            "bbox": 19207,
+            "bbox": 17657,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -14936,7 +14981,7 @@
         },
         "3a54447c-36e0-430b-8887-9af2ffb251b9": {
             "background": "",
-            "bbox": 19210,
+            "bbox": 17660,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -14967,8 +15012,9 @@
                 false,
                 ""
             ],
-            "bbox": 19239,
+            "bbox": 17689,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -15297,8 +15343,9 @@
                 false,
                 ""
             ],
-            "bbox": 19291,
+            "bbox": 17741,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -15620,7 +15667,7 @@
                 0,
                 0
             ],
-            "bbox": 19297,
+            "bbox": 17749,
             "colour": "Black",
             "endx": 875.0,
             "endy": 75.0,
@@ -15647,8 +15694,9 @@
                 false,
                 ""
             ],
-            "bbox": 19346,
+            "bbox": 17798,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -15977,8 +16025,9 @@
                 false,
                 ""
             ],
-            "bbox": 19396,
+            "bbox": 17848,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -16307,8 +16356,9 @@
                 false,
                 ""
             ],
-            "bbox": 19447,
+            "bbox": 17899,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -16637,8 +16687,9 @@
                 false,
                 ""
             ],
-            "bbox": 19504,
+            "bbox": 17956,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -16967,8 +17018,9 @@
                 false,
                 ""
             ],
-            "bbox": 19533,
+            "bbox": 17985,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -17290,7 +17342,7 @@
                 0,
                 0
             ],
-            "bbox": 19539,
+            "bbox": 17993,
             "colour": "Black",
             "endx": 850.0,
             "endy": 275.0,
@@ -17317,8 +17369,9 @@
                 false,
                 ""
             ],
-            "bbox": 19570,
+            "bbox": 18024,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -17647,8 +17700,9 @@
                 false,
                 ""
             ],
-            "bbox": 19597,
+            "bbox": 18051,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -17977,8 +18031,9 @@
                 false,
                 ""
             ],
-            "bbox": 19631,
+            "bbox": 18085,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -18307,8 +18362,9 @@
                 false,
                 ""
             ],
-            "bbox": 19660,
+            "bbox": 18114,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -18630,7 +18686,7 @@
                 0,
                 0
             ],
-            "bbox": 19666,
+            "bbox": 18122,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 875.0,
@@ -18657,8 +18713,9 @@
                 false,
                 ""
             ],
-            "bbox": 19697,
+            "bbox": 18153,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -18987,8 +19044,9 @@
                 false,
                 ""
             ],
-            "bbox": 19728,
+            "bbox": 18184,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -19317,8 +19375,9 @@
                 false,
                 ""
             ],
-            "bbox": 19756,
+            "bbox": 18212,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -19647,8 +19706,9 @@
                 false,
                 ""
             ],
-            "bbox": 19791,
+            "bbox": 18247,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -19977,8 +20037,9 @@
                 false,
                 ""
             ],
-            "bbox": 19820,
+            "bbox": 18276,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -20307,8 +20368,9 @@
                 false,
                 ""
             ],
-            "bbox": 19849,
+            "bbox": 18305,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -20637,8 +20699,9 @@
                 false,
                 ""
             ],
-            "bbox": 19879,
+            "bbox": 18335,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -20967,8 +21030,9 @@
                 false,
                 ""
             ],
-            "bbox": 19907,
+            "bbox": 18363,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -21297,8 +21361,9 @@
                 false,
                 ""
             ],
-            "bbox": 19936,
+            "bbox": 18392,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -21627,8 +21692,9 @@
                 false,
                 ""
             ],
-            "bbox": 19964,
+            "bbox": 18420,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -21957,8 +22023,9 @@
                 false,
                 ""
             ],
-            "bbox": 19972,
+            "bbox": 18428,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -22287,8 +22354,9 @@
                 false,
                 ""
             ],
-            "bbox": 20028,
+            "bbox": 18484,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -22617,8 +22685,9 @@
                 false,
                 ""
             ],
-            "bbox": 20081,
+            "bbox": 18537,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -22947,8 +23016,9 @@
                 false,
                 ""
             ],
-            "bbox": 20129,
+            "bbox": 18585,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -23277,8 +23347,9 @@
                 false,
                 ""
             ],
-            "bbox": 20156,
+            "bbox": 18612,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -23607,8 +23678,9 @@
                 false,
                 ""
             ],
-            "bbox": 20191,
+            "bbox": 18647,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -23937,8 +24009,9 @@
                 false,
                 ""
             ],
-            "bbox": 20241,
+            "bbox": 18697,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -24267,8 +24340,9 @@
                 false,
                 ""
             ],
-            "bbox": 20276,
+            "bbox": 18732,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -24597,8 +24671,9 @@
                 false,
                 ""
             ],
-            "bbox": 20304,
+            "bbox": 18760,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -24927,8 +25002,9 @@
                 false,
                 ""
             ],
-            "bbox": 20335,
+            "bbox": 18791,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -25257,8 +25333,9 @@
                 false,
                 ""
             ],
-            "bbox": 20365,
+            "bbox": 18821,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -25587,8 +25664,9 @@
                 false,
                 ""
             ],
-            "bbox": 20415,
+            "bbox": 18871,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -25917,8 +25995,9 @@
                 false,
                 ""
             ],
-            "bbox": 20465,
+            "bbox": 18921,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -26247,8 +26326,9 @@
                 false,
                 ""
             ],
-            "bbox": 20496,
+            "bbox": 18952,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -26577,8 +26657,9 @@
                 false,
                 ""
             ],
-            "bbox": 20526,
+            "bbox": 18982,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -26907,8 +26988,9 @@
                 false,
                 ""
             ],
-            "bbox": 20555,
+            "bbox": 19011,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -27237,8 +27319,9 @@
                 false,
                 ""
             ],
-            "bbox": 20582,
+            "bbox": 19038,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -27567,8 +27650,9 @@
                 false,
                 ""
             ],
-            "bbox": 20639,
+            "bbox": 19095,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -27897,8 +27981,9 @@
                 false,
                 ""
             ],
-            "bbox": 20688,
+            "bbox": 19144,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -28227,8 +28312,9 @@
                 false,
                 ""
             ],
-            "bbox": 20744,
+            "bbox": 19200,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -28557,8 +28643,9 @@
                 false,
                 ""
             ],
-            "bbox": 20771,
+            "bbox": 19227,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -28880,7 +28967,7 @@
                 0,
                 0
             ],
-            "bbox": 20777,
+            "bbox": 19235,
             "colour": "Black",
             "endx": 850.0,
             "endy": 475.0,
@@ -28907,8 +28994,9 @@
                 false,
                 ""
             ],
-            "bbox": 20808,
+            "bbox": 19266,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -29230,7 +29318,7 @@
                 0,
                 0
             ],
-            "bbox": 20814,
+            "bbox": 19274,
             "colour": "Black",
             "endx": 850.0,
             "endy": 775.0,
@@ -29257,8 +29345,9 @@
                 false,
                 ""
             ],
-            "bbox": 20844,
+            "bbox": 19304,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -29587,8 +29676,9 @@
                 false,
                 ""
             ],
-            "bbox": 20874,
+            "bbox": 19334,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -29917,8 +30007,9 @@
                 false,
                 ""
             ],
-            "bbox": 20900,
+            "bbox": 19360,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -30247,8 +30338,9 @@
                 false,
                 ""
             ],
-            "bbox": 20926,
+            "bbox": 19386,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -30577,8 +30669,9 @@
                 false,
                 ""
             ],
-            "bbox": 20956,
+            "bbox": 19416,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -30907,8 +31000,9 @@
                 false,
                 ""
             ],
-            "bbox": 20983,
+            "bbox": 19443,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -31237,8 +31331,9 @@
                 false,
                 ""
             ],
-            "bbox": 21011,
+            "bbox": 19471,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -31567,8 +31662,9 @@
                 false,
                 ""
             ],
-            "bbox": 21038,
+            "bbox": 19498,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -31890,7 +31986,7 @@
                 0,
                 0
             ],
-            "bbox": 21044,
+            "bbox": 19506,
             "colour": "Black",
             "endx": 1500.0,
             "endy": 400.0,
@@ -31917,8 +32013,9 @@
                 false,
                 ""
             ],
-            "bbox": 21078,
+            "bbox": 19540,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -32247,8 +32344,9 @@
                 false,
                 ""
             ],
-            "bbox": 21126,
+            "bbox": 19588,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -32570,7 +32668,7 @@
                 0,
                 0
             ],
-            "bbox": 21132,
+            "bbox": 19596,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 100.0,
@@ -32597,8 +32695,9 @@
                 false,
                 ""
             ],
-            "bbox": 21167,
+            "bbox": 19631,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -32927,8 +33026,9 @@
                 false,
                 ""
             ],
-            "bbox": 21195,
+            "bbox": 19659,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -33257,8 +33357,9 @@
                 false,
                 ""
             ],
-            "bbox": 21223,
+            "bbox": 19687,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -33587,8 +33688,9 @@
                 false,
                 ""
             ],
-            "bbox": 21273,
+            "bbox": 19737,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -33917,8 +34019,9 @@
                 false,
                 ""
             ],
-            "bbox": 21302,
+            "bbox": 19766,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -34247,8 +34350,9 @@
                 false,
                 ""
             ],
-            "bbox": 21333,
+            "bbox": 19797,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -34577,8 +34681,9 @@
                 false,
                 ""
             ],
-            "bbox": 21367,
+            "bbox": 19831,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -34900,7 +35005,7 @@
                 0,
                 0
             ],
-            "bbox": 21373,
+            "bbox": 19839,
             "colour": "Black",
             "endx": 1500.0,
             "endy": 475.0,
@@ -34927,8 +35032,9 @@
                 false,
                 ""
             ],
-            "bbox": 21429,
+            "bbox": 19895,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -35257,8 +35363,9 @@
                 false,
                 ""
             ],
-            "bbox": 21457,
+            "bbox": 19923,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -35587,8 +35694,9 @@
                 false,
                 ""
             ],
-            "bbox": 21506,
+            "bbox": 19972,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -35917,8 +36025,9 @@
                 false,
                 ""
             ],
-            "bbox": 21555,
+            "bbox": 20021,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -36247,8 +36356,9 @@
                 false,
                 ""
             ],
-            "bbox": 21583,
+            "bbox": 20049,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -36577,8 +36687,9 @@
                 false,
                 ""
             ],
-            "bbox": 21636,
+            "bbox": 20102,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -36907,8 +37018,9 @@
                 false,
                 ""
             ],
-            "bbox": 21666,
+            "bbox": 20132,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -37237,8 +37349,9 @@
                 false,
                 ""
             ],
-            "bbox": 21697,
+            "bbox": 20163,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -37567,8 +37680,9 @@
                 false,
                 ""
             ],
-            "bbox": 21725,
+            "bbox": 20191,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -37897,8 +38011,9 @@
                 false,
                 ""
             ],
-            "bbox": 21760,
+            "bbox": 20226,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -38227,8 +38342,9 @@
                 false,
                 ""
             ],
-            "bbox": 21794,
+            "bbox": 20260,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -38557,8 +38673,9 @@
                 false,
                 ""
             ],
-            "bbox": 21825,
+            "bbox": 20291,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -38887,8 +39004,9 @@
                 false,
                 ""
             ],
-            "bbox": 21877,
+            "bbox": 20343,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -39217,8 +39335,9 @@
                 false,
                 ""
             ],
-            "bbox": 21905,
+            "bbox": 20371,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -39547,8 +39666,9 @@
                 false,
                 ""
             ],
-            "bbox": 21931,
+            "bbox": 20397,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -39877,8 +39997,9 @@
                 false,
                 ""
             ],
-            "bbox": 21984,
+            "bbox": 20450,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -40207,8 +40328,9 @@
                 false,
                 ""
             ],
-            "bbox": 22036,
+            "bbox": 20502,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -40537,8 +40659,9 @@
                 false,
                 ""
             ],
-            "bbox": 22064,
+            "bbox": 20530,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -40867,8 +40990,9 @@
                 false,
                 ""
             ],
-            "bbox": 22072,
+            "bbox": 20538,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -41190,7 +41314,7 @@
                 0,
                 0
             ],
-            "bbox": 22078,
+            "bbox": 20546,
             "colour": "Black",
             "endx": 850.0,
             "endy": 175.0,
@@ -41217,8 +41341,9 @@
                 false,
                 ""
             ],
-            "bbox": 22108,
+            "bbox": 20576,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -41547,8 +41672,9 @@
                 false,
                 ""
             ],
-            "bbox": 22139,
+            "bbox": 20607,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -41877,8 +42003,9 @@
                 false,
                 ""
             ],
-            "bbox": 22168,
+            "bbox": 20636,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -42207,8 +42334,9 @@
                 false,
                 ""
             ],
-            "bbox": 22225,
+            "bbox": 20693,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -42537,8 +42665,9 @@
                 false,
                 ""
             ],
-            "bbox": 22233,
+            "bbox": 20701,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -42867,8 +42996,9 @@
                 false,
                 ""
             ],
-            "bbox": 22285,
+            "bbox": 20753,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -43197,8 +43327,9 @@
                 false,
                 ""
             ],
-            "bbox": 22315,
+            "bbox": 20783,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -43527,8 +43658,9 @@
                 false,
                 ""
             ],
-            "bbox": 22367,
+            "bbox": 20835,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -43857,8 +43989,9 @@
                 false,
                 ""
             ],
-            "bbox": 22398,
+            "bbox": 20866,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -44187,8 +44320,9 @@
                 false,
                 ""
             ],
-            "bbox": 22429,
+            "bbox": 20897,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -44517,8 +44651,9 @@
                 false,
                 ""
             ],
-            "bbox": 22460,
+            "bbox": 20928,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -44847,8 +44982,9 @@
                 false,
                 ""
             ],
-            "bbox": 22495,
+            "bbox": 20963,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -45177,8 +45313,9 @@
                 false,
                 ""
             ],
-            "bbox": 22544,
+            "bbox": 21012,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -45500,7 +45637,7 @@
                 0,
                 0
             ],
-            "bbox": 22550,
+            "bbox": 21020,
             "colour": "Black",
             "endx": 850.0,
             "endy": 575.0,
@@ -45527,8 +45664,9 @@
                 false,
                 ""
             ],
-            "bbox": 22602,
+            "bbox": 21072,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -45857,8 +45995,9 @@
                 false,
                 ""
             ],
-            "bbox": 22633,
+            "bbox": 21103,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -46187,8 +46326,9 @@
                 false,
                 ""
             ],
-            "bbox": 22664,
+            "bbox": 21134,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -46517,8 +46657,9 @@
                 false,
                 ""
             ],
-            "bbox": 22716,
+            "bbox": 21186,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -46847,8 +46988,9 @@
                 false,
                 ""
             ],
-            "bbox": 22747,
+            "bbox": 21217,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -47177,8 +47319,9 @@
                 false,
                 ""
             ],
-            "bbox": 22777,
+            "bbox": 21247,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -47507,8 +47650,9 @@
                 false,
                 ""
             ],
-            "bbox": 22807,
+            "bbox": 21277,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -47837,8 +47981,9 @@
                 false,
                 ""
             ],
-            "bbox": 22815,
+            "bbox": 21285,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -48167,8 +48312,9 @@
                 false,
                 ""
             ],
-            "bbox": 22844,
+            "bbox": 21314,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -48497,8 +48643,9 @@
                 false,
                 ""
             ],
-            "bbox": 22872,
+            "bbox": 21342,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -48827,8 +48974,9 @@
                 false,
                 ""
             ],
-            "bbox": 22906,
+            "bbox": 21376,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -49157,8 +49305,9 @@
                 false,
                 ""
             ],
-            "bbox": 22934,
+            "bbox": 21404,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -49487,8 +49636,9 @@
                 false,
                 ""
             ],
-            "bbox": 22984,
+            "bbox": 21454,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -49817,8 +49967,9 @@
                 false,
                 ""
             ],
-            "bbox": 23035,
+            "bbox": 21505,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -50147,8 +50298,9 @@
                 false,
                 ""
             ],
-            "bbox": 23085,
+            "bbox": 21555,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -50477,8 +50629,9 @@
                 false,
                 ""
             ],
-            "bbox": 23115,
+            "bbox": 21585,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -50807,8 +50960,9 @@
                 false,
                 ""
             ],
-            "bbox": 23166,
+            "bbox": 21636,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -51137,8 +51291,9 @@
                 false,
                 ""
             ],
-            "bbox": 23192,
+            "bbox": 21662,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -51460,7 +51615,7 @@
                 0,
                 0
             ],
-            "bbox": 23198,
+            "bbox": 21670,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 775.0,
@@ -51480,7 +51635,7 @@
                 0,
                 0
             ],
-            "bbox": 23204,
+            "bbox": 21678,
             "colour": "Black",
             "endx": 950.0,
             "endy": 875.0,
@@ -51500,7 +51655,7 @@
                 0,
                 0
             ],
-            "bbox": 23210,
+            "bbox": 21686,
             "colour": "Black",
             "endx": 850.0,
             "endy": 375.0,
@@ -51527,8 +51682,9 @@
                 false,
                 ""
             ],
-            "bbox": 23241,
+            "bbox": 21717,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -51857,8 +52013,9 @@
                 false,
                 ""
             ],
-            "bbox": 23271,
+            "bbox": 21747,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -52187,8 +52344,9 @@
                 false,
                 ""
             ],
-            "bbox": 23300,
+            "bbox": 21776,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -52517,8 +52675,9 @@
                 false,
                 ""
             ],
-            "bbox": 23328,
+            "bbox": 21804,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -52847,8 +53006,9 @@
                 false,
                 ""
             ],
-            "bbox": 23354,
+            "bbox": 21830,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -53177,8 +53337,9 @@
                 false,
                 ""
             ],
-            "bbox": 23384,
+            "bbox": 21860,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -53507,8 +53668,9 @@
                 false,
                 ""
             ],
-            "bbox": 23414,
+            "bbox": 21890,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -53837,8 +53999,9 @@
                 false,
                 ""
             ],
-            "bbox": 23422,
+            "bbox": 21898,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -54167,8 +54330,9 @@
                 false,
                 ""
             ],
-            "bbox": 23448,
+            "bbox": 21924,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -54497,8 +54661,9 @@
                 false,
                 ""
             ],
-            "bbox": 23501,
+            "bbox": 21977,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -54827,8 +54992,9 @@
                 false,
                 ""
             ],
-            "bbox": 23553,
+            "bbox": 22029,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -55157,8 +55323,9 @@
                 false,
                 ""
             ],
-            "bbox": 23604,
+            "bbox": 22080,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -55487,8 +55654,9 @@
                 false,
                 ""
             ],
-            "bbox": 23660,
+            "bbox": 22136,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -55817,8 +55985,9 @@
                 false,
                 ""
             ],
-            "bbox": 23689,
+            "bbox": 22165,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -56147,8 +56316,9 @@
                 false,
                 ""
             ],
-            "bbox": 23719,
+            "bbox": 22195,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -56477,8 +56647,9 @@
                 false,
                 ""
             ],
-            "bbox": 23749,
+            "bbox": 22225,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -56807,8 +56978,9 @@
                 false,
                 ""
             ],
-            "bbox": 23799,
+            "bbox": 22275,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -57137,8 +57309,9 @@
                 false,
                 ""
             ],
-            "bbox": 23830,
+            "bbox": 22306,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -57467,8 +57640,9 @@
                 false,
                 ""
             ],
-            "bbox": 23864,
+            "bbox": 22340,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -57797,8 +57971,9 @@
                 false,
                 ""
             ],
-            "bbox": 23891,
+            "bbox": 22367,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -58127,8 +58302,9 @@
                 false,
                 ""
             ],
-            "bbox": 23917,
+            "bbox": 22393,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -58457,8 +58633,9 @@
                 false,
                 ""
             ],
-            "bbox": 23925,
+            "bbox": 22401,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -58787,8 +58964,9 @@
                 false,
                 ""
             ],
-            "bbox": 23954,
+            "bbox": 22430,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -59117,8 +59295,9 @@
                 false,
                 ""
             ],
-            "bbox": 23984,
+            "bbox": 22460,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -59447,8 +59626,9 @@
                 false,
                 ""
             ],
-            "bbox": 24012,
+            "bbox": 22488,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -59777,8 +59957,12 @@
             "snaptogrid": true,
             "width": 1600
         },
+        "control": {
+            "dccsoundmappings": []
+        },
         "general": {
             "automation": true,
+            "baseitemid": 1,
             "editmode": true,
             "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/semaphore_signals.sig",
             "info": "Document your layout here",
@@ -59787,7 +59971,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,
