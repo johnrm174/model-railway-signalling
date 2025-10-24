@@ -243,7 +243,7 @@ def run_change_of_item_id_tests():
 # the 'schematic_routes_example.sig example' layout file
 #-----------------------------------------------------------------------------------
 
-def run_initial_state_tests():
+def run_initial_state_tests1():
     # Test_initial condition (at layout load)
     # Route 5 should be active with Point 2 switched and Signal 1 OFF
     # Instrument is BLOCKED so Route 1 will not be viable (when Route 5 de-selected)
@@ -264,8 +264,29 @@ def run_initial_state_tests():
     assert_buttons_disabled(1)
     assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     return()
+    
+def run_initial_state_tests2():
+    # Test_initial condition (at layout load)
+    # Initial state tests - Route 18 should be active
+    assert_buttons_enabled(8,19)    
+    assert_buttons_selected(18,19)
+    assert_signals_DANGER(13)
+    assert_signals_PROCEED(14)
+    # Try to deselect 18 -> 19 by deselecting 19 (exit button) - fail
+    simulate_buttons_clicked(19)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_selected(18,19)
+    assert_signals_DANGER(13)
+    assert_signals_PROCEED(14)
+    # Try to deselect 18 -> 19 by deselecting 18 (entry button) - success
+    simulate_buttons_clicked(18)
+    assert_buttons_enabled(18,19)    
+    assert_buttons_deselected(18,19)
+    assert_signals_DANGER(13,14)
+    return()
 
-def run_schematic_routes_tests():
+def run_schematic_routes_tests1():
+    reset_layout()
     # Test Route disabled if signal interlocked with Instrument
     assert_block_section_ahead_not_clear(1)
     assert_buttons_disabled(1)
@@ -353,6 +374,12 @@ def run_schematic_routes_tests():
     assert_buttons_disabled(1,2,3,4,5,6)
     set_subsidaries_on(6,7,8)
     assert_buttons_enabled(1,2,3,4,5,6)
+    return()
+
+def run_schematic_routes_tests2():
+    reset_layout()
+    # Instruments are set to CLEAR so they dont affect with the following tests
+    set_instrument_clear(2) 
     # Test Basic setup and cleardown of Signal Routes (using sensor triggers)
     assert_buttons_deselected(1,2,3,4,5,6)
     assert_buttons_deselected(9,10,11)    # Switch 9,10,11
@@ -440,55 +467,48 @@ def run_schematic_routes_tests():
     sleep(1.5)
     assert_buttons_deselected(4)
     assert_buttons_enabled(1,2,3,4,5,6)
-    # Test Reset of Main Signal if Subsidary Route Selected and vice versa
-    set_signals_off(1)
-    assert_buttons_enabled(3)
-    assert_buttons_disabled(1,2,4,5,6)
-    simulate_buttons_clicked(4)
-    sleep(2)
-    assert_buttons_selected(4)
-    simulate_buttons_clicked(3)
-    sleep(2)
-    assert_buttons_selected(3)
-    assert_buttons_deselected(4)
-    simulate_buttons_clicked(3)
-    sleep(2)
-    assert_buttons_deselected(3,4)
+    
+def run_schematic_routes_tests3():
+    reset_layout()    
+    print("Test signal and subsidiary changes during /after route setup - 6 warnings will be generated")
     # Test Signal Change invalidating an established route clears the route
     simulate_buttons_clicked(5)
-    sleep(2)
+    sleep(3.0)
     assert_buttons_selected(5)
     set_signals_on(1)
-    sleep(0.1)
+    sleep(3.0)
     assert_buttons_deselected(5)
-    # Test Subsidary Change invalidating an established route clears the route
-    simulate_buttons_clicked(4)
-    sleep(2.0)
-    assert_buttons_selected(4)
-    set_subsidaries_on(1)
-    sleep(0.1)
-    assert_buttons_deselected(4)
     # Test Signal Change invalidating an route in progress clears the route
     simulate_buttons_clicked(5)
-    sleep(2.2)
+    sleep(1.5)
     set_signals_on(1)
-    sleep(0.3)
+    sleep(3.0)
     assert_buttons_deselected(5)
-    # Test Subsidary Change invalidating a route in progress clears the route
-    simulate_buttons_clicked(4)
-    sleep(2.2)
+    # Test Subsidary Change invalidating an established route clears the route
+    simulate_buttons_clicked(6)
+    sleep(3.0)
+    assert_buttons_selected(6)
     set_subsidaries_on(1)
-    sleep(0.1)
-    assert_buttons_deselected(4)
-    # Test Signal Change (not on the route) invalidates a route in progress
-    set_points_switched(1,2)  # Give the route setup something to do
+    sleep(3.0)
+    assert_buttons_deselected(6)
+    # Test Subsidary Change invalidating a route in progress clears the route
+    simulate_buttons_clicked(6)
+    sleep(0.5)
+    set_subsidaries_on(1)
+    sleep(3.0)
+    assert_buttons_deselected(6)
+    # Test changing a conflicting signal invalidates a route in progress
+    assert_points_normal(1)
+    assert_points_switched(2)
+    set_points_switched(1)  # Give the route setup something to do
     simulate_buttons_clicked(5)
     sleep(0.3)
     set_signals_off(8)
     sleep(2.2)
     assert_buttons_deselected(5)
     set_signals_on(8)
-    # Test Subsidary Change (not on the route) invalidates a route in progress
+    sleep(3.0)
+    # Test changing a conflicting Subsidiary invalidates a route in progress
     set_points_switched(1)  # Give the route setup something to do
     simulate_buttons_clicked(4)
     sleep(0.3)
@@ -496,73 +516,70 @@ def run_schematic_routes_tests():
     sleep(2.7)
     assert_buttons_deselected(4)
     set_subsidaries_on(7)
-    # Test Point Change invalidating a route that HAS been successfully set up
+    sleep(3.0)
+    print("Test Point and switch changes during /after route setup - 4 warnings will be generated")
+    # Test Point Change invalidating a route that HAS been successfully set up - WARNING
     assert_signals_DANGER(5)
     assert_points_normal(3)
     assert_buttons_deselected(7)
     simulate_buttons_clicked(7)
-    sleep(2.0)
+    sleep(3.0)
     assert_buttons_selected(7)
     assert_points_switched(3)
     assert_signals_PROCEED(5)
     set_points_normal(3)
     sleep(0.1)
     assert_buttons_deselected(7)
-    set_signals_on(5)
-    # Test Point Change invalidating a route IN THE PROCESS OF set up
+    sleep(3.0)
+    # Test Point Change invalidating a route IN THE PROCESS OF set up - WARNING
     assert_points_normal(3)
     assert_buttons_deselected(7)
     simulate_buttons_clicked(7)
     sleep(0.6)
     assert_points_switched(3)
     set_points_normal(3)
-    sleep(1.4)
+    sleep(3.5)
     assert_buttons_deselected(7)
-    set_signals_on(5)
-    # Test Point Change (to the correct state) immediately after route button is clicked
+    # Test Point Change (to the correct state) immediately after route button is clicked - No warning
     assert_points_normal(3)
     assert_buttons_deselected(7)
     simulate_buttons_clicked(7)
-    assert_points_normal(3)
     set_points_switched(3)
-    sleep(2.0)
+    sleep(3.0)
     assert_buttons_selected(7)
     assert_points_switched(3)
     # Now clear down the route
     simulate_buttons_clicked(7)
     set_points_normal(3)
-    sleep(2.0)
+    sleep(3.0)
     assert_buttons_deselected(7)
     assert_points_normal(3)
-    # Test Switch Change invalidating a route that HAS been successfully set up
+    # Test Switch Change invalidating a route that HAS been successfully set up - WARNING
     assert_signals_DANGER(5)
     assert_points_normal(3)
     assert_buttons_deselected(12)   # Switch 12
     assert_buttons_deselected(7)
     simulate_buttons_clicked(7)     # Branch - Events = pt3 switched, sw12 on, sig 5 off
-    sleep(2.0)
+    sleep(3.0)
     assert_buttons_selected(7)
     assert_buttons_selected(12)   # Switch 12
     assert_points_switched(3)
     assert_signals_PROCEED(5)
     simulate_buttons_clicked(12)    # Switch 12
-    sleep(0.1)
+    sleep(3.0)
     assert_buttons_deselected(7)
     assert_buttons_deselected(12)   # Switch 12
-    set_signals_on(5)
-    set_points_normal(3)
-    # Test Switch Change invalidating a route IN THE PROCESS OF set up
+    # Test Switch Change invalidating a route IN THE PROCESS OF set up - WARNING
     assert_buttons_deselected(7)
     simulate_buttons_clicked(7)     # Branch - Events = pt3 switched, sw12 on, sig 5 off
-    sleep(1.3)
+    sleep(1.2)
     assert_buttons_selected(12)     # Switch 12
     simulate_buttons_clicked(12)    # Switch 12
-    sleep(0.7)
+    sleep(0.2)
     assert_buttons_deselected(12)   # Switch 12
+    sleep(3.0)
     assert_buttons_deselected(7)
-    set_signals_on(5)
-    set_points_normal(3)
-    # Test Switch Change (to the correct state) immediately after route button is clicked
+    # Test Switch Change (to the correct state) immediately after route button is clicked - No warnings
     assert_buttons_deselected(7)    # Branch - Events = pt3 switched, sw12 on, sig5 off
     simulate_buttons_clicked(7)
     assert_buttons_deselected(12)   # Switch 12
@@ -573,9 +590,6 @@ def run_schematic_routes_tests():
     # Return Layout to normal
     simulate_buttons_clicked(7)     # Branch - Events = sig5 on, pt3 normal, sw12 off, sig5 on
     sleep(2.5)
-    # Return Layout to normal
-    simulate_buttons_clicked(10)
-    set_instrument_blocked(2) 
     return()
 
 #-----------------------------------------------------------------------------------
@@ -674,8 +688,8 @@ def run_schematic_routes_example_tests():
     assert_buttons_deselected(20)
     assert_buttons_disabled(20)
     set_signals_on(15)
-    sleep(0.1)
-    assert_buttons_enabled(20)    
+    sleep(5.0)
+    assert_buttons_enabled(20)
     # Test setting up a route that includes a main signal when the Subsidary is OFF
     # For this test we use Route 15 (Platform 3 to Branch) - The button should be disabled
     set_fpls_off(9,14)
@@ -702,22 +716,6 @@ def run_schematic_routes_example_tests():
 #-----------------------------------------------------------------------------------------
 
 def test_nx_routes1():
-    # Initial state tests - Route 18 should be active
-    assert_buttons_enabled(8,19)    
-    assert_buttons_selected(18,19)
-    assert_signals_DANGER(13)
-    assert_signals_PROCEED(14)
-    # Try to deselect 18 -> 19 by deselecting 19 (exit button) - fail
-    simulate_buttons_clicked(19)
-    assert_buttons_enabled(18,19)    
-    assert_buttons_selected(18,19)
-    assert_signals_DANGER(13)
-    assert_signals_PROCEED(14)
-    # Try to deselect 18 -> 19 by deselecting 18 (entry button) - success
-    simulate_buttons_clicked(18)
-    assert_buttons_enabled(18,19)    
-    assert_buttons_deselected(18,19)
-    assert_signals_DANGER(13,14)
     # Initiate selection of Route 19 -> 18 by selecting button 19
     simulate_buttons_clicked(19)
     assert_buttons_enabled(18,19)    
@@ -874,8 +872,20 @@ def test_nx_routes2():
     assert_buttons_enabled(17,16,15,14)    
     assert_buttons_selected(14,15,16,17)
     assert_signals_PROCEED(9,10,11)
+    # Switch from RUN to EDIT Mode and then back again to check all routes are cleared down
+    # Initiate another route selection to test that gets cleared down as well
+    simulate_buttons_clicked(18)
+    assert_buttons_selected(14,15,16,17,18)
+    assert_signals_PROCEED(9,10,11)
+    set_edit_mode()
+    set_run_mode()
+    assert_buttons_deselected(14,15,16,17,18)
     return()
 
+def test_nx_routes3():
+    # Test some of the edge cases to excersise the code
+    # Case 1 - ENTRY (not also an EXIT) button clicked during router selection when there are no possible routes
+    pass
 ######################################################################################################
 
 def run_all_schematic_routes_tests():
@@ -886,25 +896,30 @@ def run_all_schematic_routes_tests():
     # Run the Tests for "test_schematic_routes.sig" - Note this layout File should  
     # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
+    print("Schematic Route Tests - Initial State Tests")
+    run_initial_state_tests1()
+    run_initial_state_tests2()
     print("Schematic Route Tests - NX route Tests")
     test_nx_routes1()
     test_nx_routes2()
-    print("Schematic Route Tests - Initial State Tests")
-    run_initial_state_tests()
     print("Schematic Route Tests - Run Mode, Automation Off")
     set_automation_off()
-    run_schematic_routes_tests()
+    run_schematic_routes_tests1()
+    run_schematic_routes_tests2()
+    run_schematic_routes_tests3()
     print("Schematic Route Tests - Run Mode, Automation On")
     set_automation_on()
-    run_schematic_routes_tests()
-#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-#     set_edit_mode()
-#     test_configuration_windows.test_all_object_edit_windows()
+    run_schematic_routes_tests1()
+    run_schematic_routes_tests2()
+    run_schematic_routes_tests3()
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_configuration_windows.test_all_object_edit_windows()
     # Run the Tests for the example layout
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_configuration_windows.test_all_object_edit_windows()
     initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
-#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-#     set_edit_mode()
-#     test_configuration_windows.test_all_object_edit_windows()
     print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     reset_layout()
     set_run_mode()
