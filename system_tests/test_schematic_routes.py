@@ -692,9 +692,6 @@ def run_schematic_routes_example_tests():
     assert_buttons_enabled(20)
     # Test setting up a route that includes a main signal when the Subsidary is OFF
     # For this test we use Route 15 (Platform 3 to Branch) - The button should be disabled
-    set_fpls_off(9,14)
-    set_points_normal(9,14)
-    set_fpls_on(9,14)
     assert_buttons_enabled(15)    
     set_subsidaries_off(7)
     assert_buttons_disabled(15)    
