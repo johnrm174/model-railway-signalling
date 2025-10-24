@@ -48,7 +48,8 @@ class sig_ahead_entry(common.str_int_item_id_entry_box):
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Class for a route interlocking group (comprising 6 points, a signal and an instrument)
+# Class for a route interlocking group (comprising a list of point settings, the signal
+# ahead and the block instrument controlling access into the next block section)
 # Uses the common row_of_point_settings class for the point entries
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
@@ -72,7 +73,12 @@ class interlocking_route_group:
         # packed LEFT in the frame by the parent class when created)
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
-        tool_tip = "Specify any points that need to be set and locked before the signal can be cleared for the route"
+        # Create the label for displaying the type of the route
+        self.routetype = Tk.Label(self.frame, anchor='w', width=7, text="----/----", state="disabled", disabledforeground="black")
+        self.routetype.pack(side = Tk.LEFT)
+        self.routetypeTT = common.CreateToolTip(self.routetype, text="Indicates if the route is directly controlled by the "+
+                    "signal and/or subsidary (otherwise it could be an 'incoming route' to support NX track occupancy)")
+        tool_tip = "Specify the points that need to be set and locked for the route"
         self.points = common.row_of_point_settings(self.frame, columns=8, tool_tip=tool_tip)
         self.points.pack(side = Tk.LEFT)
         # Create the signal ahead and instrument ahead elements (always packed)
@@ -107,13 +113,17 @@ class interlocking_route_group:
     def disable_block_ahead(self):
         self.block.disable1()
     
-    def enable_route(self):
-        self.points.enable()
+    def enable_route(self, sig:bool, sub:bool):
+        if sig: routetype = "Sig/"
+        else: routetype="----/"
+        if sub: routetype = routetype + "Sub"
+        else: routetype = routetype + "----"
+        self.routetype.config(text=routetype)
         self.sig.enable()
         self.block.enable()
 
     def disable_route(self):
-        self.points.disable()
+        self.routetype.config(text="----/----")
         self.sig.disable()
         self.block.disable()
 
@@ -173,7 +183,7 @@ class interlocking_route_frame:
 
     def set_routes(self, interlocking_frame:[[[[int,bool],],str,int]], item_id:int):
         # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
+        # Each route comprises: [variable_length_list_of_point_settings, sig_id, instrument_id]
         # Each point element in the point list comprises [point_id, point_state]
         # Note that the sig ID can be a local or remote Signal (so a string)
         # Note also we pass in the current signal_id for validation (to prevent selection)
@@ -187,7 +197,7 @@ class interlocking_route_frame:
         
     def get_routes(self):
         # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
+        # Each route comprises: [variable_length_list_of_point_settings, sig_id, instrument_id]
         # Each point element in the point list comprises [point_id, point_state]
         # Note that the sig ID can be a local or remote Signal (so a string)
         return ( [ self.main.get_route(),

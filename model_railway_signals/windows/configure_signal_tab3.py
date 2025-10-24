@@ -133,8 +133,13 @@ class section_ahead_element(Tk.Frame):
         # Create the frame to hold the individual UI elements (and pack it)
         super().__init__(parent_frame)
         self.pack()
-        self.label = Tk.Label(self, text=label, width=8)
+        self.label = Tk.Label(self, text=label, width=5)
         self.label.pack(side=Tk.LEFT)
+        # Create the label for displaying the type of the route
+        self.routetype = Tk.Label(self, anchor='w', width=7, text="----/----", state="disabled", disabledforeground="black")
+        self.routetype.pack(side = Tk.LEFT)
+        self.routetypeTT = common.CreateToolTip(self.routetype, text="Indicates if the route is directly controlled by the "+
+                    "signal and/or subsidary (otherwise it could be an 'incoming route' to support NX track occupancy)")
         tool_tip1 = ("Specify the track section immediately 'ahead of' the signal (to be occupied when the signal is passed). "+
                      "If enabled on the right, the signal will be overridden to ON when the track section is occupied.")
         tool_tip2 = ("Specify any other track sections on the route ahead (leading up to the next signal) which would "+
@@ -152,12 +157,20 @@ class section_ahead_element(Tk.Frame):
         if not self.other_sections.validate(): valid = False
         return(valid)
 
-    def enable(self):
+    def enable(self, sig:bool, sub:bool):
+        if sig:
+            routetype = "Sig/"
+            self.other_sections.enable()
+        else:
+            routetype="----/"
+            self.other_sections.disable()
+        if sub: routetype = routetype + "Sub"
+        else: routetype = routetype + "----"
+        self.routetype.config(text=routetype)
         self.first_section.enable()
-        self.other_sections.enable()
 
     def disable(self):
-        self.first_section.disable()
+        self.routetype.config(text="----/----")
         self.other_sections.disable()
 
     def set_values(self, list_of_sections:[int,]):
@@ -181,13 +194,13 @@ class section_ahead_frame(Tk.Frame):
         # Create the frame to hold the individual route element frames (packed by the calling class)
         # Note that the base classes pack themselves (we don't need to pack them here)
         super().__init__(parent_frame)
-        self.main = section_ahead_element(parent_frame, label="MAIN "+u"\u2192")
-        self.lh1 = section_ahead_element(parent_frame, label="LH1 "+u"\u2192")
-        self.lh2 = section_ahead_element(parent_frame, label="LH2 "+u"\u2192")
-        self.lh3 = section_ahead_element(parent_frame, label="LH3 "+u"\u2192")
-        self.rh1 = section_ahead_element(parent_frame, label="RH1 "+u"\u2192")
-        self.rh2 = section_ahead_element(parent_frame, label="RH2 "+u"\u2192")
-        self.rh3 = section_ahead_element(parent_frame, label="RH3 "+u"\u2192")
+        self.main = section_ahead_element(parent_frame, label="Main")
+        self.lh1 = section_ahead_element(parent_frame, label="LH1")
+        self.lh2 = section_ahead_element(parent_frame, label="LH2")
+        self.lh3 = section_ahead_element(parent_frame, label="LH3")
+        self.rh1 = section_ahead_element(parent_frame, label="RH1")
+        self.rh2 = section_ahead_element(parent_frame, label="RH2")
+        self.rh3 = section_ahead_element(parent_frame, label="RH3")
         
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI

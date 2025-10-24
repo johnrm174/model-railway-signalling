@@ -146,8 +146,8 @@ class semaphore_route_group():
         self.sig = semaphore_route_element(self.frame, label="Main (home) arm ",
                       tool_tip= "Select to add a home signal arm for this route",
                       callback=self.sig_arms_updated)
-        self.sub = semaphore_route_element(self.frame, label="Subsidary arm ",
-                    tool_tip="Select to add a subsidary signal arm for this route",
+        self.sub = semaphore_route_element(self.frame, label="Subsidiary arm ",
+                    tool_tip="Select to add a subsidiary signal arm for this route",
                     callback=self.sub_arms_updated)
         self.dist = semaphore_route_element(self.frame, label="Distant arm ",
                         tool_tip="Select to add a distant signal arm for this route",
@@ -409,13 +409,13 @@ class colour_light_aspects():
         # Create a subframe to hold the subsidary signal entry box (always packed)
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.CB = common.check_box(self.subframe, label="Subsidary signal", tool_tip="Select to add a "+
+        self.CB = common.check_box(self.subframe, label="Subsidiary signal", tool_tip="Select to add a "+
                     "seperate calling on aspect for the signal", callback=self.sub_updated)
         self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.label = Tk.Label(self.subframe, text="     DCC Address:")
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
         self.EB = common.validated_dcc_entry_box(self.subframe, item_type="Signal", tool_tip="Enter the DCC "+
-                    "address for the subsidary signal aspect (1-2047)", callback=self.dcc_updated)
+                    "address for the subsidiary signal aspect (1-2047)", callback=self.dcc_updated)
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB2 = common.check_box(self.subframe, label="Reversed logic", tool_tip="Select to reverse "+
                     "the DCC command logic for the subsidary signal aspect")
@@ -631,8 +631,8 @@ class theatre_route_indications:
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB1.pack(padx=2, pady=2)
         # Create the checkbox and tool tip for Enable Theatre for Subsidary selection
-        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidary", width=35,
-                    tool_tip = "Select to enable theatre indications for the subsidary signal (as well as the main signal)")
+        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidiary", width=35,
+                    tool_tip = "Select to enable theatre indications for the subsidiary signal (as well as the main signal)")
         self.CB2.pack(padx=2, pady=2)
 
     def auto_inhibit_update(self):
@@ -1124,7 +1124,7 @@ class signal_configuration_tab:
                         "Select one or more routes to be controlled by the main signal",
                         callback=route_selections_updated, main_signal=True)
         self.sub_routes = route_selections(parent_tab,
-                        "Routes to be controlled by the Subsidary Signal",
+                        "Routes to be controlled by the Subsidiary Signal",
                         "Select one or more routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
         self.slotwith = signal_slotting(parent_tab)

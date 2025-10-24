@@ -32,9 +32,10 @@ default_settings = {}
 
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["version"] = "Version 5.4.0"
+default_settings["general"]["version"] = "Version 6.0.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["menubarfontsize"] = 10
+default_settings["general"]["baseitemid"] = 1
 default_settings["general"]["editmode"] = True
 default_settings["general"]["automation"] = True
 default_settings["general"]["spadpopups"] = False
@@ -84,6 +85,9 @@ default_settings["mqtt"]["pubsignals"] = []
 default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
 default_settings["mqtt"]["pubsensors"] = []
+
+default_settings["control"] = {}
+default_settings["control"]["dccsoundmappings"] = []
 
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
@@ -344,6 +348,16 @@ def set_mqtt(parameter:str, value):
     settings["mqtt"][parameter] = value
     return()
 
+#------------------------------------------------------------------------------------
+# Functions to set/get the direct control (of the layout) settings
+#------------------------------------------------------------------------------------
+
+def get_control(parameter:str):
+    return(settings["control"][parameter])
+
+def set_control(parameter:str, value):
+    settings["control"][parameter] = value
+    return()
 
 ######################################################################################
     

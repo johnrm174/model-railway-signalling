@@ -27,8 +27,9 @@
                 false,
                 ""
             ],
-            "bbox": 12878,
+            "bbox": 8606,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -350,7 +351,7 @@
                 20,
                 5
             ],
-            "bbox": 12884,
+            "bbox": 8614,
             "colour": "black",
             "endx": 625.0,
             "endy": 300.0,
@@ -365,7 +366,7 @@
         },
         "3992df93-f016-42e7-a710-f0bddf9b1627": {
             "background": "grey85",
-            "bbox": 12887,
+            "bbox": 8617,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -389,7 +390,7 @@
                 20,
                 5
             ],
-            "bbox": 12893,
+            "bbox": 8625,
             "colour": "black",
             "endx": 625.0,
             "endy": 125.0,
@@ -403,7 +404,7 @@
             "tags": "line1"
         },
         "6085fa37-fea7-42cd-a7a9-f15aeb1ec731": {
-            "bbox": 12908,
+            "bbox": 8640,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -415,7 +416,7 @@
             "tags": "instrument2"
         },
         "6e4f0867-155b-4ed8-ae84-38e1cc667131": {
-            "bbox": 12912,
+            "bbox": 8644,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -440,7 +441,7 @@
         },
         "70238cfa-4556-4ed9-9a92-46ac169573de": {
             "background": "grey85",
-            "bbox": 12915,
+            "bbox": 8647,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -464,7 +465,7 @@
                 20,
                 5
             ],
-            "bbox": 12921,
+            "bbox": 8655,
             "colour": "black",
             "endx": 225.0,
             "endy": 125.0,
@@ -491,8 +492,9 @@
                 false,
                 ""
             ],
-            "bbox": 12947,
+            "bbox": 8681,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -822,7 +824,7 @@
         },
         "9ac66673-362c-4529-a451-6dba32782869": {
             "background": "grey85",
-            "bbox": 12950,
+            "bbox": 8684,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -853,8 +855,9 @@
                 false,
                 ""
             ],
-            "bbox": 12970,
+            "bbox": 8704,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1170,7 +1173,7 @@
             "ybuttonoffset": 0
         },
         "e26bc73f-b67e-4fed-ae67-8971af1d7b92": {
-            "bbox": 12974,
+            "bbox": 8708,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1195,7 +1198,7 @@
         },
         "e497d420-ad7a-4cb5-877c-6dbd0d849296": {
             "background": "grey85",
-            "bbox": 12977,
+            "bbox": 8711,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1226,8 +1229,9 @@
                 false,
                 ""
             ],
-            "bbox": 13003,
+            "bbox": 8737,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1569,8 +1573,9 @@
                 false,
                 ""
             ],
-            "bbox": 13029,
+            "bbox": 8763,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1935,11 +1940,15 @@
             "height": 500,
             "scrollbuttons": [],
             "snaptogrid": true,
-            "width": 800
+            "width": 1000
+        },
+        "control": {
+            "dccsoundmappings": []
         },
         "general": {
             "automation": true,
-            "editmode": false,
+            "baseitemid": 1,
+            "editmode": true,
             "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/networking1-node2.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
@@ -1947,7 +1956,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,

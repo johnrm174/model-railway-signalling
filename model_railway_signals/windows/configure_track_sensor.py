@@ -155,7 +155,7 @@ class edit_track_sensor():
     def __init__(self, root, object_id):
         global open_windows
         # If there is already a window open for this object then re-focus and exit
-        if object_id in open_windows.keys():
+        if object_id in open_windows.keys() and open_windows[object_id].winfo_exists():
             open_windows[object_id].lift()
             open_windows[object_id].state('normal')
             open_windows[object_id].focus_force()

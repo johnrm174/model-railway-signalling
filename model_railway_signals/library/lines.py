@@ -45,6 +45,9 @@
 # External API - classes and functions (used by the other library modules):
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#   show_line_ids() - Displays the line IDs
+#   hide_line_ids() - Hides the line IDs
+#   bring_line_ids_to_front() - Brings the IDs to the front
 #
 #---------------------------------------------------------------------------------------------
 
@@ -68,6 +71,35 @@ def configure_edit_mode(edit_mode:bool):
     global editing_enabled
     # Maintain a global flag (for creating new library objects)
     editing_enabled = edit_mode
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Library functions to show/hide Line IDs in edit mode
+#---------------------------------------------------------------------------------------------
+
+line_ids_displayed = False
+
+def show_line_ids():
+    global line_ids_displayed
+    for line_id in lines:
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label1"], state="normal")
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label2"], state="normal")
+    bring_line_ids_to_front()
+    line_ids_displayed = True
+    return()
+
+def hide_line_ids():
+    global line_ids_displayed
+    for line_id in lines:
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label1"], state="hidden")
+        lines[str(line_id)]["canvas"].itemconfig(lines[str(line_id)]["label2"], state="hidden")
+    line_ids_displayed = False
+    return()
+
+def bring_line_ids_to_front():
+    for line_id in lines:
+        lines[str(line_id)]["canvas"].tag_raise(lines[str(line_id)]["label2"])
+        lines[str(line_id)]["canvas"].tag_raise(lines[str(line_id)]["label1"])
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -133,6 +165,15 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         canvas.itemconfig(line_object, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(stop1_object, fill=colour, width=line_width, dash=tuple(line_style))
         canvas.itemconfig(stop2_object, fill=colour, width=line_width, dash=tuple(line_style))
+        # Create the line ID labels
+        label1_object = canvas.create_text(x1+(x2-x1)/2, y1+(y2-y1)/2, text=str(line_id),
+                                    font=("Courier",9,"bold"), fill="white", tags=canvas_tag)
+        bbox = canvas.bbox(label1_object)
+        label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
+                                    tags=canvas_tag, fill="purple3", width=0)
+        if not editing_enabled or not line_ids_displayed:
+            canvas.itemconfig(label1_object, state="hidden")
+            canvas.itemconfig(label2_object, state="hidden")
         # Compile a dictionary of everything we need to track
         lines[str(line_id)] = {}
         lines[str(line_id)]["canvas"] = canvas                  # Tkinter canvas object
@@ -144,6 +185,8 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         lines[str(line_id)]["end2"] = end2_object               # Reference to the Tkinter drawing object
         lines[str(line_id)]["stop1"] = stop1_object             # Reference to the Tkinter drawing object
         lines[str(line_id)]["stop2"] = stop2_object             # Reference to the Tkinter drawing object
+        lines[str(line_id)]["label1"] = label1_object           # Reference to the Tkinter drawing object
+        lines[str(line_id)]["label2"] = label2_object           # Reference to the Tkinter drawing object
         lines[str(line_id)]["tags"] = canvas_tag                # Canvas Tag for ALL drawing objects
     # Return the canvas tag references
     return(canvas_tag, selected_tag)
@@ -203,6 +246,10 @@ def move_line_end_1(line_id:int, xdiff:int, ydiff:int):
         dx, dy = get_endstop_offsets(x1, y1, x2, y2)
         lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop1"], x1+dx, y1+dy, x1-dx, y1-dy)
         lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
+        # Update the position of the line id label
+        lines[str(line_id)]["canvas"].move(lines[str(line_id)]["label1"], xdiff/2, ydiff/2)
+        lines[str(line_id)]["canvas"].move(lines[str(line_id)]["label2"], xdiff/2, ydiff/2)
+
     return()
 
 def move_line_end_2(line_id:int, xdiff:int,ydiff:int):
@@ -222,6 +269,9 @@ def move_line_end_2(line_id:int, xdiff:int,ydiff:int):
         dx, dy = get_endstop_offsets(x1, y1, x2, y2)
         lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop1"], x1+dx, y1+dy, x1-dx, y1-dy)
         lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
+        # Update the position of the line id label
+        lines[str(line_id)]["canvas"].move(lines[str(line_id)]["label1"], xdiff/2, ydiff/2)
+        lines[str(line_id)]["canvas"].move(lines[str(line_id)]["label2"], xdiff/2, ydiff/2)
     return()
 
 #--------------------------------------------------------------------------

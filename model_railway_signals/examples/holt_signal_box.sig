@@ -124,7 +124,7 @@
     "objects": {
         "00ed3df6-9d84-4f82-a135-ec64de3e6b83": {
             "background": "",
-            "bbox": 8274,
+            "bbox": 6630,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -142,7 +142,7 @@
             ]
         },
         "0233e220-45e2-4617-afa1-32d8eda9b7b5": {
-            "bbox": 8278,
+            "bbox": 6634,
             "buttoncolour": "Black",
             "buttonwidth": 10,
             "defaultlabel": "OCCUPIED",
@@ -176,7 +176,7 @@
         "066b39da-32b0-4fb7-b4e5-3470078b9ba9": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8284,
+            "bbox": 6642,
             "buttoncolour": "Grey85",
             "colour": "#0484e6",
             "dccaddress": 0,
@@ -212,7 +212,7 @@
                 1,
                 1
             ],
-            "bbox": 8290,
+            "bbox": 6650,
             "colour": "Black",
             "endx": 1355.0,
             "endy": 177.0,
@@ -232,7 +232,7 @@
                 0,
                 0
             ],
-            "bbox": 8296,
+            "bbox": 6658,
             "colour": "#555555",
             "endx": 905.0,
             "endy": 228.0,
@@ -246,9 +246,10 @@
             "tags": "line23"
         },
         "0a8f9cf6-890c-43bc-907a-588400f723dc": {
-            "bbox": 8304,
+            "bbox": 6666,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 18,
             "itemtype": 1,
@@ -280,7 +281,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "0b5a95b8-c092-4cce-8eec-afc4e38eec7a": {
             "arrowends": 0,
@@ -289,7 +292,7 @@
                 0,
                 0
             ],
-            "bbox": 8310,
+            "bbox": 6674,
             "colour": "#555555",
             "endx": 705.0,
             "endy": 177.0,
@@ -309,7 +312,7 @@
                 20,
                 5
             ],
-            "bbox": 8316,
+            "bbox": 6682,
             "colour": "Black",
             "endx": 1297.0,
             "endy": 250.0,
@@ -326,9 +329,10 @@
             "tags": "line31"
         },
         "0c6dbaa5-8d21-4071-bc44-98d471cb2afb": {
-            "bbox": 8324,
+            "bbox": 6690,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 13,
             "itemtype": 1,
@@ -360,7 +364,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "0e0829e4-cd52-407b-922f-61a758d0fccf": {
             "arrowends": 0,
@@ -369,7 +375,7 @@
                 0,
                 0
             ],
-            "bbox": 8330,
+            "bbox": 6698,
             "colour": "#0484e6",
             "endx": 155.0,
             "endy": 102.0,
@@ -389,7 +395,7 @@
                 1,
                 1
             ],
-            "bbox": 8336,
+            "bbox": 6706,
             "colour": "#3071ec",
             "endx": 705.0,
             "endy": 227.0,
@@ -403,9 +409,10 @@
             "tags": "line14"
         },
         "13ad5a0f-8da3-4b98-ba10-9401ec751558": {
-            "bbox": 8344,
+            "bbox": 6714,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 6,
             "itemtype": 1,
@@ -437,7 +444,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "143cb867-f120-415b-9221-cb380f8c8d09": {
             "arrowends": 0,
@@ -446,7 +455,7 @@
                 0,
                 0
             ],
-            "bbox": 8350,
+            "bbox": 6722,
             "colour": "Black",
             "endx": 1327.0,
             "endy": 250.0,
@@ -464,7 +473,7 @@
         },
         "157d2dd7-2742-4894-a9d7-7e0067f0a1f2": {
             "background": "",
-            "bbox": 8353,
+            "bbox": 6725,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -488,7 +497,7 @@
                 0,
                 0
             ],
-            "bbox": 8359,
+            "bbox": 6733,
             "colour": "#555555",
             "endx": 579.0,
             "endy": 177.0,
@@ -503,7 +512,7 @@
         },
         "17e83f2c-5f3d-4ea0-8239-35ca03e73021": {
             "background": "",
-            "bbox": 8362,
+            "bbox": 6736,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -523,7 +532,7 @@
         "189f2fa5-28b2-4e1b-bb9d-6d90d377af7d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8368,
+            "bbox": 6744,
             "buttoncolour": "Grey85",
             "colour": "#0484e6",
             "dccaddress": 0,
@@ -554,7 +563,7 @@
         },
         "19b79e7d-f41b-4e3a-b20f-65fc79d2689d": {
             "background": "",
-            "bbox": 8371,
+            "bbox": 6747,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -578,7 +587,7 @@
                 0,
                 0
             ],
-            "bbox": 8377,
+            "bbox": 6755,
             "colour": "#3071ec",
             "endx": 780.0,
             "endy": 302.0,
@@ -593,7 +602,7 @@
         },
         "1dc1b7da-e026-4a75-bc61-0bc1686bc6f6": {
             "background": "#e40403",
-            "bbox": 8380,
+            "bbox": 6758,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -624,8 +633,9 @@
                 false,
                 ""
             ],
-            "bbox": 8407,
+            "bbox": 6785,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -952,7 +962,7 @@
         },
         "1f1d0ec9-a65c-4e5c-b5d7-c8ba9e12b306": {
             "background": "",
-            "bbox": 8410,
+            "bbox": 6788,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -976,7 +986,7 @@
                 20,
                 5
             ],
-            "bbox": 8416,
+            "bbox": 6796,
             "colour": "Black",
             "endx": 956.0,
             "endy": 327.0,
@@ -994,7 +1004,7 @@
         },
         "21a0016f-9849-4d18-ab6f-f222df5b231c": {
             "background": "",
-            "bbox": 8419,
+            "bbox": 6799,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1025,8 +1035,9 @@
                 false,
                 ""
             ],
-            "bbox": 8426,
+            "bbox": 6806,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -1351,9 +1362,10 @@
             "ybuttonoffset": 0
         },
         "325a1b65-b961-4be5-a8bc-c6476b42d44c": {
-            "bbox": 8434,
+            "bbox": 6814,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 25,
             "itemtype": 2,
@@ -1385,12 +1397,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "341c7e8e-8769-4b67-aa55-7c601903dac6": {
-            "bbox": 8442,
+            "bbox": 6822,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 21,
             "itemtype": 2,
@@ -1422,7 +1437,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "344f20bc-f2ef-4866-be3b-3b2b256cffb4": {
             "arrowends": 2,
@@ -1431,7 +1448,7 @@
                 1,
                 1
             ],
-            "bbox": 8448,
+            "bbox": 6830,
             "colour": "#3071ec",
             "endx": 1105.0,
             "endy": 277.0,
@@ -1451,7 +1468,7 @@
                 0,
                 0
             ],
-            "bbox": 8454,
+            "bbox": 6838,
             "colour": "#0484e6",
             "endx": 205.0,
             "endy": 102.0,
@@ -1465,9 +1482,10 @@
             "tags": "line18"
         },
         "4096b447-9fc8-4fc5-8561-df873082f328": {
-            "bbox": 8462,
+            "bbox": 6846,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 14,
             "itemtype": 2,
@@ -1499,7 +1517,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "427a2980-e494-4073-9534-5ed9d8e50b36": {
             "arrowends": 0,
@@ -1508,7 +1528,7 @@
                 0,
                 0
             ],
-            "bbox": 8468,
+            "bbox": 6854,
             "colour": "#555555",
             "endx": 105.0,
             "endy": 177.0,
@@ -1523,7 +1543,7 @@
         },
         "436174c8-71da-4b3a-9680-8e7de4847baa": {
             "background": "#acabae",
-            "bbox": 8471,
+            "bbox": 6857,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -1541,9 +1561,10 @@
             ]
         },
         "50629258-41af-475c-9bec-2aa5bc6d326b": {
-            "bbox": 8479,
+            "bbox": 6865,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 7,
             "itemtype": 6,
@@ -1575,12 +1596,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "520567da-bee7-431c-be2b-92a3ca7d5cf4": {
-            "bbox": 8487,
+            "bbox": 6873,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 10,
             "itemtype": 2,
@@ -1612,7 +1636,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "534376e6-0c67-4026-af77-7e7f1dc5e2f7": {
             "arrowends": 0,
@@ -1621,7 +1647,7 @@
                 0,
                 0
             ],
-            "bbox": 8493,
+            "bbox": 6881,
             "colour": "Black",
             "endx": 262.0,
             "endy": 250.0,
@@ -1638,9 +1664,10 @@
             "tags": "line33"
         },
         "536a669a-eea8-4154-a068-089b604a10e1": {
-            "bbox": 8501,
+            "bbox": 6889,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 26,
             "itemtype": 4,
@@ -1672,7 +1699,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "54d2a971-6b0c-4508-86f3-05bd06588ced": {
             "arrowends": 0,
@@ -1681,7 +1710,7 @@
                 0,
                 0
             ],
-            "bbox": 8507,
+            "bbox": 6897,
             "colour": "#0484e6",
             "endx": 155.0,
             "endy": 127.0,
@@ -1695,9 +1724,10 @@
             "tags": "line21"
         },
         "5ba88c24-137b-4ef5-b4fc-0789c955ef85": {
-            "bbox": 8515,
+            "bbox": 6905,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 15,
             "itemtype": 2,
@@ -1729,11 +1759,13 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "5d361cbe-6149-4bbd-a0d7-665c9b73cccb": {
             "background": "",
-            "bbox": 8518,
+            "bbox": 6908,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1751,9 +1783,10 @@
             ]
         },
         "5e0154af-f898-450c-88d2-402b1ae3623c": {
-            "bbox": 8526,
+            "bbox": 6916,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 22,
             "itemtype": 2,
@@ -1785,11 +1818,13 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "5f38177b-898b-4b50-8796-f04aaed25213": {
             "background": "",
-            "bbox": 8529,
+            "bbox": 6919,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1808,7 +1843,7 @@
         },
         "5f80b348-1de1-447b-9bf6-e969be058d37": {
             "background": "",
-            "bbox": 8532,
+            "bbox": 6922,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1832,7 +1867,7 @@
                 0,
                 0
             ],
-            "bbox": 8538,
+            "bbox": 6930,
             "colour": "#555555",
             "endx": 654.0,
             "endy": 229.0,
@@ -1847,7 +1882,7 @@
         },
         "6db38663-998a-4362-a36f-b84786842893": {
             "background": "",
-            "bbox": 8541,
+            "bbox": 6933,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1871,7 +1906,7 @@
                 0,
                 0
             ],
-            "bbox": 8547,
+            "bbox": 6941,
             "colour": "#555555",
             "endx": 805.0,
             "endy": 278.0,
@@ -1891,7 +1926,7 @@
                 0,
                 0
             ],
-            "bbox": 8553,
+            "bbox": 6949,
             "colour": "Black",
             "endx": 755.0,
             "endy": 177.0,
@@ -1918,8 +1953,9 @@
                 false,
                 ""
             ],
-            "bbox": 8578,
+            "bbox": 6974,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2246,7 +2282,7 @@
         "74ba32c3-f5a7-46ba-98fd-28487d49c441": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 8583,
+            "bbox": 6981,
             "buttoncolour": "Grey85",
             "colour": "#f9a000",
             "dccaddress": 0,
@@ -2276,7 +2312,7 @@
             "ybuttonoffset": 0
         },
         "75905c1a-a32a-4f7b-89b0-15954efdf185": {
-            "bbox": 8598,
+            "bbox": 6996,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -2289,7 +2325,7 @@
         },
         "7647854f-d3d0-4962-a2c1-9125412d7d43": {
             "background": "",
-            "bbox": 8601,
+            "bbox": 6999,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2307,9 +2343,10 @@
             ]
         },
         "7ae24886-7a23-4a40-974b-775a07e171dd": {
-            "bbox": 8609,
+            "bbox": 7007,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 1,
             "itemtype": 1,
@@ -2341,12 +2378,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "7b7fc320-9d68-4f57-854a-a4fe6bb35f74": {
-            "bbox": 8617,
+            "bbox": 7015,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 12,
             "itemtype": 1,
@@ -2378,7 +2418,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "7bed7462-2848-4c57-b91f-944ad1157fee": {
             "arrowends": 0,
@@ -2387,7 +2429,7 @@
                 0,
                 0
             ],
-            "bbox": 8623,
+            "bbox": 7023,
             "colour": "#555555",
             "endx": 905.0,
             "endy": 177.0,
@@ -2402,7 +2444,7 @@
         },
         "7c18c8e2-f050-4d32-b373-8f6ca032366e": {
             "background": "",
-            "bbox": 8626,
+            "bbox": 7026,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2422,7 +2464,7 @@
         "7caeeb72-b9c2-4699-b82c-a096b59bd129": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 8633,
+            "bbox": 7035,
             "buttoncolour": "Grey85",
             "colour": "#f9a000",
             "dccaddress": 0,
@@ -2540,8 +2582,9 @@
                 false,
                 ""
             ],
-            "bbox": 8661,
+            "bbox": 7063,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -2867,9 +2910,10 @@
             "ybuttonoffset": 0
         },
         "8be1260c-d12a-4c36-a469-f79a8e9f834b": {
-            "bbox": 8669,
+            "bbox": 7071,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 5,
             "itemtype": 2,
@@ -2901,7 +2945,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "8e97c850-67dc-4279-bff9-9810c66d3f80": {
             "arrowends": 1,
@@ -2910,7 +2956,7 @@
                 20,
                 5
             ],
-            "bbox": 8675,
+            "bbox": 7079,
             "colour": "Black",
             "endx": 262.0,
             "endy": 248.0,
@@ -2928,7 +2974,7 @@
         },
         "8f02656c-b00c-429b-8d4f-06e4e2990b21": {
             "background": "",
-            "bbox": 8678,
+            "bbox": 7082,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2946,9 +2992,10 @@
             ]
         },
         "9037450c-01fe-4294-93b8-863071087675": {
-            "bbox": 8686,
+            "bbox": 7090,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 17,
             "itemtype": 1,
@@ -2980,7 +3027,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "91ceaace-f228-49ee-a9de-91a576666fd1": {
             "arrowends": 0,
@@ -2989,7 +3038,7 @@
                 0,
                 0
             ],
-            "bbox": 8692,
+            "bbox": 7098,
             "colour": "#f9a000",
             "endx": 780.0,
             "endy": 227.0,
@@ -3004,7 +3053,7 @@
         },
         "98745b5e-30e6-4109-9460-ef2de518e208": {
             "background": "",
-            "bbox": 8695,
+            "bbox": 7101,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3028,7 +3077,7 @@
                 0,
                 0
             ],
-            "bbox": 8701,
+            "bbox": 7109,
             "colour": "Black",
             "endx": 1230.0,
             "endy": 177.0,
@@ -3055,8 +3104,9 @@
                 false,
                 ""
             ],
-            "bbox": 8726,
+            "bbox": 7134,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3379,7 +3429,7 @@
         "9b5fd807-99b7-40c6-b6d9-044b5d2a136e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8732,
+            "bbox": 7142,
             "buttoncolour": "Grey85",
             "colour": "#3071ec",
             "dccaddress": 0,
@@ -3447,7 +3497,7 @@
         },
         "9db1a961-4aeb-45f7-8936-6834875e4566": {
             "background": "",
-            "bbox": 8735,
+            "bbox": 7145,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3465,9 +3515,10 @@
             ]
         },
         "9ee68c2b-f068-4d46-bb5e-904276118a8f": {
-            "bbox": 8743,
+            "bbox": 7153,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 24,
             "itemtype": 1,
@@ -3499,7 +3550,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "a29fbc37-1ed6-4909-afba-42f279909a68": {
             "arrowends": 0,
@@ -3508,7 +3561,7 @@
                 0,
                 0
             ],
-            "bbox": 8749,
+            "bbox": 7161,
             "colour": "Black",
             "endx": 230.0,
             "endy": 177.0,
@@ -3535,8 +3588,9 @@
                 false,
                 ""
             ],
-            "bbox": 8756,
+            "bbox": 7168,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -3875,8 +3929,9 @@
                 false,
                 ""
             ],
-            "bbox": 8781,
+            "bbox": 7193,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4198,7 +4253,7 @@
                 0,
                 0
             ],
-            "bbox": 8787,
+            "bbox": 7201,
             "colour": "#3071ec",
             "endx": 905.0,
             "endy": 302.0,
@@ -4225,8 +4280,9 @@
                 false,
                 ""
             ],
-            "bbox": 8798,
+            "bbox": 7212,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4555,8 +4611,9 @@
                 false,
                 ""
             ],
-            "bbox": 8823,
+            "bbox": 7237,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -4873,7 +4930,7 @@
         },
         "aadc3269-f9b3-495d-b463-5b0aa3e9cd68": {
             "background": "",
-            "bbox": 8826,
+            "bbox": 7240,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4904,8 +4961,9 @@
                 false,
                 ""
             ],
-            "bbox": 8833,
+            "bbox": 7247,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -5226,9 +5284,10 @@
             "ybuttonoffset": 0
         },
         "b1895b2d-c636-4301-8574-a38a42cc1d60": {
-            "bbox": 8841,
+            "bbox": 7255,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 9,
             "itemtype": 2,
@@ -5260,12 +5319,14 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b4126833-13ed-4e03-9d15-b39c189f6dee": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8847,
+            "bbox": 7263,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -5295,9 +5356,10 @@
             "ybuttonoffset": -40
         },
         "b50e973b-f9d3-4abb-8b15-169cd52dd3f1": {
-            "bbox": 8855,
+            "bbox": 7271,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 4,
             "itemtype": 1,
@@ -5329,12 +5391,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b5dad31e-d37a-4b95-a345-4d3b2ad02ef9": {
-            "bbox": 8863,
+            "bbox": 7279,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 27,
             "itemtype": 4,
@@ -5366,12 +5431,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b67416c2-cf83-4b8c-bd11-c6cf28e4baeb": {
-            "bbox": 8871,
+            "bbox": 7287,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 19,
             "itemtype": 1,
@@ -5403,12 +5471,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b8524ade-e8ff-4aac-8de3-f18572e80c63": {
-            "bbox": 8879,
+            "bbox": 7295,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 16,
             "itemtype": 1,
@@ -5440,12 +5511,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "b9f58a56-f0cf-4b0d-b594-7826cbdd071c": {
-            "bbox": 8887,
+            "bbox": 7303,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 2,
             "itemtype": 2,
@@ -5477,12 +5551,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "ba27e0b0-95bc-40b7-9730-9ca5126c0057": {
-            "bbox": 8895,
+            "bbox": 7311,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 23,
             "itemtype": 1,
@@ -5514,7 +5591,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "bc8b8f99-e20e-4876-acc1-4ad1430d28eb": {
             "arrowends": 2,
@@ -5523,7 +5602,7 @@
                 1,
                 1
             ],
-            "bbox": 8901,
+            "bbox": 7319,
             "colour": "#3071ec",
             "endx": 1080.0,
             "endy": 302.0,
@@ -5539,7 +5618,7 @@
         "bc9867e4-3295-45de-8a75-359b80c2e713": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 8906,
+            "bbox": 7326,
             "buttoncolour": "Grey85",
             "colour": "#0484e6",
             "dccaddress": 0,
@@ -5570,7 +5649,7 @@
         },
         "c6e2af57-46ae-4516-921b-c04677b3e3d0": {
             "background": "",
-            "bbox": 8909,
+            "bbox": 7329,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -5590,7 +5669,7 @@
         "c800e664-13a9-413c-b6f0-ed16aace20d6": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8915,
+            "bbox": 7337,
             "buttoncolour": "Grey85",
             "colour": "#0484e6",
             "dccaddress": 0,
@@ -5622,7 +5701,7 @@
         "ca9ef618-1a1f-4fc5-8ea6-40583dc96931": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8921,
+            "bbox": 7345,
             "buttoncolour": "Grey85",
             "colour": "#3071ec",
             "dccaddress": 0,
@@ -5658,7 +5737,7 @@
                 0,
                 0
             ],
-            "bbox": 8927,
+            "bbox": 7353,
             "colour": "#555555",
             "endx": 330.0,
             "endy": 177.0,
@@ -5685,8 +5764,9 @@
                 false,
                 ""
             ],
-            "bbox": 8934,
+            "bbox": 7360,
             "buttoncolour": "Grey85",
+            "clearancedelay": 0,
             "dccaspects": [
                 [],
                 [],
@@ -6007,9 +6087,10 @@
             "ybuttonoffset": 0
         },
         "d241e2d2-d254-42b5-94a1-2b8a82c716ba": {
-            "bbox": 8942,
+            "bbox": 7368,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 3,
             "itemtype": 2,
@@ -6041,7 +6122,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "d34f7a37-28db-4071-80e3-b19ea258c994": {
             "arrowends": 0,
@@ -6050,7 +6133,7 @@
                 0,
                 0
             ],
-            "bbox": 8948,
+            "bbox": 7376,
             "colour": "#f9a000",
             "endx": 780.0,
             "endy": 177.0,
@@ -6070,7 +6153,7 @@
                 0,
                 0
             ],
-            "bbox": 8954,
+            "bbox": 7384,
             "colour": "#f9a000",
             "endx": 855.0,
             "endy": 177.0,
@@ -6090,7 +6173,7 @@
                 0,
                 0
             ],
-            "bbox": 8960,
+            "bbox": 7392,
             "colour": "Black",
             "endx": 1118.0,
             "endy": 326.0,
@@ -6107,9 +6190,10 @@
             "tags": "line29"
         },
         "daa5642a-bc02-473b-9c1a-0dc73b5bc61e": {
-            "bbox": 8968,
+            "bbox": 7400,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 20,
             "itemtype": 2,
@@ -6141,7 +6225,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "db73e9e4-0d96-4e0b-9247-4e35e21020dc": {
             "arrowends": 0,
@@ -6150,7 +6236,7 @@
                 0,
                 0
             ],
-            "bbox": 8974,
+            "bbox": 7408,
             "colour": "#0484e6",
             "endx": 180.0,
             "endy": 102.0,
@@ -6165,7 +6251,7 @@
         },
         "de253608-d2d0-40dc-a1aa-450049468569": {
             "background": "",
-            "bbox": 8977,
+            "bbox": 7411,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6189,7 +6275,7 @@
                 0,
                 0
             ],
-            "bbox": 8983,
+            "bbox": 7419,
             "colour": "Black",
             "endx": 1230.0,
             "endy": 227.0,
@@ -6209,7 +6295,7 @@
                 0,
                 0
             ],
-            "bbox": 8989,
+            "bbox": 7427,
             "colour": "Black",
             "endx": 1255.0,
             "endy": 202.0,
@@ -6223,9 +6309,10 @@
             "tags": "line4"
         },
         "e5555989-36ce-4444-83d9-fcdcf98ee015": {
-            "bbox": 8997,
+            "bbox": 7435,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 8,
             "itemtype": 2,
@@ -6257,11 +6344,13 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "e559cad7-c1ff-4e0b-829f-176a268774ad": {
             "background": "",
-            "bbox": 9000,
+            "bbox": 7438,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6279,9 +6368,10 @@
             ]
         },
         "e8d00b70-f8b9-4af4-8452-162719ba8c32": {
-            "bbox": 9008,
+            "bbox": 7446,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 28,
             "itemtype": 4,
@@ -6313,12 +6403,15 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "ebb27ea3-9973-412c-8c4b-742de9fd2c37": {
-            "bbox": 9016,
+            "bbox": 7454,
             "buttoncolour": "Grey85",
             "framecolour": "Grey40",
+            "hidebuttons": false,
             "item": "lever",
             "itemid": 11,
             "itemtype": 4,
@@ -6350,7 +6443,9 @@
                 "TkFixedFont",
                 8,
                 "bold"
-            ]
+            ],
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "ed121cb7-fe4f-4aed-8de9-d683bbf8aa13": {
             "arrowends": 0,
@@ -6359,7 +6454,7 @@
                 0,
                 0
             ],
-            "bbox": 9022,
+            "bbox": 7462,
             "colour": "#555555",
             "endx": 1205.0,
             "endy": 177.0,
@@ -6379,7 +6474,7 @@
                 0,
                 0
             ],
-            "bbox": 9028,
+            "bbox": 7470,
             "colour": "#f9a000",
             "endx": 855.0,
             "endy": 227.0,
@@ -6395,7 +6490,7 @@
         "eed3ada5-83e9-4687-8a45-fa7cf9d12cfa": {
             "alsoswitch": 36,
             "automatic": false,
-            "bbox": 9034,
+            "bbox": 7478,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -6426,7 +6521,7 @@
         },
         "f8a09e21-4c49-4ba1-8fd0-ef33c01ce2eb": {
             "background": "",
-            "bbox": 9037,
+            "bbox": 7481,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -6445,7 +6540,7 @@
         },
         "fba9cf8e-81c3-4e73-954b-4e1707164dbb": {
             "background": "#acabae",
-            "bbox": 9040,
+            "bbox": 7484,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -6532,8 +6627,12 @@
             "snaptogrid": false,
             "width": 1400
         },
+        "control": {
+            "dccsoundmappings": []
+        },
         "general": {
             "automation": true,
+            "baseitemid": 1,
             "editmode": false,
             "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/holt_signal_box.sig",
             "info": "Document your layout here",
@@ -6542,7 +6641,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 5.4.0"
+            "version": "Version 6.0.0"
         },
         "gpio": {
             "maxevents": 100,

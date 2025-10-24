@@ -14,6 +14,7 @@
 #    objects.extend(new_objects) - Add to the dict of objects following an import
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.configure_remote_gpio_sensor_event_mappings() - set up the GPIO Sensor event mappings
+#    objects.set_base_item_id(item_id) - Set the base item ID (for creating new objects)
 #    schematic.initialise(root, callback, *canvasargs) - Create the canvas
 #    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
 #    schematic.update_canvas(*canvasargs) - Update the canvas following reload/resizing
@@ -103,7 +104,7 @@ import os
 import tkinter as Tk
 import logging
 import argparse
-import importlib.resources
+import pathlib
 
 from . import objects
 from . import settings
@@ -136,12 +137,13 @@ class main_menubar:
         # Create a dummy menubar item for the application Logo
         resource_folder = 'model_railway_signals.resources'
         logo_filename = 'dcc_signalling_logo.png'
+        current_folder = pathlib.Path(__file__). parent
+        fully_qualified_filename = current_folder / 'resources' / 'dcc_signalling_logo.png'
         try:
-            with importlib.resources.path(resource_folder, logo_filename) as fully_qualified_filename:
-                self.logo_image = Tk.PhotoImage(file=fully_qualified_filename)
-                self.dummy_menu = Tk.Menu(self.mainmenubar, tearoff=False)
-                self.mainmenubar.add_cascade(menu=self.dummy_menu, image=self.logo_image,
-                                             background="white",activebackground="white")
+            self.logo_image = Tk.PhotoImage(file=fully_qualified_filename)
+            self.dummy_menu = Tk.Menu(self.mainmenubar, tearoff=False)
+            self.mainmenubar.add_cascade(menu=self.dummy_menu, image=self.logo_image,
+                                         background="white",activebackground="white")
         except:
             pass
         # Create the various menubar items for the File Dropdown
@@ -191,17 +193,19 @@ class main_menubar:
         self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
         # Create the various menubar items for the Utilities Dropdown
         self.utilities_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.utilities_menu.add_command(label =" Application Upgrade...",
+                command=lambda:menubar.application_upgrade(self.root))
         self.utilities_menu.add_command(label =" DCC Programming...",
                 command=lambda:menubar.dcc_programming(self.root, self.dcc_programming_enabled,
                                                          self.dcc_power_off, self.dcc_power_on))
         self.utilities_menu.add_command(label =" DCC Mappings...",
                 command=lambda:menubar.dcc_mappings(self.root))
-        self.utilities_menu.add_command(label =" Item Renumbering...",
-                command=lambda:menubar.bulk_renumbering(self.root))
-        self.utilities_menu.add_command(label =" Application Upgrade...",
-                command=lambda:menubar.application_upgrade(self.root))
+        self.utilities_menu.add_command(label =" Exercise Points...",
+                command=lambda:menubar.exercise_points(self.root, self.reset_layout))
         self.utilities_menu.add_command(label =" Import Layout...",
                 command=lambda:menubar.import_layout(self.root, self.import_schematic))
+        self.utilities_menu.add_command(label =" Item Renumbering...",
+                command=lambda:menubar.bulk_renumbering(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -215,27 +219,29 @@ class main_menubar:
                 command=lambda:menubar.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
                 command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_update))
+        self.settings_menu.add_command(label =" Sounds...",
+                command=lambda:menubar.edit_sounds_settings(self.root, self.sounds_update))
         self.settings_menu.add_command(label =" SPROG...",
                 command=lambda:menubar.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
         # Create the various menubar items for the Styles Dropdown
         self.styles_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.styles_menu.add_command(label =" Route buttons...",
-                command=lambda:menubar.edit_route_styles(self.root))
         self.styles_menu.add_command(label =" DCC switches...",
                 command=lambda:menubar.edit_switch_styles(self.root))
-        self.styles_menu.add_command(label =" Track sections...",
-                command=lambda:menubar.edit_section_styles(self.root))
         self.styles_menu.add_command(label =" Point/Route lines...",
                 command=lambda:menubar.edit_route_line_styles(self.root))
         self.styles_menu.add_command(label =" Points...",
                 command=lambda:menubar.edit_point_styles(self.root))
+        self.styles_menu.add_command(label =" Route buttons...",
+                command=lambda:menubar.edit_route_styles(self.root))
         self.styles_menu.add_command(label =" Signals...",
                 command=lambda:menubar.edit_signal_styles(self.root))
         self.styles_menu.add_command(label =" Signalbox levers...",
                 command=lambda:menubar.edit_lever_styles(self.root))
         self.styles_menu.add_command(label =" Text boxes...",
                 command=lambda:menubar.edit_textbox_styles(self.root))
+        self.styles_menu.add_command(label =" Track sections...",
+                command=lambda:menubar.edit_section_styles(self.root))
         self.mainmenubar.add_cascade(label = "Styles", menu=self.styles_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -370,6 +376,7 @@ class main_menubar:
         self.gpio_update()
         # Apply any other general settings
         self.general_settings_update()
+        self.sounds_update()
         
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
@@ -453,9 +460,12 @@ class main_menubar:
             if Tk.messagebox.askokcancel(parent=self.root, title="Reset Schematic",
                     message="Are you sure you want to reset all signals, points, switches and "
                     +"instruments back to their default states (Note that track occupancy will be retained)"):
-                run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+                delay = run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+            else:
+                delay = None
         else:
-            run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+            delay = run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+        return(delay)
             
     #------------------------------------------------------------------------------------------
     # SPROG menubar functions
@@ -623,6 +633,13 @@ class main_menubar:
             self.scroll_buttons.append(self.quickscroll_button(self.quickscrollframe, label, width, xscroll, yscroll))
             self.scroll_buttons[-1].pack(padx=5, pady=2, side=Tk.LEFT)
 
+    def sounds_update(self):
+        sound_mappings = settings.get_control("dccsoundmappings")
+        library.reset_dcc_sound_mappings()
+        for sound_mapping in sound_mappings:
+            # value_to_set is a list comprising [filename:str, [dcc_address:int, dcc_state:bool]]
+            library.add_dcc_sound_mapping(sound_mapping[1][0], sound_mapping[1][1], sound_mapping[0])
+
     def logging_update(self):
         log_level = settings.get_logging("level")
         if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
@@ -667,6 +684,8 @@ class main_menubar:
         # Application settings - quick scroll buttons
         for scroll_button in self.scroll_buttons:
             scroll_button.config(font=("", font_size))
+        # Base item ID settings
+        objects.set_base_item_id(settings.get_general("baseitemid"))
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
@@ -691,6 +710,12 @@ class main_menubar:
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="New Schematic",
                 message="Are you sure you want to discard all changes and create a new blank schematic"):
+            # Delete any GPIO status subscriptions (if the GPIO settings window is still open)
+            library.unsubscribe_from_all_gpio_port_status()
+            # Destroy any open configutation or settings windows (or it gets confusing)
+            for widget in self.root.winfo_children():
+                if isinstance(widget, Tk.Toplevel):
+                    widget.destroy()
             # Delete all existing objects, restore the default settings and re-initialise the editor
             schematic.delete_all_objects()
             settings.restore_defaults()
@@ -770,6 +795,12 @@ class main_menubar:
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")
+                    # Delete any GPIO status subscriptions (if the GPIO settings window is still open)
+                    library.unsubscribe_from_all_gpio_port_status()
+                    # Destroy any open configutation or settings windows (or it gets confusing)
+                    for widget in self.root.winfo_children():
+                        if isinstance(widget, Tk.Toplevel):
+                            widget.destroy()
                     # Delete all existing objects
                     logging.info("DELETING-OLD-OBJECTS*****************************************************************************")
                     schematic.delete_all_objects()

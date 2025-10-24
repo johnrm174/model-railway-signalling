@@ -76,7 +76,7 @@
 import enum
 import os
 import logging
-import importlib.resources
+import pathlib
 import tkinter as Tk
 from typing import Union
 
@@ -92,14 +92,11 @@ from . import file_interface
 # package as a whole - its up to the user to install if required
 # -------------------------------------------------------------------------
 
-def is_simpleaudio_installed():
-    global simpleaudio
-    try:
-        import simpleaudio
-        return (True)
-    except Exception: pass
-    return (False)
-audio_enabled = is_simpleaudio_installed()
+try:
+    import simpleaudio
+    audio_enabled = True
+except Exception:
+    pass
 
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling create_instrument
@@ -246,14 +243,13 @@ def telegraph_key_button(inst_id:int):
 def ring_section_bell(inst_id:int):
     logging.debug ("Instrument "+str(inst_id)+": Ringing Bell")
     # Provide a visual indication and sound the bell (not if shutdown has been initiated)
-    if not common.shutdown_initiated:
-        instruments[str(inst_id)]["bellbutton"].config(bg="yellow")
-        common.root_window.after(100,lambda:reset_telegraph_button(inst_id))
-        # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
-        # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
-        if instruments[str(inst_id)]["bellsound"] is not None:
-            try: instruments[str(inst_id)]["bellsound"].play()
-            except: pass
+    instruments[str(inst_id)]["bellbutton"].config(bg="yellow")
+    common.root_window.after(100,lambda:reset_telegraph_button(inst_id))
+    # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
+    # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
+    if instruments[str(inst_id)]["bellsound"] is not None:
+        try: instruments[str(inst_id)]["bellsound"].play()
+        except: pass
     return()
 
 def reset_telegraph_button(inst_id:int):
@@ -540,9 +536,10 @@ def create_block_indicator(canvas:int, x:int, y:int, canvas_tag):
 def load_audio_file(audio_filename):
     audio_object = None
     if os.path.split(audio_filename)[1] == audio_filename:
+        current_folder = pathlib.Path(__file__).parent
+        fully_qualified_file_name = current_folder / 'resources' / audio_filename
         try:
-            with importlib.resources.path ('model_railway_signals.library.resources',audio_filename) as audio_file:
-                audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_file))
+            audio_object = simpleaudio.WaveObject.from_wave_file(str(fully_qualified_file_name))
         except Exception as exception:
             Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
                             message="Error loading audio resource file '"+str(audio_filename)+"'")

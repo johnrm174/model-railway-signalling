@@ -52,36 +52,40 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 5.x.x:
+## What's new for Release 6.0.0:
 
 > [!IMPORTANT]
-> Release 5.4.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 6.0.0 will only support the loading of layout files created by Release 5.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 5.4.0.
+> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 6.0.0.
 > You have been warned!
 
-* Additional routes for signals (giving up to 7 routes ahead of each signal):
-    * New LH3 and RH3 routes are available for selection in the signal configuration.
-    * Colour Light Signals support additional feathers for LH3 & RH3 route indications.
-    * Theatre route indicators also support these additional route indications.
-    * Semaphore route arms remain limited to MAIN, LH1, LH2, RH1 and RH2 indications.
-* Ability to define 'quick-scroll' buttons under canvas settings:
-    * Buttons are displayed on a new 'quick-scroll' bar (underneath the main menubar).
-    * Buttons will scroll the canvas to specified coordinates (within the displayed window).
-    * Provided as an alternative to the existing scroll-bars and drag-screen functionality.
-    * To improve user operation of larger schematics (especially where touchscreens are used).
-* Allow menubar font size to be increased (for improved operation with touchscreens):
-    * This new general setting will also increase the size of the new 'quick-scroll' buttons.
-* New 'Import' feature - to import another layout file into the current schematic:
-    * Enables collaboration when developing complex layouts / signalling schemes.
-* Able to specify a 'clearance delay' after signals/sensors are 'passed':
-    * Signals will turn red as soon as the signal is passed (representing the first wheelset).
-    * Track occupancy changes will be delayed until the train has 'cleared' the section.
-* Improvements to Application Upgrade utility:
-    * Will now report definitive success/failure in the user interface.
-* Minor UI improvements to improve the overall user experience during configuration:
-    * e.g. Point states can be set without having to 'enter'the point ID.
-
+* New Entry/Exit (NX) route setting feature for true prototypical operation of the schematic:
+    * Entry, exit or entry/exit buttons are supported with correct symbology.
+    * Track occupancy can be shown (with changes to signal routes as described below).
+    * 'One-click' route setting is also retained - use whatever works best for your layout.
+* The base Item ID (for creation of new objects) can now be specified under general settings:
+    * Making it easier to use different Item ID 'ranges' for different areas of the layout.
+* New Point Motor Excersising utility to continuously toggle all points on the layout:
+    * My older slow-acting point motors get a bit 'sticky' after periods of disuse.
+    * This utility can be used to exercise them for a period of time to 'free them up'.
+* New feature to trigger the playing of audio files by specified DCC commands:
+    * Uses audio output of the Signalling System and/or Remote Signalling Nodes.
+    * Enables audio such as station announcements to be triggered by DCC switches.
+* The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>:
+    * Aids identification of objects to take the pain out of configuring routes.
+* Ability to apply offsets for Signalbox Lever buttons and/or hide them in Run Mode:
+    * Can be used to provide better seperation of buttons when using touchscreens.
+    * Can be hidden completely if you are using external levers for your layout.
+* Ability to easily configure multiple objects to be 'hidden' or 'unhidden':
+    * In Edit Mode - Use'h' and 'u' to configure objects to be 'hidden' or 'unhidden'.
+    * In Run Mode - The re-configured objects will be hidden or displayed as required.
+* Minor changes to allow 'non-signalled' routes to be defined for signals:
+    * These are routes for trains passing the signal in the opposite direction.
+    * Enables more prototypical track circuit highlighting for NX panels
+* Minor improvements to File => Open and File => New:
+    * Any open configuration windows are closed to avoid confusion
+* A full documentation refresh
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

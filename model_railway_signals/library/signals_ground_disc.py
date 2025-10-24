@@ -137,7 +137,7 @@ def update_ground_disc_signal(sig_id:int):
     # If the Ground signal is slotted with a main signal and that signal is not at DANGER
     # Then the ground signal needs to show PROCEED irrespective of any other state
     slot_with = str(signals.signals[str(sig_id)]["slotwith"])
-    if signals.signal_exists(slot_with) and signals.signals[str(slot_with)]["sigstate"] != signals.signal_state_type.DANGER:
+    if signals.signal_exists(slot_with) and signals.signals[str(slot_with)]["sigclear"]:
         aspect_to_set = signals.signal_state_type.PROCEED
         log_message = " (signal is slotted with Signal "+slot_with+")"
     # Otherwise the aspect to display will depend on the state of the signal (ON or OFF)

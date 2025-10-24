@@ -24,12 +24,13 @@
 #    common.selection_buttons
 #    common.signal_route_frame
 #    common.window_controls
+#    common.sound_file_entry
 #
 #------------------------------------------------------------------------------------
 
 import os
 import copy
-import importlib.resources
+import pathlib
 
 import tkinter as Tk
 from tkinter import ttk
@@ -46,23 +47,6 @@ from .. import library
 #------------------------------------------------------------------------------------
 
 open_windows={}
-
-#------------------------------------------------------------------------------------
-# We can only use audio for the block instruments if 'simpleaudio' is installed
-# Although this package is supported across different platforms, for Windows
-# it has a dependency on Visual C++ 14.0. As this is quite a faff to install I
-# haven't made audio a hard and fast dependency for the 'model_railway_signals'
-# package as a whole - its up to the user to install if required
-#------------------------------------------------------------------------------------
-
-def is_simpleaudio_installed():
-    global simpleaudio
-    try:
-        import simpleaudio
-        return (True)
-    except Exception: pass
-    return (False)
-audio_enabled = is_simpleaudio_installed()
 
 #------------------------------------------------------------------------------------
 # Function to return a read-only list of "interlocked signals". This is the back
@@ -120,68 +104,7 @@ class linked_to_selection(common.str_int_item_id_entry_box):
                 "which has been subscribed to via MQTT networking",
                 exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
-    
-#------------------------------------------------------------------------------------
-# Class for the Sound file selection element (builds on the entry_box class)
-# Class instance methods inherited by this class are:
-#    "set_value" - will set the current value of the entry box (str)
-#    "get_value" - will return the current value of the entry box (str)
-# Class instance variables provided by this class are:
-#    "full_filename" - the fully qualified filename of the audio file
-#------------------------------------------------------------------------------------
 
-class sound_file_element(common.entry_box):
-    def __init__(self, parent_frame, label:str, tool_tip:str):
-        # Flag to test if a load file or error dialog is open or not
-        self.child_windows_open = False
-        # Create a Frame to hold the various elements
-        self.frame = Tk.Frame(parent_frame)
-        # Only enable the audio file selections if simpleaudio is installed
-        if audio_enabled:
-            button_tool_tip = "Browse to select audio file"
-            control_state = "normal"
-        else:
-            button_tool_tip = "Upload disabled - The simpleaudio package is not installed"
-            control_state = "disabled"
-        # This is the fully qualified filename (i.e. including the path)
-        self.full_filename = None
-        # Create the various UI elements
-        self.label = Tk.Label(self.frame,text=label)
-        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.frame, width=20, callback=None, tool_tip=tool_tip)
-        self.configure(state="disabled")
-        self.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.B1 = Tk.Button(self.frame, text="Browse",command=self.load, state=control_state)
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, button_tool_tip)
-        
-    def load(self):
-        self.child_windows_open = True
-        # Use the library resources folder for the initial path for the file dialog
-        # But the user can navigate away and use another sound file from somewhere else
-        with importlib.resources.files('model_railway_signals.library') / 'resources' as initial_path:
-            filename = Tk.filedialog.askopenfilename(title='Select Audio File', initialdir = initial_path,
-                    filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self.frame)
-            # Try loading/playing the selected file - with an error popup if it fails
-            if filename != () and filename != "":
-                try:
-                    simpleaudio.WaveObject.from_wave_file(filename).play()
-                except:
-                    Tk.messagebox.showerror(parent=self.frame, title="Load Error",
-                                message="Error loading audio file '"+str(filename)+"'")
-                else:
-                    # Set the filename entry to the name of the current file (split from the dir path)
-                    self.set_value(os.path.split(filename)[1])
-                    # If a resources file has been chosen then strip off the path to aid cross-platform
-                    # transfer of layout files (where the path to the resource folder may be different)
-                    if os.path.split(filename)[0] == str(initial_path):
-                        filename = os.path.split(filename)[1]
-                    self.full_filename = filename
-        self.child_windows_open = False
-
-    def is_open(self):
-        return(self.child_windows_open)
-    
 #------------------------------------------------------------------------------------
 # Class for the Sound file selections element - uses 2 instances of the element above)
 # Class instance methods provided by this class are:
@@ -193,25 +116,33 @@ class sound_file_selections():
     def __init__(self, parent_frame):
         # Create the Label Frame for the audio file selections
         self.frame = Tk.LabelFrame(parent_frame, text="Sound Files")
+        self.current_folder = pathlib.Path(__file__).parent
+        self.resources_folder = str(self.current_folder.parent / 'library/resources')
         # Create the selection elements
-        self.bell = sound_file_element(self.frame, label="Bell:", tool_tip="Audio file for the bell")
-        self.bell.frame.pack(padx=2, pady=2)
-        self.key = sound_file_element(self.frame, label="Key:", tool_tip="Audio file for telegraph key")
-        self.key.frame.pack(padx=2, pady=2)
+        self.bell = common.sound_file_entry(self.frame, label="Bell:",
+                tool_tip="Audio file for the bell", base_folder=self.resources_folder)
+        self.bell.pack(padx=2, pady=2)
+        self.key = common.sound_file_entry(self.frame, label="Key:",
+                tool_tip="Audio file for telegraph key",base_folder=self.resources_folder)
+        self.key.pack(padx=2, pady=2)
 
     def set_values(self, bell_sound:str,key_sound:str):
-        self.bell.full_filename = bell_sound
-        self.key.full_filename = key_sound
-        self.bell.set_value(os.path.split(bell_sound)[1])
-        self.key.set_value(os.path.split(key_sound)[1])
+        self.bell.set_value(bell_sound)
+        self.key.set_value(key_sound)
         
     def get_values(self):
-        return ( self.bell.full_filename,
-                 self.key.full_filename)
+        # If these are files in the application's resource folder then we remove the path
+        # from the full filename to make the configuration portable between platforms.
+        bell_sound_file, key_sound_file = self.bell.get_value(), self.key.get_value()
+        folder, filename = os.path.split(bell_sound_file)
+        if folder == self.resources_folder: bell_sound_file = filename
+        folder, filename = os.path.split(key_sound_file)
+        if folder == self.resources_folder: key_sound_file = filename
+        return(bell_sound_file, key_sound_file)
 
     def is_open(self):
         child_windows_open = self.bell.is_open() or self.key.is_open()
-        return (child_windows_open)
+        return(child_windows_open)
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Block Instrument Configuration Tab
@@ -255,7 +186,7 @@ class edit_instrument():
     def __init__(self, root, object_id):
         global open_windows
         # If there is already a  window open then we just make it jump to the top and exit
-        if object_id in open_windows.keys():
+        if object_id in open_windows.keys() and open_windows[object_id].winfo_exists():
             open_windows[object_id].lift()
             open_windows[object_id].state('normal')
             open_windows[object_id].focus_force()

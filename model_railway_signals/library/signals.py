@@ -360,10 +360,9 @@ def sig_passed_button_event(sig_id:int):
         logging.error("Signal "+str(sig_id)+": sig_passed_button_event - signal does not exist")
     else:
         logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-        # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
-        if not common.shutdown_initiated:
-            signals[str(sig_id)]["passedbutton"].config(bg="red")
-            common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
+        # Pulse the signal passed button to provide a visual indication
+        signals[str(sig_id)]["passedbutton"].config(bg="red")
+        common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
         # Reset the approach control 'released' state (if the signal supports approach control).
         # We don't reset the approach control mode  - this needs to be reset from the calling application.
         if "released" in signals[str(sig_id)].keys(): signals[str(sig_id)]["released"] = False
@@ -379,10 +378,9 @@ def approach_release_button_event(sig_id:int):
         logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not support approach control")
     else:
         logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-        # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
-        if not common.shutdown_initiated:
-            signals[str(sig_id)]["releasebutton"].config(bg="red")
-            common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
+        # Pulse the approach release button to provide a visual indication
+        signals[str(sig_id)]["releasebutton"].config(bg="red")
+        common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
         # Set the approach control 'released' state (if the signal supports approach control).
         # We also clear down the approach control mode and update the displayed signal aspects.
         signals[str(sig_id)]["released"] = True
@@ -392,14 +390,20 @@ def approach_release_button_event(sig_id:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Internal functions for "resetting" the released/passed buttons after the timeout 
+# Internal functions for "resetting" the released/passed buttons after the timeout
+# For both functions we test to see if the signal still exists to prevent exceptions
+# if the functions are run AFTER the signal has been deleted. For the Approach button,
+# we additionally check that the signal supports approach control (in case the signal
+# has been deleted and a new signal of the same ID created prior to the function being
+# called - This is primarily to prevent errors when running the automated system tests.
 # -------------------------------------------------------------------------
 
 def reset_sig_passed_button(sig_id:int):
     if signal_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg="grey85")
 
 def reset_sig_released_button(sig_id:int):
-    if signal_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg="grey85")
+    if signal_exists(sig_id) and "releasebutton" in signals[str(sig_id)].keys():
+        signals[str(sig_id)]["releasebutton"].config(bg="grey85")
 
 # -------------------------------------------------------------------------
 # Internal Function to create all the mandatory signal elements that will apply

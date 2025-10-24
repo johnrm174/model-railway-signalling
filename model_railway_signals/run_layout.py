@@ -1198,14 +1198,14 @@ def reset_layout(switch_delay:int=0):
         library.set_instrument_blocked(int(instrument_id))
     # Everything else needs to be scheduled with the specified delay so for large layouts with lots
     # of points, signals and DCC accessories we don't overload the bus by changing everything at once.
-    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_id=0, delay=0)
-    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index, switch_delay, route_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index, switch_delay, route_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index, switch_delay, route_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_button_id=0, delay=0)
+    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index, switch_delay, route_button_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index, switch_delay, route_button_id=0, delay=delay)
+    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index, switch_delay, route_button_id=0, delay=delay)
     # Finally, we schedule the task to clear down any routes that do not get automatically cleared down
     # as they are invalidated by the reset of the points, signals and switches in the route configuration
-    run_routes.schedule_tasks_to_reset_remaining_routes(switch_delay, delay=delay)
-    return()
+    delay = run_routes.schedule_tasks_to_reset_remaining_routes(switch_delay, delay=delay)
+    return(delay)
 
 ##################################################################################################
 # These are the run-layout callbacks (set up when creating the library objects on the schematic)
@@ -1339,7 +1339,7 @@ def instrument_updated_callback(instrument_id:int):
 
 def switch_updated_callback(switch_id:int, route_id:int=0):
     if enhanced_debugging: print("########## switch_updated_callback "+str(switch_id))
-    run_routes.check_routes_valid_after_switch_change(switch_id, route_id)
+    run_routes.check_routes_valid_after_switch_change(switch_id,route_id)
     return()
 
 def lever_switched_callback(lever_id:int):

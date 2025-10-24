@@ -29,6 +29,7 @@
 #    common.selection_buttons
 #    common.validated_keycode_entry_box
 #    common.window_controls
+#    common.button_configuration
 #
 #------------------------------------------------------------------------------------
 
@@ -94,7 +95,7 @@ class signal_configuration(Tk.LabelFrame):
         self.button1 = Tk.Radiobutton(self.frame1, text="Signal", variable=self.signal_selection, value=1, command=self.validate_buttons)
         self.button1.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button1TT = common.CreateToolTip(self.button1, text="Select to control the main signal aspect/arm")
-        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidary", variable=self.signal_selection, value=2, command=self.validate_buttons)
+        self.button2 = Tk.Radiobutton(self.frame1, text="Subsidiary", variable=self.signal_selection, value=2, command=self.validate_buttons)
         self.button2.pack(padx=2, pady=2, side=Tk.LEFT)
         self.button2TT = common.CreateToolTip(self.button2)
         self.button3 = Tk.Radiobutton(self.frame1, text="Dist arm", variable=self.signal_selection, value=3, command=self.validate_buttons)
@@ -116,14 +117,14 @@ class signal_configuration(Tk.LabelFrame):
         # Validate the signal ID entry box value to accept it
         self.signalid.validate()
         # Validate and the buttons (updating the tool tips as required)    
-        button2_default_tt = "Select to control the subsidary signal aspect/arm"
+        button2_default_tt = "Select to control the subsidiary signal aspect/arm"
         button3_default_tt = "Select to control the secondary distant arm (semaphore home signals with secondary distant arms only)"
         valid = True
         if self.signalid.get_value() > 0:
             signal_object = objects.schematic_objects[objects.signal(self.signalid.get_value())]
             if self.signal_selection.get() == 2 and not has_subsidary(signal_object):
                 self.button2.configure(fg="red")
-                self.button2TT.text = "Signal does not have a subsidary"
+                self.button2TT.text = "Signal does not have a subsidiary"
                 self.button3.configure(fg="black")
                 self.button3TT.text = button3_default_tt
                 valid = False
@@ -317,7 +318,7 @@ class edit_lever():
     def __init__(self, root, object_id):
         global open_windows
         # If there is already a  window open then we just make it jump to the top and exit
-        if object_id in open_windows.keys():
+        if object_id in open_windows.keys() and open_windows[object_id].winfo_exists():
             open_windows[object_id].lift()
             open_windows[object_id].state('normal')
             open_windows[object_id].focus_force()
@@ -343,6 +344,9 @@ class edit_lever():
                                         "Select the type of signalbox lever", callback=self.lever_type_changed,
                                      button_labels=("Spare", "Signal", "Point"))
             self.levertype.pack(padx=2, pady=2, fill='x')
+            # Create the button offset Selections
+            self.buttonoffsets = common.button_configuration(self.main_frame)
+            self.buttonoffsets.pack(padx=2, pady=2, fill='x')
             # Create the signal and point selection elements
             self.signal = signal_configuration(self.main_frame)
             self.signal.pack(padx=2, pady=2, fill='x')
@@ -394,6 +398,11 @@ class edit_lever():
             self.window.title("Signalbox Lever "+str(item_id))
             linked_signal = objects.schematic_objects[self.object_id]["linkedsignal"]
             linked_point = objects.schematic_objects[self.object_id]["linkedpoint"] 
+            # These are the lever button position offsets:
+            hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
+            xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
+            yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
+            self.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
             # Work out the lever type selection to set(signal, point or spare)
             lever_type = objects.schematic_objects[self.object_id]["itemtype"]
             if  lever_type in (2, 3): lever_selection = 2
@@ -430,13 +439,17 @@ class edit_lever():
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
         elif ( self.leverid.validate() and self.point.validate() and self.signal.validate() and
-               self.keycodes.validate() ):
+               self.keycodes.validate() and self.buttonoffsets.validate() ):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.leverid.get_value()
             new_object_configuration["onkeycode"] = self.keycodes.onkeycode.get_value()
             new_object_configuration["offkeycode"] = self.keycodes.offkeycode.get_value()
+            hidden, xoffset, yoffset = self.buttonoffsets.get_values()
+            new_object_configuration["hidebuttons"] = hidden
+            new_object_configuration["xbuttonoffset"] = xoffset
+            new_object_configuration["ybuttonoffset"] = yoffset
             point_id, point_lever_subtype = self.point.get_values()
             new_object_configuration["linkedpoint"] = point_id
             new_object_configuration["switchpoint"] = (point_lever_subtype == 1)

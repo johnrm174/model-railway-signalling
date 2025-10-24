@@ -5,7 +5,7 @@
 # External API functions intended for use by other editor modules:
 #
 #    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
-#    update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
+#    set_base_item_id(item_id) - Set the base value for creating new item IDs
 #    set_bbox - Common function to create/update the boundary box for a schematic object
 #    new_item_id - Common function - common function to return the next 'free' item ID
 #    get_offset_colour - Get a colour with a specified brightness offset to a specified colour
@@ -101,13 +101,16 @@ def switch(ID:int): return (switch_index[str(ID)])
 def lever(ID:int): return (lever_index[str(ID)])
 
 #------------------------------------------------------------------------------------
-# Externally used functions to see if a DCC Switch exists. We need to have a specific
-# Function here rather than use the Library function 'button_exists' as both Routes
-# and DCC Switches use the common button library objects
+# Externally used functions to see if a DCC Switch or route exists. We need to have
+# a specific Function here rather than use the Library function 'button_exists' as
+# both Route Buttons and DCC Switches use the common button library objects
 #------------------------------------------------------------------------------------
 
 def switch_exists(ID:int):
     return (str(ID) in switch_index.keys())
+
+def route_exists(ID:int):
+    return (str(ID) in route_index.keys())
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
@@ -162,15 +165,31 @@ def set_bbox(object_id:str, canvas_tags:str):
 #------------------------------------------------------------------------------------
 # Internal function to assign a unique type-specific id for a newly created object
 # This function is called on object creation or object copy/paste and takes in the
-# function to call to see if the Item_ID already exists for a specific item type
+# function to call to see if the Item_ID already exists for a specific item type.
+# From Release 5.5.0, we allow the base item id to be specified by the user. There
+# is a limit of 999 instances of any particular object type - if we get to 999
+# without finding a 'free' ID then we go back to 1 and start looking from there.
+# In the unlikely event we don't find a 'free' item ID we return None.
 # This is used by all the object type-specific creation functions.
 #------------------------------------------------------------------------------------
 
+base_item_id = 1
+
+def set_base_item_id(item_id:int):
+    global base_item_id
+    base_item_id = item_id
+
 def new_item_id(exists_function):
-    item_id = 1
+    item_id = base_item_id
+    range_reset = False
     while True:
         if not exists_function(item_id): break
         item_id += 1
+        if item_id > 999 and not range_reset:
+            item_id, range_reset = 1, True
+        elif item_id > 999 and range_reset:
+            item_id = None
+            break
     return(item_id)
 
 #------------------------------------------------------------------------------------

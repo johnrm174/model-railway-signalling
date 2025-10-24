@@ -8,6 +8,7 @@
 #    edit_logging_settings(root, logging_update_callback)
 #    edit_canvas_settings(root, canvas_update_callback)
 #    edit_gpio_settings(root, gpio_update_callback)
+#    edit_sound_settings(root, gpio_update_callback)
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - Get the current canvas settings (for editing)
@@ -31,6 +32,8 @@
 #    common.window_controls
 #    common.CreateToolTip
 #    common.entry_box_grid
+#    common.sound_file_entry
+#    common.grid_of_widgets
 #
 # Uses the following library functions:
 #    library.get_list_of_available_gpio_ports() - to get a list of supported ports
@@ -44,6 +47,7 @@ from tkinter import ttk
 
 import time
 import datetime
+import logging
 
 from .. import common
 from .. import settings
@@ -136,7 +140,7 @@ class edit_canvas_settings():
     def __init__(self, root_window, update_function):
         global canvas_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if canvas_settings_window is not None:
+        if canvas_settings_window is not None and canvas_settings_window.winfo_exists():
             canvas_settings_window.lift()
             canvas_settings_window.state('normal')
             canvas_settings_window.focus_force()
@@ -288,7 +292,7 @@ class sprog_addressing_information():
     def __init__(self, parent_window):
         global sprog_settings_learn_more_window
         # Only create the window if one doesn't already exist
-        if sprog_settings_learn_more_window is not None:
+        if sprog_settings_learn_more_window is not None and sprog_settings_learn_more_window.winfo_exists():
             sprog_settings_learn_more_window.lift()
             sprog_settings_learn_more_window.state('normal')
             sprog_settings_learn_more_window.focus_force()
@@ -323,7 +327,7 @@ class edit_sprog_settings():
     def __init__(self, root_window, connect_function, update_function):
         global edit_sprog_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_sprog_settings_window is not None:
+        if edit_sprog_settings_window is not None and edit_sprog_settings_window.winfo_exists():
             edit_sprog_settings_window.lift()
             edit_sprog_settings_window.state('normal')
             edit_sprog_settings_window.focus_force()
@@ -483,7 +487,7 @@ class edit_logging_settings():
     def __init__(self, root_window, update_function):
         global edit_logging_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_logging_settings_window is not None:
+        if edit_logging_settings_window is not None and edit_logging_settings_window.winfo_exists():
             edit_logging_settings_window.lift()
             edit_logging_settings_window.state('normal')
             edit_logging_settings_window.focus_force()
@@ -754,7 +758,7 @@ class edit_mqtt_settings():
     def __init__(self, root_window, update_function):
         global edit_mqtt_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_mqtt_settings_window is not None:
+        if edit_mqtt_settings_window is not None and edit_mqtt_settings_window.winfo_exists():
             edit_mqtt_settings_window.lift()
             edit_mqtt_settings_window.state('normal')
             edit_mqtt_settings_window.focus_force()
@@ -1000,7 +1004,7 @@ class edit_gpio_settings():
     def __init__(self, root_window, update_function):
         global edit_gpio_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_gpio_settings_window is not None:
+        if edit_gpio_settings_window is not None and edit_gpio_settings_window.winfo_exists():
             edit_gpio_settings_window.lift()
             edit_gpio_settings_window.state('normal')
             edit_gpio_settings_window.focus_force()
@@ -1107,7 +1111,7 @@ class edit_general_settings():
     def __init__(self, root_window, update_function):
         global edit_general_settings_window
         # If there is already a  window open then we just make it jump to the top and exit
-        if edit_general_settings_window is not None:
+        if edit_general_settings_window is not None and edit_general_settings_window.winfo_exists():
             edit_general_settings_window.lift()
             edit_general_settings_window.state('normal')
             edit_general_settings_window.focus_force()
@@ -1159,6 +1163,19 @@ class edit_general_settings():
                         "switching events when resetting the layout back to its default state (0-5000ms)")
             self.resetdelay.pack(padx=2, pady=2)
             #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Edit Layout settings
+            #----------------------------------------------------------------------------------
+            self.frame3 = Tk.LabelFrame(self.window, text = "Edit Layout settings")
+            self.frame3.pack(padx=2, pady=2, fill=Tk.BOTH)
+            self.frame3subframe1 = Tk.Frame(self.frame3)
+            self.frame3subframe1.pack()
+            self.label2 = Tk.Label(self.frame3subframe1, text="Base ID for new objects:")
+            self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.baseitemid = common.integer_entry_box(self.frame3subframe1, width=4, min_value=1, max_value= 901,
+                        allow_empty=False, tool_tip="Specify the base Item ID (for generating new unique "+
+                        "item IDs on creation of new schematic objects)")
+            self.baseitemid.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             #----------------------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -1175,15 +1192,17 @@ class edit_general_settings():
         self.leverinterlocking.set_value(settings.get_general("leverinterlocking"))
         self.resetdelay.set_value(settings.get_general("resetdelay"))
         self.fontsize.set_value(settings.get_general("menubarfontsize"))
+        self.baseitemid.set_value(settings.get_general("baseitemid"))
 
     def save_state(self, close_window:bool):
-        if self.resetdelay.validate() and self.fontsize.validate():
+        if self.resetdelay.validate() and self.fontsize.validate() and self.baseitemid.validate():
             self.validation_error.pack_forget()
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
             settings.set_general("leverpopupwarnings", self.enableleverpopups.get_value())
             settings.set_general("leverinterlocking", self.leverinterlocking.get_value())
             settings.set_general("resetdelay", self.resetdelay.get_value())
             settings.set_general("menubarfontsize", self.fontsize.get_value())
+            settings.set_general("baseitemid", self.baseitemid.get_value())
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )
@@ -1195,6 +1214,119 @@ class edit_general_settings():
     def close_window(self):
         global edit_general_settings_window
         edit_general_settings_window = None
+        self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Class for the Sound Settings toolbar window. Note the init function takes
+# in a callback so it can apply the updated settings in the main editor application.
+# Note also that if a window is already open then we just raise it and exit.
+#------------------------------------------------------------------------------------
+
+try:
+    import simpleaudio
+    audio_enabled = True
+except Exception:
+    audio_enabled = False
+
+class sound_file_mapping(Tk.Frame):
+    def __init__(self, parent_frame):
+        super().__init__(parent_frame)
+        self.soundfile = common.sound_file_entry(self, label="Sound file (WAV):",
+                            tool_tip="Selected WAV sound file",base_folder="")
+        self.soundfile.pack(side=Tk.LEFT)
+        self.testbutton = Tk.Button(self, text="Test", command=self.play)
+        self.testbutton.pack(side=Tk.LEFT)
+        self.testbuttonTT = common.CreateToolTip(self.testbutton, "Test playback of the audio file")
+        if not audio_enabled:
+            self.testbutton.configure(state="disabled")
+            self.testbuttonTT.text = "Playback disabled - The simpleaudio package is not installed"
+        self.label1 = Tk.Label(self, text="Trigger:")
+        self.label1.pack(side=Tk.LEFT)
+        self.dcccommand = common.validated_dcc_command_entry(self, item_type="sound",
+                        tool_tip="Enter the DCC address to trigger playback of the sound file")
+        self.dcccommand.pack(side=Tk.LEFT)
+        self.label = Tk.Label(self, text="   ")
+        self.label.pack(side=Tk.LEFT)
+
+    def play(self):
+        try:
+            filename = self.soundfile.get_value()
+            audio_object = simpleaudio.WaveObject.from_wave_file(filename)
+            audio_object.play()
+        except Exception as exception:
+            logging.error("Error Playing file '"+str(filename)+"'")
+            logging.error("Reported Exception: "+str(exception))
+            Tk.messagebox.showerror(parent=self, title="Load Error",
+                        message="Error playing audio file '"+str(filename)+"'")
+
+    def validate(self):
+        return(self.dcccommand.validate())
+
+    def get_value(self):
+        # Returned value is a list comprising [filename:str, dcc_command]
+        # The DCC command is a list comprising [dcc_address:int, dcc_state:bool]
+        return([self.soundfile.get_value(), self.dcccommand.get_value()])
+
+    def set_value(self, value_to_set:list):
+        # value_to_set is a list comprising [filename:str, dcc_command]
+        # The DCC command is a list comprising [dcc_address:int, dcc_state:bool]
+        self.soundfile.set_value(value_to_set[0])
+        self.dcccommand.set_value(value_to_set[1])
+        return()
+
+edit_sounds_settings_window = None
+
+class edit_sounds_settings():
+    def __init__(self, root_window, update_function):
+        global edit_sounds_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_sounds_settings_window is not None and edit_sounds_settings_window.winfo_exists():
+            edit_sounds_settings_window.lift()
+            edit_sounds_settings_window.state('normal')
+            edit_sounds_settings_window.focus_force()
+        else:
+            self.update_function = update_function
+            # Create the (non resizable) top level window for the General Settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Sounds")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_sounds_settings_window = self.window
+            #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Sound settings
+            #----------------------------------------------------------------------------------
+            self.frame1 = Tk.LabelFrame(self.window, text="Sound files and DCC command triggers")
+            self.frame1.pack(padx=2, pady=2)
+            self.dccmappings = common.grid_of_widgets(self.frame1, sound_file_mapping, columns=1)
+            self.dccmappings.pack()
+            #----------------------------------------------------------------------------------
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #----------------------------------------------------------------------------------
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # Load the initial UI state
+            self.load_state()
+
+    def load_state(self):
+        self.dccmappings.set_values(settings.get_control("dccsoundmappings"))
+
+    def save_state(self, close_window:bool):
+        if self.dccmappings.validate():
+            self.validation_error.pack_forget()
+            settings.set_control("dccsoundmappings",self.dccmappings.get_values())
+            # Make the callback to apply the updated settings
+            self.update_function()
+            # close the window (on OK )
+            if close_window: self.close_window()
+        else:
+            # Display the validation error message
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls)
+
+    def close_window(self):
+        global edit_sounds_settings_window
+        edit_sounds_settings_window = None
         self.window.destroy()
 
 #############################################################################################

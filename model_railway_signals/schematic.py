@@ -17,6 +17,7 @@
 #    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
 #    objects.flip_objects(list of obj IDs) - Flip the selected objects on the canvas
+#    objects.hide_objects(list of obj IDs, hide:bool) - Hide or unhide the selected objects (for run mode)
 #    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
 #    objects.undo() / objects.redo() - Undo and re-do functions as you would expect
@@ -54,7 +55,7 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
-import importlib.resources
+import pathlib
 import math
 import copy
 
@@ -417,6 +418,22 @@ def rotate_selected_objects(event=None):
 def flip_selected_objects(event=None):
     objects.flip_objects(schematic_state["selectedobjects"])
     return()
+
+#------------------------------------------------------------------------------------
+# Internal functions to Hide / Unhide all selected Objects ('cntl-h' and 'cntl-u')
+#------------------------------------------------------------------------------------
+
+def hide_selected_objects(event=None):
+    objects.hide_objects(schematic_state["selectedobjects"], hide=True)
+    return()
+
+def unhide_selected_objects(event=None):
+    objects.hide_objects(schematic_state["selectedobjects"], hide=False)
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal functions to Rotate / flip all selected Objects ('r' key and popup menu)
+#------------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------------
 # Internal function to return the ID of the Object the cursor is "highlighting"
@@ -871,6 +888,13 @@ def schematic_redo(event=None):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to toggle on/off the display of line IDs
+#------------------------------------------------------------------------------------
+
+def toggle_item_ids(event=None):
+    library.toggle_item_ids()
+
+#------------------------------------------------------------------------------------
 # Internal Functions to enable/disable canvas keypress events during an object move,
 # line edit or area selection (edit mode) or a canvas scroll operation (run mode) to
 # ensure deterministic behavior. Note that when an object move, line edit or area selection
@@ -930,7 +954,10 @@ def enable_edit_mode_event_bindings():
     canvas.bind('<Control-Key-c>', copy_selected_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
+    canvas.bind('<Control-Key-i>', toggle_item_ids)
     canvas.bind('<Control-Key-s>', canvas_event_callback)
+    canvas.bind('h', hide_selected_objects)
+    canvas.bind('u', unhide_selected_objects)
     canvas.bind('r', rotate_selected_objects)
     canvas.bind('f', flip_selected_objects)
     canvas.bind('s', snap_selected_objects_to_grid)      
@@ -951,7 +978,10 @@ def disable_edit_mode_event_bindings():
     canvas.unbind('<Control-Key-c>')
     canvas.unbind('<Control-Key-z>')
     canvas.unbind('<Control-Key-y>')
+    canvas.unbind('<Control-Key-i>')
     canvas.unbind('<Control-Key-s>')
+    canvas.unbind('h')
+    canvas.unbind('u')
     canvas.unbind('r')
     canvas.unbind('f')
     canvas.unbind('s')
@@ -1098,16 +1128,15 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                                         library.lever_type.spare.value)] ]
     # Create the buttons we need (Note that the button images are added to a global
     # list so they remain in scope (otherwise the buttons won't work)
-    resource_folder = 'model_railway_signals.resources'
+    current_folder = pathlib.Path(__file__). parent
     for index, button in enumerate (selections):
-        file_name = selections[index][0]
+        fully_qualified_file_name = current_folder / 'resources' / (selections[index][0]+".png")
         try:
             # Load the image file for the button if there is one
-            with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                button_image = Tk.PhotoImage(file=file_path)
-                button_images.append(button_image)
-                button = Tk.Button (button_frame, image=button_image,command=selections[index][1])
-                button.pack(padx=2, pady=2, fill='x')
+            button_image = Tk.PhotoImage(file=fully_qualified_file_name)
+            button_images.append(button_image)
+            button = Tk.Button (button_frame, image=button_image,command=selections[index][1])
+            button.pack(padx=2, pady=2, fill='x')
         except:
             # Else fall back to using a text label (filename) for the button
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")

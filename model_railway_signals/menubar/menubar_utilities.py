@@ -398,7 +398,7 @@ class dcc_programming():
     def __init__(self, root_window, dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function):
         global dcc_programming_window
         # If there is already a dcc programming window open then we just make it jump to the top and exit
-        if dcc_programming_window is not None:
+        if dcc_programming_window is not None and dcc_programming_window.winfo_exists():
             dcc_programming_window.lift()
             dcc_programming_window.state('normal')
             dcc_programming_window.focus_force()
@@ -440,7 +440,7 @@ class dcc_mappings():
     def __init__(self, root_window):
         global dcc_mappings_window
         # If there is already a window open then we just make it jump to the top and exit
-        if dcc_mappings_window is not None:
+        if dcc_mappings_window is not None and dcc_mappings_window.winfo_exists():
             dcc_mappings_window.lift()
             dcc_mappings_window.state('normal')
             dcc_mappings_window.focus_force()
@@ -543,7 +543,7 @@ class bulk_renumbering():
     def __init__(self, root_window):
         global renumbering_utility_window
         # If there is already a window open then we just make it jump to the top and exit
-        if renumbering_utility_window is not None:
+        if renumbering_utility_window is not None and renumbering_utility_window.winfo_exists():
             renumbering_utility_window.lift()
             renumbering_utility_window.state('normal')
             renumbering_utility_window.focus_force()
@@ -763,7 +763,7 @@ class application_upgrade():
     def __init__(self, root_window):
         global upgrade_utility_window
         # If there is already a window open then we just make it jump to the top and exit
-        if upgrade_utility_window is not None:
+        if upgrade_utility_window is not None and upgrade_utility_window.winfo_exists():
             upgrade_utility_window.lift()
             upgrade_utility_window.state('normal')
             upgrade_utility_window.focus_force()
@@ -876,7 +876,7 @@ class import_layout():
     def __init__(self, root_window, import_schematic_callback):
         global import_utility_window
         # If there is already a window open then we just make it jump to the top and exit
-        if import_utility_window is not None:
+        if import_utility_window is not None and import_utility_window.winfo_exists():
             import_utility_window.lift()
             import_utility_window.state('normal')
             import_utility_window.focus_force()
@@ -935,6 +935,148 @@ class import_layout():
     def close_window(self):
         global import_utility_window
         import_utility_window = None
+        self.window.destroy()
+
+#---------------------------------------------------------------------------------------
+# Class for the "Exercise Points" utility window (uses the classes above)
+#---------------------------------------------------------------------------------------
+
+exercise_points_window = None
+
+class exercise_points():
+    def __init__(self, root_window, reset_function):
+        global exercise_points_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if exercise_points_window is not None and exercise_points_window.winfo_exists():
+            exercise_points_window.lift()
+            exercise_points_window.state('normal')
+            exercise_points_window.focus_force()
+        else:
+            # Create the variables we need
+            self.start_time = None
+            self.list_of_point_ids = []
+            self.point_list_index = 0
+            self.next_event_scheduled = None
+            self.reset_function = reset_function
+            # Create the top level window
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Exercise Point Motors")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            exercise_points_window = self.window
+            # Create the descriptive text for the import utility window
+            self.text1 = Tk.Label(self.window, text=
+                "Utility to exercise all point motors on the layout before a running session.")
+            self.text1.pack(padx=5, pady=5)
+            self.text2 = Tk.Label(self.window, text=
+                "Sometimes, older slow acting point motors can be a bit 'sticky' if they haven't\n"+
+                "been used for a while - This utility continuously cycles through all the\n"+
+                "points on the layout, sending out the DCC commands to toggle their state\n"+
+                "and 'free them up' before you need to switch them in your running session.")
+            self.text2.pack(padx=5, pady=5)
+            self.text3 = Tk.Label(self.window, text=
+                "Note that the layout will be Reset to prevent any warnings.")
+            self.text3.pack(padx=5, pady=5)
+            # Create a frame for the parameters
+            self.frame1 = Tk.Frame(self.window)
+            self.frame1.pack(padx=5, pady=5)
+            # Crete a subframe to center everything in
+            self.L1 =Tk.Label(self.frame1, text="Switching delay (ms):")
+            self.L1.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.EB1 = common.integer_entry_box(self.frame1, width=4, min_value=100, max_value=5000,
+                            tool_tip="Specify the delay between toggling each point (100-5000ms)")
+            self.EB1.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.L2 =Tk.Label(self.frame1, text="     Exercise duration (minutes):")
+            self.L2.pack(side=Tk.LEFT, padx=2, pady=5)
+            self.EB2 = common.integer_entry_box(self.frame1, width=4, min_value=1, max_value=60,
+                            tool_tip="Specify the total duration for exercising the points (1-60 minutes)")
+            self.EB2.pack(side=Tk.LEFT, padx=2, pady=5)
+            # Create the buttons and tooltip
+            self.frame2=Tk.Frame(self.window)
+            self.frame2.pack(padx=5, pady=5)
+            self.B1 = Tk.Button(self.frame2, text = "Start", command=self.reset)
+            self.TT1 = common.CreateToolTip(self.B1, "Start excercising the points")
+            self.B1.pack(padx=5, pady=5, side=Tk.LEFT)
+            self.B2 = Tk.Button(self.frame2, text = "Stop", command=self.stop)
+            self.TT1 = common.CreateToolTip(self.B2, "Stop exercising the points")
+            self.B2.pack(padx=5, pady=5, side=Tk.LEFT)
+            self.B3 = Tk.Button(self.frame2, text = "Cancel / Close", command=self.close_window)
+            self.TT1 = common.CreateToolTip(self.B3, "Close the window")
+            self.B3.pack(padx=5, pady=5, side=Tk.LEFT)
+            # Set the initial values and states
+            self.EB1.set_value(500)
+            self.EB2.set_value(5)
+            self.B1.config(state="normal")
+            self.B2.config(state="disabled")
+            self.B3.config(state="normal")
+
+    def null_function(self):
+        pass
+
+    def reset(self):
+        if self.EB1.validate() and self.EB2.validate():
+            # Disable everything apart from the STOP button
+            self.B1.config(state="disabled")
+            self.B2.config(state="normal")
+            self.B3.config(state="disabled")
+            self.window.protocol("WM_DELETE_WINDOW", self.null_function)
+            # Reset the layout back to its default state using the provided callback function
+            # and schedule the actual start for when all reset layout actions are complete.
+            # If the returned delay is 'None' that means the user has cancelled the reset.
+            delay = self.reset_function()
+            if delay is not None: self.window.after(delay+100, self.start)
+            else: self.stop()
+
+    def start(self):
+        # Cycle through all the points to switch the FPLs OFF if required.
+        # This is so we don't get any warnings whilst we are toggling the points.
+        for point_id in objects.point_index.keys():
+            has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
+            if has_fpl and library.fpl_active(int(point_id)): library.toggle_fpl(int(point_id))
+        # Take a copy of the point index (so it can't change underneath us)
+        self.list_of_point_ids = list(objects.point_index.keys())
+        self.point_list_index = 0
+        # Schedule the first event as long as there are points to switch
+        self.start_time = time.time()
+        if len(self.list_of_point_ids) > 0:
+            self.next_event_scheduled = self.window.after(self.EB1.get_value(), self.toggle_point)
+        else:
+            self.stop()
+
+    def toggle_point(self):
+        # Check to see if we have reached the duration specified by the user
+        if time.time() > self.start_time + self.EB2.get_value() * 60:
+            self.stop()
+        else:
+            # Only toggle the point if the point still exists on the schematic. Note that
+            # we don't toggle points that are configured to be switched with another point.
+            point_id = self.list_of_point_ids[self.point_list_index]
+            if point_id in objects.point_index.keys():
+                auto_point = objects.schematic_objects[objects.point(point_id)]["automatic"]
+                if not auto_point: library.toggle_point(int(point_id))
+            # Schedule the event to toggle the next point
+            self.point_list_index = self.point_list_index + 1
+            if self.point_list_index > len(self.list_of_point_ids) - 1: self.point_list_index = 0
+            self.next_event_scheduled = self.window.after(self.EB1.get_value(), self.toggle_point)
+
+    def stop(self):
+        # Cancel the next scheduled point switching event
+        next_event_scheduled = self.next_event_scheduled
+        self.next_event_scheduled = None
+        if next_event_scheduled: self.window.after_cancel(next_event_scheduled)
+         # Cycle through all the points to switch the FPL to ON if required
+        for point_id in objects.point_index.keys():
+            has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
+            if has_fpl and not library.fpl_active(int(point_id)): library.toggle_fpl(int(point_id))
+        # Re-enable the START/CLOSE buttons and disable the STOP button
+        self.B1.config(state="normal")
+        self.B2.config(state="disabled")
+        self.B3.config(state="normal")
+        self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+
+    def close_window(self):
+        global exercise_points_window
+        exercise_points_window = None
         self.window.destroy()
 
 #############################################################################################

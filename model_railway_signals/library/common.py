@@ -24,6 +24,8 @@
 #                        reported exceptions caused by subsequent MQTT and GPIO events)
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#   toggle_item_ids() - toggles the display of Item IDs on/of (in Edit Mode)
+#   bring_item_ids_to_front() - brings Item IDs to the front (in Edit Mode)
 #
 # External API - classes and functions (used by the other library modules):
 #
@@ -41,7 +43,6 @@
 
 import math
 import logging
-import time
 import queue
 import tkinter as Tk
 
@@ -57,6 +58,7 @@ from . import block_instruments
 from . import dcc_control
 from . import buttons
 from . import points
+from . import levers
 from . import lines
 from . import signals
 
@@ -66,12 +68,12 @@ from . import signals
 
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
-# Global variable to signal (to other modules) that application is closing
+# Global flag to indicate that the application is closing
 shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
 # Global flag to track the mode (set via the configure_edit_mode function)
-run_mode = False
+editing_enabled = False
 # Global Flag to enable or disable the processing of keypress events
 keypresses_enabled = True
 
@@ -151,7 +153,7 @@ def display_warning(canvas, message:str):
 keyboard_mappings= {}
 
 def keyboard_handler(event):
-    if run_mode and keypresses_enabled:
+    if not editing_enabled and keypresses_enabled:
         debug_string = "Schematic Keypress event: Keycode="+str(event.keycode)
         if len(event.char) == 1: debug_string = debug_string + " - Character="+repr(event.char)
         logging.debug(debug_string)
@@ -293,19 +295,11 @@ def shutdown_step4():
     return()
 
 def shutdown_step5():
-    # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
-    # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
-    # (although its unlikely the user would initiate a shut down until these have finished)
-    timeout_start = time.time()
-    while time.time() < timeout_start + 30:
-        if root_window.tk.call('after','info') != "":
-            root_window.update()
-            time.sleep(0.01)
-        else:
-            logging.info ("Exiting Application")
-            break
-    if time.time() >= timeout_start + 30:
-        logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+    # Cancel any tasks we have scheduled via the tkinter 'after' method
+    scheduled_after_events = root_window.tk.call('after','info')
+    for scheduled_after_event in scheduled_after_events:
+        root_window.after_cancel(scheduled_after_event)
+    # Kill the application by destroying the main root window
     root_window.destroy()
     return()
 
@@ -314,8 +308,9 @@ def shutdown_step5():
 #------------------------------------------------------------------------------------
 
 def configure_edit_mode(edit_mode:bool):
-    global run_mode
-    run_mode = not edit_mode
+    global editing_enabled
+    editing_enabled = edit_mode
+    # Configure each library module that needs to know the mode
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
     text_boxes.configure_edit_mode(edit_mode)
@@ -323,6 +318,45 @@ def configure_edit_mode(edit_mode:bool):
     points.configure_edit_mode(edit_mode)
     lines.configure_edit_mode(edit_mode)
     signals.configure_edit_mode(edit_mode)
+    levers.configure_edit_mode(edit_mode)
+    # Toggle the hiding/display of item IDs as appropriate
+    if edit_mode and item_ids_displayed: show_item_ids()
+    else: hide_item_ids()
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Library function to show/hide Item IDs in edit mode
+#---------------------------------------------------------------------------------------------
+
+item_ids_displayed = False
+
+def show_item_ids():
+    lines.show_line_ids()
+    buttons.show_button_ids()
+    points.show_point_ids()
+    bring_item_ids_to_front()
+    return()
+
+def hide_item_ids():
+    lines.hide_line_ids()
+    buttons.hide_button_ids()
+    points.hide_point_ids()
+    return()
+
+def toggle_item_ids():
+    global item_ids_displayed
+    if not item_ids_displayed:
+        item_ids_displayed = True
+        show_item_ids()
+    else:
+        item_ids_displayed = False
+        hide_item_ids()
+    return()
+
+def bring_item_ids_to_front():
+    lines.bring_line_ids_to_front()
+    buttons.bring_button_ids_to_front()
+    points.bring_point_ids_to_front()
     return()
 
 # -------------------------------------------------------------------------
@@ -357,19 +391,18 @@ def handle_callback_in_tkinter_thread(*args):
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
-    if not shutdown_initiated:
-        event_queue.put(callback_function)
-        # When loading a layout file on startup, there were a number of possible edge cases that could cause
-        # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
-        # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
-        # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
-        # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
-        # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
-        try:
-            root_window.event_generate("<<ExtCallback>>", when="tail")
-        except Exception as exception:
-            logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
-            logging.error(str(exception))
+    event_queue.put(callback_function)
+    # When loading a layout file on startup, there were a number of possible edge cases that could cause
+    # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
+    # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
+    # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
+    # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
+    # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
+    try:
+        root_window.event_generate("<<ExtCallback>>", when="tail")
+    except Exception as exception:
+        logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
+        logging.error(str(exception))
     return()
 
 ##################################################################################################

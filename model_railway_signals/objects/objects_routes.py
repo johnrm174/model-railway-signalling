@@ -64,195 +64,268 @@ from .. import library
 #------------------------------------------------------------------------------------
 
 default_route_object = copy.deepcopy(objects_common.default_object)
+#------------------------------------------------------------------------------------
+# The following parameters apply to ALL routes contained in the route button definition
+#------------------------------------------------------------------------------------
 default_route_object["item"] = objects_common.object_type.route
 default_route_object["routename"] = "Route"
-default_route_object["routedescription"] = "Route description (Run Mode tooltip)"
+default_route_object["routedescription"] = "Route Button description (Run Mode tooltip)"
 # Styles are initially set to the default styles (defensive programming)
 default_route_object["buttonwidth"] = settings.get_style("routebuttons", "buttonwidth")
 default_route_object["buttoncolour"] = settings.get_style("routebuttons", "buttoncolour")
 default_route_object["textcolourtype"] = settings.get_style("routebuttons", "textcolourtype")
 default_route_object["textfonttuple"] = settings.get_style("routebuttons", "textfonttuple")
-# Signals and subsidaries on route comprise variable length lists of Item IDs
-default_route_object["signalsonroute"] = []
-default_route_object["subsidariesonroute"] = []
-# Signals and subsidaries on route comprise a dictionary {"item_id" : required_state}
-default_route_object["pointsonroute"] = {}
-default_route_object["switchesonroute"] = {}
-# lines and points to highlight comprise variable length lists of Item IDs
-default_route_object["linestohighlight"] = []
-default_route_object["pointstohighlight"] = []
+# From Release 5.3.0, the application supports NX (entry/exit) panel type operation, providing
+# a signalling experience similar to the NX panels used on the modern railway network
+# Route buttons can now be defined as 'entry', 'exit', 'entry/exit' or 'normal' buttons
+# The default is 'Normal' route buttons (i.e. the same behavior as previous releases)
+default_route_object["entrybutton"] = False
+default_route_object["exitbutton"] = False
 # Other object-specific parameters
-default_route_object["routecolour"] = "black"
 default_route_object["switchdelay"] = 0
 default_route_object["resetpoints"] = False
 default_route_object["resetswitches"] = False
-default_route_object["tracksensor"] = 0
 default_route_object["setupsensor"] = 0
+# Routes are normally 'reset' if signals, points or switches along the route are changed
+# If required, 'reset' of routes for signal and switch changes can be inhibited
+default_route_object["resetonsignalchanges"] = True
+default_route_object["resetonswitchchanges"] = True
+#------------------------------------------------------------------------------------
+# To support NX panel type operation, each route button can now hold multiple route
+# definitions stored as a list (the default is a single 'normal' route definition).
+#------------------------------------------------------------------------------------
+default_route_definition = {}
+default_route_definition["routenotes"] = "Notes related to the route"
+default_route_definition["routecolour"] = "white"
+# The "exitbutton" defines the exit button associated with an 'entry' route button
+# A value of zero (no exit button) means that the route button is for a 'normal' route
+default_route_definition["exitbutton"] = 0
+# Signals and subsidaries on route comprise variable length lists of Item IDs
+default_route_definition["signalsonroute"] = []
+default_route_definition["subsidariesonroute"] = []
+# Signals and subsidaries on route comprise a dictionary {"item_id" : required_state}
+default_route_definition["pointsonroute"] = {}
+default_route_definition["switchesonroute"] = {}
+# lines and points to highlight comprise variable length lists of Item IDs
+default_route_definition["linestohighlight"] = []
+default_route_definition["pointstohighlight"] = []
+# Each route definition can use a different track sensor to clear it down
+default_route_definition["exitsensor"] = 0
+# Create the list of route definition and add a default 'one-click' route
+default_route_object["routedefinitions"] = []
+default_route_object["routedefinitions"].append(default_route_definition)
 
 #------------------------------------------------------------------------------------
-# Function to remove all references to a point from the Route's points table.
+# Functions to remove/update references to a point from a Route's configuration.
 # The 'pointsonroute' table comprises a dict of point settings (True/False) with the
 # key of str(Point_ID). The 'pointstohighlight' table comprises a list of point IDs
 #------------------------------------------------------------------------------------
 
 def remove_references_to_point(point_id:int):
     for route_id in objects_common.route_index:
-        # Update the "pointstohighlight" table
-        current_points_table = objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"]
-        new_points_table = []
-        for item_id in current_points_table:
-            if item_id != point_id:
-                new_points_table.append(item_id)
-        objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"] = new_points_table
-        # Update the "pointsonroute" table
-        if str(point_id) in objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"].keys():
-            del objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"][str(point_id)]
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "pointstohighlight" table in the route definition
+            current_points_table = route_definition["pointstohighlight"]
+            new_points_table = []
+            for item_id in current_points_table:
+                if item_id != point_id:
+                    new_points_table.append(item_id)
+            objects_common.schematic_objects[object_id]["routedefinitions"][index]["pointstohighlight"] = new_points_table
+            # Update the "pointsonroute" table in the route definition
+            if str(point_id) in route_definition["pointsonroute"].keys():
+                del objects_common.schematic_objects[object_id]["routedefinitions"][index]["pointsonroute"][str(point_id)]
     return()
-
-#------------------------------------------------------------------------------------
-# Function to update all references to a point in the Route's configuration.
-# The 'pointsonroute' table comprises a dict of point settings (True/False) with the
-# key of str(Point_ID). The 'pointstohighlight' table comprises a list of point IDs
-#------------------------------------------------------------------------------------
 
 def update_references_to_point(old_point_id:int, new_point_id:int):
     for route_id in objects_common.route_index:
-        # Update the "pointstohighlight" table
-        current_points_table = objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"]
-        for index, item_id in enumerate(current_points_table):
-            if item_id == old_point_id:
-                objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"][index] = new_point_id
-        # Update the "pointsonroute" table
-        if str(old_point_id) in objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"].keys():
-            value = objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"].pop(str(old_point_id))
-            objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"][str(new_point_id)] = value   
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index1, route_definition in enumerate(route_definitions):
+            # Update the "pointstohighlight" table in the route definition
+            current_points_table = route_definition["pointstohighlight"]
+            for index2, item_id in enumerate(current_points_table):
+                if item_id == old_point_id:
+                    objects_common.schematic_objects[object_id]["routedefinitions"][index1]["pointstohighlight"][index2] = new_point_id
+            # Update the "pointsonroute" table in the route definition
+            if str(old_point_id) in route_definition["pointsonroute"].keys():
+                value = objects_common.schematic_objects[object_id]["routedefinitions"][index1]["pointsonroute"].pop(str(old_point_id))
+                objects_common.schematic_objects[object_id]["routedefinitions"][index1]["pointsonroute"][str(new_point_id)] = value
     return()
 
 #------------------------------------------------------------------------------------
-# Function to remove references to a Signal from the Route's configuration
+# Functions to remove/update references to a Signal from a Route's configuration
 # The 'signalsonroute' and 'subsidariesonroute' tables comprise a list of signal
 # IDs that need to be set to OFF to clear the route from start to finish.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_signal(signal_id:int):
     for route_id in objects_common.route_index:
-        # Remove the signal ID from the "signalsonroute" table
-        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"]
-        new_signals_table = []
-        for item_id in current_signals_table:
-            if item_id != signal_id:
-                new_signals_table.append(item_id)
-        objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"] = new_signals_table
-        # Remove the signal ID from the in the "subsidariesonroute" table
-        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"]
-        new_signals_table = []
-        for item_id in current_signals_table:
-            if item_id != signal_id:
-                new_signals_table.append(item_id)
-        objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"] = new_signals_table
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "signalsonroute" table in the route definition
+            current_signals_table = route_definition["signalsonroute"]
+            new_signals_table = []
+            for item_id in current_signals_table:
+                if item_id != signal_id:
+                    new_signals_table.append(item_id)
+            objects_common.schematic_objects[object_id]["routedefinitions"][index]["signalsonroute"] = new_signals_table
+            # Update the "subsidariesonroute" table in the route definition
+            current_signals_table = route_definition["subsidariesonroute"]
+            new_signals_table = []
+            for item_id in current_signals_table:
+                if item_id != signal_id:
+                    new_signals_table.append(item_id)
+            objects_common.schematic_objects[object_id]["routedefinitions"][index]["subsidariesonroute"] = new_signals_table
     return()
-
-#------------------------------------------------------------------------------------
-# Function to update references to a Signal ID in the Route's configuration
-# The 'signalsonroute' and 'subsidariesonroute' tables comprise a list of signal
-# IDs that need to be set to OFF to clear the route from start to finish.
-#------------------------------------------------------------------------------------
 
 def update_references_to_signal(old_signal_id:int, new_signal_id:int):
     for route_id in objects_common.route_index:
-        # UYpdate the signal ID in the "signalsonroute" table
-        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"]
-        for index, item_id in enumerate(current_signals_table):
-            if item_id == old_signal_id:
-                objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"][index] = new_signal_id
-        # Update the signal ID in the "subsidariesonroute" table
-        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"]
-        for index, item_id in enumerate(current_signals_table):
-            if item_id == old_signal_id:
-                objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"][index] = new_signal_id
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index1, route_definition in enumerate(route_definitions):
+            # Update the "signalsonroute" table in the route definition
+            current_signals_table = route_definition["signalsonroute"]
+            for index2, item_id in enumerate(current_signals_table):
+                if item_id == old_signal_id:
+                    objects_common.schematic_objects[object_id]["routedefinitions"][index1]["signalsonroute"][index2] = new_signal_id
+            # Update the "subsidariesonroute" table in the route definition
+            current_signals_table = route_definition["subsidariesonroute"]
+            for index2, item_id in enumerate(current_signals_table):
+                if item_id == old_signal_id:
+                    objects_common.schematic_objects[object_id]["routedefinitions"][index1]["subsidariesonroute"][index2] = new_signal_id
     return()
 
 #------------------------------------------------------------------------------------
-# Function to remove references to a Line ID from the Route's configuration
+# Functions to remove/update references to a Line ID in a Route's configuration
 # The 'linestohighlight' table comprises a list of line IDs for the route.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_line(line_id:int):
     for route_id in objects_common.route_index:
-        current_lines_table = objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"]
-        new_lines_table = []
-        for item_id in current_lines_table:
-            if item_id != line_id:
-                new_lines_table.append(item_id)
-        objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"] = new_lines_table
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "linestohighlight" table in the route definition
+            current_lines_table = route_definition["linestohighlight"]
+            new_lines_table = []
+            for item_id in current_lines_table:
+                if item_id != line_id:
+                    new_lines_table.append(item_id)
+            objects_common.schematic_objects[object_id]["routedefinitions"][index]["linestohighlight"] = new_lines_table
     return()
-
-#------------------------------------------------------------------------------------
-# Function to update references to a Line ID in the Route's configuration.
-# The 'linestohighlight' table comprises a list of line IDs for the route.
-#------------------------------------------------------------------------------------
 
 def update_references_to_line(old_line_id:int, new_line_id:int):
     for route_id in objects_common.route_index:
-        current_lines_table = objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"]
-        for index, item_id in enumerate(current_lines_table):
-            if item_id == old_line_id:
-                objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"][index] = new_line_id
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index1, route_definition in enumerate(route_definitions):
+            # Update the "linestohighlight" table in the route definition
+            current_lines_table = route_definition["linestohighlight"]
+            for index2, item_id in enumerate(current_lines_table):
+                if item_id == old_line_id:
+                    objects_common.schematic_objects[object_id]["routedefinitions"][index1]["linestohighlight"][index2] = new_line_id
     return()
 
 #------------------------------------------------------------------------------------
-# Function to remove references to a Sensor ID from the Route's configuration.
+# Functions to remove/update references to a Sensor ID in a Route's configuration.
 # These are the 'tracksensor' and 'setupsensor' elements in the Route dictionary.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_sensor(sensor_id:int):
     for route_id in objects_common.route_index:
-        current_cleardown_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
-        if current_cleardown_sensor_id == sensor_id:
-            objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = 0
-        current_setup_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"]
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Update the "setupsensor" in the route button definition (applies to all route definitions)
+        current_setup_sensor_id = objects_common.schematic_objects[object_id]["setupsensor"]
         if current_setup_sensor_id == sensor_id:
-            objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = 0
+            objects_common.schematic_objects[object_id]["setupsensor"] = 0
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "exitsensor" in the route definition
+            current_cleardown_sensor_id = route_definition["exitsensor"]
+            if current_cleardown_sensor_id == sensor_id:
+                objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitsensor"] = 0
     return()
-
-#------------------------------------------------------------------------------------
-# Function to update references to a Sensor ID in the Route's configuration
-# These are the 'tracksensor' and 'setupsensor' elements in the Route dictionary.
-#------------------------------------------------------------------------------------
 
 def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
     for route_id in objects_common.route_index:
-        current_cleardown_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
-        if current_cleardown_sensor_id == old_sensor_id:
-            objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = new_sensor_id
-        current_setup_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"]
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Update the "setupsensor" in the route button definition (applies to all route definitions)
+        current_setup_sensor_id = objects_common.schematic_objects[object_id]["setupsensor"]
         if current_setup_sensor_id == old_sensor_id:
             objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = new_sensor_id
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "exitsensor" in the route definition
+            current_cleardown_sensor_id = route_definition["exitsensor"]
+            if current_cleardown_sensor_id == old_sensor_id:
+                objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitsensor"] = new_sensor_id
     return()
 
 #------------------------------------------------------------------------------------
-# Function to remove references to a Switch ID from the Route's configuration
+# Functions to update/remove references to a Switch ID in a Route's configuration
 # The 'switchesonroute' table comprises a dict of switch settings (True/False)
 # with the key of str(Switch_ID).
 #------------------------------------------------------------------------------------
 
 def remove_references_to_switch(switch_id:int):
     for route_id in objects_common.route_index:
-        if str(switch_id) in objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].keys():
-            del objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][str(switch_id)]
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "switchesonroute" table in the route definition
+            if str(switch_id) in route_definition["switchesonroute"].keys():
+                del objects_common.schematic_objects[object_id]["routedefinitions"][index]["switchesonroute"][str(switch_id)]
     return()
-
-#------------------------------------------------------------------------------------
-# Function to update references to a Switch ID in the Route's configuration.
-# The 'switchesonroute' table comprises a dict of switch settings (True/False)
-# with the key of str(Switch_ID).
-#------------------------------------------------------------------------------------
 
 def update_references_to_switch(old_switch_id:int, new_switch_id:int):
     for route_id in objects_common.route_index:
-        if str(old_switch_id) in objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].keys():
-            value = objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"].pop(str(old_switch_id))
-            objects_common.schematic_objects[objects_common.route(route_id)]["switchesonroute"][str(new_switch_id)] = value
+        object_id = objects_common.route(route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "switchesonroute" table in the route definition
+            if str(old_switch_id) in route_definition["switchesonroute"].keys():
+                value = objects_common.schematic_objects[object_id]["routedefinitions"][index]["switchesonroute"].pop(str(old_switch_id))
+                objects_common.schematic_objects[object_id]["routedefinitions"][index]["switchesonroute"][str(new_switch_id)] = value
+    return()
+
+#------------------------------------------------------------------------------------
+# Functions to update/remove references to a Route ID in a Route's configuration,
+# specifically the references to the "exitbutton" in the "routedefinitions"
+#------------------------------------------------------------------------------------
+
+def remove_references_to_route(route_id:int):
+    for other_route_id in objects_common.route_index:
+        object_id = objects_common.route(other_route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "exitbutton" in the route definition
+            if route_id == route_definition["exitbutton"]:
+                objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitbutton"] = 0
+    return()
+
+def update_references_to_route(old_route_id:int, new_route_id:int):
+    for other_route_id in objects_common.route_index:
+        object_id = objects_common.route(other_route_id)
+        route_definitions = objects_common.schematic_objects[object_id]["routedefinitions"]
+        # Iterate through all the route definitions
+        for index, route_definition in enumerate(route_definitions):
+            # Update the "exitbutton" in the route definition
+            if old_route_id == route_definition["exitbutton"]:
+                objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitbutton"] = new_route_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -272,6 +345,8 @@ def update_route(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.route_index[str(old_item_id)]
         objects_common.route_index[str(new_item_id)] = object_id
+        # Update the route ID in any other route configurations
+        update_references_to_route(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -294,12 +369,13 @@ def redraw_route_object(object_id):
                 buttontype = library.button_type.switched,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                selected_callback = run_routes.set_schematic_route_callback,
-                deselected_callback = run_routes.clear_schematic_route_callback,
+                selected_callback = run_routes.route_button_selected_callback,
+                deselected_callback = run_routes.route_button_deselected_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
                 tooltip = objects_common.schematic_objects[object_id]["routedescription"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                button_data = {"route": None, "entrybutton": 0, "exitbutton": 0},
                 button_colour = button_colour,
                 active_colour = active_colour,
                 selected_colour = selected_colour,
@@ -321,7 +397,7 @@ def create_route(xpos:int, ypos:int):
     item_id = objects_common.new_item_id(exists_function=library.button_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
-    objects_common.schematic_objects[object_id]["routename"] = "Route "+str(item_id)
+    objects_common.schematic_objects[object_id]["routename"] = str(item_id)
     objects_common.schematic_objects[object_id]["posx"] = xpos
     objects_common.schematic_objects[object_id]["posy"] = ypos
     # Styles for the new object are set to the current default styles
@@ -346,22 +422,14 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=library.button_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
-    objects_common.schematic_objects[new_object_id]["routename"] = "Route "+str(new_id)
     objects_common.route_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
-    # The bits we want to copy are - buttonwidth, routecolour, switchdelay, resetpoints
     objects_common.schematic_objects[new_object_id]["routedescription"] = default_route_object["routedescription"]
-    objects_common.schematic_objects[new_object_id]["signalsonroute"] = default_route_object["signalsonroute"]
-    objects_common.schematic_objects[new_object_id]["subsidariesonroute"] = default_route_object["subsidariesonroute"]
-    objects_common.schematic_objects[new_object_id]["pointsonroute"] = default_route_object["pointsonroute"]
-    objects_common.schematic_objects[new_object_id]["switchesonroute"] = default_route_object["switchesonroute"]
-    objects_common.schematic_objects[new_object_id]["linestohighlight"] = default_route_object["linestohighlight"]
-    objects_common.schematic_objects[new_object_id]["pointstohighlight"] = default_route_object["pointstohighlight"]
-    objects_common.schematic_objects[new_object_id]["tracksensor"] = default_route_object["tracksensor"]
     objects_common.schematic_objects[new_object_id]["setupsensor"] = default_route_object["setupsensor"]
+    objects_common.schematic_objects[new_object_id]["routedefinitions"] = default_route_object["routedefinitions"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create the associated library objects
@@ -417,6 +485,8 @@ def delete_route_object(object_id):
 def delete_route(object_id):
     # Soft delete the associated library objects from the canvas
     delete_route_object(object_id)
+    # Remove the route ID from any other route congigurations
+    remove_references_to_route(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and
     # deleting the object from the dictionary of schematic objects
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

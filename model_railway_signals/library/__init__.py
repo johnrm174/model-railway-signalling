@@ -13,6 +13,8 @@ from .common import instant_shutdown
 from .common import configure_edit_mode
 from .common import get_keyboard_mapping
 from .common import display_warning
+from .common import toggle_item_ids
+from .common import bring_item_ids_to_front
 
 from .signals import signal_type
 from .signals import signal_subtype
@@ -138,6 +140,10 @@ from .buttons import disable_button
 from .buttons import lock_button
 from .buttons import unlock_button
 from .buttons import button_state
+from .buttons import set_button_data
+from .buttons import get_button_data
+from .buttons import set_button_flashing
+from .buttons import reset_button_flashing
 from .buttons import update_button_styles
 
 from .dcc_control import get_dcc_address_mappings
@@ -165,6 +171,7 @@ from .gpio_sensors import set_gpio_sensors_to_publish_state
 from .gpio_sensors import subscribe_to_remote_gpio_sensors
 from .gpio_sensors import subscribe_to_gpio_port_status
 from .gpio_sensors import unsubscribe_from_gpio_port_status
+from .gpio_sensors import unsubscribe_from_all_gpio_port_status
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -182,6 +189,9 @@ from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import send_accessory_short_event
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
+from .pi_sprog_interface import add_dcc_sound_mapping
+from .pi_sprog_interface import reset_dcc_sound_mappings
+from .pi_sprog_interface import play_dcc_sound_file
 
 __all__ = [
       # Public common functions
@@ -191,6 +201,8 @@ __all__ = [
         'configure_edit_mode',
         'get_keyboard_mapping',
         'display_warning',
+        'toggle_item_ids',
+        'bring_item_ids_to_front',
       # Public point types/functions
         'point_type',
         'point_subtype',
@@ -307,6 +319,7 @@ __all__ = [
         'set_gpio_sensors_to_publish_state',
         'subscribe_to_gpio_port_status',
         'unsubscribe_from_gpio_port_status',
+        'unsubscribe_from_all_gpio_port_status',
       # Public SPROG control functions
         'sprog_connect',
         'sprog_disconnect',
@@ -315,6 +328,9 @@ __all__ = [
         'send_accessory_short_event',
         'request_dcc_power_on',
         'request_dcc_power_off',
+        'add_dcc_sound_mapping',
+        'reset_dcc_sound_mappings',
+        'play_dcc_sound_file',
       # Public DCC control functions
         'get_dcc_address_mappings',
         'dcc_address_mapping',
@@ -356,6 +372,10 @@ __all__ = [
         'lock_button',
         'unlock_button',
         'button_state',
+        'get_button_data',
+        'set_button_data',
+        'set_button_flashing',
+        'reset_button_flashing',
       # Public file interface functions
         'save_schematic',
         'load_schematic',
