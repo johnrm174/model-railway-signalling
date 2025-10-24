@@ -453,6 +453,28 @@ def check_routes_valid_after_point_change(point_id:int, route_button_id:int):
                     route_button_deselected_callback(int(str_route_button_id))
     return()
 
+def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
+    # We only really care about latching switches - not momentary switches
+    switch_type = objects.schematic_objects[objects.switch(switch_id)]["itemtype"]
+    if switch_type == library.button_type.switched.value:
+        for str_route_button_id in objects.route_index:
+            # Find the applicable route definition for the button (stored as the route button data)
+            # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
+            route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+            route_definition_index = library.get_button_data(route_object["itemid"])["route"]
+            if route_definition_index is not None and not is_setup_in_progress(int(str_route_button_id)):
+                route_definition = route_object["routedefinitions"][route_definition_index]
+                # Reset the route if any points on the route have been unlocked or changed
+                if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
+                        and str(switch_id) in route_definition["switchesonroute"].keys() and route_object["resetonswitchchanges"] ):
+                    required_state = route_definition["switchesonroute"][str(switch_id)]
+                    if library.button_state(switch_id) != route_definition:
+                        logging.warning("RUN ROUTES - Route "+str_route_button_id+
+                            " has been invalidated by changing Switch "+str(switch_id)+" - Clearing down route")
+                        library.toggle_button(int(str_route_button_id))
+                        route_button_deselected_callback(int(str_route_button_id))
+    return()
+
 #------------------------------------------------------------------------------------
 # Function to automatically set/reset a schematic route after a track sensor passed event
 #------------------------------------------------------------------------------------
@@ -584,6 +606,10 @@ def complete_route_setup(route_button_id:int):
                 route_set_up_and_locked = False
         for int_signal_id in route_definition["subsidariesonroute"]:
             if not library.subsidary_clear(int_signal_id):
+                route_set_up_and_locked = False
+        for str_switch_id in route_definition["switchesonroute"].keys():
+            required_state = route_definition["switchesonroute"][str_switch_id]
+            if library.button_state(int(str_switch_id)) != required_state:
                 route_set_up_and_locked = False
         # If successful we update the point and line colours to highlight the route (Run Mode only)
         # If unsuccessful we de-select the button (to show the route was not set up)

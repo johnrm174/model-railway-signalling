@@ -1339,6 +1339,7 @@ def instrument_updated_callback(instrument_id:int):
 
 def switch_updated_callback(switch_id:int, route_id:int=0):
     if enhanced_debugging: print("########## switch_updated_callback "+str(switch_id))
+    run_routes.check_routes_valid_after_switch_change(switch_id,route_id)
     return()
 
 def lever_switched_callback(lever_id:int):
