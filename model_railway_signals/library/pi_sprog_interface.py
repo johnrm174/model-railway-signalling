@@ -909,8 +909,6 @@ def play_dcc_sound_file(address:int, active:bool):
             except Exception as exception:
                 logging.error("Pi-SPROG: Error playing sound file: "+dcc_sound_file_to_load_and_play)
                 logging.error("Pi-SPROG: Reported exception: "+str(exception))
-    else:
-        logging.warning("Pi-SPROG: Cannot play sound file as simpleaudio is not installed")
     return()
 
 ######################################################################################
