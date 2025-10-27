@@ -601,16 +601,27 @@ def complete_route_setup(route_button_id:int):
             # If a point does not have a FPL then the 'has_fpl' function will return True
             if library.point_switched(int(str_point_id)) != required_state or not library.fpl_active(int(str_point_id)):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +" route setup by change to point "+str_point_id+" - Clearing down route")
         for int_signal_id in route_definition["signalsonroute"]:
             if not library.signal_clear(int_signal_id):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +" route setup by change to signal "+str(int_signal_id)+" - Clearing down route")
         for int_signal_id in route_definition["subsidariesonroute"]:
             if not library.subsidary_clear(int_signal_id):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +" route setup by change to subsidiary "+str(int_signal_id)+" - Clearing down route")
         for str_switch_id in route_definition["switchesonroute"].keys():
             required_state = route_definition["switchesonroute"][str_switch_id]
-            if library.button_state(int(str_switch_id)) != required_state:
+            switch_type = objects.schematic_objects[objects.switch(str_switch_id)]["itemtype"]
+            # We only really care about latching switches - not momentary switches
+            if (switch_type == library.button_type.switched.value and
+                   library.button_state(int(str_switch_id)) != required_state):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +" route setup by change to switch "+str_switch_id+" - Clearing down route")
         # If successful we update the point and line colours to highlight the route (Run Mode only)
         # If unsuccessful we de-select the button (to show the route was not set up)
         if run_mode and route_set_up_and_locked:
@@ -619,9 +630,8 @@ def complete_route_setup(route_button_id:int):
                 library.set_point_colour(point_id, colour)
             for line_id in route_definition["linestohighlight"]:
                 library.set_line_colour(line_id, colour)
+            logging.info("RUN ROUTES - Set-up of Route "+str(route_button_id)+" is now complete **************************************")
         elif library.button_state(route_button_id):
-            logging.warning("RUN ROUTES - Route "+str(route_button_id)+
-                " has been invalidated during route setup - Clearing down route")
             library.toggle_button(route_button_id)
             route_button_deselected_callback(route_button_id)
         # Unlock the route button(s) now processing is complete
@@ -629,7 +639,6 @@ def complete_route_setup(route_button_id:int):
         if exit_button_id > 0: library.unlock_button(exit_button_id)
         # Enable/disable all route buttons (including this one) as required
         enable_disable_schematic_routes()
-        logging.info("RUN ROUTES - Set-up of Route "+str(route_button_id)+" is now complete **************************************")
     return()
 
 def complete_route_cleardown(route_button_id:int):
