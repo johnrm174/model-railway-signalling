@@ -468,7 +468,7 @@ def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
                 if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                         and str(switch_id) in route_definition["switchesonroute"].keys() and route_object["resetonswitchchanges"] ):
                     required_state = route_definition["switchesonroute"][str(switch_id)]
-                    if library.button_state(switch_id) != route_definition:
+                    if library.button_state(switch_id) != required_state:
                         logging.warning("RUN ROUTES - Route "+str_route_button_id+
                             " has been invalidated by changing Switch "+str(switch_id)+" - Clearing down route")
                         library.toggle_button(int(str_route_button_id))
