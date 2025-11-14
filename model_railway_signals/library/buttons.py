@@ -558,7 +558,11 @@ def delete_button(button_id:int):
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": delete_button - Button ID does not exist")
     else:
-        logging.debug("Button "+str(button_id)+": Deleting library object from the schematic")    
+        logging.debug("Button "+str(button_id)+": Deleting library object from the schematic")
+        # Stop flashing the button (i.e. cancel any scheduled root.after() events for the button)
+        # This covers the case of loading a new schematic whilst running an existing schematic
+        # If we didn't do this then any buttons of the same ID on the new schematic would flash
+        reset_button_flashing(button_id)
         # Delete all the tkinter drawing objects associated with the Button
         buttons[str(button_id)]["canvas"].delete(buttons[str(button_id)]["tags"])
         buttons[str(button_id)]["button"].destroy()
