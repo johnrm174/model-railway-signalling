@@ -135,8 +135,6 @@ class main_menubar:
         self.quickscrollframe.pack()
         self.scroll_buttons = []
         # Create a dummy menubar item for the application Logo
-        resource_folder = 'model_railway_signals.resources'
-        logo_filename = 'dcc_signalling_logo.png'
         current_folder = pathlib.Path(__file__). parent
         fully_qualified_filename = current_folder / 'resources' / 'dcc_signalling_logo.png'
         try:
