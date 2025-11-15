@@ -91,6 +91,7 @@
 #------------------------------------------------------------------------------------
 
 import logging
+import time
 from typing import Union
 
 from . import library
@@ -107,6 +108,8 @@ canvas = None
 run_mode = None
 automation_enabled = None
 spad_popups = False
+
+enhanced_debugging = False
 
 #------------------------------------------------------------------------------------
 # The initialise function is called at application startup (on canvas creation)
@@ -815,21 +818,20 @@ def process_all_signal_interlocking():
                 interlocked_sections = signal_object["trackinterlock"][signal_route.value-1]
                 for section in interlocked_sections:
                     if section > 0 and library.section_occupied(section):
-                        # Only lock the signal if it is already ON (we always need to allow the
-                        # signalman to return the signal to ON if it is currently OFF
-                        if not library.signal_clear(signal_object["itemid"]):
-                            signal_can_be_unlocked = False
-                            if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nTrack Section "+str(section)+" is occupied"
-        # Lock/unlock the signal as required
-        if signal_can_be_unlocked: library.unlock_signal(int_signal_id)
+                        signal_can_be_unlocked = False
+                        if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nTrack Section "+str(section)+" is occupied"
+        # Lock/unlock the signal as required - Note if the Signal is OFF we never lock it
+        # as the signalman should always be able to return the signal to Danger
+        if signal_can_be_unlocked or library.signal_clear(int_signal_id): library.unlock_signal(int_signal_id)
         else: library.lock_signal(int_signal_id, sig_tooltip)
-        # Lock/unlock the subsidary as required (if the signal has one)
+        # Lock/unlock the subsidary as required (if the signal has one) - Similarly, if the Subsidiary
+        # is OFF we never lock it as the signalman should always be able to return the signal to Danger
         if has_subsidary(int_signal_id):
-            if subsidary_can_be_unlocked: library.unlock_subsidary(int_signal_id)
+            if subsidary_can_be_unlocked or library.subsidary_clear(int_signal_id): library.unlock_subsidary(int_signal_id)
             else: library.lock_subsidary(int_signal_id, sub_tooltip)
         # lock/unlock the associated distant arms (if the signal has any)
         if has_distant_arms(int_signal_id):
-            if distant_arms_can_be_unlocked:
+            if distant_arms_can_be_unlocked or library.signal_clear(int_associated_distant_id):
                 library.unlock_signal(int_associated_distant_id)
             else:
                 library.lock_signal(int_associated_distant_id, dist_tooltip)
@@ -1218,27 +1220,37 @@ def reset_layout(switch_delay:int=0):
 # set up or clear down a route won't trigger a route re-set - eg set FPL off to change a point
 ##################################################################################################
 
-enhanced_debugging = False
-
 def point_switched_callback(point_id:int, route_id:int=0):
-    if enhanced_debugging: print("########## point_switched_callback "+str(point_id))
+    if enhanced_debugging:
+        print("########## point_switched_callback "+str(point_id))
+        start_time = time.time()
     configure_all_signal_routes()
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
     update_all_signalbox_levers()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def fpl_switched_callback(point_id:int, route_id:int=0):
-    if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
+    if enhanced_debugging:
+        print("########## fpl_switched_callback "+str(point_id))
+        start_time = time.time()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
     update_all_signalbox_levers()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_updated_callback(signal_id:Union[int,str]):
-    if enhanced_debugging: print("########## signal_updated_callback "+str(signal_id))
+    if enhanced_debugging:
+        print("########## signal_updated_callback "+str(signal_id))
+        start_time = time.time()
     if run_mode and automation_enabled:
         update_approach_control_status_for_all_signals()
         override_distant_signals_based_on_signals_ahead()
@@ -1246,10 +1258,16 @@ def signal_updated_callback(signal_id:Union[int,str]):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_switched_callback(signal_id:int, route_id:int=0):
-    if enhanced_debugging: print("########## signal_switched_callback "+str(signal_id))
+    start_time = time.time()
+    if enhanced_debugging:
+        print("########## signal_switched_callback "+str(signal_id))
+        start_time = time.time()
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals(signal_id)    
@@ -1261,15 +1279,23 @@ def signal_switched_callback(signal_id:int, route_id:int=0):
     run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
     update_all_signalbox_levers()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def subsidary_switched_callback(signal_id:int, route_id:int=0):
-    if enhanced_debugging: print("########## subsidary_switched_callback "+str(signal_id))
+    if enhanced_debugging:
+        print("########## subsidary_switched_callback "+str(signal_id))
+        start_time = time.time()
     process_all_signal_interlocking()
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
     update_all_signalbox_levers()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 # Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
@@ -1278,7 +1304,9 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
 # changes will be and schedules the actual update for after the clearance delay.
 # During this period the signal is overridden to DANGER.
 def signal_passed_callback(signal_id:int):
-    if enhanced_debugging: print("########## signal_passed_callback "+str(signal_id))
+    if enhanced_debugging:
+        print("########## signal_passed_callback "+str(signal_id))
+        start_time = time.time()
     # Work out what the track occupancy changes will be and schedule an event to update them.
     # Any timed signal sequences are triggered immediately after the signal is passed
     if run_mode: update_track_occupancy_for_signal(signal_id)
@@ -1292,10 +1320,15 @@ def signal_passed_callback(signal_id:int):
         override_distant_signals_based_on_signals_ahead()
     else:
         process_signal_aspect_update(signal_id)
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_released_callback(signal_id:int):
-    if enhanced_debugging: print("########## signal_released_callback "+str(signal_id))
+    if enhanced_debugging:
+        print("########## signal_released_callback "+str(signal_id))
+        start_time = time.time()
     if run_mode and automation_enabled:
         update_approach_control_status_for_all_signals()    
         override_distant_signals_based_on_signals_ahead()
@@ -1303,6 +1336,9 @@ def signal_released_callback(signal_id:int):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 # Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
@@ -1310,16 +1346,23 @@ def signal_released_callback(signal_id:int):
 # The update_track_occupancy_for_signal function now works out what the track occupancy
 # changes will be and schedules the actual update for after the clearance delay.
 def sensor_passed_callback(sensor_id:int):
-    if enhanced_debugging: print("########## sensor_passed_callback "+str(sensor_id))
+    if enhanced_debugging:
+        print("########## sensor_passed_callback "+str(sensor_id))
+        start_time = time.time()
     # Work out what the track occupancy changes will be and schedule an event to update them.
     # Any timed signal sequences are triggered immediately after the signal is passed
     if run_mode: update_track_occupancy_for_track_sensor(sensor_id)
     run_routes.trigger_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
         
 def section_updated_callback(section_id:int):
-    if enhanced_debugging: print("########## section_updated_callback "+str(section_id))
+    if enhanced_debugging:
+        print("########## section_updated_callback "+str(section_id))
+        start_time = time.time()
     if run_mode:
         update_route_highlighting_for_sections()
         if automation_enabled:
@@ -1329,21 +1372,36 @@ def section_updated_callback(section_id:int):
     process_all_signal_interlocking()
     process_all_point_interlocking()
     run_routes.enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def instrument_updated_callback(instrument_id:int):
-    if enhanced_debugging: print("########## instrument_updated_callback "+str(instrument_id))
+    if enhanced_debugging:
+        print("########## instrument_updated_callback "+str(instrument_id))
+        start_time = time.time()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def switch_updated_callback(switch_id:int, route_id:int=0):
-    if enhanced_debugging: print("########## switch_updated_callback "+str(switch_id))
+    if enhanced_debugging:
+        print("########## switch_updated_callback "+str(switch_id))
+        start_time = time.time()
     run_routes.check_routes_valid_after_switch_change(switch_id,route_id)
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def lever_switched_callback(lever_id:int):
-    if enhanced_debugging: print("########## lever_switched_callback "+str(lever_id))
+    if enhanced_debugging:
+        print("########## lever_switched_callback "+str(lever_id))
+        start_time = time.time()
     lever_object = objects.schematic_objects[objects.lever(lever_id)]
     lever_switched = library.lever_switched(lever_id)
     linked_signal = lever_object["linkedsignal"]
@@ -1392,6 +1450,9 @@ def lever_switched_callback(lever_id:int):
         elif lever_object["switchfpl"] and has_fpl and lever_switched != library.fpl_active(linked_point):
             library.toggle_fpl(linked_point)
             fpl_switched_callback(linked_point)
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 ##################################################################################################

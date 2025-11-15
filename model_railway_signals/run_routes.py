@@ -64,6 +64,7 @@
 #------------------------------------------------------------------------------------
 
 import logging
+import time
 
 from . import library
 from . import objects
@@ -78,6 +79,8 @@ root = None
 canvas = None
 run_mode = None
 automation_enabled = None
+
+enhanced_debugging = False
 
 #------------------------------------------------------------------------------------
 # The following Dictionary holds information as to whether a route_setup is in progress or not
@@ -732,6 +735,9 @@ activated_entry_button_id = 0
 
 def route_button_selected_callback(route_button_id:int):
     global activated_entry_button_id
+    if enhanced_debugging:
+        print("########## route_button_selected_callback "+str(route_button_id))
+        start_time = time.time()
     # Retrieve the object configuration for the Route
     route_object_id = objects.route(route_button_id)
     route_object = objects.schematic_objects[route_object_id]
@@ -830,6 +836,9 @@ def route_button_selected_callback(route_button_id:int):
             library.toggle_button(route_button_id)
     else:
         logging.debug("RUN ROUTES - Button "+str(route_button_id)+" has been Selected")
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def highlight_possible_routes(route_button_id:int):
@@ -949,6 +958,9 @@ def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definitio
 
 def route_button_deselected_callback(route_button_id:int):
     global activated_entry_button_id
+    if enhanced_debugging:
+        print("########## route_button_deselected_callback "+str(route_button_id))
+        start_time = time.time()
     # Retrieve the object configuration for the Route Button
     route_object_id = objects.route(route_button_id)
     route_object = objects.schematic_objects[route_object_id]
@@ -1045,6 +1057,9 @@ def route_button_deselected_callback(route_button_id:int):
                                     " is part of a new NX route setup sequence")
         route_button_selected_callback(route_button_id)
     enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 #------------------------------------------------------------------------------------
