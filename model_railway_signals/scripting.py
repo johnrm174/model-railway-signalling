@@ -57,6 +57,7 @@ from inspect import getframeinfo
 from inspect import stack
 from os.path import basename
 
+default_sleep_time = 0.001
 main_menubar = None
 root = None
 
@@ -76,10 +77,10 @@ def raise_test_warning(message):
 # if the user has neglected to put in any sleeps themselves
 #------------------------------------------------------------------------------
 
-def run_function(function):
+def run_function(function, sleep:float):
     if not script_thread.stopped():
         common.execute_function_in_tkinter_thread(function)
-        time.sleep(0.001)
+        time.sleep(sleep)
     return()
 
 #------------------------------------------------------------------------------
@@ -107,9 +108,8 @@ def thread_to_initialise_application(file_to_load:str, script_to_run):
     # Wait for the application to stabilise and then load the schematic
     time.sleep(2.0)
     print ("Scripting: Loading Scematic: '",file_to_load,"'")
-    run_function(lambda:main_menubar.load_schematic(file_to_load))
-    # Wait for the file to be loaded and then run the specified script
-    time.sleep(3.0)
+    run_function(lambda:main_menubar.load_schematic(file_to_load), sleep=3)
+    # Wait for the file to be loaded (sleep above) and run the specified script
     script_to_run()
     return()
 
@@ -166,46 +166,45 @@ def sleep(sleep_time:float): time.sleep(sleep_time)
 #------------------------------------------------------------------------------
 
 def reset_layout():
-    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False))
-    time.sleep(3.0)
+    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False), sleep=3.0)
     
 # ------------------------------------------------------------------------------
 # API Functions to trigger layout 'events' 
 # ------------------------------------------------------------------------------
     
-def set_lever_on(leverid):
+def set_lever_on(leverid, sleep:float=default_sleep_time):
     if str(leverid) not in levers.levers.keys():
         raise_test_warning ("set_lever_on - Lever: "+str(leverid)+" does not exist")
     elif not levers.lever_switched(leverid):
         raise_test_warning ("set_lever_on - Lever: "+str(leverid)+" is already ON")
     else:
-        run_function(lambda:levers.change_button_event(leverid))
+        run_function(lambda:levers.change_button_event(leverid), sleep)
 
-def set_lever_off(leverid):
+def set_lever_off(leverid, sleep:float=default_sleep_time):
     if str(leverid) not in levers.levers.keys():
         raise_test_warning ("set_lever_off - Lever: "+str(leverid)+" does not exist")
     elif levers.lever_switched(leverid):
         raise_test_warning ("set_lever_off - Lever: "+str(leverid)+" is already OFF")
     else:
-        run_function(lambda:levers.change_button_event(leverid))
+        run_function(lambda:levers.change_button_event(leverid), sleep)
             
-def set_signal_on(sigid):
+def set_signal_on(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signal_clear(sigid):
         raise_test_warning ("set_subsidiary_on - Signal: "+str(sigid)+" is already ON")
     else:
-        run_function(lambda:signals.signal_button_event(sigid))
+        run_function(lambda:signals.signal_button_event(sigid), sleep)
 
-def set_signal_off(sigid):
+def set_signal_off(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
     elif signals.signal_clear(sigid):
         raise_test_warning ("set_subsidiary_off - Signal: "+str(sigid)+" is already OFF")
     else:
-        run_function(lambda:signals.signal_button_event(sigid))
+        run_function(lambda:signals.signal_button_event(sigid), sleep)
 
-def set_subsidiary_on(sigid):
+def set_subsidiary_on(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signals[str(sigid)]["hassubsidary"]:
@@ -213,9 +212,9 @@ def set_subsidiary_on(sigid):
     elif not signals.subsidary_clear(sigid):
         raise_test_warning ("set_subsidiary_on - Signal: "+str(sigid)+" - subsidiary is already ON")
     else:
-        run_function(lambda:signals.subsidary_button_event(sigid))                                
+        run_function(lambda:signals.subsidary_button_event(sigid), sleep)
 
-def set_subsidiary_off(sigid):
+def set_subsidiary_off(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
     elif not signals.signals[str(sigid)]["hassubsidary"]:
@@ -223,9 +222,9 @@ def set_subsidiary_off(sigid):
     elif signals.subsidary_clear(sigid):
         raise_test_warning ("set_subsidiary_off - Signal: "+str(sigid)+" - subsidiary is already OFF")
     else:
-        run_function(lambda:signals.subsidary_button_event(sigid))                  
+        run_function(lambda:signals.subsidary_button_event(sigid), sleep)
 
-def set_secondary_dist_on(sigid):
+def set_secondary_dist_on(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("set_secondary_dist_on - Signal: "+str(sigid)+" does not exist")
     elif str(sigid+100) not in signals.signals.keys():
@@ -233,9 +232,9 @@ def set_secondary_dist_on(sigid):
     elif not signals.signal_clear(sigid+100):
         raise_test_warning ("set_secondary_dist_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
     else:
-        run_function(lambda:signals.signal_button_event(sigid+100))                                
+        run_function(lambda:signals.signal_button_event(sigid+100), sleep)
 
-def set_secondary_dist_off(sigid):
+def set_secondary_dist_off(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("set_secondary_dist_off - Signal: "+str(sigid)+" does not exist")
     elif str(sigid+100) not in signals.signals.keys():
@@ -243,27 +242,27 @@ def set_secondary_dist_off(sigid):
     elif signals.signal_clear(sigid+100):
         raise_test_warning ("set_secondary_dist_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
     else:
-        run_function(lambda:signals.signal_button_event(sigid+100))
+        run_function(lambda:signals.signal_button_event(sigid+100), sleep)
 
-def trigger_signal_passed(sigid):
+def trigger_signal_passed(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("trigger_signal_passed - Signal: "+str(sigid)+" does not exist")
     else:
-        run_function(lambda:signals.sig_passed_button_event(sigid))
+        run_function(lambda:signals.sig_passed_button_event(sigid), sleep)
                                                
-def trigger_signal_released(sigid):
+def trigger_signal_released(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
         raise_test_warning ("trigger_signal_released - Signal: "+str(sigid)+" does not exist")
     else:
-        run_function(lambda:signals.approach_release_button_event(sigid) )                             
+        run_function(lambda:signals.approach_release_button_event(sigid), sleep)
 
-def trigger_sensor_passed(sensorid):
+def trigger_sensor_passed(sensorid, sleep:float=default_sleep_time):
     if str(sensorid) not in track_sensors.track_sensors.keys():
         raise_test_warning ("trigger_sensor_passed - Track Sensor: "+str(sensorid)+" does not exist")
     else:
-        run_function(lambda:track_sensors.track_sensor_triggered(sensorid))
+        run_function(lambda:track_sensors.track_sensor_triggered(sensorid), sleep)
 
-def set_point_switched(pointid):
+def set_point_switched(pointid, sleep:float=default_sleep_time):
     if str(pointid) not in points.points.keys():
         raise_test_warning ("set_point_switched - Point: "+str(pointid)+" does not exist")
     elif points.point_switched(pointid):
@@ -271,15 +270,15 @@ def set_point_switched(pointid):
     else:
         run_function(lambda:points.change_button_event(pointid))
                                                
-def set_point_unswitched(pointid):
+def set_point_unswitched(pointid, sleep:float=default_sleep_time):
     if str(pointid) not in points.points.keys():
         raise_test_warning ("set_point_normal - Point: "+str(pointid)+" does not exist")
     elif not points.point_switched(pointid):
         raise_test_warning ("set_point_normal - Point: "+str(pointid)+" is already normal")
     else:
-        run_function(lambda:points.change_button_event(pointid))
+        run_function(lambda:points.change_button_event(pointid), sleep)
 
-def set_fpl_on(pointid):
+def set_fpl_on(pointid, sleep:float=default_sleep_time):
     if str(pointid) not in points.points.keys():
         raise_test_warning ("set_fpl_on - Point: "+str(pointid)+" does not exist")
     elif not points.points[str(pointid)]["hasfpl"]:
@@ -287,9 +286,9 @@ def set_fpl_on(pointid):
     elif points.fpl_active(pointid):
         raise_test_warning ("set_fpl_on - Point: "+str(pointid)+" - FPL is already ON")
     else:
-        run_function(lambda:points.fpl_button_event(pointid))
+        run_function(lambda:points.fpl_button_event(pointid), sleep)
 
-def set_fpl_off(pointid):
+def set_fpl_off(pointid, sleep:float=default_sleep_time):
     if str(pointid) not in points.points.keys():
         raise_test_warning ("set_fpl_off - Point: "+str(pointid)+" - does not exist on the schematic")
     elif not points.points[str(pointid)]["hasfpl"]:
@@ -297,9 +296,9 @@ def set_fpl_off(pointid):
     elif not points.fpl_active(pointid):
         raise_test_warning ("set_fpl_off - Point: "+str(pointid)+" - FPL is already OFF")
     else:
-        run_function(lambda:points.fpl_button_event(pointid))
+        run_function(lambda:points.fpl_button_event(pointid), sleep)
 
-def set_section_occupied(secid, identifier:str="OCCUPIED"):
+def set_section_occupied(secid, identifier:str="OCCUPIED", sleep:float=default_sleep_time):
     if str(secid) not in track_sections.sections.keys():
         raise_test_warning ("set_section_occupied - Section: "+str(secid)+" does not exist")
     elif track_sections.section_occupied(secid):
@@ -307,67 +306,66 @@ def set_section_occupied(secid, identifier:str="OCCUPIED"):
     else:
         # Two calls are needed - we first set the label using the 'update_label' function
         # then we call the section callback library function to simulate the 'click'
-        run_function(lambda:track_sections.update_label(secid,str(identifier)))
-        run_function(lambda:track_sections.section_state_toggled(secid))
+        run_function(lambda:track_sections.update_label(secid, str(identifier)), sleep)
+        run_function(lambda:track_sections.section_state_toggled(secid), sleep)
 
-def set_section_clear(secid):
+def set_section_clear(secid, sleep:float=default_sleep_time):
     if str(secid) not in track_sections.sections.keys():
         raise_test_warning ("set_section_clear - Section: "+str(secid)+" does not exist")
     else:
         if not track_sections.section_occupied(secid):
             raise_test_warning ("set_section_clear - Section: "+str(secid)+" is already CLEAR")
         else:
-            run_function(lambda:track_sections.section_state_toggled(secid))
+            run_function(lambda:track_sections.section_state_toggled(secid), sleep)
     
-def set_instrument_blocked(instid):
+def set_instrument_blocked(instid, sleep:float=default_sleep_time):
     if str(instid) not in block_instruments.instruments.keys():
         raise_test_warning ("set_instrument_blocked - Instrument: "+str(instid)+" does not exist")
     else:
-        run_function(lambda:block_instruments.blocked_button_event(instid))
+        run_function(lambda:block_instruments.blocked_button_event(instid), sleep)
     
-def set_instrument_occupied(instid):
+def set_instrument_occupied(instid, sleep:float=default_sleep_time):
     if str(instid) not in block_instruments.instruments.keys():
         raise_test_warning ("set_instrument_occupied - Instrument: "+str(instid)+" does not exist")
     else:
-        run_function(lambda:block_instruments.occup_button_event(instid))
+        run_function(lambda:block_instruments.occup_button_event(instid), sleep)
     
-def set_instrument_clear(instid):
+def set_instrument_clear(instid, sleep:float=default_sleep_time):
     if str(instid) not in block_instruments.instruments.keys():
         raise_test_warning ("set_instrument_clear - Instrument: "+str(instid)+" does not exist")
     else:
-        run_function(lambda:block_instruments.clear_button_event(instid))
+        run_function(lambda:block_instruments.clear_button_event(instid), sleep)
 
-def click_telegraph_key(instid):
+def click_telegraph_key(instid, sleep:float=default_sleep_time):
     if str(instid) not in block_instruments.instruments.keys():
         raise_test_warning ("click_telegraph_key - Instrument: "+str(instid)+" does not exist")
     else:
-        run_function(lambda:block_instruments.telegraph_key_button(instid))
+        run_function(lambda:block_instruments.telegraph_key_button(instid), sleep)
 
-def simulate_gpio_triggered(gpioid):
+def simulate_gpio_triggered(gpioid, sleep:float=default_sleep_time):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
-            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid), sleep)
+            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid), sleep)
 
-def simulate_gpio_on(gpioid):
+def simulate_gpio_on(gpioid, sleep:float=default_sleep_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
         raise_test_warning ("simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
     else:
-        run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+        run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid), sleep)
 
-def simulate_gpio_off(gpioid):
+def simulate_gpio_off(gpioid, sleep:float=default_sleep_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
         raise_test_warning ("simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
     else:
-        run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+        run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid), sleep)
 
-def simulate_button_clicked(buttonid):
+def simulate_button_clicked(buttonid, sleep:float=default_sleep_time):
     if str(buttonid) not in buttons.buttons.keys():
         raise_test_warning ("simulate_button_clicked - Button: "+str(buttonid)+" does not exist")
     else:
-        run_function(lambda:buttons.button_event(buttonid))
-
+        run_function(lambda:buttons.button_event(buttonid), sleep)
 
 #############################################################################################
 
