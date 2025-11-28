@@ -98,9 +98,8 @@ def clear_warning_window():
     for warning_label in list_of_warning_labels[:-1]: warning_label.destroy()
     list_of_warning_labels = [list_of_warning_labels[-1]]
 
-def user_dragging_window(event, canvas):
-    global warning_window_defocus
-    # Update Idletasks to update the window and schedule an immediate event to return
+def focus_back_on_canvas(event, canvas):
+    # Update Idletasks to update the warning window and schedule an immediate event to return
     # the focus to the canvas (to allow subsequent keypress events to be processed)
     root_window.update_idletasks()
     root_window.after(0, lambda:canvas.focus_set())
@@ -108,38 +107,40 @@ def user_dragging_window(event, canvas):
 def display_warning(canvas, message:str):
     global interlocking_warning_window
     global list_of_warning_labels
+    background = "yellow2"
     if interlocking_warning_window is not None:
         # If there is already a  window open then we just bring it to the front
         interlocking_warning_window.lift()
         interlocking_warning_window.state('normal')
     else:
-        # If there is not already a window open then create a new one. Note that we do
-        # not want to take focus from the main application window (otherwise subsequent
-        # keypress events won't be processed by the main application window). I've tried
-        # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
-        # is to schedule tasks to re-focus back on the canvas after the window has been
-        # updated with a new message or after any user interaction is complete
-        interlocking_warning_window = Tk.Toplevel(root_window, takefocus=0)
+        # If there is not already a window open then create a new one
+        interlocking_warning_window = Tk.Toplevel(root_window, bg=background)
         interlocking_warning_window.title("Layout Warnings")
         interlocking_warning_window.protocol("WM_DELETE_WINDOW", close_warning_window)
-        interlocking_warning_window.bind('<Configure>', lambda event, arg=canvas: user_dragging_window(event, arg))
-        interlocking_warning_window.bind('<FocusIn>', lambda event, arg=canvas: user_dragging_window(event, arg))
+        # We need to ensure the canvas re-takes focus afterany user interaction with the window
+        interlocking_warning_window.bind('<Configure>', lambda event, arg=canvas: focus_back_on_canvas(event, arg))
+        interlocking_warning_window.bind('<FocusIn>', lambda event, arg=canvas: focus_back_on_canvas(event, arg))
+        # Create the warning window over the main window (to make it obvious)
+        # (the user can always move it out of the wy if they want to)
         x, y = root_window.winfo_x(), root_window.winfo_y()
         interlocking_warning_window.geometry(f"+{x}+{y}")
-        buttonframe = Tk.Frame(interlocking_warning_window)
+        # Create a frame for the OK and CLEAR buttons at the bottom of the window
+        buttonframe = Tk.Frame(interlocking_warning_window, bg=background)
         buttonframe.pack(side=Tk.BOTTOM)
         button1 = Tk.Button(buttonframe, text="OK/Close", command=close_warning_window)
         button1.pack(padx=2, pady=2, side=Tk.LEFT)
-        button2 = Tk.Button(buttonframe, text="Clear", command=clear_warning_window)
+        button2 = Tk.Button(buttonframe, text="Clear all but last message", command=clear_warning_window)
         button2.pack(padx=2, pady=2, side=Tk.LEFT)
     # Add the latest warning message
     current_time = datetime.now().strftime('%H:%M:%S')
-    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w"))
-    list_of_warning_labels[-1].pack(padx=10, fill='x', expand=True)
-    # Update Idletasks to display the window and schedule an immediate event to return
-    # the focus to the canvas (to allow subsequent keypress events to be processed)
-    root_window.update_idletasks()
-    root_window.after(0, lambda:canvas.focus_set())
+    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w", bg=background))
+    list_of_warning_labels[-1].pack(padx=10, pady=2, fill='x', expand=True)
+    # We don't want to take focus from the main application window (otherwise subsequent
+    # keypress events won't be processed by the main application window). I've tried
+    # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
+    # is to schedule tasks to re-focus back on the canvas after the window has been
+    # updated with a new message or after any user interaction is complete.
+    focus_back_on_canvas(event=None, canvas=canvas)
     return()
 
 #-------------------------------------------------------------------------
