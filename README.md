@@ -55,37 +55,20 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 ## What's new for Release 6.0.0:
 
 > [!IMPORTANT]
-> Release 6.0.0 will only support the loading of layout files created by Release 5.0.0 or later.
+> Release 6.1.0 will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 5.0.0 and then load/re-save your files before upgrading to Release 6.0.0.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.1.0.
 > You have been warned!
 
-* New Entry/Exit (NX) route setting feature for true prototypical operation of the schematic:
-    * Entry, exit or entry/exit buttons are supported with correct symbology.
-    * Track occupancy can be shown (with changes to signal routes as described below).
-    * 'One-click' route setting is also retained - use whatever works best for your layout.
-* The base Item ID (for creation of new objects) can now be specified under general settings:
-    * Making it easier to use different Item ID 'ranges' for different areas of the layout.
-* New Point Motor Excersising utility to continuously toggle all points on the layout:
-    * My older slow-acting point motors get a bit 'sticky' after periods of disuse.
-    * This utility can be used to exercise them for a period of time to 'free them up'.
-* New feature to trigger the playing of audio files by specified DCC commands:
-    * Uses audio output of the Signalling System and/or Remote Signalling Nodes.
-    * Enables audio such as station announcements to be triggered by DCC switches.
-* The display of Line/Button/Point IDs can now be toggled on/off in edit mode by <Cntl-i>:
-    * Aids identification of objects to take the pain out of configuring routes.
-* Ability to apply offsets for Signalbox Lever buttons and/or hide them in Run Mode:
-    * Can be used to provide better seperation of buttons when using touchscreens.
-    * Can be hidden completely if you are using external levers for your layout.
-* Ability to easily configure multiple objects to be 'hidden' or 'unhidden':
-    * In Edit Mode - Use'h' and 'u' to configure objects to be 'hidden' or 'unhidden'.
-    * In Run Mode - The re-configured objects will be hidden or displayed as required.
-* Minor changes to allow 'non-signalled' routes to be defined for signals:
-    * These are routes for trains passing the signal in the opposite direction.
-    * Enables more prototypical track circuit highlighting for NX panels
-* Minor improvements to File => Open and File => New:
-    * Any open configuration windows are closed to avoid confusion
-* A full documentation refresh
+* Minor improvements to Route setup functionality:
+    * Ignore state of monentary switches on completion of route setup
+    * Ensure flashing of route buttons is canceled on load of new schematic
+* New scripting API to enable control of signalling application from python programs:
+    * Enables full signalbox simulations to be developed (with simulated train movements)
+    * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays
+* Minor bugfixes to enable schematics with block instrument sounds to run on Windows platforms
+* Make popup warning window (SPAD and Lever warnings) more obvious
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
