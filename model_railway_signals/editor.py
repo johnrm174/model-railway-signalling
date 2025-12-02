@@ -264,6 +264,10 @@ class main_menubar:
         # Parse the command line arguments
         parser = argparse.ArgumentParser(description = "Model railway signalling "+settings.get_general("version"),
                             formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=27))
+        # Catch the optional 'os_file_path' positional argument (to enable double-click on sig files)
+        parser.add_argument('os_file_path', nargs='?', default=None,
+            help='A positional file path passed by the OS when double-clicking a .sig file.')
+        # Catch the flagged argulents
         parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
         parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
         parser.add_argument("-l","--log",dest="log_level",metavar="LEVEL",
@@ -286,13 +290,20 @@ class main_menubar:
             self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
             tracemalloc.start()
         self.monitor_memory_usage = False
-        # If a filename has been specified as a command line argument then load it. The loaded
-        # settings will overwrite the default settings and initialise_editor will be called again
-        # Note we schedule this to run immediately after the main loop starts so Tkinter is
-        # 'ready' to handle any events that may be passed in from other threads when we configure
-        # the application with the newly loaded settings (GPIO or MQTT events)
-        if args.filename is not None:
-            self.root.after(0, self.load_schematic, args.filename)
+        # If a filename has been specified as an argument (positional or flag) then load it. The
+        # loaded settings will overwrite the default settings and initialise_editor will be called.
+        # Note we schedule this to run immediately after the main loop starts so Tkinter is 'ready'
+        # to handle any events that may be passed in from other threads when we configure the
+        # application with the newly loaded settings (GPIO or MQTT events)
+        if args.os_file_path and args.os_file_path.lower().endswith('.sig'):
+            file_to_load = args.os_file_path
+        elif args.filename and args.filename.lower().endswith('.sig'):
+            file_to_load = args.filename
+        else:
+            file_to_load = None
+        # If a filename has been specified then try to load it
+        if file_to_load is not None:
+            self.root.after(0, self.load_schematic, file_to_load)
 
     # --------------------------------------------------------------------------------------
     # Advanced debugging functions (memory allocation monitoring/reporting)

@@ -69,6 +69,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Minor bugfix to enable schematics with block instrument sounds to run on Windows platforms.
 * Minor bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys)
 * Make popup warning window (SPAD and Lever warnings) more obvious.
+* Accept optional OS arguments (to enable application start when sig file is clicked)
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
