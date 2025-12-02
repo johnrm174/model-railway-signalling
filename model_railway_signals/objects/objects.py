@@ -455,9 +455,9 @@ def hide_objects(list_of_object_ids:list, hide:bool=True):
             elif type_of_object == objects_common.object_type.textbox:
                 objects_textboxes.delete_textbox_object(object_id)
             elif type_of_object == objects_common.object_type.switch:
-                objects_switches.delete_textbox_object(object_id)
+                objects_switches.delete_switch_object(object_id)
             elif type_of_object == objects_common.object_type.track_sensor:
-                objects_sensors.delete_textbox_object(object_id)
+                objects_sensors.delete_track_sensor_object(object_id)
     # Update idletasks to provide a 'flash' - giving the user an indication of the change
     objects_common.root.update_idletasks()
     # Re-draw the drawing objects on the canvas in their new state
@@ -472,9 +472,9 @@ def hide_objects(list_of_object_ids:list, hide:bool=True):
             elif type_of_object == objects_common.object_type.textbox:
                 objects_textboxes.redraw_textbox_object(object_id)
             elif type_of_object == objects_common.object_type.switch:
-                objects_switches.redraw_textbox_object(object_id)
+                objects_switches.redraw_switch_object(object_id)
             elif type_of_object == objects_common.object_type.track_sensor:
-                objects_sensors.redraw_textbox_object(object_id)
+                objects_sensors.redraw_track_sensor_object(object_id)
     # save the current state (for undo/redo)
     save_schematic_state()
     # As we are deleting/re-creating objects we still need to process layout changes as the

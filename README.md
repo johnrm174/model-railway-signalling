@@ -60,14 +60,15 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.1.0.
 > You have been warned!
 
-* Minor improvements to Route setup functionality:
-    * Ignore state of monentary switches on completion of route setup
-    * Ensure flashing of route buttons is canceled on load of new schematic
+* Minor improvements/bugfixes to Route setup functionality:
+    * Ignore state of monentary switches on completion of route setup.
+    * Ensure flashing of route buttons is canceled on load of new schematic.
 * New scripting API to enable control of signalling application from python programs:
-    * Enables full signalbox simulations to be developed (with simulated train movements)
-    * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays
-* Minor bugfixes to enable schematics with block instrument sounds to run on Windows platforms
-* Make popup warning window (SPAD and Lever warnings) more obvious
+    * Enables full signalbox simulations to be developed (with simulated train movements).
+    * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays.
+* Minor bugfix to enable schematics with block instrument sounds to run on Windows platforms.
+* Minor bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys)
+* Make popup warning window (SPAD and Lever warnings) more obvious.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
