@@ -625,13 +625,13 @@ class theatre_route_indications:
         # disabled so it can never be selected (not really a route indication as such)
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit selection
-        self.CB1 = common.check_box(self.frame, label="Auto inhibit route indications on DANGER", width=35,
+        self.CB1 = common.check_box(self.frame, label="DCC Signal inhibits route indications on DANGER", width=45,
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
                             "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB1.pack(padx=2, pady=2)
         # Create the checkbox and tool tip for Enable Theatre for Subsidary selection
-        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidiary", width=35,
+        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidiary signal", width=45,
                     tool_tip = "Select to enable theatre indications for the subsidiary signal (as well as the main signal)")
         self.CB2.pack(padx=2, pady=2)
 
