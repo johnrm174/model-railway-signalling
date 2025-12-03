@@ -94,10 +94,10 @@ class signal_events_frame(Tk.LabelFrame):
         if not self.approach.validate(): valid = False
         # validate the entries are not the same
         if valid and self.passed.get_value()[1] !="" and self.approach.get_value()[1] == self.passed.get_value()[1]:
-            self.passed.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
-            self.approach.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
-            self.passed.set_validation_status(False)
-            self.approach.set_validation_status(False)
+            self.passed.sensor.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
+            self.approach.sensor.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
+            self.passed.sensor.set_validation_status(False)
+            self.approach.sensor.set_validation_status(False)
             valid = False
         return(valid)
 
