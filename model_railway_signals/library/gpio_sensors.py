@@ -651,7 +651,6 @@ def update_gpio_sensor_callback (sensor_id:Union[int,str], signal_passed:int=Non
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Sensor ID must be an int or str")
     elif not gpio_sensor_exists(sensor_id):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Sensor ID does not exist")
-        
     elif signal_passed is not None and (not isinstance(signal_passed,int) or signal_passed < 0):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be a positive int")
     elif signal_approach is not None and (not isinstance(signal_approach,int) or signal_approach < 0):
