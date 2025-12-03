@@ -911,14 +911,15 @@ def update_signal_styles(object_id, dict_of_new_styles:dict):
 #------------------------------------------------------------------------------------
 
 def delete_signal_object(object_id):
+    item_id = objects_common.schematic_objects[object_id]["itemid"]
     # Delete the signal drawing objects and associated DCC mapping
-    library.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
-    library.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
+    library.delete_signal(item_id)
+    library.delete_signal_mapping(item_id)
     # Delete the track sensor mappings for the signal (if any)
     passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
     approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
-    if passed_sensor != "": library.update_gpio_sensor_callback(passed_sensor)
-    if approach_sensor != "": library.update_gpio_sensor_callback(approach_sensor)
+    if passed_sensor != "": library.update_gpio_sensor_callback(passed_sensor, signal_passed=0)
+    if approach_sensor != "": library.update_gpio_sensor_callback(approach_sensor, signal_approach=0)
     # Delete the associated distant signal (if there is one)
     if has_associated_distant(object_id):
         library.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+1000)

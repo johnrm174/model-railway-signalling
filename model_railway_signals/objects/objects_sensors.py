@@ -271,7 +271,7 @@ def delete_track_sensor_object(object_id):
     library.delete_track_sensor(item_id)
     # Delete the track sensor mapping for the intermediate sensor (if any)
     linked_gpio_sensor = objects_common.schematic_objects[object_id]["passedsensor"]
-    if linked_gpio_sensor != "": library.update_gpio_sensor_callback(linked_gpio_sensor)
+    if linked_gpio_sensor != "": library.update_gpio_sensor_callback(linked_gpio_sensor, sensor_passed=0)
     return()
 
 #------------------------------------------------------------------------------------------------------------------

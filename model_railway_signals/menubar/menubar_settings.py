@@ -887,21 +887,21 @@ class gpio_port_mapping(Tk.Frame):
                 tool_tip="Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)")
         self.sensorid.pack(side=Tk.LEFT, padx=2)
         # Create the Signal/Track sensor 'mapping' label
-        self.mapping = Tk.Label(self, width=18, anchor='w')
+        self.mapping = Tk.Label(self, width=38, anchor='w')
         self.mapping.pack(side=Tk.LEFT,padx=2)
 
     def entry_updated(self, status_code:int=None):
         # Update the mapping information
+        mapping = ""
         if library.gpio_sensor_exists(self.sensorid.get_value()):
             event_mappings = library.get_gpio_sensor_callback(self.sensorid.get_value())
-            if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
-            elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
-            elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
-            elif event_mappings[3] > 0: mapping_text = u"\u2192"+" Track Section "+str(event_mappings[3])
-            else: mapping_text="--------------------------"
-        else:
-            mapping_text="--------------------------"
-        self.mapping.config(text=mapping_text)
+            if event_mappings[0] > 0: mapping = mapping + u"\u2192" + " Signal " + str(event_mappings[0]) + " "
+            if event_mappings[1] > 0: mapping = mapping + u"\u2192" + " Signal "+ str(event_mappings[1]) + " "
+            if event_mappings[2] > 0: mapping = mapping + u"\u2192" + " Tk Sensor "+ str(event_mappings[2]) + " "
+            if event_mappings[3] > 0: mapping = mapping + u"\u2192" + " Section "+ str(event_mappings[3]) + " "
+        if len(mapping) == 0:
+            mapping="-----------------------------------------------------------"
+        self.mapping.config(text=mapping)
         # Update the GPIO port status
         if status_code is not None:
             if status_code == 0:

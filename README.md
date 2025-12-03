@@ -66,10 +66,13 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * New scripting API to enable control of signalling application from python programs:
     * Enables full signalbox simulations to be developed (with simulated train movements).
     * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays.
-* Minor bugfix to enable schematics with block instrument sounds to run on Windows platforms.
-* Minor bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys)
-* Make popup warning window (SPAD and Lever warnings) more obvious.
+* Allow GPIO Sensors to be mapped to more than one object type to give more flexibility:
+    * e.g. A GPIO sensor can be mapped to a signal passed event and a Track Sensor event.
 * Accept optional OS arguments (to enable application start when sig file is clicked)
+* Colour Scheme changes to make popup warnings (SPAD and Lever warnings) more obvious.
+* Bugfix to enable schematics with block instrument sounds to run on Windows platforms.
+* Bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys).
+* Bugfix to validation of 'Signal passed' and 'signal approached' GPIO Sensor ID entries.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

@@ -488,10 +488,10 @@ def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str], mqtt_connectio
         if gpio_port_mappings[str_gpio_port]["signal_passed"] > 0:
             sig_id = gpio_port_mappings[str_gpio_port]["signal_passed"]
             signals.sig_passed_button_event(sig_id)
-        elif gpio_port_mappings[str_gpio_port]["signal_approach"] > 0:
+        if gpio_port_mappings[str_gpio_port]["signal_approach"] > 0:
             sig_id = gpio_port_mappings[str_gpio_port]["signal_approach"]
             signals.approach_release_button_event(sig_id)
-        elif gpio_port_mappings[str_gpio_port]["sensor_passed"] > 0:
+        if gpio_port_mappings[str_gpio_port]["sensor_passed"] > 0:
             sensor_id = gpio_port_mappings[str_gpio_port]["sensor_passed"]
             track_sensors.track_sensor_triggered(sensor_id)
     # We always want to process mqtt connection event messages to set the initial state of Track Sections
@@ -626,6 +626,8 @@ def get_gpio_sensor_callback(sensor_id:Union[int,str]):
     elif not gpio_sensor_exists(sensor_id):
         logging.error("GPIO Sensor "+str(sensor_id)+": get_gpio_sensor_callback - Sensor does not exist")
     else:
+        # The returned list is [signal_passed, signal_approach, sensor_passed, track_section]
+        # Where each element of the list is the ID of the mapped item (0 if no mapping)
         str_gpio_port = mapped_gpio_port(sensor_id)
         signal_passed = gpio_port_mappings[str_gpio_port]["signal_passed"]
         signal_approach = gpio_port_mappings[str_gpio_port]["signal_approach"]
@@ -641,49 +643,44 @@ def get_gpio_sensor_callback(sensor_id:Union[int,str]):
 # The function can also be called to delete all existing event mappings for the GPIO sensor.
 #---------------------------------------------------------------------------------------------------
 
-def update_gpio_sensor_callback (sensor_id:Union[int,str], signal_passed:int=0,
-                    signal_approach:int=0, sensor_passed:int=0, track_section:int=0):
+def update_gpio_sensor_callback (sensor_id:Union[int,str], signal_passed:int=None,
+                    signal_approach:int=None, sensor_passed:int=None, track_section:int=None):
     global gpio_port_mappings
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sensor_id,int) and not isinstance(sensor_id,str):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Sensor ID must be an int or str")
     elif not gpio_sensor_exists(sensor_id):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Sensor ID does not exist")
-    elif not isinstance(signal_passed,int) or signal_passed < 0:
+        
+    elif signal_passed is not None and (not isinstance(signal_passed,int) or signal_passed < 0):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be a positive int")
-    elif not isinstance(signal_approach,int) or signal_approach < 0:
+    elif signal_approach is not None and (not isinstance(signal_approach,int) or signal_approach < 0):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Signal ID must be a positive int")
-    elif not isinstance(sensor_passed,int) or sensor_passed < 0:
+    elif sensor_passed is not None and (not isinstance(sensor_passed,int) or sensor_passed < 0):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Sensor ID must be a positive int")
-    elif not isinstance(track_section,int) or track_section < 0:
+    elif track_section is not None and (not isinstance(track_section,int) or track_section < 0):
         logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - Linked Section ID must be a positive int")
-    elif ( (signal_passed > 0 and signal_approach > 0) or (signal_passed > 0 and sensor_passed > 0) or
-           (signal_approach > 0 and sensor_passed > 0) or (signal_passed > 0 and track_section > 0) or
-           (signal_approach > 0 and track_section > 0) or (sensor_passed > 0 and track_section > 0) ):
-        logging.error("GPIO Sensor "+str(sensor_id)+": add_gpio_sensor_callback - More than one event specified")
     else:
         # Add the appropriate callback event to the GPIO Sensor configuration
         str_gpio_port = mapped_gpio_port(sensor_id)
-        if signal_passed > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'passed' event for Signal "+str(signal_passed))
-        elif signal_approach > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'approach' event for Signal "+str(signal_approach))
-        elif sensor_passed > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'passed' event for Track Sensor "+str(sensor_passed))
-        elif track_section > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'updated' event for Track Section "+str(track_section))
-        else:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Removing all event mappings")
-        gpio_port_mappings[str_gpio_port]["signal_passed"] = signal_passed
-        gpio_port_mappings[str_gpio_port]["signal_approach"] = signal_approach
-        gpio_port_mappings[str_gpio_port]["sensor_passed"] = sensor_passed
-        gpio_port_mappings[str_gpio_port]["track_section"] = track_section
+        if signal_passed is not None:
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Updating 'passed' event for Signal "+str(signal_passed))
+            gpio_port_mappings[str_gpio_port]["signal_passed"] = signal_passed
+        if signal_approach  is not None:
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Updating 'approach' event for Signal "+str(signal_approach))
+            gpio_port_mappings[str_gpio_port]["signal_approach"] = signal_approach
+        if sensor_passed  is not None:
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Updating 'passed' event for Track Sensor "+str(sensor_passed))
+            gpio_port_mappings[str_gpio_port]["sensor_passed"] = sensor_passed
+        if track_section  is not None:
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Updating 'updated' event for Track Section "+str(track_section))
+            gpio_port_mappings[str_gpio_port]["track_section"] = track_section
         # If the callback is mapped to a Track Section then we make an initial callback based on the
         # current (tracked) state of the GPIO sensor to synchronise the Track Section with the sensor.
-        #The make_callback flag is used to supress any layout processing beyond updating the state of the
+        # The make_callback flag is used to supress any layout processing beyond updating the state of the
         # Track Sensor. Whilst the Track Sensor involved in the callback will have been created, other
         # objects involved in the subsequent 'run_layout' processing may not yet exist on the schematic.
-        if track_section > 0:
+        if track_section is not None and track_section > 0:
             current_state = gpio_port_mappings[str_gpio_port]["sensor_state"]
             track_sections.section_state_toggled(track_section, required_state=current_state, make_callback=False)
     return()
