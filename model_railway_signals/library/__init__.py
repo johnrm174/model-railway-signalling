@@ -160,6 +160,8 @@ from .dcc_control import reset_dcc_mqtt_configuration
 from .dcc_control import set_node_to_publish_dcc_commands
 from .dcc_control import subscribe_to_dcc_command_feed
 
+from .gpio_sensors import gpio_sensor_triggered
+from .gpio_sensors import gpio_sensor_released
 from .gpio_sensors import gpio_interface_enabled
 from .gpio_sensors import get_list_of_available_gpio_ports
 from .gpio_sensors import gpio_sensor_exists
@@ -308,7 +310,9 @@ __all__ = [
         'reset_sections_mqtt_configuration',
         'subscribe_to_remote_sections',
         'set_sections_to_publish_state',
-      # public gpio sensor functions
+      # public gpio sensor
+        'gpio_sensor_triggered',
+        'gpio_sensor_released',
         'gpio_interface_enabled',
         'get_list_of_available_gpio_ports',
         'gpio_sensor_exists',

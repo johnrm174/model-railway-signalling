@@ -875,6 +875,12 @@ class gpio_port_mapping(Tk.Frame):
         self.callback = callback
         # Create a frame to hold the label and entry box
         super().__init__(parent_frame)
+        # Create the Test button and bind the events we are interested in
+        self.test = Tk.Button(self, text="Test", pady=0, padx=0)
+        self.test.pack(padx=2, side=Tk.LEFT)
+        self.test.bind('<Button-1>', self.button_pressed_event)
+        self.test.bind('<ButtonRelease-1>', self.button_released_event)
+        self.testTT=common.CreateToolTip(self.test, text="Press/release to simulate GPIO port events")
         # Create the status indication
         self.status = Tk.Label(self, width=2,bd=1, relief="solid")
         self.status.pack(side=Tk.LEFT,padx=2)
@@ -889,6 +895,12 @@ class gpio_port_mapping(Tk.Frame):
         # Create the Signal/Track sensor 'mapping' label
         self.mapping = Tk.Label(self, width=38, anchor='w')
         self.mapping.pack(side=Tk.LEFT,padx=2)
+
+    def button_pressed_event(self, event=None):
+        library.gpio_sensor_triggered(self.gpio_port)
+
+    def button_released_event(self, event=None):
+        library.gpio_sensor_released(self.gpio_port)
 
     def entry_updated(self, status_code:int=None):
         # Update the mapping information

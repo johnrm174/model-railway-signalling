@@ -59,6 +59,9 @@
 #   subscribe_to_gpio_port_status(gpio_port:int/str, callback) - to get real-time status updates
 #   unsubscribe_from_gpio_port_status (gpio_port:int/str) - to stop getting real-time status updates
 #   unsubscribe_from_all_gpio_port_status(): - to reset all subscriptions (use case layout load or new)
+#
+#   gpio_sensor_triggered(gpio_port:int) - simulate the activation of a GPIO port (for gpio settings test)
+#   gpio_sensor_released(gpio_port:int) - simulate the deactivation of a GPIO port (for gpio settings test)
 # 
 # External API - classes and functions (used by the other library modules):
 #
@@ -211,7 +214,7 @@ def subscribe_to_gpio_port_status(gpio_port:Union[int,str], callback):
 def unsubscribe_from_gpio_port_status(gpio_port:Union[int,str]):
     global gpio_port_subscriptions
     if not isinstance(gpio_port, int) and not isinstance(gpio_port, str):
-        logging.error("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - Sensor ID must be an int or str")
+        logging.error("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - GPIO Port must be an int or str")
     elif str(gpio_port) not in gpio_port_subscriptions.keys():
         logging.warning("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - GPIO Port is not subscribed")
     else:
@@ -314,7 +317,7 @@ def gpio_released_callback(gpio_port:int):
     return()
 
 #---------------------------------------------------------------------------------------------------
-# Internal function executed in the main Tkinter thread whenever a "Button Held" event is detected
+# API function executed in the main Tkinter thread whenever a "Button Held" event is detected
 # for the external GPIO port. A timeout is applied to ignore further triggers during the timeout period.
 # If the sensor is re-triggered within the timeout period then the timeout period is extended. This is
 # to handle optical sensors which might Fall and Rise as each carriage/waggon passes the sensor.
@@ -322,63 +325,69 @@ def gpio_released_callback(gpio_port:int):
 
 def gpio_sensor_triggered(gpio_port:int):
     global gpio_port_mappings
-    # Check the breaker hasn't tripped in the time between when the event was raised in the
-    # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
-    # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
-    # so we don't have to check the gpio_port_mapping entry still exists before querying it.
-    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-        sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-        # Only process the event if we are not in the timeout period from a previous trigger
-        # If we are in the timeout period then 'our' sensor state will still be active
-        if not gpio_port_mappings[str(gpio_port)]["sensor_state"]:
-            logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
-            gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
-            # Transmit the updated state via MQTT networking and make the mapped callback
-            send_mqtt_gpio_sensor_updated_event(sensor_id)
-            make_gpio_sensor_triggered_callback(sensor_id)
-            # Report the sensor status to any subscribed modules (the status page)
-            report_gpio_port_status(gpio_port, status=2) # Active
-        else:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
-        # Reset the timeout period (whether we have acted on it or not)
-        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
+    if not isinstance(gpio_port, int):
+        logging.error("GPIO Port "+str(gpio_port)+": gpio_sensor_triggered - GPIO Port must be an int")
+    elif str(gpio_port) in gpio_port_mappings.keys():
+        # Check the breaker hasn't tripped in the time between when the event was raised in the
+        # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
+        # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
+        # so we don't have to check the gpio_port_mapping entry still exists before querying it.
+        if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+            sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+            # Only process the event if we are not in the timeout period from a previous trigger
+            # If we are in the timeout period then 'our' sensor state will still be active
+            if not gpio_port_mappings[str(gpio_port)]["sensor_state"]:
+                logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
+                gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
+                # Transmit the updated state via MQTT networking and make the mapped callback
+                send_mqtt_gpio_sensor_updated_event(sensor_id)
+                make_gpio_sensor_triggered_callback(sensor_id)
+                # Report the sensor status to any subscribed modules (the status page)
+                report_gpio_port_status(gpio_port, status=2) # Active
+            else:
+                logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
+            # Reset the timeout period (whether we have acted on it or not)
+            gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
     return()
 
 #---------------------------------------------------------------------------------------------------
-# Internal function executed in the main Tkinter thread whenever a "Button Released" event is detected.
+# API function executed in the main Tkinter thread whenever a "Button Released" event is detected.
 #---------------------------------------------------------------------------------------------------
 
 def gpio_sensor_released(gpio_port:int):
     global gpio_port_mappings
-    # Check the breaker hasn't tripped in the time between when the event was raised in the
-    # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
-    # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
-    # so we don't have to check the gpio_port_mapping entry still exists before querying it.
-    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-        timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
-        timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
-        button_object = gpio_port_mappings[str(gpio_port)]["sensor_device"]
-        # Only process the event if the GPIO input is released and 'our' sensor state is still
-        # active. This is to cope with the case where we might have had multiple additional
-        # trigger/release events during the timeout period which have extended 'out' sensor
-        # active time and resulted in additional re-scheduled release events. This is to ensure
-        # we only make a single callback for the release event after the timeout period
-        if not button_object.is_pressed and gpio_port_mappings[str(gpio_port)]["sensor_state"]:
-            # Only process the release event if the trigger timeout period has expired
-            # Otherwise re-schedule the event for when the trigger timeout period expires
-            if time.time() > timeout_start + timeout_value:
-                gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
-                sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-                logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
-                # Transmit the updated state via MQTT networking and make the mapped callback
-                send_mqtt_gpio_sensor_updated_event(sensor_id)
-                make_gpio_sensor_released_callback(sensor_id)
-                # Report the sensor status to any subscribed modules (the status page)
-                report_gpio_port_status(gpio_port, status=3)  # Inactive
-            else:
-                # Reschedule the event to be processed after the timeout has expired
-                remaining_timeout_ms = int((timeout_start + timeout_value - time.time())*1000)
-                common.root_window.after(remaining_timeout_ms, lambda:gpio_sensor_released(gpio_port))
+    if not isinstance(gpio_port, int):
+        logging.error("GPIO Port "+str(gpio_port)+": gpio_sensor_released - GPIO Port must be an int")
+    elif str(gpio_port) in gpio_port_mappings.keys():
+        # Check the breaker hasn't tripped in the time between when the event was raised in the
+        # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
+        # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
+        # so we don't have to check the gpio_port_mapping entry still exists before querying it.
+        if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+            timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
+            timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
+            button_object = gpio_port_mappings[str(gpio_port)]["sensor_device"]
+            # Only process the event if the GPIO input is released and 'our' sensor state is still
+            # active. This is to cope with the case where we might have had multiple additional
+            # trigger/release events during the timeout period which have extended 'out' sensor
+            # active time and resulted in additional re-scheduled release events. This is to ensure
+            # we only make a single callback for the release event after the timeout period
+            if not button_object.is_pressed and gpio_port_mappings[str(gpio_port)]["sensor_state"]:
+                # Only process the release event if the trigger timeout period has expired
+                # Otherwise re-schedule the event for when the trigger timeout period expires
+                if time.time() > timeout_start + timeout_value:
+                    gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
+                    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+                    logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
+                    # Transmit the updated state via MQTT networking and make the mapped callback
+                    send_mqtt_gpio_sensor_updated_event(sensor_id)
+                    make_gpio_sensor_released_callback(sensor_id)
+                    # Report the sensor status to any subscribed modules (the status page)
+                    report_gpio_port_status(gpio_port, status=3)  # Inactive
+                else:
+                    # Reschedule the event to be processed after the timeout has expired
+                    remaining_timeout_ms = int((timeout_start + timeout_value - time.time())*1000)
+                    common.root_window.after(remaining_timeout_ms, lambda:gpio_sensor_released(gpio_port))
     return()
 
 #---------------------------------------------------------------------------------------------------
