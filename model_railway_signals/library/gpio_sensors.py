@@ -67,6 +67,7 @@
 #
 #   handle_mqtt_gpio_sensor_triggered_event(message:dict) - Called on receipt of a remote 'gpio_sensor_event'
 #        Dictionary comprises ["sourceidentifier"] - the identifier for the remote gpio sensor
+#        (Note that this is also used as an API Function to "Test" remote GPIO Sensor activation)
 #
 #    mqtt_send_all_gpio_sensor_states_on_broker_connect() - transmit the state of all sensors set to publish
 #
@@ -205,6 +206,7 @@ def subscribe_to_gpio_port_status(gpio_port:Union[int,str], callback):
     else:
         gpio_port_subscriptions[str(gpio_port)] = callback
         if str(gpio_port) not in gpio_port_mappings.keys(): status = 0
+        elif gpio_port_mappings[str(gpio_port)]["sensor_state"] is None: status = 0
         elif gpio_port_mappings[str(gpio_port)]["breaker_tripped"]: status = 1
         elif gpio_port_mappings[str(gpio_port)]["sensor_state"]: status = 2
         else: status = 3
@@ -215,9 +217,7 @@ def unsubscribe_from_gpio_port_status(gpio_port:Union[int,str]):
     global gpio_port_subscriptions
     if not isinstance(gpio_port, int) and not isinstance(gpio_port, str):
         logging.error("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - GPIO Port must be an int or str")
-    elif str(gpio_port) not in gpio_port_subscriptions.keys():
-        logging.warning("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - GPIO Port is not subscribed")
-    else:
+    elif str(gpio_port) in gpio_port_subscriptions.keys():
         del gpio_port_subscriptions[str(gpio_port)]
     return()
 
@@ -765,7 +765,7 @@ def subscribe_to_remote_gpio_sensors(*remote_identifiers:str):
             gpio_port_mappings[remote_id]["signal_passed"] = 0
             gpio_port_mappings[remote_id]["sensor_passed"] = 0
             gpio_port_mappings[remote_id]["track_section"] = 0
-            gpio_port_mappings[remote_id]["sensor_state"] = False
+            gpio_port_mappings[remote_id]["sensor_state"] = None
             gpio_port_mappings[remote_id]["breaker_tripped"] = False
             # Subscribe to GPIO Sensor Events from the remote GPIO sensor
             [node_id, item_id] = mqtt_interface.split_remote_item_identifier(remote_id)

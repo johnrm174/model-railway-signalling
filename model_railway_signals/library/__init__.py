@@ -175,6 +175,7 @@ from .gpio_sensors import subscribe_to_remote_gpio_sensors
 from .gpio_sensors import subscribe_to_gpio_port_status
 from .gpio_sensors import unsubscribe_from_gpio_port_status
 from .gpio_sensors import unsubscribe_from_all_gpio_port_status
+from .gpio_sensors import handle_mqtt_gpio_sensor_event
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -326,6 +327,7 @@ __all__ = [
         'subscribe_to_gpio_port_status',
         'unsubscribe_from_gpio_port_status',
         'unsubscribe_from_all_gpio_port_status',
+        'handle_mqtt_gpio_sensor_event',
       # Public SPROG control functions
         'sprog_connect',
         'sprog_disconnect',

@@ -59,6 +59,8 @@ from .menubar_utilities import application_upgrade
 from .menubar_utilities import import_layout
 from .menubar_utilities import exercise_points
 
+from .menubar_subscriptions import mqtt_subscriptions
+
 __all__ = [
     'display_help',
     'display_about',
@@ -84,6 +86,7 @@ __all__ = [
     'bulk_renumbering',
     'application_upgrade',
     'import_layout',
-    'exercise_points' ]
+    'exercise_points',
+    'mqtt_subscriptions']
 
 ##############################################################################################################

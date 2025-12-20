@@ -204,6 +204,8 @@ class main_menubar:
                 command=lambda:menubar.import_layout(self.root, self.import_schematic))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
+        self.utilities_menu.add_command(label =" MQTT Subscriptions...",
+                command=lambda:menubar.mqtt_subscriptions(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
