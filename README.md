@@ -77,11 +77,14 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Allows end-to end test of functionality whilst not connected to the layout.
 * New SPROG Status Monitoring Feature (SPROG Settings Window):
     * Provides display of SPROG Status, DCC Bus Voltage and DCC Bus current
+* Added ability to override ground signals (to ON) based on track occupancy ahead
+* Added ability to override subsidiary signals (to ON) based on track occupancy ahead
 * Accept optional OS arguments (to enable application start when sig file is clicked)
 * Colour Scheme changes to make popup warnings (SPAD and Lever warnings) more obvious.
 * Bugfix to enable schematics with block instrument sounds to run on Windows platforms.
 * Bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys).
 * Bugfix to validation of 'Signal passed' and 'signal approached' GPIO Sensor ID entries.
+* Bugfix to interlocking of subsidiary signals (now locked correctly if no route ahead)
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
