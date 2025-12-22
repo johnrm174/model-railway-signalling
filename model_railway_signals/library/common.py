@@ -227,12 +227,12 @@ def sprog_transmit_all():
 def set_root_window(root):
     global root_window
     root_window = root
-    # bind the tkinter event for handling events raised in external threads
-    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
     # Bind a handler for any keypress events used to trigger library events such
     # as switching signalbox levers or Sensor Triggered events. Note that any
     # specific canvas event bindings elsewhere in the code will still work.
     root_window.bind("<Key>", keyboard_handler)
+    # Start the polling loop (for handling events passed in by other threads)
+    root_window.after(100, process_external_events)
     return()
 
 #-------------------------------------------------------------------------
@@ -377,33 +377,29 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
     return (start_point, end_point)
 
 #-------------------------------------------------------------------------
-# Functions to allow custom callback functions to be passed in (from an external thread)
-# and then handled in the main Tkinter thread (to keep everything threadsafe). We use
-# the tkinter event_generate method to generate a custom event in the main event loop
-# in conjunction with a (threadsafe) queue to pass the callback function. We don't use
-# the tkinter root.after method as we don't believe that this is threadsafe.
-# Use as follows: execute_function_in_tkinter_thread (lambda: my_function(arg1,arg2...))
+# Functions to allow custom callback functions to be passed in (from an
+# external thread) and then handled in the main Tkinter thread (to keep
+# everything threadsafe). We Use a polling Method (pulling from a Queue
+# as we know Tkinter isnt thread safe - Even the Root.after method and
+# root.event_generate method can sometimes cause the thread to hang
 #-------------------------------------------------------------------------
 
-def handle_callback_in_tkinter_thread(*args):
-    while not event_queue.empty():
-        callback = event_queue.get(False)
-        callback()
+def process_external_events():
+    # Check how many items are waiting
+    backlog = event_queue.qsize()
+    # Process only what is currently in the queue (max 20 at a time)
+    # This ensures a flood of MQTT data doesn't starve the GUI thread.
+    for _ in range(min(backlog, 20)):
+        callback = event_queue.get_nowait()
+        # Add exception handling so the polling function doesn't get kinned.
+        try: callback()
+        except: pass
+    # Schedule next check. 100ms is standard
+    root_window.after(100, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
-    # When loading a layout file on startup, there were a number of possible edge cases that could cause
-    # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
-    # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
-    # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
-    # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
-    # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
-    try:
-        root_window.event_generate("<<ExtCallback>>", when="tail")
-    except Exception as exception:
-        logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
-        logging.error(str(exception))
     return()
 
 ##################################################################################################
