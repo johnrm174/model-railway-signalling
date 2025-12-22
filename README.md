@@ -81,6 +81,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Added ability to override subsidiary signals (to ON) based on track occupancy ahead
 * Accept optional OS arguments (to enable application start when sig file is clicked)
 * Colour Scheme changes to make popup warnings (SPAD and Lever warnings) more obvious.
+* Clearance delay (track occupancy changes) can now be specified up to 60 seconds.
 * Bugfix to enable schematics with block instrument sounds to run on Windows platforms.
 * Bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys).
 * Bugfix to validation of 'Signal passed' and 'signal approached' GPIO Sensor ID entries.

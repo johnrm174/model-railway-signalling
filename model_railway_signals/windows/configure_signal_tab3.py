@@ -243,7 +243,7 @@ class track_occupancy_frame(Tk.LabelFrame):
         self.subframe.pack()
         self.label = Tk.Label(self.subframe, text="'Clearance' delay:")
         self.label.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.clearance = common.integer_entry_box(self.subframe, width=3, min_value=0, max_value=10,
+        self.clearance = common.integer_entry_box(self.subframe, width=3, min_value=0, max_value=60,
                         tool_tip="Enter the delay (in seconds) between the signal being 'passed' and any "+
                         "track occupancy changes being triggered", empty_equals_zero=False, allow_empty=False)
         self.clearance.pack(padx=2, pady=2, side=Tk.LEFT)

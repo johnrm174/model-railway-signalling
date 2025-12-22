@@ -192,7 +192,7 @@ class edit_track_sensor():
             # Create a subframe to center everything in
             self.subframe2=Tk.LabelFrame(self.frame, text="'Clearance' delay:")
             self.subframe2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            self.clearance = common.integer_entry_box(self.subframe2, width=3, min_value=0, max_value=10,
+            self.clearance = common.integer_entry_box(self.subframe2, width=3, min_value=0, max_value=60,
                             tool_tip="Enter the delay (in seconds) between the sensor being 'passed' and any "+
                             "track occupancy changes being triggered", empty_equals_zero=False, allow_empty=False)
             self.clearance.pack(padx=2, pady=2)
