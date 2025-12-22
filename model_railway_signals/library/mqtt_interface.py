@@ -138,7 +138,9 @@ heartbeats = {}
 #-----------------------------------------------------------------------------------------------
 
 def get_mqtt_node_status():
-    return(heartbeats)
+    # Returning a .copy() prevents a RuntimeError if a heartbeat arrives
+    # while the editor is iterating over this dictionary.
+    return(heartbeats.copy())
 
 #-----------------------------------------------------------------------------------------------
 # Find the local IP address (to include in the heartbeat messages):
@@ -187,7 +189,7 @@ def publish_heartbeat_message():
 # This identifier can then be used as the "key" to look up the Item in the associated dictionary
 # ---------------------------------------------------------------------------------------------
 
-def create_remote_item_identifier(item_id:int,node:str = None):
+def create_remote_item_identifier(item_id:int,node:str):
     return (node+"-"+str(item_id))
 
 # ---------------------------------------------------------------------------------------------
@@ -421,11 +423,12 @@ def mqtt_broker_connect (broker_host:str,
         node_config["broker_username"] = broker_username
         node_config["broker_password"] = broker_password
         # Cancel the connection_timeout_check (scheduled from the connect_to_broker function)
-        connection_timeout_check_scheduled = node_config["connection_check_event"]
-        node_config["connection_check_event"] = None
-        if connection_timeout_check_scheduled: common.root_window.after_cancel(connection_timeout_check_scheduled)
+        if node_config["connection_check_event"]:
+            common.root_window.after_cancel(node_config["connection_check_event"])
+            node_config["connection_check_event"] = None
         # Handle the case where we are already connected to the broker
         if node_config["connected_to_broker"]: mqtt_broker_disconnect()
+        ############ TO REFACTOR AT SOME STAGE ###############################################
         # Handle the case where we are in the process of disconnecting. Here we have to use
         # the root.update() method to continue processing the disconnect steps (scheduled
         # by the root.after() method - I don't like this solution but it works
@@ -436,6 +439,7 @@ def mqtt_broker_connect (broker_host:str,
                 if not node_config["disconnection_in_progress"]: break
             if node_config["disconnection_in_progress"]:
                 logging.error("MQTT-Client: Timeout disconnecting from broker")
+        ############ TO REFACTOR AT SOME STAGE ###############################################
         # Create a new mqtt broker instance
         logging.debug("MQTT-Client: Connecting to Broker at "+node_config["broker_host"]+":"+str(node_config["broker_port"]))
         if mqtt_client is None: mqtt_client = paho.mqtt.client.Client(clean_session=True)
@@ -611,7 +615,7 @@ def unsubscribe_from_message_type(message_type:str):
             if node_config["connected_to_broker"]: mqtt_client.unsubscribe(subscribed_topic)
         else:
             new_list_of_subscribed_topics.append(subscribed_topic)
-        node_config["list_of_subscribed_topics"] = new_list_of_subscribed_topics
+    node_config["list_of_subscribed_topics"] = new_list_of_subscribed_topics
     return()
 
 ##################################################################################################################
