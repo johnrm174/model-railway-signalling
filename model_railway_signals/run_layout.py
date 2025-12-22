@@ -570,7 +570,7 @@ def update_track_occupancy_for_signal(item_id:int):
     # DANGER then we can assume any movement from the sectiion_behind to the section_ahead is valid.
     # Otherwise we may need to raise a Signal Passed at Danger warning later on in the code
     if ( (library.signal_state(item_id) != library.signal_state_type.DANGER) or
-         (has_subsidary(item_id) and library.subsidary_clear(item_id)) ):
+         (has_subsidary(item_id) and library.subsidary_state(item_id) != library.signal_state_type.DANGER) ):
         signal_clear = True
     else:
         signal_clear = False
@@ -579,6 +579,7 @@ def update_track_occupancy_for_signal(item_id:int):
     if route is not None and not is_secondary_event:
         if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
             library.set_signal_override(item_id)
+            library.set_subsidary_override(item_id)
             clearance_delay = schematic_object["clearancedelay"]*1000
             root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, item_id))
     return()
@@ -711,7 +712,9 @@ def process_occupancy_changes(section_ahead:int, section_behind:int, sig_id:int=
         library.set_section_occupied (section_ahead, train_descriptor)
     # Process any other layout changes that could be affected by changes in track occupancy.
     update_route_highlighting_for_sections()
-    if sig_id > 0: library.clear_signal_override(sig_id)
+    if sig_id > 0:
+        library.clear_signal_override(sig_id)
+        if has_subsidary(sig_id): library.clear_subsidary_override(sig_id)
     if automation_enabled:
         override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals()
@@ -1293,6 +1296,8 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     if enhanced_debugging:
         print("########## subsidary_switched_callback "+str(signal_id))
         start_time = time.time()
+    if run_mode and automation_enabled:
+        override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
     process_all_point_interlocking()
     run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)

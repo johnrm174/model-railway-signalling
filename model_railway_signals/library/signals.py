@@ -148,6 +148,7 @@
 #   subsidary_clear(sig_id:int, route=None) - As above, but for the subsidary signal
 #
 #   signal_state(sig_id) - Returns the displayed aspect of the signal (as opposed to ON/OFF)
+#   subsidary_state(sig_id) - Returns the displayed aspect of the subsidary (as opposed to ON/OFF)
 #
 #   trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int) - Trigger a timed signal sequence
 #
@@ -1169,13 +1170,29 @@ def signal_clear(sig_id:int, route:route_type=None):
 def signal_state(sig_id:Union[int,str]):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int) and not isinstance(sig_id, str):
-        logging.error("Signal "+str(sig_id)+": signal_state - Signal ID must be an int or a str")    
+        logging.error("Signal "+str(sig_id)+": signal_state - Signal ID must be an int or a str")
         sig_state = signal_state_type.DANGER
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": signal_state - Signal ID does not exist")
         sig_state = signal_state_type.DANGER
     else:
         sig_state = signals[str(sig_id)]["sigstate"]
+    return(sig_state)
+
+def subsidary_state(sig_id:Union[int,str]):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int) and not isinstance(sig_id, str):
+        logging.error("Signal "+str(sig_id)+": subsidary_state - Signal ID must be an int or a str")
+        sig_state = signal_state_type.DANGER
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": subsidary_state - Signal ID does not exist")
+        sig_state = signal_state_type.DANGER
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": subsidary_state - Signal does not have a subsidary")
+    elif signals[str(sig_id)]["oversubsidary"] or not signals[str(sig_id)]["subclear"]:
+        sig_state = signal_state_type.DANGER
+    else:
+        sig_state = signal_state_type.PROCEED
     return(sig_state)
 
 # -------------------------------------------------------------------------
