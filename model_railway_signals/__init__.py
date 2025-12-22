@@ -1,4 +1,10 @@
 #------------------------------------------------------------------------------------
+# This is the function to run up the editor from a development environment
+#------------------------------------------------------------------------------------
+
+from .editor import run_editor
+
+#------------------------------------------------------------------------------------
 # These are the Public API functions that can be used by external python scripts
 #------------------------------------------------------------------------------------
 
@@ -31,7 +37,8 @@ from .scripting import simulate_gpio_on
 from .scripting import simulate_gpio_off
 from .scripting import simulate_button_clicked
 
-__all__ = [ 'initialise_application',
+__all__ = [ 'run_editor',
+            'initialise_application',
             'sleep',
             'reset_layout',
             'set_lever_on',
