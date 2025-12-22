@@ -36,6 +36,8 @@ from .signals import unlock_subsidary
 from .signals import subsidary_locked
 from .signals import set_signal_override
 from .signals import clear_signal_override
+from .signals import set_subsidary_override
+from .signals import clear_subsidary_override
 from .signals import set_signal_override_caution
 from .signals import clear_signal_override_caution
 from .signals import set_approach_control
@@ -281,6 +283,8 @@ __all__ = [
         'subsidary_locked',
         'set_signal_override',
         'clear_signal_override',
+        'set_subsidary_override',
+        'clear_subsidary_override',
         'set_signal_override_caution',
         'clear_signal_override_caution',
         'set_approach_control',

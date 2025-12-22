@@ -322,24 +322,17 @@ class general_settings_frame(Tk.LabelFrame):
                     tool_tip="Select to override the signal to ON if the track "+
                     "sections ahead of the signal (specified on the left) are occupied")
         self.override.pack(anchor="w")
+        self.override_subsidary = common.check_box(self.frame,
+                    label="Override subsidiary to ON if section(s) ahead occupied",
+                    tool_tip="Select to override the subsidiary to ON if the track "+
+                    "sections ahead of the signal (specified on the left) are occupied")
+        self.override_subsidary.pack(anchor="w")
         self.override_ahead = common.check_box(self.frame,
                     label="Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
         self.override_ahead.pack(anchor="w")
                         
-    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
-        self.override.set_value(override)
-        self.automatic.set_value(main_auto)
-        self.override_ahead.set_value(override_ahead)
-        self.distant_automatic.set_value(dist_auto)
-
-    def get_values(self):
-        return ( self.override.get_value(),
-                 self.automatic.get_value(),
-                 self.override_ahead.get_value(),
-                 self.distant_automatic.get_value() )
-
 #------------------------------------------------------------------------------------
 # Class for a "Timed signal" UI element for ground signals only. Builds on the
 # common.int_item_id_entry_box but with additional validation to ensure the

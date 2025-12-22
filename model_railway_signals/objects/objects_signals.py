@@ -189,10 +189,13 @@ default_signal_object["tracksections"] = [ 0, [ [0], [0], [0], [0], [0], [0], [0
 # 'distautomatic' (associated distant signals only) - Associated distant Signal has no control button
 # 'overrideahead' (sistant signal only) - override distant to CAUTION if any home signals ahead are at DANGER
 # 'overridesignal' (all main signals) - Signal will be overridden if any track sections ahead are OCCUPIED
+# 'overridesubsidary' (all main signals) - Subsidary will be overridden if any track sections ahead are OCCUPIED
+# Note that if the signal doesn't have a subsidary then this value will always be False
 default_signal_object["fullyautomatic"] = False
 default_signal_object["distautomatic"] = False
 default_signal_object["overrideahead"] = False
 default_signal_object["overridesignal"] = False
+default_signal_object["overridesubsidary"] = False
 # The 'approachcontrol' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each 'signal_route' element represents the approach control mode set for that route:
 # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3

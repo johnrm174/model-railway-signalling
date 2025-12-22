@@ -758,7 +758,7 @@ def process_all_signal_interlocking():
             if not signal_object["sigroutes"][signal_route.value-1]:
                 sig_tooltip = sig_tooltip + "\nRoute not supported by signal"
                 signal_can_be_unlocked, add_to_sig_tt = False, False
-            elif not signal_object["subroutes"][signal_route.value-1]:
+            if not signal_object["subroutes"][signal_route.value-1]:
                 sub_tooltip = sub_tooltip + "\nRoute not supported by subsidary"
                 subsidary_can_be_unlocked, add_to_sub_tt = False, False
             # Interlock the main signal with the subsidary (and vice versa)
@@ -939,6 +939,7 @@ def override_signals_based_on_track_sections_ahead():
         signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
         # Override/clear the current signal based on the section ahead
         override_signal = False
+        override_subsidary = False
         if signal_route is not None:
             signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
             list_of_sections_ahead = signal_object["tracksections"][1][signal_route.value-1]
@@ -946,11 +947,15 @@ def override_signals_based_on_track_sections_ahead():
                 if (section_ahead > 0 and library.section_occupied(section_ahead)
                        and signal_object["sigroutes"][signal_route.value-1] ):
                     override_signal = True
+                    override_subsidary = objects.schematic_objects[objects.signal(int_signal_id)]["overridesubsidary"]
                     break
             if library.signal_clear(int_signal_id) and override_signal: set_signal_override(int_signal_id)
             else: clear_signal_override(int_signal_id)
+            if library.subsidary_clear(int_signal_id) and override_subsidary: library.set_subsidary_override(int_signal_id)
+            else: library.clear_subsidary_override(int_signal_id)
         else:
             clear_signal_override(int_signal_id)
+            if has_subsidary(int_signal_id): library.clear_subsidary_override(int_signal_id)
     return()
 
 #------------------------------------------------------------------------------------

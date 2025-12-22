@@ -115,23 +115,21 @@
 #   set_route(sig_id:int, route, theatre_text) - Set the signal route indication
 #
 #   lock_signal(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
-#
 #   unlock_signal(sig_id:int) - use for point/signal interlocking
 #
 #   lock_subsidary(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
-#
 #   unlock_subsidary(sig_id:int) - use for point/signal interlocking
 #
 #   signal_locked(signal_id:int) - returns the current state of the interlocking
-#
 #   subsidary_locked(signal_id:int) - returns the current state of the interlocking
 #
 #   set_signal_override(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
-#
 #   clear_signal_override(sig_id:int)  - Revert the signal to display its normal aspect
 #
-#   set_signal_override_caution(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
+#   set_subsidary_override(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
+#   clear_subsidary_override(sig_id:int)  - Revert the signal to display its normal aspect
 #
+#   set_signal_override_caution(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
 #   clear_signal_override_caution(sig_id:int) - Revert the signal to display its normal aspect
 #
 #   set_approach_control(sig_id:int, rel_on_ylw:bool, force_set) - Select "approach control mode"
@@ -141,7 +139,6 @@
 #   clear_approach_control(sig_id:int) - clear the approach control mode 
 #
 #   toggle_signal(sig_id:int) - toggle the state of the signal (ON/OFF)
-#
 #   toggle_subsidary(sig_id:int) - toggle the state of the subsidary (ON/OFF)
 #
 #   signal_clear(sig_id:int, route=None) - Returns True if the signal is OFF (otherwise False)
@@ -516,6 +513,7 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["routeset"]            = route_type.MAIN        # MANDATORY - Route setting for signal (MAIN at creation)
     signals[str(sig_id)]["sigclear"]            = False                  # MANDATORY - State of the main signal control (ON/OFF)
     signals[str(sig_id)]["override"]            = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["oversubsidary"]       = False                  # MANDATORY - Subsidary is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["overcaution"]         = False                  # MANDATORY - Signal is "Overridden" to CAUTION
     signals[str(sig_id)]["sigstate"]            = None                   # MANDATORY - Displayed 'aspect' of the signal (None on creation)
     signals[str(sig_id)]["hassubsidary"]        = has_subsidary          # MANDATORY - Whether the signal has a subsidary aspect or arms
@@ -877,14 +875,14 @@ def clear_approach_control(sig_id:int):
     return()
 
 # -------------------------------------------------------------------------
-# Library API function to set a signal override (all signal types)
+# Library API functions to set / clear signal overrides (all signal types)
 # -------------------------------------------------------------------------
 
 def set_signal_override(sig_id:int):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
-        logging.error("Signal "+str(sig_id)+": set_signal_override - Signal ID must be an int")    
+        logging.error("Signal "+str(sig_id)+": set_signal_override - Signal ID must be an int")
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": set_signal_override - Signal ID does not exist")
     elif not signals[str(sig_id)]["override"]:
@@ -896,15 +894,11 @@ def set_signal_override(sig_id:int):
         signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
     return()
 
-# -------------------------------------------------------------------------
-# Library API function to clear a signal override (all signal types)
-# -------------------------------------------------------------------------
-
 def clear_signal_override(sig_id:int):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
-        logging.error("Signal "+str(sig_id)+": clear_signal_override - Signal ID must be an int")    
+        logging.error("Signal "+str(sig_id)+": clear_signal_override - Signal ID must be an int")
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": clear_signal_override - Signal ID does not exist")
     elif signals[str(sig_id)]["override"]:
@@ -916,6 +910,48 @@ def clear_signal_override(sig_id:int):
         # button text colour back to the standard button text colour
         text_colour = signals[str(sig_id)]["textcolour"]
         signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
+    return()
+
+# -------------------------------------------------------------------------
+# Library API functions to set / clear subsidary overrides (all signal types)
+# -------------------------------------------------------------------------
+
+def set_subsidary_override(sig_id:int):
+    global signals
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": set_subsidary_override - Signal ID must be an int")
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": set_subsidary_override - Signal ID does not exist")
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": set_subsidary_override - Signal does not have a subsidary")
+    elif not signals[str(sig_id)]["oversubsidary"]:
+        logging.info("Signal "+str(sig_id)+": Setting override")
+        # Set the override state and update the displayed aspect
+        signals[str(sig_id)]["oversubsidary"] = True
+        update_subsidary_aspect(sig_id)
+        # Provide an indication that the override has been set
+        signals[str(sig_id)]["subbutton"].config(foreground="red", activeforeground="red")
+    return()
+
+def clear_subsidary_override(sig_id:int):
+    global signals
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": clear_subsidary_override - Signal ID must be an int")
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": clear_subsidary_override - Signal ID does not exist")
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": clear_subsidary_override - Signal does not have a subsidary")
+    elif signals[str(sig_id)]["oversubsidary"]:
+        # Clear the override state and update the displayed aspect
+        logging.info("Signal "+str(sig_id)+": Clearing override")
+        signals[str(sig_id)]["oversubsidary"] = False
+        update_subsidary_aspect(sig_id)
+        # Provide an indication that the override has been cleared by reverting the
+        # button text colour back to the standard button text colour
+        text_colour = signals[str(sig_id)]["textcolour"]
+        signals[str(sig_id)]["subbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
 
 # -------------------------------------------------------------------------

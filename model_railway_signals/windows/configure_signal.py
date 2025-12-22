@@ -635,11 +635,9 @@ def update_tab3_general_settings_selections(signal):
     # Enable/disable the "Fully Automatic"(no signal button) and "Override" selections
     if ( signal.config.sigtype.get_value() == library.signal_type.semaphore.value  or
          signal.config.sigtype.get_value() == library.signal_type.colour_light.value):
-        signal.automation.general_settings.automatic.enable()
         signal.automation.general_settings.override.enable()
     else:
         signal.automation.general_settings.automatic.disable()
-        signal.automation.general_settings.override.disable()
     # Enable/disable the "Dustant Automatic"(no distant button) selection
     if ( signal.config.sigtype.get_value() == library.signal_type.semaphore.value and
          has_secondary_distant(signal) ):
@@ -657,6 +655,12 @@ def update_tab3_general_settings_selections(signal):
         signal.automation.general_settings.override_ahead.enable()
     else:
         signal.automation.general_settings.override_ahead.disable()
+    # Enable and disable Override Subsidiary if section ahead is occupied
+    # This should only be enabled if the signal has a subsidiary
+    if has_subsidary(signal):
+        signal.automation.general_settings.override_subsidary.enable()
+    else:
+        signal.automation.general_settings.override_subsidary.disable()
     return()
 
 #------------------------------------------------------------------------------------
@@ -857,7 +861,7 @@ class edit_signal:
             self.automation = configure_signal_tab3.signal_automation_tab(self.tab3)
             # load the initial UI state
             self.load_state()
-                
+
     def signal_type_updated(self):
         # The signal type has been changed (colour-light/semaphore/ground-pos-ground-disc)
         self.config.subtype.set_value(1)
@@ -872,7 +876,7 @@ class edit_signal:
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
         update_tab3_signal_ui_elements(self)
-        
+
     def sub_type_updated(self):
         # The signal subtype has been changed (choices dependant on signal type)
         update_tab1_signal_aspect_selections(self)
@@ -884,7 +888,7 @@ class edit_signal:
         update_tab3_general_settings_selections(self)
         update_tab3_approach_control_selections(self)
         update_tab3_signal_ui_elements(self)
-        
+
     def route_type_updated(self):
         # The route indication type has changed (none/theatre/feather/semaphore-arms)
         update_tab1_route_selection_elements(self)
@@ -894,7 +898,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-        
+
     def route_selections_updated(self):
         # A Theatre route has been enabled/disabled on Tab1
         # A Feather route has been enabled/disabled on Tab1
@@ -905,6 +909,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
+        update_tab3_general_settings_selections(self)
 
     def sig_routes_updated(self):
         # A semaphore main signal arm has been enabled/disabled on Tab 1
@@ -914,7 +919,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-        
+
     def sub_routes_updated(self):
         # A semaphore subsidary arm has been enabled/disabled on Tab1
         # A colour light subsidary has been enabled/disabled on Tab1
@@ -925,6 +930,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
+        update_tab3_general_settings_selections(self)
 
     def dist_routes_updated(self):
         # A secondary semaphore distant arm has been enabled/disabled on Tab1
@@ -984,11 +990,13 @@ class edit_signal:
             self.automation.signal_events.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
             self.automation.track_occupancy.clearance.set_value(objects.schematic_objects[self.object_id]["clearancedelay"])
-            override = objects.schematic_objects[self.object_id]["overridesignal"]
-            main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
-            dist_auto = objects.schematic_objects[self.object_id]["distautomatic"]
-            override_ahead = objects.schematic_objects[self.object_id]["overrideahead"]
-            self.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
+            # These are the general configuration flags
+            self.automation.general_settings.automatic.set_value(objects.schematic_objects[self.object_id]["fullyautomatic"])
+            self.automation.general_settings.distant_automatic.set_value(objects.schematic_objects[self.object_id]["distautomatic"])
+            self.automation.general_settings.override.set_value(objects.schematic_objects[self.object_id]["overridesignal"])
+            self.automation.general_settings.override_subsidary.set_value(objects.schematic_objects[self.object_id]["overridesubsidary"])
+            self.automation.general_settings.override_ahead.set_value(objects.schematic_objects[self.object_id]["overrideahead"])
+            # These are the timed signal and approach control elements
             self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"], item_id)
             self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
             # Configure the initial Route indication selection
@@ -1103,11 +1111,13 @@ class edit_signal:
                 new_object_configuration["approachsensor"] = self.automation.signal_events.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
                 new_object_configuration["clearancedelay"] = self.automation.track_occupancy.clearance.get_value()
-                override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
-                new_object_configuration["fullyautomatic"] = main_auto
-                new_object_configuration["distautomatic"] = dist_auto
-                new_object_configuration["overridesignal"] = override
-                new_object_configuration["overrideahead"] = override_ahead
+                # These are the general settings flags:
+                new_object_configuration["fullyautomatic"] = self.automation.general_settings.automatic.get_value()
+                new_object_configuration["distautomatic"] = self.automation.general_settings.distant_automatic.get_value()
+                new_object_configuration["overridesignal"] = self.automation.general_settings.override.get_value()
+                new_object_configuration["overridesubsidary"] = self.automation.general_settings.override_subsidary.get_value()
+                new_object_configuration["overrideahead"] = self.automation.general_settings.override_ahead.get_value()
+                # Timed sequence and approach control settings
                 new_object_configuration["timedsequences"] = self.automation.timed_signal.get_values()
                 new_object_configuration["approachcontrol"] = self.automation.approach_control.get_values()
                 # Save the updated configuration (and re-draw the object)
