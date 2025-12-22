@@ -922,20 +922,6 @@ def process_all_point_interlocking():
 #------------------------------------------------------------------------------------
 
 def override_signals_based_on_track_sections_ahead():
-    # Sub-function to set a signal override
-    def set_signal_override(int_signal_id:int):
-        if objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]:
-            library.set_signal_override(int_signal_id)
-            if has_distant_arms(int_signal_id):
-                library.set_signal_override(int_signal_id + 1000)
-
-    # Sub-function to Clear a signal override
-    def clear_signal_override(int_signal_id:int):
-        if objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]:
-            library.clear_signal_override(int_signal_id)
-            if has_distant_arms(int_signal_id):
-                library.clear_signal_override(int_signal_id + 1000)
-
     # Start of main function
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
@@ -949,16 +935,28 @@ def override_signals_based_on_track_sections_ahead():
             for section_ahead in list_of_sections_ahead:
                 if (section_ahead > 0 and library.section_occupied(section_ahead)
                        and signal_object["sigroutes"][signal_route.value-1] ):
-                    override_signal = True
+                    override_signal = objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]
                     override_subsidary = objects.schematic_objects[objects.signal(int_signal_id)]["overridesubsidary"]
                     break
-            if library.signal_clear(int_signal_id) and override_signal: set_signal_override(int_signal_id)
-            else: clear_signal_override(int_signal_id)
-            if library.subsidary_clear(int_signal_id) and override_subsidary: library.set_subsidary_override(int_signal_id)
-            else: library.clear_subsidary_override(int_signal_id)
+            if library.signal_clear(int_signal_id) and override_signal:
+                library.set_signal_override(int_signal_id)
+                if has_distant_arms(int_signal_id):
+                    library.set_signal_override(int_signal_id + 1000)
+            else:
+                library.clear_signal_override(int_signal_id)
+                if has_distant_arms(int_signal_id):
+                    library.clear_signal_override(int_signal_id + 1000)
+            if has_subsidary(int_signal_id):
+                if library.subsidary_clear(int_signal_id) and override_subsidary:
+                    library.set_subsidary_override(int_signal_id)
+                else:
+                    library.clear_subsidary_override(int_signal_id)
         else:
-            clear_signal_override(int_signal_id)
-            if has_subsidary(int_signal_id): library.clear_subsidary_override(int_signal_id)
+            library.clear_signal_override(int_signal_id)
+            if has_distant_arms(int_signal_id):
+                library.clear_signal_override(int_signal_id + 1000)
+            if has_subsidary(int_signal_id):
+                library.clear_subsidary_override(int_signal_id)
     return()
 
 #------------------------------------------------------------------------------------
