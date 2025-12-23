@@ -158,16 +158,12 @@ class section_ahead_element(Tk.Frame):
         return(valid)
 
     def enable(self, sig:bool, sub:bool):
-        if sig:
-            routetype = "Sig/"
-            self.other_sections.enable()
-        else:
-            routetype="----/"
-            self.other_sections.disable()
+        if sig: routetype = "Sig/"
+        else: routetype="----/"
         if sub: routetype = routetype + "Sub"
         else: routetype = routetype + "----"
         self.routetype.config(text=routetype)
-        self.first_section.enable()
+        self.other_sections.enable()
 
     def disable(self):
         self.routetype.config(text="----/----")

@@ -393,7 +393,6 @@ class sprog_status_frame(Tk.Frame):
             self.after_cancel(self.watchdog_timer)
             self.watchdog_timer = None
         library.disable_status_reporting()
-        super().destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the SPROG Config Tab.
@@ -892,16 +891,16 @@ class edit_mqtt_settings():
         # Hide the validation error messag
         self.validation_error.pack_forget()
         # Populate the network configuration tab
-        self.sprogconfig.url.set_value(settings.get_mqtt("url"))
-        self.sprogconfig.port.set_value(settings.get_mqtt("port"))
-        self.sprogconfig.network.set_value(settings.get_mqtt("network"))
-        self.sprogconfig.node.set_value(settings.get_mqtt("node"))
-        self.sprogconfig.username.set_value(settings.get_mqtt("username"))
-        self.sprogconfig.password.set_value(settings.get_mqtt("password"))
-        self.sprogconfig.debug.set_value(settings.get_mqtt("debug"))
-        self.sprogconfig.startup.set_value(settings.get_mqtt("startup"))
-        self.sprogconfig.pubshutdown.set_value(settings.get_mqtt("pubshutdown"))
-        self.sprogconfig.subshutdown.set_value(settings.get_mqtt("subshutdown"))
+        self.config.url.set_value(settings.get_mqtt("url"))
+        self.config.port.set_value(settings.get_mqtt("port"))
+        self.config.network.set_value(settings.get_mqtt("network"))
+        self.config.node.set_value(settings.get_mqtt("node"))
+        self.config.username.set_value(settings.get_mqtt("username"))
+        self.config.password.set_value(settings.get_mqtt("password"))
+        self.config.debug.set_value(settings.get_mqtt("debug"))
+        self.config.startup.set_value(settings.get_mqtt("startup"))
+        self.config.pubshutdown.set_value(settings.get_mqtt("pubshutdown"))
+        self.config.subshutdown.set_value(settings.get_mqtt("subshutdown"))
         # Populate the subscribe tab
         self.subscribe.dcc.set_values(settings.get_mqtt("subdccnodes"))
         self.subscribe.signals.set_values(settings.get_mqtt("subsignals"))
@@ -917,21 +916,21 @@ class edit_mqtt_settings():
         
     def save_state(self, close_window:bool, apply_and_connect:bool=False):
         # Validate the entries to "accept" the current values before reading
-        self.sprogconfig.accept_all_entries()
+        self.config.accept_all_entries()
         # Only allow close if valid
         if self.subscribe.validate() and self.publish.validate():
             self.validation_error.pack_forget()
             # Save the general configuration settings
-            settings.set_mqtt("url", self.sprogconfig.url.get_value())
-            settings.set_mqtt("port", self.sprogconfig.port.get_value())
-            settings.set_mqtt("network", self.sprogconfig.network.get_value())
-            settings.set_mqtt("node", self.sprogconfig.node.get_value())
-            settings.set_mqtt("username", self.sprogconfig.username.get_value())
-            settings.set_mqtt("password", self.sprogconfig.password.get_value())
-            settings.set_mqtt("debug", self.sprogconfig.debug.get_value())
-            settings.set_mqtt("startup", self.sprogconfig.startup.get_value())
-            settings.set_mqtt("pubshutdown", self.sprogconfig.pubshutdown.get_value())
-            settings.set_mqtt("subshutdown", self.sprogconfig.subshutdown.get_value())
+            settings.set_mqtt("url", self.config.url.get_value())
+            settings.set_mqtt("port", self.config.port.get_value())
+            settings.set_mqtt("network", self.config.network.get_value())
+            settings.set_mqtt("node", self.config.node.get_value())
+            settings.set_mqtt("username", self.config.username.get_value())
+            settings.set_mqtt("password", self.config.password.get_value())
+            settings.set_mqtt("debug", self.config.debug.get_value())
+            settings.set_mqtt("startup", self.config.startup.get_value())
+            settings.set_mqtt("pubshutdown", self.config.pubshutdown.get_value())
+            settings.set_mqtt("subshutdown", self.config.subshutdown.get_value())
             # Save the Subscribe settings
             settings.set_mqtt("subdccnodes", self.subscribe.dcc.get_values())
             settings.set_mqtt("subsignals", self.subscribe.signals.get_values())

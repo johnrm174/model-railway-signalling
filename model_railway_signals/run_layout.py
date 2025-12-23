@@ -579,7 +579,7 @@ def update_track_occupancy_for_signal(item_id:int):
     if route is not None and not is_secondary_event:
         if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
             library.set_signal_override(item_id)
-            library.set_subsidary_override(item_id)
+            if has_subsidary(item_id): library.set_subsidary_override(item_id)
             clearance_delay = schematic_object["clearancedelay"]*1000
             root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, item_id))
     return()
@@ -933,8 +933,7 @@ def override_signals_based_on_track_sections_ahead():
             signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
             list_of_sections_ahead = signal_object["tracksections"][1][signal_route.value-1]
             for section_ahead in list_of_sections_ahead:
-                if (section_ahead > 0 and library.section_occupied(section_ahead)
-                       and signal_object["sigroutes"][signal_route.value-1] ):
+                if section_ahead > 0 and library.section_occupied(section_ahead):
                     override_signal = objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]
                     override_subsidary = objects.schematic_objects[objects.signal(int_signal_id)]["overridesubsidary"]
                     break

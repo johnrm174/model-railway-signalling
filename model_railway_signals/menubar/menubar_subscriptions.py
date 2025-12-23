@@ -107,7 +107,6 @@ class gpio_subscription(Tk.Frame):
         # The 'destroy' function should get called when the widget is destroyes
         # We therefore need to unsubscribe from subsequent status updates
         library.unsubscribe_from_gpio_port_status(self.gpio_sensor_id)
-        super().destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the GPIO Sensor Subscription Tab. This contains a variable length
