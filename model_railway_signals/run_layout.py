@@ -578,8 +578,8 @@ def update_track_occupancy_for_signal(item_id:int):
     # warnings as required. If there is a change to process, then schedule this for later
     if route is not None and not is_secondary_event:
         if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
-            library.set_signal_override(item_id)
-            if has_subsidary(item_id): library.set_subsidary_override(item_id)
+            library.set_signal_override(item_id, temp_override=True)
+            if has_subsidary(item_id): library.set_subsidary_override(item_id, temp_override=True)
             clearance_delay = schematic_object["clearancedelay"]*1000
             root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, item_id))
     return()
@@ -713,8 +713,8 @@ def process_occupancy_changes(section_ahead:int, section_behind:int, sig_id:int=
     # Process any other layout changes that could be affected by changes in track occupancy.
     update_route_highlighting_for_sections()
     if sig_id > 0:
-        library.clear_signal_override(sig_id)
-        if has_subsidary(sig_id): library.clear_subsidary_override(sig_id)
+        library.clear_signal_override(sig_id, temp_override=True)
+        if has_subsidary(sig_id): library.clear_subsidary_override(sig_id, temp_override=True)
     if automation_enabled:
         override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals()

@@ -70,7 +70,7 @@ layout_state ={}
 
 def get_sig_file_config(get_sig_file_data:bool = False):
     
-    signal_elements = ( ("sigclear","bool"),("subclear","bool"),("override","bool"),
+    signal_elements = ( ("sigclear","bool"),("subclear","bool"),("override","bool"), ("overridesub","bool"),
                         ("siglocked","bool") ,("sublocked","bool"),("routeset","enum"),
                         ("releaseonred","bool"),("releaseonyel","bool"),("theatretext","str") )
     point_elements = ( ("switched","bool"),("fpllock","bool"),("locked","bool") )

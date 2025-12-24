@@ -479,14 +479,22 @@ def has_route_arm(sig_id:int, route:signals.route_type):
 
 def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
     # We explicitly test for True and False as a state of 'None' signifies the signal was created without a subsidary
-    if signals.signals[str(sig_id)]["oversubsidary"] or signals.signals[str(sig_id)]["subclear"] == False:
-        # The subsidary signal is at danger
+    old_state = signals.signals[str(sig_id)]["substate"]
+    if ( signals.signals[str(sig_id)]["overridesub"] or signals.signals[str(sig_id)]["overridesub2"] or
+            signals.signals[str(sig_id)]["subclear"] == False ):
+        new_state = signals.signal_state_type.DANGER
+    elif signals.signals[str(sig_id)]["subclear"] == True:
+        new_state = signals.signal_state_type.PROCEED
+    else:
+        new_state=None
+    # Update the displayed aspect if there has been a change
+    if new_state != old_state and new_state == signals.signal_state_type.DANGER:
         update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
         update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
         update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
         update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
         update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
-    elif signals.signals[str(sig_id)]["subclear"] == True:
+    elif new_state != old_state and new_state == signals.signal_state_type.PROCEED:
         # If the route has been set to signals.route_type.NONE then we assume MAIN and change the MAIN arm
         # We also change the MAIN subsidary arm for Home signals without any diverging route arms (main signal or 
         # subsidary signal) to cover the case of a single subsidary signal arm controlling multiple routes
@@ -531,8 +539,9 @@ def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
             update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
             update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", True, log_message)
     # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
-    if signals.signals[str(sig_id)]["subsidarytheatre"]:
+    if new_state != old_state and signals.signals[str(sig_id)]["subsidarytheatre"]:
         signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
+    signals.signals[str(sig_id)]["substate"] = new_state
     return ()
 
 # -------------------------------------------------------------------------
@@ -626,7 +635,7 @@ def update_semaphore_signal(sig_id:int):
         if not signals.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is ON"
-        elif signals.signals[str(sig_id)]["override"]:
+        elif signals.signals[str(sig_id)]["override"] or signals.signals[str(sig_id)]["override2"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OVERRIDDEN"
         elif signals.signals[str(sig_id)]["overcaution"]:
@@ -650,7 +659,7 @@ def update_semaphore_signal(sig_id:int):
         if not signals.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is ON"
-        elif signals.signals[str(sig_id)]["override"]:
+        elif signals.signals[str(sig_id)]["override"] or signals.signals[str(sig_id)]["override2"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is OVERRIDDEN"
         elif signals.signals[str(sig_id)]["timedsequence"][signal_route.value].sequence_in_progress:

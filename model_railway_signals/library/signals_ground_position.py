@@ -172,7 +172,7 @@ def update_ground_position_signal(sig_id:int):
         else:
             aspect_to_set = signals.signal_state_type.DANGER
         log_message = " (signal is ON)"
-    elif signals.signals[str(sig_id)]["override"]:
+    elif signals.signals[str(sig_id)]["override"] or signals.signals[str(sig_id)]["override2"]:
         if ( signals.signals[str(sig_id)]["subtype"] == ground_pos_subtype.shunt_ahead or
              signals.signals[str(sig_id)]["subtype"] == ground_pos_subtype.early_shunt_ahead ):
             aspect_to_set = signals.signal_state_type.CAUTION
