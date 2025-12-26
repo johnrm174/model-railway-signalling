@@ -32,7 +32,7 @@ default_settings = {}
 
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["version"] = "Version 6.0.3"
+default_settings["general"]["version"] = "Version 6.0.4"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["menubarfontsize"] = 10
 default_settings["general"]["baseitemid"] = 1
