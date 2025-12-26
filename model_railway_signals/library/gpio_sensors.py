@@ -282,7 +282,7 @@ def circuit_breaker_thread():
                         common.execute_function_in_tkinter_thread(lambda:send_mqtt_gpio_sensor_updated_event(sensor_id))
             except:
                 pass
-        time.sleep(0.0001)
+        time.sleep(0.0005)
     return()
 
 circuit_breaker_thread = threading.Thread(target=circuit_breaker_thread)
