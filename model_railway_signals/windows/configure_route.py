@@ -424,21 +424,26 @@ class route_definition_tab(Tk.Frame):
         #----------------------------------------------------------------------------------
         # Create the Route settings UI Elements (frame 11)
         #----------------------------------------------------------------------------------
-        self.frame11 = Tk.LabelFrame(self, text="Route settings")
+        # Track Sensors for route clear down
+        self.frame11 = Tk.LabelFrame(self, text="Track Sensors to trigger Route Cleardown")
         self.frame11.pack(padx=2, pady=2, fill='x')
-        # Track Sensor for route clear down
-        self.frame11bsubframe3 = Tk.Frame(self.frame11)
-        self.frame11bsubframe3.pack()
-        self.frame11bsubframe3label1 = Tk.Label(self.frame11bsubframe3, text="Track Sensor to trigger route reset:")
-        self.frame11bsubframe3label1.pack(padx=2, side=Tk.LEFT)
-        self.exitsensor = common.int_item_id_entry_box(self.frame11bsubframe3, exists_function=library.track_sensor_exists,
-                tool_tip="Enter the ID of a track sensor to automatically clear down the route when the sensor is passed")
-        self.exitsensor.pack(padx=2, side=Tk.LEFT)
+        self.exitsensors = common.grid_of_generic_entry_boxes(self.frame11,
+                common.int_item_id_entry_box, columns = 12, exists_function=library.track_sensor_exists,
+                tool_tip="Enter the ID of a track sensor to automatically clear down the route (when the sensor is passed)")
+        self.exitsensors.pack()
+        # Track Signals for route clear down
+        self.frame12 = Tk.LabelFrame(self, text="Signals to trigger Route Cleardown")
+        self.frame12.pack(padx=2, pady=2, fill='x')
+        self.exitsignals = common.grid_of_generic_entry_boxes(self.frame12,
+                common.int_item_id_entry_box, columns = 12, exists_function=library.signal_exists,
+                tool_tip="Enter the ID of a Signal to automatically clear down the route (when the signal is passed)")
+        self.exitsignals.pack()
 
     def validate(self):
         valid = True
         if not self.exitbutton.validate(): valid = False
-        if not self.exitsensor.validate(): valid = False
+        if not self.exitsensors.validate(): valid = False
+        if not self.exitsignals.validate(): valid = False
         if not self.signals.validate(): valid = False
         if not self.subsidaries.validate(): valid = False
         if not self.highlightlines.validate(): valid = False
@@ -449,7 +454,8 @@ class route_definition_tab(Tk.Frame):
 
     def enable(self):
         self.exitbutton.enable()
-        self.exitsensor.enable()
+        self.exitsensors.enable()
+        self.exitsignals.enable()
         self.signals.enable()
         self.subsidaries.enable()
         self.highlightlines.enable()
@@ -461,7 +467,8 @@ class route_definition_tab(Tk.Frame):
 
     def disable(self):
         self.exitbutton.disable()
-        self.exitsensor.disable()
+        self.exitsensors.disable()
+        self.exitsignals.disable()
         self.signals.disable()
         self.subsidaries.disable()
         self.highlightlines.disable()
@@ -473,7 +480,8 @@ class route_definition_tab(Tk.Frame):
 
     def reset_values(self, colour:str="Black"):
         self.exitbutton.set_value(0)
-        self.exitsensor.set_value(0)
+        self.exitsensors.set_values([])
+        self.exitsignals.set_values([])
         self.signals.set_values([])
         self.subsidaries.set_values([])
         self.highlightlines.set_values([])
@@ -487,7 +495,8 @@ class route_definition_tab(Tk.Frame):
         self.routecolour.set_value(route_definition["routecolour"])
         self.routenotes.set_value(route_definition["routenotes"])
         self.exitbutton.set_value(route_definition["exitbutton"])
-        self.exitsensor.set_value(route_definition["exitsensor"])
+        self.exitsensors.set_values(route_definition["exitsensors"])
+        self.exitsignals.set_values(route_definition["exitsignals"])
         self.signals.set_values(route_definition["signalsonroute"])
         self.subsidaries.set_values(route_definition["subsidariesonroute"])
         self.highlightlines.set_values(route_definition["linestohighlight"])
@@ -515,7 +524,8 @@ class route_definition_tab(Tk.Frame):
         route_definition["routecolour"] = self.routecolour.get_value()
         route_definition["routenotes"] = self.routenotes.get_value()
         route_definition["exitbutton"] = self.exitbutton.get_value()
-        route_definition["exitsensor"] = self.exitsensor.get_value()
+        route_definition["exitsensors"] = self.exitsensors.get_values()
+        route_definition["exitsignals"] = self.exitsignals.get_values()
         route_definition["signalsonroute"] = self.signals.get_values()
         route_definition["subsidariesonroute"] = self.subsidaries.get_values()
         route_definition["switchesonroute"] = self.switches.get_values()

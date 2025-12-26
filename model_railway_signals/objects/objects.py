@@ -773,6 +773,20 @@ def set_all(new_objects:dict):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 else:
+                    ######################################################################################################
+                    ## Handle Breaking change for Release 6.1.0. The "exitsensor" element in each route definition has ###
+                    ## Changed to ""exitsensors" which is a variable length list of track sensors which, when triggered ##
+                    ## Would Clear down the route (in previous releases it was a single integer value) ###################
+                    ######################################################################################################
+                    if default_object == objects_routes.default_route_object and element == "routedefinitions":
+                        for index, route_definition in enumerate(new_objects[object_id]["routedefinitions"]):
+                            if "exitsensor" in route_definition.keys():
+                                sensor_id = new_objects[object_id]["routedefinitions"][index]["exitsensor"]
+                                new_objects[object_id]["routedefinitions"][index]["exitsensors"] = [sensor_id,]
+                                del(new_objects[object_id]["routedefinitions"][index]["exitsensor"])
+                    ######################################################################################################
+                    ## End of Code to handle Breaking Changes ############################################################
+                    ######################################################################################################
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)

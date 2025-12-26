@@ -490,11 +490,12 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
-            # Process the clear down of any one-click or NX routes (button is always enabled if active)
-            if library.button_state(int(str_route_button_id)) and route_definition["exitsensor"] == sensor_id:
-                # Deselect the button and schedule all required events to clear down the route
-                library.toggle_button(int(str_route_button_id))
-                route_button_deselected_callback(int(str_route_button_id))
+            for exit_sensor_id in route_definition["exitsensors"]:
+                # Process the clear down of any one-click or NX routes (button is always enabled if active)
+                if library.button_state(int(str_route_button_id)) and exit_sensor_id == sensor_id:
+                    # Deselect the button and schedule all required events to clear down the route
+                    library.toggle_button(int(str_route_button_id))
+                    route_button_deselected_callback(int(str_route_button_id))
         # Process the set up of any one-touch routes (button may be enabled or disabled)
         # One-touch routes use the route index of zero - This feature is not enabled for NX routes
         elif not library.button_state(int(str_route_button_id)) and route_object["setupsensor"] == sensor_id:
@@ -509,6 +510,26 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
             else:
                 logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+
                                    str_route_button_id+" set-up because:"+route_tooltip)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to automatically set/reset a schematic route after a signal passed event
+#------------------------------------------------------------------------------------
+
+def trigger_routes_after_signal_passed(signal_id:int):
+    for str_route_button_id in objects.route_index:
+        # Find the applicable route definition for the button (stored as the route button data)
+        # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+        route_definition_index = library.get_button_data(route_object["itemid"])["route"]
+        if route_definition_index is not None:
+            route_definition = route_object["routedefinitions"][route_definition_index]
+            for exit_signal_id in route_definition["exitsignals"]:
+                # Process the clear down of any one-click or NX routes (button is always enabled if active)
+                if library.button_state(int(str_route_button_id)) and exit_signal_id == signal_id:
+                    # Deselect the button and schedule all required events to clear down the route
+                    library.toggle_button(int(str_route_button_id))
+                    route_button_deselected_callback(int(str_route_button_id))
     return()
 
 #-------------------------------------------------------------------------------------------------
