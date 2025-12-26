@@ -63,6 +63,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Minor improvements/bugfixes to Route setup functionality:
     * Ignore state of monentary switches on completion of route setup.
     * Ensure flashing of route buttons is canceled on load of new schematic.
+* More flexibility in the automatic cleardown of routes (one-touch and NX routes):
+    * Multiple track sensors can be specified (useful when routes are 'laddered').
+    * Multiple signals can be specified (to clear down route on signal passed events).
 * New scripting API to enable control of signalling application from python programs:
     * Enables full signalbox simulations to be developed (with simulated train movements).
     * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays.
