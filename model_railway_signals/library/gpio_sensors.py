@@ -150,8 +150,7 @@ def get_list_of_available_gpio_ports():
 # "sensor_passed"     : A Sensor ID (to raise a 'sensor passed' event when triggered)
 # "track_section"     : A Section ID (to raise a occupied/clear event when triggered/released)
 # "sensor_state"      : The current state of the GPIO input (True=active, False=inactive)
-# "breaker_reset"     : The start of the one second time period for counting sensor events
-# "breaker_events"    : A count of the number of trigger/release events since the last reset
+# "event_timestamps"  : A list of trigger/release event timestamps over a rolling 1 second window
 # "breaker_threshold" : The maximum number of events allowed within the one second time period
 # "breaker_tripped"   : A flag to indicate if the sircuit breaker has tripped or not
 # "sensor_device"     : The reference to the gpiozero button object mapped to the GPIO port
@@ -253,21 +252,26 @@ def circuit_breaker_thread():
             # Put exception handling around the code to keep the thread alive to
             # cover edge cases that might arise (e.g. sensor deleted in main thread)
             try:
-                # This is the maximum number of events per second for the breaker to cut out
-                max_events = gpio_port_mappings[str(gpio_port)]["breaker_threshold"]
-                # Increment/decrement the unprocessed event counter for the gpio port
-                gpio_port_mappings[str(gpio_port)]["breaker_events"] += 1
-                # See if there have been more than 100 events since the last count reset
-                if gpio_port_mappings[str(gpio_port)]["breaker_events"] > max_events:
-                    # If these have happened within the last second then trip the breaker
-                    time_period = time.time() - gpio_port_mappings[str(gpio_port)]["breaker_reset"]
-                    if time_period < 1.0:
+                event_time = time.time()
+                # Add current event to the list of event timestamps
+                gpio_port_mappings[str(gpio_port)]["event_timestamps"].append(event_time)
+                # Take a snapshot of the current timestamp list
+                old_timestamps = list(gpio_port_mappings[str(gpio_port)]["event_timestamps"])
+                # Only keep the last seconds worth of timestamps
+                new_timestamps = []
+                for timestamp in old_timestamps:
+                    if event_time - timestamp <= 1.0:
+                        new_timestamps.append(timestamp)
+                gpio_port_mappings[str(gpio_port)]["event_timestamps"] = new_timestamps
+                # Check if the count in this rolling window exceeds the threshold
+                if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+                    max_events = gpio_port_mappings[str(gpio_port)]["breaker_threshold"]
+                    if len(gpio_port_mappings[str(gpio_port)]["event_timestamps"]) > max_events:
                         gpio_port_mappings[str(gpio_port)]["breaker_tripped"] = True
                         sensor_id = "GPIO Sensor "+str(gpio_port_mappings[str(gpio_port)]["sensor_id"])
-                        str_time_period = str(round(time_period,2))
                         logging.error("**********************************************************************************************")
                         logging.error(sensor_id+" - Circuit breaker function for GPIO Port "+ str(gpio_port)+" has tripped due to over "+str(max_events))
-                        logging.error(sensor_id+" - trigger/release events being received within the last "+str_time_period+" seconds.")
+                        logging.error(sensor_id+" - trigger/release events being received within the last 1.0 seconds.")
                         logging.error(sensor_id+" - All subsequent trigger / release events will be ignored by the application.")
                         logging.error(sensor_id+" - Try increasing the the 'max events per second' in the GPIO settings.")
                         logging.error(sensor_id+" - Otherwise the probable cause is a faulty external sensor or GPIO input.")
@@ -276,9 +280,6 @@ def circuit_breaker_thread():
                         common.execute_function_in_tkinter_thread(lambda:report_gpio_port_status(gpio_port, status=1))
                         # Transmit the updated state via MQTT networking
                         common.execute_function_in_tkinter_thread(lambda:send_mqtt_gpio_sensor_updated_event(sensor_id))
-                    # reset the event count and sample period start time
-                    gpio_port_mappings[str(gpio_port)]["breaker_events"] = 0
-                    gpio_port_mappings[str(gpio_port)]["breaker_reset"] = time.time()
             except:
                 pass
         time.sleep(0.0001)
@@ -560,8 +561,7 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
         gpio_port_mappings[str(gpio_channel)]["sensor_passed"] = 0
         gpio_port_mappings[str(gpio_channel)]["track_section"] = 0
         gpio_port_mappings[str(gpio_channel)]["sensor_state"] = False
-        gpio_port_mappings[str(gpio_channel)]["breaker_reset"] = time.time()
-        gpio_port_mappings[str(gpio_channel)]["breaker_events"] = 0
+        gpio_port_mappings[str(gpio_channel)]["event_timestamps"] = []
         gpio_port_mappings[str(gpio_channel)]["breaker_tripped"] = False
         gpio_port_mappings[str(gpio_channel)]["breaker_threshold"] = max_events_per_second
         # We report the initial GPIO port status at the end of this funcion (0=unmapped)
