@@ -784,6 +784,7 @@ def set_all(new_objects:dict):
                                 sensor_id = new_objects[object_id]["routedefinitions"][index]["exitsensor"]
                                 new_objects[object_id]["routedefinitions"][index]["exitsensors"] = [sensor_id,]
                                 del(new_objects[object_id]["routedefinitions"][index]["exitsensor"])
+                        new_objects[object_id]["routedefinitions"][index]["exitsignals"] = []
                     ######################################################################################################
                     ## End of Code to handle Breaking Changes ############################################################
                     ######################################################################################################
