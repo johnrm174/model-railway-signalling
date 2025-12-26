@@ -542,7 +542,7 @@ def sprog_connect (port_name:str="/dev/serial0",
         logging.error("Pi-SPROG: sprog_connect - Port name must be specified as a string")
     elif not isinstance(baud_rate, int):
         logging.error("Pi-SPROG: sprog_connect - Baud rate must be specified as an integer")
-    elif not isinstance(dcc_address_mode, int) or dcc_address_mode < 0 or dcc_address_mode > 3:
+    elif not isinstance(dcc_address_mode, int) or dcc_address_mode < 1 or dcc_address_mode > 3:
         logging.error("Pi-SPROG: sprog_connect - dcc_address_mode  must be specified as an integer (1-3)")
     elif not isinstance(dcc_debug_mode, bool):
         logging.error("Pi-SPROG: sprog_connect - Enhanced debug flag must be specified as a boolean")
