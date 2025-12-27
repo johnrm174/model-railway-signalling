@@ -743,16 +743,16 @@ def send_accessory_short_event(address:int, active:bool):
     elif not isinstance(active, bool):
         logging.error("Pi-SPROG: send_accessory_short_event - State must be specified as a boolean")
     else:
-        # Apply any address mode offsets
-        if address_mode == 1:
-            offset_text = ""
-            address_to_send = address
-        elif address_mode == 2:
+        # Apply any address mode offsets (1 = None, 2 = +4, 3 = -4)
+        if address_mode == 2:
             address_to_send = address + 4
             offset_text = " (Address Offset '+4')"
         elif address_mode == 3:
             address_to_send = address - 4
             offset_text = " (Address Offset '-4')"
+        else:
+            offset_text = ""
+            address_to_send = address
         # Validate the modified address - Log the address we have been given - not the one with offsets applied
         if (address_to_send < 1 or address_to_send > 2047):
             logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address)+offset_text)
