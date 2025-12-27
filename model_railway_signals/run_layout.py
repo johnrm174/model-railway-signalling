@@ -1328,7 +1328,7 @@ def signal_passed_callback(signal_id:int):
     else:
         process_signal_aspect_update(signal_id)
     # Reset any routes on signal passed events
-    run_routes.trigger_routes_after_sensor_passed(signal_id)
+    run_routes.trigger_routes_after_signal_passed(signal_id)
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
