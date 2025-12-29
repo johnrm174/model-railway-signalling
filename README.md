@@ -82,6 +82,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Provides display of SPROG Status, DCC Bus Voltage and DCC Bus current
 * Added ability to override ground signals (to ON) based on track occupancy ahead
 * Added ability to override subsidiary signals (to ON) based on track occupancy ahead
+* Semaphore signals can now be specified (and displayed) with lower quadrant arms.
 * Accept optional OS arguments (to enable application start when sig file is clicked)
 * Colour Scheme changes to make popup warnings (SPAD and Lever warnings) more obvious.
 * Clearance delay (track occupancy changes) can now be specified up to 60 seconds.
