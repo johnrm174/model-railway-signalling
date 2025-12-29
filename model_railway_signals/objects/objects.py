@@ -778,13 +778,13 @@ def set_all(new_objects:dict):
                     ## Changed to ""exitsensors" which is a variable length list of track sensors which, when triggered ##
                     ## Would Clear down the route (in previous releases it was a single integer value) ###################
                     ######################################################################################################
-                    if default_object == objects_routes.default_route_object and element == "routedefinitions":
+                    if new_object_type == objects_common.object_type.route and element == "routedefinitions":
                         for index, route_definition in enumerate(new_objects[object_id]["routedefinitions"]):
                             if "exitsensor" in route_definition.keys():
                                 sensor_id = new_objects[object_id]["routedefinitions"][index]["exitsensor"]
                                 new_objects[object_id]["routedefinitions"][index]["exitsensors"] = [sensor_id,]
                                 del(new_objects[object_id]["routedefinitions"][index]["exitsensor"])
-                        new_objects[object_id]["routedefinitions"][index]["exitsignals"] = []
+                            new_objects[object_id]["routedefinitions"][index]["exitsignals"] = []
                     ######################################################################################################
                     ## End of Code to handle Breaking Changes ############################################################
                     ######################################################################################################
