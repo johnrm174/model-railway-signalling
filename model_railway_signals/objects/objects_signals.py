@@ -148,6 +148,7 @@ default_signal_object["sigarms"] = [
             [ [False,0],[False,0],[False,0] ],
             [ [False,0],[False,0],[False,0] ],
             [ [False,0],[False,0],[False,0] ] ]
+default_signal_object["lowerquadrant"] = False
 #------------------------------------------------------------------------------------
 # General Configuration - parameters specific to Ground Position and Ground disc signals
 #------------------------------------------------------------------------------------
@@ -687,6 +688,7 @@ def redraw_signal_object(object_id):
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    lower_quadrant =  objects_common.schematic_objects[object_id]["lowerquadrant"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
                     post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
@@ -721,6 +723,7 @@ def redraw_signal_object(object_id):
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    lower_quadrant =  objects_common.schematic_objects[object_id]["lowerquadrant"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
                     post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,

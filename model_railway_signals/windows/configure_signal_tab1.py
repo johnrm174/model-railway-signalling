@@ -263,6 +263,11 @@ class semaphore_signal_arms():
                                 sig_arms_updated_callback=sig_arms_updated,
                                 sub_arms_updated_callback=subs_arms_updated,
                                 dist_arms_updated_callback=dist_arms_updated)
+        # Add the check box for the 'Lower Quadrant' Selection
+        self.lowerquadrant = common.check_box(self.frame, label="Lower quadrant arms",
+                        tool_tip="Select to create lower quadrant signal arms "+
+                        "(leave unselected for upper quadrant signal arms)")
+        self.lowerquadrant.pack(padx=2, pady=2)
         # The signal arm for the main route cannot be deselected so we need to
         # set the value and then disable the base tkinter widget (we can't use
         # the disable function as this would also 'blank' the checkbox)
