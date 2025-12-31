@@ -917,6 +917,7 @@ def clear_signal_override(sig_id:int, temp_override:bool=False):
         if temp_override and signals[str(sig_id)]["override2"]:
             logging.info("Signal "+str(sig_id)+": Clearing temp signal override")
             signals[str(sig_id)]["override2"] = False
+            update_signal_aspect(sig_id)
         elif not temp_override and signals[str(sig_id)]["override"]:
             logging.info("Signal "+str(sig_id)+": Clearing signal override")
             signals[str(sig_id)]["override"] = False
@@ -961,6 +962,7 @@ def clear_subsidary_override(sig_id:int, temp_override:bool=False):
         if temp_override and signals[str(sig_id)]["overridesub2"]:
             logging.info("Signal "+str(sig_id)+": Clearing temp subsidiary override")
             signals[str(sig_id)]["overridesub2"] = False
+            update_subsidary_aspect(sig_id)
         elif not temp_override and signals[str(sig_id)]["overridesub"]:
             logging.info("Signal "+str(sig_id)+": Clearing subsidiary override")
             signals[str(sig_id)]["overridesub"] = False
