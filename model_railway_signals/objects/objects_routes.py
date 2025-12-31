@@ -206,7 +206,7 @@ def update_references_to_signal(old_signal_id:int, new_signal_id:int):
                 if item_id == old_signal_id:
                     objects_common.schematic_objects[object_id]["routedefinitions"][index1]["subsidariesonroute"][index2] = new_signal_id
             # Update the list of signals to clear down the route (when passed)
-            for index2, item_id in enumerate(route_definition["exitsensors"]):
+            for index2, item_id in enumerate(route_definition["exitsignals"]):
                 if item_id == old_signal_id:
                     objects_common.schematic_objects[object_id]["routedefinitions"][index1]["exitsignals"][index2] = new_signal_id
     return()
