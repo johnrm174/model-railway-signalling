@@ -773,6 +773,10 @@ def set_all(new_objects:dict):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 else:
+                    # Tuples are converted to lists by the json.dumps function on layout save
+                    # We convert them back to tuples (primarily to stop the system tests breaking)
+                    if element == "textfonttuple" and type(new_objects[object_id][element]) is list:
+                        new_objects[object_id]["textfonttuple"] = tuple(new_objects[object_id]["textfonttuple"])
                     ######################################################################################################
                     ## Handle Breaking change for Release 6.1.0. The "exitsensor" element in each route definition has ###
                     ## Changed to ""exitsensors" which is a variable length list of track sensors which, when triggered ##
