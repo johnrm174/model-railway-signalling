@@ -394,8 +394,8 @@ def process_external_events():
         # Add exception handling so the polling function doesn't get kinned.
         try: callback()
         except: pass
-    # Schedule next check. 100ms is standard
-    root_window.after(100, process_external_events)
+    # Schedule next check. 10ms is standard
+    root_window.after(10, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
