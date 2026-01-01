@@ -14,7 +14,7 @@ import test_configuration_windows
 # any additional triggers received within the 0.1 seconds will be ignored
 #-----------------------------------------------------------------------------------
 
-network_delay = 0.1
+network_delay = 0.2
 gpio_trigger_delay = 0.2
 
 #-----------------------------------------------------------------------------------
