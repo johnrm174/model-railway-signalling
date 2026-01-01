@@ -784,11 +784,20 @@ def set_all(new_objects:dict):
                     ######################################################################################################
                     if new_object_type == objects_common.object_type.route and element == "routedefinitions":
                         for index, route_definition in enumerate(new_objects[object_id]["routedefinitions"]):
+                            # Turn the 'old' single 'exitsensor' entry to a list of 'exitsensors'
                             if "exitsensor" in route_definition.keys():
                                 sensor_id = new_objects[object_id]["routedefinitions"][index]["exitsensor"]
-                                new_objects[object_id]["routedefinitions"][index]["exitsensors"] = [sensor_id,]
+                                if sensor_id == 0: list_of_sensors = []
+                                else: list_of_sensors = [sensor_id]
+                                new_objects[object_id]["routedefinitions"][index]["exitsensors"] = list_of_sensors
                                 del(new_objects[object_id]["routedefinitions"][index]["exitsensor"])
-                            new_objects[object_id]["routedefinitions"][index]["exitsignals"] = []
+                            # Handle the case (from interim releases) where we ended up with '[0]'
+                            list_of_sensors = new_objects[object_id]["routedefinitions"][index]["exitsensors"]
+                            if list_of_sensors == [0]:
+                                new_objects[object_id]["routedefinitions"][index]["exitsensors"] = []
+                            # Create an empty list of 'exitsignals' if the route definition doesn't contain one
+                            if "exitsignals" not in route_definition.keys():
+                                new_objects[object_id]["routedefinitions"][index]["exitsignals"] = []
                     ######################################################################################################
                     ## End of Code to handle Breaking Changes ############################################################
                     ######################################################################################################
