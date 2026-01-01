@@ -77,24 +77,33 @@ def raise_test_warning(message):
 # if the user has neglected to put in any sleeps themselves
 #------------------------------------------------------------------------------
 
-def process_after_queue(): pass
-
 def run_function(function, sleep:float=0.0):
     if not script_thread.stopped():
         # Create an Event (to signal back into this thread when the function has completed)
-        done_event = threading.Event()
+        done_event1 = threading.Event()
+        done_event2 = threading.Event()
         # Create a function Wrapper that will always set the event when the function has completed)
-        def function_wrapper():
-                try: function()
-                finally: done_event.set()
+        def function_wrapper1():
+            try: function()
+            finally: done_event1.set()
         # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
-        common.execute_function_in_tkinter_thread(function_wrapper)
+        common.execute_function_in_tkinter_thread(function_wrapper1)
         # Wait for the event to complete before returning
         # wait() returns True if the flag is set, False if it timed out
-        successfully_completed = done_event.wait(timeout=5.0)
-        if not successfully_completed: raise_test_warning("Test function timed out after 5.0 seconds")
-        # Sleep (If a sleep has been specified by the user)
-        time.sleep(sleep)
+        successfully_completed = done_event1.wait(timeout=5.0)
+        if not successfully_completed: raise_test_warning("Script function timed out after 5.0 seconds")
+        # Some application functions schedule events via the root.after() method to
+        # complete all required actions (e.g. reset_layout, signal_passed events etc.
+        # We therefore ensure any 'immediate' events that have been added to the queue
+        # are processed as required before we hand back execution to the calling programme
+        def function_wrapper2():
+            done_event2.set()
+        common.execute_function_in_tkinter_thread(function_wrapper2)
+        successfully_completed = done_event2.wait(timeout=5.0)
+        if not successfully_completed:
+            raise_test_error("Secondary script function events timed out after 5.0 seconds")
+        # Sleep if the user has specified a sleep
+        time.sleep(sleep)    
 
 #------------------------------------------------------------------------------
 # Class for a stoppable thread - when the main thread exits it calls the 'stop'
@@ -119,10 +128,8 @@ class stoppable_thread(threading.Thread):
 
 def thread_to_initialise_application(file_to_load:str, script_to_run):
     # Wait for the application to stabilise and then load the schematic
-    run_function(lambda:process_after_queue())
     print ("Scripting: Loading Scematic: '",file_to_load,"'")
     run_function(lambda:main_menubar.load_schematic(file_to_load))
-    run_function(lambda:process_after_queue())
     # Wait for the file to be loaded (sleep above) and run the specified script
     script_to_run()
     return()
@@ -181,7 +188,6 @@ def sleep(sleep_time:float): time.sleep(sleep_time)
 
 def reset_layout():
     run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False))
-    run_function(lambda:process_after_queue())
     
 # ------------------------------------------------------------------------------
 # API Functions to trigger layout 'events' 
@@ -264,7 +270,6 @@ def trigger_signal_passed(sigid, sleep:float=default_sleep_time):
         raise_test_warning ("trigger_signal_passed - Signal: "+str(sigid)+" does not exist")
     else:
         run_function(lambda:signals.sig_passed_button_event(sigid), sleep)
-        run_function(lambda:process_after_queue())
                                                
 def trigger_signal_released(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
@@ -277,7 +282,6 @@ def trigger_sensor_passed(sensorid, sleep:float=default_sleep_time):
         raise_test_warning ("trigger_sensor_passed - Track Sensor: "+str(sensorid)+" does not exist")
     else:
         run_function(lambda:track_sensors.track_sensor_triggered(sensorid), sleep)
-        run_function(lambda:process_after_queue())
 
 def set_point_switched(pointid, sleep:float=default_sleep_time):
     if str(pointid) not in points.points.keys():
@@ -364,10 +368,8 @@ def simulate_gpio_triggered(gpioid, sleep:float=default_sleep_time):
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
-            time.sleep(0.1)
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
-            time.sleep(0.3)
-            run_function(lambda:process_after_queue())
+            time.sleep(0.2)
 
 def simulate_gpio_on(gpioid, sleep:float=default_sleep_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
