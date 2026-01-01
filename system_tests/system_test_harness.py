@@ -231,23 +231,32 @@ def start_application(callback_function):
         schematic.shutdown()
         common.instant_shutdown()
 
-def process_after_queue(): pass
-
-def run_function(test_function, timeout=1.0):
+def run_function(test_function, timeout=2.0):
     # Create an Event (to signal back into this thread when the function has completed)
-    done_event = threading.Event()
+    done_event1 = threading.Event()
+    done_event2 = threading.Event()
     # Create a function Wrapper that will always set the event when the function has completed)
-    def function_wrapper():
-            try: test_function()
-            finally: done_event.set()
+    def function_wrapper1():
+        try: test_function()
+        finally: done_event1.set()
     # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
-    common.execute_function_in_tkinter_thread(function_wrapper)
+    common.execute_function_in_tkinter_thread(function_wrapper1)
     # Wait for the event to complete before returning
     # wait() returns True if the flag is set, False if it timed out
-    successfully_completed = done_event.wait(timeout=timeout)
+    successfully_completed = done_event1.wait(timeout=timeout)
     if not successfully_completed:
-        raise_test_error(f"################### Test function timed out after {timeout} seconds ####################")
-
+        raise_test_error(f"Test function timed out after {timeout} seconds")
+    # Some application functions schedule events via the root.after() method to
+    # complete all required actions (e.g. reset_layout, signal_passed events etc.
+    # We therefore ensure any 'immediate' events that have been added to the queue
+    # are processed as required before we hand back execution to the calling programme
+    def function_wrapper2():
+        done_event2.set()
+    common.execute_function_in_tkinter_thread(function_wrapper2)
+    successfully_completed = done_event2.wait(timeout=timeout)
+    if not successfully_completed:
+        raise_test_error(f"Secondary events timed out after {timeout} seconds")
+    
 # ------------------------------------------------------------------------------
 # Functions to log out test error/warning messages with the filename and line number 
 # of the parent test file that called the test assert functions in this module
@@ -279,17 +288,11 @@ def increment_tests_executed():
 def initialise_test_harness(filename=None):
     if filename is None:
         # Ensure any queued tkinter events have completed
-        run_function(lambda:process_after_queue())
         run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),timeout=2.0)
-        # Process the root.after queue before returning execution back to the calling programme
-        run_function(lambda:process_after_queue())
     else:
         # Ensure any queued tkinter events have completed
-        run_function(lambda:process_after_queue())
         print ("System Tests: Load Scematic: '",filename,"'")
         run_function(lambda:main_menubar.load_schematic(filename),timeout=3.0)
-        # Process the root.after queue before returning execution back to the calling programme
-        run_function(lambda:process_after_queue())
 
 # ------------------------------------------------------------------------------
 # Function to finish the tests and report on any failures. Then drops straight
@@ -400,12 +403,7 @@ def trigger_signals_passed(*sigids):
         if str(sigid) not in signals.signals.keys():
             raise_test_warning ("trigger_signals_passed - Signal: "+str(sigid)+" does not exist")
         else:
-            # For functions that may change track occupancy we always generate an additional
-            # dummy event when the first event (which scheduled the occupancy change) has completed.
-            # This will be added to the root.after event queue and so should always be processed
-            # after the track occupancy change event has been processed (assuming a delay of zero)
             run_function(lambda:signals.sig_passed_button_event(sigid))
-            run_function(lambda:process_after_queue())
 
 def trigger_signals_released(*sigids):
     for sigid in sigids:
@@ -419,12 +417,7 @@ def trigger_sensors_passed(*sensorids):
         if str(sensorid) not in track_sensors.track_sensors.keys():
             raise_test_warning ("trigger_sensors_passed - Track Sensor: "+str(sensorid)+" does not exist")
         else:
-            # For functions that may change track occupancy we always generate an additional
-            # dummy event when the first event (which scheduled the occupancy change) has completed.
-            # This will be added to the root.after event queue and so should always be processed
-            # after the track occupancy change event has been processed (assuming a delay of zero)
             run_function(lambda:track_sensors.track_sensor_triggered(sensorid))
-            run_function(lambda:process_after_queue())
 
 def set_points_switched(*pointids):
     for pointid in pointids:
@@ -531,15 +524,10 @@ def simulate_gpio_triggered(*gpioids):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            # For functions that may change track occupancy we always generate an additional
-            # dummy event when the first event (which scheduled the occupancy change) has completed.
-            # This will be added to the root.after event queue and so should always be processed
-            # after the track occupancy change event has been processed (assuming a delay of zero)
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
-            # We also wait an additional 0.25 seconds (default GPIO sensor timeout = 0.1s)
-            time.sleep(0.25)
-            run_function(lambda:process_after_queue())
+            # Wait 0.2 seconds (default GPIO sensor timeout = 0.1s)
+            time.sleep(0.2)
 
 def simulate_gpio_on(*gpioids):
     for gpioid in gpioids:
@@ -1154,10 +1142,6 @@ def set_automation_off():
 
 def reset_layout():
     run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False))
-    # Object reset events are added to the root.after queue so we need
-    # to process this before returning execution back to the calling programme
-    run_function(lambda:process_after_queue())
-    process_after_queue
 
 # ------------------------------------------------------------------------------
 # Functions to exercise the schematic Editor

@@ -279,7 +279,7 @@ def run_initial_state_tests1():
 def run_initial_state_tests2():
     # Test_initial condition (at layout load)
     # Initial state tests - Route 18 should be active
-    assert_buttons_enabled(8,19)    
+    assert_buttons_enabled(18,19)
     assert_buttons_selected(18,19)
     assert_signals_DANGER(13)
     assert_signals_PROCEED(14)
