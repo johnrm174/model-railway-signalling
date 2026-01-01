@@ -57,7 +57,7 @@ from inspect import getframeinfo
 from inspect import stack
 from os.path import basename
 
-default_sleep_time = 0.001
+default_sleep_time = 0.0
 main_menubar = None
 root = None
 
@@ -77,11 +77,24 @@ def raise_test_warning(message):
 # if the user has neglected to put in any sleeps themselves
 #------------------------------------------------------------------------------
 
-def run_function(function, sleep:float):
+def process_after_queue(): pass
+
+def run_function(function, sleep:float=0.0):
     if not script_thread.stopped():
-        common.execute_function_in_tkinter_thread(function)
+        # Create an Event (to signal back into this thread when the function has completed)
+        done_event = threading.Event()
+        # Create a function Wrapper that will always set the event when the function has completed)
+        def function_wrapper():
+                try: function()
+                finally: done_event.set()
+        # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
+        common.execute_function_in_tkinter_thread(function_wrapper)
+        # Wait for the event to complete before returning
+        # wait() returns True if the flag is set, False if it timed out
+        successfully_completed = done_event.wait(timeout=5.0)
+        if not successfully_completed: raise_test_warning("Test function timed out after 5.0 seconds")
+        # Sleep (If a sleep has been specified by the user)
         time.sleep(sleep)
-    return()
 
 #------------------------------------------------------------------------------
 # Class for a stoppable thread - when the main thread exits it calls the 'stop'
@@ -106,9 +119,10 @@ class stoppable_thread(threading.Thread):
 
 def thread_to_initialise_application(file_to_load:str, script_to_run):
     # Wait for the application to stabilise and then load the schematic
-    time.sleep(2.0)
+    run_function(lambda:process_after_queue())
     print ("Scripting: Loading Scematic: '",file_to_load,"'")
-    run_function(lambda:main_menubar.load_schematic(file_to_load), sleep=3)
+    run_function(lambda:main_menubar.load_schematic(file_to_load))
+    run_function(lambda:process_after_queue())
     # Wait for the file to be loaded (sleep above) and run the specified script
     script_to_run()
     return()
@@ -166,7 +180,8 @@ def sleep(sleep_time:float): time.sleep(sleep_time)
 #------------------------------------------------------------------------------
 
 def reset_layout():
-    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False), sleep=3.0)
+    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False))
+    run_function(lambda:process_after_queue())
     
 # ------------------------------------------------------------------------------
 # API Functions to trigger layout 'events' 
@@ -249,6 +264,7 @@ def trigger_signal_passed(sigid, sleep:float=default_sleep_time):
         raise_test_warning ("trigger_signal_passed - Signal: "+str(sigid)+" does not exist")
     else:
         run_function(lambda:signals.sig_passed_button_event(sigid), sleep)
+        run_function(lambda:process_after_queue())
                                                
 def trigger_signal_released(sigid, sleep:float=default_sleep_time):
     if str(sigid) not in signals.signals.keys():
@@ -261,6 +277,7 @@ def trigger_sensor_passed(sensorid, sleep:float=default_sleep_time):
         raise_test_warning ("trigger_sensor_passed - Track Sensor: "+str(sensorid)+" does not exist")
     else:
         run_function(lambda:track_sensors.track_sensor_triggered(sensorid), sleep)
+        run_function(lambda:process_after_queue())
 
 def set_point_switched(pointid, sleep:float=default_sleep_time):
     if str(pointid) not in points.points.keys():
@@ -346,8 +363,11 @@ def simulate_gpio_triggered(gpioid, sleep:float=default_sleep_time):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid), sleep)
-            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid), sleep)
+            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+            time.sleep(0.1)
+            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+            time.sleep(0.3)
+            run_function(lambda:process_after_queue())
 
 def simulate_gpio_on(gpioid, sleep:float=default_sleep_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
