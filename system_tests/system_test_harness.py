@@ -180,7 +180,6 @@ from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
 from model_railway_signals.library import levers
 
-thread_delay_time = 0.150
 tkinter_thread_started = False
 main_menubar = None
 root = None
@@ -231,10 +230,23 @@ def start_application(callback_function):
         logging.info("Keyboard Interrupt - Shutting down")
         schematic.shutdown()
         common.instant_shutdown()
-        
-def run_function(test_function, delay:float=thread_delay_time):
-    common.execute_function_in_tkinter_thread(test_function)
-    sleep(delay)
+
+def process_after_queue(): pass
+
+def run_function(test_function, timeout=1.0):
+    # Create an Event (to signal back into this thread when the function has completed)
+    done_event = threading.Event()
+    # Create a function Wrapper that will always set the event when the function has completed)
+    def function_wrapper():
+            try: test_function()
+            finally: done_event.set()
+    # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
+    common.execute_function_in_tkinter_thread(function_wrapper)
+    # Wait for the event to complete before returning
+    # wait() returns True if the flag is set, False if it timed out
+    successfully_completed = done_event.wait(timeout=timeout)
+    if not successfully_completed:
+        raise_test_error(f"################### Test function timed out after {timeout} seconds ####################")
 
 # ------------------------------------------------------------------------------
 # Functions to log out test error/warning messages with the filename and line number 
@@ -267,13 +279,17 @@ def increment_tests_executed():
 def initialise_test_harness(filename=None):
     if filename is None:
         # Ensure any queued tkinter events have completed
-        time.sleep(1.0) 
-        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),delay=2.0)
+        run_function(lambda:process_after_queue())
+        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),timeout=2.0)
+        # Process the root.after queue before returning execution back to the calling programme
+        run_function(lambda:process_after_queue())
     else:
         # Ensure any queued tkinter events have completed
-        time.sleep(1.0) 
+        run_function(lambda:process_after_queue())
         print ("System Tests: Load Scematic: '",filename,"'")
-        run_function(lambda:main_menubar.load_schematic(filename),delay=3.0)
+        run_function(lambda:main_menubar.load_schematic(filename),timeout=3.0)
+        # Process the root.after queue before returning execution back to the calling programme
+        run_function(lambda:process_after_queue())
 
 # ------------------------------------------------------------------------------
 # Function to finish the tests and report on any failures. Then drops straight
@@ -384,8 +400,13 @@ def trigger_signals_passed(*sigids):
         if str(sigid) not in signals.signals.keys():
             raise_test_warning ("trigger_signals_passed - Signal: "+str(sigid)+" does not exist")
         else:
+            # For functions that may change track occupancy we always generate an additional
+            # dummy event when the first event (which scheduled the occupancy change) has completed.
+            # This will be added to the root.after event queue and so should always be processed
+            # after the track occupancy change event has been processed (assuming a delay of zero)
             run_function(lambda:signals.sig_passed_button_event(sigid))
-                                               
+            run_function(lambda:process_after_queue())
+
 def trigger_signals_released(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals.signals.keys():
@@ -398,7 +419,12 @@ def trigger_sensors_passed(*sensorids):
         if str(sensorid) not in track_sensors.track_sensors.keys():
             raise_test_warning ("trigger_sensors_passed - Track Sensor: "+str(sensorid)+" does not exist")
         else:
+            # For functions that may change track occupancy we always generate an additional
+            # dummy event when the first event (which scheduled the occupancy change) has completed.
+            # This will be added to the root.after event queue and so should always be processed
+            # after the track occupancy change event has been processed (assuming a delay of zero)
             run_function(lambda:track_sensors.track_sensor_triggered(sensorid))
+            run_function(lambda:process_after_queue())
 
 def set_points_switched(*pointids):
     for pointid in pointids:
@@ -505,8 +531,15 @@ def simulate_gpio_triggered(*gpioids):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
+            # For functions that may change track occupancy we always generate an additional
+            # dummy event when the first event (which scheduled the occupancy change) has completed.
+            # This will be added to the root.after event queue and so should always be processed
+            # after the track occupancy change event has been processed (assuming a delay of zero)
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+            # We also wait an additional 0.25 seconds (default GPIO sensor timeout = 0.1s)
+            time.sleep(0.25)
+            run_function(lambda:process_after_queue())
 
 def simulate_gpio_on(*gpioids):
     for gpioid in gpioids:
@@ -945,7 +978,7 @@ class dummy_event():
 def place_object(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
     move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
     event = dummy_event(x=xpos, y=ypos)
-    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress(), delay=0.2)
+    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress())
     run_function(lambda:schematic.left_button_click(event))
     run_function(lambda:schematic.left_button_release(event))
     
@@ -1108,20 +1141,24 @@ def get_object_id(item_type:str, item_id:int):
 # ------------------------------------------------------------------------------
 
 def set_edit_mode():
-    run_function(lambda:main_menubar.edit_mode(),delay=0.5)
+    run_function(lambda:main_menubar.edit_mode())
     
 def set_run_mode():
-    run_function(lambda:main_menubar.run_mode(),delay=0.5)
+    run_function(lambda:main_menubar.run_mode())
     
 def set_automation_on():
-    run_function(lambda:main_menubar.automation_enable(),delay=0.5)
+    run_function(lambda:main_menubar.automation_enable())
     
 def set_automation_off():
-    run_function(lambda:main_menubar.automation_disable(),delay=0.5)
+    run_function(lambda:main_menubar.automation_disable())
 
 def reset_layout():
-    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=1.0)
-    
+    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False))
+    # Object reset events are added to the root.after queue so we need
+    # to process this before returning execution back to the calling programme
+    run_function(lambda:process_after_queue())
+    process_after_queue
+
 # ------------------------------------------------------------------------------
 # Functions to exercise the schematic Editor
 # ------------------------------------------------------------------------------
@@ -1130,24 +1167,24 @@ def reset_layout():
 # This event is normally only enabled in RUN Mode
 def toggle_automation():
     event = dummy_event(keysym="a")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    run_function(lambda:main_menubar.handle_canvas_event(event))
 
 # Simulates the <cntl-m> keypress on the canvas
 # This event is normally enabled in both EDIT Mode (disabled when move in progress) and RUN mode
 def toggle_mode():
     event = dummy_event(keysym="m")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    run_function(lambda:main_menubar.handle_canvas_event(event))
 
 # Simulates the <cntl-s> keypress on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def toggle_snap_to_grid():
     event = dummy_event(keysym="s")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    run_function(lambda:main_menubar.handle_canvas_event(event))
 
 # Simulates the <cntl-r> keypress on the canvas
 # This event is normally enabled in EDIT Mode (disabled when move in progress) and RUN mode
 def reset_window_size():
-    run_function(lambda:schematic.reset_window_size(),delay=0.5)
+    run_function(lambda:schematic.reset_window_size())
 
 # This function enables object configurations to be changed in support of the testing
 # (effectively simulating OK/Apply from an object configuration window to save the changes)
@@ -1202,7 +1239,7 @@ def select_and_edit_single_object(object_id):
     else:
         xpos, ypos = get_selection_position(object_id)
         event = dummy_event(x=xpos, y=ypos)
-        run_function(lambda:schematic.left_double_click(event), delay=1.0)
+        run_function(lambda:schematic.left_double_click(event))
         run_function(lambda:schematic.close_edit_window(cancel=True))
         
 # Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
@@ -1273,7 +1310,7 @@ def nudge_selected_objects(direction:str="Left"):
 # Simulates the <s> keypress or 'snap-to-grid' selection from object popup menu
 # These events are only enabled in EDIT Mode (disabled when move in progress)
 def snap_selected_objects_to_grid():
-    run_function(lambda:schematic.snap_selected_objects_to_grid(), delay=0.5)
+    run_function(lambda:schematic.snap_selected_objects_to_grid())
 
 # Simulates the 'select_all' selection from the canvas popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
@@ -1289,17 +1326,17 @@ def deselect_all_objects():
 # Simulates the <r> keypress or 'rotate' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def rotate_selected_objects():
-    run_function(lambda:schematic.rotate_selected_objects(),delay=0.5)
+    run_function(lambda:schematic.rotate_selected_objects())
 
 # Simulates the <f> keypress or 'flip' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def flip_selected_objects():
-    run_function(lambda:schematic.flip_selected_objects(),delay=0.5)
+    run_function(lambda:schematic.flip_selected_objects())
 
 # Simulates the <backspace>/<delete> keypress or 'delete' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def delete_selected_objects():
-    run_function(lambda:schematic.delete_selected_objects(),delay=0.5)
+    run_function(lambda:schematic.delete_selected_objects())
     
 # Simulates the <cntl-c> keypress or 'copy' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
@@ -1313,12 +1350,12 @@ def copy_selected_objects(xdiff:int, ydiff:int, steps:int=10, delay:float=0.0, t
 # Simulates the <cntl-z> keypress event on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def undo():
-    run_function(lambda:schematic.schematic_undo(),delay=0.5)
+    run_function(lambda:schematic.schematic_undo())
 
 # Simulates the <cntl-v> keypress event on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def redo():
-    run_function(lambda:schematic.schematic_redo(),delay=0.5)
+    run_function(lambda:schematic.schematic_redo())
 
 
     
