@@ -1775,7 +1775,7 @@ def run_library_common_tests():
     time.sleep(2.0)
     common.clear_warning_window()
     common.display_warning(canvas, "Test Message 3")
-    common.user_dragging_window(event=None, canvas=canvas)
+    common.focus_back_on_canvas(event=None, canvas=canvas)
     time.sleep(2.0)
     common.close_warning_window()
     return()

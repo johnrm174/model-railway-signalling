@@ -61,7 +61,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"1":True, "2":False, "3":True},
                           "linestohighlight":[1,2,3],
                           "pointstohighlight":[1,2,3],
-                          "exitsensor":1,
+                          "exitsensors":[1,2],
+                          "exitsignals":[3,4],
                           "exitbutton":5,
                           "routenotes":"",
                           "routecolour":"Red"}
@@ -71,7 +72,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"1":False, "2":True, "3":False},
                           "linestohighlight":[1,2,4],
                           "pointstohighlight":[1,2,4],
-                          "exitsensor":2,
+                          "exitsensors":[2,3],
+                          "exitsignals":[1,2],
                           "exitbutton":4,
                           "routenotes":"",
                           "routecolour":"Red"}
@@ -125,7 +127,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"51":True, "52":False, "53":True},
                               "linestohighlight":[11,12,13],
                               "pointstohighlight":[21,22,23],
-                              "exitsensor":41,
+                              "exitsensors":[41,42],
+                              "exitsignals":[33,34],
                               "exitbutton":65,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -135,7 +138,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"51":False, "52":True, "53":False},
                               "linestohighlight":[11,12,14],
                               "pointstohighlight":[21,22,24],
-                              "exitsensor":42,
+                              "exitsensors":[42,43],
+                              "exitsignals":[31,32],
                               "exitbutton":64,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -152,7 +156,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":False, "53":True},
                               "linestohighlight":[11,12],
                               "pointstohighlight":[22,23],
-                              "exitsensor":0,
+                              "exitsensors":[42],
+                              "exitsignals":[33,34],
                               "exitbutton":65,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -162,7 +167,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":True, "53":False},
                               "linestohighlight":[11,12,14],
                               "pointstohighlight":[22,24],
-                              "exitsensor":42,
+                              "exitsensors":[42,43],
+                              "exitsignals":[31],
                               "exitbutton":64,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -178,7 +184,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":False},
                               "linestohighlight":[11,12],
                               "pointstohighlight":[22,23],
-                              "exitsensor":0,
+                              "exitsensors":[],
+                              "exitsignals":[33],
                               "exitbutton":65,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -188,7 +195,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":True},
                               "linestohighlight":[11,12],
                               "pointstohighlight":[22],
-                              "exitsensor":0,
+                              "exitsensors":[43],
+                              "exitsignals":[31],
                               "exitbutton":64,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -201,7 +209,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"2":True},
                           "linestohighlight":[11,12],
                           "pointstohighlight":[22,23],
-                          "exitsensor":43,
+                          "exitsensors":[43],
+                          "exitsignals":[44],
                           "exitbutton":65,
                           "routenotes":"ABC",
                           "routecolour":"Red"}
@@ -214,7 +223,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{},
                           "linestohighlight":[],
                           "pointstohighlight":[],
-                          "exitsensor":0,
+                          "exitsensors":[],
+                          "exitsignals":[],
                           "exitbutton":0,
                           "routenotes":"Notes related to the route",
                           "routecolour":"white"}
@@ -228,10 +238,11 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"2":True},
                           "linestohighlight":[11,12],
                           "pointstohighlight":[22,23],
-                          "exitsensor":43,
+                          "exitsensors":[43],
+                          "exitsignals":[44],
                           "exitbutton":0,
                           "routenotes":"ABC",
-                          "routecolour":"Red"}    
+                          "routecolour":"Red"}
     assert_object_configuration(rb1, {"routedefinitions": [route_definition1,], "setupsensor": 43 })
     # Clean up
     select_all_objects()
@@ -470,31 +481,31 @@ def run_schematic_routes_tests2():
     
 def run_schematic_routes_tests3():
     reset_layout()    
-    print("Test signal and subsidiary changes during /after route setup - 6 warnings will be generated")
+    print("Test signal and subsidiary changes during/after route setup - 6 warnings will be generated")
     # Test Signal Change invalidating an established route clears the route
     simulate_buttons_clicked(5)
     sleep(3.0)
     assert_buttons_selected(5)
-    set_signals_on(1)
+    set_signals_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(5)
     # Test Signal Change invalidating an route in progress clears the route
     simulate_buttons_clicked(5)
     sleep(1.5)
-    set_signals_on(1)
+    set_signals_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(5)
     # Test Subsidary Change invalidating an established route clears the route
     simulate_buttons_clicked(6)
     sleep(3.0)
     assert_buttons_selected(6)
-    set_subsidaries_on(1)
+    set_subsidaries_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(6)
     # Test Subsidary Change invalidating a route in progress clears the route
     simulate_buttons_clicked(6)
     sleep(0.5)
-    set_subsidaries_on(1)
+    set_subsidaries_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(6)
     # Test changing a conflicting signal invalidates a route in progress
@@ -527,7 +538,7 @@ def run_schematic_routes_tests3():
     assert_buttons_selected(7)
     assert_points_switched(3)
     assert_signals_PROCEED(5)
-    set_points_normal(3)
+    set_points_normal(3) # Route Invalidated
     sleep(0.1)
     assert_buttons_deselected(7)
     sleep(3.0)
@@ -537,7 +548,7 @@ def run_schematic_routes_tests3():
     simulate_buttons_clicked(7)
     sleep(0.6)
     assert_points_switched(3)
-    set_points_normal(3)
+    set_points_normal(3) # Route Invalidated
     sleep(3.5)
     assert_buttons_deselected(7)
     # Test Point Change (to the correct state) immediately after route button is clicked - No warning
@@ -565,7 +576,7 @@ def run_schematic_routes_tests3():
     assert_buttons_selected(12)   # Switch 12
     assert_points_switched(3)
     assert_signals_PROCEED(5)
-    simulate_buttons_clicked(12)    # Switch 12
+    simulate_buttons_clicked(12)    #  # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(7)
     assert_buttons_deselected(12)   # Switch 12
@@ -574,7 +585,7 @@ def run_schematic_routes_tests3():
     simulate_buttons_clicked(7)     # Branch - Events = pt3 switched, sw12 on, sig 5 off
     sleep(1.2)
     assert_buttons_selected(12)     # Switch 12
-    simulate_buttons_clicked(12)    # Switch 12
+    simulate_buttons_clicked(12)    # Route Invalidated
     sleep(0.2)
     assert_buttons_deselected(12)   # Switch 12
     sleep(3.0)
@@ -584,7 +595,7 @@ def run_schematic_routes_tests3():
     simulate_buttons_clicked(7)
     assert_buttons_deselected(12)   # Switch 12
     simulate_buttons_clicked(12)    # Switch 12
-    sleep(2.0)
+    sleep(3.0)
     assert_buttons_selected(7)
     assert_buttons_selected(12)     # Switch 12
     # Return Layout to normal
@@ -883,6 +894,7 @@ def test_nx_routes3():
     # Test some of the edge cases to excersise the code
     # Case 1 - ENTRY (not also an EXIT) button clicked during router selection when there are no possible routes
     pass
+
 ######################################################################################################
 
 def run_all_schematic_routes_tests():
@@ -913,11 +925,11 @@ def run_all_schematic_routes_tests():
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
     # Run the Tests for the example layout
+    initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
+    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
-    initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
-    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     reset_layout()
     set_run_mode()
     set_automation_off()
