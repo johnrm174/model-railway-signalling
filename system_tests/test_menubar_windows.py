@@ -367,12 +367,12 @@ def run_all_menubar_window_tests():
     system_test_harness.report_results()
     # Load a layout file with plenty of 'active' config for these tests
     system_test_harness.initialise_test_harness(filename="./test_mqtt_networking.sig")
-#     test_menubar_help_windows()
-#     test_menubar_settings_windows()
+    test_menubar_help_windows()
+    test_menubar_settings_windows()
     test_menubar_utilities_windows()
-#     # Load a layout to test the style changes
-#     system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
-#     test_menubar_styles_windows()
+    # Load a layout to test the style changes
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
+    test_menubar_styles_windows()
     system_test_harness.report_results()
     
 if __name__ == "__main__":
