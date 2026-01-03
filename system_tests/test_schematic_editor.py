@@ -740,6 +740,8 @@ def run_hide_and_unhide_tests():
     assert_object_configuration(tb1,{"hidden" : False})
     assert_object_configuration(ts1,{"hidden" : False})
     assert_object_configuration(sb1,{"hidden" : False})
+    # Clean up
+    deselect_all_objects()
     return()
 
 #-----------------------------------------------------------------------------------
@@ -988,6 +990,30 @@ def run_canvas_scroll_tests2():
     reset_window_size()
     return()
 
+#-----------------------------------------------------------------------------------
+# Test the scrolling of the canvas area in edit or run mode (quick scroll buttons):
+#-----------------------------------------------------------------------------------
+
+def run_canvas_scroll_tests3(mode:str):
+    print("Schematic editor tests - Quick Scroll of canvas area in "+mode)
+    # Test scrolling of the canvas (drag and drop with left mouse click and hold).
+    # We first have to force a re-size of the root window to make it smaller than the canvas size
+    run_function(lambda:schematic.root.geometry("500x300"))
+    scroll_canvas(470,250)
+    scroll_canvas(0,0)
+    reset_window_size()
+    return()
+
+#-----------------------------------------------------------------------------------
+# Test toggling of item IDs (in Edit Mode)
+#-----------------------------------------------------------------------------------
+
+def run_toggle_of_item_id_tests():
+    print("Schematic editor tests - Toggle on/off of item IDs in Edit Mode")
+    toggle_item_ids()
+    toggle_item_ids()
+    return()
+
 ######################################################################################################
 
 def run_all_schematic_editor_tests():
@@ -1003,10 +1029,14 @@ def run_all_schematic_editor_tests():
     run_object_rotation_tests()
     run_object_flipping_tests()
     run_hide_and_unhide_tests()
+    run_toggle_of_item_id_tests()
     run_canvas_scroll_tests1("Edit Mode")
+    run_canvas_scroll_tests3("Edit Mode")
     set_run_mode()
     run_canvas_scroll_tests1("Run Mode")
     run_canvas_scroll_tests2()
+    run_canvas_scroll_tests3("Run Mode")
+    # 
     set_edit_mode()
     run_delete_object_tests()
     run_undo_and_redo_tests()

@@ -183,6 +183,20 @@ def test_menubar_settings_windows():
     system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["sprog"] == initial_settings
+    # ------------------------------------------------------------------------------------------
+    print("Testing Menubar Settings windows - SOUNDS - will generate 2 updated callbacks ")
+    # we need to check the config remains unchanged
+    initial_settings = copy.deepcopy(settings.settings["control"]["dccsoundmappings"])
+    # Open the window (we then sleep twice the delay as it tests open and re-open)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_sounds_settings), timeout=5.0)
+    # Apply
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
+    # Revert
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
+    # Check the settings remain unchanged
+    assert settings.settings["control"]["dccsoundmappings"] == initial_settings
     return()
 
 #-----------------------------------------------------------------------------------
@@ -193,17 +207,16 @@ def test_menubar_settings_windows():
 def dummy_function(): return()
 
 def point_exersise_reset_function():
-    print("Triggering Layout reset and setting delay to 0.25 seconds")
-    return(250)
+    print("Triggering Layout reset (Layout won't actually be reset)")
 
 def import_layout_file_function(xoffset, yoffset):
-    system_test_harness.main_menubar.import_schematic(25, 25, "./test_mqtt_networking.sig")
+    print("Layout Import has been initiated (Layout won't be imported)")
     
 def test_menubar_utilities_windows():
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar utilities windows - DCC PROGRAMMING")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
-    # At a later stage I might develop these tests further (across the board)
+    # At a later stage I might develop further tests for the DCC Programming functions
     system_test_harness.run_function(lambda:open_window(menubar.dcc_programming,
                             dummy_function, dummy_function, dummy_function), timeout=5.0)
     # OK (Close Window)
@@ -217,6 +230,7 @@ def test_menubar_utilities_windows():
     system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     print("Testing Menubar utilities windows - BULK RENUMBERING")
     # Open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop further tests for the Bulk Renumbering functions
     system_test_harness.run_function(lambda:open_window(menubar.bulk_renumbering), timeout=5.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
@@ -225,8 +239,7 @@ def test_menubar_utilities_windows():
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     print("Testing Menubar utilities windows - EXERSISE POINTS")
-    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
-    # At a later stage I might develop these tests further (across the board)
+    # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(menubar.exercise_points, point_exersise_reset_function), timeout=5.0)
     # Exersise some points
     system_test_harness.run_function(lambda:menubar_class_instance.reset())
@@ -235,16 +248,26 @@ def test_menubar_utilities_windows():
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     print("Testing Menubar utilities windows - IMPORT")
+    # Open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might add further tests for the actual import file process
     import_function_to_run = system_test_harness.main_menubar.import_schematic
     system_test_harness.run_function(lambda:open_window(menubar.import_layout, import_layout_file_function), timeout=5.0)
-    system_test_harness.run_function(lambda:menubar_class_instance.load_file(), timeout=5.0) 
+    # Exersise the "Import File" Function - this just makes a dummy callback
+    system_test_harness.run_function(lambda:menubar_class_instance.load_file(), timeout=5.0)
+    # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     print("Testing Menubar utilities windows - SUBSCRIPTIONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
-    # At a later stage I might develop these tests further (across the board)
+    # At a later stage I might develop further tests for the "Subscribed GPIO Sensor Test buttons"
     system_test_harness.run_function(lambda:open_window(menubar.mqtt_subscriptions), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window.close_window(cancel=True), timeout=5.0)
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
+    print("Testing Menubar utilities windows - APPLICATION UPGRADE")
+    # Open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop further tests for the actual upgrade process
+    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade), timeout=5.0)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -350,16 +373,16 @@ def test_menubar_styles_windows():
 # part of the normal system tests as it doesn't add any real value over manual testing
 # ######## NOTE THAT THIS FUNCTION IS NOT RUN AS PART OF NORMAL TESTING ##############
 #-----------------------------------------------------------------------------------
-
-def test_application_upgrade():
-    print("Testing Menubar utilities windows - APPLICATION UPGRADE")
-    # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade), timeout=5.0)
-    # Try the upgrade process
-    system_test_harness.run_function(lambda:test_application_upgrade(), timeout=5.0)
-    # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
-    return()
+# 
+# def test_application_upgrade():
+#     print("Testing Menubar utilities windows - APPLICATION UPGRADE")
+#     # Open the window (we then sleep twice the delay as it tests open and re-open)
+#     system_test_harness.run_function(lambda:open_window(menubar.application_upgrade), timeout=5.0)
+#     # Try the upgrade process
+#     system_test_harness.run_function(lambda:test_application_upgrade(), timeout=5.0)
+#     # OK (Close Window)
+#     system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
+#     return()
 
 ######################################################################################################
 

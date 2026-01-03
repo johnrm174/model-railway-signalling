@@ -125,8 +125,10 @@
 #    copy_selected_objects()          - 'Cntl-c' - also right-click-menu function
 #    paste_clipboard_objects()        - 'Cntl-v' - also right-click-menu function
 #    undo() / redo()                  - 'Cntl-x' / 'Cntl-y'
-#    select_all_objects()              - Right-click-menu function
+#    select_all_objects()             - Right-click-menu function
 #    deselect_all_objects()           - 'esc' key
+#    scroll_canvas(x,y)               - Scroll the canvas to an absolute position
+#    toggle_item_ids()                - Toggle display of item IDs On/off
 #
 # Supported Schematic mouse event invocations:
 #    test_all_edit_object_windows(test_all_controls:bool=False - Opens & exercises all edit windows for all schematic objects
@@ -1161,6 +1163,11 @@ def toggle_mode():
     event = dummy_event(keysym="m")
     run_function(lambda:main_menubar.handle_canvas_event(event))
 
+# Simulates the <cntl-i> keypress to toggle the display of item IDs
+# This event is normally enabled in only EDIT Mode
+def toggle_item_ids():
+    run_function(lambda:schematic.toggle_item_ids())
+
 # Simulates the <cntl-s> keypress on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def toggle_snap_to_grid():
@@ -1293,6 +1300,15 @@ def nudge_selected_objects(direction:str="Left"):
         event=dummy_event(keysym=direction)
         run_function(lambda:schematic.nudge_selected_objects(event))
 
+# Simulates a "quickscroll" menubar selection - scrolling the canvas to specified coords:
+# These events are  enabled in both EDIT and RUN Modes
+def scroll_canvas(x:int, y:int):
+    run_function(lambda:schematic.scroll_canvas(x, y))
+
+# These events are only enabled in EDIT Mode (disabled when move in progress)
+def snap_selected_objects_to_grid():
+    run_function(lambda:schematic.snap_selected_objects_to_grid())
+
 # Simulates the <s> keypress or 'snap-to-grid' selection from object popup menu
 # These events are only enabled in EDIT Mode (disabled when move in progress)
 def snap_selected_objects_to_grid():
@@ -1350,8 +1366,6 @@ def undo():
 def redo():
     run_function(lambda:schematic.schematic_redo())
 
-
-    
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
