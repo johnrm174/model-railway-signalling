@@ -145,22 +145,55 @@ def run_library_api_tests():
     assert len(signals.signals) == 5
     print("Library Tests - set_signal_override - will generate 2 errors:")
     assert not signals.signals["1"]["override"]
+    assert not signals.signals["1"]["override2"]
     assert not signals.signals["2"]["override"]
+    assert not signals.signals["2"]["override2"]
     signals.set_signal_override(1)
     signals.set_signal_override(1)
-    signals.set_signal_override(2)
+    signals.set_signal_override(2, temp_override=True)
     signals.set_signal_override(6)     # Error - does not exist
     signals.set_signal_override("1")   # Error - not an int
     assert signals.signals["1"]["override"]
-    assert signals.signals["2"]["override"]
+    assert not signals.signals["1"]["override2"]
+    assert signals.signals["2"]["override2"]
+    assert not signals.signals["2"]["override"]
     print("Library Tests - clear_signal_override - will generate 2 errors:")
     signals.clear_signal_override(1)
     signals.clear_signal_override(1)
-    signals.clear_signal_override(2)
+    signals.clear_signal_override(2, temp_override=True)
     signals.clear_signal_override(6)     # Error - does not exist
     signals.clear_signal_override("1")   # Error - not an int
     assert not signals.signals["1"]["override"]
+    assert not signals.signals["1"]["override2"]
     assert not signals.signals["2"]["override"]
+    assert not signals.signals["2"]["override2"]
+    print("Library Tests - set_subsidary_override - will generate 3 errors:")
+    # Note that signals 1 and 2 have subsidaties
+    assert not signals.signals["1"]["overridesub"]
+    assert not signals.signals["1"]["overridesub2"]
+    assert not signals.signals["2"]["overridesub"]
+    assert not signals.signals["2"]["overridesub2"]
+    signals.set_subsidary_override(1)
+    signals.set_subsidary_override(1)
+    signals.set_subsidary_override(2, temp_override=True)
+    signals.set_subsidary_override(4)     # Error - does not have a subsidary
+    signals.set_subsidary_override(6)     # Error - does not exist
+    signals.set_subsidary_override("1")   # Error - not an int
+    assert signals.signals["1"]["overridesub"]
+    assert not signals.signals["1"]["overridesub2"]
+    assert signals.signals["2"]["overridesub2"]
+    assert not signals.signals["2"]["overridesub"]
+    print("Library Tests - clear_subsidary_override - will generate 3 errors:")
+    signals.clear_subsidary_override(1)
+    signals.clear_subsidary_override(1)
+    signals.clear_subsidary_override(2, temp_override=True)
+    signals.clear_subsidary_override(4)     # Error - does not have a subsidary
+    signals.clear_subsidary_override(6)     # Error - does not exist
+    signals.clear_subsidary_override("1")   # Error - not an int
+    assert not signals.signals["1"]["overridesub"]
+    assert not signals.signals["1"]["overridesub2"]
+    assert not signals.signals["2"]["overridesub"]
+    assert not signals.signals["2"]["overridesub2"]
     print("Library Tests - set_signal_override_caution (distants only) - will generate 6 errors:")
     # Create some additional signals to facilitate this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250,
@@ -427,10 +460,22 @@ def run_library_api_tests():
     assert signals.signal_state("1") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.signal_state("2") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.signal_state("3") == signals.signal_state_type.CAUTION  # Valid - ID str
-    assert signals.signal_state(4) == signals.signal_state_type.DANGER     # Valid - ID str
-    assert signals.signal_state(5) == signals.signal_state_type.DANGER     # Valid - ID str
+    assert signals.signal_state(4) == signals.signal_state_type.DANGER     # Valid - ID int
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER     # Valid - ID int
     assert signals.signal_state(5.2) == signals.signal_state_type.DANGER   # Error - not an int
     assert signals.signal_state(6) == signals.signal_state_type.DANGER     # Error - does not exist
+    print("Library Tests - subsidary_state (validation failures) - will generate 3 errors:")
+    # Colour light signals do not update their aspects on creation (state defaults to 'None'
+    # they rely on the 'update_colour_light_signal' function being called
+    assert signals.subsidary_state(1) == signals.signal_state_type.DANGER     # Valid - ID int
+    assert signals.subsidary_state("1") == signals.signal_state_type.DANGER   # Valid - ID str
+    assert signals.subsidary_state(5.2) == signals.signal_state_type.DANGER   # Error - not an int/str
+    assert signals.subsidary_state(6) == signals.signal_state_type.DANGER     # Error - does not exist
+    assert signals.subsidary_state(2) == signals.signal_state_type.DANGER     # Error - does not have a subsidary
+    signals.toggle_subsidary(1)
+    assert signals.subsidary_state(1) == signals.signal_state_type.PROCEED    
+    signals.toggle_subsidary(1)
+    assert signals.subsidary_state(1) == signals.signal_state_type.DANGER    
     print("Library Tests - set_route (validation failures) - will generate 10 errors:")
     # Signal Route indications
     assert signals.signals["1"]["routeset"] == signals.route_type.MAIN
