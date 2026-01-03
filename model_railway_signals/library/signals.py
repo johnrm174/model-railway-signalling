@@ -1206,6 +1206,7 @@ def subsidary_state(sig_id:Union[int,str]):
         sub_state = signal_state_type.DANGER
     elif not signals[str(sig_id)]["hassubsidary"]:
         logging.error("Signal "+str(sig_id)+": subsidary_state - Signal does not have a subsidary")
+        sub_state = signal_state_type.DANGER
     else:
         sub_state = signals[str(sig_id)]["substate"]
     return(sub_state)
