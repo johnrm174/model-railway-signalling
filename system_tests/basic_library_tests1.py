@@ -186,15 +186,15 @@ def run_gpio_sensor_library_api_tests():
     print ("GPIO Sensors - Test Publishing of Sensors")
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
-    gpio_sensors.gpio_triggered_callback(4)   # Sensor 10
-    gpio_sensors.gpio_triggered_callback(5)   # Sensor 11
-    time.sleep(0.1)
+    # Note we have to trigger/release the sensor in the Main Tkinter thread
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(4))   # Sensor 10
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))   # Sensor 11
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
-    gpio_sensors.gpio_released_callback(4)    # Sensor 10
-    time.sleep(0.1)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(4))    # Sensor 10
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
+    # Transmit all GPIO Sensor stated
     gpio_sensors.mqtt_send_all_gpio_sensor_states_on_broker_connect()
     # reset_mqtt_configuration (all remote sensors will be deleted)
     print ("GPIO Sensors - reset_mqtt_configuration")
@@ -257,11 +257,12 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["8"]["sensor_state"] == False
     # Trigger the GPIO inputs
-    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
-    gpio_sensors.gpio_triggered_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
+    # Note we have to trigger/release the sensor in the Main Tkinter thread
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(8))  # Port number for GPIO Sensor 14 (timeout=4.0)
     time.sleep(0.3)
     # Test the state of the GPIO sensors shortly after triggering (to let the event be processed)
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
@@ -270,11 +271,11 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["8"]["sensor_state"] == True
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
-    gpio_sensors.gpio_released_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(8))  # Port number for GPIO Sensor 14 (timeout=4.0)
     time.sleep(0.1)
     # Test the sensor timeouts 0.1 seconds after release - Port 4 should have been released
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
@@ -312,28 +313,28 @@ def run_gpio_triggering_tests():
     #------------------------------------------------------------------------------------------------------
     print ("GPIO Sensors - Sensor Re-triggering tests (extending trigger timeouts) - Triggering Sensors 10, 11, 12, 13,14")
     print ("  ----  Initial trigger (time=0.0) - Will generate 6 Errors (signals / Track Sensors / Track Sections not existing)")
-    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
-    gpio_sensors.gpio_triggered_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(8))  # Port number for GPIO Sensor 14 (timeout=4.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
-    gpio_sensors.gpio_released_callback(8)  # Port number for GPIO Sensor 14 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(8))  # Port number for GPIO Sensor 14 (timeout=3.0)
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=0.5) - No errors (trigger periods extended)")
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -341,14 +342,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True    
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=1.0) - No errors (trigger periods extended)")
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -356,14 +357,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True    
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=1.5) - No errors (trigger periods extended)")
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -371,14 +372,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True    
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=2.0) - No errors (trigger periods extended)")
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -386,14 +387,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True     
     print ("  ----  Re-trigger Sensors 11,12,13 (time=2.5) - No errors (trigger periods extended)")
     time.sleep(0.5)
-    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
-    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -428,6 +429,8 @@ def gpio_port_10_status_reporting_callback(status):
     return()
 
 def run_gpio_circuit_breaker_tests():
+    # Note we don't pass triggering/release of sensors into the Main tkinter thread
+    # As we want to 'Flood' the system with events faster than they can be processed
     print ("GPIO Sensors - Enable status reporting - Will generate 3 Errors and one 'No Mapping' report")
     gpio_sensors.subscribe_to_gpio_port_status(1.0, gpio_port_10_status_reporting_callback)     # Error (not an int or str)
     gpio_sensors.subscribe_to_gpio_port_status(0, gpio_port_10_status_reporting_callback)       # Error (not in list of local ports)
