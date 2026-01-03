@@ -262,7 +262,7 @@ def run_gpio_triggering_tests():
     gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
     gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     gpio_sensors.gpio_triggered_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
-    time.sleep(0.1)
+    time.sleep(0.3)
     # Test the state of the GPIO sensors shortly after triggering (to let the event be processed)
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True

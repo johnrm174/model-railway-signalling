@@ -471,7 +471,7 @@ def run_library_api_tests():
     assert signals.subsidary_state("1") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.subsidary_state(5.2) == signals.signal_state_type.DANGER   # Error - not an int/str
     assert signals.subsidary_state(6) == signals.signal_state_type.DANGER     # Error - does not exist
-    assert signals.subsidary_state(2) == signals.signal_state_type.DANGER     # Error - does not have a subsidary
+    assert signals.subsidary_state(4) == signals.signal_state_type.DANGER     # Error - does not have a subsidary
     signals.toggle_subsidary(1)
     assert signals.subsidary_state(1) == signals.signal_state_type.PROCEED    
     signals.toggle_subsidary(1)

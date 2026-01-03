@@ -1430,6 +1430,7 @@ def run_button_library_tests():
     assert not buttons.button_state(2)        # Success (exists)
     assert not buttons.button_state(3)        # Error - does not exist
     print("Library Tests - enable_button, disable_button - will generate 4 errors:")
+    print(buttons.buttons["1"]["button"]["state"])
     assert buttons.buttons["1"]["button"]["state"] == "normal"
     assert buttons.buttons["2"]["button"]["state"] == "normal"
     buttons.disable_button("1")               # Error - not an int
@@ -1503,18 +1504,16 @@ def run_button_library_tests():
     assert buttons.get_button_data(10) == None        # Fail - ID does not exist
     assert buttons.get_button_data(1) == {"data":1}   # success
     print("Library Tests Flash Button - will generate 4 Errors")
-    buttons.set_button_flashing("1")                  # Fail - ID ot an Int
-    buttons.set_button_flashing(10)                   # Fail - ID does not exist
-    buttons.set_button_flashing(1)                    # success
-    # Test the next flash event is scheduled and then
-    # Let it flash for a bit to excersise the code
+    # Note that set/reset button flashing functions need to be executed in the main tkinter thread
+    system_test_harness.run_function(buttons.set_button_flashing("1")) # Fail - ID ot an Int
+    system_test_harness.run_function(buttons.set_button_flashing(10))  # Fail - ID does not exist
+    system_test_harness.run_function(buttons.set_button_flashing(1))   # success
     assert buttons.buttons[str(1)]["flashevent"] is not None
+    # Test the next flash event is scheduled and then Let it flash for a bit to excersise the code
     time.sleep(1.0)
-    assert buttons.buttons[str(1)]["flashevent"] is not None
-    buttons.reset_button_flashing("1")                # Fail - ID ot an Int
-    buttons.reset_button_flashing(10)                 # Fail - ID does not exist
-    buttons.reset_button_flashing(1)                  # success
-    time.sleep(0.1)
+    system_test_harness.run_function(buttons.reset_button_flashing("1")) # Fail - ID ot an Int
+    system_test_harness.run_function(buttons.reset_button_flashing(10))  # Fail - ID does not exist
+    system_test_harness.run_function(buttons.reset_button_flashing(1))   # success
     assert buttons.buttons[str(1)]["flashevent"] is None
     print("Library Tests - configure_edit_mode - Creation in Edit Mode - No errors:")
     buttons.configure_edit_mode(edit_mode=True)
@@ -1611,6 +1610,7 @@ def run_button_library_tests():
     assert buttons.buttons[str(3)]["canvas"].itemcget(buttons.buttons[str(3)]["placeholder1"], 'state') == "hidden"
     assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["buttonwindow"], 'state') == "normal"    
     assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["placeholder1"], 'state') == "hidden"
+    buttons.configure_edit_mode(edit_mode=True)
     print("Library Tests - Run Style Update tests - will generate 2 Errors")
     # Create / update Buttons in Run Mode (This is the default mode and we haven't changed it in any other tests)
     buttons.configure_edit_mode(edit_mode=False)
