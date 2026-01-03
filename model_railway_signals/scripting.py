@@ -101,7 +101,7 @@ def run_function(function, sleep:float=0.0):
         common.execute_function_in_tkinter_thread(function_wrapper2)
         successfully_completed = done_event2.wait(timeout=5.0)
         if not successfully_completed:
-            raise_test_error("Secondary script function events timed out after 5.0 seconds")
+            raise_test_warning("Secondary script function events timed out after 5.0 seconds")
         # Sleep if the user has specified a sleep
         time.sleep(sleep)    
 

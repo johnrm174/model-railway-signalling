@@ -387,14 +387,13 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
 def process_external_events():
     # Check how many items are waiting
     backlog = event_queue.qsize()
-    # Process only what is currently in the queue (max 20 at a time)
-    # This ensures a flood of MQTT data doesn't starve the GUI thread.
-    for _ in range(min(backlog, 20)):
+    # Process only what is currently in the queue (max 10 events at a time)
+    # This ensures a flood of event data doesn't starve the GUI thread.
+    for item in range(min(backlog, 20)):
         callback = event_queue.get_nowait()
-        # Add exception handling so the polling function doesn't get kinned.
         try: callback()
         except: pass
-    # Schedule next check. 10ms is standard
+    # Schedule next check. 10ms seems to give good performance
     root_window.after(10, process_external_events)
     return()
 
