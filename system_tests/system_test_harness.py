@@ -118,12 +118,14 @@
 #    snap_selected_objects_to_grid()  - 's' key - also right-click-menu function
 #    rotate_selected_objects()        - 'r' key - also right-click-menu function
 #    flip_selected_objects()          - 'f' key - also right-click-menu function
+#    hide_selected_objects()          - 'h' key
+#    unhide_selected_objects()        - 'u' key
 #    delete_selected_objects()        - 'del' key - also right-click-menu function
 #    nudge_selected_objects()         - 'arrow' keys
 #    copy_selected_objects()          - 'Cntl-c' - also right-click-menu function
 #    paste_clipboard_objects()        - 'Cntl-v' - also right-click-menu function
 #    undo() / redo()                  - 'Cntl-x' / 'Cntl-y'
-#    select_all_objects()             - Right-click-menu function
+#    select_all_objects()              - Right-click-menu function
 #    deselect_all_objects()           - 'esc' key
 #
 # Supported Schematic mouse event invocations:
@@ -1316,6 +1318,13 @@ def rotate_selected_objects():
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def flip_selected_objects():
     run_function(lambda:schematic.flip_selected_objects())
+    
+# Simulates the <h>/<u> keypress to hide/unhide schematic objects (in Run Mode
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
+def hide_selected_objects():
+    run_function(lambda:schematic.hide_selected_objects())
+def unhide_selected_objects():
+    run_function(lambda:schematic.unhide_selected_objects())
 
 # Simulates the <backspace>/<delete> keypress or 'delete' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)

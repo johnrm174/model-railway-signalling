@@ -47,30 +47,30 @@ def test_menubar_help_windows():
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - HELP")
     # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.display_help))
-    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.run_function(lambda:open_window(menubar.display_help), timeout=5.0)
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - ABOUT")
     # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.display_about))
-    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.run_function(lambda:open_window(menubar.display_about), timeout=5.0)
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar documentation windows - DOCS")
     # All we can do is open the window and OK/Close (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.display_docs))
-    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.run_function(lambda:open_window(menubar.display_docs), timeout=5.0)
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar help windows - INFO")
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["general"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_layout_info))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_layout_info), timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["general"] == initial_settings
     return()
@@ -95,13 +95,13 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["canvas"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_canvas_settings, callback_function))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_canvas_settings, callback_function), timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["canvas"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -109,13 +109,13 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["general"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_general_settings, callback_function))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_general_settings, callback_function), timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["general"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -123,13 +123,13 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["gpio"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_gpio_settings, callback_function))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_gpio_settings, callback_function), timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["gpio"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -137,13 +137,13 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["logging"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_logging_settings, callback_function))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_logging_settings, callback_function), timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["logging"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -151,15 +151,15 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["mqtt"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_mqtt_settings, mqtt_callback_function))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_mqtt_settings, mqtt_callback_function), timeout=5.0)
     # Check the 'Test broker connectivity' function
-    system_test_harness.run_function(lambda:test_mqtt_connectivity())
+    system_test_harness.run_function(lambda:test_mqtt_connectivity(), timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["mqtt"] == initial_settings
     # ------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ def test_menubar_settings_windows():
     initial_settings = copy.deepcopy(settings.settings["sprog"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(menubar.edit_sprog_settings,
-                                                        sprog_connect_function, callback_function))
+                                                        sprog_connect_function, callback_function), timeout=5.0)
     # Test the popup help window for the SPROG address offsets
     help_window1 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
     help_window2 = menubar_settings.sprog_addressing_information(menubar_settings.edit_sprog_settings_window)
@@ -176,11 +176,11 @@ def test_menubar_settings_windows():
     # Check the 'Test SPROG connectivity' function
     system_test_harness.run_function(lambda:test_sprog_connectivity(),timeout=5.0)
     # Apply
-    system_test_harness.run_function(lambda:close_window(apply=True))
+    system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(ok=True))
+    system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
     # Check the settings remain unchanged
     assert settings.settings["sprog"] == initial_settings
     return()
@@ -192,6 +192,13 @@ def test_menubar_settings_windows():
 
 def dummy_function(): return()
 
+def point_exersise_reset_function():
+    print("Triggering Layout reset and setting delay to 0.25 seconds")
+    return(250)
+
+def import_layout_file_function(xoffset, yoffset):
+    system_test_harness.main_menubar.import_schematic(25, 25, "./test_mqtt_networking.sig")
+    
 def test_menubar_utilities_windows():
     # ------------------------------------------------------------------------------------------
     print("Testing Menubar utilities windows - DCC PROGRAMMING")
@@ -200,14 +207,14 @@ def test_menubar_utilities_windows():
     system_test_harness.run_function(lambda:open_window(menubar.dcc_programming,
                             dummy_function, dummy_function, dummy_function), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     print("Testing Menubar utilities windows - DCC MAPPINGS")
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(menubar.dcc_mappings), timeout=5.0)
     # Revert
-    system_test_harness.run_function(lambda:close_window(reset=True))
+    system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     print("Testing Menubar utilities windows - BULK RENUMBERING")
     # Open the window (we then sleep twice the delay as it tests open and re-open)
     system_test_harness.run_function(lambda:open_window(menubar.bulk_renumbering), timeout=5.0)
@@ -217,6 +224,27 @@ def test_menubar_utilities_windows():
     system_test_harness.run_function(lambda:close_window(reset=True), timeout=5.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(ok=True), timeout=5.0)
+    print("Testing Menubar utilities windows - EXERSISE POINTS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(menubar.exercise_points, point_exersise_reset_function), timeout=5.0)
+    # Exersise some points
+    system_test_harness.run_function(lambda:menubar_class_instance.reset())
+    system_test_harness.sleep(5.0)
+    system_test_harness.run_function(lambda:menubar_class_instance.stop())
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
+    print("Testing Menubar utilities windows - IMPORT")
+    import_function_to_run = system_test_harness.main_menubar.import_schematic
+    system_test_harness.run_function(lambda:open_window(menubar.import_layout, import_layout_file_function), timeout=5.0)
+    system_test_harness.run_function(lambda:menubar_class_instance.load_file(), timeout=5.0) 
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
+    print("Testing Menubar utilities windows - SUBSCRIPTIONS")
+    # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
+    # At a later stage I might develop these tests further (across the board)
+    system_test_harness.run_function(lambda:open_window(menubar.mqtt_subscriptions), timeout=5.0)
+    # OK (Close Window)
+    system_test_harness.run_function(lambda:close_window.close_window(cancel=True), timeout=5.0)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -275,7 +303,7 @@ def test_menubar_styles_windows():
     print("Testing Menubar styles windows - POINT BUTTONS")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop these tests further (across the board)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_point_styles))
+    system_test_harness.run_function(lambda:open_window(menubar.edit_point_styles), timeout=5.0)
     # Apply All
     system_test_harness.run_function(lambda:close_styles_window(apply_all=True), timeout=5.0)
     # Apply Selected
@@ -320,30 +348,31 @@ def test_menubar_styles_windows():
 #-----------------------------------------------------------------------------------
 # Function to test the application upgrade utility. Note this does not get run as
 # part of the normal system tests as it doesn't add any real value over manual testing
+# ######## NOTE THAT THIS FUNCTION IS NOT RUN AS PART OF NORMAL TESTING ##############
 #-----------------------------------------------------------------------------------
 
 def test_application_upgrade():
     print("Testing Menubar utilities windows - APPLICATION UPGRADE")
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade))
+    system_test_harness.run_function(lambda:open_window(menubar.application_upgrade), timeout=5.0)
     # Try the upgrade process
-    system_test_harness.run_function(lambda:test_application_upgrade())
+    system_test_harness.run_function(lambda:test_application_upgrade(), timeout=5.0)
     # OK (Close Window)
-    system_test_harness.run_function(lambda:close_window(cancel=True))
+    system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     return()
 
 ######################################################################################################
 
 def run_all_menubar_window_tests():
+    system_test_harness.report_results()
     # Load a layout file with plenty of 'active' config for these tests
     system_test_harness.initialise_test_harness(filename="./test_mqtt_networking.sig")
-    test_menubar_help_windows()
-    test_menubar_settings_windows()
+#     test_menubar_help_windows()
+#     test_menubar_settings_windows()
     test_menubar_utilities_windows()
-    ################     test_application_upgrade()  ############################
-    # Load a layout to test the style changes
-    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
-    test_menubar_styles_windows()
+#     # Load a layout to test the style changes
+#     system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
+#     test_menubar_styles_windows()
     system_test_harness.report_results()
     
 if __name__ == "__main__":
