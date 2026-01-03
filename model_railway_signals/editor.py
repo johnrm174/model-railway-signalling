@@ -834,9 +834,11 @@ class main_menubar:
                     message="File does not contain\nall required elements")
         return()
 
-    def import_schematic(self, xoffset:int=0, yoffset:int=0):
+    def import_schematic(self, xoffset:int=0, yoffset:int=0, filename:str=None):
+        # Note that the Filename will be none for all standard use cases - only specified
+        # for the automated tests in which case we need to inhibit any pop up warnings
         logging.info("IMPORT-LAYOUT-FILE*********************************************************************************")
-        file_loaded, layout_state = library.load_schematic()
+        file_loaded, layout_state = library.load_schematic(filename)
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need
@@ -849,7 +851,7 @@ class main_menubar:
                     logging.error("Import File - File was saved by application "+sig_file_version)
                     logging.error("Import File - Current version of the application is "+application_version)
                     logging.error("Import File - Version of imported file must match version of the application")
-                    Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                    if filename is None: Tk.messagebox.showerror(parent=self.root, title="Import Error",
                         message="Version of imported file does not match version of the application")
                 else:
                     # Purge the loaded state for all library objects (we don't use it for the import process)
@@ -857,14 +859,14 @@ class main_menubar:
                     logging.info("CHECKING-FOR-SETTINGS-CONFLICTS******************************************************************")
                     if settings.check_for_import_conflicts(layout_state["settings"]):
                         logging.error("IMPORT LAYOUT - Failed to import layout due to conflicts in layout settings")
-                        Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                        if filename is None: Tk.messagebox.showerror(parent=self.root, title="Import Error",
                             message="Failed to import layout due to conflicts in layout settings "+
                                         "(see logs for details) - Resolve conflicts and retry" )
                     else:
                         logging.info("CHECKING-FOR-IMPORT-CONFLICTS********************************************************************")
                         if objects.check_for_import_conflicts(layout_state["objects"]):
                             logging.error("IMPORT LAYOUT - Failed to import layout due to schematic object conflicts")
-                            Tk.messagebox.showerror(parent=self.root, title="Import Error",
+                            if filename is None: Tk.messagebox.showerror(parent=self.root, title="Import Error",
                                 message="Failed to import layout due to schematic object conflicts "+
                                             "(see logs for details) - Resolve conflicts and retry" )
                         else:
