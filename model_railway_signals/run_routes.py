@@ -826,6 +826,12 @@ def route_button_selected_callback(route_button_id:int):
                 logging.debug("RUN ROUTES - Initiating a new NX route setup sequence as Button "+
                               str(route_button_id)+" is also an ENTRY Button")
             else:
+                ########################################################################################################
+                # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation because:
+                # 1) EXIT Buttons are disabled if there are no valid routes available from the selected ENTRY Button
+                # 2) ENTRY/EXIT buttons are disabled the same as above AND if there are no valid routes from the button
+                #    to another exit button (this is the case where a new NX route selection would be initiated) 
+                ########################################################################################################
                 logging.debug("RUN ROUTES - No available routes - Clearing down current NX route setup sequence")
                 activated_entry_button_id = 0
                 # Deselect the button (only if not part of an active route)
@@ -853,10 +859,18 @@ def route_button_selected_callback(route_button_id:int):
             enable_disable_schematic_routes()
         # Deselect the button (only if not part of an active route)
         elif library.button_state(route_button_id) and entry_button_data["entrybutton"] == 0 and entry_button_data["exitbutton"] == 0:
-            logging.debug("RUN ROUTES - Deselecting Button "+str(route_button_id)+" as no available routes")
+            ########################################################################################################
+            # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
+            # As ENTRY Buttons are disabled unless there is one or more valid routes available
+            ########################################################################################################
+            logging.error("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
             library.toggle_button(route_button_id)
     else:
-        logging.debug("RUN ROUTES - Button "+str(route_button_id)+" has been Selected")
+        ########################################################################################################
+        # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
+        # As EXIT-ONLY Buttons should be disabled unless a route selection has been initiated
+        ########################################################################################################
+        logging.error("RUN ROUTES - EXIT Button "+str(route_button_id)+" has been Selected - but no ENTRY button is active")
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
         print("########## Took "+str(time_in_ms)+" milliseconds")
