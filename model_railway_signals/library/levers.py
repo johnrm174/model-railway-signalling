@@ -236,7 +236,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                  selected_colour:str="White", text_colour:str="Black",
                  frame_colour:str="Grey40", lock_text_colour:str="White",
                  font=("TkFixedFont", 8 ,"bold"), button_xoffset:int=0,
-                 button_yoffset:int=0, hide_buttons:bool=False):
+                 button_yoffset:int=0, hide_buttons:bool=False,
+                 button_label:str=""):
     global levers
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "lever"+str(lever_id)
@@ -274,8 +275,10 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
             colour1, colour2 = "DodgerBlue", "Black"
         else:
             colour1, colour2 = "White", "White"
+        # If the button_label is an empty string then we use the ID instead:
+        if len(button_label) == 0: button_label = format(lever_id,'02d')
         # Create the tkinter button object
-        button = Tk.Button( canvas, text=format(lever_id,'02d'), state="normal", relief="raised",
+        button = Tk.Button( canvas, text=button_label, state="normal", relief="raised",
                             font=font, highlightthickness=0, padx=2, pady=0, background=button_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:change_button_event(lever_id) )

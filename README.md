@@ -70,16 +70,18 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Enables full signalbox simulations to be developed (with simulated train movements).
     * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays.
 * Allow GPIO Sensors to be mapped to more than one object type to give more flexibility:
-    * e.g. A GPIO sensor can be mapped to a signal passed event and a Track Sensor event.
+    * e.g. A GPIO sensor can be mapped to a Signal Passed event and a Track Sensor event.
 * Added new test functionality into the GPIO Settings window to aid layout configuration:
     * Test buttons for each GPIO input can be pressed/release to simulate events.
     * Allows end-to end test of functionality whilst not connected to the layout.
 * Added new Subscriptions utility to monitor the state of subscribed objects:
     * Initial release displays the state of Subscribed GPIO Sensors:
     * Test buttons for subscribed sensor can be pressed/release to simulate events.
-    * Allows end-to end test of functionality whilst not connected to the layout.
+    * Allows end-to end test of functionality whilst not connected to other nodes.
 * New SPROG Status Monitoring Feature (SPROG Settings Window):
     * Provides display of SPROG Status, DCC Bus Voltage and DCC Bus current
+* Alternative labels can now be specified for Signalbox Lever control buttons:
+    * Provides greater flexibility for associating Levers towith Signals and Points.
 * Added ability to override ground signals (to ON) based on track occupancy ahead
 * Added ability to override subsidiary signals (to ON) based on track occupancy ahead
 * Semaphore signals can now be specified (and displayed) with lower quadrant arms.
