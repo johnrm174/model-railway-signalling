@@ -335,6 +335,7 @@ def show_item_ids():
     lines.show_line_ids()
     buttons.show_button_ids()
     points.show_point_ids()
+    levers.show_lever_ids()
     bring_item_ids_to_front()
     return()
 
@@ -342,6 +343,7 @@ def hide_item_ids():
     lines.hide_line_ids()
     buttons.hide_button_ids()
     points.hide_point_ids()
+    levers.hide_lever_ids()
     return()
 
 def toggle_item_ids():
@@ -358,6 +360,7 @@ def bring_item_ids_to_front():
     lines.bring_line_ids_to_front()
     buttons.bring_button_ids_to_front()
     points.bring_point_ids_to_front()
+    levers.bring_lever_ids_to_front()
     return()
 
 # -------------------------------------------------------------------------
