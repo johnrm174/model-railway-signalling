@@ -19,6 +19,7 @@
 #    common.list_of_widgets
 #------------------------------------------------------------------------------------
 
+import webbrowser
 import tkinter as Tk
 from tkinter import ttk
 
@@ -132,8 +133,15 @@ class gpio_subscriptions_frame(Tk.LabelFrame):
 class signal_subscriptions_frame(Tk.LabelFrame):
     def __init__(self, root_window):
         super().__init__(root_window, text="Subscribed Signals")
-        self.label = Tk.Label(self, text="Coming soon")
-        self.label.pack(fill="both")
+        self.label = Tk.Label(self, text="Coming soon - Please contact us\nif you would like us to prioritise this feature")
+        self.label.pack(padx=2,pady=2)
+        self.hyperlink = "https://www.model-railway-signalling.co.uk/contact/"
+        self.label2 = Tk.Label(self, text=self.hyperlink, fg="blue", font=("TkDefaultFont",10,"underline"),cursor="hand2")
+        self.label2.pack(padx=5, pady=5)
+        self.label2.bind("<Button-1>", self.contact)
+
+    def contact(self,event):
+        webbrowser.open_new(self.hyperlink)
 
     def load_state(self):
         pass
@@ -145,8 +153,15 @@ class signal_subscriptions_frame(Tk.LabelFrame):
 class section_subscriptions_frame(Tk.LabelFrame):
     def __init__(self, root_window):
         super().__init__(root_window, text="Subscribed Track Sections")
-        self.label = Tk.Label(self, text="Coming soon")
-        self.label.pack(fill="both")
+        self.label = Tk.Label(self, text="Coming soon - Please contact us\nif you would like us to prioritise this feature")
+        self.label.pack(padx=2,pady=2)
+        self.hyperlink = "https://www.model-railway-signalling.co.uk/contact/"
+        self.label2 = Tk.Label(self, text=self.hyperlink, fg="blue", font=("TkDefaultFont",10,"underline"),cursor="hand2")
+        self.label2.pack(padx=5, pady=5)
+        self.label2.bind("<Button-1>", self.contact)
+
+    def contact(self,event):
+        webbrowser.open_new(self.hyperlink)
 
     def load_state(self):
         pass
@@ -158,8 +173,15 @@ class section_subscriptions_frame(Tk.LabelFrame):
 class instrument_subscriptions_frame(Tk.LabelFrame):
     def __init__(self, root_window):
         super().__init__(root_window, text="Subscribed Block Instruments")
-        self.label = Tk.Label(self, text="Coming soon")
-        self.label.pack(fill="both")
+        self.label = Tk.Label(self, text="Coming soon - Please contact us\nif you would like us to prioritise this feature")
+        self.label.pack(padx=2,pady=2)
+        self.hyperlink = "https://www.model-railway-signalling.co.uk/contact/"
+        self.label2 = Tk.Label(self, text=self.hyperlink, fg="blue", font=("TkDefaultFont",10,"underline"),cursor="hand2")
+        self.label2.pack(padx=5, pady=5)
+        self.label2.bind("<Button-1>", self.contact)
+
+    def contact(self,event):
+        webbrowser.open_new(self.hyperlink)
 
     def load_state(self):
         pass
