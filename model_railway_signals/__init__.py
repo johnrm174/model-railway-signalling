@@ -9,8 +9,10 @@ from .editor import run_editor
 #------------------------------------------------------------------------------------
 
 from .scripting import initialise_application
-from .scripting import sleep
+from .scripting import delay
 from .scripting import reset_layout
+from .scripting import load_layout
+from .scripting import save_layout
 from .scripting import set_lever_on
 from .scripting import set_lever_off
 from .scripting import set_signal_on
@@ -39,8 +41,10 @@ from .scripting import simulate_button_clicked
 
 __all__ = [ 'run_editor',
             'initialise_application',
-            'sleep',
+            'delay',
             'reset_layout',
+            'load_layout',
+            'save_layout',
             'set_lever_on',
             'set_lever_off',
             'set_signal_on',

@@ -763,7 +763,7 @@ class main_menubar:
         if len(version)==3: version += ".0"
         return tuple(map(int,(version.split("."))))
 
-    def load_schematic(self, filename:str=None, examples:bool=False):
+    def load_schematic(self, filename:str=None, examples:bool=False, suppress_popups:bool=False):
         # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the file selection dialog. If
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
@@ -783,19 +783,19 @@ class main_menubar:
                     logging.error("Load File - File was saved by "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - Upgrade application to "+sig_file_version+" or later to support this file.")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
-                        message="File was saved by "+sig_file_version+". Upgrade application to "+
-                                        sig_file_version+" or later to support this layout file.")
+                    if not suppress_popups:
+                        Tk.messagebox.showerror(parent=self.root, title="Load Error", message="File was saved by "+
+                            sig_file_version+". Upgrade application to "+sig_file_version+" or later to support this layout file.")
                 elif self.tuple_version(sig_file_version) < self.tuple_version("5.0.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
                     logging.error("Load File - File was saved by application "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - This version of the application only supports files saved by version 5.0.0 or later")
                     logging.error("Load File - Try loading/saving your file with version 5.0.0 first")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
-                        message="Layout file was saved by Application "+sig_file_version+".\n"+
-                            "This version of the application only supports files saved by version 5.0.0 "+
-                            "or later. Try loading/saving your file with version 5.0.0 first.")
+                    if not suppress_popups:
+                        Tk.messagebox.showerror(parent=self.root, title="Load Error", message="Layout file was saved by Application "+
+                                sig_file_version+".\n"+ "This version of the application only supports files saved by version 5.0.0 "+
+                                    "or later. Try loading/saving your file with version 5.0.0 first.")
                 else:
                     # We should now be OK to attempt the load, but if the file was saved under a
                     # previous version then we still want to flag a warning message to the user
@@ -803,9 +803,9 @@ class main_menubar:
                         logging.warning("Load File - File was saved by application "+sig_file_version)
                         logging.warning("Load File - Current version of the application is "+application_version)
                         logging.warning("Load File - Re-save with current version to ensure forward compatibility")
-                        Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
-                            message="File was saved by "+sig_file_version+". "+
-                                "Re-save with current version to ensure forward compatibility.")
+                        if not suppress_popups:
+                            Tk.messagebox.showwarning(parent=self.root, title="Load Warning", message="File was saved by "+
+                                    sig_file_version+". "+"Re-save with current version to ensure forward compatibility.")
                     # Delete any GPIO status subscriptions (if the GPIO settings window is still open)
                     library.unsubscribe_from_all_gpio_port_status()
                     # Destroy any open configutation or settings windows (or it gets confusing)
