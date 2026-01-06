@@ -18,7 +18,7 @@
                 false,
                 ""
             ],
-            "bbox": 1324,
+            "bbox": 9941,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -160,9 +160,11 @@
             "itemid": 2,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "19"
@@ -445,7 +447,7 @@
         },
         "05c99664-2259-4355-a881-4c3e2c4279d3": {
             "background": "",
-            "bbox": 1327,
+            "bbox": 9944,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -464,7 +466,7 @@
         },
         "0cdde9d4-28ce-4644-8601-f613605ff8f4": {
             "background": "",
-            "bbox": 1330,
+            "bbox": 9947,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -488,7 +490,7 @@
                 0,
                 0
             ],
-            "bbox": 1338,
+            "bbox": 9955,
             "colour": "black",
             "endx": 1675,
             "endy": 275,
@@ -503,7 +505,7 @@
         },
         "147bdac0-2cb4-4de7-a45d-a87b46155eab": {
             "background": "",
-            "bbox": 1341,
+            "bbox": 9958,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -521,7 +523,7 @@
             ]
         },
         "233a09d0-5c3b-4fd7-9838-1045b392fc85": {
-            "bbox": 1345,
+            "bbox": 9962,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -546,7 +548,7 @@
         },
         "237bec79-c24f-4c2f-956a-a12133fa79db": {
             "background": "",
-            "bbox": 1348,
+            "bbox": 9965,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -565,7 +567,7 @@
         },
         "2809aba0-8417-4ffe-b8ab-9d0bcfd4b777": {
             "background": "",
-            "bbox": 1351,
+            "bbox": 9968,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -589,7 +591,7 @@
                 0,
                 0
             ],
-            "bbox": 1359,
+            "bbox": 9976,
             "colour": "black",
             "endx": 0,
             "endy": 275,
@@ -605,7 +607,7 @@
         "36c92467-cd2d-4608-bd3d-1ae2fe2fb9b0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 1367,
+            "bbox": 9984,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1005,
@@ -709,7 +711,7 @@
                 false,
                 ""
             ],
-            "bbox": 1387,
+            "bbox": 10004,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -803,9 +805,11 @@
             "itemid": 4,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "12"
@@ -1048,7 +1052,7 @@
         },
         "3d9905d7-3a8c-42d0-ada6-e78748273374": {
             "background": "",
-            "bbox": 1390,
+            "bbox": 10007,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -1072,7 +1076,7 @@
                 0,
                 0
             ],
-            "bbox": 1398,
+            "bbox": 10015,
             "colour": "black",
             "endx": 1300.0,
             "endy": 225.0,
@@ -1099,7 +1103,7 @@
                 false,
                 ""
             ],
-            "bbox": 1410,
+            "bbox": 10027,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1191,9 +1195,11 @@
             "itemid": 6,
             "itemsubtype": 1,
             "itemtype": 2,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "18"
@@ -1484,7 +1490,7 @@
         },
         "4c400af8-bf96-447e-85f4-9928287360c5": {
             "background": "",
-            "bbox": 1413,
+            "bbox": 10030,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -1503,7 +1509,7 @@
         },
         "500f7750-b750-4d33-b9fe-1e6373da674d": {
             "background": "",
-            "bbox": 1416,
+            "bbox": 10033,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -1521,7 +1527,7 @@
             ]
         },
         "5424b00f-f0ad-4900-8b9c-7d858a2e05d0": {
-            "bbox": 1420,
+            "bbox": 10037,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1558,7 +1564,7 @@
                 false,
                 ""
             ],
-            "bbox": 1442,
+            "bbox": 10059,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1700,9 +1706,11 @@
             "itemid": 3,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "10"
@@ -1979,7 +1987,7 @@
                 false,
                 ""
             ],
-            "bbox": 1462,
+            "bbox": 10079,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2073,9 +2081,11 @@
             "itemid": 9,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "21"
@@ -2330,7 +2340,7 @@
                 false,
                 ""
             ],
-            "bbox": 1482,
+            "bbox": 10099,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2434,9 +2444,11 @@
             "itemid": 8,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "6"
@@ -2716,7 +2728,7 @@
                 false,
                 ""
             ],
-            "bbox": 1502,
+            "bbox": 10119,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2810,9 +2822,11 @@
             "itemid": 11,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "27"
@@ -3055,7 +3069,7 @@
         },
         "632a3066-6bfb-4269-81f1-c73b4b294ae9": {
             "background": "",
-            "bbox": 1505,
+            "bbox": 10122,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3086,7 +3100,7 @@
                 false,
                 ""
             ],
-            "bbox": 1525,
+            "bbox": 10142,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3190,9 +3204,11 @@
             "itemid": 16,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "5"
@@ -3447,7 +3463,7 @@
                 false,
                 ""
             ],
-            "bbox": 1537,
+            "bbox": 10154,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3539,9 +3555,11 @@
             "itemid": 15,
             "itemsubtype": 1,
             "itemtype": 2,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "9"
@@ -3815,7 +3833,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1544,
+            "bbox": 10161,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -3846,7 +3864,7 @@
         },
         "6df4e851-8669-4940-8dc9-fec3e1873294": {
             "background": "",
-            "bbox": 1547,
+            "bbox": 10164,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3865,7 +3883,7 @@
         },
         "709c0d2f-3d16-4669-b53f-38614ef26ea2": {
             "background": "",
-            "bbox": 1550,
+            "bbox": 10167,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3884,7 +3902,7 @@
         },
         "75eb7e1b-08a6-4223-8ed8-f31381186102": {
             "background": "",
-            "bbox": 1553,
+            "bbox": 10170,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3902,7 +3920,7 @@
             ]
         },
         "7648db7c-97c7-41f3-beee-e60656b9173a": {
-            "bbox": 1557,
+            "bbox": 10174,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3926,7 +3944,7 @@
             ]
         },
         "768c5e02-b80c-4025-a27a-ab5a225ae105": {
-            "bbox": 1561,
+            "bbox": 10178,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3951,7 +3969,7 @@
         },
         "7b1d99fb-c02e-48be-9c48-c5645301eb85": {
             "background": "",
-            "bbox": 1564,
+            "bbox": 10181,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -3975,7 +3993,7 @@
                 0,
                 0
             ],
-            "bbox": 1572,
+            "bbox": 10189,
             "colour": "black",
             "endx": 800.0,
             "endy": 225.0,
@@ -4002,7 +4020,7 @@
                 false,
                 ""
             ],
-            "bbox": 1584,
+            "bbox": 10201,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4094,9 +4112,11 @@
             "itemid": 14,
             "itemsubtype": 1,
             "itemtype": 2,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "23"
@@ -4357,7 +4377,7 @@
         },
         "8c773174-1179-4350-946c-4e8548569e33": {
             "background": "",
-            "bbox": 1587,
+            "bbox": 10204,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4381,7 +4401,7 @@
                 0,
                 0
             ],
-            "bbox": 1595,
+            "bbox": 10212,
             "colour": "black",
             "endx": 1200.0,
             "endy": 175.0,
@@ -4396,7 +4416,7 @@
         },
         "956e68f3-b5ca-4869-9be5-186c3b2b2663": {
             "background": "",
-            "bbox": 1598,
+            "bbox": 10215,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -4415,7 +4435,7 @@
         },
         "9754f858-e3bb-4c96-a3a6-d70b3cc8287f": {
             "background": "",
-            "bbox": 1601,
+            "bbox": 10218,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4434,7 +4454,7 @@
         },
         "9a537d13-0794-4f88-8386-67b76bbd39d7": {
             "background": "",
-            "bbox": 1604,
+            "bbox": 10221,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4453,7 +4473,7 @@
         },
         "9f0bd8e5-accc-4abc-8491-8db955715941": {
             "background": "",
-            "bbox": 1607,
+            "bbox": 10224,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -4471,7 +4491,7 @@
             ]
         },
         "a19e74b3-1746-478b-92c3-2ae4183b4c71": {
-            "bbox": 1611,
+            "bbox": 10228,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4508,7 +4528,7 @@
                 false,
                 ""
             ],
-            "bbox": 1631,
+            "bbox": 10248,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4602,9 +4622,11 @@
             "itemid": 10,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "24"
@@ -4859,7 +4881,7 @@
                 false,
                 ""
             ],
-            "bbox": 1651,
+            "bbox": 10268,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4953,9 +4975,11 @@
             "itemid": 19,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "26"
@@ -5203,7 +5227,7 @@
                 1,
                 1
             ],
-            "bbox": 1659,
+            "bbox": 10276,
             "colour": "black",
             "endx": 1250.0,
             "endy": 175.0,
@@ -5218,7 +5242,7 @@
         },
         "abd81429-2c2a-4b04-bc62-81a103da6e24": {
             "background": "#04fb8e",
-            "bbox": 1662,
+            "bbox": 10279,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -5249,7 +5273,7 @@
                 false,
                 ""
             ],
-            "bbox": 1682,
+            "bbox": 10299,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5343,9 +5367,11 @@
             "itemid": 12,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "22"
@@ -5593,7 +5619,7 @@
         },
         "b31a2cd1-3494-4f09-95b8-f50e6708bdeb": {
             "background": "",
-            "bbox": 1685,
+            "bbox": 10302,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -5611,7 +5637,7 @@
             ]
         },
         "b3b255c4-744a-4476-a7d0-3535e718fac1": {
-            "bbox": 1689,
+            "bbox": 10306,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5635,7 +5661,7 @@
             ]
         },
         "b55de778-8bb5-4d62-965e-d62ca9aa136d": {
-            "bbox": 1693,
+            "bbox": 10310,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5660,7 +5686,7 @@
         },
         "b778ffd2-cf39-4c24-b299-58e6131ff2d2": {
             "background": "",
-            "bbox": 1696,
+            "bbox": 10313,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -5680,7 +5706,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 1705,
+            "bbox": 10322,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1003,
@@ -5765,7 +5791,7 @@
                 0,
                 0
             ],
-            "bbox": 1713,
+            "bbox": 10330,
             "colour": "black",
             "endx": -50.0,
             "endy": 225.0,
@@ -5781,7 +5807,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 1722,
+            "bbox": 10339,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1002,
@@ -5866,7 +5892,7 @@
                 1,
                 1
             ],
-            "bbox": 1730,
+            "bbox": 10347,
             "colour": "black",
             "endx": 525.0,
             "endy": 175.0,
@@ -5893,7 +5919,7 @@
                 false,
                 ""
             ],
-            "bbox": 1742,
+            "bbox": 10359,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5985,9 +6011,11 @@
             "itemid": 5,
             "itemsubtype": 1,
             "itemtype": 2,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "13"
@@ -6271,7 +6299,7 @@
             "ybuttonoffset": 0
         },
         "cf7ab31e-b781-435b-8b96-0398da28e8f1": {
-            "bbox": 1746,
+            "bbox": 10363,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -6295,7 +6323,7 @@
             ]
         },
         "d2c6a4dd-630c-4836-ad26-52269177edcc": {
-            "bbox": 1750,
+            "bbox": 10367,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -6319,7 +6347,7 @@
             ]
         },
         "d53174a7-e4e9-425d-94a8-80507bd85a04": {
-            "bbox": 1754,
+            "bbox": 10371,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -6343,7 +6371,7 @@
             ]
         },
         "d5d3aa4e-cc00-4d66-a1c6-8b52bb7b1a92": {
-            "bbox": 1758,
+            "bbox": 10375,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -6380,7 +6408,7 @@
                 false,
                 ""
             ],
-            "bbox": 1778,
+            "bbox": 10395,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6474,9 +6502,11 @@
             "itemid": 17,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "4"
@@ -6720,7 +6750,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1785,
+            "bbox": 10402,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -6750,7 +6780,7 @@
             "ybuttonoffset": 0
         },
         "e3b1ad43-1e39-456d-aad8-7943e5864ac8": {
-            "bbox": 1789,
+            "bbox": 10406,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -6775,7 +6805,7 @@
         },
         "e4853677-978f-4fc5-b03d-c92d0bb216ea": {
             "background": "#04fb8e",
-            "bbox": 1792,
+            "bbox": 10409,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -6794,7 +6824,7 @@
         },
         "e54253c4-ec5b-4a4a-835d-5e3b5eb4e183": {
             "background": "",
-            "bbox": 1795,
+            "bbox": 10412,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -6825,7 +6855,7 @@
                 false,
                 ""
             ],
-            "bbox": 1807,
+            "bbox": 10424,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6917,9 +6947,11 @@
             "itemid": 7,
             "itemsubtype": 1,
             "itemtype": 2,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "20"
@@ -7203,7 +7235,7 @@
             "ybuttonoffset": 0
         },
         "ee774c2b-3946-44aa-9254-a31f2bebecb8": {
-            "bbox": 1811,
+            "bbox": 10428,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -7228,7 +7260,7 @@
         },
         "eeacfc57-2e9e-4a4e-b6df-ce1df762fcf0": {
             "background": "",
-            "bbox": 1814,
+            "bbox": 10431,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -7259,7 +7291,7 @@
                 false,
                 ""
             ],
-            "bbox": 1826,
+            "bbox": 10443,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -7351,9 +7383,11 @@
             "itemid": 13,
             "itemsubtype": 1,
             "itemtype": 2,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "11"
@@ -7693,7 +7727,7 @@
             "ybuttonoffset": 0
         },
         "f1dbf1a3-0d5b-43e2-a476-18ccb8b0b920": {
-            "bbox": 1830,
+            "bbox": 10447,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -7719,7 +7753,7 @@
         "f2b7d2d9-eb4d-4e55-859f-100131262fe2": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1837,
+            "bbox": 10454,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -7750,7 +7784,7 @@
         },
         "f514300f-50b5-477c-9673-8cacdaac0c5b": {
             "background": "",
-            "bbox": 1840,
+            "bbox": 10457,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -7768,7 +7802,7 @@
             ]
         },
         "f771894a-e7a8-4e26-a9d0-d316f9aff774": {
-            "bbox": 1844,
+            "bbox": 10461,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -7793,7 +7827,7 @@
         },
         "f7dc96fe-3f96-4f6b-8a63-8589f6b82d33": {
             "background": "",
-            "bbox": 1847,
+            "bbox": 10464,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -7824,7 +7858,7 @@
                 true,
                 "8"
             ],
-            "bbox": 1870,
+            "bbox": 10487,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -7981,9 +8015,11 @@
             "itemid": 1,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "7"
@@ -8310,7 +8346,7 @@
                 false,
                 ""
             ],
-            "bbox": 1890,
+            "bbox": 10507,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -8404,9 +8440,11 @@
             "itemid": 18,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "25"
@@ -8649,7 +8687,7 @@
         },
         "ff661e89-2111-4e98-8191-9fe3d3e39471": {
             "background": "",
-            "bbox": 1893,
+            "bbox": 10510,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -8668,7 +8706,7 @@
         },
         "ffc65294-6626-4af4-9a43-305530b7f891": {
             "background": "",
-            "bbox": 1896,
+            "bbox": 10513,
             "borderwidth": 0,
             "hidden": true,
             "item": "textbox",
@@ -8798,14 +8836,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": true,
-            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/automation_colour_light_example.sig",
+            "filename": "model_railway_signals/examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nAlternatively, if running on a Raspberry pi, the track sensors can be triggered directly via the Ri-Pi's \nGPIO ports (momentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC pins). Select \n'Settings' =>'Sensors' from the Menubar to view the configuration. In this example the Track Sensor IDs\nhave been mapped to the GPIO port number, but any numbering scheme can be used (e.g. allocate the same ID \nfor the sensor as the signal ID it is triggering). \n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n\n",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.0.0"
+            "version": "Version 6.1.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -9010,6 +9048,7 @@
     "signals": {
         "1": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 2,
@@ -9021,6 +9060,7 @@
         },
         "10": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9032,6 +9072,7 @@
         },
         "11": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9043,6 +9084,7 @@
         },
         "12": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9054,6 +9096,7 @@
         },
         "13": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -9065,6 +9108,7 @@
         },
         "14": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -9076,6 +9120,7 @@
         },
         "15": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -9087,6 +9132,7 @@
         },
         "16": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9098,6 +9144,7 @@
         },
         "17": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9109,6 +9156,7 @@
         },
         "18": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9120,6 +9168,7 @@
         },
         "19": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9131,6 +9180,7 @@
         },
         "2": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 2,
@@ -9142,6 +9192,7 @@
         },
         "3": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9153,6 +9204,7 @@
         },
         "4": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9164,6 +9216,7 @@
         },
         "5": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -9175,6 +9228,7 @@
         },
         "6": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 2,
@@ -9186,6 +9240,7 @@
         },
         "7": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -9197,6 +9252,7 @@
         },
         "8": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -9208,6 +9264,7 @@
         },
         "9": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
