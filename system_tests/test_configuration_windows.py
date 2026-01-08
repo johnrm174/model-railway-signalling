@@ -49,7 +49,7 @@ def really_do_test_all_object_edit_windows(test_all_controls:bool=False, report_
                     print("Testing object edit window for:",configuration["item"],configuration["itemid"])
                 xpos, ypos = get_selection_position(object_id)
                 event = dummy_event(xpos, ypos)
-                run_function(lambda:schematic.left_double_click(event))
+                run_function(lambda:schematic.left_double_click(event), timeout=5.0)
                 if test_all_controls:
                     run_function(lambda:schematic.close_edit_window(reset=True), timeout=5.0)
                     run_function(lambda:schematic.close_edit_window(apply=True), timeout=5.0)
