@@ -99,6 +99,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                             theatre_route_indicator:bool=False,
                             theatre_route_subsidary:bool=False,
                             fully_automatic:bool=False,
+                            lower_quadrant:bool=True,
                             associated_home:int=0,
                             button_xoffset:int=0,
                             button_yoffset:int=0,
@@ -228,51 +229,53 @@ def create_semaphore_signal(canvas, sig_id:int,
         # to be created underneath the main home signal arms - we therefore need to apply a vertical offset
         if associated_home > 0: armoffset = -8
         else: armoffset = 0
+        if lower_quadrant: armoffset2, armoffset3 = -7, -5
+        else: armoffset2, armoffset3 = +7, +5
         # Draw the signal arm for the main route
         line_coords = common.rotate_line(x,y,55+armoffset,post_offset+3,55+armoffset,post_offset-8,orientation)
         mainsigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,55+armoffset,post_offset+3,62+armoffset,post_offset-8,orientation)
+        line_coords = common.rotate_line(x,y,55+armoffset,post_offset+3,55+armoffset+armoffset2,post_offset-8,orientation)
         mainsigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arm for the main route
         line_coords = common.rotate_line(x,y,+37,post_offset+3,+37,post_offset-6,orientation)
         mainsubon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+37,post_offset+3,+42,post_offset-6,orientation)
+        line_coords = common.rotate_line(x,y,+37,post_offset+3,+37+armoffset3,post_offset-6,orientation)
         mainsuboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Draw the signal arms for the RH routes
         line_coords = common.rotate_line(x,y,50+armoffset,rh1offset+2,50+armoffset,rh1offset-8,orientation)
         rh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,50+armoffset,rh1offset+2,57+armoffset,rh1offset-8,orientation)
+        line_coords = common.rotate_line(x,y,50+armoffset,rh1offset+2,50+armoffset+armoffset2,rh1offset-8,orientation)
         rh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         line_coords = common.rotate_line(x,y,50+armoffset,rh2offset+2,50+armoffset,rh2offset-8,orientation)
         rh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,50+armoffset,rh2offset+2,57+armoffset,rh2offset-8,orientation)
+        line_coords = common.rotate_line(x,y,50+armoffset,rh2offset+2,50+armoffset+armoffset2,rh2offset-8,orientation)
         rh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arms for the RH routes
         line_coords = common.rotate_line(x,y,+33,rh1offset+2,+33,rh1offset-6,orientation)
         rh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+33,rh1offset+2,+38,rh1offset-6,orientation)
+        line_coords = common.rotate_line(x,y,+33,rh1offset+2,+33+armoffset3,rh1offset-6,orientation)
         rh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         line_coords = common.rotate_line(x,y,+33,rh2offset+2,+33,rh2offset-6,orientation)
         rh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+33,rh2offset+2,+38,rh2offset-6,orientation)
+        line_coords = common.rotate_line(x,y,+33,rh2offset+2,+33+armoffset3,rh2offset-6,orientation)
         rh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Draw the signal arms for the LH routes
         line_coords = common.rotate_line(x,y,50+armoffset,lh1offset+2,50+armoffset,lh1offset-8,orientation)
         lh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,50+armoffset,lh1offset+2,57+armoffset,lh1offset-8,orientation)
+        line_coords = common.rotate_line(x,y,50+armoffset,lh1offset+2,50+armoffset+armoffset2,lh1offset-8,orientation)
         lh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         line_coords = common.rotate_line(x,y,50+armoffset,lh2offset+2,50+armoffset,lh2offset-8,orientation)
         lh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,50+armoffset,lh2offset+2,57+armoffset,lh2offset-8,orientation)
+        line_coords = common.rotate_line(x,y,50+armoffset,lh2offset+2,50+armoffset+armoffset2,lh2offset-8,orientation)
         lh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arms for the LH routes
         line_coords = common.rotate_line(x,y,+33,lh1offset+2,+33,lh1offset-6,orientation)
         lh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+33,lh1offset+2,+38,lh1offset-6,orientation)
+        line_coords = common.rotate_line(x,y,+33,lh1offset+2,+33+armoffset3,lh1offset-6,orientation)
         lh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         line_coords = common.rotate_line(x,y,+33,lh2offset+2,+33,lh2offset-6,orientation)
         lh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
-        line_coords = common.rotate_line(x,y,+33,lh2offset+2,+38,lh2offset-6,orientation)
+        line_coords = common.rotate_line(x,y,+33,lh2offset+2,+33+armoffset3,lh2offset-6,orientation)
         lh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Hide any otherdrawing objects we don't need for this particular signal
         if not main_signal: canvas.itemconfigure(mainsigon,state='hidden')
@@ -479,7 +482,22 @@ def has_route_arm(sig_id:int, route:signals.route_type):
 
 def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
     # We explicitly test for True and False as a state of 'None' signifies the signal was created without a subsidary
-    if signals.signals[str(sig_id)]["subclear"] == True:
+    old_state = signals.signals[str(sig_id)]["substate"]
+    if ( signals.signals[str(sig_id)]["overridesub"] or signals.signals[str(sig_id)]["overridesub2"] or
+            signals.signals[str(sig_id)]["subclear"] == False ):
+        new_state = signals.signal_state_type.DANGER
+    elif signals.signals[str(sig_id)]["subclear"] == True:
+        new_state = signals.signal_state_type.PROCEED
+    else:
+        new_state=None
+    # Update the displayed aspect if there has been a change
+    if new_state != old_state and new_state == signals.signal_state_type.DANGER:
+        update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
+        update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
+        update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
+        update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
+        update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+    elif new_state != old_state and new_state == signals.signal_state_type.PROCEED:
         # If the route has been set to signals.route_type.NONE then we assume MAIN and change the MAIN arm
         # We also change the MAIN subsidary arm for Home signals without any diverging route arms (main signal or 
         # subsidary signal) to cover the case of a single subsidary signal arm controlling multiple routes
@@ -523,16 +541,10 @@ def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
             update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
             update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
             update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", True, log_message)
-    elif signals.signals[str(sig_id)]["subclear"] == False: 
-        # The subsidary signal is at danger
-        update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
-        update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
-        update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
-        update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
-        update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
     # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
-    if signals.signals[str(sig_id)]["subsidarytheatre"]:
+    if new_state != old_state and signals.signals[str(sig_id)]["subsidarytheatre"]:
         signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
+    signals.signals[str(sig_id)]["substate"] = new_state
     return ()
 
 # -------------------------------------------------------------------------
@@ -626,7 +638,7 @@ def update_semaphore_signal(sig_id:int):
         if not signals.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is ON"
-        elif signals.signals[str(sig_id)]["override"]:
+        elif signals.signals[str(sig_id)]["override"] or signals.signals[str(sig_id)]["override2"]:
             new_aspect = signals.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OVERRIDDEN"
         elif signals.signals[str(sig_id)]["overcaution"]:
@@ -650,7 +662,7 @@ def update_semaphore_signal(sig_id:int):
         if not signals.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is ON"
-        elif signals.signals[str(sig_id)]["override"]:
+        elif signals.signals[str(sig_id)]["override"] or signals.signals[str(sig_id)]["override2"]:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (DANGER) - signal is OVERRIDDEN"
         elif signals.signals[str(sig_id)]["timedsequence"][signal_route.value].sequence_in_progress:

@@ -110,7 +110,8 @@ default_route_definition["switchesonroute"] = {}
 default_route_definition["linestohighlight"] = []
 default_route_definition["pointstohighlight"] = []
 # Each route definition can use a different track sensor to clear it down
-default_route_definition["exitsensor"] = 0
+default_route_definition["exitsensors"] = []
+default_route_definition["exitsignals"] = []
 # Create the list of route definition and add a default 'one-click' route
 default_route_object["routedefinitions"] = []
 default_route_object["routedefinitions"].append(default_route_definition)
@@ -182,6 +183,10 @@ def remove_references_to_signal(signal_id:int):
                 if item_id != signal_id:
                     new_signals_table.append(item_id)
             objects_common.schematic_objects[object_id]["routedefinitions"][index]["subsidariesonroute"] = new_signals_table
+            # Update the list of signals to clear down the route (when passed)
+            for index2, item_id in enumerate(route_definition["exitsignals"]):
+                if item_id == signal_id:
+                    del(objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitsignals"][index2])
     return()
 
 def update_references_to_signal(old_signal_id:int, new_signal_id:int):
@@ -200,6 +205,10 @@ def update_references_to_signal(old_signal_id:int, new_signal_id:int):
             for index2, item_id in enumerate(current_signals_table):
                 if item_id == old_signal_id:
                     objects_common.schematic_objects[object_id]["routedefinitions"][index1]["subsidariesonroute"][index2] = new_signal_id
+            # Update the list of signals to clear down the route (when passed)
+            for index2, item_id in enumerate(route_definition["exitsignals"]):
+                if item_id == old_signal_id:
+                    objects_common.schematic_objects[object_id]["routedefinitions"][index1]["exitsignals"][index2] = new_signal_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -249,11 +258,11 @@ def remove_references_to_sensor(sensor_id:int):
         if current_setup_sensor_id == sensor_id:
             objects_common.schematic_objects[object_id]["setupsensor"] = 0
         # Iterate through all the route definitions
-        for index, route_definition in enumerate(route_definitions):
-            # Update the "exitsensor" in the route definition
-            current_cleardown_sensor_id = route_definition["exitsensor"]
-            if current_cleardown_sensor_id == sensor_id:
-                objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitsensor"] = 0
+        for index1, route_definition in enumerate(route_definitions):
+            # Update the "exitsensors" in the route definition
+            for index2, item_id in enumerate(route_definition["exitsensors"]):
+                if item_id == sensor_id:
+                    del(objects_common.schematic_objects[object_id]["routedefinitions"][index1]["exitsensors"][index2])
     return()
 
 def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
@@ -265,13 +274,12 @@ def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
         if current_setup_sensor_id == old_sensor_id:
             objects_common.schematic_objects[objects_common.route(route_id)]["setupsensor"] = new_sensor_id
         # Iterate through all the route definitions
-        for index, route_definition in enumerate(route_definitions):
-            # Update the "exitsensor" in the route definition
-            current_cleardown_sensor_id = route_definition["exitsensor"]
-            if current_cleardown_sensor_id == old_sensor_id:
-                objects_common.schematic_objects[object_id]["routedefinitions"][index]["exitsensor"] = new_sensor_id
+        for index1, route_definition in enumerate(route_definitions):
+            # Update the "exitsensors" in the route definition
+            for index2, item_id in enumerate(route_definition["exitsensors"]):
+                if item_id == old_sensor_id:
+                    objects_common.schematic_objects[object_id]["routedefinitions"][index1]["exitsensors"][index2] = new_sensor_id
     return()
-
 #------------------------------------------------------------------------------------
 # Functions to update/remove references to a Switch ID in a Route's configuration
 # The 'switchesonroute' table comprises a dict of switch settings (True/False)

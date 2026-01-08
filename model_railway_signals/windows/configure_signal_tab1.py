@@ -263,6 +263,11 @@ class semaphore_signal_arms():
                                 sig_arms_updated_callback=sig_arms_updated,
                                 sub_arms_updated_callback=subs_arms_updated,
                                 dist_arms_updated_callback=dist_arms_updated)
+        # Add the check box for the 'Lower Quadrant' Selection
+        self.lowerquadrant = common.check_box(self.frame, label="Lower quadrant arms",
+                        tool_tip="Select to create lower quadrant signal arms "+
+                        "(leave unselected for upper quadrant signal arms)")
+        self.lowerquadrant.pack(padx=2, pady=2)
         # The signal arm for the main route cannot be deselected so we need to
         # set the value and then disable the base tkinter widget (we can't use
         # the disable function as this would also 'blank' the checkbox)
@@ -625,13 +630,13 @@ class theatre_route_indications:
         # disabled so it can never be selected (not really a route indication as such)
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit selection
-        self.CB1 = common.check_box(self.frame, label="Auto inhibit route indications on DANGER", width=35,
+        self.CB1 = common.check_box(self.frame, label="DCC Signal inhibits route indications on DANGER", width=45,
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
                             "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB1.pack(padx=2, pady=2)
         # Create the checkbox and tool tip for Enable Theatre for Subsidary selection
-        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidiary", width=35,
+        self.CB2 = common.check_box(self.frame, label="Enable theatre indications for subsidiary signal", width=45,
                     tool_tip = "Select to enable theatre indications for the subsidiary signal (as well as the main signal)")
         self.CB2.pack(padx=2, pady=2)
 

@@ -61,7 +61,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"1":True, "2":False, "3":True},
                           "linestohighlight":[1,2,3],
                           "pointstohighlight":[1,2,3],
-                          "exitsensor":1,
+                          "exitsensors":[1,2],
+                          "exitsignals":[3,4],
                           "exitbutton":5,
                           "routenotes":"",
                           "routecolour":"Red"}
@@ -71,7 +72,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"1":False, "2":True, "3":False},
                           "linestohighlight":[1,2,4],
                           "pointstohighlight":[1,2,4],
-                          "exitsensor":2,
+                          "exitsensors":[2,3],
+                          "exitsignals":[1,2],
                           "exitbutton":4,
                           "routenotes":"",
                           "routecolour":"Red"}
@@ -125,7 +127,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"51":True, "52":False, "53":True},
                               "linestohighlight":[11,12,13],
                               "pointstohighlight":[21,22,23],
-                              "exitsensor":41,
+                              "exitsensors":[41,42],
+                              "exitsignals":[33,34],
                               "exitbutton":65,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -135,7 +138,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"51":False, "52":True, "53":False},
                               "linestohighlight":[11,12,14],
                               "pointstohighlight":[21,22,24],
-                              "exitsensor":42,
+                              "exitsensors":[42,43],
+                              "exitsignals":[31,32],
                               "exitbutton":64,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -152,7 +156,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":False, "53":True},
                               "linestohighlight":[11,12],
                               "pointstohighlight":[22,23],
-                              "exitsensor":0,
+                              "exitsensors":[42],
+                              "exitsignals":[33,34],
                               "exitbutton":65,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -162,7 +167,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":True, "53":False},
                               "linestohighlight":[11,12,14],
                               "pointstohighlight":[22,24],
-                              "exitsensor":42,
+                              "exitsensors":[42,43],
+                              "exitsignals":[31],
                               "exitbutton":64,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -178,7 +184,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":False},
                               "linestohighlight":[11,12],
                               "pointstohighlight":[22,23],
-                              "exitsensor":0,
+                              "exitsensors":[],
+                              "exitsignals":[33],
                               "exitbutton":65,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -188,7 +195,8 @@ def run_change_of_item_id_tests():
                               "switchesonroute":{"52":True},
                               "linestohighlight":[11,12],
                               "pointstohighlight":[22],
-                              "exitsensor":0,
+                              "exitsensors":[43],
+                              "exitsignals":[31],
                               "exitbutton":64,
                               "routenotes":"",
                               "routecolour":"Red"}
@@ -201,7 +209,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"2":True},
                           "linestohighlight":[11,12],
                           "pointstohighlight":[22,23],
-                          "exitsensor":43,
+                          "exitsensors":[43],
+                          "exitsignals":[44],
                           "exitbutton":65,
                           "routenotes":"ABC",
                           "routecolour":"Red"}
@@ -214,7 +223,8 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{},
                           "linestohighlight":[],
                           "pointstohighlight":[],
-                          "exitsensor":0,
+                          "exitsensors":[],
+                          "exitsignals":[],
                           "exitbutton":0,
                           "routenotes":"Notes related to the route",
                           "routecolour":"white"}
@@ -228,10 +238,11 @@ def run_change_of_item_id_tests():
                           "switchesonroute":{"2":True},
                           "linestohighlight":[11,12],
                           "pointstohighlight":[22,23],
-                          "exitsensor":43,
+                          "exitsensors":[43],
+                          "exitsignals":[44],
                           "exitbutton":0,
                           "routenotes":"ABC",
-                          "routecolour":"Red"}    
+                          "routecolour":"Red"}
     assert_object_configuration(rb1, {"routedefinitions": [route_definition1,], "setupsensor": 43 })
     # Clean up
     select_all_objects()
@@ -243,7 +254,7 @@ def run_change_of_item_id_tests():
 # the 'schematic_routes_example.sig example' layout file
 #-----------------------------------------------------------------------------------
 
-def run_initial_state_tests1():
+def run_initial_state_tests_for_one_click_routes():
     # Test_initial condition (at layout load)
     # Route 5 should be active with Point 2 switched and Signal 1 OFF
     # Instrument is BLOCKED so Route 1 will not be viable (when Route 5 de-selected)
@@ -265,10 +276,10 @@ def run_initial_state_tests1():
     assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     return()
     
-def run_initial_state_tests2():
+def run_initial_state_tests_for_nx_routes():
     # Test_initial condition (at layout load)
     # Initial state tests - Route 18 should be active
-    assert_buttons_enabled(8,19)    
+    assert_buttons_enabled(18,19)
     assert_buttons_selected(18,19)
     assert_signals_DANGER(13)
     assert_signals_PROCEED(14)
@@ -285,7 +296,7 @@ def run_initial_state_tests2():
     assert_signals_DANGER(13,14)
     return()
 
-def run_schematic_routes_tests1():
+def test_basic_set_up_and_clear_down_of_one_click_routes():
     reset_layout()
     # Test Route disabled if signal interlocked with Instrument
     assert_block_section_ahead_not_clear(1)
@@ -312,7 +323,22 @@ def run_schematic_routes_tests1():
     assert_buttons_deselected(1)
     assert_buttons_deselected(9,10,11)  # Switch 9,10,11
     # Instruments are set to CLEAR so they dont affect with the following tests
-    set_instrument_clear(2) 
+    set_instrument_clear(2)
+    # Test Routes are disabled if a point is locked in the wrong position by an Occupied Track Section
+    assert_points_normal(1)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(10)
+    assert_buttons_enabled(3,4,5,6)
+    assert_buttons_disabled(1,2)
+    set_sections_clear(10)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_points_switched(1)    
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(10)
+    assert_buttons_enabled(1,2)
+    assert_buttons_disabled(3,4,5,6)
+    set_sections_clear(10)
+    set_points_normal(1)
     # Test Route disabled if signal interlocked with track sections
     assert_buttons_enabled(1,2,3,4,5,6)
     set_sections_occupied(1)
@@ -376,15 +402,31 @@ def run_schematic_routes_tests1():
     assert_buttons_enabled(1,2,3,4,5,6)
     return()
 
-def run_schematic_routes_tests2():
+def test_setup_and_cleardown_of_one_click_routes_by_track_sensors():
+    print("Test Setup and cleardown of routes by Track Sensors - 1 warning will be generated")
     reset_layout()
     # Instruments are set to CLEAR so they dont affect with the following tests
     set_instrument_clear(2) 
     # Test Basic setup and cleardown of Signal Routes (using sensor triggers)
     assert_buttons_deselected(1,2,3,4,5,6)
+    assert_buttons_enabled(1,2,3,4,5,6)
     assert_buttons_deselected(9,10,11)    # Switch 9,10,11
     assert_points_normal(1,2)
     assert_signals_DANGER(1)
+    # Test Route cannot be set up if a point is locked in the wrong position (by a track sensor)
+    assert_points_normal(1)
+    set_points_switched(1)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(10)
+    assert_buttons_disabled(3,4,5,6)
+    assert_buttons_enabled(1,2)
+    trigger_sensors_passed(3)             # Route 3 Main - Events = pt2 sw, sw11 on, sig1 off
+    sleep(2.0)
+    assert_buttons_deselected(5)
+    set_sections_clear(10)
+    set_points_normal(1)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    # Test Successful set up of routes from Sensor Passed
     trigger_sensors_passed(3)             # Route 3 Main - Events = pt2 sw, sw11 on, sig1 off
     sleep(2.0)
     assert_buttons_selected(5)
@@ -467,34 +509,73 @@ def run_schematic_routes_tests2():
     sleep(1.5)
     assert_buttons_deselected(4)
     assert_buttons_enabled(1,2,3,4,5,6)
-    
-def run_schematic_routes_tests3():
+    return()
+
+def test_clear_down_of_one_click_routes_by_signals():
+    reset_layout()
+    # Instruments are set to CLEAR so they dont affect with the following tests
+    set_instrument_clear(2) 
+    # Test Basic setup and cleardown of Signal Routes (using sensor triggers)
+    assert_buttons_deselected(1,2,3,4,5,6)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    assert_buttons_deselected(9,10,11)    # Switch 9,10,11
+    assert_points_normal(1,2)
+    assert_signals_DANGER(1)
+    # Setup Route 3 (Main)
+    assert_buttons_enabled(5)
+    simulate_buttons_clicked(5)
+    assert_buttons_disabled(5)
+    time.sleep(2.0)
+    assert_buttons_selected(5)
+    assert_buttons_enabled(5)
+    # Clear Down
+    trigger_signals_passed(15)
+    assert_buttons_disabled(5)
+    time.sleep(2.0)
+    assert_buttons_deselected(5)
+    assert_buttons_enabled(5)
+    # Setup Route 3 (Shunt)
+    assert_buttons_enabled(6)
+    simulate_buttons_clicked(6)
+    assert_buttons_disabled(6)
+    time.sleep(2.0)
+    assert_buttons_selected(6)
+    assert_buttons_enabled(6)
+    # Clear Down
+    trigger_signals_passed(15)
+    assert_buttons_disabled(6)
+    time.sleep(2.0)
+    assert_buttons_deselected(6)
+    assert_buttons_enabled(6)
+    return()
+
+def test_one_click_route_edge_cases():
     reset_layout()    
-    print("Test signal and subsidiary changes during /after route setup - 6 warnings will be generated")
+    print("Test signal and subsidiary changes during/after route setup - 6 warnings will be generated")
     # Test Signal Change invalidating an established route clears the route
     simulate_buttons_clicked(5)
     sleep(3.0)
     assert_buttons_selected(5)
-    set_signals_on(1)
+    set_signals_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(5)
     # Test Signal Change invalidating an route in progress clears the route
     simulate_buttons_clicked(5)
     sleep(1.5)
-    set_signals_on(1)
+    set_signals_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(5)
     # Test Subsidary Change invalidating an established route clears the route
     simulate_buttons_clicked(6)
     sleep(3.0)
     assert_buttons_selected(6)
-    set_subsidaries_on(1)
+    set_subsidaries_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(6)
     # Test Subsidary Change invalidating a route in progress clears the route
     simulate_buttons_clicked(6)
     sleep(0.5)
-    set_subsidaries_on(1)
+    set_subsidaries_on(1) # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(6)
     # Test changing a conflicting signal invalidates a route in progress
@@ -527,8 +608,7 @@ def run_schematic_routes_tests3():
     assert_buttons_selected(7)
     assert_points_switched(3)
     assert_signals_PROCEED(5)
-    set_points_normal(3)
-    sleep(0.1)
+    set_points_normal(3) # Route Invalidated
     assert_buttons_deselected(7)
     sleep(3.0)
     # Test Point Change invalidating a route IN THE PROCESS OF set up - WARNING
@@ -537,7 +617,7 @@ def run_schematic_routes_tests3():
     simulate_buttons_clicked(7)
     sleep(0.6)
     assert_points_switched(3)
-    set_points_normal(3)
+    set_points_normal(3) # Route Invalidated
     sleep(3.5)
     assert_buttons_deselected(7)
     # Test Point Change (to the correct state) immediately after route button is clicked - No warning
@@ -565,7 +645,7 @@ def run_schematic_routes_tests3():
     assert_buttons_selected(12)   # Switch 12
     assert_points_switched(3)
     assert_signals_PROCEED(5)
-    simulate_buttons_clicked(12)    # Switch 12
+    simulate_buttons_clicked(12)    #  # Route Invalidated
     sleep(3.0)
     assert_buttons_deselected(7)
     assert_buttons_deselected(12)   # Switch 12
@@ -574,7 +654,7 @@ def run_schematic_routes_tests3():
     simulate_buttons_clicked(7)     # Branch - Events = pt3 switched, sw12 on, sig 5 off
     sleep(1.2)
     assert_buttons_selected(12)     # Switch 12
-    simulate_buttons_clicked(12)    # Switch 12
+    simulate_buttons_clicked(12)    # Route Invalidated
     sleep(0.2)
     assert_buttons_deselected(12)   # Switch 12
     sleep(3.0)
@@ -584,12 +664,53 @@ def run_schematic_routes_tests3():
     simulate_buttons_clicked(7)
     assert_buttons_deselected(12)   # Switch 12
     simulate_buttons_clicked(12)    # Switch 12
-    sleep(2.0)
+    sleep(3.0)
     assert_buttons_selected(7)
     assert_buttons_selected(12)     # Switch 12
     # Return Layout to normal
     simulate_buttons_clicked(7)     # Branch - Events = sig5 on, pt3 normal, sw12 off, sig5 on
     sleep(2.5)
+    assert_buttons_deselected(7)   # Switch 7
+    print("Test Point FPLs are activated if deactivated duting route cleardown - 1 Warning will be generated")
+    assert_buttons_deselected(21)
+    assert_points_normal(4)
+    assert_signals_DANGER(16)
+    simulate_buttons_clicked(21)
+    sleep(2.0)
+    assert_buttons_selected(21)
+    assert_signals_PROCEED(16)
+    # Set FPL to Off - This should be set back to ON during route cleardown
+    set_fpls_off(4) # Route invalidated)
+    sleep(1.0)
+    assert_buttons_deselected(21)
+    assert_points_normal(4)
+    assert_signals_DANGER(16)
+    return()
+
+def run_mode_change_tests():
+    reset_layout()    
+    # Test Mode changes clear down routes successfully
+    assert_buttons_deselected(2,17,16,15,14)
+    simulate_buttons_clicked(2) # Route 1 Main
+    sleep(3.0)
+    assert_buttons_selected(2)
+    simulate_buttons_clicked(17) # Nx Route
+    sleep(0.1)
+    simulate_buttons_clicked(16)
+    sleep(0.1)
+    simulate_buttons_clicked(16)
+    sleep(0.1)
+    simulate_buttons_clicked(15)
+    sleep(0.1)
+    simulate_buttons_clicked(15)
+    sleep(0.1)
+    simulate_buttons_clicked(14)
+    sleep(0.1)
+    assert_buttons_selected(2,17,16,15,14)
+    # Change to Edit Mode and then back again - all routes should have been cleared)
+    set_edit_mode()
+    set_run_mode()
+    assert_buttons_deselected(2,17,16,15,14)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -881,8 +1002,52 @@ def test_nx_routes2():
 
 def test_nx_routes3():
     # Test some of the edge cases to excersise the code
-    # Case 1 - ENTRY (not also an EXIT) button clicked during router selection when there are no possible routes
-    pass
+    # Case 1 - Selection in progress from ENTRY Button 15
+    # ENTRY Button 17 Clicked (no route from 15 to 17 so new Route Selection initiated)
+    assert_buttons_deselected(14,15,16,17,18)
+    simulate_buttons_clicked(15)
+    assert_buttons_selected(15)
+    assert_buttons_deselected(14,16,17,18)
+    simulate_buttons_clicked(17)
+    assert_buttons_selected(17)
+    assert_buttons_deselected(14,15,16,18)
+    simulate_buttons_clicked(17)
+    assert_buttons_deselected(14,15,16,17,18)
+    # Test Case 2 - Route setup from Buttons 17 to 16
+    # Button 16 is clicked (this will start a new Route Selection)
+    # Button 16 is clicked (this will cancel the new Route Selection)
+    simulate_buttons_clicked(17)
+    simulate_buttons_clicked(16)
+    assert_buttons_selected(17,16)
+    simulate_buttons_clicked(16) # Start a new Sequence
+    assert_buttons_selected(17,16)
+    simulate_buttons_clicked(16) # Cancel the new Sequence
+    assert_buttons_selected(17,16)
+    simulate_buttons_clicked(17)
+    assert_buttons_deselected(14,15,16,17,18)    
+    # Button 16 is clicked (this will start a new Route Selection)
+    # Button 16 is clicked (this will cancel the new Route Selection)
+    simulate_buttons_clicked(16) # Start a new Sequence
+    assert_buttons_selected(16)
+    simulate_buttons_clicked(16) # Cancel the new Sequence
+    assert_buttons_deselected(16)
+    assert_buttons_deselected(14,15,16,17,18)
+    # Test Case 2 - Route setup from Buttons 17 to 16
+    # Button 18 is clicked (this will start a new Route Selection)
+    # Button 16 is clicked (this will Cancel the old Route Selection and start a new Route Selection)
+    simulate_buttons_clicked(17)
+    simulate_buttons_clicked(16)
+    assert_buttons_selected(17,16)
+    simulate_buttons_clicked(18)
+    assert_buttons_selected(17,16,18)
+    simulate_buttons_clicked(16)
+    assert_buttons_selected(17,16)
+    assert_buttons_deselected(18)
+    simulate_buttons_clicked(17) # Cancel the route selection
+    simulate_buttons_clicked(17) # Cancel the route
+    assert_buttons_deselected(14,15,16,17,18)    
+    return()
+
 ######################################################################################################
 
 def run_all_schematic_routes_tests():
@@ -894,30 +1059,35 @@ def run_all_schematic_routes_tests():
     # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
     print("Schematic Route Tests - Initial State Tests")
-    run_initial_state_tests1()
-    run_initial_state_tests2()
+    run_initial_state_tests_for_one_click_routes()
+    run_initial_state_tests_for_nx_routes()
     print("Schematic Route Tests - NX route Tests")
     test_nx_routes1()
     test_nx_routes2()
+    test_nx_routes3()
     print("Schematic Route Tests - Run Mode, Automation Off")
     set_automation_off()
-    run_schematic_routes_tests1()
-    run_schematic_routes_tests2()
-    run_schematic_routes_tests3()
+    test_basic_set_up_and_clear_down_of_one_click_routes()
+    test_setup_and_cleardown_of_one_click_routes_by_track_sensors()
+    test_clear_down_of_one_click_routes_by_signals()
+    test_one_click_route_edge_cases()
     print("Schematic Route Tests - Run Mode, Automation On")
     set_automation_on()
-    run_schematic_routes_tests1()
-    run_schematic_routes_tests2()
-    run_schematic_routes_tests3()
+    test_basic_set_up_and_clear_down_of_one_click_routes()
+    test_setup_and_cleardown_of_one_click_routes_by_track_sensors()
+    test_clear_down_of_one_click_routes_by_signals()
+    test_one_click_route_edge_cases()
+    print("Test routes are cleared down switching to Edit Mode -  No warnings")
+    run_mode_change_tests()   
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
     # Run the Tests for the example layout
+    initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
+    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
-    initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
-    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     reset_layout()
     set_run_mode()
     set_automation_off()

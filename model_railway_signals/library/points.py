@@ -86,8 +86,8 @@
 # External API - classes and functions (used by the other library modules):
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
-#   show_point_ids() - Displays the line IDs
-#   hide_point_ids() - Hides the line IDs
+#   show_point_ids() - Displays the point IDs
+#   hide_point_ids() - Hides the point IDs
 #   bring_point_ids_to_front() - Brings the IDs to the front
 #
 #---------------------------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ def configure_edit_mode(edit_mode:bool):
     return()
 
 #---------------------------------------------------------------------------------------------
-# Library functions to show/hide Line IDs in edit mode
+# Library functions to show/hide point IDs in edit mode
 #---------------------------------------------------------------------------------------------
 
 point_ids_displayed = False
@@ -596,15 +596,19 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             point_button_tooltip.text="FPL is active"
         # Hide the blade line for the switched route (display it later when we need it)
         canvas.itemconfig(blade2_tag, state="hidden")
-        # Create the line ID labels
+        # Create the Point ID labels
         label1_object = canvas.create_text(x, y, text=str(point_id),
                             font=("Courier",9,"bold"), fill="white", tags=canvas_tag)
         bbox = canvas.bbox(label1_object)
         label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
-                                    tags=canvas_tag, fill="purple3", width=0)
+                            tags=canvas_tag, fill="purple3", width=0)
+        canvas.tag_raise(label1_object)
         if not editing_enabled or not point_ids_displayed:
             canvas.itemconfig(label1_object, state="hidden")
             canvas.itemconfig(label2_object, state="hidden")
+        else:
+            canvas.itemconfig(label1_object, state="normal")
+            canvas.itemconfig(label2_object, state="normal")
         # Compile a dictionary of everything we need to track
         points[str(point_id)] = {}
         points[str(point_id)]["canvas"] = canvas                   # Tkinter canvas object
@@ -617,8 +621,8 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         points[str(point_id)]["window2"] = fpl_button_window       # Tkinter tag for the FPL button window
         points[str(point_id)]["changebutton"] = point_button       # Tkinter button object
         points[str(point_id)]["lockbutton"] = fpl_button           # Tkinter button object
-        points[str(point_id)]["label1"] = label1_object           # Reference to the Tkinter drawing object
-        points[str(point_id)]["label2"] = label2_object           # Reference to the Tkinter drawing object
+        points[str(point_id)]["label1"] = label1_object            # Reference to the Tkinter drawing object
+        points[str(point_id)]["label2"] = label2_object            # Reference to the Tkinter drawing object
         points[str(point_id)]["tooltip1"] = point_button_tooltip   # Tooltip object
         points[str(point_id)]["tooltip2"] = fpl_button_tooltip     # Tooltip object
         points[str(point_id)]["fplcallback"] = fpl_callback        # The callback to make on an event

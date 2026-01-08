@@ -954,16 +954,18 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
         if valid and self.entry.get() != "":
             gpio_sensor_id = self.entry.get()
             event_mappings = library.get_gpio_sensor_callback(gpio_sensor_id)
-            if event_mappings[0] > 0 and (self.current_item_type != "Signal" or event_mappings[0] != self.local_item_id):
+            # The returned list is [signal_passed, signal_approach, sensor_passed, track_section]
+            # Where each element of the list is the ID of the mapped item (0 if no mapping)
+            if self.current_item_type == "Signal" and event_mappings[0] > 0 and event_mappings[0] != self.local_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
                 valid = False
-            elif event_mappings[1] > 0 and (self.current_item_type != "Signal" or event_mappings[1] != self.local_item_id):
+            elif self.current_item_type == "Signal" and event_mappings[1] > 0 and event_mappings[1] != self.local_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
-            elif event_mappings[2] > 0 and (self.current_item_type != "Sensor" or event_mappings[2] != self.local_item_id):
+            elif self.current_item_type == "Sensor" and event_mappings[2] > 0 and event_mappings[2] != self.local_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
-            elif event_mappings[3] > 0 and (self.current_item_type != "Section" or event_mappings[3] != self.local_item_id):
+            elif self.current_item_type == "Section" and event_mappings[3] > 0 and event_mappings[3] != self.local_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Section "+str(event_mappings[3]))
                 valid = False
         if update_validation_status: self.set_validation_status(valid)

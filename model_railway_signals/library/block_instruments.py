@@ -96,7 +96,7 @@ try:
     import simpleaudio
     audio_enabled = True
 except Exception:
-    pass
+    audio_enabled = False
 
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling create_instrument

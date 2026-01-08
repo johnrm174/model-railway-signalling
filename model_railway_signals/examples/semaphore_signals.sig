@@ -18,7 +18,7 @@
                 false,
                 ""
             ],
-            "bbox": 16048,
+            "bbox": 2220,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -92,9 +92,11 @@
             "itemid": 103,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -349,7 +351,7 @@
                 false,
                 ""
             ],
-            "bbox": 16096,
+            "bbox": 2268,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -423,9 +425,11 @@
             "itemid": 39,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -680,7 +684,7 @@
                 false,
                 ""
             ],
-            "bbox": 16126,
+            "bbox": 2298,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -754,9 +758,11 @@
             "itemid": 108,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -1011,7 +1017,7 @@
                 false,
                 ""
             ],
-            "bbox": 16176,
+            "bbox": 2348,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1085,9 +1091,11 @@
             "itemid": 59,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -1342,7 +1350,7 @@
                 false,
                 ""
             ],
-            "bbox": 16204,
+            "bbox": 2376,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1416,9 +1424,11 @@
             "itemid": 11,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -1673,7 +1683,7 @@
                 false,
                 ""
             ],
-            "bbox": 16235,
+            "bbox": 2407,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1747,9 +1757,11 @@
             "itemid": 93,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -2004,7 +2016,7 @@
                 false,
                 ""
             ],
-            "bbox": 16265,
+            "bbox": 2437,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2078,9 +2090,11 @@
             "itemid": 72,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -2335,7 +2349,7 @@
                 false,
                 ""
             ],
-            "bbox": 16294,
+            "bbox": 2466,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2409,9 +2423,11 @@
             "itemid": 84,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -2666,7 +2682,7 @@
                 false,
                 ""
             ],
-            "bbox": 16346,
+            "bbox": 2518,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2740,9 +2756,11 @@
             "itemid": 163,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -2997,7 +3015,7 @@
                 false,
                 ""
             ],
-            "bbox": 16398,
+            "bbox": 2570,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3071,9 +3089,11 @@
             "itemid": 150,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -3328,7 +3348,7 @@
                 false,
                 ""
             ],
-            "bbox": 16424,
+            "bbox": 2596,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3402,9 +3422,11 @@
             "itemid": 36,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -3659,7 +3681,7 @@
                 false,
                 ""
             ],
-            "bbox": 16455,
+            "bbox": 2627,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3733,9 +3755,11 @@
             "itemid": 55,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -3990,7 +4014,7 @@
                 false,
                 ""
             ],
-            "bbox": 16486,
+            "bbox": 2658,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4064,9 +4088,11 @@
             "itemid": 146,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -4321,7 +4347,7 @@
                 false,
                 ""
             ],
-            "bbox": 16520,
+            "bbox": 2692,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4395,9 +4421,11 @@
             "itemid": 76,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -4652,7 +4680,7 @@
                 false,
                 ""
             ],
-            "bbox": 16551,
+            "bbox": 2723,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4726,9 +4754,11 @@
             "itemid": 139,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -4983,7 +5013,7 @@
                 false,
                 ""
             ],
-            "bbox": 16582,
+            "bbox": 2754,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5057,9 +5087,11 @@
             "itemid": 90,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -5314,7 +5346,7 @@
                 false,
                 ""
             ],
-            "bbox": 16635,
+            "bbox": 2807,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5388,9 +5420,11 @@
             "itemid": 22,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -5638,7 +5672,7 @@
                 0,
                 0
             ],
-            "bbox": 16643,
+            "bbox": 2815,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 550.0,
@@ -5665,7 +5699,7 @@
                 false,
                 ""
             ],
-            "bbox": 16674,
+            "bbox": 2846,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5739,9 +5773,11 @@
             "itemid": 174,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -5996,7 +6032,7 @@
                 false,
                 ""
             ],
-            "bbox": 16705,
+            "bbox": 2877,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6070,9 +6106,11 @@
             "itemid": 92,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -6327,7 +6365,7 @@
                 false,
                 ""
             ],
-            "bbox": 16736,
+            "bbox": 2908,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6401,9 +6439,11 @@
             "itemid": 83,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -6658,7 +6698,7 @@
                 false,
                 ""
             ],
-            "bbox": 16765,
+            "bbox": 2937,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6732,9 +6772,11 @@
             "itemid": 179,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -6982,7 +7024,7 @@
                 0,
                 0
             ],
-            "bbox": 16773,
+            "bbox": 2945,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 275.0,
@@ -7009,7 +7051,7 @@
                 false,
                 ""
             ],
-            "bbox": 16781,
+            "bbox": 2953,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -7083,9 +7125,11 @@
             "itemid": 77,
             "itemsubtype": 2,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -7340,7 +7384,7 @@
                 false,
                 ""
             ],
-            "bbox": 16833,
+            "bbox": 3005,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -7414,9 +7458,11 @@
             "itemid": 156,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -7671,7 +7717,7 @@
                 false,
                 ""
             ],
-            "bbox": 16883,
+            "bbox": 3055,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -7745,9 +7791,11 @@
             "itemid": 58,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -8002,7 +8050,7 @@
                 false,
                 ""
             ],
-            "bbox": 16933,
+            "bbox": 3105,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -8076,9 +8124,11 @@
             "itemid": 13,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -8333,7 +8383,7 @@
                 false,
                 ""
             ],
-            "bbox": 16960,
+            "bbox": 3132,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -8407,9 +8457,11 @@
             "itemid": 44,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -8664,7 +8716,7 @@
                 false,
                 ""
             ],
-            "bbox": 16995,
+            "bbox": 3167,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -8738,9 +8790,11 @@
             "itemid": 56,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -8995,7 +9049,7 @@
                 false,
                 ""
             ],
-            "bbox": 17023,
+            "bbox": 3195,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -9069,9 +9123,11 @@
             "itemid": 113,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -9326,7 +9382,7 @@
                 false,
                 ""
             ],
-            "bbox": 17073,
+            "bbox": 3245,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -9400,9 +9456,11 @@
             "itemid": 148,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -9657,7 +9715,7 @@
                 false,
                 ""
             ],
-            "bbox": 17104,
+            "bbox": 3276,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -9731,9 +9789,11 @@
             "itemid": 178,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -9988,7 +10048,7 @@
                 false,
                 ""
             ],
-            "bbox": 17134,
+            "bbox": 3306,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -10062,9 +10122,11 @@
             "itemid": 10,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -10319,7 +10381,7 @@
                 false,
                 ""
             ],
-            "bbox": 17164,
+            "bbox": 3336,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -10393,9 +10455,11 @@
             "itemid": 117,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -10650,7 +10714,7 @@
                 false,
                 ""
             ],
-            "bbox": 17212,
+            "bbox": 3384,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -10724,9 +10788,11 @@
             "itemid": 159,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -10981,7 +11047,7 @@
                 false,
                 ""
             ],
-            "bbox": 17246,
+            "bbox": 3418,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -11055,9 +11121,11 @@
             "itemid": 97,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -11305,7 +11373,7 @@
                 0,
                 0
             ],
-            "bbox": 17254,
+            "bbox": 3426,
             "colour": "Black",
             "endx": 850.0,
             "endy": 675.0,
@@ -11325,7 +11393,7 @@
                 0,
                 0
             ],
-            "bbox": 17262,
+            "bbox": 3434,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 650.0,
@@ -11352,7 +11420,7 @@
                 false,
                 ""
             ],
-            "bbox": 17311,
+            "bbox": 3483,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -11426,9 +11494,11 @@
             "itemid": 7,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -11683,7 +11753,7 @@
                 false,
                 ""
             ],
-            "bbox": 17340,
+            "bbox": 3512,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -11757,9 +11827,11 @@
             "itemid": 172,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -12014,7 +12086,7 @@
                 false,
                 ""
             ],
-            "bbox": 17370,
+            "bbox": 3542,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -12088,9 +12160,11 @@
             "itemid": 64,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -12345,7 +12419,7 @@
                 false,
                 ""
             ],
-            "bbox": 17398,
+            "bbox": 3570,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -12419,9 +12493,11 @@
             "itemid": 45,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -12676,7 +12752,7 @@
                 false,
                 ""
             ],
-            "bbox": 17428,
+            "bbox": 3600,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -12750,9 +12826,11 @@
             "itemid": 60,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -13007,7 +13085,7 @@
                 false,
                 ""
             ],
-            "bbox": 17481,
+            "bbox": 3653,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -13081,9 +13159,11 @@
             "itemid": 29,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -13338,7 +13418,7 @@
                 false,
                 ""
             ],
-            "bbox": 17489,
+            "bbox": 3661,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -13412,9 +13492,11 @@
             "itemid": 81,
             "itemsubtype": 2,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -13669,7 +13751,7 @@
                 false,
                 ""
             ],
-            "bbox": 17541,
+            "bbox": 3713,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -13743,9 +13825,11 @@
             "itemid": 57,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -14000,7 +14084,7 @@
                 false,
                 ""
             ],
-            "bbox": 17572,
+            "bbox": 3744,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -14074,9 +14158,11 @@
             "itemid": 140,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -14331,7 +14417,7 @@
                 false,
                 ""
             ],
-            "bbox": 17600,
+            "bbox": 3772,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -14405,9 +14491,11 @@
             "itemid": 100,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -14662,7 +14750,7 @@
                 false,
                 ""
             ],
-            "bbox": 17657,
+            "bbox": 3829,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -14736,9 +14824,11 @@
             "itemid": 102,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -14981,7 +15071,7 @@
         },
         "3a54447c-36e0-430b-8887-9af2ffb251b9": {
             "background": "",
-            "bbox": 17660,
+            "bbox": 3832,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -15012,7 +15102,7 @@
                 false,
                 ""
             ],
-            "bbox": 17689,
+            "bbox": 3861,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -15086,9 +15176,11 @@
             "itemid": 143,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -15343,7 +15435,7 @@
                 false,
                 ""
             ],
-            "bbox": 17741,
+            "bbox": 3913,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -15417,9 +15509,11 @@
             "itemid": 157,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -15667,7 +15761,7 @@
                 0,
                 0
             ],
-            "bbox": 17749,
+            "bbox": 3921,
             "colour": "Black",
             "endx": 875.0,
             "endy": 75.0,
@@ -15694,7 +15788,7 @@
                 false,
                 ""
             ],
-            "bbox": 17798,
+            "bbox": 3970,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -15768,9 +15862,11 @@
             "itemid": 48,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -16025,7 +16121,7 @@
                 false,
                 ""
             ],
-            "bbox": 17848,
+            "bbox": 4020,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -16099,9 +16195,11 @@
             "itemid": 149,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -16356,7 +16454,7 @@
                 false,
                 ""
             ],
-            "bbox": 17899,
+            "bbox": 4071,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -16430,9 +16528,11 @@
             "itemid": 32,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -16687,7 +16787,7 @@
                 false,
                 ""
             ],
-            "bbox": 17956,
+            "bbox": 4128,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -16761,9 +16861,11 @@
             "itemid": 125,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -17018,7 +17120,7 @@
                 false,
                 ""
             ],
-            "bbox": 17985,
+            "bbox": 4157,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -17092,9 +17194,11 @@
             "itemid": 53,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -17342,7 +17446,7 @@
                 0,
                 0
             ],
-            "bbox": 17993,
+            "bbox": 4165,
             "colour": "Black",
             "endx": 850.0,
             "endy": 275.0,
@@ -17369,7 +17473,7 @@
                 false,
                 ""
             ],
-            "bbox": 18024,
+            "bbox": 4196,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -17443,9 +17547,11 @@
             "itemid": 171,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -17700,7 +17806,7 @@
                 false,
                 ""
             ],
-            "bbox": 18051,
+            "bbox": 4223,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -17774,9 +17880,11 @@
             "itemid": 132,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -18031,7 +18139,7 @@
                 false,
                 ""
             ],
-            "bbox": 18085,
+            "bbox": 4257,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -18105,9 +18213,11 @@
             "itemid": 104,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -18362,7 +18472,7 @@
                 false,
                 ""
             ],
-            "bbox": 18114,
+            "bbox": 4286,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -18436,9 +18546,11 @@
             "itemid": 142,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -18686,7 +18798,7 @@
                 0,
                 0
             ],
-            "bbox": 18122,
+            "bbox": 4294,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 875.0,
@@ -18713,7 +18825,7 @@
                 false,
                 ""
             ],
-            "bbox": 18153,
+            "bbox": 4325,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -18787,9 +18899,11 @@
             "itemid": 87,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -19044,7 +19158,7 @@
                 false,
                 ""
             ],
-            "bbox": 18184,
+            "bbox": 4356,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -19118,9 +19232,11 @@
             "itemid": 177,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -19375,7 +19491,7 @@
                 false,
                 ""
             ],
-            "bbox": 18212,
+            "bbox": 4384,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -19449,9 +19565,11 @@
             "itemid": 38,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -19706,7 +19824,7 @@
                 false,
                 ""
             ],
-            "bbox": 18247,
+            "bbox": 4419,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -19780,9 +19898,11 @@
             "itemid": 120,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -20037,7 +20157,7 @@
                 false,
                 ""
             ],
-            "bbox": 18276,
+            "bbox": 4448,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -20111,9 +20231,11 @@
             "itemid": 91,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -20368,7 +20490,7 @@
                 false,
                 ""
             ],
-            "bbox": 18305,
+            "bbox": 4477,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -20442,9 +20564,11 @@
             "itemid": 50,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -20699,7 +20823,7 @@
                 false,
                 ""
             ],
-            "bbox": 18335,
+            "bbox": 4507,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -20773,9 +20897,11 @@
             "itemid": 75,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -21030,7 +21156,7 @@
                 false,
                 ""
             ],
-            "bbox": 18363,
+            "bbox": 4535,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -21104,9 +21230,11 @@
             "itemid": 70,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -21361,7 +21489,7 @@
                 false,
                 ""
             ],
-            "bbox": 18392,
+            "bbox": 4564,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -21435,9 +21563,11 @@
             "itemid": 169,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -21692,7 +21822,7 @@
                 false,
                 ""
             ],
-            "bbox": 18420,
+            "bbox": 4592,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -21766,9 +21896,11 @@
             "itemid": 107,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -22023,7 +22155,7 @@
                 false,
                 ""
             ],
-            "bbox": 18428,
+            "bbox": 4600,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -22097,9 +22229,11 @@
             "itemid": 165,
             "itemsubtype": 1,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -22354,7 +22488,7 @@
                 false,
                 ""
             ],
-            "bbox": 18484,
+            "bbox": 4656,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -22428,9 +22562,11 @@
             "itemid": 122,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -22685,7 +22821,7 @@
                 false,
                 ""
             ],
-            "bbox": 18537,
+            "bbox": 4709,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -22759,9 +22895,11 @@
             "itemid": 26,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -23016,7 +23154,7 @@
                 false,
                 ""
             ],
-            "bbox": 18585,
+            "bbox": 4757,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -23090,9 +23228,11 @@
             "itemid": 153,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -23347,7 +23487,7 @@
                 false,
                 ""
             ],
-            "bbox": 18612,
+            "bbox": 4784,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -23421,9 +23561,11 @@
             "itemid": 42,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -23678,7 +23820,7 @@
                 false,
                 ""
             ],
-            "bbox": 18647,
+            "bbox": 4819,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -23752,9 +23894,11 @@
             "itemid": 94,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -24009,7 +24153,7 @@
                 false,
                 ""
             ],
-            "bbox": 18697,
+            "bbox": 4869,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -24083,9 +24227,11 @@
             "itemid": 161,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -24340,7 +24486,7 @@
                 false,
                 ""
             ],
-            "bbox": 18732,
+            "bbox": 4904,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -24414,9 +24560,11 @@
             "itemid": 173,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -24671,7 +24819,7 @@
                 false,
                 ""
             ],
-            "bbox": 18760,
+            "bbox": 4932,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -24745,9 +24893,11 @@
             "itemid": 52,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -25002,7 +25152,7 @@
                 false,
                 ""
             ],
-            "bbox": 18791,
+            "bbox": 4963,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -25076,9 +25226,11 @@
             "itemid": 86,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -25333,7 +25485,7 @@
                 false,
                 ""
             ],
-            "bbox": 18821,
+            "bbox": 4993,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -25407,9 +25559,11 @@
             "itemid": 95,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -25664,7 +25818,7 @@
                 false,
                 ""
             ],
-            "bbox": 18871,
+            "bbox": 5043,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -25738,9 +25892,11 @@
             "itemid": 82,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -25995,7 +26151,7 @@
                 false,
                 ""
             ],
-            "bbox": 18921,
+            "bbox": 5093,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -26069,9 +26225,11 @@
             "itemid": 154,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -26326,7 +26484,7 @@
                 false,
                 ""
             ],
-            "bbox": 18952,
+            "bbox": 5124,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -26400,9 +26558,11 @@
             "itemid": 133,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -26657,7 +26817,7 @@
                 false,
                 ""
             ],
-            "bbox": 18982,
+            "bbox": 5154,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -26731,9 +26891,11 @@
             "itemid": 110,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -26988,7 +27150,7 @@
                 false,
                 ""
             ],
-            "bbox": 19011,
+            "bbox": 5183,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -27062,9 +27224,11 @@
             "itemid": 89,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -27319,7 +27483,7 @@
                 false,
                 ""
             ],
-            "bbox": 19038,
+            "bbox": 5210,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -27393,9 +27557,11 @@
             "itemid": 144,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -27650,7 +27816,7 @@
                 false,
                 ""
             ],
-            "bbox": 19095,
+            "bbox": 5267,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -27724,9 +27890,11 @@
             "itemid": 124,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -27981,7 +28149,7 @@
                 false,
                 ""
             ],
-            "bbox": 19144,
+            "bbox": 5316,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -28055,9 +28223,11 @@
             "itemid": 34,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -28312,7 +28482,7 @@
                 false,
                 ""
             ],
-            "bbox": 19200,
+            "bbox": 5372,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -28386,9 +28556,11 @@
             "itemid": 63,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -28643,7 +28815,7 @@
                 false,
                 ""
             ],
-            "bbox": 19227,
+            "bbox": 5399,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -28717,9 +28889,11 @@
             "itemid": 138,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -28967,7 +29141,7 @@
                 0,
                 0
             ],
-            "bbox": 19235,
+            "bbox": 5407,
             "colour": "Black",
             "endx": 850.0,
             "endy": 475.0,
@@ -28994,7 +29168,7 @@
                 false,
                 ""
             ],
-            "bbox": 19266,
+            "bbox": 5438,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -29068,9 +29242,11 @@
             "itemid": 135,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -29318,7 +29494,7 @@
                 0,
                 0
             ],
-            "bbox": 19274,
+            "bbox": 5446,
             "colour": "Black",
             "endx": 850.0,
             "endy": 775.0,
@@ -29345,7 +29521,7 @@
                 false,
                 ""
             ],
-            "bbox": 19304,
+            "bbox": 5476,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -29419,9 +29595,11 @@
             "itemid": 69,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -29676,7 +29854,7 @@
                 false,
                 ""
             ],
-            "bbox": 19334,
+            "bbox": 5506,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -29750,9 +29928,11 @@
             "itemid": 101,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -30007,7 +30187,7 @@
                 false,
                 ""
             ],
-            "bbox": 19360,
+            "bbox": 5532,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -30081,9 +30261,11 @@
             "itemid": 106,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -30338,7 +30520,7 @@
                 false,
                 ""
             ],
-            "bbox": 19386,
+            "bbox": 5558,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -30412,9 +30594,11 @@
             "itemid": 28,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -30669,7 +30853,7 @@
                 false,
                 ""
             ],
-            "bbox": 19416,
+            "bbox": 5588,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -30743,9 +30927,11 @@
             "itemid": 98,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -31000,7 +31186,7 @@
                 false,
                 ""
             ],
-            "bbox": 19443,
+            "bbox": 5615,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -31074,9 +31260,11 @@
             "itemid": 12,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -31331,7 +31519,7 @@
                 false,
                 ""
             ],
-            "bbox": 19471,
+            "bbox": 5643,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -31405,9 +31593,11 @@
             "itemid": 9,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -31662,7 +31852,7 @@
                 false,
                 ""
             ],
-            "bbox": 19498,
+            "bbox": 5670,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -31736,9 +31926,11 @@
             "itemid": 37,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -31986,7 +32178,7 @@
                 0,
                 0
             ],
-            "bbox": 19506,
+            "bbox": 5678,
             "colour": "Black",
             "endx": 1500.0,
             "endy": 400.0,
@@ -32013,7 +32205,7 @@
                 false,
                 ""
             ],
-            "bbox": 19540,
+            "bbox": 5712,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -32087,9 +32279,11 @@
             "itemid": 66,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -32344,7 +32538,7 @@
                 false,
                 ""
             ],
-            "bbox": 19588,
+            "bbox": 5760,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -32418,9 +32612,11 @@
             "itemid": 147,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -32668,7 +32864,7 @@
                 0,
                 0
             ],
-            "bbox": 19596,
+            "bbox": 5768,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 100.0,
@@ -32695,7 +32891,7 @@
                 false,
                 ""
             ],
-            "bbox": 19631,
+            "bbox": 5803,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -32769,9 +32965,11 @@
             "itemid": 126,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -33026,7 +33224,7 @@
                 false,
                 ""
             ],
-            "bbox": 19659,
+            "bbox": 5831,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -33100,9 +33298,11 @@
             "itemid": 5,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -33357,7 +33557,7 @@
                 false,
                 ""
             ],
-            "bbox": 19687,
+            "bbox": 5859,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -33431,9 +33631,11 @@
             "itemid": 47,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -33688,7 +33890,7 @@
                 false,
                 ""
             ],
-            "bbox": 19737,
+            "bbox": 5909,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -33762,9 +33964,11 @@
             "itemid": 46,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -34019,7 +34223,7 @@
                 false,
                 ""
             ],
-            "bbox": 19766,
+            "bbox": 5938,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -34093,9 +34297,11 @@
             "itemid": 131,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -34350,7 +34556,7 @@
                 false,
                 ""
             ],
-            "bbox": 19797,
+            "bbox": 5969,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -34424,9 +34630,11 @@
             "itemid": 168,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -34681,7 +34889,7 @@
                 false,
                 ""
             ],
-            "bbox": 19831,
+            "bbox": 6003,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -34755,9 +34963,11 @@
             "itemid": 127,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -35005,7 +35215,7 @@
                 0,
                 0
             ],
-            "bbox": 19839,
+            "bbox": 6011,
             "colour": "Black",
             "endx": 1500.0,
             "endy": 475.0,
@@ -35032,7 +35242,7 @@
                 false,
                 ""
             ],
-            "bbox": 19895,
+            "bbox": 6067,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -35106,9 +35316,11 @@
             "itemid": 3,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -35363,7 +35575,7 @@
                 false,
                 ""
             ],
-            "bbox": 19923,
+            "bbox": 6095,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -35437,9 +35649,11 @@
             "itemid": 19,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -35694,7 +35908,7 @@
                 false,
                 ""
             ],
-            "bbox": 19972,
+            "bbox": 6144,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -35768,9 +35982,11 @@
             "itemid": 25,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -36025,7 +36241,7 @@
                 false,
                 ""
             ],
-            "bbox": 20021,
+            "bbox": 6193,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -36099,9 +36315,11 @@
             "itemid": 43,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -36356,7 +36574,7 @@
                 false,
                 ""
             ],
-            "bbox": 20049,
+            "bbox": 6221,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -36430,9 +36648,11 @@
             "itemid": 99,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -36687,7 +36907,7 @@
                 false,
                 ""
             ],
-            "bbox": 20102,
+            "bbox": 6274,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -36761,9 +36981,11 @@
             "itemid": 15,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -37018,7 +37240,7 @@
                 false,
                 ""
             ],
-            "bbox": 20132,
+            "bbox": 6304,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -37092,9 +37314,11 @@
             "itemid": 16,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -37349,7 +37573,7 @@
                 false,
                 ""
             ],
-            "bbox": 20163,
+            "bbox": 6335,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -37423,9 +37647,11 @@
             "itemid": 134,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -37680,7 +37906,7 @@
                 false,
                 ""
             ],
-            "bbox": 20191,
+            "bbox": 6363,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -37754,9 +37980,11 @@
             "itemid": 71,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -38011,7 +38239,7 @@
                 false,
                 ""
             ],
-            "bbox": 20226,
+            "bbox": 6398,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -38085,9 +38313,11 @@
             "itemid": 27,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -38342,7 +38572,7 @@
                 false,
                 ""
             ],
-            "bbox": 20260,
+            "bbox": 6432,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -38416,9 +38646,11 @@
             "itemid": 121,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -38673,7 +38905,7 @@
                 false,
                 ""
             ],
-            "bbox": 20291,
+            "bbox": 6463,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -38747,9 +38979,11 @@
             "itemid": 176,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -39004,7 +39238,7 @@
                 false,
                 ""
             ],
-            "bbox": 20343,
+            "bbox": 6515,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -39078,9 +39312,11 @@
             "itemid": 151,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -39335,7 +39571,7 @@
                 false,
                 ""
             ],
-            "bbox": 20371,
+            "bbox": 6543,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -39409,9 +39645,11 @@
             "itemid": 78,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -39666,7 +39904,7 @@
                 false,
                 ""
             ],
-            "bbox": 20397,
+            "bbox": 6569,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -39740,9 +39978,11 @@
             "itemid": 118,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -39997,7 +40237,7 @@
                 false,
                 ""
             ],
-            "bbox": 20450,
+            "bbox": 6622,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -40071,9 +40311,11 @@
             "itemid": 23,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -40328,7 +40570,7 @@
                 false,
                 ""
             ],
-            "bbox": 20502,
+            "bbox": 6674,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -40402,9 +40644,11 @@
             "itemid": 62,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -40659,7 +40903,7 @@
                 false,
                 ""
             ],
-            "bbox": 20530,
+            "bbox": 6702,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -40733,9 +40977,11 @@
             "itemid": 115,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -40990,7 +41236,7 @@
                 false,
                 ""
             ],
-            "bbox": 20538,
+            "bbox": 6710,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -41064,9 +41310,11 @@
             "itemid": 40,
             "itemsubtype": 1,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -41314,7 +41562,7 @@
                 0,
                 0
             ],
-            "bbox": 20546,
+            "bbox": 6718,
             "colour": "Black",
             "endx": 850.0,
             "endy": 175.0,
@@ -41341,7 +41589,7 @@
                 false,
                 ""
             ],
-            "bbox": 20576,
+            "bbox": 6748,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -41415,9 +41663,11 @@
             "itemid": 8,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -41672,7 +41922,7 @@
                 false,
                 ""
             ],
-            "bbox": 20607,
+            "bbox": 6779,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -41746,9 +41996,11 @@
             "itemid": 167,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -42003,7 +42255,7 @@
                 false,
                 ""
             ],
-            "bbox": 20636,
+            "bbox": 6808,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -42077,9 +42329,11 @@
             "itemid": 137,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -42334,7 +42588,7 @@
                 false,
                 ""
             ],
-            "bbox": 20693,
+            "bbox": 6865,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -42408,9 +42662,11 @@
             "itemid": 49,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -42665,7 +42921,7 @@
                 false,
                 ""
             ],
-            "bbox": 20701,
+            "bbox": 6873,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -42739,9 +42995,11 @@
             "itemid": 79,
             "itemsubtype": 1,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -42996,7 +43254,7 @@
                 false,
                 ""
             ],
-            "bbox": 20753,
+            "bbox": 6925,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -43070,9 +43328,11 @@
             "itemid": 164,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -43327,7 +43587,7 @@
                 false,
                 ""
             ],
-            "bbox": 20783,
+            "bbox": 6955,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -43401,9 +43661,11 @@
             "itemid": 105,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -43658,7 +43920,7 @@
                 false,
                 ""
             ],
-            "bbox": 20835,
+            "bbox": 7007,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -43732,9 +43994,11 @@
             "itemid": 152,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -43989,7 +44253,7 @@
                 false,
                 ""
             ],
-            "bbox": 20866,
+            "bbox": 7038,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -44063,9 +44327,11 @@
             "itemid": 85,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -44320,7 +44586,7 @@
                 false,
                 ""
             ],
-            "bbox": 20897,
+            "bbox": 7069,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -44394,9 +44660,11 @@
             "itemid": 129,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -44651,7 +44919,7 @@
                 false,
                 ""
             ],
-            "bbox": 20928,
+            "bbox": 7100,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -44725,9 +44993,11 @@
             "itemid": 51,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -44982,7 +45252,7 @@
                 false,
                 ""
             ],
-            "bbox": 20963,
+            "bbox": 7135,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -45056,9 +45326,11 @@
             "itemid": 175,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -45313,7 +45585,7 @@
                 false,
                 ""
             ],
-            "bbox": 21012,
+            "bbox": 7184,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -45387,9 +45659,11 @@
             "itemid": 80,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -45637,7 +45911,7 @@
                 0,
                 0
             ],
-            "bbox": 21020,
+            "bbox": 7192,
             "colour": "Black",
             "endx": 850.0,
             "endy": 575.0,
@@ -45664,7 +45938,7 @@
                 false,
                 ""
             ],
-            "bbox": 21072,
+            "bbox": 7244,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -45738,9 +46012,11 @@
             "itemid": 158,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -45995,7 +46271,7 @@
                 false,
                 ""
             ],
-            "bbox": 21103,
+            "bbox": 7275,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -46069,9 +46345,11 @@
             "itemid": 170,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -46326,7 +46604,7 @@
                 false,
                 ""
             ],
-            "bbox": 21134,
+            "bbox": 7306,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -46400,9 +46678,11 @@
             "itemid": 54,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -46657,7 +46937,7 @@
                 false,
                 ""
             ],
-            "bbox": 21186,
+            "bbox": 7358,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -46731,9 +47011,11 @@
             "itemid": 61,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -46988,7 +47270,7 @@
                 false,
                 ""
             ],
-            "bbox": 21217,
+            "bbox": 7389,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -47062,9 +47344,11 @@
             "itemid": 141,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -47319,7 +47603,7 @@
                 false,
                 ""
             ],
-            "bbox": 21247,
+            "bbox": 7419,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -47393,9 +47677,11 @@
             "itemid": 109,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -47650,7 +47936,7 @@
                 false,
                 ""
             ],
-            "bbox": 21277,
+            "bbox": 7449,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -47724,9 +48010,11 @@
             "itemid": 116,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -47981,7 +48269,7 @@
                 false,
                 ""
             ],
-            "bbox": 21285,
+            "bbox": 7457,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -48055,9 +48343,11 @@
             "itemid": 41,
             "itemsubtype": 2,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -48312,7 +48602,7 @@
                 false,
                 ""
             ],
-            "bbox": 21314,
+            "bbox": 7486,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -48386,9 +48676,11 @@
             "itemid": 88,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -48643,7 +48935,7 @@
                 false,
                 ""
             ],
-            "bbox": 21342,
+            "bbox": 7514,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -48717,9 +49009,11 @@
             "itemid": 112,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -48974,7 +49268,7 @@
                 false,
                 ""
             ],
-            "bbox": 21376,
+            "bbox": 7548,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -49048,9 +49342,11 @@
             "itemid": 123,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -49305,7 +49601,7 @@
                 false,
                 ""
             ],
-            "bbox": 21404,
+            "bbox": 7576,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -49379,9 +49675,11 @@
             "itemid": 68,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -49636,7 +49934,7 @@
                 false,
                 ""
             ],
-            "bbox": 21454,
+            "bbox": 7626,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -49710,9 +50008,11 @@
             "itemid": 160,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -49967,7 +50267,7 @@
                 false,
                 ""
             ],
-            "bbox": 21505,
+            "bbox": 7677,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -50041,9 +50341,11 @@
             "itemid": 31,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -50298,7 +50600,7 @@
                 false,
                 ""
             ],
-            "bbox": 21555,
+            "bbox": 7727,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -50372,9 +50674,11 @@
             "itemid": 155,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -50629,7 +50933,7 @@
                 false,
                 ""
             ],
-            "bbox": 21585,
+            "bbox": 7757,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -50703,9 +51007,11 @@
             "itemid": 4,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -50960,7 +51266,7 @@
                 false,
                 ""
             ],
-            "bbox": 21636,
+            "bbox": 7808,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -51034,9 +51340,11 @@
             "itemid": 14,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -51291,7 +51599,7 @@
                 false,
                 ""
             ],
-            "bbox": 21662,
+            "bbox": 7834,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -51365,9 +51673,11 @@
             "itemid": 96,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -51615,7 +51925,7 @@
                 0,
                 0
             ],
-            "bbox": 21670,
+            "bbox": 7842,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 775.0,
@@ -51635,7 +51945,7 @@
                 0,
                 0
             ],
-            "bbox": 21678,
+            "bbox": 7850,
             "colour": "Black",
             "endx": 950.0,
             "endy": 875.0,
@@ -51655,7 +51965,7 @@
                 0,
                 0
             ],
-            "bbox": 21686,
+            "bbox": 7858,
             "colour": "Black",
             "endx": 850.0,
             "endy": 375.0,
@@ -51682,7 +51992,7 @@
                 false,
                 ""
             ],
-            "bbox": 21717,
+            "bbox": 7889,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -51756,9 +52066,11 @@
             "itemid": 33,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -52013,7 +52325,7 @@
                 false,
                 ""
             ],
-            "bbox": 21747,
+            "bbox": 7919,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -52087,9 +52399,11 @@
             "itemid": 67,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -52344,7 +52658,7 @@
                 false,
                 ""
             ],
-            "bbox": 21776,
+            "bbox": 7948,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -52418,9 +52732,11 @@
             "itemid": 136,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -52675,7 +52991,7 @@
                 false,
                 ""
             ],
-            "bbox": 21804,
+            "bbox": 7976,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -52749,9 +53065,11 @@
             "itemid": 73,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -53006,7 +53324,7 @@
                 false,
                 ""
             ],
-            "bbox": 21830,
+            "bbox": 8002,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -53080,9 +53398,11 @@
             "itemid": 21,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -53337,7 +53657,7 @@
                 false,
                 ""
             ],
-            "bbox": 21860,
+            "bbox": 8032,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -53411,9 +53731,11 @@
             "itemid": 65,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -53668,7 +53990,7 @@
                 false,
                 ""
             ],
-            "bbox": 21890,
+            "bbox": 8062,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -53742,9 +54064,11 @@
             "itemid": 18,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -53999,7 +54323,7 @@
                 false,
                 ""
             ],
-            "bbox": 21898,
+            "bbox": 8070,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -54073,9 +54397,11 @@
             "itemid": 17,
             "itemsubtype": 1,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -54330,7 +54656,7 @@
                 false,
                 ""
             ],
-            "bbox": 21924,
+            "bbox": 8096,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -54404,9 +54730,11 @@
             "itemid": 114,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -54661,7 +54989,7 @@
                 false,
                 ""
             ],
-            "bbox": 21977,
+            "bbox": 8149,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -54735,9 +55063,11 @@
             "itemid": 20,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -54992,7 +55322,7 @@
                 false,
                 ""
             ],
-            "bbox": 22029,
+            "bbox": 8201,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -55066,9 +55396,11 @@
             "itemid": 162,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -55323,7 +55655,7 @@
                 false,
                 ""
             ],
-            "bbox": 22080,
+            "bbox": 8252,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -55397,9 +55729,11 @@
             "itemid": 30,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -55654,7 +55988,7 @@
                 false,
                 ""
             ],
-            "bbox": 22136,
+            "bbox": 8308,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -55728,9 +56062,11 @@
             "itemid": 128,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -55985,7 +56321,7 @@
                 false,
                 ""
             ],
-            "bbox": 22165,
+            "bbox": 8337,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -56059,9 +56395,11 @@
             "itemid": 180,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -56316,7 +56654,7 @@
                 false,
                 ""
             ],
-            "bbox": 22195,
+            "bbox": 8367,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -56390,9 +56728,11 @@
             "itemid": 74,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -56647,7 +56987,7 @@
                 false,
                 ""
             ],
-            "bbox": 22225,
+            "bbox": 8397,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -56721,9 +57061,11 @@
             "itemid": 24,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -56978,7 +57320,7 @@
                 false,
                 ""
             ],
-            "bbox": 22275,
+            "bbox": 8447,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -57052,9 +57394,11 @@
             "itemid": 2,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -57309,7 +57653,7 @@
                 false,
                 ""
             ],
-            "bbox": 22306,
+            "bbox": 8478,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -57383,9 +57727,11 @@
             "itemid": 145,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -57640,7 +57986,7 @@
                 false,
                 ""
             ],
-            "bbox": 22340,
+            "bbox": 8512,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -57714,9 +58060,11 @@
             "itemid": 119,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -57971,7 +58319,7 @@
                 false,
                 ""
             ],
-            "bbox": 22367,
+            "bbox": 8539,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -58045,9 +58393,11 @@
             "itemid": 1,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -58302,7 +58652,7 @@
                 false,
                 ""
             ],
-            "bbox": 22393,
+            "bbox": 8565,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -58376,9 +58726,11 @@
             "itemid": 35,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -58633,7 +58985,7 @@
                 false,
                 ""
             ],
-            "bbox": 22401,
+            "bbox": 8573,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -58707,9 +59059,11 @@
             "itemid": 166,
             "itemsubtype": 2,
             "itemtype": 4,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -58964,7 +59318,7 @@
                 false,
                 ""
             ],
-            "bbox": 22430,
+            "bbox": 8602,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -59038,9 +59392,11 @@
             "itemid": 130,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -59295,7 +59651,7 @@
                 false,
                 ""
             ],
-            "bbox": 22460,
+            "bbox": 8632,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -59369,9 +59725,11 @@
             "itemid": 111,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -59626,7 +59984,7 @@
                 false,
                 ""
             ],
-            "bbox": 22488,
+            "bbox": 8660,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -59700,9 +60058,11 @@
             "itemid": 6,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -59964,14 +60324,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": true,
-            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/semaphore_signals.sig",
+            "filename": "model_railway_signals/examples/semaphore_signals.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.0.0"
+            "version": "Version 6.1.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -60095,6 +60455,7 @@
     "signals": {
         "1": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60106,6 +60467,7 @@
         },
         "10": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60117,6 +60479,7 @@
         },
         "100": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60128,6 +60491,7 @@
         },
         "1002": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60139,6 +60503,7 @@
         },
         "1003": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60150,6 +60515,7 @@
         },
         "1007": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60161,6 +60527,7 @@
         },
         "101": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60172,6 +60539,7 @@
         },
         "1013": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60183,6 +60551,7 @@
         },
         "1014": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60194,6 +60563,7 @@
         },
         "1015": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60205,6 +60575,7 @@
         },
         "102": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60216,6 +60587,7 @@
         },
         "1020": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60227,6 +60599,7 @@
         },
         "1022": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60238,6 +60611,7 @@
         },
         "1023": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60249,6 +60623,7 @@
         },
         "1025": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60260,6 +60635,7 @@
         },
         "1026": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60271,6 +60647,7 @@
         },
         "1029": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60282,6 +60659,7 @@
         },
         "103": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60293,6 +60671,7 @@
         },
         "1030": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60304,6 +60683,7 @@
         },
         "1031": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60315,6 +60695,7 @@
         },
         "1032": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60326,6 +60707,7 @@
         },
         "1034": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60337,6 +60719,7 @@
         },
         "1039": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60348,6 +60731,7 @@
         },
         "104": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60359,6 +60743,7 @@
         },
         "1043": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60370,6 +60755,7 @@
         },
         "1046": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60381,6 +60767,7 @@
         },
         "1048": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60392,6 +60779,7 @@
         },
         "1049": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60403,6 +60791,7 @@
         },
         "105": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60414,6 +60803,7 @@
         },
         "1057": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60425,6 +60815,7 @@
         },
         "1058": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60436,6 +60827,7 @@
         },
         "1059": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60447,6 +60839,7 @@
         },
         "106": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60458,6 +60851,7 @@
         },
         "1061": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60469,6 +60863,7 @@
         },
         "1062": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60480,6 +60875,7 @@
         },
         "1063": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60491,6 +60887,7 @@
         },
         "107": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60502,6 +60899,7 @@
         },
         "108": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60513,6 +60911,7 @@
         },
         "1080": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60524,6 +60923,7 @@
         },
         "1082": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60535,6 +60935,7 @@
         },
         "109": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60546,6 +60947,7 @@
         },
         "11": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60557,6 +60959,7 @@
         },
         "110": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60568,6 +60971,7 @@
         },
         "1102": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60579,6 +60983,7 @@
         },
         "111": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60590,6 +60995,7 @@
         },
         "112": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60601,6 +61007,7 @@
         },
         "1122": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60612,6 +61019,7 @@
         },
         "1124": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60623,6 +61031,7 @@
         },
         "1125": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60634,6 +61043,7 @@
         },
         "1128": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60645,6 +61055,7 @@
         },
         "113": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60656,6 +61067,7 @@
         },
         "114": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60667,6 +61079,7 @@
         },
         "1147": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60678,6 +61091,7 @@
         },
         "1148": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60689,6 +61103,7 @@
         },
         "1149": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60700,6 +61115,7 @@
         },
         "115": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60711,6 +61127,7 @@
         },
         "1150": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60722,6 +61139,7 @@
         },
         "1151": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60733,6 +61151,7 @@
         },
         "1152": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60744,6 +61163,7 @@
         },
         "1153": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60755,6 +61175,7 @@
         },
         "1154": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60766,6 +61187,7 @@
         },
         "1155": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60777,6 +61199,7 @@
         },
         "1156": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60788,6 +61211,7 @@
         },
         "1157": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60799,6 +61223,7 @@
         },
         "1158": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60810,6 +61235,7 @@
         },
         "1159": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60821,6 +61247,7 @@
         },
         "116": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60832,6 +61259,7 @@
         },
         "1160": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60843,6 +61271,7 @@
         },
         "1161": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60854,6 +61283,7 @@
         },
         "1162": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60865,6 +61295,7 @@
         },
         "1163": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60876,6 +61307,7 @@
         },
         "1164": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60887,6 +61319,7 @@
         },
         "117": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60898,6 +61331,7 @@
         },
         "118": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60909,6 +61343,7 @@
         },
         "119": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60920,6 +61355,7 @@
         },
         "12": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60931,6 +61367,7 @@
         },
         "120": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60942,6 +61379,7 @@
         },
         "121": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60953,6 +61391,7 @@
         },
         "122": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60964,6 +61403,7 @@
         },
         "123": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60975,6 +61415,7 @@
         },
         "124": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60986,6 +61427,7 @@
         },
         "125": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -60997,6 +61439,7 @@
         },
         "126": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61008,6 +61451,7 @@
         },
         "127": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61019,6 +61463,7 @@
         },
         "128": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61030,6 +61475,7 @@
         },
         "129": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61041,6 +61487,7 @@
         },
         "13": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61052,6 +61499,7 @@
         },
         "130": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61063,6 +61511,7 @@
         },
         "131": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61074,6 +61523,7 @@
         },
         "132": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61085,6 +61535,7 @@
         },
         "133": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61096,6 +61547,7 @@
         },
         "134": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61107,6 +61559,7 @@
         },
         "135": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61118,6 +61571,7 @@
         },
         "136": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61129,6 +61583,7 @@
         },
         "137": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61140,6 +61595,7 @@
         },
         "138": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61151,6 +61607,7 @@
         },
         "139": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61162,6 +61619,7 @@
         },
         "14": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61173,6 +61631,7 @@
         },
         "140": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61184,6 +61643,7 @@
         },
         "141": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61195,6 +61655,7 @@
         },
         "142": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61206,6 +61667,7 @@
         },
         "143": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61217,6 +61679,7 @@
         },
         "144": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61228,6 +61691,7 @@
         },
         "145": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61239,6 +61703,7 @@
         },
         "146": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61250,6 +61715,7 @@
         },
         "147": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61261,6 +61727,7 @@
         },
         "148": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61272,6 +61739,7 @@
         },
         "149": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61283,6 +61751,7 @@
         },
         "15": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61294,6 +61763,7 @@
         },
         "150": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61305,6 +61775,7 @@
         },
         "151": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61316,6 +61787,7 @@
         },
         "152": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61327,6 +61799,7 @@
         },
         "153": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61338,6 +61811,7 @@
         },
         "154": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61349,6 +61823,7 @@
         },
         "155": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61360,6 +61835,7 @@
         },
         "156": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61371,6 +61847,7 @@
         },
         "157": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61382,6 +61859,7 @@
         },
         "158": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61393,6 +61871,7 @@
         },
         "159": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61404,6 +61883,7 @@
         },
         "16": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61415,6 +61895,7 @@
         },
         "160": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61426,6 +61907,7 @@
         },
         "161": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61437,6 +61919,7 @@
         },
         "162": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61448,6 +61931,7 @@
         },
         "163": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61459,6 +61943,7 @@
         },
         "164": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61470,6 +61955,7 @@
         },
         "165": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -61481,6 +61967,7 @@
         },
         "166": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -61492,6 +61979,7 @@
         },
         "167": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61503,6 +61991,7 @@
         },
         "168": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61514,6 +62003,7 @@
         },
         "169": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61525,6 +62015,7 @@
         },
         "17": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -61536,6 +62027,7 @@
         },
         "170": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61547,6 +62039,7 @@
         },
         "171": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61558,6 +62051,7 @@
         },
         "172": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61569,6 +62063,7 @@
         },
         "173": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61580,6 +62075,7 @@
         },
         "174": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61591,6 +62087,7 @@
         },
         "175": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61602,6 +62099,7 @@
         },
         "176": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61613,6 +62111,7 @@
         },
         "177": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61624,6 +62123,7 @@
         },
         "178": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61635,6 +62135,7 @@
         },
         "179": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61646,6 +62147,7 @@
         },
         "18": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61657,6 +62159,7 @@
         },
         "180": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61668,6 +62171,7 @@
         },
         "19": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61679,6 +62183,7 @@
         },
         "2": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61690,6 +62195,7 @@
         },
         "20": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61701,6 +62207,7 @@
         },
         "21": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61712,6 +62219,7 @@
         },
         "22": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61723,6 +62231,7 @@
         },
         "23": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61734,6 +62243,7 @@
         },
         "24": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61745,6 +62255,7 @@
         },
         "25": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61756,6 +62267,7 @@
         },
         "26": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61767,6 +62279,7 @@
         },
         "27": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61778,6 +62291,7 @@
         },
         "28": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61789,6 +62303,7 @@
         },
         "29": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61800,6 +62315,7 @@
         },
         "3": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61811,6 +62327,7 @@
         },
         "30": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61822,6 +62339,7 @@
         },
         "31": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61833,6 +62351,7 @@
         },
         "32": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61844,6 +62363,7 @@
         },
         "33": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61855,6 +62375,7 @@
         },
         "34": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61866,6 +62387,7 @@
         },
         "35": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61877,6 +62399,7 @@
         },
         "36": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61888,6 +62411,7 @@
         },
         "37": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61899,6 +62423,7 @@
         },
         "38": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61910,6 +62435,7 @@
         },
         "39": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61921,6 +62447,7 @@
         },
         "4": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61932,6 +62459,7 @@
         },
         "40": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -61943,6 +62471,7 @@
         },
         "41": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -61954,6 +62483,7 @@
         },
         "42": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61965,6 +62495,7 @@
         },
         "43": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61976,6 +62507,7 @@
         },
         "44": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61987,6 +62519,7 @@
         },
         "45": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -61998,6 +62531,7 @@
         },
         "46": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62009,6 +62543,7 @@
         },
         "47": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62020,6 +62555,7 @@
         },
         "48": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62031,6 +62567,7 @@
         },
         "49": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62042,6 +62579,7 @@
         },
         "5": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62053,6 +62591,7 @@
         },
         "50": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62064,6 +62603,7 @@
         },
         "51": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62075,6 +62615,7 @@
         },
         "52": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62086,6 +62627,7 @@
         },
         "53": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62097,6 +62639,7 @@
         },
         "54": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62108,6 +62651,7 @@
         },
         "55": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62119,6 +62663,7 @@
         },
         "56": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62130,6 +62675,7 @@
         },
         "57": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62141,6 +62687,7 @@
         },
         "58": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62152,6 +62699,7 @@
         },
         "59": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62163,6 +62711,7 @@
         },
         "6": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62174,6 +62723,7 @@
         },
         "60": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62185,6 +62735,7 @@
         },
         "61": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62196,6 +62747,7 @@
         },
         "62": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62207,6 +62759,7 @@
         },
         "63": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62218,6 +62771,7 @@
         },
         "64": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62229,6 +62783,7 @@
         },
         "65": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62240,6 +62795,7 @@
         },
         "66": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62251,6 +62807,7 @@
         },
         "67": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62262,6 +62819,7 @@
         },
         "68": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62273,6 +62831,7 @@
         },
         "69": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62284,6 +62843,7 @@
         },
         "7": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62295,6 +62855,7 @@
         },
         "70": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62306,6 +62867,7 @@
         },
         "71": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62317,6 +62879,7 @@
         },
         "72": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62328,6 +62891,7 @@
         },
         "73": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62339,6 +62903,7 @@
         },
         "74": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62350,6 +62915,7 @@
         },
         "75": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62361,6 +62927,7 @@
         },
         "76": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62372,6 +62939,7 @@
         },
         "77": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -62383,6 +62951,7 @@
         },
         "78": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62394,6 +62963,7 @@
         },
         "79": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -62405,6 +62975,7 @@
         },
         "8": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62416,6 +62987,7 @@
         },
         "80": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62427,6 +62999,7 @@
         },
         "81": {
             "override": false,
+            "overridesub": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -62438,6 +63011,7 @@
         },
         "82": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62449,6 +63023,7 @@
         },
         "83": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62460,6 +63035,7 @@
         },
         "84": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62471,6 +63047,7 @@
         },
         "85": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62482,6 +63059,7 @@
         },
         "86": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62493,6 +63071,7 @@
         },
         "87": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62504,6 +63083,7 @@
         },
         "88": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62515,6 +63095,7 @@
         },
         "89": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62526,6 +63107,7 @@
         },
         "9": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62537,6 +63119,7 @@
         },
         "90": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62548,6 +63131,7 @@
         },
         "91": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62559,6 +63143,7 @@
         },
         "92": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62570,6 +63155,7 @@
         },
         "93": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62581,6 +63167,7 @@
         },
         "94": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62592,6 +63179,7 @@
         },
         "95": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62603,6 +63191,7 @@
         },
         "96": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62614,6 +63203,7 @@
         },
         "97": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62625,6 +63215,7 @@
         },
         "98": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -62636,6 +63227,7 @@
         },
         "99": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,

@@ -47,6 +47,9 @@
 #          returns True - if we have  acknowledgement that Track Power has been turned off
 #          returns False - if the request times out
 #
+#   enable_status_reporting(callback) - Enable reporting
+#   disable_status_reporting() - Disable Reporting
+#
 # API functions used associated with DCC-command-triggered sounds:
 #   add_dcc_sound_mapping(address:int, state:bool, fully_qualified_sound_filename:str):
 #   reset_dcc_sound_mappings() - Delete all current mappings
@@ -92,7 +95,7 @@ serial_port = serial.Serial()
 
 # Global constants used when transmitting CBUS messages
 can_bus_id = 1                       # The arbitary CANBUS ID we will use for the Pi
-pi_cbus_node = 1                     # The arbitary CBUS Node ID we will use for the Pi
+pi_cbus_node = 258                   # The CBUS Node ID Of the Pi-Sprog (This is updated with that reported in the STAT)
 transmit_delay = 0.02                # The delay between sending CBUS Messages (in seconds)
 
 # Global Flag to enable enhanced debug logging for the Pi-SPROG interface
@@ -124,6 +127,9 @@ output_buffer = queue.Queue()
 # short accessory commands (1 = No Offset, 2 = Plus 4 Offset, 3 = minus 4 Offset)
 address_mode = 1
 
+# Global variable to hold the SPROG status callback reference
+status_callback = None
+
 #------------------------------------------------------------------------------
 # Common function used by the main thread to wait for responses in other threads.
 # When the specified function returns True, the function exits and returns True.
@@ -131,11 +137,11 @@ address_mode = 1
 
 def wait_for_response(timeout:float,test_for_response_function):
     response_received = False
-    timeout_start = time.time()
-    while time.time() < timeout_start + timeout:
+    timeout_end = time.time() + timeout  # Calculate the end time once
+    while time.time() < timeout_end:
         response_received = test_for_response_function()
         if response_received: break
-        time.sleep(0.001)
+        time.sleep(0.002)
     return(response_received)
 
 #------------------------------------------------------------------------------
@@ -215,24 +221,94 @@ def thread_to_read_received_data ():
                 # Note that there is exception handling around the decoding of the message to
                 # deal with any "edge-case" exceptions we might get with corrupted messages
                 try:
-                    # Extract the OpCode and Process the message (only a subset of messages is supported)
-                    op_code = int((chr(byte_string[7]) + chr(byte_string[8])),16)
-                    # Command Station Status Report (0xE3 = 227 decimal)
-                    if op_code == 227: process_stat_message(byte_string)
-                    # Response to confirm Track Power is OFF (0x04 = 4 decimal)
-                    elif op_code == 4: process_tof_message(byte_string)
-                    # Response to confirm Track Power is ON (0x05 = 5 decimal)
-                    elif op_code == 5: process_ton_message(byte_string)
-                    # Report CV value in service programming mode (0x85 = 133 decimal)
-                    elif op_code == 133: process_pcvs_message(byte_string)
-                    # Report Service Mode Status response (0x4C = 76 decimal) 
-                    elif op_code == 76: process_sstat_message(byte_string)
+                    # Convert to String and remove the start/end markers
+                    msg_str = byte_string.decode('Ascii').strip(':;')
+                    # Find where the OpCode is in the message (depending on the message type)
+                    # Normal(N): N [Data...] - Opcode position is variable - Position of 'N' + 1
+                    # Standard (S): S hhhh [OpCode] ...5 (S + 4 hex digits for 11-bit ID)
+                    # Extended (X): X hhhhhhhh [OpCode] ...9 (X + 8 hex digits for 29-bit ID)
+                    if 'N' in msg_str:
+                        start_pos = msg_str.find('N') + 1
+                    elif msg_str.startswith('S'):
+                        start_pos = 5
+                    elif msg_str.startswith('X'):
+                        start_pos = 9
+                    else:
+                        start_pos = 0
+                        logging.warning("Pi-SPROG: Rx thread - Unhandled Message Type: "+byte_string.decode('Ascii')+"\r")
+                    if start_pos > 0:
+                        # Extract exactly 2 characters for the OpCode
+                        op_hex = msg_str[start_pos : start_pos + 2]
+                        op_code = int(op_hex, 16)
+                        # Command Station Status Report (0xE3 = 227 decimal)
+                        if op_code == 0xE3: process_stat_message(byte_string)
+                        # Response to confirm Track Power is OFF (0x04 = 4 decimal)
+                        elif op_code == 0x04: process_tof_message(byte_string)
+                        # Response to confirm Track Power is ON (0x05 = 5 decimal)
+                        elif op_code == 0x05: process_ton_message(byte_string)
+                        # Report CV value in service programming mode (0x85 = 133 decimal)
+                        elif op_code == 0x85: process_pcvs_message(byte_string)
+                        # Report Service Mode Status response (0x4C = 76 decimal)
+                        elif op_code == 0x4C: process_sstat_message(byte_string)
+                        # Accessory Data Command for multimeter mode (0xD0 = 208 decimal) 
+                        elif op_code == 0xD0: process_accessory_data(byte_string)
                 except:
-                    logging.warning("Pi-SPROG: Rx thread - Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
+                    # Ignore any heartbeat or Bus Sync Messages
+                    if msg_str not in ("S4"):
+                        logging.warning("Pi-SPROG: Rx thread - Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
         # Ensure the thread doesn't hog all the CPU time
         time.sleep(0.001)
     if debug: logging.debug("Pi-SPROG: Rx Thread - exiting")
     rx_thread_terminated = True
+    return()
+
+#------------------------------------------------------------------------------
+# Internal function running in the main Tkinter Thread to handle status
+# and current telemetry updates from the SPROG. Returned data comprises a
+# dictionary of Values that have been updated
+#------------------------------------------------------------------------------
+
+def report_status(status:dict):
+    if status_callback is not None: status_callback(status)
+
+#------------------------------------------------------------------------------
+# Internal function to process Accessory Data Commands (Voltage / Current reporting)
+#------------------------------------------------------------------------------
+
+def process_accessory_data(byte_string):
+    logging.debug ("Pi-SPROG: Rx thread - Received ADC (Accessory Data Command) message")
+    # Process the message (with exception handling just in case)
+    try:
+        # Convert to String and remove the start/end markers
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # The following code uses Indices based on the stripped GridConnect string:
+        # Index:    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7
+        # String:   S B 0 0 0 N D 0 0 1 0 0 0 1 0 0 7 4
+        # N is at index 5. Opcode D0 is at 6,7. Node ID 0102 is at 8,9,10,11.
+        n_index = msg_str.find('N')
+        # The Telemetry Sub-code (01 or 02) starts 8 characters after 'N'
+        # (2 for OpCode, 4 for NodeID, 2 for padding/index)
+        type_start = n_index + 9
+        data_type_hex = msg_str[type_start : type_start + 2]
+        # The Value (4 hex chars) follows immediately
+        value_hex = msg_str[type_start + 2 : type_start + 6]
+        raw_value = int(value_hex, 16)
+        # Work out whether voltage or current is being reported
+        if data_type_hex == "01":
+            # Current Reporting is in mA so we convert to Amps (e.g., 1200mA -> 1.2A)
+            current_amps = float(raw_value / 1000.0)
+            if debug: logging.debug(f"Pi-SPROG: Rx thread - Telemetry - DCC Bus Current: {current_amps:.3f} A")
+            # Pass the values back into the main Tkinter thread
+            common.execute_function_in_tkinter_thread(lambda: report_status({"current": current_amps}))
+        elif data_type_hex == "02":
+            # Voltage reporting is in decivolts (1/10th Volt) so we convert to Volts (e.g., 145 -> 14.5V)
+            voltage_volts = float(raw_value / 10.0)
+            if debug: logging.debug(f"Pi-SPROG: Rx thread - Telemetry - DCC Bus Voltage: {voltage_volts:.1f} V")
+            # Pass the values back into the main Tkinter thread
+            common.execute_function_in_tkinter_thread(lambda: report_status({"voltage": voltage_volts}))
+    except Exception as exception:
+        logging.error("Pi-SPROG: Error parsing Accessory Data Command (ADC/D0) Message")
+        logging.error(exception)
     return()
 
 #------------------------------------------------------------------------------
@@ -241,28 +317,69 @@ def thread_to_read_received_data ():
 #------------------------------------------------------------------------------
 
 def process_stat_message(byte_string):
-    global rstat_response
-    # Print out the status report (if the appropriate debug level is set)
-    if debug:
-        logging.debug ("Pi-SPROG: Rx thread - Received STAT (Command Station Status Report):")
-        logging.debug ("    Node Id       :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
-                                                  + chr(byte_string[11]) + chr(byte_string[12]),16)))
-        logging.debug ("    CS Number     :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
-        logging.debug ("    Version       :"+str(int(chr(byte_string[17]) + chr(byte_string[18]),16))+"."
-                                           +str(int(chr(byte_string[19]) + chr(byte_string[20]),16))+"."
-                                           +str(int(chr(byte_string[21]) + chr(byte_string[22]),16)))
-        # Get the Flags - we only need the last hex character (to get the 4 bits)
-        flags = int(chr(byte_string[16]),16)
-        logging.debug ("    Reserved      :"+str((flags & 0x080)==0x80))
-        logging.debug ("    Service Mode  :"+str((flags & 0x040)==0x40))
-        logging.debug ("    Reset Done    :"+str((flags & 0x02)==0x20))
-        logging.debug ("    Emg Stop Perf :"+str((flags & 0x10)==0x10))
-        logging.debug ("    Bus On        :"+str((flags & 0x08)==0x08))
-        logging.debug ("    Track On      :"+str((flags & 0x04)==0x04))
-        logging.debug ("    Track Error   :"+str((flags & 0x02)==0x02))
-        logging.debug ("    H/W Error     :"+str((flags & 0x01)==0x01)+"\r")
+    global rstat_response, pi_cbus_node
     # Respond to the trigger function (waiting in the main thread for a response)
     rstat_response = True
+    logging.debug ("Pi-SPROG: Rx thread - Received STAT (Command Station Status) message")
+    # Process the message (with exception handling just in case)
+    try:
+        # Convert to String and remove the start/end markers
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # Find where the OpCode is in the message (depending on the message type)
+        # Normal(N): N [Data...] - Opcode position is variable - Position of 'N' + 1
+        # The following code uses Indices based on the stripped GridConnect string:
+        # Index:    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+        # String:   S B 0 0 0 N E 3 D 0 0 1 0 2 0 8 0 3 0 1 0 A 7 4
+        # Find 'N', then skip 'N' (1 char) and the OpCode 'E3' (2 chars) = +3
+        d_start = msg_str.find('N') + 3
+        # Extract values using dynamic offsets from d_start
+        # Node ID (2 bytes / 4 hex chars)
+        pi_cbus_node = int(msg_str[d_start : d_start+4], 16)
+        # Command Station ID (1 byte / 2 hex chars)
+        command_station_id = int(msg_str[d_start+4 : d_start+6], 16)
+        # Flags (1 byte / 2 hex chars)
+        flags = int(msg_str[d_start+6 : d_start+8], 16)
+        # Firmware Version (3 bytes / 6 hex chars)
+        v_maj = int(msg_str[d_start+8 : d_start+10], 16)
+        v_min = int(msg_str[d_start+10 : d_start+12], 16)
+        v_bld = int(msg_str[d_start+12 : d_start+14], 16)
+        firmware_version = f"{v_maj}.{v_min}.{v_bld}"
+        # Flag Mapping (Standard CBUS / SPROG)
+        sprog_error_flag     = bool(flags & 0x01)       # Bit 0
+        track_error_flag     = bool(flags & 0x02)       # Bit 1
+        track_power_on_flag  = bool(flags & 0x04)       # Bit 2
+        bus_active_flag      = bool(flags & 0x08)       # Bit 3
+        emergency_stop_flag  = bool(flags & 0x10)       # Bit 4
+        reset_performed_flag = bool(flags & 0x20)       # Bit 5
+        service_mode_flag    = bool(flags & 0x40)       # Bit 6
+        # Report the status back into the main Tkinter Thread
+        status = {
+            "cbus_node"        : str(pi_cbus_node),
+            "firmware_version" : firmware_version,
+            "service_mode"     : str(service_mode_flag),
+            "reset_performed"  : str(reset_performed_flag),
+            "track_power_on"   : str(track_power_on_flag),
+            "track_error"      : str(track_error_flag),
+            "bus_active_flag"  : str(bus_active_flag),
+            "sprog_error"      : str(sprog_error_flag),
+            "emergency_stop"   : str(emergency_stop_flag) }
+        common.execute_function_in_tkinter_thread(lambda: report_status(status))
+        # Log out the status report
+        if debug:
+            logging.debug("Pi-SPROG: Rx thread - Received STAT (Command Station Status Report):")
+            logging.debug("    CBUS Node Id       :"+str(pi_cbus_node))
+            logging.debug("    Command Station Id :"+str(command_station_id))
+            logging.debug("    Firmware Version   :"+str(firmware_version))
+            logging.debug("    Service Mode       :"+str(service_mode_flag))
+            logging.debug("    Reset Done         :"+str(reset_performed_flag))
+            logging.debug("    Emg Stop Perf      :"+str(emergency_stop_flag))
+            logging.debug("    Track Power On     :"+str(track_power_on_flag))
+            logging.debug("    DCC Bus Active     :"+str(bus_active_flag))
+            logging.debug("    Track Power Error  :"+str(track_error_flag))
+            logging.debug("    SPROG Error        :"+str(sprog_error_flag))
+    except Exception as exception:
+        logging.error("Pi-SPROG: Error parsing Command Station Status (STAT) Message")
+        logging.error(exception)
     return()
 
 #------------------------------------------------------------------------------
@@ -272,16 +389,16 @@ def process_stat_message(byte_string):
 
 def process_tof_message(byte_string):
     global tof_response
-    if debug: logging.debug ("Pi-SPROG: Rx thread - Received TOF (Track OFF) acknowledgement")
     # Respond to the trigger function (waiting in the main thread for a response)
     tof_response = True
+    logging.debug ("Pi-SPROG: Rx thread - Received TOF (Track OFF) acknowledgement")
     return()
                         
 def process_ton_message(byte_string):
     global ton_response
-    if debug: logging.debug ("Pi-SPROG: Rx thread - Received TON (Track ON) acknowledgement")
     # Respond to the trigger function (waiting in the main thread for a response)
     ton_response = True
+    logging.debug ("Pi-SPROG: Rx thread - Received TON (Track ON) acknowledgement")
     return()
 
 #------------------------------------------------------------------------------
@@ -290,21 +407,36 @@ def process_ton_message(byte_string):
 #------------------------------------------------------------------------------
 
 def process_pcvs_message(byte_string):
-    global service_mode_cv_value
-    global service_mode_cv_address
-    global service_mode_session_id
-    # Response contains [header]<85><Session><High CV#><Low CV#><Val>
-    session_id = int(chr(byte_string[9]) + chr(byte_string[10]),16)
-    cv = ( int(chr(byte_string[11]) + chr(byte_string[12]),16) +
-           int(chr(byte_string[13]) + chr(byte_string[14]),16) )
-    value = int(chr(byte_string[15]) + chr(byte_string[16]),16)
-    if debug: logging.debug ("Pi-SPROG: Rx thread - Received PCVS (Report CV) - Session:"+
-                   str(session_id)+", CV:"+str(cv)+", Value:"+str(value))
-    # Respond to the trigger function (waiting in the main thread for a response)
-    service_mode_session_id = session_id
-    service_mode_cv_address = cv
-    service_mode_cv_value = value
-    return()
+    global service_mode_cv_value, service_mode_cv_address, service_mode_session_id
+    logging.debug ("Pi-SPROG: Rx thread - Received PCVS (CV Response) message")
+    # Process the message (with exception handling just in case)
+    try:
+        # Convert to String and remove the start/end markers
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # The following code uses Indices based on the stripped GridConnect string:
+        # Index:    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7
+        # String:   S B 0 0 0 N 8 5 0 1 0 0 0 A 0 5 7 4
+        # Find 'N', then skip 'N' (1 char) and the OpCode '85' (2 chars) = +3
+        d_start = msg_str.find('N') + 3
+        # Extract values using dynamic offsets from d_start
+        # Session ID (1 byte / 2 hex chars)
+        session_id = int(msg_str[d_start : d_start+2], 16)
+        # CV Address is 2 bytes (High Byte + Low Byte)
+        # We extract both and combine them (High << 8 | Low)
+        cv_high = int(msg_str[d_start+2 : d_start+4], 16)
+        cv_low  = int(msg_str[d_start+4 : d_start+6], 16)
+        cv = (cv_high << 8) | cv_low
+        # CV Value (1 byte / 2 hex chars)
+        value = int(msg_str[d_start+6 : d_start+8], 16)
+        if debug: logging.debug(f"Pi-SPROG: Rx thread - Received PCVS (Report CV) - Session:{session_id}, CV:{cv}, Value:{value}")
+        # Respond to the trigger function (waiting in the main thread for a response)
+        service_mode_session_id = session_id
+        service_mode_cv_address = cv
+        service_mode_cv_value = value
+    except Exception as exception:
+        logging.error("Pi-SPROG: Error parsing Report CV (PCVS/85) Message")
+        logging.error(exception)
+        return()
 
 #------------------------------------------------------------------------------
 # Internal function to process a service mode status response (SSTAT message)
@@ -314,20 +446,36 @@ def process_pcvs_message(byte_string):
 def process_sstat_message(byte_string):
     global service_mode_response
     global service_mode_session_id
-    session_id = int(chr(byte_string[9]) + chr(byte_string[10]),16)
-    service_mode_status = int(chr(byte_string[11]) + chr(byte_string[12]),16)
-    if service_mode_status == 0: status = "Reserved"
-    elif service_mode_status == 1: status = "No Acknowledge"
-    elif service_mode_status == 2: status = "Overload on Programming Track"
-    elif service_mode_status == 3: status = "Write Acknowledge"
-    elif service_mode_status == 4: status = "Busy"
-    elif service_mode_status == 5: status = "CV Out of Range"
-    else: status = "Unrecognised response code" + str (service_mode_status)
-    if debug: logging.debug ("Pi-SPROG: Rx thread - Received SSTAT (Service Mode Status) - Session:"
-                           + str(session_id)+", Status:" + status)
-    # Respond to the trigger function (waiting in the main thread for a response)
-    service_mode_session_id = session_id
-    service_mode_response = service_mode_status
+    logging.debug ("Pi-SPROG: Rx thread - Received SSTAT (Service Mode Status Response) message")
+    # Process the message (with exception handling just in case)
+    try:
+        # Convert to String and remove the start/end markers
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # The following code uses Indices based on the stripped GridConnect string:
+        # Index:    0 1 2 3 4 5 6 7 8 9 0 1 2 3
+        # String:   S B 0 0 0 N 4 C 0 1 0 3 7 4
+        # Find 'N', then skip 'N' (1 char) and the OpCode '4C' (2 chars) = +3
+        d_start = msg_str.find('N') + 3
+        # Extract values using dynamic offsets from d_start
+        # Session ID (1 byte / 2 hex chars)
+        session_id = int(msg_str[d_start : d_start+2], 16)
+        # Service Mode Status Code (1 byte / 2 hex chars)
+        service_mode_status = int(msg_str[d_start+2 : d_start+4], 16)
+        # Map the status code to a human-readable string
+        if service_mode_status == 0: status_text = "Reserved"
+        elif service_mode_status == 1: status_text = "No Acknowledge"
+        elif service_mode_status == 2: status_text = "Overload on Programming Track"
+        elif service_mode_status == 3: status_text = "Write Acknowledge"
+        elif service_mode_status == 4: status_text = "Busy"
+        elif service_mode_status == 5: status_text = "CV Out of Range"
+        else: status_text = f"Unrecognised response code: {service_mode_status}"
+        if debug: logging.debug(f"Pi-SPROG: Rx thread - Received SSTAT (Service Mode Status) - Session:{session_id}, Status:{status_text}")
+        # Respond to the trigger function (waiting in the main thread for a response)
+        service_mode_session_id = session_id
+        service_mode_response = service_mode_status
+    except Exception as exception:
+        logging.error("Pi-SPROG: Error parsing Service Mode Status (SSTAT/4C) Message")
+        logging.error(exception)
     return()
 
 #------------------------------------------------------------------------------
@@ -360,19 +508,21 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
     elif (op_code < 0 or op_code > 255):
         logging.error("Pi-SPROG: CBUS Command - Op Code out of range "+str(op_code))
     else:
-        # Encode the CAN Header        
-        header_byte1 = (mj_pri << 6) | (min_pri <<4) | (can_bus_id >> 3)
-        header_byte2 = (0x1F & can_bus_id) << 5
-        # Start building the GridConnect Protocol string for the CBUS command
-        command_string = (":S" + format(header_byte1,"02X") + format(header_byte2,"02X")
-                          + "N" + format (op_code,"02X"))
-        # Add the Data Bytes associated with the OpCode (if there are any)
-        for data_byte in data_bytes: command_string = command_string + format(data_byte,"02X")
+        # Encode the CAN Header (11-bit Identifier)
+        # Pri1 (bits 10-9), Pri2 (bits 8-7), CAN ID (bits 6-0)
+        header_val = (mj_pri << 9) | (min_pri << 7) | can_bus_id
+        # Start building the GridConnect Protocol string
+        # :S hhhh N [OpCode][Data...];
+        command_string = ":S" + format(header_val, "04X") + "N" + format(op_code, "02X")
+        # Add the Data Bytes associated with the OpCode
+        for data_byte in data_bytes:
+            command_string = command_string + format(data_byte, "02X")
         # Finally - add the command string termination character
         command_string = command_string + ";"
         # Add the command to the output buffer (to be picked up by the Tx thread)
         output_buffer.put(command_string)
-    return()
+        if debug: logging.debug("Pi-SPROG: Tx thread - Queued CBUS Command: " + command_string)
+        return()
 
 #------------------------------------------------------------------------------
 # Externally Called Function to establish basic comms with the PI-SPROG
@@ -392,7 +542,7 @@ def sprog_connect (port_name:str="/dev/serial0",
         logging.error("Pi-SPROG: sprog_connect - Port name must be specified as a string")
     elif not isinstance(baud_rate, int):
         logging.error("Pi-SPROG: sprog_connect - Baud rate must be specified as an integer")
-    elif not isinstance(dcc_address_mode, int) or dcc_address_mode < 0 or dcc_address_mode > 3:
+    elif not isinstance(dcc_address_mode, int) or dcc_address_mode < 1 or dcc_address_mode > 3:
         logging.error("Pi-SPROG: sprog_connect - dcc_address_mode  must be specified as an integer (1-3)")
     elif not isinstance(dcc_debug_mode, bool):
         logging.error("Pi-SPROG: sprog_connect - Enhanced debug flag must be specified as a boolean")
@@ -449,10 +599,14 @@ def sprog_disconnect():
     def response_received(): return(rx_thread_terminated and tx_thread_terminated)
     pi_sprog_disconnected = False
     if serial_port.is_open:
+        # Ensure Status reporting is turned off before we disconnect
+        if status_callback is not None:
+            disable_status_reporting()
+            time.sleep(0.3)
         if debug: logging.debug("Pi-SPROG: Shutting down Tx and Rx Threads")
         port_close_initiated = True
         # Wait until we get confirmation the Threads have been terminated
-        wait_for_response(0.5, response_received)
+        wait_for_response(1.0, response_received)
         if not tx_thread_terminated: logging.error("Pi-SPROG: Tx thread failed to terminate")
         if not rx_thread_terminated: logging.error("Pi-SPROG: Rx thread failed to terminate") 
         # Try to close the serial port (with exception handling)
@@ -482,16 +636,12 @@ def query_command_station_status():
     rstat_response = False
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
-        # Retry sending the command (3 attempts) if we don't get a response
-        attempts = 0
-        while attempts < 3:
-            # Query the status of the command station to confirm connectivity (0x0C = 12 decimal)
-            logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
-            send_cbus_command(mj_pri=2, min_pri=2, op_code=12)
-            # Wait for the response (with a 1 second timeout)
-            if wait_for_response(1.0, response_received): break
-            attempts = attempts + 1
-            logging.warning("Pi-SPROG: Request Command Station Status timeout - retrying")
+        # Query the status of the command station to confirm connectivity
+        logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
+        # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
+        send_cbus_command(mj_pri=0, min_pri=0, op_code=0x0C)
+        # Wait for the response (with a 5 second timeout)
+        wait_for_response(5.0, response_received)
         if rstat_response: logging.debug ("Pi-SPROG: Received STAT (Command Station Status Report)")
         else: logging.error("Pi-SPROG: Request Command Station Status failed")
     else:
@@ -508,22 +658,16 @@ def request_dcc_power_on():
     ton_response = False
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
-        # Retry sending the command (3 attempts) if we don't get a response
-        attempts = 0
-        while attempts < 3:
-            # Send the command to switch on the Track Supply (to the DCC Bus)
-            logging.debug ("Pi-SPROG: Sending RTON command (Request Track Power On)")
-            send_cbus_command (mj_pri=2, min_pri=2, op_code=9)
-            # Wait for the response (with a 1 second timeout)
-            if wait_for_response(1.0, response_received): break
-            attempts = attempts + 1
-            logging.warning("Pi-SPROG: Request Track Power On timeout - retrying")
-        if ton_response:
-            logging.debug("Pi-SPROG: Received TON (Track ON) acknowledgement")
-            logging.info("Pi-SPROG: Track power has been turned ON")
+        # Send the command to switch on the Track Supply (to the DCC Bus)
+        logging.debug ("Pi-SPROG: Sending RTON command (Request Track Power On)")
+        # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
+        send_cbus_command (mj_pri=0, min_pri=0, op_code=0x09)
+        # Wait for the response (with a 1 second timeout)
+        wait_for_response(5.0, response_received)
+        if ton_response: logging.info("Pi-SPROG: Track power has been turned ON")
         else: logging.error("Pi-SPROG: Request to turn on Track Power failed")
         # Give things time to get established before sending out any commands
-        time.sleep (0.1)
+        time.sleep (0.2)
         # Tell the application to send out any DCC commands that may have been 'issued' before
         # DCC Power was turned on but not transmitted (as they would have been silently ignored)
         if ton_response: common.sprog_transmit_all()
@@ -539,21 +683,55 @@ def request_dcc_power_off():
     tof_response = False
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
-        # Retry sending the command (3 attempts) if we don't get a response
-        attempts = 0
-        while attempts < 3:
-            # Send the command to switch on the Track Supply (to the DCC Bus)
-            logging.debug("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
-            send_cbus_command(mj_pri=2, min_pri=2, op_code=8)
-            # Wait for the response (with a 1 second timeout)
-            if wait_for_response(1.0, response_received): break
-            attempts = attempts + 1
-            logging.warning("Pi-SPROG: Request Track Power Off timeout - retrying")
-        if tof_response:
-            logging.debug("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
-            logging.info("Pi-SPROG: Track power has been turned OFF")
+        # Send the command to switch on the Track Supply (to the DCC Bus)
+        logging.debug("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
+        # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
+        send_cbus_command(mj_pri=0, min_pri=0, op_code=0x08)
+        # Wait for the response (with a 1 second timeout)
+        wait_for_response(5.0, response_received)
+        if tof_response: logging.info("Pi-SPROG: Track power has been turned OFF")
         else: logging.error("Pi-SPROG: Request to turn off Track Power failed")
     return(tof_response)
+
+#------------------------------------------------------------------------------
+# Externally Called Functions to register and di-register for multimeter updates
+# We only ever expect a single external function to register for these updates
+#------------------------------------------------------------------------------
+
+def request_status_report():
+    if status_callback is not None and serial_port.is_open:
+        if debug: logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
+        send_cbus_command(mj_pri=0, min_pri=0, op_code=0x0C)
+        # Schedule the next poll in 2000ms (2 seconds)
+        common.root_window.after(2000, request_status_report)
+    return()
+
+def enable_status_reporting(callback):
+    global status_callback
+    status_callback = callback
+    if serial_port.is_open:
+        # NVSET (OpCode 0x96) - Write to Node Variable 10 to enable telemetry
+        # Logic: mj_pri=0, min_pri=2, op_code=0x96, Data: NN_high, NN_low, NV_index, NV_value
+        logging.debug("Pi-SPROG: Enabling SPROG Telemetry Reporting (NVSET Command)")
+        # Early Firmware versions (Node 258)
+        send_cbus_command(0, 2, 0x96, 0x01, 0x02, 10, 1)
+        # Later Firmware Versions (Global/Alias)
+        send_cbus_command(0, 2, 0x96, 0xFF, 0xFE, 10, 1)
+        # Kick off the first regular poll after 1000ms
+        common.root_window.after(1000, request_status_report)
+        return()
+
+def disable_status_reporting():
+    global status_callback
+    status_callback = None
+    if serial_port.is_open:
+        logging.debug("Pi-SPROG: Disabling SPROG Telemetry Reporting (NVSET Command)")
+        # NVSET (OpCode 0x96) - Write 0 to Node Variable 10 to disable telemetry
+        # Early Firmware versions
+        send_cbus_command(0, 2, 0x96, 0x01, 0x02, 10, 0)
+        # Later Firmware Versions
+        send_cbus_command(0, 2, 0x96, 0xFF, 0xFE, 10, 0)
+    return()
 
 #------------------------------------------------------------------------------
 # Externally Called Function to send an Accessory Short CBUS On/Off Event
@@ -565,37 +743,39 @@ def send_accessory_short_event(address:int, active:bool):
     elif not isinstance(active, bool):
         logging.error("Pi-SPROG: send_accessory_short_event - State must be specified as a boolean")
     else:
-        # Apply any address mode offsets
-        if address_mode == 1:
-            offset_text = ""
-            address_to_send = address
-        elif address_mode == 2:
+        # Apply any address mode offsets (1 = None, 2 = +4, 3 = -4)
+        if address_mode == 2:
             address_to_send = address + 4
             offset_text = " (Address Offset '+4')"
         elif address_mode == 3:
             address_to_send = address - 4
             offset_text = " (Address Offset '-4')"
+        else:
+            offset_text = ""
+            address_to_send = address
         # Validate the modified address - Log the address we have been given - not the one with offsets applied
         if (address_to_send < 1 or address_to_send > 2047):
             logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address)+offset_text)
         # Only bother sending commands to the Pi Sprog if the serial port has been opened
         elif serial_port.is_open:
-            # Encode the message into the required number of bytes
-            byte1 = (pi_cbus_node & 0xff00) >> 8
-            byte2 = (pi_cbus_node & 0x00ff)
-            byte3 = (address_to_send & 0xff00) >> 8
-            byte4 = (address_to_send & 0x00ff)
-            # Send a ASON or ASOF Command (Accessoy Short On or Accessory Short Off).
-            # Note we log the address we have been given - not the one with offsets applied
+            # Split Node ID and Address into High/Low bytes
+            # pi_cbus_node is usually the fixed node ID of the command station
+            node_hi = (pi_cbus_node >> 8) & 0xFF
+            node_lo = pi_cbus_node & 0xFF
+            addr_hi = (address_to_send >> 8) & 0xFF
+            addr_lo = address_to_send & 0xFF
+            # Send ASON (0x98) or ASOF (0x99)- mj_pri=2, min_pri=3 (standard for accessory events)
             if active:
-                logging.debug("Pi-SPROG: Sending DCC command ASON (Accessory Short ON) to DCC address: "+ str(address)+offset_text)
-                send_cbus_command(2, 3, 152, byte1, byte2, byte3, byte4)
+                logging.debug(f"Pi-SPROG: Sending ASON (Accessory Short ON) to DCC address: {address}{offset_text}")
+                send_cbus_command(2, 3, 0x98, node_hi, node_lo, addr_hi, addr_lo)
             else:
-                logging.debug("Pi-SPROG: Sending DCC command ASOF (Accessory Short OFF) to DCC address: "+ str(address)+offset_text)
-                send_cbus_command(2, 3, 153, byte1, byte2, byte3, byte4)
+                logging.debug(f"Pi-SPROG: Sending ASOF (Accessory Short OFF) to DCC address: {address}{offset_text}")
+                send_cbus_command(2, 3, 0x99, node_hi, node_lo, addr_hi, addr_lo)
         elif debug:
             # Note we only log the discard messages in enhanced debugging mode (to reduce the spam in the logs)
             # Note we log the address we have been given - not the one with offsets applied
+            state_label = "ASON" if active else "ASOF"
+            logging.debug(f"Pi-SPROG: Discarding {state_label} command to DCC address: {address}{offset_text} - SPROG disconnected")
             if active: log_string ="Discarding ASON command to DCC address: "+ str(address)+offset_text
             else: log_string = "Discarding ASOF command to DCC address: "+ str(address)+offset_text
             logging.debug("Pi-SPROG: "+log_string+" - SPROG is disconnected")
@@ -619,39 +799,37 @@ def service_mode_read_cv(cv:int):
     if not isinstance(cv, int):
         logging.error("Pi-SPROG: service_mode_read_cv - CV to read must be specified as an integer")
     elif (cv < 0 or cv > 1023):
-        logging.error("Pi-SPROG: service_mode_read_cv - Invalid CV specified: "+str(cv))
-    # Only bother sending commands to the Pi Sprog if the serial port has been opened
+        logging.error(f"Pi-SPROG: service_mode_read_cv - Invalid CV specified: {cv}")
+    # Only bother sending commands to the Pi SPROG if the serial port has been opened
     elif serial_port.is_open:
-        # Encode the message into the required number of bytes
+        # Encode the message into the required bytes
         byte1 = session_id             # Session ID
-        byte2 = (cv & 0xff00) >> 8     # High CV
-        byte3 = (cv & 0x00ff)          # Low CV
-        byte4 = 1                      # Mode (1 = Direct bit)
-        # Sending the QCVS command (without any re-tries)
-        logging.debug ("Pi-SPROG: Sending QCVS (Read CV in Service Mode) - Session:"+str(byte1)+", CV:"+str(cv))
-        # Command to send is 0x84 (=132 Decimal) - Read CV in Service Mode (QCVS) 
-        send_cbus_command(2, 2, 132, byte1, byte2, byte3, byte4)
-        # Wait for the response (with a 5 second timeout - this takes a long time)
+        byte2 = (cv >> 8) & 0xFF       # High CV Byte
+        byte3 = cv & 0xFF              # Low CV Byte
+        byte4 = 1                      # Mode (1 = Direct Byte)
+        logging.debug(f"Pi-SPROG: Sending QCVS (Read CV in Service Mode) - Session:{byte1}, CV:{cv}")
+        # Command 0x84 (132 Decimal) - Read CV in Service Mode (QCVS)
+        send_cbus_command(2, 2, 0x84, byte1, byte2, byte3, byte4)
+        # Wait for the response (5 second timeout as service mode reads involve physical DCC pulses)
         if wait_for_response(5.0, response_received):
-            logging.debug("Pi-SPROG: Received PCVS (Report CV) - Session:"+ str(service_mode_session_id)+
-                           ", CV:"+str(service_mode_cv_address)+", Value:"+str(service_mode_cv_value))
+            logging.debug(f"Pi-SPROG: Received PCVS (Report CV) - Session:{service_mode_session_id}, CV:{service_mode_cv_address}, Value:{service_mode_cv_value}")
+            # Validation checks to ensure the response matches the request
             if service_mode_cv_address != cv:
-                logging.error("Pi-SPROG: Failed to read CV "+str(cv)+" - Responded with incorrect CV address")
+                logging.error(f"Pi-SPROG: Failed to read CV {cv} - Responded with incorrect CV address: {service_mode_cv_address}")
                 service_mode_cv_value = None
             elif service_mode_session_id != session_id:
-                logging.error("Pi-SPROG: Failed to read CV "+str(cv)+" - Responded with incorrect Session ID")
+                logging.error(f"Pi-SPROG: Failed to read CV {cv} - Responded with incorrect Session ID")
                 service_mode_cv_value = None
             else:
-                logging.info("Pi-SPROG: Successfully read CV"+str(service_mode_cv_address)+
-                              " - value:"+str(service_mode_cv_value))
+                logging.info(f"Pi-SPROG: Successfully read CV {service_mode_cv_address} - value: {service_mode_cv_value}")
         else:
-            logging.error("Pi-SPROG: Failed to read CV "+str(cv)+" - Timeout awaiting response")
-        # Increment the 'one up' session Id for the next time
+            logging.error(f"Pi-SPROG: Failed to read CV {cv} - Timeout awaiting response")
+        # Increment the session ID for the next transaction (keeping it within 1-255)
         session_id = session_id + 1
         if session_id > 255: session_id = 1
     else:
-        logging.warning("Pi-SPROG: Failed to read CV "+str(cv)+" - SPROG is disconnected or DCC power is off")
-    return (service_mode_cv_value)
+        logging.warning(f"Pi-SPROG: Failed to read CV {cv} - SPROG is disconnected")
+    return(service_mode_cv_value)
 
 #------------------------------------------------------------------------------
 # Externally Called Function to programme a single CV (used for testing)
@@ -670,41 +848,40 @@ def service_mode_write_cv(cv:int, value:int):
     elif not isinstance(value, int):
         logging.error("Pi-SPROG: service_mode_write_cv - Value to write must be specified as an integer")
     elif (cv < 0 or cv > 1023):
-        logging.error("Pi-SPROG: service_mode_write_cv - Invalid CV specified: "+str(cv))
+        logging.error(f"Pi-SPROG: service_mode_write_cv - Invalid CV specified: {cv}")
     elif (value < 0 or value > 255):
-        logging.error("Pi-SPROG: service_mode_write_cv - CV "+str(cv)+" - Invalid value specified: "+str(value))
-    # Only try to send the command if the PI-SPROG-3 has initialised correctly
+        logging.error(f"Pi-SPROG: service_mode_write_cv - CV {cv} - Invalid value specified: {value}")
+    # Only try to send the command if the PI-SPROG-3 is connected
     elif serial_port.is_open:
-        # Encode the message into the required number of bytes
+        # Encode the message into the required bytes
         byte1 = session_id             # Session ID
-        byte2 = (cv & 0xff00) >> 8     # High CV
-        byte3 = (cv & 0x00ff)          # Low CV
-        byte4 = 1                      # Mode (1 = Direct bit)
-        byte5 = value                  # value to write
-        # Sending the WCVS command (without any re-tries)
-        logging.debug("Pi-SPROG: Sending WCVS (Write CV in Service Mode) command - Session:"
-                         +str(byte1)+", CV:"+str(cv)+", Value:"+str(value))
-        # Command to send is 0xA2 (=162 Decimal) - Write CV in Service mode (WCVS)
-        send_cbus_command(2, 2, 162, byte1, byte2, byte3, byte4, byte5)
-        # Wait for the response (with a 5 second timeout)
+        byte2 = (cv >> 8) & 0xFF       # High CV Byte
+        byte3 = cv & 0xFF              # Low CV Byte
+        byte4 = 1                      # Mode (1 = Direct Byte)
+        byte5 = value                  # Value to write
+        logging.debug(f"Pi-SPROG: Sending WCVS (Write CV in Service Mode) - Session:{byte1}, CV:{cv}, Value:{value}")
+        # Command 0xA2 (162 Decimal) - Write CV in Service mode (WCVS)
+        send_cbus_command(2, 2, 0xA2, byte1, byte2, byte3, byte4, byte5)
+        # Wait for the response (5 second timeout for programming acknowledgment)
         if wait_for_response(5.0, response_received):
-            logging.debug("Pi-SPROG: Received SSTAT (Service Mode Status) - Session:"
-                    +str(service_mode_session_id)+", Status:"+str(service_mode_response))
+            logging.debug(f"Pi-SPROG: Received SSTAT (Service Mode Status) - Session:{service_mode_session_id}, Status:{service_mode_response}")
+            # Validation checks
             if service_mode_session_id != session_id:
-                logging.error("Pi-SPROG: Failed to write CV "+str(cv)+" - Responded with incorrect Session ID")
+                logging.error(f"Pi-SPROG: Failed to write CV {cv} - Responded with incorrect Session ID")
                 service_mode_response = None
             elif service_mode_response != 3:
-                logging.error("Pi-SPROG: Failed to write CV "+str(cv)+" - Error Code: "+str(service_mode_response))
+                # Status 3 is 'Write Acknowledge' (Success)
+                logging.error(f"Pi-SPROG: Failed to write CV {cv} - Error Code: {service_mode_response}")
                 service_mode_response = None
             else:
-                logging.info("Pi-SPROG: Successfully programmed CV"+str(cv)+" with value:"+str(value))
+                logging.info(f"Pi-SPROG: Successfully programmed CV {cv} with value: {value}")
         else:
-            logging.error("Pi-SPROG: Failed to write CV "+str(cv)+" - Timeout awaiting response")
-        # Increment the 'one up' session Id for the next time
+            logging.error(f"Pi-SPROG: Failed to write CV {cv} - Timeout awaiting response")
+        # Increment the session ID (keeping it within 1-255)
         session_id = session_id + 1
         if session_id > 255: session_id = 1
     else:
-        logging.warning("Pi-SPROG: Failed to write CV "+str(cv)+" - SPROG is disconnected or DCC power is off")
+        logging.warning(f"Pi-SPROG: Failed to write CV {cv} - SPROG is disconnected")
     return(service_mode_response == 3)
 
 #------------------------------------------------------------------------------
@@ -909,8 +1086,6 @@ def play_dcc_sound_file(address:int, active:bool):
             except Exception as exception:
                 logging.error("Pi-SPROG: Error playing sound file: "+dcc_sound_file_to_load_and_play)
                 logging.error("Pi-SPROG: Reported exception: "+str(exception))
-    else:
-        logging.warning("Pi-SPROG: Cannot play sound file as simpleaudio is not installed")
     return()
 
 ######################################################################################

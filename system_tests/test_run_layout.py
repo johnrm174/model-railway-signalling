@@ -26,11 +26,6 @@
 from system_test_harness import *
 import test_configuration_windows
 
-# We need to introduce a delay after triggering of the remote GPIO sensors
-# as these are configured with a timeout period of 0.1 seconds (this means that
-# any additional triggers received within the 0.1 seconds will be ignored
-gpio_trigger_delay = 0.2
-
 #-----------------------------------------------------------------------------------
 # This function Tests the Override of signals on Track sections ahead
 # (override is Only enabled in RUN Mode when automation is ON)
@@ -317,6 +312,7 @@ def run_interlocking_tests(edit_mode:bool):
     assert_signals_route_MAIN(1)
     assert_signals_unlocked(4)
     assert_signals_locked(1,2,3,5,6)
+    assert_signals_unlocked(4)
     assert_points_unlocked(1,2,3,4)
     set_instrument_clear(2)
     assert_signals_unlocked(1,4)
@@ -775,9 +771,7 @@ def test_route(sig1, sig2, gpio1, gpio2, sec1, sec2, test_sensors):
     assert_sections_clear(sec2)
     if test_sensors:
         simulate_gpio_triggered(gpio1)
-        sleep(gpio_trigger_delay)
         simulate_gpio_triggered(gpio2)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(sig1)
         trigger_signals_passed(sig2)
@@ -866,41 +860,37 @@ def run_signal_track_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         test_route(sig1=2, sig2=1, gpio1=5, gpio2=4, sec1=2, sec2=1, test_sensors=test_sensors)
         set_signals_on(2)
         # -------------------------------------------------------------------------------------------------------------        
-        print("Test Track occupancy changes for Signals - Edge case tests - 3 warnings should be generated:")
-        # Test Both sections occupied - and signal is CLEAR - No warnings generated for this one
+        print("Test Track occupancy changes for Signals - Edge case tests - 4 warnings should be generated:")
+        # Test Both sections occupied - and signal is CLEAR - Warning #1 will be generated
         set_subsidaries_off(1)
         set_sections_occupied(2)
         assert_sections_occupied(1,2)
         if test_sensors:
             simulate_gpio_triggered(4)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(1)
         assert_sections_occupied(2)
         assert_sections_clear(1)
-        # Test Both sections occupied - and signal is at DANGER - Warning #1 will be generated
+        # Test Both sections occupied - and signal is at DANGER - Warning #2 will be generated
         set_subsidaries_on(1)
         set_sections_occupied(1)
         assert_sections_occupied(1,2)
         if test_sensors:
             simulate_gpio_triggered(4)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(1)
         assert_sections_occupied(1,2)
-        # Test Both sections clear - and signal is at DANGER - Warning #2 will be generated
+        # Test Both sections clear - and signal is at DANGER - Warning #3 will be generated
         set_sections_clear(1,2)
         if test_sensors:
             simulate_gpio_triggered(4)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(1)
         assert_sections_clear(1,2)
-        # Test Both sections clear - and signal is Clear - Warning #3 will be generated
+        # Test Both sections clear - and signal is Clear - Warning #4 will be generated
         set_subsidaries_off(1)
         if test_sensors:
             simulate_gpio_triggered(4)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(1)
         assert_sections_clear(1,2)
@@ -923,7 +913,6 @@ def test_route_sensors(sen1, gpio1, sec1, sec2, test_sensors):
     assert_sections_clear(sec2)
     if test_sensors:
         simulate_gpio_triggered(gpio1)
-        sleep(gpio_trigger_delay)
     else:
         trigger_sensors_passed(sen1)
     assert_sections_occupied(sec2)
@@ -970,7 +959,6 @@ def run_track_sensor_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         assert_sections_occupied(28,36)
         if test_sensors:
             simulate_gpio_triggered(22)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(1)
         assert_sections_occupied(28,36)
@@ -978,7 +966,6 @@ def run_track_sensor_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         set_sections_clear(28,36)
         if test_sensors:
             simulate_gpio_triggered(22)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(1)
         assert_sections_clear(28,36)
@@ -990,7 +977,6 @@ def run_track_sensor_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         set_points_switched(18)
         if test_sensors:
             simulate_gpio_triggered(22)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(1)
         # Test the case of no route existing after the sensor (negative test coverage) - Warning #4
@@ -998,7 +984,6 @@ def run_track_sensor_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         set_points_switched(17)
         if test_sensors:
             simulate_gpio_triggered(22)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(1)
         set_points_normal(17)
@@ -1026,7 +1011,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All other signal types - train will not be passed and a warning will be generated
     if test_sensors:
         simulate_gpio_triggered(12)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(9)
     if distant:
@@ -1039,7 +1023,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All other signal types - train will not be passed and a warning will be generated
     if test_sensors:
         simulate_gpio_triggered(12)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(9)
     if distant:
@@ -1053,7 +1036,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_points_switched(5)
     if test_sensors:
         simulate_gpio_triggered(12)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(9)
     assert_sections_occupied(9)
@@ -1061,7 +1043,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All signal types - train will be passed without any warnings
     if test_sensors:
         simulate_gpio_triggered(12)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(9)
     assert_sections_clear(9)
@@ -1070,7 +1051,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_signals_off(9)
     if test_sensors:
         simulate_gpio_triggered(12)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(9)
     assert_sections_occupied(9)
@@ -1078,7 +1058,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All signal types - train will be passed without any warnings
     if test_sensors:
         simulate_gpio_triggered(12)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(9)
     assert_sections_clear(9)
@@ -1093,7 +1072,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_sections_occupied(10)
     if test_sensors:
         simulate_gpio_triggered(13)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(10)
     if distant:
@@ -1106,7 +1084,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All other signal types - train will not be passed and a warning will be generated
     if test_sensors:
         simulate_gpio_triggered(13)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(10)
     if distant:
@@ -1120,7 +1097,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_points_switched(5)
     if test_sensors:
         simulate_gpio_triggered(13)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(10)
     assert_sections_clear(10)
@@ -1128,7 +1104,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All signal types - train will be passed without any warnings
     if test_sensors:
         simulate_gpio_triggered(13)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(10)
     assert_sections_occupied(10)
@@ -1137,7 +1112,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_signals_off(10)
     if test_sensors:
         simulate_gpio_triggered(13)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(10)
     assert_sections_clear(10)
@@ -1145,7 +1119,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All signal types - train will be passed without any warnings
     if test_sensors:
         simulate_gpio_triggered(13)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(10)
     assert_sections_occupied(10)
@@ -1161,7 +1134,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_sections_occupied(11)
     if test_sensors:
         simulate_gpio_triggered(18)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(11)
     if distant:
@@ -1177,7 +1149,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All other signal types - train will not be passed and a warning will be generated
     if test_sensors:
         simulate_gpio_triggered(18)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(11)
     if distant:
@@ -1194,7 +1165,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_points_switched(5)
     if test_sensors:
         simulate_gpio_triggered(18)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(11)
     assert_sections_clear(11)
@@ -1203,7 +1173,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All signal types - train will be passed without any warnings
     if test_sensors:
         simulate_gpio_triggered(18)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(11)
     assert_sections_occupied(11)
@@ -1213,7 +1182,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     set_signals_off(11)
     if test_sensors:
         simulate_gpio_triggered(18)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(11)
     assert_sections_clear(11)
@@ -1222,7 +1190,6 @@ def subtest_signals_sections_ahead_behind(distant:bool, test_sensors:bool=False)
     # All signal types - train will be passed without any warnings
     if test_sensors:
         simulate_gpio_triggered(18)
-        sleep(gpio_trigger_delay)
     else:
         trigger_signals_passed(11)
     assert_sections_occupied(11)
@@ -1322,7 +1289,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         # FORWARDS - invalid route - no changes to occupancy - warning will be generated
         if test_sensors:
             simulate_gpio_triggered(23)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(2)
         assert_sections_clear(38)
@@ -1330,7 +1296,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_sections_occupied(38)
         if test_sensors:
             simulate_gpio_triggered(23)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(2)
         assert_sections_occupied(38)
@@ -1339,14 +1304,12 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_points_switched(19)
         if test_sensors:
             simulate_gpio_triggered(23)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(2)
         assert_sections_occupied(38)
         # BACKWARDS - valid route - train will be passed - no warnings
         if test_sensors:
             simulate_gpio_triggered(23)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(2)
         assert_sections_clear(38)
@@ -1357,7 +1320,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_sections_occupied(39)
         if test_sensors:
             simulate_gpio_triggered(24)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(3)
         assert_sections_occupied(39)
@@ -1365,7 +1327,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_sections_clear(39)
         if test_sensors:
             simulate_gpio_triggered(24)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(3)
         assert_sections_clear(39)
@@ -1374,14 +1335,12 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_sections_occupied(39)
         if test_sensors:
             simulate_gpio_triggered(24)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(3)
         assert_sections_clear(39)
         # BACKWARDS - valid route - train will be passed - no warnings
         if test_sensors:
             simulate_gpio_triggered(24)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(3)
         assert_sections_occupied(39)
@@ -1393,7 +1352,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_sections_occupied(7)
         if test_sensors:
             simulate_gpio_triggered(25)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(4)
         assert_sections_occupied(7)
@@ -1403,7 +1361,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_sections_occupied(8)
         if test_sensors:
             simulate_gpio_triggered(25)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(4)
         assert_sections_clear(7)
@@ -1414,7 +1371,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         set_points_switched(19)
         if test_sensors:
             simulate_gpio_triggered(25)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(4)
         assert_sections_clear(7)
@@ -1422,7 +1378,6 @@ def sensors_sections_ahead_and_behind(edit_mode:bool, test_sensors:bool=False):
         # BACKWARDS - valid route - train will be passed - no warnings
         if test_sensors:
             simulate_gpio_triggered(25)
-            sleep(gpio_trigger_delay)
         else:
             trigger_sensors_passed(4)
         assert_sections_occupied(7)
@@ -1447,7 +1402,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         set_sections_occupied(13)
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(14)
@@ -1455,7 +1409,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         # Main Route - Back- signal is ON
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(13)
@@ -1464,7 +1417,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         set_points_switched(6)
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(15)
@@ -1472,7 +1424,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         # Diverging Route - Back- signal is ON
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(13)
@@ -1484,7 +1435,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         set_signals_off(12)
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(14)
@@ -1492,7 +1442,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         # Main Route - Back- signal is OFF
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(13)
@@ -1503,7 +1452,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         set_signals_off(12)
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(15)
@@ -1511,7 +1459,6 @@ def shunt_ahead_signal_route_tests(edit_mode:bool, test_sensors:bool=False):
         # Diverging Route - Back- signal is OFF
         if test_sensors:
             simulate_gpio_triggered(19)
-            sleep(gpio_trigger_delay)
         else:
             trigger_signals_passed(12)
         assert_sections_occupied(13)
@@ -1739,7 +1686,6 @@ def run_all_run_layout_tests():
     initialise_test_harness(filename="./test_run_layout.sig")
     # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
     # Run the tests in all mode combinations. Note that we don't toggle Automation On/Off in Edit mode as
     # The 'A' keypress event is disabled and the menubar 'Automation Enable/Disable' selection is inhibited

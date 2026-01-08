@@ -317,7 +317,7 @@ def delete_section_object(object_id):
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["tags"])
     # Delete the track sensor mapping for the Track Sensor (if any)
     linked_gpio_sensor = objects_common.schematic_objects[object_id]["gpiosensor"]
-    if linked_gpio_sensor != "": library.update_gpio_sensor_callback(linked_gpio_sensor)
+    if linked_gpio_sensor != "": library.update_gpio_sensor_callback(linked_gpio_sensor, track_section=0)
     return()
 
 #------------------------------------------------------------------------------------

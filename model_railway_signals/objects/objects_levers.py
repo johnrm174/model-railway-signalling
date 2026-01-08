@@ -61,6 +61,7 @@ default_lever_object["textfonttuple"] = settings.get_style("levers", "textfonttu
 # Other object-specific parameters
 default_lever_object["xbuttonoffset"] = 0
 default_lever_object["ybuttonoffset"] = 0
+default_lever_object["buttonlabel"] = ""
 default_lever_object["hidebuttons"] = False
 default_lever_object["itemtype"] = library.lever_type.spare.value
 default_lever_object["linkedsignal"] = 0
@@ -187,6 +188,7 @@ def redraw_lever_object(object_id, create_selected:bool=False):
                 button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                 button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                 hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                button_label = objects_common.schematic_objects[object_id]["buttonlabel"],
                 frame_colour = frame_colour,
                 lock_text_colour = lock_text_colour,
                 button_colour = button_colour,

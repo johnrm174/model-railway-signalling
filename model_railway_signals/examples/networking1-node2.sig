@@ -27,7 +27,7 @@
                 false,
                 ""
             ],
-            "bbox": 8606,
+            "bbox": 10682,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -101,9 +101,11 @@
             "itemid": 3,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": true,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "Node1-3"
@@ -351,7 +353,7 @@
                 20,
                 5
             ],
-            "bbox": 8614,
+            "bbox": 10690,
             "colour": "black",
             "endx": 625.0,
             "endy": 300.0,
@@ -366,7 +368,7 @@
         },
         "3992df93-f016-42e7-a710-f0bddf9b1627": {
             "background": "grey85",
-            "bbox": 8617,
+            "bbox": 10693,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -390,7 +392,7 @@
                 20,
                 5
             ],
-            "bbox": 8625,
+            "bbox": 10701,
             "colour": "black",
             "endx": 625.0,
             "endy": 125.0,
@@ -404,7 +406,7 @@
             "tags": "line1"
         },
         "6085fa37-fea7-42cd-a7a9-f15aeb1ec731": {
-            "bbox": 8640,
+            "bbox": 10716,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -416,7 +418,7 @@
             "tags": "instrument2"
         },
         "6e4f0867-155b-4ed8-ae84-38e1cc667131": {
-            "bbox": 8644,
+            "bbox": 10720,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -441,7 +443,7 @@
         },
         "70238cfa-4556-4ed9-9a92-46ac169573de": {
             "background": "grey85",
-            "bbox": 8647,
+            "bbox": 10723,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -465,7 +467,7 @@
                 20,
                 5
             ],
-            "bbox": 8655,
+            "bbox": 10731,
             "colour": "black",
             "endx": 225.0,
             "endy": 125.0,
@@ -492,7 +494,7 @@
                 false,
                 ""
             ],
-            "bbox": 8681,
+            "bbox": 10757,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -566,9 +568,11 @@
             "itemid": 15,
             "itemsubtype": 2,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -824,7 +828,7 @@
         },
         "9ac66673-362c-4529-a451-6dba32782869": {
             "background": "grey85",
-            "bbox": 8684,
+            "bbox": 10760,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -855,7 +859,7 @@
                 false,
                 ""
             ],
-            "bbox": 8704,
+            "bbox": 10780,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -929,9 +933,11 @@
             "itemid": 4,
             "itemsubtype": 5,
             "itemtype": 1,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 "Node1-4"
@@ -1173,7 +1179,7 @@
             "ybuttonoffset": 0
         },
         "e26bc73f-b67e-4fed-ae67-8971af1d7b92": {
-            "bbox": 8708,
+            "bbox": 10784,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1198,7 +1204,7 @@
         },
         "e497d420-ad7a-4cb5-877c-6dbd0d849296": {
             "background": "grey85",
-            "bbox": 8711,
+            "bbox": 10787,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1229,7 +1235,7 @@
                 false,
                 ""
             ],
-            "bbox": 8737,
+            "bbox": 10813,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1303,9 +1309,11 @@
             "itemid": 14,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 0,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -1573,7 +1581,7 @@
                 false,
                 ""
             ],
-            "bbox": 8763,
+            "bbox": 10839,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1647,9 +1655,11 @@
             "itemid": 13,
             "itemsubtype": 1,
             "itemtype": 3,
+            "lowerquadrant": false,
             "orientation": 180,
             "overrideahead": false,
             "overridesignal": false,
+            "overridesubsidary": false,
             "passedsensor": [
                 true,
                 ""
@@ -1949,14 +1959,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": true,
-            "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/networking1-node2.sig",
+            "filename": "model_railway_signals/examples/networking1-node2.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.0.0"
+            "version": "Version 6.1.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -2093,6 +2103,7 @@
     "signals": {
         "13": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -2104,6 +2115,7 @@
         },
         "14": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -2115,6 +2127,7 @@
         },
         "15": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -2126,6 +2139,7 @@
         },
         "3": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -2137,6 +2151,7 @@
         },
         "4": {
             "override": false,
+            "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,

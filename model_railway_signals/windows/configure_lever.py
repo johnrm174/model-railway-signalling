@@ -309,6 +309,24 @@ class keycode_configuration(Tk.LabelFrame):
             valid = False
         return(valid)
 
+#------------------------------------------------------------------------------------
+# Class for the Button Label entry Box - Based on the Generic Entry box with
+# Additional validation to limit the entry to 4 characters
+#------------------------------------------------------------------------------------
+
+class level_label_entry_box(common.entry_box):
+    def __init__(self, parent_window, tool_tip:str, callback=None):
+        super().__init__(parent_window, width=5, callback=callback, tool_tip=tool_tip)
+
+    def validate(self, update_validation_status:bool=True):
+        if len(self.entry.get()) > 4:
+            self.TT.text = ("Can only specify a maximum of 4 characters (or leave blank)")
+            valid = False
+        else:
+            valid = True
+        if update_validation_status: self.set_validation_status(valid)
+        return(valid)
+
 #####################################################################################
 # Top level Class for the Edit Signalbox Lever window
 # This window doesn't have any tabs (unlike other object configuration windows)
@@ -347,6 +365,16 @@ class edit_lever():
             # Create the button offset Selections
             self.buttonoffsets = common.button_configuration(self.main_frame)
             self.buttonoffsets.pack(padx=2, pady=2, fill='x')
+            # Create the Lever Label Entry element
+            self.frame2 = Tk.LabelFrame(self.main_frame, text="Signalbox lever label")
+            self.frame2.pack(padx=2, pady=2, fill='x')
+            self.subframe = Tk.Frame(self.frame2)
+            self.subframe.pack(padx=2, pady=2)
+            self.label1 = Tk.Label(self.subframe, text="Alternative Lever button label:")
+            self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.buttonlabel = level_label_entry_box(self.subframe, tool_tip="Specify the label for the Lever "+
+                                        "control button (or leave blank to use the Lever ID as the label)")
+            self.buttonlabel.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the signal and point selection elements
             self.signal = signal_configuration(self.main_frame)
             self.signal.pack(padx=2, pady=2, fill='x')
@@ -403,6 +431,7 @@ class edit_lever():
             xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
             yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
             self.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
+            self.buttonlabel.set_value(objects.schematic_objects[self.object_id]["buttonlabel"])
             # Work out the lever type selection to set(signal, point or spare)
             lever_type = objects.schematic_objects[self.object_id]["itemtype"]
             if  lever_type in (2, 3): lever_selection = 2
@@ -439,7 +468,7 @@ class edit_lever():
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
         elif ( self.leverid.validate() and self.point.validate() and self.signal.validate() and
-               self.keycodes.validate() and self.buttonoffsets.validate() ):
+               self.keycodes.validate() and self.buttonoffsets.validate() and self.buttonlabel.validate()):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
@@ -450,6 +479,7 @@ class edit_lever():
             new_object_configuration["hidebuttons"] = hidden
             new_object_configuration["xbuttonoffset"] = xoffset
             new_object_configuration["ybuttonoffset"] = yoffset
+            new_object_configuration["buttonlabel"] = self.buttonlabel.get_value()
             point_id, point_lever_subtype = self.point.get_values()
             new_object_configuration["linkedpoint"] = point_id
             new_object_configuration["switchpoint"] = (point_lever_subtype == 1)

@@ -98,9 +98,8 @@ def clear_warning_window():
     for warning_label in list_of_warning_labels[:-1]: warning_label.destroy()
     list_of_warning_labels = [list_of_warning_labels[-1]]
 
-def user_dragging_window(event, canvas):
-    global warning_window_defocus
-    # Update Idletasks to update the window and schedule an immediate event to return
+def focus_back_on_canvas(event, canvas):
+    # Update Idletasks to update the warning window and schedule an immediate event to return
     # the focus to the canvas (to allow subsequent keypress events to be processed)
     root_window.update_idletasks()
     root_window.after(0, lambda:canvas.focus_set())
@@ -108,38 +107,40 @@ def user_dragging_window(event, canvas):
 def display_warning(canvas, message:str):
     global interlocking_warning_window
     global list_of_warning_labels
+    background = "yellow2"
     if interlocking_warning_window is not None:
         # If there is already a  window open then we just bring it to the front
         interlocking_warning_window.lift()
         interlocking_warning_window.state('normal')
     else:
-        # If there is not already a window open then create a new one. Note that we do
-        # not want to take focus from the main application window (otherwise subsequent
-        # keypress events won't be processed by the main application window). I've tried
-        # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
-        # is to schedule tasks to re-focus back on the canvas after the window has been
-        # updated with a new message or after any user interaction is complete
-        interlocking_warning_window = Tk.Toplevel(root_window, takefocus=0)
+        # If there is not already a window open then create a new one
+        interlocking_warning_window = Tk.Toplevel(root_window, bg=background)
         interlocking_warning_window.title("Layout Warnings")
         interlocking_warning_window.protocol("WM_DELETE_WINDOW", close_warning_window)
-        interlocking_warning_window.bind('<Configure>', lambda event, arg=canvas: user_dragging_window(event, arg))
-        interlocking_warning_window.bind('<FocusIn>', lambda event, arg=canvas: user_dragging_window(event, arg))
+        # We need to ensure the canvas re-takes focus afterany user interaction with the window
+        interlocking_warning_window.bind('<Configure>', lambda event, arg=canvas: focus_back_on_canvas(event, arg))
+        interlocking_warning_window.bind('<FocusIn>', lambda event, arg=canvas: focus_back_on_canvas(event, arg))
+        # Create the warning window over the main window (to make it obvious)
+        # (the user can always move it out of the wy if they want to)
         x, y = root_window.winfo_x(), root_window.winfo_y()
         interlocking_warning_window.geometry(f"+{x}+{y}")
-        buttonframe = Tk.Frame(interlocking_warning_window)
+        # Create a frame for the OK and CLEAR buttons at the bottom of the window
+        buttonframe = Tk.Frame(interlocking_warning_window, bg=background)
         buttonframe.pack(side=Tk.BOTTOM)
         button1 = Tk.Button(buttonframe, text="OK/Close", command=close_warning_window)
         button1.pack(padx=2, pady=2, side=Tk.LEFT)
-        button2 = Tk.Button(buttonframe, text="Clear", command=clear_warning_window)
+        button2 = Tk.Button(buttonframe, text="Clear all but last message", command=clear_warning_window)
         button2.pack(padx=2, pady=2, side=Tk.LEFT)
     # Add the latest warning message
     current_time = datetime.now().strftime('%H:%M:%S')
-    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w"))
-    list_of_warning_labels[-1].pack(padx=10, fill='x', expand=True)
-    # Update Idletasks to display the window and schedule an immediate event to return
-    # the focus to the canvas (to allow subsequent keypress events to be processed)
-    root_window.update_idletasks()
-    root_window.after(0, lambda:canvas.focus_set())
+    list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w", bg=background))
+    list_of_warning_labels[-1].pack(padx=10, pady=2, fill='x', expand=True)
+    # We don't want to take focus from the main application window (otherwise subsequent
+    # keypress events won't be processed by the main application window). I've tried
+    # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
+    # is to schedule tasks to re-focus back on the canvas after the window has been
+    # updated with a new message or after any user interaction is complete.
+    focus_back_on_canvas(event=None, canvas=canvas)
     return()
 
 #-------------------------------------------------------------------------
@@ -226,12 +227,12 @@ def sprog_transmit_all():
 def set_root_window(root):
     global root_window
     root_window = root
-    # bind the tkinter event for handling events raised in external threads
-    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
     # Bind a handler for any keypress events used to trigger library events such
     # as switching signalbox levers or Sensor Triggered events. Note that any
     # specific canvas event bindings elsewhere in the code will still work.
     root_window.bind("<Key>", keyboard_handler)
+    # Start the polling loop (for handling events passed in by other threads)
+    root_window.after(100, process_external_events)
     return()
 
 #-------------------------------------------------------------------------
@@ -334,6 +335,7 @@ def show_item_ids():
     lines.show_line_ids()
     buttons.show_button_ids()
     points.show_point_ids()
+    levers.show_lever_ids()
     bring_item_ids_to_front()
     return()
 
@@ -341,6 +343,7 @@ def hide_item_ids():
     lines.hide_line_ids()
     buttons.hide_button_ids()
     points.hide_point_ids()
+    levers.hide_lever_ids()
     return()
 
 def toggle_item_ids():
@@ -357,6 +360,7 @@ def bring_item_ids_to_front():
     lines.bring_line_ids_to_front()
     buttons.bring_button_ids_to_front()
     points.bring_point_ids_to_front()
+    levers.bring_lever_ids_to_front()
     return()
 
 # -------------------------------------------------------------------------
@@ -376,33 +380,28 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
     return (start_point, end_point)
 
 #-------------------------------------------------------------------------
-# Functions to allow custom callback functions to be passed in (from an external thread)
-# and then handled in the main Tkinter thread (to keep everything threadsafe). We use
-# the tkinter event_generate method to generate a custom event in the main event loop
-# in conjunction with a (threadsafe) queue to pass the callback function. We don't use
-# the tkinter root.after method as we don't believe that this is threadsafe.
-# Use as follows: execute_function_in_tkinter_thread (lambda: my_function(arg1,arg2...))
+# Functions to allow custom callback functions to be passed in (from an
+# external thread) and then handled in the main Tkinter thread (to keep
+# everything threadsafe). We Use a polling Method (pulling from a Queue
+# as we know Tkinter isnt thread safe - Even the Root.after method and
+# root.event_generate method can sometimes cause the thread to hang
 #-------------------------------------------------------------------------
 
-def handle_callback_in_tkinter_thread(*args):
-    while not event_queue.empty():
-        callback = event_queue.get(False)
-        callback()
+def process_external_events():
+    # Check how many items are waiting
+    backlog = event_queue.qsize()
+    # Process only what is currently in the queue (max 10 events at a time)
+    # This ensures a flood of event data doesn't starve the GUI thread.
+    for item in range(min(backlog, 20)):
+        callback = event_queue.get_nowait()
+        try: callback()
+        except: pass
+    # Schedule next check. 10ms seems to give good performance
+    root_window.after(10, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
-    # When loading a layout file on startup, there were a number of possible edge cases that could cause
-    # this function to be called before root.mainloop had been called (e.g. publish MQTT heartbeat messages
-    # or receive other MQTT/GPIO events). This could cause exceptions (i've seen them when running the code
-    # on the Pi-Zero). This has been mitigated in the main 'editor.py' module by using the root.after method
-    # to shedule loading the layout file after the tkinter main loop has been started. The exception handling
-    # code here is 'belt and braces' defensive programming so we don't inadvertantly kill the calling thread.
-    try:
-        root_window.event_generate("<<ExtCallback>>", when="tail")
-    except Exception as exception:
-        logging.error("execute_function_in_tkinter_thread - Exception when calling root.event_generate:")
-        logging.error(str(exception))
     return()
 
 ##################################################################################################

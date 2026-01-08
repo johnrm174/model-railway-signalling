@@ -58,6 +58,12 @@
 #
 #   set_lever_switching_behaviour(ignore_locking:bool, display_popups:bool)
 # 
+# External API - classes and functions (used by the other library modules):
+#
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#   show_lever_ids() - Displays the lever IDs
+#   hide_lever_ids() - Hides the lever IDs
+#   bring_lever_ids_to_front() - Brings the IDs to the front
 #---------------------------------------------------------------------------------------------
 
 import enum
@@ -122,6 +128,35 @@ def configure_edit_mode(edit_mode:bool):
         elif lever["hidebuttons"]:
             # In Run Mode - If the buttons are configured as 'hidden' then hide the button windows
             lever["canvas"].itemconfig(lever["window"], state="hidden")
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Library functions to show/hide lever IDs in edit mode
+#---------------------------------------------------------------------------------------------
+
+lever_ids_displayed = False
+
+def show_lever_ids():
+    global lever_ids_displayed
+    for lever_id in levers:
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["label1"], state="normal")
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["label2"], state="normal")
+    bring_lever_ids_to_front()
+    lever_ids_displayed = True
+    return()
+
+def hide_lever_ids():
+    global lever_ids_displayed
+    for lever_id in levers:
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["label1"], state="hidden")
+        levers[str(lever_id)]["canvas"].itemconfig(levers[str(lever_id)]["label2"], state="hidden")
+    lever_ids_displayed = False
+    return()
+
+def bring_lever_ids_to_front():
+    for lever_id in levers:
+        levers[str(lever_id)]["canvas"].tag_raise(levers[str(lever_id)]["label2"])
+        levers[str(lever_id)]["canvas"].tag_raise(levers[str(lever_id)]["label1"])
     return()
 
 #-------------------------------------------------------------------------
@@ -236,7 +271,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
                  selected_colour:str="White", text_colour:str="Black",
                  frame_colour:str="Grey40", lock_text_colour:str="White",
                  font=("TkFixedFont", 8 ,"bold"), button_xoffset:int=0,
-                 button_yoffset:int=0, hide_buttons:bool=False):
+                 button_yoffset:int=0, hide_buttons:bool=False,
+                 button_label:str=""):
     global levers
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "lever"+str(lever_id)
@@ -274,8 +310,10 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
             colour1, colour2 = "DodgerBlue", "Black"
         else:
             colour1, colour2 = "White", "White"
+        # If the button_label is an empty string then we use the ID instead:
+        if len(button_label) == 0: button_label = format(lever_id,'02d')
         # Create the tkinter button object
-        button = Tk.Button( canvas, text=format(lever_id,'02d'), state="normal", relief="raised",
+        button = Tk.Button( canvas, text=button_label, state="normal", relief="raised",
                             font=font, highlightthickness=0, padx=2, pady=0, background=button_colour,
                             activebackground=active_colour, activeforeground=text_colour,
                             foreground=text_colour, command=lambda:change_button_event(lever_id) )
@@ -302,6 +340,19 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
             canvas.itemconfig(lever_button_window, state="hidden")
         else:
             canvas.itemconfig(lever_button_window, state="normal")
+        # Create the Lever ID labels
+        label1_object = canvas.create_text(x, y, text=str(lever_id),
+                    font=("Courier",9,"bold"), fill="white", tags=canvas_tag)
+        bbox = canvas.bbox(label1_object)
+        label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
+                    tags=canvas_tag, fill="purple3", width=0)
+        canvas.tag_raise(label1_object)
+        if not editing_enabled or not lever_ids_displayed:
+            canvas.itemconfig(label1_object, state="hidden")
+            canvas.itemconfig(label2_object, state="hidden")
+        else:
+            canvas.itemconfig(label1_object, state="normal")
+            canvas.itemconfig(label2_object, state="normal")
         # Compile a dictionary of everything we need to track
         levers[str(lever_id)] = {}
         levers[str(lever_id)]["canvas"] = canvas                   # Tkinter canvas object
@@ -314,6 +365,8 @@ def create_lever(canvas, lever_id:int, levertype:lever_type, x:int, y:int,
         levers[str(lever_id)]["lever2a"] = lever2a                 # Tkinter drawing object
         levers[str(lever_id)]["lever2b"] = lever2b                 # Tkinter drawing object
         levers[str(lever_id)]["locktext"] = locked                 # Tkinter drawing object
+        levers[str(lever_id)]["label1"] = label1_object            # Tkinter drawing object
+        levers[str(lever_id)]["label2"] = label2_object            # Tkinter drawing object
         levers[str(lever_id)]["callback"] = lever_callback         # The callback to make on a change event
         levers[str(lever_id)]["levertype"] = levertype             # The type of the lever
         levers[str(lever_id)]["switched"] = False                  # Initial "switched" state of the lever

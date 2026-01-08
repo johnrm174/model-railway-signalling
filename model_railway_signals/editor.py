@@ -135,8 +135,6 @@ class main_menubar:
         self.quickscrollframe.pack()
         self.scroll_buttons = []
         # Create a dummy menubar item for the application Logo
-        resource_folder = 'model_railway_signals.resources'
-        logo_filename = 'dcc_signalling_logo.png'
         current_folder = pathlib.Path(__file__). parent
         fully_qualified_filename = current_folder / 'resources' / 'dcc_signalling_logo.png'
         try:
@@ -206,6 +204,8 @@ class main_menubar:
                 command=lambda:menubar.import_layout(self.root, self.import_schematic))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
+        self.utilities_menu.add_command(label =" MQTT Subscriptions...",
+                command=lambda:menubar.mqtt_subscriptions(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -266,6 +266,10 @@ class main_menubar:
         # Parse the command line arguments
         parser = argparse.ArgumentParser(description = "Model railway signalling "+settings.get_general("version"),
                             formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=27))
+        # Catch the optional 'os_file_path' positional argument (to enable double-click on sig files)
+        parser.add_argument('os_file_path', nargs='?', default=None,
+            help='A positional file path passed by the OS when double-clicking a .sig file.')
+        # Catch the flagged argulents
         parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
         parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
         parser.add_argument("-l","--log",dest="log_level",metavar="LEVEL",
@@ -288,13 +292,20 @@ class main_menubar:
             self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
             tracemalloc.start()
         self.monitor_memory_usage = False
-        # If a filename has been specified as a command line argument then load it. The loaded
-        # settings will overwrite the default settings and initialise_editor will be called again
-        # Note we schedule this to run immediately after the main loop starts so Tkinter is
-        # 'ready' to handle any events that may be passed in from other threads when we configure
-        # the application with the newly loaded settings (GPIO or MQTT events)
-        if args.filename is not None:
-            self.root.after(0, self.load_schematic, args.filename)
+        # If a filename has been specified as an argument (positional or flag) then load it. The
+        # loaded settings will overwrite the default settings and initialise_editor will be called.
+        # Note we schedule this to run immediately after the main loop starts so Tkinter is 'ready'
+        # to handle any events that may be passed in from other threads when we configure the
+        # application with the newly loaded settings (GPIO or MQTT events)
+        if args.os_file_path and args.os_file_path.lower().endswith('.sig'):
+            file_to_load = args.os_file_path
+        elif args.filename and args.filename.lower().endswith('.sig'):
+            file_to_load = args.filename
+        else:
+            file_to_load = None
+        # If a filename has been specified then try to load it
+        if file_to_load is not None:
+            self.root.after(0, self.load_schematic, file_to_load)
 
     # --------------------------------------------------------------------------------------
     # Advanced debugging functions (memory allocation monitoring/reporting)
@@ -752,7 +763,7 @@ class main_menubar:
         if len(version)==3: version += ".0"
         return tuple(map(int,(version.split("."))))
 
-    def load_schematic(self, filename:str=None, examples:bool=False):
+    def load_schematic(self, filename:str=None, examples:bool=False, suppress_popups:bool=False):
         # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the file selection dialog. If
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
@@ -772,19 +783,19 @@ class main_menubar:
                     logging.error("Load File - File was saved by "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
                     logging.error("Load File - Upgrade application to "+sig_file_version+" or later to support this file.")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
-                        message="File was saved by "+sig_file_version+". Upgrade application to "+
-                                        sig_file_version+" or later to support this layout file.")
-                elif self.tuple_version(sig_file_version) < self.tuple_version("5.0.0"):
+                    if not suppress_popups:
+                        Tk.messagebox.showerror(parent=self.root, title="Load Error", message="File was saved by "+
+                            sig_file_version+". Upgrade application to "+sig_file_version+" or later to support this layout file.")
+                elif self.tuple_version(sig_file_version) < self.tuple_version("6.0.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
                     logging.error("Load File - File was saved by application "+sig_file_version)
                     logging.error("Load File - Current version of the application is "+application_version)
-                    logging.error("Load File - This version of the application only supports files saved by version 5.0.0 or later")
-                    logging.error("Load File - Try loading/saving your file with version 5.0.0 first")
-                    Tk.messagebox.showerror(parent=self.root, title="Load Error",
-                        message="Layout file was saved by Application "+sig_file_version+".\n"+
-                            "This version of the application only supports files saved by version 5.0.0 "+
-                            "or later. Try loading/saving your file with version 5.0.0 first.")
+                    logging.error("Load File - This version of the application only supports files saved by version 6.0.0 or later")
+                    logging.error("Load File - Try loading/saving your file with version 6.0.0 first")
+                    if not suppress_popups:
+                        Tk.messagebox.showerror(parent=self.root, title="Load Error", message="Layout file was saved by Application "+
+                                sig_file_version+".\n"+ "This version of the application only supports files saved by version 6.0.0 "+
+                                    "or later. Try loading/saving your file with version 6.0.0 first.")
                 else:
                     # We should now be OK to attempt the load, but if the file was saved under a
                     # previous version then we still want to flag a warning message to the user
@@ -792,9 +803,9 @@ class main_menubar:
                         logging.warning("Load File - File was saved by application "+sig_file_version)
                         logging.warning("Load File - Current version of the application is "+application_version)
                         logging.warning("Load File - Re-save with current version to ensure forward compatibility")
-                        Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
-                            message="File was saved by "+sig_file_version+". "+
-                                "Re-save with current version to ensure forward compatibility.")
+                        if not suppress_popups:
+                            Tk.messagebox.showwarning(parent=self.root, title="Load Warning", message="File was saved by "+
+                                    sig_file_version+". "+"Re-save with current version to ensure forward compatibility.")
                     # Delete any GPIO status subscriptions (if the GPIO settings window is still open)
                     library.unsubscribe_from_all_gpio_port_status()
                     # Destroy any open configutation or settings windows (or it gets confusing)
@@ -824,6 +835,8 @@ class main_menubar:
         return()
 
     def import_schematic(self, xoffset:int=0, yoffset:int=0):
+        # Note that the Filename will be none for all standard use cases - only specified
+        # for the automated tests in which case we need to inhibit any pop up warnings
         logging.info("IMPORT-LAYOUT-FILE*********************************************************************************")
         file_loaded, layout_state = library.load_schematic()
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)

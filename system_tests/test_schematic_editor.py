@@ -7,6 +7,7 @@
 #       Editing of Lines (Drag and drop line ends) - snap to grid on/off
 #       Select/de-select objects via mouse/keyboard
 #       Add/remove objects from current selection 
+#       Hide/Unhide objects from current selection 
 #       Select multiple objects via area selection
 #       Delete selected objects
 #       Rotate selected objects
@@ -716,6 +717,34 @@ def run_object_flipping_tests():
     return()
 
 #-----------------------------------------------------------------------------------
+# This function tests configuration of hide/unhide of selected objects.
+# This is pimarily to excersise the code.
+#-----------------------------------------------------------------------------------
+
+def run_hide_and_unhide_tests():
+    global tb1, s1, s2, s3, s4, p1, p2, l1, l2, t1, i1, ts1, rb1, sb1, lev1
+    print("Schematic editor tests - Hide and Unhide of selected objects")
+    assert_object_configuration(t1,{"hidden" : False})
+    assert_object_configuration(tb1,{"hidden" : False})
+    assert_object_configuration(ts1,{"hidden" : False})
+    assert_object_configuration(sb1,{"hidden" : False})
+    select_all_objects()
+    hide_selected_objects()    
+    assert_object_configuration(t1,{"hidden" : True})
+    assert_object_configuration(tb1,{"hidden" : True})
+    assert_object_configuration(ts1,{"hidden" : True})
+    assert_object_configuration(sb1,{"hidden" : True})
+    select_all_objects()
+    unhide_selected_objects()    
+    assert_object_configuration(t1,{"hidden" : False})
+    assert_object_configuration(tb1,{"hidden" : False})
+    assert_object_configuration(ts1,{"hidden" : False})
+    assert_object_configuration(sb1,{"hidden" : False})
+    # Clean up
+    deselect_all_objects()
+    return()
+
+#-----------------------------------------------------------------------------------
 # This function tests the copy (and 'place') of selected objects.
 # Note the test uses the objects from the run_create_and_place_tests function.
 #-----------------------------------------------------------------------------------
@@ -961,6 +990,30 @@ def run_canvas_scroll_tests2():
     reset_window_size()
     return()
 
+#-----------------------------------------------------------------------------------
+# Test the scrolling of the canvas area in edit or run mode (quick scroll buttons):
+#-----------------------------------------------------------------------------------
+
+def run_canvas_scroll_tests3(mode:str):
+    print("Schematic editor tests - Quick Scroll of canvas area in "+mode)
+    # Test scrolling of the canvas (drag and drop with left mouse click and hold).
+    # We first have to force a re-size of the root window to make it smaller than the canvas size
+    run_function(lambda:schematic.root.geometry("500x300"))
+    scroll_canvas(470,250)
+    scroll_canvas(0,0)
+    reset_window_size()
+    return()
+
+#-----------------------------------------------------------------------------------
+# Test toggling of item IDs (in Edit Mode)
+#-----------------------------------------------------------------------------------
+
+def run_toggle_of_item_id_tests():
+    print("Schematic editor tests - Toggle on/off of item IDs in Edit Mode")
+    toggle_item_ids()
+    toggle_item_ids()
+    return()
+
 ######################################################################################################
 
 def run_all_schematic_editor_tests():
@@ -975,10 +1028,15 @@ def run_all_schematic_editor_tests():
     run_area_selection_and_move_tests2()
     run_object_rotation_tests()
     run_object_flipping_tests()
+    run_hide_and_unhide_tests()
+    run_toggle_of_item_id_tests()
     run_canvas_scroll_tests1("Edit Mode")
+    run_canvas_scroll_tests3("Edit Mode")
     set_run_mode()
     run_canvas_scroll_tests1("Run Mode")
     run_canvas_scroll_tests2()
+    run_canvas_scroll_tests3("Run Mode")
+    # 
     set_edit_mode()
     run_delete_object_tests()
     run_undo_and_redo_tests()

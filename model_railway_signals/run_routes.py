@@ -64,6 +64,7 @@
 #------------------------------------------------------------------------------------
 
 import logging
+import time
 
 from . import library
 from . import objects
@@ -78,6 +79,8 @@ root = None
 canvas = None
 run_mode = None
 automation_enabled = None
+
+enhanced_debugging = False
 
 #------------------------------------------------------------------------------------
 # The following Dictionary holds information as to whether a route_setup is in progress or not
@@ -468,7 +471,7 @@ def check_routes_valid_after_switch_change(switch_id:int, route_button_id:int):
                 if ( int(str_route_button_id) != route_button_id and library.button_state(int(str_route_button_id))
                         and str(switch_id) in route_definition["switchesonroute"].keys() and route_object["resetonswitchchanges"] ):
                     required_state = route_definition["switchesonroute"][str(switch_id)]
-                    if library.button_state(switch_id) != route_definition:
+                    if library.button_state(switch_id) != required_state:
                         logging.warning("RUN ROUTES - Route "+str_route_button_id+
                             " has been invalidated by changing Switch "+str(switch_id)+" - Clearing down route")
                         library.toggle_button(int(str_route_button_id))
@@ -487,11 +490,12 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
         route_definition_index = library.get_button_data(route_object["itemid"])["route"]
         if route_definition_index is not None:
             route_definition = route_object["routedefinitions"][route_definition_index]
-            # Process the clear down of any one-click or NX routes (button is always enabled if active)
-            if library.button_state(int(str_route_button_id)) and route_definition["exitsensor"] == sensor_id:
-                # Deselect the button and schedule all required events to clear down the route
-                library.toggle_button(int(str_route_button_id))
-                route_button_deselected_callback(int(str_route_button_id))
+            for exit_sensor_id in route_definition["exitsensors"]:
+                # Process the clear down of any one-click or NX routes (button is always enabled if active)
+                if library.button_state(int(str_route_button_id)) and exit_sensor_id == sensor_id:
+                    # Deselect the button and schedule all required events to clear down the route
+                    library.toggle_button(int(str_route_button_id))
+                    route_button_deselected_callback(int(str_route_button_id))
         # Process the set up of any one-touch routes (button may be enabled or disabled)
         # One-touch routes use the route index of zero - This feature is not enabled for NX routes
         elif not library.button_state(int(str_route_button_id)) and route_object["setupsensor"] == sensor_id:
@@ -506,6 +510,26 @@ def trigger_routes_after_sensor_passed(sensor_id:int):
             else:
                 logging.warning("RUN ROUTES - Track Sensor "+str(sensor_id)+" cannot trigger Route "+
                                    str_route_button_id+" set-up because:"+route_tooltip)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to automatically set/reset a schematic route after a signal passed event
+#------------------------------------------------------------------------------------
+
+def trigger_routes_after_signal_passed(signal_id:int):
+    for str_route_button_id in objects.route_index:
+        # Find the applicable route definition for the button (stored as the route button data)
+        # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
+        route_object = objects.schematic_objects[objects.route(str_route_button_id)]
+        route_definition_index = library.get_button_data(route_object["itemid"])["route"]
+        if route_definition_index is not None:
+            route_definition = route_object["routedefinitions"][route_definition_index]
+            for exit_signal_id in route_definition["exitsignals"]:
+                # Process the clear down of any one-click or NX routes (button is always enabled if active)
+                if library.button_state(int(str_route_button_id)) and exit_signal_id == signal_id:
+                    # Deselect the button and schedule all required events to clear down the route
+                    library.toggle_button(int(str_route_button_id))
+                    route_button_deselected_callback(int(str_route_button_id))
     return()
 
 #-------------------------------------------------------------------------------------------------
@@ -601,16 +625,27 @@ def complete_route_setup(route_button_id:int):
             # If a point does not have a FPL then the 'has_fpl' function will return True
             if library.point_switched(int(str_point_id)) != required_state or not library.fpl_active(int(str_point_id)):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +"route setup by change to point "+str_point_id+" - Clearing down route")
         for int_signal_id in route_definition["signalsonroute"]:
             if not library.signal_clear(int_signal_id):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +"route setup by change to signal "+str(int_signal_id)+" - Clearing down route")
         for int_signal_id in route_definition["subsidariesonroute"]:
             if not library.subsidary_clear(int_signal_id):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +"route setup by change to subsidiary "+str(int_signal_id)+" - Clearing down route")
         for str_switch_id in route_definition["switchesonroute"].keys():
             required_state = route_definition["switchesonroute"][str_switch_id]
-            if library.button_state(int(str_switch_id)) != required_state:
+            switch_type = objects.schematic_objects[objects.switch(str_switch_id)]["itemtype"]
+            # We only really care about latching switches - not momentary switches
+            if (switch_type == library.button_type.switched.value and
+                   library.button_state(int(str_switch_id)) != required_state):
                 route_set_up_and_locked = False
+                logging.warning("RUN ROUTES - Route "+str(route_button_id)+" has been invalidated during "
+                         +"route setup by change to switch "+str_switch_id+" - Clearing down route")
         # If successful we update the point and line colours to highlight the route (Run Mode only)
         # If unsuccessful we de-select the button (to show the route was not set up)
         if run_mode and route_set_up_and_locked:
@@ -619,9 +654,8 @@ def complete_route_setup(route_button_id:int):
                 library.set_point_colour(point_id, colour)
             for line_id in route_definition["linestohighlight"]:
                 library.set_line_colour(line_id, colour)
+            logging.info("RUN ROUTES - Set-up of Route "+str(route_button_id)+" is now complete **************************************")
         elif library.button_state(route_button_id):
-            logging.warning("RUN ROUTES - Route "+str(route_button_id)+
-                " has been invalidated during route setup - Clearing down route")
             library.toggle_button(route_button_id)
             route_button_deselected_callback(route_button_id)
         # Unlock the route button(s) now processing is complete
@@ -629,7 +663,6 @@ def complete_route_setup(route_button_id:int):
         if exit_button_id > 0: library.unlock_button(exit_button_id)
         # Enable/disable all route buttons (including this one) as required
         enable_disable_schematic_routes()
-        logging.info("RUN ROUTES - Set-up of Route "+str(route_button_id)+" is now complete **************************************")
     return()
 
 def complete_route_cleardown(route_button_id:int):
@@ -723,6 +756,9 @@ activated_entry_button_id = 0
 
 def route_button_selected_callback(route_button_id:int):
     global activated_entry_button_id
+    if enhanced_debugging:
+        print("########## route_button_selected_callback "+str(route_button_id))
+        start_time = time.time()
     # Retrieve the object configuration for the Route
     route_object_id = objects.route(route_button_id)
     route_object = objects.schematic_objects[route_object_id]
@@ -790,6 +826,12 @@ def route_button_selected_callback(route_button_id:int):
                 logging.debug("RUN ROUTES - Initiating a new NX route setup sequence as Button "+
                               str(route_button_id)+" is also an ENTRY Button")
             else:
+                ########################################################################################################
+                # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation because:
+                # 1) EXIT Buttons are disabled if there are no valid routes available from the selected ENTRY Button
+                # 2) ENTRY/EXIT buttons are disabled the same as above AND if there are no valid routes from the button
+                #    to another exit button (this is the case where a new NX route selection would be initiated) 
+                ########################################################################################################
                 logging.debug("RUN ROUTES - No available routes - Clearing down current NX route setup sequence")
                 activated_entry_button_id = 0
                 # Deselect the button (only if not part of an active route)
@@ -817,10 +859,21 @@ def route_button_selected_callback(route_button_id:int):
             enable_disable_schematic_routes()
         # Deselect the button (only if not part of an active route)
         elif library.button_state(route_button_id) and entry_button_data["entrybutton"] == 0 and entry_button_data["exitbutton"] == 0:
-            logging.debug("RUN ROUTES - Deselecting Button "+str(route_button_id)+" as no available routes")
+            ########################################################################################################
+            # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
+            # As ENTRY Buttons are disabled unless there is one or more valid routes available
+            ########################################################################################################
+            logging.error("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
             library.toggle_button(route_button_id)
     else:
-        logging.debug("RUN ROUTES - Button "+str(route_button_id)+" has been Selected")
+        ########################################################################################################
+        # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
+        # As EXIT-ONLY Buttons should be disabled unless a route selection has been initiated
+        ########################################################################################################
+        logging.error("RUN ROUTES - EXIT Button "+str(route_button_id)+" has been Selected - but no ENTRY button is active")
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def highlight_possible_routes(route_button_id:int):
@@ -940,6 +993,9 @@ def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definitio
 
 def route_button_deselected_callback(route_button_id:int):
     global activated_entry_button_id
+    if enhanced_debugging:
+        print("########## route_button_deselected_callback "+str(route_button_id))
+        start_time = time.time()
     # Retrieve the object configuration for the Route Button
     route_object_id = objects.route(route_button_id)
     route_object = objects.schematic_objects[route_object_id]
@@ -1036,6 +1092,9 @@ def route_button_deselected_callback(route_button_id:int):
                                     " is part of a new NX route setup sequence")
         route_button_selected_callback(route_button_id)
     enable_disable_schematic_routes()
+    if enhanced_debugging:
+        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        print("########## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 #------------------------------------------------------------------------------------

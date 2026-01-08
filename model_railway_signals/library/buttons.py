@@ -344,9 +344,6 @@ def flash_button2(button_id:int):
         buttons[str(button_id)]["flashevent"] = common.root_window.after(250, lambda:flash_button1(button_id))
     return()
 
-def reset_button_colour_according_to_state(button_id:int):
-    return()
-
 def set_button_flashing(button_id:int):
     global buttons
     # Validate the parameters we have been given as this is a library API function
@@ -459,9 +456,13 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         bbox = canvas.bbox(label1_object)
         label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
                             tags=canvas_tag, fill="purple3", width=0)
+        canvas.tag_raise(label1_object)
         if not editing_enabled or not button_ids_displayed:
             canvas.itemconfig(label1_object, state="hidden")
             canvas.itemconfig(label2_object, state="hidden")
+        else:
+            canvas.itemconfig(label1_object, state="normal")
+            canvas.itemconfig(label2_object, state="normal")
         # Compile a dictionary of everything we need to track
         buttons[str(button_id)] = {}
         buttons[str(button_id)]["canvas"] = canvas                            # Tkinter canvas object
@@ -558,7 +559,11 @@ def delete_button(button_id:int):
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": delete_button - Button ID does not exist")
     else:
-        logging.debug("Button "+str(button_id)+": Deleting library object from the schematic")    
+        logging.debug("Button "+str(button_id)+": Deleting library object from the schematic")
+        # Stop flashing the button (i.e. cancel any scheduled root.after() events for the button)
+        # This covers the case of loading a new schematic whilst running an existing schematic
+        # If we didn't do this then any buttons of the same ID on the new schematic would flash
+        reset_button_flashing(button_id)
         # Delete all the tkinter drawing objects associated with the Button
         buttons[str(button_id)]["canvas"].delete(buttons[str(button_id)]["tags"])
         buttons[str(button_id)]["button"].destroy()

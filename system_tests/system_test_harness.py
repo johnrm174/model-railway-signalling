@@ -118,6 +118,8 @@
 #    snap_selected_objects_to_grid()  - 's' key - also right-click-menu function
 #    rotate_selected_objects()        - 'r' key - also right-click-menu function
 #    flip_selected_objects()          - 'f' key - also right-click-menu function
+#    hide_selected_objects()          - 'h' key
+#    unhide_selected_objects()        - 'u' key
 #    delete_selected_objects()        - 'del' key - also right-click-menu function
 #    nudge_selected_objects()         - 'arrow' keys
 #    copy_selected_objects()          - 'Cntl-c' - also right-click-menu function
@@ -125,6 +127,8 @@
 #    undo() / redo()                  - 'Cntl-x' / 'Cntl-y'
 #    select_all_objects()             - Right-click-menu function
 #    deselect_all_objects()           - 'esc' key
+#    scroll_canvas(x,y)               - Scroll the canvas to an absolute position
+#    toggle_item_ids()                - Toggle display of item IDs On/off
 #
 # Supported Schematic mouse event invocations:
 #    test_all_edit_object_windows(test_all_controls:bool=False - Opens & exercises all edit windows for all schematic objects
@@ -180,7 +184,6 @@ from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
 from model_railway_signals.library import levers
 
-thread_delay_time = 0.150
 tkinter_thread_started = False
 main_menubar = None
 root = None
@@ -231,11 +234,33 @@ def start_application(callback_function):
         logging.info("Keyboard Interrupt - Shutting down")
         schematic.shutdown()
         common.instant_shutdown()
-        
-def run_function(test_function, delay:float=thread_delay_time):
-    common.execute_function_in_tkinter_thread(test_function)
-    sleep(delay)
 
+def run_function(test_function, timeout=2.0):
+    # Create an Event (to signal back into this thread when the function has completed)
+    done_event1 = threading.Event()
+    done_event2 = threading.Event()
+    # Create a function Wrapper that will always set the event when the function has completed)
+    def function_wrapper1():
+        try: test_function()
+        finally: done_event1.set()
+    # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
+    common.execute_function_in_tkinter_thread(function_wrapper1)
+    # Wait for the event to complete before returning
+    # wait() returns True if the flag is set, False if it timed out
+    successfully_completed = done_event1.wait(timeout=timeout)
+    if not successfully_completed:
+        raise_test_error(f"Test function timed out after {timeout} seconds")
+    # Some application functions schedule events via the root.after() method to
+    # complete all required actions (e.g. reset_layout, signal_passed events etc.
+    # We therefore ensure any 'immediate' events that have been added to the queue
+    # are processed as required before we hand back execution to the calling programme
+    def function_wrapper2():
+        done_event2.set()
+    common.execute_function_in_tkinter_thread(function_wrapper2)
+    successfully_completed = done_event2.wait(timeout=timeout)
+    if not successfully_completed:
+        raise_test_error(f"Secondary events timed out after {timeout} seconds")
+    
 # ------------------------------------------------------------------------------
 # Functions to log out test error/warning messages with the filename and line number 
 # of the parent test file that called the test assert functions in this module
@@ -267,13 +292,11 @@ def increment_tests_executed():
 def initialise_test_harness(filename=None):
     if filename is None:
         # Ensure any queued tkinter events have completed
-        time.sleep(1.0) 
-        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),delay=2.0)
+        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),timeout=2.0)
     else:
         # Ensure any queued tkinter events have completed
-        time.sleep(1.0) 
         print ("System Tests: Load Scematic: '",filename,"'")
-        run_function(lambda:main_menubar.load_schematic(filename),delay=3.0)
+        run_function(lambda:main_menubar.load_schematic(filename),timeout=5.0)
 
 # ------------------------------------------------------------------------------
 # Function to finish the tests and report on any failures. Then drops straight
@@ -385,7 +408,7 @@ def trigger_signals_passed(*sigids):
             raise_test_warning ("trigger_signals_passed - Signal: "+str(sigid)+" does not exist")
         else:
             run_function(lambda:signals.sig_passed_button_event(sigid))
-                                               
+
 def trigger_signals_released(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals.signals.keys():
@@ -507,6 +530,8 @@ def simulate_gpio_triggered(*gpioids):
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+            # Wait 0.2 seconds (default GPIO sensor timeout = 0.1s)
+            time.sleep(0.2)
 
 def simulate_gpio_on(*gpioids):
     for gpioid in gpioids:
@@ -945,7 +970,7 @@ class dummy_event():
 def place_object(xpos:int, ypos:int, steps:int, delay:float, test_cancel:bool=False):
     move_cursor(xstart=0, ystart=0, xfinish=xpos, yfinish=ypos, steps=steps, delay=delay)
     event = dummy_event(x=xpos, y=ypos)
-    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress(), delay=0.2)
+    if test_cancel: run_function(lambda:schematic.cancel_place_object_in_progress())
     run_function(lambda:schematic.left_button_click(event))
     run_function(lambda:schematic.left_button_release(event))
     
@@ -1108,20 +1133,20 @@ def get_object_id(item_type:str, item_id:int):
 # ------------------------------------------------------------------------------
 
 def set_edit_mode():
-    run_function(lambda:main_menubar.edit_mode(),delay=0.5)
+    run_function(lambda:main_menubar.edit_mode())
     
 def set_run_mode():
-    run_function(lambda:main_menubar.run_mode(),delay=0.5)
+    run_function(lambda:main_menubar.run_mode())
     
 def set_automation_on():
-    run_function(lambda:main_menubar.automation_enable(),delay=0.5)
+    run_function(lambda:main_menubar.automation_enable())
     
 def set_automation_off():
-    run_function(lambda:main_menubar.automation_disable(),delay=0.5)
+    run_function(lambda:main_menubar.automation_disable())
 
 def reset_layout():
-    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=1.0)
-    
+    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False))
+
 # ------------------------------------------------------------------------------
 # Functions to exercise the schematic Editor
 # ------------------------------------------------------------------------------
@@ -1130,24 +1155,29 @@ def reset_layout():
 # This event is normally only enabled in RUN Mode
 def toggle_automation():
     event = dummy_event(keysym="a")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    run_function(lambda:main_menubar.handle_canvas_event(event))
 
 # Simulates the <cntl-m> keypress on the canvas
 # This event is normally enabled in both EDIT Mode (disabled when move in progress) and RUN mode
 def toggle_mode():
     event = dummy_event(keysym="m")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    run_function(lambda:main_menubar.handle_canvas_event(event))
+
+# Simulates the <cntl-i> keypress to toggle the display of item IDs
+# This event is normally enabled in only EDIT Mode
+def toggle_item_ids():
+    run_function(lambda:schematic.toggle_item_ids())
 
 # Simulates the <cntl-s> keypress on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def toggle_snap_to_grid():
     event = dummy_event(keysym="s")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    run_function(lambda:main_menubar.handle_canvas_event(event))
 
 # Simulates the <cntl-r> keypress on the canvas
 # This event is normally enabled in EDIT Mode (disabled when move in progress) and RUN mode
 def reset_window_size():
-    run_function(lambda:schematic.reset_window_size(),delay=0.5)
+    run_function(lambda:schematic.reset_window_size())
 
 # This function enables object configurations to be changed in support of the testing
 # (effectively simulating OK/Apply from an object configuration window to save the changes)
@@ -1202,7 +1232,7 @@ def select_and_edit_single_object(object_id):
     else:
         xpos, ypos = get_selection_position(object_id)
         event = dummy_event(x=xpos, y=ypos)
-        run_function(lambda:schematic.left_double_click(event), delay=1.0)
+        run_function(lambda:schematic.left_double_click(event))
         run_function(lambda:schematic.close_edit_window(cancel=True))
         
 # Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
@@ -1270,10 +1300,19 @@ def nudge_selected_objects(direction:str="Left"):
         event=dummy_event(keysym=direction)
         run_function(lambda:schematic.nudge_selected_objects(event))
 
+# Simulates a "quickscroll" menubar selection - scrolling the canvas to specified coords:
+# These events are  enabled in both EDIT and RUN Modes
+def scroll_canvas(x:int, y:int):
+    run_function(lambda:schematic.scroll_canvas(x, y))
+
+# These events are only enabled in EDIT Mode (disabled when move in progress)
+def snap_selected_objects_to_grid():
+    run_function(lambda:schematic.snap_selected_objects_to_grid())
+
 # Simulates the <s> keypress or 'snap-to-grid' selection from object popup menu
 # These events are only enabled in EDIT Mode (disabled when move in progress)
 def snap_selected_objects_to_grid():
-    run_function(lambda:schematic.snap_selected_objects_to_grid(), delay=0.5)
+    run_function(lambda:schematic.snap_selected_objects_to_grid())
 
 # Simulates the 'select_all' selection from the canvas popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
@@ -1289,17 +1328,24 @@ def deselect_all_objects():
 # Simulates the <r> keypress or 'rotate' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def rotate_selected_objects():
-    run_function(lambda:schematic.rotate_selected_objects(),delay=0.5)
+    run_function(lambda:schematic.rotate_selected_objects())
 
 # Simulates the <f> keypress or 'flip' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def flip_selected_objects():
-    run_function(lambda:schematic.flip_selected_objects(),delay=0.5)
+    run_function(lambda:schematic.flip_selected_objects())
+    
+# Simulates the <h>/<u> keypress to hide/unhide schematic objects (in Run Mode
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
+def hide_selected_objects():
+    run_function(lambda:schematic.hide_selected_objects())
+def unhide_selected_objects():
+    run_function(lambda:schematic.unhide_selected_objects())
 
 # Simulates the <backspace>/<delete> keypress or 'delete' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def delete_selected_objects():
-    run_function(lambda:schematic.delete_selected_objects(),delay=0.5)
+    run_function(lambda:schematic.delete_selected_objects())
     
 # Simulates the <cntl-c> keypress or 'copy' selection from the object popup menu
 # These events are normally only enabled in EDIT Mode (disabled when move in progress)
@@ -1313,15 +1359,13 @@ def copy_selected_objects(xdiff:int, ydiff:int, steps:int=10, delay:float=0.0, t
 # Simulates the <cntl-z> keypress event on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def undo():
-    run_function(lambda:schematic.schematic_undo(),delay=0.5)
+    run_function(lambda:schematic.schematic_undo())
 
 # Simulates the <cntl-v> keypress event on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def redo():
-    run_function(lambda:schematic.schematic_redo(),delay=0.5)
+    run_function(lambda:schematic.schematic_redo())
 
-
-    
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------

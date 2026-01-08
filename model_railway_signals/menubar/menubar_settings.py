@@ -316,6 +316,176 @@ class sprog_addressing_information():
         sprog_settings_learn_more_window = None
 
 #------------------------------------------------------------------------------------
+# Class for the SPROG Status Tab.
+#------------------------------------------------------------------------------------
+
+class sprog_status_frame(Tk.Frame):
+    def __init__(self, parent_window):
+        super().__init__(parent_window)
+        # Variable to hold the Tkinter referene to the watchdog timer
+        self.watchdog_timer = None
+        # Create a frame for DCC Power monitoring
+        self.frame1 = Tk.LabelFrame(self, text="DCC Bus Power")
+        self.frame1.pack(fill="x")
+        self.voltage=Tk.Label(self.frame1, width=18)
+        self.voltage.pack(padx=5, pady=5, side=Tk.LEFT)
+        self.current=Tk.Label(self.frame1, width=18)
+        self.current.pack(padx=5, pady=5, side=Tk.LEFT)
+        # Create a frame for SPROG Status
+        self.frame2 = Tk.LabelFrame(self, text="SPROG Status")
+        self.frame2.pack(fill="x")
+        self.cbus_node =        Tk.Label(self.frame2, width=30)
+        self.firmware_version = Tk.Label(self.frame2, width=30)
+        self.track_power_on =   Tk.Label(self.frame2, width=30)
+        self.track_error =      Tk.Label(self.frame2, width=30)
+        self.sprog_error =      Tk.Label(self.frame2, width=30)
+        self.cbus_node.pack(padx=5, pady=2)
+        self.firmware_version.pack(padx=5, pady=2)
+        self.track_power_on.pack(padx=5, pady=2)
+        self.track_error.pack(padx=5, pady=2)
+        self.sprog_error.pack(padx=5, pady=2)
+        # Create the buttons to start and stop reporting
+        self.frame3 = Tk.Frame(self)
+        self.frame3.pack()
+        self.B1 = Tk.Button(self.frame3, text="Start Status Reporting",
+                    command=lambda:library.enable_status_reporting(self.update))
+        self.B1.pack(padx=5, pady=5, side=Tk.LEFT)
+        self.B2 = Tk.Button(self.frame3, text="Stop Status Reporting",
+                    command=lambda:library.disable_status_reporting())
+        self.B2.pack(padx=5, pady=5, side=Tk.LEFT)
+        # Set the initial labels (showing no data)
+        self.reset_to_defaults()
+
+    def update(self, data):
+        # Cancel the existing timer if one is running
+        if self.watchdog_timer is not None:
+            self.after_cancel(self.watchdog_timer)
+        # Update the labels with the new data
+        if "voltage" in data:
+            self.voltage.config(text=f"Voltage: {data['voltage']:.1f} V")
+        if "current" in data:
+            self.current.config(text=f"Current: {data['current']:.3f} A")
+        if "cbus_node" in data:
+            self.cbus_node.config       (text="SPROG CBUS Node ID     : "+str(data["cbus_node"]))
+        if "firmware_version" in data:
+            self.firmware_version.config(text="SPROG Firmware Version : "+str(data["firmware_version"]))
+        if "track_power_on" in data:
+            self.track_power_on.config  (text="DCC Bus Supply On      : "+str(data["track_power_on"]))
+        if "track_error" in data:
+            self.track_error.config     (text="DCC Bus Power Error    : "+str(data["track_error"]))
+        if "sprog_error" in data:
+            self.sprog_error.config     (text="SPROG Internal Error   : "+str(data["sprog_error"]))
+        # Start a new 5-second timer to call 'self.reset_to_defaults' if no data within 5 seconds
+        self.watchdog_timer = self.after(3000, self.reset_to_defaults)
+
+    def reset_to_defaults(self):
+        self.voltage.config(text="Voltage: --- V")
+        self.current.config(text="Current: --- A")
+        self.cbus_node.config(text="SPROG CBUS Node ID     : --- ")
+        self.firmware_version.config(text="SPROG Firmware Version : --- ")
+        self.track_power_on.config(text="DCC Bus Supply On      : --- ")
+        self.track_error.config(text="DCC Bus Overload       : --- ")
+        self.sprog_error.config(text="SPROG Internal Error   : --- ")
+        self.watchdog_timer = None
+
+    def destroy(self):
+        if self.watchdog_timer is not None:
+            self.after_cancel(self.watchdog_timer)
+            self.watchdog_timer = None
+        library.disable_status_reporting()
+
+#------------------------------------------------------------------------------------
+# Class for the SPROG Config Tab.
+#------------------------------------------------------------------------------------
+
+class sprog_config_frame(Tk.Frame):
+    def __init__(self, parent_window, connect_function):
+        super().__init__(parent_window)
+        self.connect_function = connect_function
+        #----------------------------------------------------------------------------
+        # Create a labelframe for the main SPROG Settings
+        #----------------------------------------------------------------------------
+        self.frame1 = Tk.LabelFrame(self, text="SPROG Configuration")
+        self.frame1.pack(padx=2, pady=2, fill='x')
+        # Create the Serial Port and baud rate UI elements in a subframe
+        self.subframe1 = Tk.Frame(self.frame1)
+        self.subframe1.pack()
+        self.label1 = Tk.Label(self.subframe1, text="Port:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.port = common.entry_box(self.subframe1, width=15,tool_tip="Specify "+
+                    "the serial port to use for communicating with the SPROG")
+        self.port.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label2 = Tk.Label(self.subframe1, text="Baud:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.options = ['115200','460800']
+        self.baud_selection = Tk.StringVar(self, "")
+        self.baud = Tk.OptionMenu(self.subframe1, self.baud_selection, *self.options)
+        menu_width = len(max(self.options, key=len))
+        self.baud.config(width=menu_width)
+        common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port "
+                                        +"(115200 for Pi-SPROG3 or 460800 for Pi-SPROG3 v2)")
+        self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create the remaining remaining SPROG Configuration UI elements
+        self.debug = common.check_box(self.frame1, label="Enhanced SPROG debug logging", width=28,
+            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
+                     "to 'debug')")
+        self.debug.pack(padx=2, pady=2)
+        self.startup = common.check_box(self.frame1, label="Initialise SPROG on layout load", width=28,
+            tool_tip="Select to configure serial port and initialise SPROG following layout load",
+            callback=self.selection_changed)
+        self.startup.pack(padx=2, pady=2)
+        self.power = common.check_box(self.frame1, label="Enable DCC power on layout load", width=28,
+            tool_tip="Select to enable DCC accessory bus power following layout load")
+        self.power.pack(padx=2, pady=2)
+        #----------------------------------------------------------------------------
+        # Create a labelframe for the SPROG Address mode Settings
+        #----------------------------------------------------------------------------
+        self.frame2 = Tk.LabelFrame(self, text="DCC Address Offsets")
+        self.frame2.pack(padx=2, pady=2, fill='x')
+        self.addressmode = common.selection_buttons(self.frame2, label="", border_width=0,
+            tool_tip="Select the DCC Addressing Mode (click button below for more information)",
+            button_labels=("No Offset", "Plus 4 Offset", "Minus 4 Offset"))
+        self.addressmode.pack(padx=2, pady=2)
+        self.B2 = Tk.Button (self.frame2, text="Extended help for this setting",
+                             command=lambda:sprog_addressing_information(self.window))
+        self.B2.pack(padx=2, pady=2)
+        self.TT2 = common.CreateToolTip(self.B2, "Click for more information on DCC Addressing Modes")
+        #----------------------------------------------------------------------------
+        # Create the Button to test connectivity
+        #----------------------------------------------------------------------------
+        self.frame3 = Tk.LabelFrame(self, text="Test SPROG connectivity")
+        self.frame3.pack(padx=2, pady=2, fill='x')
+        self.B1 = Tk.Button (self.frame3, text="Apply Settings and Connect",command=self.test_connectivity)
+        self.B1.pack(padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
+                        "the command station status to confirm a connection to the SPROG has been established")
+        # Create the Status Label
+        self.status = Tk.Label(self.frame3, text="")
+        self.status.pack(padx=2, pady=2)
+
+    def selection_changed(self):
+        # If connect on startup is selected then enable the DCC power on startup selection
+        if self.startup.get_value(): self.power.enable()
+        else: self.power.disable()
+
+    def test_connectivity(self):
+        # Validate the port to "accept" the current value and focus out (onto the button)
+        self.port.validate()
+        self.B1.focus()
+        # Apply the current settings (as they appear in the UI)
+        settings.set_sprog("port", self.port.get_value())
+        settings.set_sprog("baud", int(self.baud_selection.get()))
+        settings.set_sprog("debug", self.debug.get_value())
+        settings.set_sprog("startup", self.startup.get_value())
+        settings.set_sprog("power", self.power.get_value())
+        # The Sprog Connect function will return True if successful
+        # It will also update the Menubar to reflect the SPROG connection status
+        if self.connect_function(show_popup=False):
+            self.status.config(text="SPROG successfully connected", fg="green")
+        else:
+            self.status.config(text="SPROG connection failure", fg="red")
+
+#------------------------------------------------------------------------------------
 # Class for the SPROG settings selection toolbar window. Note the init function takes
 # in callbacks for connecting to the SPROG and for applying the updated settings.
 # Note also that if a window is already open then we just raise it and exit.
@@ -332,7 +502,6 @@ class edit_sprog_settings():
             edit_sprog_settings_window.state('normal')
             edit_sprog_settings_window.focus_force()
         else:
-            self.connect_function = connect_function
             self.update_function = update_function
             # Create the (non resizable) top level window for the SPROG configuration
             self.window = Tk.Toplevel(root_window)
@@ -341,63 +510,20 @@ class edit_sprog_settings():
             self.window.resizable(False, False)
             edit_sprog_settings_window = self.window
             #----------------------------------------------------------------------------
-            # Create a labelframe for the main SPROG Settings
+            # Create the Notebook and Tabs
             #----------------------------------------------------------------------------
-            self.frame1 = Tk.LabelFrame(self.window, text="SPROG Configuration")
-            self.frame1.pack(padx=2, pady=2, fill='x')
-            # Create the Serial Port and baud rate UI elements in a subframe
-            self.subframe1 = Tk.Frame(self.frame1)
-            self.subframe1.pack()
-            self.label1 = Tk.Label(self.subframe1, text="Port:")
-            self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.port = common.entry_box(self.subframe1, width=15,tool_tip="Specify "+
-                        "the serial port to use for communicating with the SPROG")
-            self.port.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.label2 = Tk.Label(self.subframe1, text="Baud:")
-            self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.options = ['115200','460800']
-            self.baud_selection = Tk.StringVar(self.window, "")
-            self.baud = Tk.OptionMenu(self.subframe1, self.baud_selection, *self.options)
-            menu_width = len(max(self.options, key=len))
-            self.baud.config(width=menu_width)
-            common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port "
-                                            +"(115200 for Pi-SPROG3 or 460800 for Pi-SPROG3 v2)")
-            self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
-            # Create the remaining remaining SPROG Configuration UI elements
-            self.debug = common.check_box(self.frame1, label="Enhanced SPROG debug logging", width=28,
-                tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
-                         "to 'debug')")
-            self.debug.pack(padx=2, pady=2)
-            self.startup = common.check_box(self.frame1, label="Initialise SPROG on layout load", width=28,
-                tool_tip="Select to configure serial port and initialise SPROG following layout load",
-                callback=self.selection_changed)
-            self.startup.pack(padx=2, pady=2)
-            self.power = common.check_box(self.frame1, label="Enable DCC power on layout load", width=28,
-                tool_tip="Select to enable DCC accessory bus power following layout load")
-            self.power.pack(padx=2, pady=2)
-            #----------------------------------------------------------------------------
-            # Create a labelframe for the DPROG Address mode Settings
-            #----------------------------------------------------------------------------
-            self.frame2 = Tk.LabelFrame(self.window, text="DCC Address Offsets")
-            self.frame2.pack(padx=2, pady=2, fill='x')
-            self.addressmode = common.selection_buttons(self.frame2, label="", border_width=0,
-                tool_tip="Select the DCC Addressing Mode (click button below for more information)",
-                button_labels=("No Offset", "Plus 4 Offset", "Minus 4 Offset"))
-            self.addressmode.pack(padx=2, pady=2)
-            self.B2 = Tk.Button (self.frame2, text="Extended help for this setting",
-                                 command=lambda:sprog_addressing_information(self.window))
-            self.B2.pack(padx=2, pady=2)
-            self.TT2 = common.CreateToolTip(self.B2, "Click for more information on DCC Addressing Modes")
-            #----------------------------------------------------------------------------
-            # Create the Button to test connectivity
-            #----------------------------------------------------------------------------
-            self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
-            self.B1.pack(padx=2, pady=2)
-            self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
-                            "the command station status to confirm a connection to the SPROG has been established")
-            # Create the Status Label
-            self.status = Tk.Label(self.window, text="")
-            self.status.pack(padx=2, pady=2)
+            self.tabs = ttk.Notebook(self.window)
+            # Create the Window tabs
+            self.tab1 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab1, text="Config")
+            self.tab2 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab2, text="Status")
+            # Populate the contents of each tab:
+            self.sprogconfig = sprog_config_frame(self.tab1, connect_function)
+            self.sprogconfig.pack(padx=5, pady=5, fill="both", expand=True)
+            self.sprogstatus = sprog_status_frame(self.tab2)
+            self.sprogstatus.pack(padx=5, pady=5, fill="both", expand=True)
+            self.tabs.pack()
             #----------------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             #----------------------------------------------------------------------------
@@ -405,64 +531,30 @@ class edit_sprog_settings():
             self.controls.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
-
-    def selection_changed(self):
-        # If connect on startup is selected then enable the DCC power on startup selection
-        if self.startup.get_value(): self.power.enable()
-        else: self.power.disable()
-
-    def test_connectivity(self):
-        # Validate the port to "accept" the current value and focus out (onto the button)
-        self.port.validate()
-        self.B1.focus()
-        # Save the existing settings (as they haven't been "applied" yet)
-        current_port = settings.get_sprog("port")
-        current_baud = settings.get_sprog("baud")
-        current_debug = settings.get_sprog("debug")
-        current_startup = settings.get_sprog("startup")
-        current_power = settings.get_sprog("power")
-        # Apply the current settings (as thery currently appear in the UI)
-        settings.set_sprog("port", self.port.get_value())
-        settings.set_sprog("baud", int(self.baud_selection.get()))
-        settings.set_sprog("debug", self.debug.get_value())
-        settings.set_sprog("startup", self.startup.get_value())
-        settings.set_sprog("power", self.power.get_value())
-        # The Sprog Connect function will return True if successful
-        # It will also update the Menubar to reflect the SPROG connection status
-        if self.connect_function(show_popup=False):
-            self.status.config(text="SPROG successfully connected", fg="green")
-        else:
-            self.status.config(text="SPROG connection failure", fg="red")
-        # Now restore the existing settings (as they haven't been "applied" yet)
-        settings.set_sprog("port", current_port)
-        settings.set_sprog("baud", current_baud)
-        settings.set_sprog("debug", current_debug)
-        settings.set_sprog("startup", current_startup)
-        settings.set_sprog("power", current_power)
         
     def load_state(self):
         # Reset the Test connectivity message
-        self.status.config(text="")
+        self.sprogconfig.status.config(text="")
         # Load the UI from the settings
-        self.port.set_value(settings.get_sprog("port"))
-        self.baud_selection.set(str(settings.get_sprog("baud")))
-        self.debug.set_value(settings.get_sprog("debug"))
-        self.startup.set_value(settings.get_sprog("startup"))
-        self.power.set_value(settings.get_sprog("power"))
-        self.addressmode.set_value(settings.get_sprog("addressmode"))
+        self.sprogconfig.port.set_value(settings.get_sprog("port"))
+        self.sprogconfig.baud_selection.set(str(settings.get_sprog("baud")))
+        self.sprogconfig.debug.set_value(settings.get_sprog("debug"))
+        self.sprogconfig.startup.set_value(settings.get_sprog("startup"))
+        self.sprogconfig.power.set_value(settings.get_sprog("power"))
+        self.sprogconfig.addressmode.set_value(settings.get_sprog("addressmode"))
         # Grey out the power checkbox as required
-        self.selection_changed()
+        self.sprogconfig.selection_changed()
         
     def save_state(self, close_window:bool):
         # Validate the port to "accept" the current value
-        self.port.validate()
+        self.sprogconfig.port.validate()
         # Save the new settings
-        settings.set_sprog("port", self.port.get_value())
-        settings.set_sprog("baud", int(self.baud_selection.get()))
-        settings.set_sprog("debug", self.debug.get_value())
-        settings.set_sprog("startup", self.startup.get_value())
-        settings.set_sprog("power", self.power.get_value())
-        settings.set_sprog("addressmode", self.addressmode.get_value())
+        settings.set_sprog("port", self.sprogconfig.port.get_value())
+        settings.set_sprog("baud", int(self.sprogconfig.baud_selection.get()))
+        settings.set_sprog("debug", self.sprogconfig.debug.get_value())
+        settings.set_sprog("startup", self.sprogconfig.startup.get_value())
+        settings.set_sprog("power", self.sprogconfig.power.get_value())
+        settings.set_sprog("addressmode", self.sprogconfig.addressmode.get_value())
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK)
@@ -875,6 +967,12 @@ class gpio_port_mapping(Tk.Frame):
         self.callback = callback
         # Create a frame to hold the label and entry box
         super().__init__(parent_frame)
+        # Create the Test button and bind the events we are interested in
+        self.test = Tk.Button(self, text="Test", pady=0, padx=0)
+        self.test.pack(padx=2, side=Tk.LEFT)
+        self.test.bind('<Button-1>', self.button_pressed_event)
+        self.test.bind('<ButtonRelease-1>', self.button_released_event)
+        self.testTT=common.CreateToolTip(self.test, text="Press/release to simulate GPIO port events")
         # Create the status indication
         self.status = Tk.Label(self, width=2,bd=1, relief="solid")
         self.status.pack(side=Tk.LEFT,padx=2)
@@ -887,21 +985,27 @@ class gpio_port_mapping(Tk.Frame):
                 tool_tip="Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)")
         self.sensorid.pack(side=Tk.LEFT, padx=2)
         # Create the Signal/Track sensor 'mapping' label
-        self.mapping = Tk.Label(self, width=18, anchor='w')
+        self.mapping = Tk.Label(self, width=38, anchor='w')
         self.mapping.pack(side=Tk.LEFT,padx=2)
+
+    def button_pressed_event(self, event=None):
+        library.gpio_sensor_triggered(self.gpio_port)
+
+    def button_released_event(self, event=None):
+        library.gpio_sensor_released(self.gpio_port)
 
     def entry_updated(self, status_code:int=None):
         # Update the mapping information
+        mapping = ""
         if library.gpio_sensor_exists(self.sensorid.get_value()):
             event_mappings = library.get_gpio_sensor_callback(self.sensorid.get_value())
-            if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
-            elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
-            elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
-            elif event_mappings[3] > 0: mapping_text = u"\u2192"+" Track Section "+str(event_mappings[3])
-            else: mapping_text="--------------------------"
-        else:
-            mapping_text="--------------------------"
-        self.mapping.config(text=mapping_text)
+            if event_mappings[0] > 0: mapping = mapping + u"\u2192" + " Signal " + str(event_mappings[0]) + " "
+            if event_mappings[1] > 0: mapping = mapping + u"\u2192" + " Signal "+ str(event_mappings[1]) + " "
+            if event_mappings[2] > 0: mapping = mapping + u"\u2192" + " Tk Sensor "+ str(event_mappings[2]) + " "
+            if event_mappings[3] > 0: mapping = mapping + u"\u2192" + " Section "+ str(event_mappings[3]) + " "
+        if len(mapping) == 0:
+            mapping="-----------------------------------------------------------"
+        self.mapping.config(text=mapping)
         # Update the GPIO port status
         if status_code is not None:
             if status_code == 0:

@@ -115,23 +115,21 @@
 #   set_route(sig_id:int, route, theatre_text) - Set the signal route indication
 #
 #   lock_signal(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
-#
 #   unlock_signal(sig_id:int) - use for point/signal interlocking
 #
 #   lock_subsidary(sig_id:int, tooltip:str) - use for point/signal interlocking (tooltip displays locking status)
-#
 #   unlock_subsidary(sig_id:int) - use for point/signal interlocking
 #
 #   signal_locked(signal_id:int) - returns the current state of the interlocking
-#
 #   subsidary_locked(signal_id:int) - returns the current state of the interlocking
 #
 #   set_signal_override(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
-#
 #   clear_signal_override(sig_id:int)  - Revert the signal to display its normal aspect
 #
-#   set_signal_override_caution(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
+#   set_subsidary_override(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
+#   clear_subsidary_override(sig_id:int)  - Revert the signal to display its normal aspect
 #
+#   set_signal_override_caution(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
 #   clear_signal_override_caution(sig_id:int) - Revert the signal to display its normal aspect
 #
 #   set_approach_control(sig_id:int, rel_on_ylw:bool, force_set) - Select "approach control mode"
@@ -141,7 +139,6 @@
 #   clear_approach_control(sig_id:int) - clear the approach control mode 
 #
 #   toggle_signal(sig_id:int) - toggle the state of the signal (ON/OFF)
-#
 #   toggle_subsidary(sig_id:int) - toggle the state of the subsidary (ON/OFF)
 #
 #   signal_clear(sig_id:int, route=None) - Returns True if the signal is OFF (otherwise False)
@@ -151,6 +148,7 @@
 #   subsidary_clear(sig_id:int, route=None) - As above, but for the subsidary signal
 #
 #   signal_state(sig_id) - Returns the displayed aspect of the signal (as opposed to ON/OFF)
+#   subsidary_state(sig_id) - Returns the displayed aspect of the subsidary (as opposed to ON/OFF)
 #
 #   trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int) - Trigger a timed signal sequence
 #
@@ -516,8 +514,12 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["routeset"]            = route_type.MAIN        # MANDATORY - Route setting for signal (MAIN at creation)
     signals[str(sig_id)]["sigclear"]            = False                  # MANDATORY - State of the main signal control (ON/OFF)
     signals[str(sig_id)]["override"]            = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["override2"]           = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["overridesub"]         = False                  # MANDATORY - Subsidary is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["overridesub2"]        = False                  # MANDATORY - Subsidary is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["overcaution"]         = False                  # MANDATORY - Signal is "Overridden" to CAUTION
     signals[str(sig_id)]["sigstate"]            = None                   # MANDATORY - Displayed 'aspect' of the signal (None on creation)
+    signals[str(sig_id)]["substate"]            = None                   # MANDATORY - Displayed 'aspect' of the subsidiary (None on creation)
     signals[str(sig_id)]["hassubsidary"]        = has_subsidary          # MANDATORY - Whether the signal has a subsidary aspect or arms
     signals[str(sig_id)]["subclear"]            = False                  # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
     signals[str(sig_id)]["siglocked"]           = False                  # MANDATORY - State of signal interlocking 
@@ -877,45 +879,97 @@ def clear_approach_control(sig_id:int):
     return()
 
 # -------------------------------------------------------------------------
-# Library API function to set a signal override (all signal types)
+# Library API functions to set / clear signal overrides (all signal types)
+# There are two override flags used - The first is the override set/cleared
+# if the track section ahead is occupied. The second is the override set
+# as soon as the train passes a signal and then cleared when the track
+# occupancy changes are processed (after the clearance delay) 
 # -------------------------------------------------------------------------
 
-def set_signal_override(sig_id:int):
+def set_signal_override(sig_id:int, temp_override:bool=False):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
-        logging.error("Signal "+str(sig_id)+": set_signal_override - Signal ID must be an int")    
+        logging.error("Signal "+str(sig_id)+": set_signal_override - Signal ID must be an int")
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": set_signal_override - Signal ID does not exist")
-    elif not signals[str(sig_id)]["override"]:
-        logging.info("Signal "+str(sig_id)+": Setting override")
-        # Set the override state and update the displayed aspect
-        signals[str(sig_id)]["override"] = True
-        update_signal_aspect(sig_id)
-        # Provide an indication that the override has been set
-        signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
+    else:
+        if temp_override and not signals[str(sig_id)]["override2"]:
+            logging.info("Signal "+str(sig_id)+": Setting temp signal override")
+            signals[str(sig_id)]["override2"] = True
+            update_signal_aspect(sig_id)
+        elif not temp_override and not signals[str(sig_id)]["override"]:
+            logging.info("Signal "+str(sig_id)+": Setting signal override")
+            signals[str(sig_id)]["override"] = True
+            update_signal_aspect(sig_id)
+        if signals[str(sig_id)]["override"] or signals[str(sig_id)]["override2"]:
+            signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
     return()
 
-# -------------------------------------------------------------------------
-# Library API function to clear a signal override (all signal types)
-# -------------------------------------------------------------------------
-
-def clear_signal_override(sig_id:int):
+def clear_signal_override(sig_id:int, temp_override:bool=False):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
-        logging.error("Signal "+str(sig_id)+": clear_signal_override - Signal ID must be an int")    
+        logging.error("Signal "+str(sig_id)+": clear_signal_override - Signal ID must be an int")
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": clear_signal_override - Signal ID does not exist")
-    elif signals[str(sig_id)]["override"]:
-        # Clear the override state and update the displayed aspect
-        logging.info("Signal "+str(sig_id)+": Clearing override")
-        signals[str(sig_id)]["override"] = False
-        update_signal_aspect(sig_id)
-        # Provide an indication that the override has been cleared by reverting the
-        # button text colour back to the standard button text colour
-        text_colour = signals[str(sig_id)]["textcolour"]
-        signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
+    else:
+        if temp_override and signals[str(sig_id)]["override2"]:
+            logging.info("Signal "+str(sig_id)+": Clearing temp signal override")
+            signals[str(sig_id)]["override2"] = False
+            update_signal_aspect(sig_id)
+        elif not temp_override and signals[str(sig_id)]["override"]:
+            logging.info("Signal "+str(sig_id)+": Clearing signal override")
+            signals[str(sig_id)]["override"] = False
+            update_signal_aspect(sig_id)
+        if not signals[str(sig_id)]["override"] or not signals[str(sig_id)]["override2"]:
+            text_colour = signals[str(sig_id)]["textcolour"]
+            signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
+    return()
+
+def set_subsidary_override(sig_id:int, temp_override:bool=False):
+    global signals
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": set_subsidary_override - Signal ID must be an int")
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": set_subsidary_override - Signal ID does not exist")
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": set_subsidary_override - Signal does not have a subsidary")
+    else:
+        if temp_override and not signals[str(sig_id)]["overridesub2"]:
+            logging.info("Signal "+str(sig_id)+": Setting temp subsidiary override")
+            signals[str(sig_id)]["overridesub2"] = True
+            update_subsidary_aspect(sig_id)
+        elif not temp_override and not signals[str(sig_id)]["overridesub"]:
+            logging.info("Signal "+str(sig_id)+": Setting subsidiary override")
+            signals[str(sig_id)]["overridesub"] = True
+            update_subsidary_aspect(sig_id)
+        if signals[str(sig_id)]["overridesub"] or signals[str(sig_id)]["overridesub2"]:
+            signals[str(sig_id)]["subbutton"].config(foreground="red", activeforeground="red")
+    return()
+
+def clear_subsidary_override(sig_id:int, temp_override:bool=False):
+    global signals
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": clear_subsidary_override - Signal ID must be an int")
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": clear_subsidary_override - Signal ID does not exist")
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": clear_subsidary_override - Signal does not have a subsidary")
+    else:
+        if temp_override and signals[str(sig_id)]["overridesub2"]:
+            logging.info("Signal "+str(sig_id)+": Clearing temp subsidiary override")
+            signals[str(sig_id)]["overridesub2"] = False
+            update_subsidary_aspect(sig_id)
+        elif not temp_override and signals[str(sig_id)]["overridesub"]:
+            logging.info("Signal "+str(sig_id)+": Clearing subsidiary override")
+            signals[str(sig_id)]["overridesub"] = False
+            update_subsidary_aspect(sig_id)
+        if not signals[str(sig_id)]["overridesub"] or not signals[str(sig_id)]["overridesub2"]:
+            text_colour = signals[str(sig_id)]["textcolour"]
+            signals[str(sig_id)]["subbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
 
 # -------------------------------------------------------------------------
@@ -1133,7 +1187,7 @@ def signal_clear(sig_id:int, route:route_type=None):
 def signal_state(sig_id:Union[int,str]):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int) and not isinstance(sig_id, str):
-        logging.error("Signal "+str(sig_id)+": signal_state - Signal ID must be an int or a str")    
+        logging.error("Signal "+str(sig_id)+": signal_state - Signal ID must be an int or a str")
         sig_state = signal_state_type.DANGER
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": signal_state - Signal ID does not exist")
@@ -1141,6 +1195,21 @@ def signal_state(sig_id:Union[int,str]):
     else:
         sig_state = signals[str(sig_id)]["sigstate"]
     return(sig_state)
+
+def subsidary_state(sig_id:Union[int,str]):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int) and not isinstance(sig_id, str):
+        logging.error("Signal "+str(sig_id)+": subsidary_state - Signal ID must be an int or a str")
+        sub_state = signal_state_type.DANGER
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": subsidary_state - Signal ID does not exist")
+        sub_state = signal_state_type.DANGER
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": subsidary_state - Signal does not have a subsidary")
+        sub_state = signal_state_type.DANGER
+    else:
+        sub_state = signals[str(sig_id)]["substate"]
+    return(sub_state)
 
 # -------------------------------------------------------------------------
 # Library API function to return the SWITCHED state of the subsidary

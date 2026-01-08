@@ -148,6 +148,7 @@ default_signal_object["sigarms"] = [
             [ [False,0],[False,0],[False,0] ],
             [ [False,0],[False,0],[False,0] ],
             [ [False,0],[False,0],[False,0] ] ]
+default_signal_object["lowerquadrant"] = False
 #------------------------------------------------------------------------------------
 # General Configuration - parameters specific to Ground Position and Ground disc signals
 #------------------------------------------------------------------------------------
@@ -189,10 +190,13 @@ default_signal_object["tracksections"] = [ 0, [ [0], [0], [0], [0], [0], [0], [0
 # 'distautomatic' (associated distant signals only) - Associated distant Signal has no control button
 # 'overrideahead' (sistant signal only) - override distant to CAUTION if any home signals ahead are at DANGER
 # 'overridesignal' (all main signals) - Signal will be overridden if any track sections ahead are OCCUPIED
+# 'overridesubsidary' (all main signals) - Subsidary will be overridden if any track sections ahead are OCCUPIED
+# Note that if the signal doesn't have a subsidary then this value will always be False
 default_signal_object["fullyautomatic"] = False
 default_signal_object["distautomatic"] = False
 default_signal_object["overrideahead"] = False
 default_signal_object["overridesignal"] = False
+default_signal_object["overridesubsidary"] = False
 # The 'approachcontrol' element comprises a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each 'signal_route' element represents the approach control mode set for that route:
 # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
@@ -684,6 +688,7 @@ def redraw_signal_object(object_id):
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    lower_quadrant =  objects_common.schematic_objects[object_id]["lowerquadrant"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
                     post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
@@ -718,6 +723,7 @@ def redraw_signal_object(object_id):
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
+                    lower_quadrant =  objects_common.schematic_objects[object_id]["lowerquadrant"],
                     font = objects_common.schematic_objects[object_id]["textfonttuple"],
                     post_colour = objects_common.schematic_objects[object_id]["postcolour"],
                     button_colour = button_colour,
@@ -911,14 +917,15 @@ def update_signal_styles(object_id, dict_of_new_styles:dict):
 #------------------------------------------------------------------------------------
 
 def delete_signal_object(object_id):
+    item_id = objects_common.schematic_objects[object_id]["itemid"]
     # Delete the signal drawing objects and associated DCC mapping
-    library.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
-    library.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
+    library.delete_signal(item_id)
+    library.delete_signal_mapping(item_id)
     # Delete the track sensor mappings for the signal (if any)
     passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
     approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
-    if passed_sensor != "": library.update_gpio_sensor_callback(passed_sensor)
-    if approach_sensor != "": library.update_gpio_sensor_callback(approach_sensor)
+    if passed_sensor != "": library.update_gpio_sensor_callback(passed_sensor, signal_passed=0)
+    if approach_sensor != "": library.update_gpio_sensor_callback(approach_sensor, signal_approach=0)
     # Delete the associated distant signal (if there is one)
     if has_associated_distant(object_id):
         library.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+1000)

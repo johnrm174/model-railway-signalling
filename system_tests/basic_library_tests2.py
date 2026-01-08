@@ -912,6 +912,22 @@ def run_point_library_tests():
     points.delete_point(2)
     points.delete_point(3)
     points.delete_point(4)
+    print("Library Tests - hide/unhide Point IDs in Edit Mode - No errors or warnings")
+    # Select Edit mode, enable display of IDs  and then create a new Point
+    points.configure_edit_mode(True)
+    points.show_point_ids()
+    points.create_point(canvas, 1, points.point_type.LH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback)
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="normal"
+    # Toggle between modes to test
+    points.hide_point_ids()
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="hidden"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="hidden"
+    points.show_point_ids()
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="normal"
+    # Clean up
+    points.delete_point(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(points.points) == 0
     # Check the creation of all supported point types
@@ -1353,6 +1369,22 @@ def run_line_library_tests():
     assert canvas.itemcget(lines.lines[str(1)]["line"],"width") == "5.0"
     # Clean up
     lines.delete_line(1)
+    print("Library Tests - hide/unhide Line IDs in Edit Mode - No errors or warnings")
+    # Select Edit mode, enable display of IDs  and then create a new Line
+    lines.configure_edit_mode(True)
+    lines.show_line_ids()
+    lines.create_line(canvas, 1, 100, 100, 200, 100)
+    assert canvas.itemcget(lines.lines["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(lines.lines["1"]["label2"],"state") =="normal"
+    # Toggle between modes to test
+    lines.hide_line_ids()
+    assert canvas.itemcget(lines.lines["1"]["label1"],"state") =="hidden"
+    assert canvas.itemcget(lines.lines["1"]["label2"],"state") =="hidden"
+    lines.show_line_ids()
+    assert canvas.itemcget(lines.lines["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(lines.lines["1"]["label2"],"state") =="normal"
+    # Clean up
+    lines.delete_line(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(lines.lines) == 0
     print("----------------------------------------------------------------------------------------")
@@ -1398,6 +1430,7 @@ def run_button_library_tests():
     assert not buttons.button_state(2)        # Success (exists)
     assert not buttons.button_state(3)        # Error - does not exist
     print("Library Tests - enable_button, disable_button - will generate 4 errors:")
+    print(buttons.buttons["1"]["button"]["state"])
     assert buttons.buttons["1"]["button"]["state"] == "normal"
     assert buttons.buttons["2"]["button"]["state"] == "normal"
     buttons.disable_button("1")               # Error - not an int
@@ -1463,6 +1496,25 @@ def run_button_library_tests():
     buttons.toggle_button(2)
     assert not buttons.button_state(1)
     assert not buttons.button_state(2)
+    print("Library Tests - Set/Get Button Data - will generate 4 Errors")
+    buttons.set_button_data("1", {"data":1})          # Fail - ID not an int
+    buttons.set_button_data(10, {"data":1})           # Fail - ID does not exist
+    buttons.set_button_data(1, {"data":1})            # success
+    assert buttons.get_button_data("1") == None       # Fail - ID not an int
+    assert buttons.get_button_data(10) == None        # Fail - ID does not exist
+    assert buttons.get_button_data(1) == {"data":1}   # success
+    print("Library Tests Flash Button - will generate 4 Errors")
+    # Note that set/reset button flashing functions need to be executed in the main tkinter thread
+    system_test_harness.run_function(buttons.set_button_flashing("1")) # Fail - ID ot an Int
+    system_test_harness.run_function(buttons.set_button_flashing(10))  # Fail - ID does not exist
+    system_test_harness.run_function(buttons.set_button_flashing(1))   # success
+    assert buttons.buttons[str(1)]["flashevent"] is not None
+    # Test the next flash event is scheduled and then Let it flash for a bit to excersise the code
+    time.sleep(1.0)
+    system_test_harness.run_function(buttons.reset_button_flashing("1")) # Fail - ID ot an Int
+    system_test_harness.run_function(buttons.reset_button_flashing(10))  # Fail - ID does not exist
+    system_test_harness.run_function(buttons.reset_button_flashing(1))   # success
+    assert buttons.buttons[str(1)]["flashevent"] is None
     print("Library Tests - configure_edit_mode - Creation in Edit Mode - No errors:")
     buttons.configure_edit_mode(edit_mode=True)
     buttons.create_button(canvas,3,buttontype,300,100,selected_callback,deselected_callback)      # Success
@@ -1558,6 +1610,7 @@ def run_button_library_tests():
     assert buttons.buttons[str(3)]["canvas"].itemcget(buttons.buttons[str(3)]["placeholder1"], 'state') == "hidden"
     assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["buttonwindow"], 'state') == "normal"    
     assert buttons.buttons[str(4)]["canvas"].itemcget(buttons.buttons[str(4)]["placeholder1"], 'state') == "hidden"
+    buttons.configure_edit_mode(edit_mode=True)
     print("Library Tests - Run Style Update tests - will generate 2 Errors")
     # Create / update Buttons in Run Mode (This is the default mode and we haven't changed it in any other tests)
     buttons.configure_edit_mode(edit_mode=False)
@@ -1602,6 +1655,22 @@ def run_button_library_tests():
     buttons.delete_button(2)
     buttons.delete_button(3)
     buttons.delete_button(4)
+    print("Library Tests - hide/unhide Button IDs in Edit Mode - No errors or warnings")
+    # Select Edit mode, enable display of IDs  and then create a new Button
+    buttons.configure_edit_mode(True)
+    buttons.show_button_ids()
+    buttons.create_button(canvas,1,buttontype,100,100,selected_callback,deselected_callback)      # Success
+    assert canvas.itemcget(buttons.buttons["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(buttons.buttons["1"]["label2"],"state") =="normal"
+    # Toggle between modes to test
+    buttons.hide_button_ids()
+    assert canvas.itemcget(buttons.buttons["1"]["label1"],"state") =="hidden"
+    assert canvas.itemcget(buttons.buttons["1"]["label2"],"state") =="hidden"
+    buttons.show_button_ids()
+    assert canvas.itemcget(buttons.buttons["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(buttons.buttons["1"]["label2"],"state") =="normal"
+    # Clean up
+    buttons.delete_button(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(buttons.buttons) == 0
     print("----------------------------------------------------------------------------------------")
@@ -1756,6 +1825,19 @@ def run_lever_library_tests():
     levers.delete_lever(2)
     levers.delete_lever(1)
     assert len(levers.levers) == 0
+    print("Library Tests - hide/unhide levers in Run Mode - No errors or warnings")
+    # Select run mode and then create a 'hidden' lever in Run Mode
+    levers.configure_edit_mode(False)
+    levers.create_lever(canvas, 1, levers.lever_type.spare, 100, 100, lever_callback, hide_buttons=True)         # success
+    assert canvas.itemcget(levers.levers["1"]["window"],"state") =="hidden"
+    # Toggle between modes to test
+    levers.configure_edit_mode(True)
+    assert canvas.itemcget(levers.levers["1"]["window"],"state") =="normal"
+    levers.configure_edit_mode(False)
+    assert canvas.itemcget(levers.levers["1"]["window"],"state") == "hidden"
+    # Clean up
+    levers.delete_lever(1)
+    assert len(levers.levers) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1775,9 +1857,12 @@ def run_library_common_tests():
     time.sleep(2.0)
     common.clear_warning_window()
     common.display_warning(canvas, "Test Message 3")
-    common.user_dragging_window(event=None, canvas=canvas)
+    common.focus_back_on_canvas(event=None, canvas=canvas)
     time.sleep(2.0)
     common.close_warning_window()
+    print("Library Common Tests - show/hide item IDs (just to exersise the code)")
+    common.toggle_item_ids()
+    common.toggle_item_ids()
     return()
     
 #---------------------------------------------------------------------------------------------------------

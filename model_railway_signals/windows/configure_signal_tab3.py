@@ -94,10 +94,10 @@ class signal_events_frame(Tk.LabelFrame):
         if not self.approach.validate(): valid = False
         # validate the entries are not the same
         if valid and self.passed.get_value()[1] !="" and self.approach.get_value()[1] == self.passed.get_value()[1]:
-            self.passed.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
-            self.approach.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
-            self.passed.set_validation_status(False)
-            self.approach.set_validation_status(False)
+            self.passed.sensor.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
+            self.approach.sensor.TT.text="The same GPIO Sensor ID has been been specified for both 'passed' and 'approach' events"
+            self.passed.sensor.set_validation_status(False)
+            self.approach.sensor.set_validation_status(False)
             valid = False
         return(valid)
 
@@ -158,16 +158,12 @@ class section_ahead_element(Tk.Frame):
         return(valid)
 
     def enable(self, sig:bool, sub:bool):
-        if sig:
-            routetype = "Sig/"
-            self.other_sections.enable()
-        else:
-            routetype="----/"
-            self.other_sections.disable()
+        if sig: routetype = "Sig/"
+        else: routetype="----/"
         if sub: routetype = routetype + "Sub"
         else: routetype = routetype + "----"
         self.routetype.config(text=routetype)
-        self.first_section.enable()
+        self.other_sections.enable()
 
     def disable(self):
         self.routetype.config(text="----/----")
@@ -243,7 +239,7 @@ class track_occupancy_frame(Tk.LabelFrame):
         self.subframe.pack()
         self.label = Tk.Label(self.subframe, text="'Clearance' delay:")
         self.label.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.clearance = common.integer_entry_box(self.subframe, width=3, min_value=0, max_value=10,
+        self.clearance = common.integer_entry_box(self.subframe, width=3, min_value=0, max_value=60,
                         tool_tip="Enter the delay (in seconds) between the signal being 'passed' and any "+
                         "track occupancy changes being triggered", empty_equals_zero=False, allow_empty=False)
         self.clearance.pack(padx=2, pady=2, side=Tk.LEFT)
@@ -322,24 +318,17 @@ class general_settings_frame(Tk.LabelFrame):
                     tool_tip="Select to override the signal to ON if the track "+
                     "sections ahead of the signal (specified on the left) are occupied")
         self.override.pack(anchor="w")
+        self.override_subsidary = common.check_box(self.frame,
+                    label="Override subsidiary to ON if section(s) ahead occupied",
+                    tool_tip="Select to override the subsidiary to ON if the track "+
+                    "sections ahead of the signal (specified on the left) are occupied")
+        self.override_subsidary.pack(anchor="w")
         self.override_ahead = common.check_box(self.frame,
                     label="Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
         self.override_ahead.pack(anchor="w")
                         
-    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
-        self.override.set_value(override)
-        self.automatic.set_value(main_auto)
-        self.override_ahead.set_value(override_ahead)
-        self.distant_automatic.set_value(dist_auto)
-
-    def get_values(self):
-        return ( self.override.get_value(),
-                 self.automatic.get_value(),
-                 self.override_ahead.get_value(),
-                 self.distant_automatic.get_value() )
-
 #------------------------------------------------------------------------------------
 # Class for a "Timed signal" UI element for ground signals only. Builds on the
 # common.int_item_id_entry_box but with additional validation to ensure the

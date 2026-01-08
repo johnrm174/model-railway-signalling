@@ -15,6 +15,7 @@ from .common import get_keyboard_mapping
 from .common import display_warning
 from .common import toggle_item_ids
 from .common import bring_item_ids_to_front
+from .common import execute_function_in_tkinter_thread
 
 from .signals import signal_type
 from .signals import signal_subtype
@@ -35,6 +36,8 @@ from .signals import unlock_subsidary
 from .signals import subsidary_locked
 from .signals import set_signal_override
 from .signals import clear_signal_override
+from .signals import set_subsidary_override
+from .signals import clear_subsidary_override
 from .signals import set_signal_override_caution
 from .signals import clear_signal_override_caution
 from .signals import set_approach_control
@@ -44,6 +47,7 @@ from .signals import toggle_subsidary
 from .signals import signal_clear
 from .signals import subsidary_clear
 from .signals import signal_state
+from .signals import subsidary_state
 from .signals import trigger_timed_signal
 from .signals import update_colour_light_signal
 from .signals import reset_signals_mqtt_configuration
@@ -159,6 +163,8 @@ from .dcc_control import reset_dcc_mqtt_configuration
 from .dcc_control import set_node_to_publish_dcc_commands
 from .dcc_control import subscribe_to_dcc_command_feed
 
+from .gpio_sensors import gpio_sensor_triggered
+from .gpio_sensors import gpio_sensor_released
 from .gpio_sensors import gpio_interface_enabled
 from .gpio_sensors import get_list_of_available_gpio_ports
 from .gpio_sensors import gpio_sensor_exists
@@ -172,6 +178,7 @@ from .gpio_sensors import subscribe_to_remote_gpio_sensors
 from .gpio_sensors import subscribe_to_gpio_port_status
 from .gpio_sensors import unsubscribe_from_gpio_port_status
 from .gpio_sensors import unsubscribe_from_all_gpio_port_status
+from .gpio_sensors import handle_mqtt_gpio_sensor_event
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -189,6 +196,8 @@ from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import send_accessory_short_event
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
+from .pi_sprog_interface import enable_status_reporting
+from .pi_sprog_interface import disable_status_reporting
 from .pi_sprog_interface import add_dcc_sound_mapping
 from .pi_sprog_interface import reset_dcc_sound_mappings
 from .pi_sprog_interface import play_dcc_sound_file
@@ -203,6 +212,7 @@ __all__ = [
         'display_warning',
         'toggle_item_ids',
         'bring_item_ids_to_front',
+        'execute_function_in_tkinter_thread',
       # Public point types/functions
         'point_type',
         'point_subtype',
@@ -274,6 +284,8 @@ __all__ = [
         'subsidary_locked',
         'set_signal_override',
         'clear_signal_override',
+        'set_subsidary_override',
+        'clear_subsidary_override',
         'set_signal_override_caution',
         'clear_signal_override_caution',
         'set_approach_control',
@@ -283,6 +295,7 @@ __all__ = [
         'signal_clear',
         'subsidary_clear',
         'signal_state',
+        'subsidary_state',
         'trigger_timed_signal',
         'update_colour_light_signal',
         'reset_signals_mqtt_configuration',
@@ -306,7 +319,9 @@ __all__ = [
         'reset_sections_mqtt_configuration',
         'subscribe_to_remote_sections',
         'set_sections_to_publish_state',
-      # public gpio sensor functions
+      # public gpio sensor
+        'gpio_sensor_triggered',
+        'gpio_sensor_released',
         'gpio_interface_enabled',
         'get_list_of_available_gpio_ports',
         'gpio_sensor_exists',
@@ -320,6 +335,7 @@ __all__ = [
         'subscribe_to_gpio_port_status',
         'unsubscribe_from_gpio_port_status',
         'unsubscribe_from_all_gpio_port_status',
+        'handle_mqtt_gpio_sensor_event',
       # Public SPROG control functions
         'sprog_connect',
         'sprog_disconnect',
@@ -328,6 +344,8 @@ __all__ = [
         'send_accessory_short_event',
         'request_dcc_power_on',
         'request_dcc_power_off',
+        'enable_status_reporting',
+        'disable_status_reporting',
         'add_dcc_sound_mapping',
         'reset_dcc_sound_mappings',
         'play_dcc_sound_file',

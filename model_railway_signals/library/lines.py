@@ -171,9 +171,13 @@ def create_line (canvas, line_id:int, x1:int, y1:int, x2:int, y2:int, colour:str
         bbox = canvas.bbox(label1_object)
         label2_object = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
                                     tags=canvas_tag, fill="purple3", width=0)
+        canvas.tag_raise(label1_object)
         if not editing_enabled or not line_ids_displayed:
             canvas.itemconfig(label1_object, state="hidden")
             canvas.itemconfig(label2_object, state="hidden")
+        else:
+            canvas.itemconfig(label1_object, state="normal")
+            canvas.itemconfig(label2_object, state="normal")
         # Compile a dictionary of everything we need to track
         lines[str(line_id)] = {}
         lines[str(line_id)]["canvas"] = canvas                  # Tkinter canvas object
