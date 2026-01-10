@@ -200,6 +200,12 @@ from .pi_sprog_interface import enable_status_reporting
 from .pi_sprog_interface import disable_status_reporting
 from .pi_sprog_interface import add_dcc_sound_mapping
 from .pi_sprog_interface import reset_dcc_sound_mappings
+
+from .pi_sprog_interface import request_loco_session
+from .pi_sprog_interface import release_loco_session
+from .pi_sprog_interface import set_loco_speed_and_direction
+from .pi_sprog_interface import send_emergency_stop
+
 from .pi_sprog_interface import play_dcc_sound_file
 
 __all__ = [
@@ -348,6 +354,10 @@ __all__ = [
         'disable_status_reporting',
         'add_dcc_sound_mapping',
         'reset_dcc_sound_mappings',
+        'request_loco_session',
+        'release_loco_session',
+        'set_loco_speed_and_direction',
+        'send_emergency_stop',
         'play_dcc_sound_file',
       # Public DCC control functions
         'get_dcc_address_mappings',

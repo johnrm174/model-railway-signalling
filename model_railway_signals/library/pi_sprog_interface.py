@@ -50,6 +50,11 @@
 #   enable_status_reporting(callback) - Enable reporting
 #   disable_status_reporting() - Disable Reporting
 #
+#   request_loco_session(dcc_address) - generates a loco session and returns session_id
+#   release_loco_session(session_id) - releases the locomotive session
+#   set_loco_speed_and_direction(session_id:int, speed:int, forward:bool)
+#   send_emergency_stop(session_id) - Emergency Stops the loco
+#
 # API functions used associated with DCC-command-triggered sounds:
 #   add_dcc_sound_mapping(address:int, state:bool, fully_qualified_sound_filename:str):
 #   reset_dcc_sound_mappings() - Delete all current mappings
@@ -252,6 +257,8 @@ def thread_to_read_received_data ():
                         elif op_code == 0x4C: process_sstat_message(byte_string)
                         # Accessory Data Command for multimeter mode (0xD0 = 208 decimal) 
                         elif op_code == 0xD0: process_accessory_data(byte_string)
+                        # Engine Report / Response to DLOC (0xE1 = 225 decimal)
+                        elif op_code == 0xE1: process_ploc_message(byte_string)
                 except:
                     # Ignore any heartbeat or Bus Sync Messages
                     if msg_str not in ("S4"):
@@ -884,6 +891,163 @@ def service_mode_write_cv(cv:int, value:int):
         logging.warning(f"Pi-SPROG: Failed to write CV {cv} - SPROG is disconnected")
     return(service_mode_response == 3)
 
+#########################################################################################
+# Functions for Basic Locomotive control - mj_pri=2, min_pri=2 (Standard for Loco setup).
+# In the land of DCC, Locomotive addresses fall into two type: Short Addresses: 1 to 127
+# and Long Addresses: 0 to 10239 (sent as two bytes). Understanding is that the Pi-Sprog
+# interprets 1–127 as short addrersses and 128-10239 as Long addressed.
+#########################################################################################
+
+# locomotive_sessions is a dict, comprising an entry for each session
+# {"loco_address": session_id:int, heartbeat:tkinter_reference}
+locomotive_sessions={}
+
+#------------------------------------------------------------------------------
+# Internal Helper function to find the dcc address for a session (0 if not found)
+#------------------------------------------------------------------------------
+
+def find_dcc_address_for_session(session_id:int):
+    dcc_address = 0
+    for str_dcc_address, locomotive_session in locomotive_sessions.items():
+        if locomotive_session["sessionid"] == session_id:
+            dcc_address = int(str_dcc_address)
+            break
+    return(dcc_address)
+
+#------------------------------------------------------------------------------
+# API function to request a loco session (returns session ID or 0 if unsuccessful)
+#------------------------------------------------------------------------------
+
+def request_loco_session(dcc_address:int):
+    def response_received(dcc_address:int):
+        return(locomotive_sessions[str(dcc_address)]["sessionid"] > 0)
+    if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
+        logging.error(f"Pi-SPROG: request_loco_session - Invalid DCC Address {dcc_address} - must be an int (1-10239)")
+    else:
+        logging.debug(f"Pi-SPROG: Requesting Locomotive Session for DCC address {dcc_address}")
+        # Initialise the session entry
+        locomotive_sessions[str(dcc_address)] = {}
+        locomotive_sessions[str(dcc_address)]["sessionid"] = 0
+        locomotive_sessions[str(dcc_address)]["heartbeat"] = None
+        # CBUS Command is Request Locomotive Session (RLOC) - Opcode 0x40
+        # Range of Addresses that can be used is 1 to 10239
+        addr_hi = (dcc_address >> 8) & 0xFF
+        addr_lo = dcc_address & 0xFF
+        send_cbus_command(2, 2, 0x40, addr_hi, addr_lo)
+        if wait_for_response(5.0, response_received):
+            # The Pi-SPROG 3 has a hardware timeout (often set to 20 seconds).
+            # If it does not receive a command (speed change, function toggle, or KLOC)
+            # for a specific session within that window, it will "purge" the session.
+            # This stops the locomotive and releases the session ID.
+            heartbeat = common.root_window.after(5000, lambda:send_loco_keep_alive(locomotive_sessions[str(dcc_address)]["sessionid"]))
+            locomotive_sessions[str(dcc_address)]["heartbeat"] = heartbeat
+            session_id_to_return = locomotive_sessions[str(dcc_address)]["sessionid"]
+        else:
+            del(locomotive_sessions[str(dcc_address)])
+            logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
+            session_id_to_return = 0
+    return(session_id_to_return)
+
+#------------------------------------------------------------------------------
+# Internal heartbeat function to keep a loco session alive until released
+#------------------------------------------------------------------------------
+
+def send_loco_keep_alive(session_id:int):
+    # CBUS command is Keep Alive (DKEEP) - Opcode 0x21
+    for str_dcc_address, locomotive_session in locomotive_sessions.items():
+        dcc_address = find_dcc_address_for_session(session_id)
+        if dcc_address > 0:
+            send_cbus_command(2, 2, 0x21, [session_id])
+            common.root_window.after(5000, lambda:send_loco_keep_alive(session_id))
+            break
+    return()
+
+#------------------------------------------------------------------------------
+# API function to release a loco session
+#------------------------------------------------------------------------------
+
+def release_loco_session(session_id:int):
+    if not isinstance(session_id, int):
+        logging.error(f"Pi-SPROG: release_loco_session - Invalid Session ID {session_id} - must be an int")
+    else:
+        logging.debug(f"Pi-SPROG: Releasing Locomotive Session {session_id}")
+        # There is no CBUS Command to instantly De-allocate/Release Loccomotive (DLOC/KLOC)
+        # In MERG CBUS Protocol, the same Opcode (0x21) is used for DLOC, DKEEP and KLOC.
+        # The Pi-SPROG 3 uses a timer logic: If it receives 0x21 followed by another 0x21 within ~10
+        # seconds, it treats them as KLOC/DKEEP (Heartbeats). If it receives 0x21 and then silence for
+        # 20 seconds, it treats that last message as the final DLOC (Release) and clears the slot.
+        # We therefore need to stop sending the 'keep session alive' (DKEEP) heartbeats
+        dcc_address = find_dcc_address_for_session(session_id)
+        if dcc_address > 0:
+            heartbeat = locomotive_sessions[str(dcc_address)]["heartbeat"]
+            locomotive_sessions[str(dcc_address)]["sessionid"] = None
+            common.root_window.after_cancel(heartbeat)
+        else:
+            logging.error(f"Pi-SPROG: release_loco_session - Session ID {session_id} not found")
+    return()
+
+#------------------------------------------------------------------------------
+# Internal function to process the PLOC message (response to RLOC) and
+# save the session ID so it can be returned to the calling programme
+#------------------------------------------------------------------------------
+
+def process_ploc_message(byte_string):
+    logging.debug("Pi-SPROG: Rx thread - Received PLOC (Engine Report) message")
+    # Process the message (with exception handling just in case)
+    try:
+        # Convert to String and remove the start/end markers
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # GridConnect Example: :SB000NE10100038F000000;
+        # Find 'N', then skip 'N' (1 char) and the OpCode 'E1' (2 chars) = +3
+        d_start = msg_str.find('N') + 3
+        # 1. Session Handle (1 byte)
+        session_handle = int(msg_str[d_start : d_start+2], 16)
+        # 2. Loco Address (2 bytes: High + Low)
+        addr_high = int(msg_str[d_start+2 : d_start+4], 16)
+        addr_low  = int(msg_str[d_start+4 : d_start+6], 16)
+        dcc_address = (addr_high << 8) | addr_low
+        # Store the session address
+        if str(dcc_address) in locomotive_sessions.keys():
+            locomotive_sessions[str(dcc_address)]["sessionid"] = session_handle
+    except Exception as exception:
+        logging.error("Pi-SPROG: Error parsing Engine Report (PLOC/E1) Message")
+        logging.error(exception)
+    return()
+
+#------------------------------------------------------------------------------
+# API function to set Loco Speed and direction
+#------------------------------------------------------------------------------
+
+def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_emergency_stop:bool=False):
+    if not isinstance(session_id, int):
+        logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid Session ID {session_id} - must be an int")
+    elif not isinstance(speed, int) or speed < 0 or speed > 127:
+        logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid speed for session {session_id} - must be an int (0-127)")
+    # Inhibit the Emergency Stop (unless overridden in the function call)
+    if not allow_emergency_stop and speed == 1: speed = 0
+    # CBUS Command is set Speed and Direction (DSPD) - Opcode 0x45
+    # Direction bit: 1 for Forward, 0 for Reverse
+    # Speed is in the range 0-127 where 0 is normal Stop and 1 is Emergency Stop
+    dcc_address = find_dcc_address_for_session(session_id)
+    if dcc_address > 0:
+        dir_val = 128 if forward else 0
+        # DCC Speed 1 is usually Emergency Stop, so we map 0-127
+        speed_byte = (speed & 0x7F) | dir_val
+        logging.debug(f"Pi-SPROG: Session {session_id} Speed {speed} Forward {forward}")
+        send_cbus_command(2, 2, 0x45, session_id, speed_byte)
+    else:
+        logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Session {session_id} not found")
+    return()
+
+def send_emergency_stop(session_id:int):
+    set_loco_speed_and_direction(session_id, speed=1, forward=True, allow_emergency_stop=True)
+    return()
+
+def send_emergency_stop_all():
+    # CBUS Command for Emergency Stop (RESP) - Opcode 0x06
+    send_cbus_command(0, 0, 0x06, [])
+    return()
+
 #------------------------------------------------------------------------------
 # Function to encode a standard 3-byte DCC Accessory Decoder Packet into 3 bytes
 # for transmission to the PI-SPROG as a RDCC3 Command (Request 3-byte DCC Packet).
@@ -1040,7 +1204,7 @@ def service_mode_write_cv(cv:int, value:int):
 #     qnn_response = True
 #     return()
 #
-#------------------------------------------------------------------------------
+###################################################################################
 # Functions to Play sound files, triggered by DCC commands. These should really be
 # located in a seperate library module, but I've put them here for the time being
 # as the playing of the audio files is triggered from DCC commands, and the
@@ -1049,7 +1213,7 @@ def service_mode_write_cv(cv:int, value:int):
 # Note that, unlike block instruments audio, I've taken the conscious descision
 # to only load in the audio files when playback is triggered. From the limited
 # testing I've done, this doesn't seem to have any real impact on performance.
-#------------------------------------------------------------------------------
+###################################################################################
 
 # The global flag to indicate if audio is enabled or not
 try:

@@ -13,6 +13,7 @@
 #    edit_canvas_settings(root, canvas_update_callback)
 #    edit_gpio_settings(root, gpio_update_callback)
 #    edit_sounds_settings(root, sounds_update_callback)
+#
 #    edit_section_styles(root)
 #    edit_route_styles(root)
 #    edit_switch_styles(root)
@@ -21,12 +22,15 @@
 #    edit_signal_styles(root)
 #    edit_lever_styles(root)
 #    edit_textbox_styles(root)
+#
 #    dcc_programming(root, dcc_prog_enabled_function, dcc_power_on_function, dcc_power_off_function)
 #    dcc_mappings(root)
 #    bulk_renumbering(root)
 #    application_upgrade(root)
 #    import_layout(root, import_schematic_callback)
 #    exercise_points(root, reset_layout_callback)
+#    mqtt_subscriptions(root)
+#    loco_control(root)
 #
 #------------------------------------------------------------------------------------
 
@@ -61,6 +65,8 @@ from .menubar_utilities import exercise_points
 
 from .menubar_subscriptions import mqtt_subscriptions
 
+from .menubar_loco_control import loco_control
+
 __all__ = [
     'display_help',
     'display_about',
@@ -87,6 +93,7 @@ __all__ = [
     'application_upgrade',
     'import_layout',
     'exercise_points',
-    'mqtt_subscriptions']
+    'mqtt_subscriptions',
+    'loco_control']
 
 ##############################################################################################################
