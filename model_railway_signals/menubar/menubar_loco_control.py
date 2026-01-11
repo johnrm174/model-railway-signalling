@@ -32,10 +32,25 @@ class loco_control():
         self.direction= None
         # Create the (non-resizable) top level window for application about
         self.window = Tk.Toplevel(root_window)
-        self.window.title("Loco Throttle")
+        self.window.title("Throttle")
         self.window.protocol("WM_DELETE_WINDOW", self.close_window)
         self.window.resizable(False, False)
         self.window.wm_attributes("-topmost", True)
+        # Create a frame For the Roster selection
+        self.frame1 = Tk.LabelFrame(self.window, text="Locomotive")
+        self.frame1.pack(padx=5,pady=5, fill="x")
+
+        self.roster = {"Loco1": 123, "Loco2": 456, "Loco4":5000, "Loco6":3}
+
+        self.default_selection = "<Select Loco>"
+        self.options = [self.default_selection]+list(self.roster.keys())
+        self.loco_selection = Tk.StringVar(self.window, "")
+        self.loco_selection.set(self.options[0])
+        self.locomotove = Tk.OptionMenu(self.frame1, self.loco_selection, *self.options, command=self.roster_updated)
+        self.locomotove.pack(padx=5, pady=5)
+        self.locomotove.config(width=15)
+        self.dccaddress = Tk.Label(self.frame1)
+        self.dccaddress.pack(padx=2, pady=2)
         # Create a frame to hold the Speed buttons and slider
         self.frame2 = Tk.LabelFrame(self.window, text="Speed")
         self.frame2.pack(padx=5,pady=5, fill="x")
@@ -56,9 +71,15 @@ class loco_control():
         self.increase.bind("<ButtonRelease-1>", lambda e:self.inc_dec_speed(stop=True))
         self.decrease.bind("<Button-1>", lambda e:self.inc_dec_speed(increase=False, stop=False))
         self.decrease.bind("<ButtonRelease-1>", lambda e:self.inc_dec_speed(stop=True))
+        # Create the Function keys (F0 to F4)
+        self.function_buttons = {}
+        for function_id in range(0, 4):
+            self.function_buttons[function_id] = Tk.Button(self.subframe1, text=f"F{function_id}", width=3,
+                                            command=lambda funcid=function_id: self.function_updated(funcid))
+            self.function_buttons[function_id].pack(padx=2, pady=2)        
         # Create the throttle slider
         self.throttle = Tk.Scale(self.subframe2, from_=127, to=0, orient="vertical", showvalue=0,
-                    width=60, length=200, sliderlength=40,command=self.speed_updated)
+                    width=60, length=230, sliderlength=40,command=self.speed_updated)
         self.throttle.pack(padx=5, pady=5)
         # Create a frame for the Forward and reverse buttons
         self.frame2 = Tk.LabelFrame(self.window, text="Direction")
@@ -69,25 +90,117 @@ class loco_control():
         self.forward.pack(side=Tk.RIGHT, padx=5, pady=5)
         self.forward.configure(font=button_font)
         self.reverse.configure(font=button_font)
-       
-        
-        
         # Create a frame For the Emergency Stop Button
         self.frame3 = Tk.LabelFrame(self.window, text="Emergency Stop")
         self.frame3.pack(padx=5,pady=5, fill="x")
         # Create the emergency stop button
-        self.emgergencystop = Tk.Button(self.frame3, text="Stop", bg="pink2", activebackground="pink1",
+        self.emergencystop = Tk.Button(self.frame3, text="Stop", bg="pink2", activebackground="pink1",
                                         width=8, command=self.emergency_stop)
-        self.emgergencystop.pack(padx=5, pady=5, fill="x")
-        self.emgergencystop.configure(font=button_font)
+        self.emergencystop.pack(padx=5, pady=5, fill="x")
+        self.emergencystop.configure(font=button_font)
         
         # Create the close button and tooltip
         self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.close_window)
         self.B1.pack(padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.B1, "Close window")
         # Initialise the UI state
-        self.speed_updated("0")
-        self.direction_updated(self.direction)
+        self.deselect_locomotive()
+        self.direction_updated(None)
+        self.disable_speed_controls()
+        self.disable_forward_and_reverse()
+        self.disable_emergency_stop()
+        self.disable_function_buttons()
+        
+    def disable_function_buttons(self):
+        for button_id in self.function_buttons:
+            self.function_buttons[button_id].config(state="disabled")
+         
+    def enable_function_buttons(self):
+        for button_id in self.function_buttons:
+            self.function_buttons[button_id].config(state="normal")
+
+    def disable_speed_controls(self):
+        self.throttle.config(state="disabled")
+        self.increase.config(state="disabled")
+        self.decrease.config(state="disabled")
+        
+    def enable_speed_controls(self):
+        self.throttle.config(state="normal")
+        self.increase.config(state="normal")
+        self.decrease.config(state="normal")
+
+    def disable_forward_and_reverse(self):
+        self.forward.config(state="disabled")
+        self.reverse.config(state="disabled")
+        
+    def enable_forward_and_reverse(self):
+        self.forward.config(state="normal")
+        self.reverse.config(state="normal")
+        
+    def disable_emergency_stop(self):
+        self.emergencystop.config(state="disabled")
+
+    def enable_emergency_stop(self):
+        self.emergencystop.config(state="normal")
+        
+    def disable_loco_selection(self):
+        self.locomotove.config(state="disabled")
+
+    def enable_loco_selection(self):
+        self.locomotove.config(state="normal")
+
+    def deselect_locomotive(self):
+        self.loco_selection.set(self.default_selection)
+
+    def deselect_function_buttons(self):
+        for button_id in self.function_buttons:
+            self.function_buttons[button_id].config(relief="raised")
+
+    def function_updated(self, function_id:int):
+        if self.function_buttons[function_id]["relief"] =="sunken":
+            self.function_buttons[function_id].config(relief="raised")
+            #################################### Send Function Command #################################
+        else:
+            self.function_buttons[function_id].config(relief="sunken")
+            #################################### Send Function Command #################################
+            
+    def roster_updated(self, selection):
+        if self.session_id > 0:
+            library.release_loco_session(self.session_id)
+            self.session_id = 0
+        if selection not in self.roster.keys():
+            self.deselect_locomotive()
+            self.deselect_function_buttons()
+            self.disable_speed_controls()
+            self.disable_forward_and_reverse()
+            self.disable_emergency_stop()
+            self.disable_function_buttons()
+            self.forward.config(relief="raised")
+            self.reverse.config(relief="raised")
+            self.direction = None
+        else:
+            self.dccaddress.config(text=f"DCC Address: {self.roster[selection]:05}")
+            self.session_id = library.request_loco_session(self.roster[selection])
+            if self.session_id > 0:
+                self.deselect_function_buttons()
+                self.enable_forward_and_reverse()
+                self.enable_function_buttons()
+                self.enable_emergency_stop()
+                ################# Set all the function buttons to "Raised" #######################
+                ################# Send commands for all function buttons to OFF ##################
+                ################# Set speed to zero just in case #################################
+            else:
+                print("here")
+                self.deselect_locomotive()
+                self.deselect_function_buttons()
+                self.disable_speed_controls()
+                self.disable_forward_and_reverse()
+                self.disable_emergency_stop()
+                self.disable_function_buttons()
+                self.forward.config(relief="raised")
+                self.reverse.config(relief="raised")
+                self.direction = None
+                #################### POPUP WARNING #####################################
 
     # This is the callback function for the Emergency Stop button
     # We reset the slider and send the emergency stop command
@@ -97,6 +210,7 @@ class loco_control():
         self.reverse.config(relief="raised")
         current_speed_value = self.throttle.set(0)
         library.send_emergency_stop(self.session_id)
+        self.direction_updated(None)
 
     # This is the callback function for the Fwd and Rev buttons
     def direction_updated(self, direction:bool):
@@ -112,19 +226,13 @@ class loco_control():
         # Work out the direction based on the state of the buttons
         if self.forward["relief"] =="sunken":
             self.direction = True
-            self.throttle.config(state="normal")
-            self.increase.config(state="normal")
-            self.decrease.config(state="normal")
+            self.enable_speed_controls()
         elif self.reverse["relief"] =="sunken":
             self.direction = False
-            self.throttle.config(state="normal")
-            self.increase.config(state="normal")
-            self.decrease.config(state="normal")
+            self.enable_speed_controls()
         else:
             self.direction = None
-            self.throttle.config(state="disabled")
-            self.increase.config(state="disabled")
-            self.decrease.config(state="disabled")
+            self.disable_speed_controls()
 
     # This is the callback function for the + and - buttons
     def inc_dec_speed(self, increase:bool=None, stop:bool=False):
@@ -137,26 +245,26 @@ class loco_control():
             self.next_event = None
         else:
             self.next_event = self.root_window.after(50, lambda:self.inc_dec_speed(increase, stop))
-        
+
     # This is the callback function for the Slider. It also gets called
     # if the slider has been changed by the + or - buttons
     def speed_updated(self, speed:str):
         if int(speed) > 0:
-            self.forward.config(state="disabled")
-            self.reverse.config(state="disabled")
+            self.disable_forward_and_reverse()
+            self.disable_loco_selection()
         else:
-            self.forward.config(state="normal")
-            self.reverse.config(state="normal")
+            self.enable_forward_and_reverse()
+            self.enable_loco_selection()
         if self.direction is not None:
-            print(speed, self.direction) ########################################################
             library.set_loco_speed_and_direction(self.session_id, int(speed), self.direction)
-        
+
+    # This will get calles if the user closes the window
     def close_window(self):
         self.destroy()
         self.window.destroy()
-        
+
+    # This should get called if the application forces the window to be closed
     def destroy(self):
-        pass
-    
+        if self.session_id > 0: library.release_loco_session(self.session_id)
 
 ###########################################################################################
