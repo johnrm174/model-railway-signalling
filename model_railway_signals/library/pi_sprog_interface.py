@@ -164,7 +164,7 @@ def thread_to_send_buffered_data():
     # The main thread triggers a shutdown of this thread by setting port_close_initiated to TRUE
     # Just before this thread exits, it sets tx_thread_active to FALSE to confirm thread is exiting
     tx_thread_terminated = False
-    while not port_close_initiated:
+    while not (port_close_initiated and output_buffer.empty()):
         # Get the next message to transmit from the buffer
         if not output_buffer.empty():
             command_string = output_buffer.get()
@@ -259,7 +259,7 @@ def thread_to_read_received_data ():
                         elif op_code == 0xD0: process_accessory_data(byte_string)
                         # Engine Report / Response to DLOC (0xE1 = 225 decimal)
                         elif op_code == 0xE1: process_ploc_message(byte_string)
-                        # Error Code (from request session) (0x63)
+                        # Error Code (from request session) ERR (0x63)
                         elif op_code == 0x63: process_error_message(byte_string)
                 except:
                     # Ignore any heartbeat or Bus Sync Messages
@@ -483,6 +483,39 @@ def process_sstat_message(byte_string):
         service_mode_response = service_mode_status
     except Exception as exception:
         logging.error("Pi-SPROG: Error parsing Service Mode Status (SSTAT) Message")
+        logging.error(exception)
+    return()
+
+#------------------------------------------------------------------------------
+# Internal function to process any ERR messages received from the SPROG
+#------------------------------------------------------------------------------
+
+def process_error_message(byte_string):
+    logging.debug("Pi-SPROG: Rx thread - Received ERROR message")
+    try:
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # :SB000N63000302;
+        # OpCode is 63. Address is 0003. Error is 02.
+        d_start = msg_str.find('N') + 3
+        error_code = int(msg_str[d_start+4 : d_start+6], 16)
+        if error_code == 1:
+            logging.error("Pi-SPROG: Received Error Message - Loco Stack Full")
+        if error_code == 2:
+            logging.error("Pi-SPROG: Received Error Message - Loco Address Taken")
+        if error_code == 3:
+            logging.error("Pi-SPROG: Received Error Message - Session not Present")
+        if error_code == 4:
+            logging.error("Pi-SPROG: Received Error Message - Consist (loco groups) Empty")
+        if error_code == 5:
+            logging.error("Pi-SPROG: Received Error Message - Loco not Found")
+        if error_code == 6:
+            logging.error("Pi-SPROG: Received Error Message - Can Bus Error")
+        if error_code == 7:
+            logging.error("Pi-SPROG: Received Error Message - Invalid Request")
+        if error_code == 8:
+            logging.error("Pi-SPROG: Received Error Message - Session Cancelled")
+    except Exception as exception:
+        logging.error("Pi-SPROG: Error parsing ERROR message")
         logging.error(exception)
     return()
 
@@ -903,6 +936,7 @@ def service_mode_write_cv(cv:int, value:int):
 #     Session Keep Alive (DKEEP) - Opcode 0x23
 #     Release Locomotove (KLOC) - Opcode 0x21
 #     Set Loco Speed and Direction (DSPD) - Opcode 0x47
+#     set_loco_function  (DFNON/DFNOF) - Opcodes 0x49/0x4A
 #
 #########################################################################################
 
@@ -933,34 +967,38 @@ def request_loco_session(dcc_address:int):
     if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
         logging.error(f"Pi-SPROG: request_loco_session - Invalid DCC Address {dcc_address} - must be an int (1-10239)")
     else:
-        logging.debug(f"Pi-SPROG: Requesting Locomotive Session for DCC address {dcc_address}")
-        # Initialise the session entry
-        locomotive_sessions[str(dcc_address)] = {}
-        locomotive_sessions[str(dcc_address)]["sessionid"] = 0
-        locomotive_sessions[str(dcc_address)]["heartbeat"] = None
-        # Range of Addresses that can be used is 1 to 10239
-        if dcc_address < 128:
-            # Standard Short Address - Use 0x01 to set the 'Steal' bit on high byte
-            addr_hi = 0x01
-            addr_lo = dcc_address
+        logging.debug(f"Pi-SPROG: Requesting Loco Session for DCC address {dcc_address}")
+        # Check if the DCC address is already in use - if so there is an active session so we error
+        if not str(dcc_address) in locomotive_sessions.keys():
+            locomotive_sessions[str(dcc_address)] = {}
+            locomotive_sessions[str(dcc_address)]["sessionid"] = 0
+            locomotive_sessions[str(dcc_address)]["heartbeat"] = None
+            # Range of Addresses that can be used is 1 to 10239
+            if dcc_address < 128:
+                # Standard Short Address - Use 0x01 to set the 'Steal' bit on high byte
+                addr_hi = 0x01
+                addr_lo = dcc_address
+            else:
+                # Extended Addresses - Use raw hex and set the steal bit
+                addr_hi = (dcc_address >> 8) | 0xC1
+                addr_lo = dcc_address & 0xFF
+            # Request the session and wait for a response
+            send_cbus_command(2, 2, 0x40, addr_hi, addr_lo)
+            if wait_for_response(2.0, response_received):
+                # The Pi-SPROG 3 has a hardware timeout (often set to 20 seconds). If it does not receive a
+                # command (speed change, function toggle, or KLOC) for a specific session within that window,
+                # it will "purge" the session, stopping the locomotive and releasing the session ID.
+                heartbeat = common.root_window.after(5000, lambda:send_loco_keep_alive(locomotive_sessions[str(dcc_address)]["sessionid"]))
+                locomotive_sessions[str(dcc_address)]["heartbeat"] = heartbeat
+                session_id_to_return = locomotive_sessions[str(dcc_address)]["sessionid"]
+            else:
+                # Return Session ID of zero (could not create session)
+                logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
+                del(locomotive_sessions[str(dcc_address)])
+                session_id_to_return = 0
         else:
-            # Extended Addresses - Use raw hex and set the steal bit
-            addr_hi = (dcc_address >> 8) | 0xC1
-            addr_lo = dcc_address & 0xFF
-        # Request the session and wait for a response
-        request_loco_session_error = False
-        send_cbus_command(2, 2, 0x40, addr_hi, addr_lo)
-        if wait_for_response(2.0, response_received):
-            # The Pi-SPROG 3 has a hardware timeout (often set to 20 seconds). If it does not receive a
-            # command (speed change, function toggle, or KLOC) for a specific session within that window,
-            # it will "purge" the session, stopping the locomotive and releasing the session ID.
-            heartbeat = common.root_window.after(5000, lambda:send_loco_keep_alive(locomotive_sessions[str(dcc_address)]["sessionid"]))
-            locomotive_sessions[str(dcc_address)]["heartbeat"] = heartbeat
-            session_id_to_return = locomotive_sessions[str(dcc_address)]["sessionid"]
-        else:
-            # Delete the Session entry and return zero (could not create session)
-            del(locomotive_sessions[str(dcc_address)])
-            logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
+            # Return Session ID of zero (could not create session)
+            logging.error(f"Pi-SPROG: request_loco_session - DCC Address {dcc_address} is already allocated to a loco session")
             session_id_to_return = 0
     return(session_id_to_return)
 
@@ -970,13 +1008,13 @@ def request_loco_session(dcc_address:int):
 #------------------------------------------------------------------------------
 
 def send_loco_keep_alive(session_id:int):
-    # Check that the session is still active (in our list of active sessions)
-    for str_dcc_address, locomotive_session in locomotive_sessions.items():
-        dcc_address = find_dcc_address_for_session(session_id)
-        if dcc_address > 0:
-            send_cbus_command(2, 2, 0x23, session_id)
-            common.root_window.after(5000, lambda:send_loco_keep_alive(session_id))
-            break
+    # Find the DCC address associated with this session
+    # If DCC address > 0 The session is still in our dict of active sessions
+    dcc_address = find_dcc_address_for_session(session_id)
+    if dcc_address > 0:
+        send_cbus_command(2, 2, 0x23, session_id)
+        new_heartbeat = common.root_window.after(5000, lambda:send_loco_keep_alive(session_id))
+        locomotive_sessions[str(dcc_address)]["heartbeat"] = new_heartbeat
     return()
 
 #------------------------------------------------------------------------------
@@ -988,14 +1026,15 @@ def release_loco_session(session_id:int):
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: release_loco_session - Invalid Session ID {session_id} - must be an int")
     else:
-        logging.debug(f"Pi-SPROG: Releasing Locomotive Session {session_id}")
+        logging.debug(f"Pi-SPROG: Releasing Loco Session {session_id}")
         # Check that the session is still active (in our list of active sessions)
         dcc_address = find_dcc_address_for_session(session_id)
         if dcc_address > 0:
             # Kill the heartbeat thread and send the release locomotive command
             heartbeat = locomotive_sessions[str(dcc_address)]["heartbeat"]
-            locomotive_sessions[str(dcc_address)]["sessionid"] = None
             common.root_window.after_cancel(heartbeat)
+            locomotive_sessions[str(dcc_address)]["heartbeat"] = None
+            locomotive_sessions[str(dcc_address)]["sessionid"] = None
             send_cbus_command(2, 2, 0x21, session_id)
             # Delete the Session entry from the list of active sessions
             del(locomotive_sessions[str(dcc_address)])
@@ -1028,10 +1067,10 @@ def process_ploc_message(byte_string):
             dcc_address = ((addr_high & 0x3F) << 8) | addr_low
             address_type = "Long"
         else:
-            # STRIP THE STEAL BIT (0x01) for Short Addresses
-            # This ensures 0x0103 becomes 0x0003 (Address 3)
-            dcc_address = ((addr_high & 0xFE) << 8) | addr_low
-            address_type = "Short"        # The following parameters are only used for debug logging
+            # For short addresses, addr_high is just flags/padding
+            dcc_address = addr_low
+            address_type = "Short"
+            # The following parameters are only used for debug logging
         # Speed and Direction (1 byte) - Bit 7 is direction (1 = Forward, 0 = Reverse), Bits 0-6 are speed
         speed_and_direction = int(msg_str[d_start+6 : d_start+8], 16)
         direction = "Forward" if speed_and_direction & 0x80 else "Reverse"
@@ -1047,27 +1086,6 @@ def process_ploc_message(byte_string):
             locomotive_sessions[str(dcc_address)]["sessionid"] = session_handle
     except Exception as exception:
         logging.error("Pi-SPROG: Error parsing Engine Report (PLOC) Message")
-        logging.error(exception)
-    return()
-
-#------------------------------------------------------------------------------
-# Internal function to process the PLOC message (response to RLOC) and
-# save the session ID so it can be returned to the calling programme
-#------------------------------------------------------------------------------
-
-def process_error_message(byte_string):
-    logging.debug("Pi-SPROG: Rx thread - Received ERROR message")
-    try:
-        msg_str = byte_string.decode('Ascii').strip(':;')
-        # :SB000N63000302;
-        # OpCode is 63. Address is 0003. Error is 02.
-        d_start = msg_str.find('N') + 3
-        error_code = int(msg_str[d_start+4 : d_start+6], 16)
-        if error_code == 2:
-            logging.debug("Pi-SPROG: Unable to create new Locomotive Session - Slot busy")
-            #################################### TODO - LOG OTHER Error Messages ######################################
-    except Exception as exception:
-        logging.error(f"Pi-SPROG: Error parsing ERROR message")
         logging.error(exception)
     return()
 
@@ -1106,7 +1124,7 @@ def send_emergency_stop(session_id:int):
 
 #------------------------------------------------------------------------------
 # API function to set The Locomotive Functions On/Off
-# OpCodea are either 0x49 for ON (DFNON), 0x4A for OFF (DFNOF)
+# OpCodes are either 0x49 for ON (DFNON), 0x4A for OFF (DFNOF)
 #------------------------------------------------------------------------------
 
 def set_loco_function(session_id:int, function_id:int, state:bool):

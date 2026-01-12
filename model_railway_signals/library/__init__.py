@@ -204,6 +204,7 @@ from .pi_sprog_interface import reset_dcc_sound_mappings
 from .pi_sprog_interface import request_loco_session
 from .pi_sprog_interface import release_loco_session
 from .pi_sprog_interface import set_loco_speed_and_direction
+from .pi_sprog_interface import set_loco_function
 from .pi_sprog_interface import send_emergency_stop
 
 from .pi_sprog_interface import play_dcc_sound_file
@@ -357,6 +358,7 @@ __all__ = [
         'request_loco_session',
         'release_loco_session',
         'set_loco_speed_and_direction',
+        'set_loco_function',
         'send_emergency_stop',
         'play_dcc_sound_file',
       # Public DCC control functions

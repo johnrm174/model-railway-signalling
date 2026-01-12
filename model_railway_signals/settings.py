@@ -58,7 +58,7 @@ default_settings["logging"]["level"] = 2   # Warning
 
 default_settings["sprog"] = {}
 default_settings["sprog"]["port"] = "/dev/serial0"
-default_settings["sprog"]["baud"] = 460800
+default_settings["sprog"]["baud"] = 115200
 default_settings["sprog"]["debug"] = False
 default_settings["sprog"]["startup"] = False
 default_settings["sprog"]["power"] = False
@@ -88,6 +88,7 @@ default_settings["mqtt"]["pubsensors"] = []
 
 default_settings["control"] = {}
 default_settings["control"]["dccsoundmappings"] = []
+default_settings["control"]["locomotiveroster"] = {}
 
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020
