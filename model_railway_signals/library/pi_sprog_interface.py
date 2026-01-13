@@ -690,6 +690,16 @@ def query_command_station_status():
     return(rstat_response)
 
 #------------------------------------------------------------------------------
+# Externally Called Function to Register for DCC power status updates
+#------------------------------------------------------------------------------
+
+registered_dcc_power_state_callbacks = []
+def register_power_state_callback(callback):
+    global registered_dcc_power_state_callbacks
+    if callback not in registered_dcc_power_state_callbacks:
+        registered_dcc_power_state_callbacks.append(callback)
+
+#------------------------------------------------------------------------------
 # Externally Called Function to turn on the track power
 #------------------------------------------------------------------------------
 
@@ -711,7 +721,11 @@ def request_dcc_power_on():
         time.sleep (0.2)
         # Tell the application to send out any DCC commands that may have been 'issued' before
         # DCC Power was turned on but not transmitted (as they would have been silently ignored)
-        if ton_response: common.sprog_transmit_all()
+        # We also transmit the DCC power state to anyone who has registered a callback
+        if ton_response:
+            for power_status_changed_callback in registered_dcc_power_state_callbacks:
+                power_status_changed_callback(True)
+            common.sprog_transmit_all()
     return(ton_response)
 
 #------------------------------------------------------------------------------
@@ -730,8 +744,13 @@ def request_dcc_power_off():
         send_cbus_command(mj_pri=0, min_pri=0, op_code=0x08)
         # Wait for the response (with a 1 second timeout)
         wait_for_response(5.0, response_received)
-        if tof_response: logging.info("Pi-SPROG: Track power has been turned OFF")
-        else: logging.error("Pi-SPROG: Request to turn off Track Power failed")
+        if tof_response:
+            logging.info("Pi-SPROG: Track power has been turned OFF")
+            # We transmit the DCC power state to anyone who has registered a callback
+            for power_status_changed_callback in registered_dcc_power_state_callbacks:
+                power_status_changed_callback(False)
+        else:
+            logging.error("Pi-SPROG: Request to turn off Track Power failed")
     return(tof_response)
 
 #------------------------------------------------------------------------------
@@ -1148,7 +1167,7 @@ def set_loco_function(session_id:int, function_id:int, state:bool):
 
 #------------------------------------------------------------------------------
 # API function for Emergency Stop All
-    # CBUS Command for Emergency Stop (RESP) - Opcode 0x06
+# CBUS Command for Emergency Stop (RESP) - Opcode 0x06
 #------------------------------------------------------------------------------
 
 def send_emergency_stop_all():
