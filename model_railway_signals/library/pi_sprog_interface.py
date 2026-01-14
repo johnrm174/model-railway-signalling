@@ -50,6 +50,9 @@
 #   enable_status_reporting(callback) - Enable reporting
 #   disable_status_reporting() - Disable Reporting
 #
+#   subscribe_to_dcc_power_updates (callback) - subscribe to DCC power state changes
+#   unsubscribe_from_dcc_power_updates - unsubscribe from DCC power state changes
+#
 #   request_loco_session(dcc_address) - generates a loco session and returns session_id
 #   release_loco_session(session_id) - releases the locomotive session
 #   set_loco_speed_and_direction(session_id:int, speed:int, forward:bool)
@@ -694,10 +697,16 @@ def query_command_station_status():
 #------------------------------------------------------------------------------
 
 registered_dcc_power_state_callbacks = []
-def register_power_state_callback(callback):
+
+def subscribe_to_dcc_power_updates(callback):
     global registered_dcc_power_state_callbacks
     if callback not in registered_dcc_power_state_callbacks:
         registered_dcc_power_state_callbacks.append(callback)
+
+def unsubscribe_from_dcc_power_updates(callback):
+    global registered_dcc_power_state_callbacks
+    if callback in registered_dcc_power_state_callbacks:
+        registered_dcc_power_state_callbacks.remove(callback)
 
 #------------------------------------------------------------------------------
 # Externally Called Function to turn on the track power

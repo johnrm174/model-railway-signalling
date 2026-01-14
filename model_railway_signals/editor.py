@@ -113,10 +113,12 @@ from . import run_layout
 from . import run_routes
 from . import menubar
 from . import library
+from . import throttle_server #####################################################
 
 # The following imports are only used for the advanced debugging functions
 import linecache
 import tracemalloc
+
 
 #------------------------------------------------------------------------------------
 # Top level class for the toolbar window
@@ -124,6 +126,9 @@ import tracemalloc
 
 class main_menubar:
     def __init__(self, root):
+        # The following parameters keep track of the SPROG connection/power status
+        self.sprog_connection_state = False
+        self.sprog_power_state = None # Unknown
         # Configure the logger (log level gets set later)
         logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
@@ -363,8 +368,8 @@ class main_menubar:
         # Reset the SPROG and MQTT connecions to their default states - the MQTT and SPROG
         # configuration settings in the loaded file may be completely different so we
         # want to close down everything before re-opening everything from scratch
-        if self.power_label == "DCC Power:On": self.dcc_power_off()
-        if self.sprog_label == "SPROG:Connected":self.sprog_disconnect()
+        if self.sprog_power_state: self.dcc_power_off()
+        if self.sprog_connection_state:self.sprog_disconnect()
         if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
@@ -484,35 +489,27 @@ class main_menubar:
     # SPROG menubar functions
     #------------------------------------------------------------------------------------------
 
-    def update_sprog_menubar_controls(self, desired_state:bool, connected:bool, show_popup:bool):
-        if connected:
+    def update_sprog_menubar_controls(self):
+        if self.sprog_connection_state:
             new_label = "SPROG:Connected"
+            self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
             self.mainmenubar.entryconfigure(self.power_label, state="normal")
-            if show_popup and connected != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="Error disconnecting from Serial Port - try rebooting")
+            self.sprog_label= new_label
         else:
             new_label = "SPROG:Disconnected"
+            self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
             self.mainmenubar.entryconfigure(self.power_label, state="disabled")
-            if show_popup and connected != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="SPROG connection failure - Check SPROG settings")
-        self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
-        self.sprog_label = new_label
+            self.sprog_label= new_label
 
-    def update_power_menubar_controls(self, desired_state:bool, power_on:bool):
-        if power_on:
+    def update_power_menubar_controls(self):
+        if self.sprog_power_state == True:
             new_label = "DCC Power:On"
-            if power_on != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="DCC power off failed - Check SPROG settings")
-        else:
+            self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+            self.power_label = new_label
+        elif self.sprog_power_state == False:
             new_label = "DCC Power:Off"
-            if power_on != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="DCC power on failed - Check SPROG settings")
-        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
-        self.power_label = new_label
+            self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+            self.power_label = new_label
 
     def sprog_connect(self, show_popup:bool=True):
         # The connect request returns True if successful
@@ -520,32 +517,47 @@ class main_menubar:
         baud = settings.get_sprog("baud")
         address_mode = settings.get_sprog("addressmode")
         debug = settings.get_sprog("debug")
-        connected = library.sprog_connect(port, baud, address_mode, debug)
-        self.update_sprog_menubar_controls(True, connected, show_popup)
-        return(connected)
+        self.sprog_connection_state = library.sprog_connect(port, baud, address_mode, debug)
+        self.update_sprog_menubar_controls()
+        # Subscribe to DCC Power state changes
+        if self.sprog_connection_state: library.subscribe_to_dcc_power_updates(self.dcc_power_state_updated)
+        return(self.sprog_connection_state)
     
-    def sprog_disconnect(self):
+    def sprog_disconnect(self, show_popup:bool=True):
         # The disconnect request returns True if successful
-        connected = not library.sprog_disconnect()
-        self.update_sprog_menubar_controls(False, connected, True)
+        self.sprog_connection_state = not library.sprog_disconnect()
+        self.update_sprog_menubar_controls()
+        # Unsubscribe from to DCC Power state changes
+        library.unsubscribe_from_dcc_power_updates(self.dcc_power_state_updated)
+        if show_popup and self.sprog_connection_state:
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                message="Error disconnecting from Serial Port - try rebooting")
+
+    def dcc_power_off(self, show_popup:bool=True):
+        # The power off request returns True if successful
+        if not library.request_dcc_power_off() and show_popup:
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                message="DCC power off failed - Check SPROG settings")
+        return()
+
+    def dcc_power_on(self, show_popup:bool=True):
+        # The power on request returns True if successful
+        if not library.request_dcc_power_on() and show_popup:
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                message="DCC power on failed - Check SPROG settings")
+        return()
 
     def sprog_update(self):
         # Only update the configuration if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
         if self.sprog_label == "SPROG:Connected": self.sprog_connect()
 
-    def dcc_power_off(self):
-        # The power off request returns True if successful
-        power_on = not library.request_dcc_power_off()
-        self.update_power_menubar_controls(False, power_on)
-
-    def dcc_power_on(self):
-        # The power on request returns True if successful
-        power_on = library.request_dcc_power_on()
-        self.update_power_menubar_controls(True, power_on)
+    def dcc_power_state_updated(self, dcc_power:bool):
+        self.sprog_power_state = dcc_power
+        self.update_power_menubar_controls()
 
     def dcc_programming_enabled(self):
-        return (self.power_label=="DCC Power:On" and self.sprog_label=="SPROG:Connected")
+        return (self.sprog_power_state and self.sprog_connected)
 
     #------------------------------------------------------------------------------------------
     # MQTT menubar functions - The MQTT library module now calls back into the 'update mqtt
@@ -714,6 +726,9 @@ class main_menubar:
             # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
             # power and disconnect from the serial port, Revert all GPIO ports to their default states
             # and then wait until all scheduled Tkinter tasks have completed before destroying root)
+            ################################################## START THROTTLE SERVER ############################################
+            throttle_server.stop_throttle_server()
+            ################################################## START THROTTLE SERVER ############################################
             schematic.shutdown()
             library.orderly_shutdown()
         return()
@@ -915,9 +930,15 @@ def run_editor():
     # Bind the close window event to the editor quit function to perform an orderly shutdown
     root.protocol("WM_DELETE_WINDOW", main_window_menubar.quit_schematic)
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
+    ################################################## START THROTTLE SERVER ############################################
+    throttle_server.start_throttle_server(main_window_menubar.sprog_power_state)
+    ################################################## START THROTTLE SERVER ############################################
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
+        ################################################## START THROTTLE SERVER ############################################
+        throttle_server.stop_throttle_server()
+        ################################################## START THROTTLE SERVER ############################################
         # Kill off the PhotoImage objects so we don't get spurious exceptions on window close and
         # perform an instant shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
         # power and disconnect from the serial port, Revert all GPIO ports to their default states

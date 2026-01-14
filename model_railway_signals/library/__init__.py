@@ -194,7 +194,8 @@ from .pi_sprog_interface import sprog_disconnect
 from .pi_sprog_interface import service_mode_read_cv
 from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import send_accessory_short_event
-from .pi_sprog_interface import register_power_state_callback
+from .pi_sprog_interface import subscribe_to_dcc_power_updates
+from .pi_sprog_interface import unsubscribe_from_dcc_power_updates
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
 from .pi_sprog_interface import enable_status_reporting
@@ -350,7 +351,8 @@ __all__ = [
         'service_mode_read_cv',
         'service_mode_write_cv',
         'send_accessory_short_event',
-        "register_power_state_callback",
+        "subscribe_to_dcc_power_updates",
+        "unsubscribe_from_dcc_power_updates",
         'request_dcc_power_on',
         'request_dcc_power_off',
         'enable_status_reporting',
