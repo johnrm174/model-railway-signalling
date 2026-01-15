@@ -90,7 +90,7 @@ async def send_capabilities(writer):
     await writer.drain()
     if server_debug: logging.debug("Throttle Server - Capabilities sent")
     
-# THIS DOESN'T WORK ##################################  
+# THIS DOESN'T WORK ##################################
 # async def send_roster(writer):
 # # Format: RL<Count><;><Name><;><Address><;><Type>...
 #     # Type: 'S' for Short, 'L' for Long
@@ -134,7 +134,7 @@ async def handle_client(reader, writer):
                 #---------------------------------------------------------------------------
                 if msg.startswith("HU"):
                     await send_capabilities(writer)
-                    ##await send_roster(writer) THIS DOESN'T WORK ##################################  
+                    ##await send_roster(writer) THIS DOESN'T WORK ##################################
                     await send_power_state(writer)
                 #---------------------------------------------------------------------------
                 # Heattbeat message - we just need to respond to say we are still alive
@@ -157,7 +157,7 @@ async def handle_client(reader, writer):
                 if msg.startswith("M"):
                     # Identify the Index (the first char after 'M')
                     # Example: In "M0AS123", the index is '0'
-                    throttle_index = msg[1] 
+                    throttle_index = msg[1]
                     # Define full_key early so it's available for all sub-blocks
                     full_key_match = re.match(r"M([^+\-VRFL<]+)", msg)
                     full_key = full_key_match.group(1).strip() if full_key_match else throttle_index
@@ -169,19 +169,18 @@ async def handle_client(reader, writer):
                         try:
                             raw_addr = rest.split("<;>")[1]
                             dcc_addr_int = int(raw_addr[1:])
-                            
                             session_id = library.request_loco_session(dcc_addr_int)
                             if session_id > 0:
                                 # Store it using the SINGLE CHARACTER index (e.g., '0')
                                 wi_sessions[throttle_index] = {
-                                    "session_id": session_id, 
-                                    "speed": 0, 
+                                    "session_id": session_id,
+                                    "speed": 0,
                                     "forward": True,
                                     "addr_str": raw_addr}
                                 # Echo back the FULL key the client used in the message
                                 # If they sent M0+, we reply M0+...
                                 full_key_match = re.match(r"M([^+\-VRFL<]+)", msg)
-                                full_key = full_key_match.group(1) if full_key_match else throttle_index     
+                                full_key = full_key_match.group(1) if full_key_match else throttle_index
                                 writer.write(f"M{full_key}+{raw_addr}<;>{raw_addr}\n".encode())
                                 await writer.drain()
                                 if server_debug: logging.debug(f"Throttle Server - Acquired {raw_addr} for Index "+
@@ -213,7 +212,7 @@ async def handle_client(reader, writer):
                             # Acknowledge with the index
                             writer.write(f"M{throttle_index}-*\n".encode())
                             await writer.drain()
-                            del wi_sessions[throttle_index]     
+                            del wi_sessions[throttle_index]
                         elif action.startswith("q"):
                             # Cab Engineer is just asking for a status update.
                             # We "ignore" this by NOT calling the library, but we MUST reply to the client.
@@ -235,7 +234,7 @@ async def handle_client(reader, writer):
                     break # This exits the while loop and goes to the 'finally' block
                 #---------------------------------------------------------------------------
                 # Send Roster request - THIS DOESN'T WORK
-                #---------------------------------------------------------------------------   
+                #---------------------------------------------------------------------------
 #                 if msg.startswith("RL"):
 #                     await send_roster(writer)
 #                     continue
