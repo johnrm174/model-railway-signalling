@@ -557,7 +557,7 @@ class main_menubar:
         self.update_power_menubar_controls()
 
     def dcc_programming_enabled(self):
-        return (self.sprog_power_state and self.sprog_connected)
+        return (self.sprog_power_state and self.sprog_connection_state)
 
     #------------------------------------------------------------------------------------------
     # MQTT menubar functions - The MQTT library module now calls back into the 'update mqtt
