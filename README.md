@@ -52,46 +52,17 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 6.0.0:
+## What's new for Release 6.x.x:
 
 > [!IMPORTANT]
-> Release 6.1.0 will only support the loading of layout files created by Release 6.0.0 or later.
+> Release 6.x.x will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.1.0.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
 > You have been warned!
 
-* Minor improvements/bugfixes to Route setup functionality:
-    * Ignore state of monentary switches on completion of route setup.
-    * Ensure flashing of route buttons is canceled on load of new schematic.
-* More flexibility in the automatic cleardown of routes (one-touch and NX routes):
-    * Multiple track sensors can be specified (useful when routes are 'laddered').
-    * Multiple signals can be specified (to clear down route on signal passed events).
-* New scripting API to enable control of signalling application from python programs:
-    * Enables full signalbox simulations to be developed (with simulated train movements).
-    * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays.
-* Allow GPIO Sensors to be mapped to more than one object type to give more flexibility:
-    * e.g. A GPIO sensor can be mapped to a Signal Passed event and a Track Sensor event.
-* Added new test functionality into the GPIO Settings window to aid layout configuration:
-    * Test buttons for each GPIO input can be pressed/release to simulate events.
-    * Allows end-to end test of functionality whilst not connected to the layout.
-* Added new Subscriptions utility to monitor the state of subscribed objects:
-    * Initial release displays the state of Subscribed GPIO Sensors:
-    * Test buttons for subscribed sensor can be pressed/release to simulate events.
-    * Allows end-to end test of functionality whilst not connected to other nodes.
-* New SPROG Status Monitoring Feature (SPROG Settings Window):
-    * Provides display of SPROG Status, DCC Bus Voltage and DCC Bus current
-* Alternative labels can now be specified for Signalbox Lever control buttons:
-    * Provides greater flexibility for associating Levers towith Signals and Points.
-* Added ability to override ground signals (to ON) based on track occupancy ahead
-* Added ability to override subsidiary signals (to ON) based on track occupancy ahead
-* Semaphore signals can now be specified (and displayed) with lower quadrant arms.
-* Accept optional OS arguments (to enable application start when sig file is clicked)
-* Colour Scheme changes to make popup warnings (SPAD and Lever warnings) more obvious.
-* Clearance delay (track occupancy changes) can now be specified up to 60 seconds.
-* Bugfix to enable schematics with block instrument sounds to run on Windows platforms.
-* Bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys).
-* Bugfix to validation of 'Signal passed' and 'signal approached' GPIO Sensor ID entries.
-* Bugfix to interlocking of subsidiary signals (now locked correctly if no route ahead)
+* Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons)
+* TBD, TBD
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
