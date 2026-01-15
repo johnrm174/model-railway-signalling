@@ -1,4 +1,5 @@
 
+import re
 import threading
 import asyncio
 import socket
@@ -6,6 +7,11 @@ import logging
 from zeroconf.asyncio import AsyncZeroconf, AsyncServiceInfo
 
 from . import library
+
+
+############################################################################################
+### TODO - Function buttons, Timeout for Cab engineer????, Test with WiThrottle, Roster ####
+############################################################################################
 
 #-----------------------------------------------------------------------------------------------
 # Find the local IP address of the machine we are running on
@@ -40,6 +46,9 @@ server_port_number = 12021
 server_debug = True
 
 dcc_power_state = None
+# A The dictionary to map WiThrottle keys to CBUS session IDs and DCC addresses
+# Format of each entry: {"T1": {"session_id":2, "dcc_address":3, "addr_type":"S", "speed":0, "forward":True},}
+wi_sessions = {}
 
 ##############################################
 ROSTER = {
@@ -81,13 +90,14 @@ async def send_capabilities(writer):
     await writer.drain()
     if server_debug: logging.debug("Throttle Server - Capabilities sent")
     
-async def send_roster(writer):
-    writer.write(b"RLH|Index|Name|Address|Type\n")
-    for i, (name, addr) in enumerate(ROSTER.items(), start=1):
-        writer.write(f"RL{i}|{name}|{addr}|L\n".encode())
-    writer.write(b"RLD\n")
-    await writer.drain()
-    if server_debug: logging.debug("Throttle Server - Loco Roster sent")
+# THIS DOESN'T WORK ##################################  
+# async def send_roster(writer):
+# # Format: RL<Count><;><Name><;><Address><;><Type>...
+#     # Type: 'S' for Short, 'L' for Long
+#     roster_msg = "RL1<;>Class 37<;>3701<;>L\n"
+#     writer.write(roster_msg.encode())
+#     await writer.drain()
+#     if server_debug: logging.debug("Throttle Server - Loco Roster sent")
     
 async def send_power_state(writer):
     if dcc_power_state is not None:
@@ -107,7 +117,6 @@ async def handle_client(reader, writer):
     if server_debug: logging.debug(f"Throttle Server - Client connected: {peer}")
     # Send the initial handshake
     await send_handshake(writer)
-    # Wait for HU ###### Need to elaborate on this
     try: 
         await send_handshake(writer)
         while True:
@@ -120,63 +129,134 @@ async def handle_client(reader, writer):
                 msg=msg.strip()
                 if not msg: continue
                 if server_debug: logging.debug(f"Throttle Server - Received message: {msg}")
+                #---------------------------------------------------------------------------
                 # Capabilities requested - respond with capabilities
+                #---------------------------------------------------------------------------
                 if msg.startswith("HU"):
                     await send_capabilities(writer)
+                    ##await send_roster(writer) THIS DOESN'T WORK ##################################  
                     await send_power_state(writer)
+                #---------------------------------------------------------------------------
                 # Heattbeat message - we just need to respond to say we are still alive
+                #---------------------------------------------------------------------------
                 if msg == "*":
                     writer.write(b"*\n")
                     await writer.drain()
                     continue
-                # Request Power On/OFF
+                #---------------------------------------------------------------------------
+                # DCC Power On/OFF Requested
+                #---------------------------------------------------------------------------
                 if msg.startswith("PPA"):
                     state = msg[3:]  # "0" or "1"
                     if state == "1": library.request_dcc_power_on()
                     else: library.request_dcc_power_off()
                     continue
-
-
-                if msg.startswith("M") and "+S" in msg:
-                    # Example: M0+S123<;>S123
-                    parts = msg.split("<;>")
-                    left = parts[0]          # M0+S123
-                    loco = left.split("+S")[1]  # 123
-
-                    cab = left[1]            # '0'
-
-                    # Respond with OK to acquire the throttle
-                    writer.write(f"M{cab}+S{loco}<;>OK\n".encode())
-                    await writer.drain()
-
-                    print(f"Throttle acquired for cab {cab}, loco {loco}")
-                    continue
-
-
-                if msg.startswith("MTA"):
-                    # Example: MTA*<;>qV
-                    parts = msg.split("<;>")
-                    if len(parts) == 2:
-                        loco = parts[0][3:]  # after "MTA"
-                        writer.write(f"MTA{loco}<;>OK\n".encode())
-                        await writer.drain()
-                        print(f"Acknowledged throttle for {loco}")
-                    continue
-
-
-                if msg.startswith("RL"):
-                    await send_roster(writer)
-                    continue
-
-                if msg.startswith("PW"):
-                    writer.write((msg + "\n").encode())
-                    await writer.drain()
-                    continue
-
+                #---------------------------------------------------------------------------
+                # Multi-Throttle Commands (acquire/release loco)
+                #---------------------------------------------------------------------------
+                if msg.startswith("M"):
+                    # Identify the Index (the first char after 'M')
+                    # Example: In "M0AS123", the index is '0'
+                    throttle_index = msg[1] 
+                    # Define full_key early so it's available for all sub-blocks
+                    full_key_match = re.match(r"M([^+\-VRFL<]+)", msg)
+                    full_key = full_key_match.group(1).strip() if full_key_match else throttle_index
+                    match = re.search(r"[+\-VRFL<].*", msg)
+                    if not match: continue
+                    rest = match.group(0)
+                    # --- ACQUIRE (+) ---
+                    if "+" in rest:
+                        try:
+                            raw_addr = rest.split("<;>")[1]
+                            dcc_addr_int = int(raw_addr[1:])
+                            
+                            session_id = library.request_loco_session(dcc_addr_int)
+                            if session_id > 0:
+                                # Store it using the SINGLE CHARACTER index (e.g., '0')
+                                wi_sessions[throttle_index] = {
+                                    "session_id": session_id, 
+                                    "speed": 0, 
+                                    "forward": True,
+                                    "addr_str": raw_addr}
+                                # Echo back the FULL key the client used in the message
+                                # If they sent M0+, we reply M0+...
+                                full_key_match = re.match(r"M([^+\-VRFL<]+)", msg)
+                                full_key = full_key_match.group(1) if full_key_match else throttle_index     
+                                writer.write(f"M{full_key}+{raw_addr}<;>{raw_addr}\n".encode())
+                                await writer.drain()
+                                if server_debug: logging.debug(f"Throttle Server - Acquired {raw_addr} for Index "+
+                                                               f"{throttle_index} - session ID is {session_id}")
+                        except Exception as e:
+                            logging.error(f"Acquisition error: {e}")
+                        continue
+                    # --- CONTROL (V, R, etc.) ---
+                    # Look up using only the throttle_index ('0')
+                    if throttle_index in wi_sessions:
+                        session_id = wi_sessions[throttle_index]["session_id"]
+                        action = rest.replace("<;>", "")
+                        # SPEED (V)
+                        if action.startswith("V"):
+                            speed_val = int(action[1:])
+                            wi_sessions[throttle_index]["speed"] = speed_val
+                            library.set_loco_speed_and_direction(session_id, speed_val, wi_sessions[throttle_index]["forward"])
+                            if server_debug: logging.debug(f"Throttle Server - Applied Speed {speed_val} to Session {session_id}")
+                        # DIRECTION (R)
+                        elif action.startswith("R"):
+                            dir_val = int(action[1:])
+                            wi_sessions[throttle_index]["forward"] = (dir_val == 1)
+                            library.set_loco_speed_and_direction(session_id, wi_sessions[throttle_index]["speed"], wi_sessions[throttle_index]["forward"])
+                            if server_debug: logging.debug(f"Throttle Server - Applied Direction {dir_val} to Session {session_id}")
+                        # RELEASE (-)
+                        elif action.startswith("-"):
+                            library.release_loco_session(session_id)
+                            if server_debug: logging.debug(f"Throttle Server - Released session {session_id} for Index {throttle_index}")
+                            # Acknowledge with the index
+                            writer.write(f"M{throttle_index}-*\n".encode())
+                            await writer.drain()
+                            del wi_sessions[throttle_index]     
+                        elif action.startswith("q"):
+                            # Cab Engineer is just asking for a status update.
+                            # We "ignore" this by NOT calling the library, but we MUST reply to the client.
+                            if "V" in action:
+                                v = wi_sessions[throttle_index]["speed"]
+                                # Use full_key here instead of key
+                                writer.write(f"M{full_key}<;>V{v}\n".encode())
+                            elif "R" in action:
+                                r = 1 if wi_sessions[throttle_index]["forward"] else 0
+                                # Use full_key here instead of key
+                                writer.write(f"M{full_key}<;>R{r}\n".encode())
+                            await writer.drain()
+                            continue # Skip the rest of the loop for this message
+                #---------------------------------------------------------------------------
+                # Quit notification (Client has gracefully disconnected)
+                #---------------------------------------------------------------------------
+                if msg == "Q":
+                    logging.info(f"Throttle Server - Client {peer} sent Quit command.")
+                    break # This exits the while loop and goes to the 'finally' block
+                #---------------------------------------------------------------------------
+                # Send Roster request - THIS DOESN'T WORK
+                #---------------------------------------------------------------------------   
+#                 if msg.startswith("RL"):
+#                     await send_roster(writer)
+#                     continue
     finally:
+        # This code runs no matter HOW the loop exits (Quit command, crash, or disconnect)
+        logging.debug(f"Throttle Server - Cleaning up sessions for {peer}")
+        for index in list(wi_sessions.keys()):
+            try:
+                session_id = wi_sessions[index]["session_id"]
+                addr = wi_sessions[index]["addr_str"]
+                # Release the loco in the Pi-SPROG hardware
+                library.release_loco_session(session_id)
+                logging.debug(f"Released session {session_id} for loco {addr}")
+            except Exception as e:
+                logging.error(f"Error releasing session during cleanup: {e}")
+        wi_sessions.clear()
         connected_clients.remove(writer)
+        # Close the socket properly
         writer.close()
         await writer.wait_closed()
+        logging.debug(f"Throttle Server - Connection closed for {peer}")
     return()
 
 #-----------------------------------------------------------------------------------------------
