@@ -734,7 +734,9 @@ def request_dcc_power_on():
         if ton_response:
             for power_status_changed_callback in registered_dcc_power_state_callbacks:
                 power_status_changed_callback(True)
-            common.sprog_transmit_all()
+            # Wait until things have stabilised before sending out any messages
+            # Testing on my layout has indicated we need at least a second to be sure
+            common.root_window.after(1000, common.sprog_transmit_all)
     return(ton_response)
 
 #------------------------------------------------------------------------------
