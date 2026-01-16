@@ -383,6 +383,7 @@ class loco_control(Tk.Toplevel):
         else:
             self.direction = None
             self.disable_speed_controls()
+        library.set_loco_speed_and_direction(self.session_id, self.throttle.get(), direction)
 
     # This is the callback function for the + and - buttons
     def inc_dec_speed(self, increase:bool=None, stop:bool=False):
