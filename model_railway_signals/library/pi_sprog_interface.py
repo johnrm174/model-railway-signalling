@@ -1001,6 +1001,9 @@ def request_loco_session(dcc_address:int):
             locomotive_sessions[str(dcc_address)] = {}
             locomotive_sessions[str(dcc_address)]["sessionid"] = 0
             locomotive_sessions[str(dcc_address)]["heartbeat"] = None
+            locomotive_sessions[str(dcc_address)]["functions"] = {}
+            for function_id in range(0, 3):
+                locomotive_sessions[str(dcc_address)]["functions"][str(function_id)] = False
             # Range of Addresses that can be used is 1 to 10239
             if dcc_address < 128:
                 # Standard Short Address - Use 0x01 to set the 'Steal' bit on high byte
@@ -1152,7 +1155,7 @@ def send_emergency_stop(session_id:int):
 
 #------------------------------------------------------------------------------
 # API function to set The Locomotive Functions On/Off
-# OpCodes are either 0x49 for ON (DFNON), 0x4A for OFF (DFNOF)
+# OpCode is  0x60 (DFUN)
 #------------------------------------------------------------------------------
 
 def set_loco_function(session_id:int, function_id:int, state:bool):
@@ -1163,13 +1166,27 @@ def set_loco_function(session_id:int, function_id:int, state:bool):
     # Check if the session is valid before sending
     dcc_address = find_dcc_address_for_session(session_id)
     if dcc_address > 0:
-        # Select OpCode based on state
-        if state: opcode = 0x49
-        else: opcode = 0x4A
+        # Update the persistant state in the local dictionary:
+        locomotive_sessions[str(dcc_address)]["functions"][str(function_id)] = state
+        locomotive = locomotive_sessions[str(dcc_address)]
+        # Range 1: F0, F1, F2, F3, F4
+        if 0 <= function_id <= 4:
+            range_id = 1
+            mask = (16 if locomotive["functions"].get("0") else 0) | \
+                   (8  if locomotive["functions"].get("4") else 0) | \
+                   (4  if locomotive["functions"].get("3") else 0) | \
+                   (2  if locomotive["functions"].get("2") else 0) | \
+                   (1  if locomotive["functions"].get("1") else 0)
+            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+        # Range 2: F5, F6, F7, F8
+        elif 5 <= function_id <= 8:
+            range_id = 2
+            mask = (8 if locomotive["functions"].get("8") else 0) | \
+                   (4 if locomotive["functions"].get("7") else 0) | \
+                   (2 if locomotive["functions"].get("6") else 0) | \
+                   (1 if locomotive["functions"].get("5") else 0)
+            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)        
         logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
-        # CBUS command format for DFNON/DFNOF: [OpCode] [Session] [Function_Number]
-        # Data length is 2 bytes (Session and Function ID)
-        send_cbus_command(2, 2, opcode, session_id, function_id)
     else:
         logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
     return()
