@@ -289,7 +289,8 @@ class main_menubar:
         elif args.log_level == "DEBUG": settings.set_logging("level", 4)
         self.logging_update()
         # Initialise the editor configuration at startup (using the default settings)
-        self.initialise_editor()
+        self.initialise_editor1()
+        self.initialise_editor2()
         # The following code is to help with advanced debugging (start the app with the -d flag)
         if args.debug_mode:
             self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -356,9 +357,11 @@ class main_menubar:
     
     # --------------------------------------------------------------------------------------
     # Common initialisation functions (called on editor start or layout load or new layout)
+    # initialise_editor1 is called prior to creating the schematic objects (layout load)
+    # initialise_editor2 is called after creating the schematic objects (layout load
     # --------------------------------------------------------------------------------------
     
-    def initialise_editor(self):
+    def initialise_editor1(self):
         # Set the root window label to the name of the current file (split from the dir path)
         # The filename returned from get_settings is the fully qualified filename
         path, name = os.path.split(settings.get_general("filename"))
@@ -371,19 +374,7 @@ class main_menubar:
         if self.sprog_power_state: self.dcc_power_off()
         if self.sprog_connection_state:self.sprog_disconnect()
         if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
-        # Initialise the SPROG (if configured). Note that we use the menubar functions
-        # for connection and the DCC power so these are correctly reflected in the UI
-        if settings.get_sprog("startup"):
-            sprog_connected = self.sprog_connect()
-            if sprog_connected and settings.get_sprog("power"):
-                self.dcc_power_on()
-        # Initialise the MQTT networking (if configured). Note that we use the menubar
-        # functionfor connection so the state is correctly reflected in the UI.
-        # The "connect on startup" flag is the 8th parameter returned.
         self.reset_mqtt_pub_sub_configuration()
-        self.mqtt_reconfigure_client()
-        if settings.get_mqtt("startup"): self.mqtt_connect()
-        self.apply_new_mqtt_pub_sub_configuration()
         # Both the automation_enable and automation_disable calls will update the 'run_layout' module
         if settings.get_general("automation"): self.automation_enable()
         else: self.automation_disable()
@@ -395,7 +386,21 @@ class main_menubar:
         # Apply any other general settings
         self.general_settings_update()
         self.sounds_update()
-        
+
+    def initialise_editor2(self):
+        # Initialise the SPROG (if configured). Note that we use the menubar functions
+        # for connection and the DCC power so these are correctly reflected in the UI
+        if settings.get_sprog("startup"):
+            sprog_connected = self.sprog_connect()
+            if sprog_connected and settings.get_sprog("power"):
+                self.dcc_power_on()
+        # Initialise the MQTT networking (if configured). Note that we use the menubar
+        # functionfor connection so the state is correctly reflected in the UI.
+        # The "connect on startup" flag is the 8th parameter returned.
+        self.mqtt_reconfigure_client()
+        if settings.get_mqtt("startup"): self.mqtt_connect()
+        self.apply_new_mqtt_pub_sub_configuration()
+
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
     # --------------------------------------------------------------------------------------
@@ -747,7 +752,8 @@ class main_menubar:
             # Delete all existing objects, restore the default settings and re-initialise the editor
             schematic.delete_all_objects()
             settings.restore_defaults()
-            self.initialise_editor()
+            self.initialise_editor1()
+            self.initialise_editor2()
             # Save the current state (for undo/redo) - deleting all previous history
             objects.save_schematic_state(reset_pointer=True)
             # Set the file saved flag back to false (to force a "save as" on next save)
@@ -837,10 +843,13 @@ class main_menubar:
                     # Set the filename to reflect that actual name of the loaded file
                     settings.set_general("filename", file_loaded)
                     # Re-initialise the editor for the new settings to take effect
-                    self.initialise_editor()
+                    self.initialise_editor1()
                     # Create the loaded layout objects then purge the loaded state information
                     logging.info("CREATING-NEW-OBJECTS*****************************************************************************")
                     objects.set_all(layout_state["objects"])
+                    logging.info("Initialising SPROG and MQTT**********************************************************************")
+                    # Re-initialise the editor for the new settings to take effect
+                    self.initialise_editor2()
                     # Purge the loaded state (to stope it being erroneously inherited when items are deleted/created with the same IDs)
                     library.purge_loaded_state_information()
                     # Set the flag so we don't enforce a "save as" on next save
