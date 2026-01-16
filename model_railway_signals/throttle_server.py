@@ -155,77 +155,84 @@ async def handle_client(reader, writer):
                 # Multi-Throttle Commands (acquire/release loco)
                 #---------------------------------------------------------------------------
                 if msg.startswith("M"):
-                    # Identify the Index (the first char after 'M')
-                    # Example: In "M0AS123", the index is '0'
-                    throttle_index = msg[1]
-                    # Define full_key early so it's available for all sub-blocks
-                    full_key_match = re.match(r"M([^+\-VRFL<]+)", msg)
-                    full_key = full_key_match.group(1).strip() if full_key_match else throttle_index
-                    match = re.search(r"[+\-VRFL<].*", msg)
+                    # 1. Get the Index (for our internal dictionary)
+                    throttle_index = msg[1] 
+                    
+                    # 2. Get the Full Key (for replying to the app)
+                    full_key_match = re.match(r"M([^+\-VRFL<q]+)", msg)
+                    full_key = full_key_match.group(1) if full_key_match else throttle_index
+                    
+                    # 3. Get the Action part
+                    match = re.search(r"[+\-VRFL<q].*", msg)
                     if not match: continue
                     rest = match.group(0)
+
                     # --- ACQUIRE (+) ---
-                    if "+" in rest:
+                    if rest.startswith("+"):
                         try:
-                            raw_addr = rest.split("<;>")[1]
-                            dcc_addr_int = int(raw_addr[1:])
+                            # Robust Address Parsing: Handle "S3" or "<;>S3"
+                            if "<;>" in rest:
+                                raw_addr = rest.split("<;>")[1]
+                            else:
+                                raw_addr = rest[1:] # Strip the '+'
+
+                            dcc_addr_int = int(re.sub(r"[^0-9]", "", raw_addr))
                             session_id = library.request_loco_session(dcc_addr_int)
+                            
                             if session_id > 0:
-                                # Store it using the SINGLE CHARACTER index (e.g., '0')
+                                # Store using throttle_index
                                 wi_sessions[throttle_index] = {
                                     "session_id": session_id,
                                     "speed": 0,
                                     "forward": True,
-                                    "addr_str": raw_addr}
-                                # Echo back the FULL key the client used in the message
-                                # If they sent M0+, we reply M0+...
-                                full_key_match = re.match(r"M([^+\-VRFL<]+)", msg)
-                                full_key = full_key_match.group(1) if full_key_match else throttle_index
-                                writer.write(f"M{full_key}+{raw_addr}<;>{raw_addr}\n".encode())
+                                    "addr_str": raw_addr
+                                }
+                                # Reply using full_key to unlock the app UI
+                                writer.write(f"M{full_key}+{raw_addr}<;>{dcc_addr_int}\n".encode())
                                 await writer.drain()
-                                if server_debug: logging.debug(f"Throttle Server - Acquired {raw_addr} for Index "+
-                                                               f"{throttle_index} - session ID is {session_id}")
                         except Exception as e:
                             logging.error(f"Acquisition error: {e}")
                         continue
-                    # --- CONTROL (V, R, etc.) ---
-                    # Look up using only the throttle_index ('0')
+
+                    # --- CONTROL (V, R, F, etc.) ---
                     if throttle_index in wi_sessions:
                         session_id = wi_sessions[throttle_index]["session_id"]
-                        action = rest.replace("<;>", "")
+                        # Clean the action string (remove the separator if present)
+                        clean_action = rest.replace("<;>", "")
+
                         # SPEED (V)
-                        if action.startswith("V"):
-                            speed_val = int(action[1:])
+                        if clean_action.startswith("V"):
+                            speed_val = int(clean_action[1:])
                             wi_sessions[throttle_index]["speed"] = speed_val
                             library.set_loco_speed_and_direction(session_id, speed_val, wi_sessions[throttle_index]["forward"])
-                            if server_debug: logging.debug(f"Throttle Server - Applied Speed {speed_val} to Session {session_id}")
+
                         # DIRECTION (R)
-                        elif action.startswith("R"):
-                            dir_val = int(action[1:])
+                        elif clean_action.startswith("R"):
+                            dir_val = int(clean_action[1:])
                             wi_sessions[throttle_index]["forward"] = (dir_val == 1)
                             library.set_loco_speed_and_direction(session_id, wi_sessions[throttle_index]["speed"], wi_sessions[throttle_index]["forward"])
-                            if server_debug: logging.debug(f"Throttle Server - Applied Direction {dir_val} to Session {session_id}")
+
+                        # FUNCTION (F)
+                        elif clean_action.upper().startswith("F"):
+                            try:
+                                # Example: F110 -> state '1', func '10'
+                                state = (clean_action[1] == '1')
+                                func_id = int(clean_action[2:])
+                                library.set_loco_function(session_id, func_id, state)
+                                
+                                # Acknowledge back so the app button stays lit/unlit
+                                addr_str = wi_sessions[throttle_index]["addr_str"]
+                                writer.write(f"M{full_key}{addr_str}<;>{clean_action.upper()}\n".encode())
+                                await writer.drain()
+                            except Exception as e:
+                                logging.error(f"Function Error: {e}")
+
                         # RELEASE (-)
-                        elif action.startswith("-"):
+                        elif clean_action.startswith("-"):
                             library.release_loco_session(session_id)
-                            if server_debug: logging.debug(f"Throttle Server - Released session {session_id} for Index {throttle_index}")
-                            # Acknowledge with the index
-                            writer.write(f"M{throttle_index}-*\n".encode())
+                            writer.write(f"M{full_key}-*\n".encode())
                             await writer.drain()
                             del wi_sessions[throttle_index]
-                        elif action.startswith("q"):
-                            # Cab Engineer is just asking for a status update.
-                            # We "ignore" this by NOT calling the library, but we MUST reply to the client.
-                            if "V" in action:
-                                v = wi_sessions[throttle_index]["speed"]
-                                # Use full_key here instead of key
-                                writer.write(f"M{full_key}<;>V{v}\n".encode())
-                            elif "R" in action:
-                                r = 1 if wi_sessions[throttle_index]["forward"] else 0
-                                # Use full_key here instead of key
-                                writer.write(f"M{full_key}<;>R{r}\n".encode())
-                            await writer.drain()
-                            continue # Skip the rest of the loop for this message
                 #---------------------------------------------------------------------------
                 # Quit notification (Client has gracefully disconnected)
                 #---------------------------------------------------------------------------
