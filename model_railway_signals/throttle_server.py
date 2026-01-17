@@ -61,28 +61,29 @@ ROSTER = {
 }###############################################
 
 #-----------------------------------------------------------------------------------------------
-# Functions for sending specific Responses to WiThrottle Client
+# Function for sending the capabilities to WiThrottle Client
 #-----------------------------------------------------------------------------------------------
-
 
 async def send_capabilities(writer):
     # Power capability: 2 = power supported
     power_capability ="PPA2\n"
     writer.write(power_capability.encode())
-    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Power: {power_capability}")
+    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Power: {power_capability!r}")
     # No turnout capability block
     # No route capability block
     # Consist count (0 for initialisation)
     consist_count ="RCC0\n"
     writer.write(consist_count.encode())
-    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Consist Count: {consist_count}")
+    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Consist Count: {consist_count!r}")
     # Heartbeat interval (10 seconds)
     heartbeat_interval ="*10\n"
     writer.write(heartbeat_interval.encode())
-    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Heartbeat Interval: {heartbeat_interval}")
+    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Heartbeat Interval: {heartbeat_interval!r}")
     await writer.drain()
     
-    
+#-----------------------------------------------------------------------------------------------
+# Function for sending the Roster to WiThrottle Client
+#-----------------------------------------------------------------------------------------------
     
 async def send_roster(writer):
     # JMRI-style delimiters: Entry delimiter: ]\[ Field delimiter: }|{
@@ -101,19 +102,22 @@ async def send_roster(writer):
             ###############################################################################
             # Build entry
             entry = (name+"}|{"+address+"}|{"+address_type+function_block)
-            entries.append(entry)
+            roster_entries.append(entry)
         # Join entries using JMRI entry delimiter ]\[
-        roster_messsage = "RL" + str(len(entries)) + "]\\[" + "]\\[".join(entries) + "]\n"
+        roster_messsage = "RL" + str(len(roster_entries)) + "]\\[" + "]\\[".join(roster_entries) + "]\n"
     writer.write(roster_messsage.encode())
-    if server_debug: logging.debug(f"Throttle Server - Sent Roster: {roster_messsage}")
+    if server_debug: logging.debug(f"Throttle Server - Sent Roster: {roster_messsage!r}")
     await writer.drain()
 
+#-----------------------------------------------------------------------------------------------
+# Function for sending the the power state to WiThrottle Client
+#-----------------------------------------------------------------------------------------------
 
 async def send_power_state(writer):
     state = 1 if dcc_power_state else 0
     power_state = f"PPA{state}\n"
     writer.write(power_state.encode())
-    if server_debug: logging.debug(f"Throttle Server - Sent DCC Power state: {power_state}")
+    if server_debug: logging.debug(f"Throttle Server - Sent DCC Power state: {power_state!r}")
     await writer.drain()
 
 #-----------------------------------------------------------------------------------------------
@@ -126,7 +130,7 @@ async def handle_client(reader, writer):
     # ONLY send the version at the very start - Do NOT send Roster or Capabilities yet.
     protocol_version = "VN2.0\n" 
     writer.write(protocol_version.encode())
-    if server_debug: logging.debug(f"Throttle Server - Sent Protocol Version: {protocol_version}")    
+    if server_debug: logging.debug(f"Throttle Server - Sent Protocol Version: {protocol_version!r}")    
     await writer.drain()
     # Put exception handling around the client loop
     try: 
@@ -139,7 +143,7 @@ async def handle_client(reader, writer):
             for message in messages:
                 message = message.strip()
                 if not message: continue
-                if server_debug: logging.debug(f"Throttle Server - Received Message: {message}")
+                if server_debug: logging.debug(f"Throttle Server - Received Message: {message!r}")
                 #------------------------------------------------------------
                 # Identity 'N' or Hardware Update 'HU' Message
                 #------------------------------------------------------------
@@ -149,10 +153,10 @@ async def handle_client(reader, writer):
                     # Send Hardware info and server name
                     hardware_type_response = f"HT{server_name}\n"
                     writer.write(hardware_type_response.encode())
-                    if server_debug: logging.debug(f"Throttle Server - Sent Hardware Type: {hardware_type_response}")
+                    if server_debug: logging.debug(f"Throttle Server - Sent Hardware Type: {hardware_type_response!r}")
                     server_name_response = f"*NM{server_name}\n"
                     writer.write(server_name_response.encode())
-                    if server_debug: logging.debug(f"Throttle Server - Sent Server Name: {server_name_response}")
+                    if server_debug: logging.debug(f"Throttle Server - Sent Server Name: {server_name_response!r}")
                     # Send the ACTUAL roster, Send capabilities and power state
                     await send_roster(writer)
                     await send_capabilities(writer)
@@ -160,7 +164,7 @@ async def handle_client(reader, writer):
                     # End the burst with the terminator
                     burst_terminator = "#\n"
                     writer.write(burst_terminator.encode())
-                    if server_debug: logging.debug(f"Throttle Server - Sent Burst Terminator: {burst_terminator}")
+                    if server_debug: logging.debug(f"Throttle Server - Sent Burst Terminator: {burst_terminator!r}")
                     await writer.drain()
                     continue
                 #------------------------------------------------------------
@@ -171,12 +175,12 @@ async def handle_client(reader, writer):
                         logging.debug("Throttle Server - Handling Heartbeat Timeout Message")
                         heartbeat_response = "*10\n"
                         writer.write(heartbeat_response.encode()) # Start EKG with 10s timeout
-                        if server_debug: logging.debug(f"Throttle Server - Sent Heartbeat Response: {heartbeat_response}")
+                        if server_debug: logging.debug(f"Throttle Server - Sent Heartbeat Response: {heartbeat_response!r}")
                     else:
                         logging.debug("Throttle Server - Handling regular Heartbeat Message")
                         heartbeat_response = "*\n"
                         writer.write(heartbeat_response.encode()) # Standard pulse
-                        if server_debug: logging.debug(f"Throttle Server - Sent Heartbeat Response: {heartbeat_response}")
+                        if server_debug: logging.debug(f"Throttle Server - Sent Heartbeat Response: {heartbeat_response!r}")
                     await writer.drain()
                     continue
                 #------------------------------------------------------------
@@ -193,7 +197,7 @@ async def handle_client(reader, writer):
                     # Acknowledge the power change back to app
                     power_response_message = f"PPA{state}\n"
                     writer.write(power_response_message.encode())
-                    if server_debug: logging.debug(f"Throttle Server - Sent Power Response: {power_response_message}")
+                    if server_debug: logging.debug(f"Throttle Server - Sent Power Response: {power_response_message!r}")
                     await writer.drain()
                     continue
                 #---------------------------------------------------------------------------
@@ -247,22 +251,22 @@ async def handle_client(reader, writer):
                                 # 4. PROTOCOL ACKNOWLEDGMENT (The 3-Step Handshake)
                                 # A) Echo the Address: Confirms the server has "grabbed" this loco
                                 address_to_send = f"M{full_key}+{raw_addr}<;>\n"
-                                writer.write(address_to_echo.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Address Confirmation: {address_to_send}")
+                                writer.write(address_to_send.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Address Confirmation: {address_to_send!r}")
                                 # B) Send Roster Label: Forces the app UI to switch to the throttle screen
-                                roster_label_to_send f"M{full_key}L{raw_addr}<;>{roster_name}\n"
+                                roster_label_to_send = f"M{full_key}L{raw_addr}<;>{roster_name}\n"
                                 writer.write(roster_label_to_send.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Roster Label: {roster_label_to_send}")
+                                if server_debug: logging.debug(f"Throttle Server - Sent Roster Label: {roster_label_to_send!r}")
                                 # C) State Sync: Tell the app the current Speed (V), Direction (R), and Steps (s)
                                 speed_to_send = f"M{full_key}AS{raw_addr}<;>V0\n"  # Speed 0
                                 writer.write(speed_to_send.encode()) 
-                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Speed: {speed_to_send}")
+                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Speed: {speed_to_send!r}")
                                 direction_to_send = f"M{full_key}AS{raw_addr}<;>R1\n"   # Forward
                                 writer.write(direction_to_send.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Direction: {direction_to_send}")
+                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Direction: {direction_to_send!r}")
                                 speed_steps_mode_to_send = f"M{full_key}AS{raw_addr}<;>s1\n"  # 128 Speed Steps mode
                                 writer.write(speed_steps_mode_to_send.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Speed Steps Mode: {speed_steps_mode_to_send}")
+                                if server_debug: logging.debug(f"Throttle Server - Sent Speed Steps Mode: {speed_steps_mode_to_send!r}")
                                 # Look up the specific function labels (like 'Horn' or 'Lights') from our ROSTER dictionary.
                                 # This ensures the buttons in the app match the specific locomotive.
                                 roster_lookup = roster_name
@@ -276,14 +280,17 @@ async def handle_client(reader, writer):
                                         # Format: M[key]AS[address]<;>F[State][FunctionNumber]
                                         function_configuration = f"M{full_key}AS{raw_addr}<;>F0{function}\n"
                                         writer.write(function_configuration.encode())
-                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration}")
+                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration!r}")
                                 else:
                                     # Fallback: if roster isn't found, sync a default range so buttons still work
                                     for function in range(29):
                                         function_configuration = f"M{full_key}AS{raw_addr}<;>F0{function}\n"
                                         writer.write(function_configuration.encode())
-                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration}")
+                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration!r}")
                                 await writer.drain()
+                                continue
+                        except Exception as e:
+                            logging.error(f"Function Error: {e}")
                     #-----------------------------------------------------------------------
                     # CONTROL & QUERIES (V, R, F, q, -) ---
                     #-----------------------------------------------------------------------
@@ -294,17 +301,17 @@ async def handle_client(reader, writer):
                         # Handle Queries (qV, qR) - Crucial for UI Sync
                         if "qV" in rest_of_message:
                             if server_debug:logging.debug("Throttle Server - Handling Query Speed Request")
-                            speed_response = f"M{full_key}AS{addr_str}<;>V{sess['speed']}\n"
+                            speed_response = f"M{full_key}AS{address_str}<;>V{session['speed']}\n"
                             writer.write(speed_response.encode())
-                            if server_debug: logging.debug(f"Throttle Server - Sent Speed Response: {speed_response}")
+                            if server_debug: logging.debug(f"Throttle Server - Sent Speed Response: {speed_response!r}")
                             await writer.drain()
                             continue
                         if "qR" in rest_of_message:
                             if server_debug:logging.debug("Throttle Server - Handling Query Direction Request")
                             direction_value = 1 if session["forward"] else 0
-                            direction_response = f"M{full_key}AS{addr_str}<;>R{direction_value}\n"
-                            writer.write(direction_value.encode())
-                            if server_debug: logging.debug(f"Throttle Server - Sent direction Response: {speed_response}")
+                            direction_response = f"M{full_key}AS{address_str}<;>R{direction_value}\n"
+                            writer.write(direction_response.encode())
+                            if server_debug: logging.debug(f"Throttle Server - Sent direction Response: {direction_response!r}")
                             await writer.drain()
                             continue
                         # Clean the action string for control commands
@@ -331,7 +338,7 @@ async def handle_client(reader, writer):
                                 # Echo back to keep app buttons in sync
                                 function_response = f"M{full_key}AS{addr_str}<;>{clean_action.upper()}\n"
                                 writer.write(function_response.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Function Response: {function_response}")
+                                if server_debug: logging.debug(f"Throttle Server - Sent Function Response: {function_response!r}")
                                 await writer.drain()
                             except Exception as e:
                                 logging.error(f"Function Error: {e}")
@@ -341,7 +348,7 @@ async def handle_client(reader, writer):
                             library.release_loco_session(session_id)
                             release_loco_response = f"M{full_key}-*\n"
                             writer.write(release_loco_response.encode())
-                            if server_debug: logging.debug(f"Throttle Server - Sent Release Locomotive response: {release_loco_response}")
+                            if server_debug: logging.debug(f"Throttle Server - Sent Release Locomotive response: {release_loco_response!r}")
                             await writer.drain()
                             del wi_sessions[throttle_index]
                     continue
@@ -358,7 +365,7 @@ async def handle_client(reader, writer):
                 if "<;>q" in message:
                     # Optimization: To stop Engine Driver from spamming qV and qR, 
                     # you can echo back the current state, but 'continue' is the priority.
-                    if server_debug: logging.debug(f"Ignored Query: {message}")
+                    if server_debug: logging.debug(f"Ignored Query: {message!r}")
                     continue
     finally:
         # This code runs no matter HOW the loop exits (Quit command, crash, or disconnect)
