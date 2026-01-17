@@ -1,3 +1,6 @@
+
+# https://www.jmri.org/help/en/package/jmri/jmrit/withrottle/Protocol.shtml
+
 import re
 import threading
 import asyncio
@@ -61,309 +64,302 @@ ROSTER = {
 # Functions for sending specific Responses to WiThrottle Client
 #-----------------------------------------------------------------------------------------------
 
-async def send_initial_connection_info(writer):
-    """Send all initial connection information immediately after client connects"""
-    # Protocol version
-    writer.write(b"VN2.0\n")
-    # Server type
-    writer.write(b"HTJMRI\n")
-    # Server description
-    writer.write(f"Ht{server_name}\n".encode())
-    # Roster
-    await send_roster(writer)
-    # Capabilities
-    await send_capabilities(writer)
-    # Power state
-    await send_power_state(writer)
-    # Web port (required even if not used)
-    writer.write(b"PW12080\n")
-    await writer.drain()
-    if server_debug: logging.debug("Throttle Server - Initial connection info sent")
 
 async def send_capabilities(writer):
     # Power capability: 2 = power supported
-    writer.write(b"PPA2\n")
-
+    power_capability ="PPA2\n"
+    writer.write(power_capability.encode())
+    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Power: {power_capability}")
     # No turnout capability block
     # No route capability block
-
     # Consist count (0 for initialisation)
-    writer.write(b"RCC0\n")
-
+    consist_count ="RCC0\n"
+    writer.write(consist_count.encode())
+    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Consist Count: {consist_count}")
     # Heartbeat interval (10 seconds)
-    writer.write(b"*10\n")
-
+    heartbeat_interval ="*10\n"
+    writer.write(heartbeat_interval.encode())
+    if server_debug: logging.debug(f"Throttle Server - Sent Capabilities - Heartbeat Interval: {heartbeat_interval}")
     await writer.drain()
-    if server_debug:
-        logging.debug("Throttle Server - Capabilities sent (minimal)")
+    
+    
     
 async def send_roster(writer):
-    # JMRI-style delimiters:
-    # Entry delimiter: ]\[
-    # Field delimiter: }|{
-    
+    # JMRI-style delimiters: Entry delimiter: ]\[ Field delimiter: }|{
     if len(ROSTER) == 0:
-        writer.write(b"RL0\n")
-        await writer.drain()
-        return
-
-    entries = []
-
-    for name, data in ROSTER.items():
-        address = data["address"]
-        addr_type = "L" if int(address) > 127 else "S"
-
-        print("LOCO:", name)
-        print("  Address:", address)
-        print("  Type:", addr_type)
-
-        # Build function list using }|{
-        func_block = ""
-        for fn in data["functions"]:
-            func_block += "}|{" + fn
-        print("  FUNC BLOCK:", func_block)
-
-        # Build entry
-        entry = (
-            name +
-            "}|{" + address +
-            "}|{" + addr_type +
-            func_block
-        )
-
-        print("  ROSTER ENTRY:", entry)
-        entries.append(entry)
-
-    # Join entries using JMRI entry delimiter ]\[
-    roster_msg = "RL" + str(len(entries)) + "]\\[" + "]\\[".join(entries) + "]\n"
-
-    print("ROSTER MSG:", roster_msg)
-
-    writer.write(roster_msg.encode())
+        roster_messsage = "RL0\n"
+    else:
+        roster_entries = []
+        for name, data in ROSTER.items():
+            address = data["address"]
+            address_type = "L" if int(address) > 127 else "S"
+            ########################### FUNCTION LIST NOT WORKING #########################
+            # Build function list using }|{
+            function_block = ""
+            for function in data["functions"]:
+                function_block += "}|{" + function
+            ###############################################################################
+            # Build entry
+            entry = (name+"}|{"+address+"}|{"+address_type+function_block)
+            entries.append(entry)
+        # Join entries using JMRI entry delimiter ]\[
+        roster_messsage = "RL" + str(len(entries)) + "]\\[" + "]\\[".join(entries) + "]\n"
+    writer.write(roster_messsage.encode())
+    if server_debug: logging.debug(f"Throttle Server - Sent Roster: {roster_messsage}")
     await writer.drain()
-
-
-
 
 
 async def send_power_state(writer):
     state = 1 if dcc_power_state else 0
-    writer.write(f"PPA{state}\n".encode())
+    power_state = f"PPA{state}\n"
+    writer.write(power_state.encode())
+    if server_debug: logging.debug(f"Throttle Server - Sent DCC Power state: {power_state}")
     await writer.drain()
-    if server_debug:
-        logging.debug(f"Throttle Server - DCC Power state {state} sent")
 
 #-----------------------------------------------------------------------------------------------
 # Function for handling connections initiated from each WiThrottle Client
 #-----------------------------------------------------------------------------------------------
 
-
 async def handle_client(reader, writer):
     peer = writer.get_extra_info("peername")
     connected_clients.add(writer)
-    
-    # 1. ONLY send the version at the very start.
-    # Do NOT send Roster or Capabilities yet.
-    writer.write(b"VN2.0\n")
+    # ONLY send the version at the very start - Do NOT send Roster or Capabilities yet.
+    protocol_version = "VN2.0\n" 
+    writer.write(protocol_version.encode())
+    if server_debug: logging.debug(f"Throttle Server - Sent Protocol Version: {protocol_version}")    
     await writer.drain()
-
+    # Put exception handling around the client loop
     try: 
         while True:
+            # If no data then the client has disconnected
             data = await reader.read(1024)
             if not data: break
-            
+            # We have data so we go on to parse the messages
             messages = data.decode().split('\n')
-            for msg in messages:
-                msg = msg.strip()
-                if not msg: continue
-                
-                if server_debug: logging.debug(f"RX: {msg}")
-
-                # 2. WAIT for the Identity 'N' or Hardware Update 'HU'
-                if msg.startswith("N") or msg.startswith("HU"):
-                    # Send Hardware info
-                    writer.write(f"HT{server_name}\n".encode())
-                    writer.write(f"*NM{server_name}\n".encode())
-                    
-                    # Send the ACTUAL roster instead of hardcoded RL0
+            for message in messages:
+                message = message.strip()
+                if not message: continue
+                if server_debug: logging.debug(f"Throttle Server - Received Message: {message}")
+                #------------------------------------------------------------
+                # Identity 'N' or Hardware Update 'HU' Message
+                #------------------------------------------------------------
+                if message.startswith("N") or message.startswith("HU"):
+                    if message.startswith("N") and server_debug: logging.debug("Throttle Server - Handling Identity Message")
+                    if message.startswith("HU") and server_debug: logging.debug("Throttle Server - Handling Hardware Update Message")
+                    # Send Hardware info and server name
+                    hardware_type_response = f"HT{server_name}\n"
+                    writer.write(hardware_type_response.encode())
+                    if server_debug: logging.debug(f"Throttle Server - Sent Hardware Type: {hardware_type_response}")
+                    server_name_response = f"*NM{server_name}\n"
+                    writer.write(server_name_response.encode())
+                    if server_debug: logging.debug(f"Throttle Server - Sent Server Name: {server_name_response}")
+                    # Send the ACTUAL roster, Send capabilities and power state
                     await send_roster(writer)
-                    
-                    # Send capabilities and power
                     await send_capabilities(writer)
                     await send_power_state(writer)
-                    
                     # End the burst with the terminator
-                    writer.write(b"#\n")
+                    burst_terminator = "#\n"
+                    writer.write(burst_terminator.encode())
+                    if server_debug: logging.debug(f"Throttle Server - Sent Burst Terminator: {burst_terminator}")
                     await writer.drain()
-                    logging.info("Sent actual configuration burst after App Identity.")
                     continue
-                
-                # 1. Handle Heartbeat (MUST RESPOND TO KEEP SOCKET OPEN)
-                if msg.startswith("*"):
-                    if msg == "*+":
-                        writer.write(b"*10\n") # Start EKG with 10s timeout
-                        if server_debug: logging.debug("TX Heartbeat: *10")
+                #------------------------------------------------------------
+                # Handle Heartbeat Message (MUST RESPOND TO KEEP SOCKET OPEN)
+                #------------------------------------------------------------
+                if message.startswith("*"):
+                    if message == "*+":
+                        logging.debug("Throttle Server - Handling Heartbeat Timeout Message")
+                        heartbeat_response = "*10\n"
+                        writer.write(heartbeat_response.encode()) # Start EKG with 10s timeout
+                        if server_debug: logging.debug(f"Throttle Server - Sent Heartbeat Response: {heartbeat_response}")
                     else:
-                        writer.write(b"*\n") # Standard pulse
+                        logging.debug("Throttle Server - Handling regular Heartbeat Message")
+                        heartbeat_response = "*\n"
+                        writer.write(heartbeat_response.encode()) # Standard pulse
+                        if server_debug: logging.debug(f"Throttle Server - Sent Heartbeat Response: {heartbeat_response}")
                     await writer.drain()
                     continue
-                
-                # 4. Handle DCC Power
-                if msg.startswith("PPA"):
-                    state = msg[3:]
-                    if state == "1": library.request_dcc_power_on()
-                    else: library.request_dcc_power_off()
+                #------------------------------------------------------------
+                # Handle DCC Power ON/OFF requests
+                #------------------------------------------------------------
+                if message.startswith("PPA"):
+                    state = message[3:]
+                    if state == "1":
+                        if server_debug:logging.debug("Throttle Server - Handling Power ON Request")
+                        library.request_dcc_power_on()
+                    else:
+                        if server_debug:logging.debug("Throttle Server - Handling Power OFF Request")
+                        library.request_dcc_power_off()
                     # Acknowledge the power change back to app
-                    writer.write(f"PPA{state}\n".encode())
+                    power_response_message = f"PPA{state}\n"
+                    writer.write(power_response_message.encode())
+                    if server_debug: logging.debug(f"Throttle Server - Sent Power Response: {power_response_message}")
                     await writer.drain()
                     continue
-
-
                 #---------------------------------------------------------------------------
-                # 4 Multi-Throttle Commands (acquire/release loco)
+                # Multi-Throttle Commands (acquire/control/release loco)
                 #---------------------------------------------------------------------------
-                
-                if msg.startswith("M"):
-                    # 1. Get the Index (for our internal dictionary)
-                    throttle_index = msg[1] 
-                    
-                    # 2. Get the Full Key (for replying to the app, e.g., '0' or 'T0')
-                    full_key_match = re.match(r"M([^+\-VRFL<q]+)", msg)
+                if message.startswith("M"):
+                    # Get the Index for our internal dictionary of registered locos
+                    throttle_index = message[1] 
+                    # Get the Full Key (for replying to the app, e.g., '0' or 'T0')
+                    full_key_match = re.match(r"M([^+\-VRFL<q]+)", message)
                     full_key = full_key_match.group(1) if full_key_match else throttle_index
-                    
-                    # 3. Get the Action part
-                    match = re.search(r"[+\-VRFL<q].*", msg)
+                    # Get the Action part of the message
+                    match = re.search(r"[+\-VRFL<q].*", message)
                     if not match: continue
-                    rest = match.group(0)
-
-                    # --- ACQUIRE (+) ---
-                    if rest.startswith("+"):
+                    # We have an action match we can handle
+                    rest_of_message = match.group(0)
+                    #-----------------------------------------------------------------------
+                    # ACQUIRE LOCO - This section triggers when the user selects a train
+                    #in the App. Incoming message format example: "M0+L4701<;>EClass 47"
+                    #-----------------------------------------------------------------------
+                    if rest_of_message.startswith("+"):
+                        if server_debug:logging.debug("Throttle Server - Handling Acquire Locomotive Request")
                         try:
-                            addr_match = re.search(r"\+(.*?)<;>", rest)
+                            # 1. PARSE DCC ADDRESS
+                            # Look between the '+' and '<;>' to find the address and prefix.
+                            # 'S' = Short address (1-127), 'L' = Long address (128-9999).
+                            addr_match = re.search(r"\+(.*?)<;>", rest_of_message)
                             raw_addr = addr_match.group(1) if addr_match else "3"
-                            
-                            # CORRECTED: Handle the EH prefix (Entry Handle)
+                            # 2. PARSE ROSTER NAME
+                            # The App sends the Name after the 'E' (Entry) or 'EH' (Entry Handle) tag.
+                            # This is crucial for looking up our function labels later.
                             roster_name = ""
-                            if "<;>EH" in rest:
-                                roster_name = rest.split("<;>EH")[1]
-                            elif "<;>E" in rest:
-                                roster_name = rest.split("<;>E")[1]
-
+                            found_a_match = re.search(r"<;>E(.+)$", rest_of_message)
+                            if found_a_match:
+                                roster_name = found_a_match.group(1)
+                            else:
+                                # Fallback logic for variations in client implementations (e.g. Engine Driver vs WiThrottle iOS)
+                                if "<;>EH" in rest_of_message:
+                                    # Some clients prefix the handle with 'H'
+                                    roster_name = "H" + rest_of_message.split("<;>EH")[1]
+                                elif "<;>E" in rest_of_message:
+                                    roster_name = rest_of_message.split("<;>E")[1]
+                            # 3. PREPARE FOR BACKEND
+                            # Strip the 'L' or 'S' to get just the integer
                             dcc_addr_int = int(re.sub(r"[^0-9]", "", raw_addr))
+                            # Request the session from the Pi SPROG interface
                             session_id = library.request_loco_session(dcc_addr_int)
-                            
                             if session_id > 0:
-                                wi_sessions[throttle_index] = {
-                                    "session_id": session_id,
-                                    "addr_str": raw_addr,
-                                    "speed": 0,
-                                    "forward": True
-                                }
-                                
-                                writer.write(f"M{full_key}+{raw_addr}<;>\n".encode())
-                                writer.write(f"M{full_key}L{raw_addr}<;>{roster_name}\n".encode())
-                                
-                                # Initial State Sync
-                                writer.write(f"M{full_key}AS{raw_addr}<;>V0\n".encode())
-                                writer.write(f"M{full_key}AS{raw_addr}<;>R1\n".encode())
-                                writer.write(f"M{full_key}AS{raw_addr}<;>s1\n".encode())
-                                
-                                # Sync the specific number of functions
-                                # First, let's make sure we stripped the 'H' from 'EH' if needed
+                                # Store the session mapping so speed/function commands know which ID to use
+                                wi_sessions[throttle_index] = {"session_id": session_id, "addr_str": raw_addr, "speed": 0, "forward": True }
+                                # 4. PROTOCOL ACKNOWLEDGMENT (The 3-Step Handshake)
+                                # A) Echo the Address: Confirms the server has "grabbed" this loco
+                                address_to_send = f"M{full_key}+{raw_addr}<;>\n"
+                                writer.write(address_to_echo.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Address Confirmation: {address_to_send}")
+                                # B) Send Roster Label: Forces the app UI to switch to the throttle screen
+                                roster_label_to_send f"M{full_key}L{raw_addr}<;>{roster_name}\n"
+                                writer.write(roster_label_to_send.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Roster Label: {roster_label_to_send}")
+                                # C) State Sync: Tell the app the current Speed (V), Direction (R), and Steps (s)
+                                speed_to_send = f"M{full_key}AS{raw_addr}<;>V0\n"  # Speed 0
+                                writer.write(speed_to_send.encode()) 
+                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Speed: {speed_to_send}")
+                                direction_to_send = f"M{full_key}AS{raw_addr}<;>R1\n"   # Forward
+                                writer.write(direction_to_send.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Direction: {direction_to_send}")
+                                speed_steps_mode_to_send = f"M{full_key}AS{raw_addr}<;>s1\n"  # 128 Speed Steps mode
+                                writer.write(speed_steps_mode_to_send.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Speed Steps Mode: {speed_steps_mode_to_send}")
+                                # Look up the specific function labels (like 'Horn' or 'Lights') from our ROSTER dictionary.
+                                # This ensures the buttons in the app match the specific locomotive.
                                 roster_lookup = roster_name
+                                # Strip 'H' prefix for dictionary lookup if the app added one
                                 if roster_lookup.startswith('H') and roster_lookup not in ROSTER:
                                     roster_lookup = roster_lookup[1:]
-
                                 if roster_lookup in ROSTER:
-                                    num_funcs = len(ROSTER[roster_lookup]["functions"])
-                                    for f in range(num_funcs):
-                                        # Format: M0AS3<;>F0f  (where 0 is 'off' and f is function number)
-                                        # Note: No space between F, 0, and the number
-                                        writer.write(f"M{full_key}AS{raw_addr}<;>F0{f}\n".encode())
-                                    logging.info(f"Synced {num_funcs} functions for {roster_lookup}")
+                                    number_of_functions = len(ROSTER[roster_lookup]["functions"])
+                                    for function in range(number_of_functions):
+                                        # Set all defined function buttons to 'Off' (0) initially
+                                        # Format: M[key]AS[address]<;>F[State][FunctionNumber]
+                                        function_configuration = f"M{full_key}AS{raw_addr}<;>F0{function}\n"
+                                        writer.write(function_configuration.encode())
+                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration}")
                                 else:
-                                    # Fallback if roster lookup fails
-                                    logging.warning(f"Roster name '{roster_name}' not found. Falling back to default F0-F28.")
-                                    for f in range(29):
-                                        writer.write(f"M{full_key}AS{raw_addr}<;>F0{f}\n".encode())
-
+                                    # Fallback: if roster isn't found, sync a default range so buttons still work
+                                    for function in range(29):
+                                        function_configuration = f"M{full_key}AS{raw_addr}<;>F0{function}\n"
+                                        writer.write(function_configuration.encode())
+                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration}")
                                 await writer.drain()
-                                logging.info(f"Roster Loco {roster_name} ({raw_addr}) bound successfully.")
-                        except Exception as e:
-                            logging.error(f"Acquisition error: {e}")
-                        continue
-
-                    # --- CONTROL & QUERIES (V, R, F, q, -) ---
+                    #-----------------------------------------------------------------------
+                    # CONTROL & QUERIES (V, R, F, q, -) ---
+                    #-----------------------------------------------------------------------
                     if throttle_index in wi_sessions:
-                        sess = wi_sessions[throttle_index]
-                        session_id = sess["session_id"]
-                        addr_str = sess["addr_str"]
-                        
+                        session = wi_sessions[throttle_index]
+                        session_id = session["session_id"]
+                        address_str = session["addr_str"]
                         # Handle Queries (qV, qR) - Crucial for UI Sync
-                        if "qV" in rest:
-                            writer.write(f"M{full_key}AS{addr_str}<;>V{sess['speed']}\n".encode())
+                        if "qV" in rest_of_message:
+                            if server_debug:logging.debug("Throttle Server - Handling Query Speed Request")
+                            speed_response = f"M{full_key}AS{addr_str}<;>V{sess['speed']}\n"
+                            writer.write(speed_response.encode())
+                            if server_debug: logging.debug(f"Throttle Server - Sent Speed Response: {speed_response}")
                             await writer.drain()
                             continue
-
-                        if "qR" in rest:
-                            dir_val = 1 if sess["forward"] else 0
-                            writer.write(f"M{full_key}AS{addr_str}<;>R{dir_val}\n".encode())
+                        if "qR" in rest_of_message:
+                            if server_debug:logging.debug("Throttle Server - Handling Query Direction Request")
+                            direction_value = 1 if session["forward"] else 0
+                            direction_response = f"M{full_key}AS{addr_str}<;>R{direction_value}\n"
+                            writer.write(direction_value.encode())
+                            if server_debug: logging.debug(f"Throttle Server - Sent direction Response: {speed_response}")
                             await writer.drain()
                             continue
-
                         # Clean the action string for control commands
-                        clean_action = rest.replace("<;>", "")
-
+                        clean_action = rest_of_message.replace("<;>", "")
                         # SPEED (V)
                         if clean_action.startswith("V"):
-                            speed_val = int(clean_action[1:])
-                            sess["speed"] = speed_val
-                            library.set_loco_speed_and_direction(session_id, speed_val, sess["forward"])
-
+                            if server_debug:logging.debug("Throttle Server - Handling Speed Change Request")
+                            speed_value = int(clean_action[1:])
+                            session["speed"] = speed_value
+                            library.set_loco_speed_and_direction(session_id, session["speed"], session["forward"])
                         # DIRECTION (R)
                         elif clean_action.startswith("R"):
-                            dir_val = int(clean_action[1:])
-                            sess["forward"] = (dir_val == 1)
-                            library.set_loco_speed_and_direction(session_id, sess["speed"], sess["forward"])
-
+                            if server_debug:logging.debug("Throttle Server - Handling Direction Change Request")
+                            direction_value = int(clean_action[1:])
+                            session["forward"] = (direction_value == 1)
+                            library.set_loco_speed_and_direction(session_id, session["speed"], session["forward"])
                         # FUNCTION (F)
                         elif clean_action.upper().startswith("F"):
+                            if server_debug:logging.debug("Throttle Server - Handling Function Change Request")
                             try:
                                 state = (clean_action[1] == '1')
                                 func_id = int(clean_action[2:])
                                 library.set_loco_function(session_id, func_id, state)
                                 # Echo back to keep app buttons in sync
-                                writer.write(f"M{full_key}AS{addr_str}<;>{clean_action.upper()}\n".encode())
+                                function_response = f"M{full_key}AS{addr_str}<;>{clean_action.upper()}\n"
+                                writer.write(function_response.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Function Response: {function_response}")
                                 await writer.drain()
                             except Exception as e:
                                 logging.error(f"Function Error: {e}")
-
                         # RELEASE (-)
                         elif clean_action.startswith("-"):
+                            if server_debug:logging.debug("Throttle Server - Handling Release Locomotive Request")
                             library.release_loco_session(session_id)
-                            writer.write(f"M{full_key}-*\n".encode())
+                            release_loco_response = f"M{full_key}-*\n"
+                            writer.write(release_loco_response.encode())
+                            if server_debug: logging.debug(f"Throttle Server - Sent Release Locomotive response: {release_loco_response}")
                             await writer.drain()
                             del wi_sessions[throttle_index]
-                    
                     continue
-
-
                 #---------------------------------------------------------------------------
-                # 5 Quit notification (Client has gracefully disconnected)
+                # Handle Quit notification (Client has gracefully disconnected)
                 #---------------------------------------------------------------------------
-                if msg == "Q":
+                if message == "Q":
                     logging.info(f"Throttle Server - Client {peer} sent Quit command.")
                     break # This exits the while loop and goes to the 'finally' block
                 
-                # --- 6. Handle Queries (NEW) ---
-                # This prevents 'M0A*<;>qV' and 'M0A*<;>qR' from crashing the loop
-                if "<;>q" in msg:
+                #---------------------------------------------------------------------------
+                # Handle Queries - This prevents 'M0A*<;>qV' and 'M0A*<;>qR' from crashing the loop
+                #---------------------------------------------------------------------------
+                if "<;>q" in message:
                     # Optimization: To stop Engine Driver from spamming qV and qR, 
                     # you can echo back the current state, but 'continue' is the priority.
-                    if server_debug: logging.debug(f"Ignored Query: {msg}")
+                    if server_debug: logging.debug(f"Ignored Query: {message}")
                     continue
-                
-                
     finally:
         # This code runs no matter HOW the loop exits (Quit command, crash, or disconnect)
         logging.debug(f"Throttle Server - Cleaning up sessions for {peer}")
