@@ -1,5 +1,26 @@
+####################################################################################################
+# This is a WiThrottle Server for the DCC Signalling system providing the following:
+#
+# 1) Loco Roster - loco names, dcc_addresses, basic function key labels
+# 2) Acquire a loco via the roster or DCC address
+# 3) Control the loco - speed, direction, functions
+# 4) Control DCC Bus Power
+#
+# Compatible wit the following:
+#
+# Engine Driver (Android) - All working OK
+# Cab engineer (Android) - All functions are defaulting to mandatory???
+# WiThrottle (Android) - Not working - won't go past the dashboard screen - doesn't work with JMRI either
+#
+# More info Here: https://www.jmri.org/help/en/package/jmri/jmrit/withrottle/Protocol.shtml
+# Acknowledgements to JMRI debugging logs (enabled in  for the WiThrottle elements)
+# Add:   <logger name="jmri.jmrit.withrottle" level="DEBUG"/>  to default_lcf.xml
+#
+####################################################################################################
 
-# https://www.jmri.org/help/en/package/jmri/jmrit/withrottle/Protocol.shtml
+### TODO - Latching/Non Latching Function buttons
+### TODO - Get fully working with Cab Engineer and WiThrottle
+### TODO - Use real roster
 
 import re
 import threading
@@ -10,28 +31,6 @@ from zeroconf.asyncio import AsyncZeroconf, AsyncServiceInfo
 
 from . import library
 
-
-############################################################################################
-### TODO - Function buttons, Timeout for Cab engineer????, Test with WiThrottle, Roster ####
-############################################################################################
-
-#-----------------------------------------------------------------------------------------------
-# Find the local IP address of the machine we are running on
-#-----------------------------------------------------------------------------------------------
-
-def find_local_ip_address():
-    test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        test_socket.connect(('10.255.255.255', 1))
-        ip_address = test_socket.getsockname()[0]
-        logging.debug("MQTT-Client: Local IP address is "+ip_address)
-    except:
-        logging.error("MQTT-Client: Could not retrieve local IP address")
-        ip_address = "<unknown>"
-    finally:
-        test_socket.close()
-    return(ip_address)
-
 #-----------------------------------------------------------------------------------------------
 # Global parameters used by the WiThrottle Server
 #-----------------------------------------------------------------------------------------------
@@ -41,14 +40,15 @@ connected_clients = set()
 server_loop = None
 stop_event = None
 
+# This is the Server Identification information
 server_host = socket.gethostname()
-server_name = "DCCsignalling"
-server_ip_address = socket.inet_aton(find_local_ip_address())
+server_name = f"DCCsignalling@{server_host}"
 server_port_number = 12021
 server_debug = True
 
 dcc_power_state = None
-# A The dictionary to map WiThrottle keys to CBUS session IDs and DCC addresses
+
+# The dictionary to map WiThrottle session keys to SPROG session IDs (also tracks other important session info)
 # Format of each entry: {"T1": {"session_id":2, "dcc_address":3, "addr_type":"S", "speed":0, "forward":True},}
 wi_sessions = {}
 
@@ -219,78 +219,77 @@ async def handle_client(reader, writer):
                     #in the App. Incoming message format example: "M0+L4701<;>EClass 47"
                     #-----------------------------------------------------------------------
                     if rest_of_message.startswith("+"):
-                        if server_debug:logging.debug("Throttle Server - Handling Acquire Locomotive Request")
+                        if server_debug: logging.debug("Throttle Server - Handling Acquire Locomotive Request")
                         try:
-                            # 1. PARSE DCC ADDRESS
-                            # Look between the '+' and '<;>' to find the address and prefix.
-                            # 'S' = Short address (1-127), 'L' = Long address (128-9999).
+                            # Parse the raw address with prefix (e.g. "S3" or "L4701")
                             addr_match = re.search(r"\+(.*?)<;>", rest_of_message)
                             raw_addr = addr_match.group(1) if addr_match else "3"
-                            # 2. PARSE ROSTER NAME
-                            # The App sends the Name after the 'E' (Entry) or 'EH' (Entry Handle) tag.
-                            # This is crucial for looking up our function labels later.
+                            # Split prefix (S or L) from numeric address
+                            addr_prefix = raw_addr[0] if raw_addr and raw_addr[0] in ("S", "L") else ""
+                            addr_num = re.sub(r"\D", "", raw_addr)  # numeric-only address for AS messages
+                            # Parse roster name (preserve leading 'H' if client provided it)
                             roster_name = ""
-                            found_a_match = re.search(r"<;>E(.+)$", rest_of_message)
-                            if found_a_match:
-                                roster_name = found_a_match.group(1)
+                            roster_match = re.search(r"<;>E(.+)$", rest_of_message)
+                            if roster_match:
+                                roster_name = roster_match.group(1)
                             else:
-                                # Fallback logic for variations in client implementations (e.g. Engine Driver vs WiThrottle iOS)
                                 if "<;>EH" in rest_of_message:
-                                    # Some clients prefix the handle with 'H'
                                     roster_name = "H" + rest_of_message.split("<;>EH")[1]
                                 elif "<;>E" in rest_of_message:
                                     roster_name = rest_of_message.split("<;>E")[1]
-                            # 3. PREPARE FOR BACKEND
-                            # Strip the 'L' or 'S' to get just the integer
+                            # Request session from backend
                             dcc_addr_int = int(re.sub(r"[^0-9]", "", raw_addr))
-                            # Request the session from the Pi SPROG interface
                             session_id = library.request_loco_session(dcc_addr_int)
                             if session_id > 0:
-                                # Store the session mapping so speed/function commands know which ID to use
-                                wi_sessions[throttle_index] = {"session_id": session_id, "addr_str": raw_addr, "speed": 0, "forward": True }
-                                # 4. PROTOCOL ACKNOWLEDGMENT (The 3-Step Handshake)
-                                # A) Echo the Address: Confirms the server has "grabbed" this loco
+                                wi_sessions[throttle_index] = {"session_id": session_id,"addr_str": raw_addr,"speed": 0,"forward": True}
+                                # A) Echo acquisition to the client (keep prefix form here)
                                 address_to_send = f"M{full_key}+{raw_addr}<;>\n"
                                 writer.write(address_to_send.encode())
                                 if server_debug: logging.debug(f"Throttle Server - Sent Address Confirmation: {address_to_send!r}")
-                                # B) Send Roster Label: Forces the app UI to switch to the throttle screen
-                                roster_label_to_send = f"M{full_key}L{raw_addr}<;>{roster_name}\n"
-                                writer.write(roster_label_to_send.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Roster Label: {roster_label_to_send!r}")
-                                # C) State Sync: Tell the app the current Speed (V), Direction (R), and Steps (s)
-                                speed_to_send = f"M{full_key}AS{raw_addr}<;>V0\n"  # Speed 0
-                                writer.write(speed_to_send.encode()) 
-                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Speed: {speed_to_send!r}")
-                                direction_to_send = f"M{full_key}AS{raw_addr}<;>R1\n"   # Forward
-                                writer.write(direction_to_send.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Initial Direction: {direction_to_send!r}")
-                                speed_steps_mode_to_send = f"M{full_key}AS{raw_addr}<;>s1\n"  # 128 Speed Steps mode
-                                writer.write(speed_steps_mode_to_send.encode())
-                                if server_debug: logging.debug(f"Throttle Server - Sent Speed Steps Mode: {speed_steps_mode_to_send!r}")
-                                # Look up the specific function labels (like 'Horn' or 'Lights') from our ROSTER dictionary.
-                                # This ensures the buttons in the app match the specific locomotive.
+                                # B) Send function LABEL list in the L message (use raw_addr with prefix)
+                                # Build function list from ROSTER if found, otherwise blank entries
                                 roster_lookup = roster_name
-                                # Strip 'H' prefix for dictionary lookup if the app added one
                                 if roster_lookup.startswith('H') and roster_lookup not in ROSTER:
                                     roster_lookup = roster_lookup[1:]
+                                max_slots = 31  # advertise F0..F30 (matches the JMRI example)
                                 if roster_lookup in ROSTER:
-                                    number_of_functions = len(ROSTER[roster_lookup]["functions"])
-                                    for function in range(number_of_functions):
-                                        # Set all defined function buttons to 'Off' (0) initially
-                                        # Format: M[key]AS[address]<;>F[State][FunctionNumber]
-                                        function_configuration = f"M{full_key}AS{raw_addr}<;>F0{function}\n"
-                                        writer.write(function_configuration.encode())
-                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration!r}")
+                                    funcs = list(ROSTER[roster_lookup].get("functions", []))
                                 else:
-                                    # Fallback: if roster isn't found, sync a default range so buttons still work
-                                    for function in range(29):
-                                        function_configuration = f"M{full_key}AS{raw_addr}<;>F0{function}\n"
-                                        writer.write(function_configuration.encode())
-                                        if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration!r}")
+                                    funcs = []
+                                # Pad/truncate to max_slots
+                                if len(funcs) < max_slots:
+                                    funcs_padded = funcs + [""] * (max_slots - len(funcs))
+                                else:
+                                    funcs_padded = funcs[:max_slots]
+                                # Build JMRI-style function-list block using ]\[ delimiters
+                                func_list_block = "]\\[" + "]\\[".join(funcs_padded)
+                                # Send L message with prefixed address (S/L) so client knows short/long form
+                                roster_label_l_msg = f"M{full_key}L{raw_addr}<;>{func_list_block}\n"
+                                writer.write(roster_label_l_msg.encode())
+                                if server_debug: logging.debug(f"Throttle Server - Sent Function-label L message: {roster_label_l_msg!r}")
+                                # Optionally send human-readable roster name as LN (some clients honor this)
+                                if roster_name:
+                                    writer.write(f"M{full_key}LN{raw_addr}<;>{roster_name}\n".encode())
+                                    if server_debug: logging.debug(f"Throttle Server - Sent Roster Name LN message: {roster_name!r}")
+                                # C) State sync: Use numeric address (no S/L) AFTER the AS token
+                                # Send initial function states for every advertised slot using numeric address
+                                for f in range(len(funcs_padded)):
+                                    # Format: M{key}AS{numeric_addr}<;>F0{f}
+                                    function_configuration = f"M{full_key}AS{addr_num}<;>F0{f}\n"
+                                    writer.write(function_configuration.encode())
+                                    if server_debug: logging.debug(f"Throttle Server - Sent Function Configuration: {function_configuration!r}")
+                                # Other common initial syncs (V, R, s) also use numeric address
+                                writer.write(f"M{full_key}AS{addr_num}<;>V0\n".encode())
+                                writer.write(f"M{full_key}AS{addr_num}<;>R1\n".encode())
+                                writer.write(f"M{full_key}AS{addr_num}<;>s1\n".encode())
+                                if server_debug:
+                                    logging.debug(f"Throttle Server - Sent Initial Speed/Direction/Steps using numeric addr: {addr_num!r}")
                                 await writer.drain()
-                                continue
+                                logging.info(f"Synced {len(funcs)} functions for roster '{roster_lookup}' (raw roster_name='{roster_name}').")
+                                logging.info(f"Roster Loco {roster_name} ({raw_addr}) bound successfully.")
                         except Exception as e:
-                            logging.error(f"Function Error: {e}")
+                            logging.error(f"Acquisition error: {e}")
+                        continue
                     #-----------------------------------------------------------------------
                     # CONTROL & QUERIES (V, R, F, q, -) ---
                     #-----------------------------------------------------------------------
@@ -336,7 +335,7 @@ async def handle_client(reader, writer):
                                 func_id = int(clean_action[2:])
                                 library.set_loco_function(session_id, func_id, state)
                                 # Echo back to keep app buttons in sync
-                                function_response = f"M{full_key}AS{addr_str}<;>{clean_action.upper()}\n"
+                                function_response = f"M{full_key}AS{address_str}<;>{clean_action.upper()}\n"
                                 writer.write(function_response.encode())
                                 if server_debug: logging.debug(f"Throttle Server - Sent Function Response: {function_response!r}")
                                 await writer.drain()
@@ -401,6 +400,23 @@ def broadcast_to_all(message):
     return()
 
 #-----------------------------------------------------------------------------------------------
+# Find the local IP address of the machine we are running on
+#-----------------------------------------------------------------------------------------------
+
+def find_local_ip_address():
+    test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        test_socket.connect(('10.255.255.255', 1))
+        ip_address = test_socket.getsockname()[0]
+        logging.debug("MQTT-Client: Local IP address is "+ip_address)
+    except:
+        logging.error("MQTT-Client: Could not retrieve local IP address")
+        ip_address = "<unknown>"
+    finally:
+        test_socket.close()
+    return(ip_address)
+
+#-----------------------------------------------------------------------------------------------
 # The actual WiThrottle Server runs in a seperate thread to the main Tkinter thread
 #-----------------------------------------------------------------------------------------------
 
@@ -408,6 +424,7 @@ async def throttle_Server_thread():
     global server_loop, stop_event
     server_loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
+    server_ip_address = socket.inet_aton(find_local_ip_address())
     # Only continue if we have found the local IP address
     if server_ip_address is not None:
         try:
