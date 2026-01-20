@@ -375,31 +375,37 @@ class main_menubar:
         if self.sprog_connection_state:self.sprog_disconnect()
         if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         self.reset_mqtt_pub_sub_configuration()
+        # Initialise the MQTT networking at startup (even if they are blank as
+        # the pub/sub configuration needs to be applied prior to object creation.
+        # The "connect on startup" flag is the 8th parameter returned.
+        self.mqtt_reconfigure_client()
+        self.apply_new_mqtt_pub_sub_configuration()
         # Both the automation_enable and automation_disable calls will update the 'run_layout' module
         if settings.get_general("automation"): self.automation_enable()
         else: self.automation_disable()
         # Both the "edit_mode" and "run_mode" calls will update the 'run_layout' module
         if settings.get_general("editmode"): self.edit_mode()
         else: self.run_mode()
-        # Create all the track sensor objects that have been defined
+        # Create all the track sensor objects that have been defined. This needs to be 
+        # done after the objects have been created but before the MQTT configuration
         self.gpio_update()
         # Apply any other general settings
         self.general_settings_update()
         self.sounds_update()
 
     def initialise_editor2(self):
-        # Initialise the SPROG (if configured). Note that we use the menubar functions
-        # for connection and the DCC power so these are correctly reflected in the UI
+        # Connect the MQTT Broker on startup (if configured). We do this after
+        # creating all the objects so any DCC command messages generated are
+        # queued, and we can control the rate of this initial transmission
+        if settings.get_mqtt("startup"):
+            self.mqtt_connect()
+        # Connect the SPROG and enable DCC power on startup (if configured).
+        # We do this after creating all the objects so any DCC commands generated
+        # are queued, and we can control the rate of this initial transmission
         if settings.get_sprog("startup"):
             sprog_connected = self.sprog_connect()
             if sprog_connected and settings.get_sprog("power"):
                 self.dcc_power_on()
-        # Initialise the MQTT networking (if configured). Note that we use the menubar
-        # functionfor connection so the state is correctly reflected in the UI.
-        # The "connect on startup" flag is the 8th parameter returned.
-        self.mqtt_reconfigure_client()
-        if settings.get_mqtt("startup"): self.mqtt_connect()
-        self.apply_new_mqtt_pub_sub_configuration()
 
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
