@@ -29,35 +29,108 @@ from .. import settings
 registered_callbacks=[]
 
 #------------------------------------------------------------------------------------
-# Class for a Roster entry
+# Class for a function_key_entry (Function name and momentary/latching)
 #------------------------------------------------------------------------------------
 
+class function_key_entry(Tk.LabelFrame):
+    def __init__(self, parent_frame, label:str):
+        super().__init__(parent_frame)
+        self.label = Tk.Label(self, text=label)
+        self.label.pack(side=Tk.LEFT, padx=0, pady=0)
+        self.funcname = common.entry_box(self, width=6, tool_tip="Enter the label for the function key (or leave blank to disable)")
+        self.funcname.pack(side=Tk.LEFT, padx=0, pady=0)
+        self.latching=common.check_box(self, label="", tool_tip="Check for Latching function (uncheck for momentary function)")
+        self.latching.pack(side=Tk.LEFT, padx=0, pady=0)
+
+    def set_value(self, function_key_definition:list):
+        # function_key_definition is a list comprising [function_key_name:str, latching:bool]
+        self.funcname.set_value(function_key_definition[0])
+        self.latching.set_value(function_key_definition[1])
+        
+    def get_value(self):
+        return( [self.funcname.get_value(), self.latching.get_value()] )
+    
+    def validate(self):
+        if len(self.funcname.get()) > 6:
+            self.funcname.TT.text = ("Can only specify up to 6 characters")
+            valid = False
+        else:
+            valid = True
+        self.funcname.set_validation_status(valid)            
+        return(valid)
+
+#------------------------------------------------------------------------------------
+# Class for a row of 11 function_key_entries (F0-F10)
+#------------------------------------------------------------------------------------
+
+class row_of_function_key_entries(Tk.Frame):
+    def __init__(self, parent_frame):
+        super().__init__(parent_frame)
+        self.list_of_function_key_entries=[]
+        for function_entry in range(0,13):
+            self.list_of_function_key_entries.append(function_key_entry(self, f"F{function_entry}:"))
+            self.list_of_function_key_entries[-1].pack(side=Tk.LEFT)
+    
+    def set_values(self, list_of_function_key_values:dict):
+        # Each entry comprises [function_key_name:str, latching:bool]
+        for index, function_key_value in enumerate(list_of_function_key_values):
+            if index <  len(self.list_of_function_key_entries):
+                self.list_of_function_key_entries[index].set_value(function_key_value)
+                
+    def get_values(self):
+        # Each entry comprises [function_key_name:str, latching:bool]
+        list_of_function_key_values = []
+        for function_key_entry in self.list_of_function_key_entries:
+            list_of_function_key_values.append(function_key_entry.get_value())
+        return(list_of_function_key_values)
+
+    def validate(self):
+        valid = True
+        for function_key_entry in self.list_of_function_key_entries:
+            if not function_key_entry.validate(): valid=False
+        return(valid)
+
+#------------------------------------------------------------------------------------
+# Class for a Roster entry - Loco name, DCC address and row of function keys
+#------------------------------------------------------------------------------------
+    
 class roster_entry(Tk.Frame):
     def __init__(self, parent_frame):
         # Use the parent class frame to pack everything into
         super().__init__(parent_frame)
         # Create a frame for the button name elements
         self.label1 = Tk.Label(self, text="Loco:")
-        self.label1.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.label1.pack(padx=0, pady=0, side=Tk.LEFT)
         self.locomotive = common.entry_box(self, width=15, tool_tip="Specify the locomotive mame")
-        self.locomotive.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.label2 = Tk.Label(self, text="DCC address:")
-        self.label2.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.locomotive.pack(padx=0, pady=0, side=Tk.LEFT)
+        self.label2 = Tk.Label(self, text="Address:")
+        self.label2.pack(padx=0, pady=0, side=Tk.LEFT)
         self.dccaddress = common.integer_entry_box(self, width=6, min_value=0, max_value=10239,
                    tool_tip="Specify the DCC address of the locomotive")
-        self.dccaddress.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.dccaddress.pack(padx=0, pady=0, side=Tk.LEFT)
+        self.functions = row_of_function_key_entries(self)
+        self.functions.pack(padx=2, pady=2, side=Tk.LEFT)
 
-    def set_value(self, roster_entry:list[str, int]):
-        # Each entry comprises [locomotive_identifier:str, dcc_address:int])
+    def set_value(self, roster_entry:list):
+        # Each entry comprises [locomotive_identifier:str, dcc_address:int, [list_of_function_keys]]
+        # where the list_of_function_keys comprises [key_name:str, latching:bool]
         self.locomotive.set_value(roster_entry[0])
         self.dccaddress.set_value(roster_entry[1])
+        self.functions.set_values(roster_entry[2])
 
     def get_value(self):
-        return([self.locomotive.get_value(), self.dccaddress.get_value()])
+        return([self.locomotive.get_value(), self.dccaddress.get_value(), self.functions.get_values()])
 
     def validate(self):
-        return(self.locomotive.validate() and self.dccaddress.validate())
+        valid = True
+        if not self.locomotive.validate(): valid = False
+        if not self.dccaddress.validate(): valid = False
+        if not self.functions.validate(): valid=False
+        return(valid)
 
+#------------------------------------------------------------------------------------
+# Class for a Grid of Roster entries (Rows can be added/deleted as required)
+#------------------------------------------------------------------------------------
 
 class grid_of_roster_entries(common.grid_of_widgets):
     def __init__(self, parent_frame):
@@ -67,17 +140,16 @@ class grid_of_roster_entries(common.grid_of_widgets):
     def get_values(self):
         # Get a list of currently entered values
         entered_values = super().get_values()
-        # Compile a list of values to return removing any blanks
+        # Compile a list of values to return removing any blanks (loco blank)
         values_to_return = []
         for entered_value in entered_values:
-            if entered_value[0] != "" and entered_value[1] > 0:
+            if entered_value[0] != "":
                 values_to_return.append(entered_value)
         return(values_to_return)
 
 #------------------------------------------------------------------------------------
 # Class for the Roster window - We only allow a single window to be opened.
 #------------------------------------------------------------------------------------
-
 
 edit_roster_window = None
 
@@ -111,8 +183,10 @@ class edit_roster():
     def load_state(self):
         locomotive_roster = settings.get_control("locomotiveroster")
         values_to_set=[]
-        for locomotive, dcc_address in locomotive_roster.items():
-            values_to_set.append([locomotive, dcc_address])
+        for locomotive, roster_entry in locomotive_roster.items():
+            dcc_address = roster_entry[0]
+            function_keys = roster_entry[1]
+            values_to_set.append([locomotive, dcc_address, function_keys])
         self.rosterentries.set_values(values_to_set)
 
     def save_state(self, close_window:bool):
@@ -121,7 +195,8 @@ class edit_roster():
             new_roster_entries = self.rosterentries.get_values()
             new_locomotive_roster = {}
             for new_entry in new_roster_entries:
-                new_locomotive_roster[new_entry[0]] = new_entry[1]
+                loco_name, loco_data = new_entry[0], new_entry[1:]
+                new_locomotive_roster[loco_name] = loco_data
             settings.set_control("locomotiveroster", new_locomotive_roster)
             # Make the callbacks (to refresh the roster in all open throttle windows)
             for callback in registered_callbacks:
@@ -136,6 +211,44 @@ class edit_roster():
         self.window.destroy()
 
 #------------------------------------------------------------------------------------
+# Class for a latching or Momentary button
+#------------------------------------------------------------------------------------
+
+class Function_button(Tk.Button):
+    def __init__(self, parent, **kwargs):
+        self.state = False
+        self.callback = kwargs.pop('command', None)
+        self.latching = kwargs.pop('latching', False)
+        super().__init__(parent, **kwargs)
+        self.bind("<ButtonPress-1>", self.on_press)
+        self.bind("<ButtonRelease-1>", self.on_release)
+        
+    def config(self, **kwargs):
+        if "latching" in kwargs: self.latching = kwargs.pop('latching')
+        super().config(**kwargs)
+
+    def on_press(self, function_id:int):
+        if self.latching:
+            if self.state:
+                self.config(relief="raised")
+                self.state = False
+                if self.callback: self.callback()
+            else:
+                self.config(relief="sunken")
+                self.state = True
+                if self.callback: self.callback()
+            # Tell Tkinter not to process its 'normal' logic for changing the button
+            return("break")
+        else:
+            self.state = True
+            if self.callback: self.callback()
+            
+    def on_release(self, function_id:int):
+        if not self.latching:
+            self.state = False
+            if self.callback: self.callback()
+
+#------------------------------------------------------------------------------------
 # Class for the Loco Control window - Note that unlike other utility popup windows
 # we allow multiple windows to be opened.
 #------------------------------------------------------------------------------------
@@ -148,7 +261,7 @@ class loco_control(Tk.Toplevel):
         self.next_event = None
         self.session_id = 0
         self.direction= None
-        self.roster = None
+        self.roster_entry = None
         # Set the window attributes
         self.title("Throttle")
         self.protocol("WM_DELETE_WINDOW", self.destroy)
@@ -173,10 +286,12 @@ class loco_control(Tk.Toplevel):
         self.subframe1.pack(side=Tk.LEFT, fill="y")
         self.subframe2 = Tk.Frame(self.frame2)
         self.subframe2.pack(side=Tk.LEFT)
+        self.subframe3 = Tk.Frame(self.frame2)
+        self.subframe3.pack(side=Tk.LEFT)
         # Create the speed increase/decrease buttons (subframe1)
-        self.increase = Tk.Button(self.subframe1, width=3, text="+", )
+        self.increase = Function_button(self.subframe1, width=3, text="+" )
         self.increase.pack(side=Tk.TOP, padx=5, pady=5)
-        self.decrease = Tk.Button(self.subframe1, width=3, text="-")
+        self.decrease = Function_button(self.subframe1, width=3, text="-")
         self.decrease.pack(side=Tk.BOTTOM, padx=5, pady=5)
         button_font = TkFont.Font(font=self.increase.cget("font"))
         button_font.configure(weight="bold",size=18)
@@ -188,9 +303,14 @@ class loco_control(Tk.Toplevel):
         self.decrease.bind("<ButtonRelease-1>", lambda e:self.inc_dec_speed(stop=True))
         # Create the speed function buttons (F0-F4) (subframe1)
         self.function_buttons = {}
-        for function_id in range(0, 4):
-            self.function_buttons[function_id] = Tk.Button(self.subframe1, text=f"F{function_id}", width=3,
-                                            command=lambda funcid=function_id: self.function_updated(funcid))
+        for function_id in range(0, 5):
+            self.function_buttons[function_id] = Function_button(self.subframe1, width=6,
+                            command=lambda funcid=function_id: self.function_updated(funcid))
+            self.function_buttons[function_id].pack(padx=2, pady=2)
+        # Create the additional function buttons (F4-F11) (subframe3)
+        for function_id in range(5, 13):
+            self.function_buttons[function_id] = Function_button(self.subframe3, width=6,
+                            command=lambda funcid=function_id: self.function_updated(funcid))
             self.function_buttons[function_id].pack(padx=2, pady=2)
         # Create the throttle slider (subframe2)
         self.throttle = Tk.Scale(self.subframe2, from_=127, to=0, orient="vertical", showvalue=0,
@@ -224,72 +344,117 @@ class loco_control(Tk.Toplevel):
         self.TT2 = common.CreateToolTip(self.B2, "Close window")
         # Initialise the UI state
         self.deselect_and_disable_all()
-        # Update the roster with the current values
+        # Load the current Roster selections
         self.roster_updated()
         # Register the callback for future roster updates
         registered_callbacks.append(self.roster_updated)
 
-    def edit_roster(self):
-        edit_roster(self, self.roster_updated)
-        
+    #--------------------------------------------------------------------
+    # Function to update the available loco selections from the Roster
+    # Called from the edit_roster class if the roster has been updated
+    #--------------------------------------------------------------------
+
     def roster_updated(self):
-        self.roster = settings.get_control("locomotiveroster")
+        new_roster = settings.get_control("locomotiveroster")
         # Delete the old Roster menu items
         loco_options = self.locomotive["menu"]
         loco_options.delete(0,"end")
         # Add the default option (no loco selected)
         loco_options.add_command(label=self.default_selection, command=lambda value=self.default_selection:
                             [self.loco_updated(value), self.loco_selection.set(value)])
-        # Add the other entries from the roster
-        for roster_entry in self.roster.keys():
+        # Add allthe other entries from the roster
+        for roster_entry in new_roster.keys():
             loco_options.add_command(label=roster_entry, command=lambda value=roster_entry:
                             [self.loco_updated(value), self.loco_selection.set(value)])
 
-    def disable_function_buttons(self):
-        for button_id in self.function_buttons:
-            self.function_buttons[button_id].config(state="disabled")
+    #--------------------------------------------------------------------
+    # Helper functions for the Function Buttons
+    #--------------------------------------------------------------------
 
-    def enable_function_buttons(self):
-        for button_id in self.function_buttons:
-            self.function_buttons[button_id].config(state="normal")
+    # Called when no locomotive is deselected (on loco selection)
+    # Only called from the 'deselect_and_disable_all' function
+    def disable_all_function_buttons(self):
+        for index, function_id in enumerate(self.function_buttons):
+            self.function_buttons[function_id].config(text=(f"F{index}"))
+            self.function_buttons[function_id].config(state="disabled")
 
+    # Called when a locomotive is selected and has been successfully acquired.
+    # Only called from the 'loco_selected' function
+    def enable_supported_function_buttons(self):
+        function_key_config = self.roster_entry[1]
+        for index, function_id in enumerate(self.function_buttons):
+            if index < len(function_key_config):
+                # Only enable the function keys that are supported (as defined in the roster)
+                function_key_text = function_key_config[index][0]
+                function_key_latching = function_key_config[index][1]
+                if function_key_text != "":
+                    self.function_buttons[function_id].config(text=function_key_text)
+                    self.function_buttons[function_id].config(state="normal")
+                    self.function_buttons[function_id].config(latching=function_key_latching)
+                else:
+                    self.function_buttons[function_id].config(text=f"F{index}")
+                    self.function_buttons[function_id].config(state="disabled")
+            else:
+                self.function_buttons[function_id].config(text=f"F{index}")
+                self.function_buttons[function_id].config(state="disabled")
+
+    def deselect_all_function_buttons(self):
+        for index, function_id in enumerate(self.function_buttons):
+            self.function_buttons[function_id].config(relief="raised")
+
+    def force_all_loco_functions_to_off(self):
+        function_key_config = self.roster_entry[1]
+        for index, function_id in enumerate(function_key_config):
+            library.set_loco_function(self.session_id, index, False)
+
+    #--------------------------------------------------------------------
+    # Helper Functions to disable/enable the other UI elements
+    #--------------------------------------------------------------------
+
+    # Called when a loco has been de-selected OR when speed > 0
+    def disable_forward_and_reverse(self):
+        self.forward.config(state="disabled")
+        self.reverse.config(state="disabled")
+
+    # Called when a loco has been selected AND speed = 0
+    def enable_forward_and_reverse(self):
+        self.forward.config(state="normal")
+        self.reverse.config(state="normal")
+
+    # Called if both FWD and REV buttons are de-selected
     def disable_speed_controls(self):
         self.throttle.config(state="disabled")
         self.increase.config(state="disabled")
         self.decrease.config(state="disabled")
 
+    # Called if FWD OR REV buttons are selected
     def enable_speed_controls(self):
         self.throttle.config(state="normal")
         self.increase.config(state="normal")
         self.decrease.config(state="normal")
 
-    def disable_forward_and_reverse(self):
-        self.forward.config(state="disabled")
-        self.reverse.config(state="disabled")
-
-    def enable_forward_and_reverse(self):
-        self.forward.config(state="normal")
-        self.reverse.config(state="normal")
-
+    # Called when a loco has been de-selected
     def disable_emergency_stop(self):
         self.emergencystop.config(state="disabled")
 
+    # Called when a loco has been selected
     def enable_emergency_stop(self):
         self.emergencystop.config(state="normal")
 
+    # Called when Speed > 0
     def disable_loco_selection(self):
         self.locomotive.config(state="disabled")
 
+    # Called when speed = 0
     def enable_loco_selection(self):
         self.locomotive.config(state="normal")
 
-    def deselect_function_buttons(self):
-        for button_id in self.function_buttons:
-            self.function_buttons[button_id].config(relief="raised")
-
+    # Called on initialisation, if no loco is selected or if acquire session failed
     def deselect_and_disable_all(self):
         # Change the loco control ui elements to show the de-selected state
-        self.deselect_function_buttons()
+        # Speed must be zero for the user to be able to select/deselect a loco
+        # So we only need to deselect FWD, REV and the function buttons
+        self.deselect_all_function_buttons()
         self.forward.config(relief="raised")
         self.reverse.config(relief="raised")
         self.dccaddress.config(text="DCC Address: -----")
@@ -297,74 +462,100 @@ class loco_control(Tk.Toplevel):
         self.disable_speed_controls()
         self.disable_forward_and_reverse()
         self.disable_emergency_stop()
-        self.disable_function_buttons()
+        self.disable_all_function_buttons()
         # Set the direction to None (will force re-selection for new loco)
         self.direction = None
 
+    #--------------------------------------------------------------------
+    # Helper function to release the current loco session 
+    # Called on loco selection and window destroy (if a session exists)
+    #--------------------------------------------------------------------
+
     def release_loco_session(self):
-        if self.session_id > 0:
-            for function_id in range(0, 4):
-                library.set_loco_function(self.session_id, function_id, False)
-            library.set_loco_speed_and_direction(self.session_id, 0, False)
-            library.release_loco_session(self.session_id)
-            self.session_id = 0
+        library.set_loco_speed_and_direction(self.session_id, 0, False)
+        library.release_loco_session(self.session_id)
+        self.session_id = 0
+
+    #--------------------------------------------------------------------
+    # User selection callback functions
+    #--------------------------------------------------------------------
 
     # Callback function for the Function Buttons
     def function_updated(self, function_id:int):
-        if self.function_buttons[function_id]["relief"] =="sunken":
-            self.function_buttons[function_id].config(relief="raised")
-            library.set_loco_function(self.session_id, function_id, False)
-        else:
-            self.function_buttons[function_id].config(relief="sunken")
-            library.set_loco_function(self.session_id, function_id, True)
-            
-    # Callback function for the Roster Selection
+        button_state = self.function_buttons[function_id].state
+        library.set_loco_function(self.session_id, function_id, button_state)
+
+    #-------------------------------------------------------------------------------------------
+    # User selection callback function for Loco selection/deselection
+    #-------------------------------------------------------------------------------------------
+
     def loco_updated(self, selection):
-        # Release the existing loco session
-        if self.session_id > 0: self.release_loco_session()
+        # If there is an existing session, Force any functions to OFF and Release theloco
+        if self.session_id > 0:
+            self.deselect_all_function_buttons()
+            self.force_all_loco_functions_to_off()
+            self.release_loco_session()
+        # Retrieve the current Roster
+        roster = settings.get_control("locomotiveroster")
         # Check it is a de-selection or a new selection (valid roster entry)
-        if selection not in self.roster.keys():
+        if selection not in roster.keys():
             # Its a de-selection - reset the UI
             self.deselect_and_disable_all()
+            # Change the loco selection and DCC address elements to Black (valid)
             self.locomotive.config(fg="black")
             self.dccaddress.config(fg="black")
         else:
-            self.session_id = library.request_loco_session(self.roster[selection])
+            # Get the loco data from the roster (DCC address and Function key definitions)
+            self.roster_entry = roster[selection]
+            dcc_address = self.roster_entry[0]
+            function_key_config = self.roster_entry[1]
+            # Request a session form the Pi Sprog Library function
+            self.session_id = library.request_loco_session(dcc_address)
             if self.session_id > 0:
                 # The loco session was successfully created
                 # Enable Fwd/Rev, the function buttons and emergency stop
                 self.enable_forward_and_reverse()
-                self.enable_function_buttons()
+                self.enable_supported_function_buttons()
                 self.enable_emergency_stop()
-                # Set all functions to OFF (so we know the state)
-                self.deselect_function_buttons()
-                for function_id in range(0, 4):
-                    library.set_loco_function(self.session_id, function_id, False)
-                # Set the speed to zero just in case we have stolen the engine
+                # Set the speed to zero and all functions to OFF (in case we have stolen the engine)
                 library.set_loco_speed_and_direction(self.session_id, 0, False)
-                self.dccaddress.config(text=f"DCC Address: {self.roster[selection]:05}", fg="black")
+                self.force_all_loco_functions_to_off()
+                self.deselect_all_function_buttons()
+                # Display the DCC Address (Black = Valid)
+                self.dccaddress.config(text=f"DCC Address: {self.roster_entry[0]:05}", fg="black")
                 self.locomotive.config(fg="black")
             else:
                 # The loco session was not created - reset the UI
                 self.deselect_and_disable_all()
+                # Change the loco selection and DCC address elements to Red (invalid)
                 self.locomotive.config(fg="red")
                 self.dccaddress.config(fg="red")
                 Tk.messagebox.showerror(parent=self, title="Error",
                     message="Could not create\ncontrol session")
 
-    # This is the callback function for the Emergency Stop button
-    # We reset the slider and send the emergency stop command
+    #-------------------------------------------------------------------------------------------
+    # User selection callback function for Loco Emergncy Stop
+    #-------------------------------------------------------------------------------------------
+
     def emergency_stop(self):
+        # Reset the throttle slider and direction buttons
         self.throttle.set(0)
         self.direction = None
+        # Unselect the FWD and REV buttons and
+        # force the de-selection of other UI elements
         self.forward.config(relief="raised")
         self.reverse.config(relief="raised")
+        self.direction_updated(self.direction)
+        # Call the library function to perform the emergency stop
         library.send_emergency_stop(self.session_id)
-        self.direction_updated(None)
 
-    # This is the callback function for the Fwd and Rev buttons
+    #-------------------------------------------------------------------------------------------
+    # User selection callback function for the Direction change buttons
+    #-------------------------------------------------------------------------------------------
+
     def direction_updated(self, direction:bool):
         # Set the state of the buttons to show the selected direction
+        # State could be True (FWD), False (REV) or None (No selection)
         if direction == False:
             if self.reverse["relief"] =="sunken": self.reverse.config(relief="raised")
             else: self.reverse.config(relief="sunken")
@@ -383,22 +574,32 @@ class loco_control(Tk.Toplevel):
         else:
             self.direction = None
             self.disable_speed_controls()
+        # Send the speed/direction update via the library function
         library.set_loco_speed_and_direction(self.session_id, self.throttle.get(), direction)
 
-    # This is the callback function for the + and - buttons
+    #-------------------------------------------------------------------------------------------
+    # User selection callbacks for Speed Changes
+    #-------------------------------------------------------------------------------------------
+
+    # This is the callback function for the (+) and (-) buttons.
+    # Note we 'throttle' the rate of change to once every 25ms
     def inc_dec_speed(self, increase:bool=None, stop:bool=False):
         current_speed_value = self.throttle.get()
         if increase == True and current_speed_value < 127: current_speed_value += 1
         if increase == False and current_speed_value > 0: current_speed_value -= 1
-        current_speed_value = self.throttle.set(current_speed_value)
+        # Set the Throttle Slider to the new Value
+        self.throttle.set(current_speed_value)
+        self.speed_updated(current_speed_value)
+        # Schedule the next speed command transmititon (in 25 ms)
         if stop and self.next_event is not None:
             self.after_cancel(self.next_event)
             self.next_event = None
         else:
             self.next_event = self.after(25, lambda:self.inc_dec_speed(increase, stop))
 
-    # This is the callback function for the Slider. It also gets called
-    # if the slider has been changed by the + or - buttons
+    # This is the callback function for the Throttle Slider. It also gets called
+    # from the function above if the slider has been changed by the + or - buttons
+    # Note that we 'throttle' the commands being sent out to the Pi-SPROG
     def speed_updated(self, speed:str):
         if int(speed) > 0:
             self.disable_forward_and_reverse()
@@ -409,8 +610,7 @@ class loco_control(Tk.Toplevel):
         if not self.speed_update_in_progress:
             self.send_throttled_speed(speed)
 
-    # These fiunctions are to throttle the number of speed change
-    # Commands we send out to the SPROG so we don't flood it
+    # These functions throttle the commands being sent to the SPROG to every 100ms
     def send_throttled_speed(self, speed):
         library.set_loco_speed_and_direction(self.session_id, int(speed), self.direction)
         self.speed_update_in_progress = True
@@ -420,14 +620,20 @@ class loco_control(Tk.Toplevel):
         self.speed_update_in_progress = False
         library.set_loco_speed_and_direction(self.session_id, self.throttle.get(), self.direction)
 
-    # Called if the user closes the window or if the application forces the window to be closed
+    #-------------------------------------------------------------------------------------------
+    # Called if the user closes the window or the application forces the window to be closed
+    #-------------------------------------------------------------------------------------------
+
     def destroy(self):
         # Remove this specific window's callback from the global list
         if self.roster_updated in registered_callbacks:
             registered_callbacks.remove(self.roster_updated)
-        # Clean up by setting the speed to zero and all function keys to off
+        # Cancel any speed step event that might be scheduled
         if self.next_event is not None: self.after_cancel(self.next_event)
-        self.release_loco_session()
+        # Clean up by setting the speed to zero and all function keys to off
+        if self.session_id > 0:
+            self.force_all_loco_functions_to_off()
+            self.release_loco_session()
         super().destroy()
 
-###########################################################################################
+#################################################################################################
