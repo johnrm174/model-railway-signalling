@@ -999,7 +999,9 @@ class edit_signal:
             self.automation.general_settings.override_ahead.set_value(objects.schematic_objects[self.object_id]["overrideahead"])
             # These are the timed signal and approach control elements
             self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"], item_id)
-            self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
+            approach_control_settings = objects.schematic_objects[self.object_id]["approachcontrol"]
+            inhibit_flashing_aspects = objects.schematic_objects[self.object_id]["inhibitflashing"]
+            self.automation.approach_control.set_values(approach_control_settings, inhibit_flashing_aspects)
             # Configure the initial Route indication selection
             feathers = objects.schematic_objects[self.object_id]["feathers"]
             if objects.schematic_objects[self.object_id]["itemtype"] == library.signal_type.colour_light.value:
@@ -1121,7 +1123,9 @@ class edit_signal:
                 new_object_configuration["overrideahead"] = self.automation.general_settings.override_ahead.get_value()
                 # Timed sequence and approach control settings
                 new_object_configuration["timedsequences"] = self.automation.timed_signal.get_values()
-                new_object_configuration["approachcontrol"] = self.automation.approach_control.get_values()
+                approach_control_settings, inhibit_flashing_aspects = self.automation.approach_control.get_values()
+                new_object_configuration["approachcontrol"] = approach_control_settings
+                new_object_configuration["inhibitflashing"] = inhibit_flashing_aspects
                 # Save the updated configuration (and re-draw the object)
                 objects.update_object(self.object_id, new_object_configuration)
                 # Close window on "OK" or re-load UI for "apply"

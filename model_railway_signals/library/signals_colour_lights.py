@@ -75,6 +75,7 @@ def create_colour_light_signal (canvas, sig_id:int,
                                 flip_position:bool=False,
                                 sig_passed_button:bool=False,
                                 sig_release_button:bool=False,
+                                inhibit_flashing:bool=False,
                                 has_subsidary:bool=False,
                                 mainfeather:bool=False,
                                 lhfeather45:bool=False,
@@ -126,9 +127,8 @@ def create_colour_light_signal (canvas, sig_id:int,
                                     x, y, post_offset, button_xoffset, button_yoffset, hide_buttons, orientation,
                                     sig_switched_callback, sig_passed_callback, sig_updated_callback = sig_updated_callback,
                                     sub_switched_callback=sub_switched_callback,sig_passed_button=sig_passed_button,
-                                    has_subsidary=has_subsidary, sig_automatic=fully_automatic,
-                                    button_colour=button_colour, active_colour=active_colour, selected_colour=selected_colour,
-                                    text_colour=text_colour, font=font)
+                                    has_subsidary=has_subsidary, sig_automatic=fully_automatic, text_colour=text_colour, font=font,
+                                    button_colour=button_colour, active_colour=active_colour, selected_colour=selected_colour)
         # Get the assigned tag to use for all the signal post elements
         post_tag = signals.signals[str(sig_id)]["posttag"]
         # Draw the signal base line & signal post   
@@ -227,8 +227,9 @@ def create_colour_light_signal (canvas, sig_id:int,
         # as the associated drawing objects have been "swapped" by the code above
         # All SHARED attributes are signals_common to more than one signal Types
         signals.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
-        signals.signals[str(sig_id)]["subtype"] = signalsubtype                  # Type-specific - subtype of the signal
+        signals.signals[str(sig_id)]["subtype"] = signalsubtype                   # Type-specific - subtype of the signal
         signals.signals[str(sig_id)]["hasfeathers"] = signal_has_feathers         # Type-specific - If there is a Feather Route display
+        signals.signals[str(sig_id)]["inhibitflashing"] = inhibit_flashing        # Type-specific - Inhibit flashing aspects behind signal
         signals.signals[str(sig_id)]["featherenabled"] = None                     # Type-specific - State of the Feather Route display
         signals.signals[str(sig_id)]["grn"] = grn                                 # Type-specific - drawing object
         signals.signals[str(sig_id)]["yel"] = yel                                 # Type-specific - drawing object
@@ -354,8 +355,12 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
     # Set to CAUTION_APPROACH_CONTROL if the signal is subject to "Release on YELLOW"
     # Note this will only apply to signals OTHER THAN 2 aspect home signals.
     elif signals.signals[str(sig_id)]["releaseonyel"]:
-        new_aspect = signals.signal_state_type.CAUTION_APP_CNTL
-        log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
+        if signals.signals[str(sig_id)]["inhibitflashing"]:
+            new_aspect = signals.signal_state_type.CAUTION
+            log_message = " (signal is OFF - 'release on yellow' approach control is active but flashing aspects are inhibited)"
+        else:
+            new_aspect = signals.signal_state_type.CAUTION_APP_CNTL
+            log_message = " (signal is OFF - 'release on yellow' approach control is active "
     # If signal is currently on a timed sequence then set to the sequence aspect
     elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
         new_aspect = signals.signals[str(sig_id)]["timedsequence"][route.value].aspect
