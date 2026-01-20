@@ -992,8 +992,8 @@ def find_dcc_address_for_session(session_id:int):
 #------------------------------------------------------------------------------
 
 def request_loco_session(dcc_address:int):
-    def response_received():
-        return(locomotive_sessions[str(dcc_address)]["sessionid"] > 0)
+    def response_received(): return(locomotive_sessions[str(dcc_address)]["sessionid"] > 0)
+    session_id_to_return = 0
     if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
         logging.error(f"Pi-SPROG: request_loco_session - Invalid DCC Address {dcc_address} - must be an int (1-10239)")
     else:
@@ -1028,11 +1028,9 @@ def request_loco_session(dcc_address:int):
                 # Return Session ID of zero (could not create session)
                 logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
                 del(locomotive_sessions[str(dcc_address)])
-                session_id_to_return = 0
         else:
             # Return Session ID of zero (could not create session)
             logging.error(f"Pi-SPROG: request_loco_session - DCC Address {dcc_address} is already allocated to a loco session")
-            session_id_to_return = 0
     return(session_id_to_return)
 
 #------------------------------------------------------------------------------
@@ -1163,7 +1161,7 @@ def send_emergency_stop(session_id:int):
 def set_loco_function(session_id:int, function_id:int, state:bool):
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: set_loco_function - Invalid Session ID {session_id} - must be an int")
-    elif not isinstance(function_id, int) or function_id < 0 or function_id > 28:
+    elif not isinstance(function_id, int) or function_id < 0 or function_id > 12:
         logging.error(f"Pi-SPROG: set_loco_function - Invalid function ID {function_id} for session {session_id} - must be 0-28")
     # Check if the session is valid before sending
     dcc_address = find_dcc_address_for_session(session_id)
@@ -1188,6 +1186,14 @@ def set_loco_function(session_id:int, function_id:int, state:bool):
                    (2 if locomotive["functions"].get("6") else 0) | \
                    (1 if locomotive["functions"].get("5") else 0)
             send_cbus_command(2, 2, 0x60, session_id, range_id, mask)        
+        # Range 3: F9, F10, F11, F12
+        elif 9 <= function_id <= 12:
+            range_id = 3
+            mask = (8 if locomotive["functions"].get("12") else 0) | \
+                   (4 if locomotive["functions"].get("11") else 0) | \
+                   (2 if locomotive["functions"].get("10") else 0) | \
+                   (1 if locomotive["functions"].get("9") else 0)
+            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
         logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
     else:
         logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
