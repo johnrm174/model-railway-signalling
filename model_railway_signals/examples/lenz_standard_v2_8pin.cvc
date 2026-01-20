@@ -1,0 +1,156 @@
+{
+   "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/lenz_standard_v2_8pin.cvc",
+   "documentation": "CV Configuraation for a Lenz Standard +v2 8 pin decoder\nCV29 Bits are: 0 direction (0=Norm), 1 Speed Steps (1=28/128), 2 Analogue (0=DCC only)\n           3 Railcom (0=disabled), 4 Speed Curve (0=use CV 2/5/6), 5 Addressing (0=short)",
+   "configuration": [
+      [
+         1,
+         1,
+         "Short Loco Address"
+      ],
+      [
+         17,
+         192,
+         "Extended Address - High byte"
+      ],
+      [
+         18,
+         100,
+         "Extended Address - Low byte"
+      ],
+      [
+         29,
+         2,
+         "Settings 1 "
+      ],
+      [
+         19,
+         0,
+         "Consist Address"
+      ],
+      [
+         50,
+         null,
+         "Motor Type"
+      ],
+      [
+         113,
+         null,
+         "BEMF - Proportional"
+      ],
+      [
+         114,
+         null,
+         "BEMF Integral"
+      ],
+      [
+         33,
+         null,
+         "F0 on =  Forward Light output"
+      ],
+      [
+         34,
+         null,
+         "F0 on =  Backward Light output"
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ],
+      [
+         null,
+         null,
+         ""
+      ]
+   ]
+}
