@@ -11,6 +11,7 @@
 # Uses the following library functions:
 #------------------------------------------------------------------------------------
 
+import json
 import tkinter as Tk
 from tkinter import font as TkFont
 
@@ -174,30 +175,105 @@ class edit_roster():
             # Create the grid of Roster entries
             self.rosterentries = grid_of_roster_entries(self.frame1)
             self.rosterentries.pack(padx=5,pady=5)
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.pack(padx=2, pady=2)
+            # Create the Import/Export andcommon Apply/OK/Reset/Cancel buttons for the window
+            self.frame2 = Tk.Frame(self.window)
+            self.frame2.pack(fill=Tk.X, pady=5) # Allow frame to stretch across the window
+            # Configure column weights to handle centering
+            # Column 0 (Left) and Column 2 (Right) get weight=1 to push Column 1 to the center
+            self.frame2.columnconfigure(0, weight=1, uniform="group1")
+            self.frame2.columnconfigure(1, weight=0) # Center column stays tight to content
+            self.frame2.columnconfigure(2, weight=1, uniform="group1")
+            # 1. Import/Export Group (Left Side)
+            self.left_group = Tk.Frame(self.frame2)
+            self.left_group.grid(row=0, column=0, sticky="w", padx=5)
+            self.B1 = Tk.Button(self.left_group, text="Import Roster from file", command=self.import_roster)
+            self.B1.pack(side=Tk.LEFT, padx=2)
+            self.B2 = Tk.Button(self.left_group, text="Export Roster to File", command=self.export_roster)
+            self.B2.pack(side=Tk.LEFT, padx=2)
+            # 2. Control Buttons (Center)
+            self.controls = common.window_controls(self.frame2, self.load_state, self.save_state, self.close_window)
+            self.controls.grid(row=0, column=1, padx=2, pady=2)
+            # 3. Dummy spacer (Right Side)
+            self.right_spacer = Tk.Frame(self.frame2)
+            self.right_spacer.grid(row=0, column=2, sticky="e")
             # Load the initial UI state
             self.load_state()
 
-    def load_state(self):
-        locomotive_roster = settings.get_control("locomotiveroster")
+    def get_roster_data(self):
+        new_roster_entries = self.rosterentries.get_values()
+        new_locomotive_roster = {}
+        for new_entry in new_roster_entries:
+            loco_name, loco_data = new_entry[0], new_entry[1:]
+            new_locomotive_roster[loco_name] = loco_data
+        return(new_locomotive_roster)
+    
+    def set_roster_data(self, roster_data:dict):
         values_to_set=[]
-        for locomotive, roster_entry in locomotive_roster.items():
+        for locomotive, roster_entry in roster_data.items():
             dcc_address = roster_entry[0]
             function_keys = roster_entry[1]
             values_to_set.append([locomotive, dcc_address, function_keys])
         self.rosterentries.set_values(values_to_set)
 
+    def export_roster(self):
+        if self.rosterentries.validate():
+            filename_to_save=Tk.filedialog.asksaveasfilename(parent=self.window, title='Export Roster', 
+                                          filetypes=(('Roster files','*.rst'),('all files','*.*')))
+            # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
+            if filename_to_save == (): filename_to_save = ""
+            # If the filename is not blank enforce the '.rst' extention
+            if filename_to_save != "" and not filename_to_save.endswith(".rst"): filename_to_save.append(".rst")
+            # Only continue (to save the file) if the filename is not blank
+            if filename_to_save != "":
+                # Create a json structure to save the data 
+                data_to_save = {}
+                data_to_save["filename"] = filename_to_save
+                data_to_save["fileinfo"] = "DCC Signallisng system Roster File"
+                data_to_save["roster"] = self.get_roster_data()
+                try:
+                    file_contents = json.dumps(data_to_save,indent=3,sort_keys=False)
+                except Exception as exception:
+                    Tk.messagebox.showerror(parent=self.window, title="Data Error", message=str(exception))
+                else:
+                    # write the json structure to file
+                    try:
+                        with open (filename_to_save,'w') as file: file.write(file_contents)
+                        file.close
+                    except Exception as exception:
+                        Tk.messagebox.showerror(parent=self.window, title="File Save Error", message=str(exception))
+                        
+    def import_roster(self):
+        # Open the file chooser dialog to select a file
+        filename_to_load = Tk.filedialog.askopenfilename(parent=self.window, title='Import Roster',
+                                    filetypes=(('rst files','*.rst'),('all files','*.*')))
+        # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
+        if filename_to_load == (): filename_to_load = ""
+        # Only continue (to load the file) if the filename is not blank
+        if filename_to_load != "":
+            try:
+                with open (filename_to_load,'r') as file: loaded_data=file.read()
+                file.close
+            except Exception as exception:
+                Tk.messagebox.showerror(parent=self.window, title="File Load Error", message=str(exception))
+            else:
+                try:
+                    loaded_data = json.loads(loaded_data)
+                except Exception as exception:
+                    Tk.messagebox.showerror(parent=self.window, title="File Parse Error", message=str(exception))
+                else:
+                    self.loaded_file = filename_to_load
+                    locomotive_roster = loaded_data["roster"]
+                    self.set_roster_data(locomotive_roster)
+
+    def load_state(self):
+        locomotive_roster = settings.get_control("locomotiveroster")
+        self.set_roster_data(locomotive_roster)
+
     def save_state(self, close_window:bool):
         if self.rosterentries.validate():
             # Roster entries are [loco:str, address:int] - We need to translate to a dict
-            new_roster_entries = self.rosterentries.get_values()
-            new_locomotive_roster = {}
-            for new_entry in new_roster_entries:
-                loco_name, loco_data = new_entry[0], new_entry[1:]
-                new_locomotive_roster[loco_name] = loco_data
-            settings.set_control("locomotiveroster", new_locomotive_roster)
+            locomotive_roster = settings.get_control("locomotiveroster")
+            settings.set_control("locomotiveroster", locomotive_roster)
             # Make the callbacks (to refresh the roster in all open throttle windows)
             for callback in registered_callbacks:
                 callback()
