@@ -845,8 +845,9 @@ def issue_dcc_command_to_broker(address:int, state:bool):
 #---------------------------------------------------------------------------------------------------
 
 def mqtt_send_all_dcc_command_states_on_broker_connect():
+    delay, total_delay = 250, 0
     for address, state in local_dcc_commands.items():
-        issue_dcc_command_to_broker(address, state)
+        common.root_window.after(total_delay, lambda a=address, s=state: issue_dcc_command_to_broker(a, s))
     return()
 
 #---------------------------------------------------------------------------------------------------
