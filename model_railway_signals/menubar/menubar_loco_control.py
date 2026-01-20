@@ -272,7 +272,7 @@ class edit_roster():
     def save_state(self, close_window:bool):
         if self.rosterentries.validate():
             # Roster entries are [loco:str, address:int] - We need to translate to a dict
-            locomotive_roster = settings.get_control("locomotiveroster")
+            locomotive_roster = self.get_roster_data()
             settings.set_control("locomotiveroster", locomotive_roster)
             # Make the callbacks (to refresh the roster in all open throttle windows)
             for callback in registered_callbacks:
