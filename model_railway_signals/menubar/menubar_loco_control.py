@@ -600,10 +600,9 @@ class loco_control(Tk.Toplevel):
             self.locomotive.config(fg="black")
             self.dccaddress.config(fg="black")
         else:
-            # Get the loco data from the roster (DCC address and Function key definitions)
+            # Get the loco DCC Address from the roster
             self.roster_entry = roster[selection]
             dcc_address = self.roster_entry[0]
-            function_key_config = self.roster_entry[1]
             # Request a session form the Pi Sprog Library function
             self.session_id = library.request_loco_session(dcc_address)
             if self.session_id > 0:
