@@ -36,12 +36,16 @@ registered_callbacks=[]
 class function_key_entry(Tk.LabelFrame):
     def __init__(self, parent_frame, label:str):
         super().__init__(parent_frame)
-        self.label = Tk.Label(self, text=label)
+        self.subframe1=Tk.Frame(self)
+        self.subframe1.pack()
+        self.label = Tk.Label(self.subframe1, text=label)
         self.label.pack(side=Tk.LEFT, padx=0, pady=0)
-        self.funcname = common.entry_box(self, width=6, tool_tip="Enter the label for the function key (or leave blank to disable)")
+        self.funcname = common.entry_box(self.subframe1, width=8, tool_tip="Enter the label for the function key (or leave blank to disable)")
         self.funcname.pack(side=Tk.LEFT, padx=0, pady=0)
-        self.latching=common.check_box(self, label="", tool_tip="Check for Latching function (uncheck for momentary function)")
-        self.latching.pack(side=Tk.LEFT, padx=0, pady=0)
+        self.subframe2=Tk.Frame(self)
+        self.subframe2.pack()
+        self.latching=common.check_box(self.subframe2, label="Latching", tool_tip="Check for Latching function (uncheck for momentary function)")
+        self.latching.pack(padx=0, pady=0)
 
     def set_value(self, function_key_definition:list):
         # function_key_definition is a list comprising [function_key_name:str, latching:bool]
@@ -52,8 +56,8 @@ class function_key_entry(Tk.LabelFrame):
         return( [self.funcname.get_value(), self.latching.get_value()] )
     
     def validate(self):
-        if len(self.funcname.get()) > 6:
-            self.funcname.TT.text = ("Can only specify up to 6 characters")
+        if len(self.funcname.get()) > 8:
+            self.funcname.TT.text = ("Can only specify up to 8 characters")
             valid = False
         else:
             valid = True
@@ -100,13 +104,19 @@ class roster_entry(Tk.Frame):
         # Use the parent class frame to pack everything into
         super().__init__(parent_frame)
         # Create a frame for the button name elements
-        self.label1 = Tk.Label(self, text="Loco:")
+        self.subframe1=Tk.Frame(self)
+        self.subframe1.pack(side=Tk.LEFT)
+        self.subframe2=Tk.Frame(self.subframe1)
+        self.subframe2.pack()
+        self.label1 = Tk.Label(self.subframe2, text="Loco:")
         self.label1.pack(padx=0, pady=0, side=Tk.LEFT)
-        self.locomotive = common.entry_box(self, width=15, tool_tip="Specify the locomotive mame")
+        self.locomotive = common.entry_box(self.subframe2, width=15, tool_tip="Specify the locomotive mame")
         self.locomotive.pack(padx=0, pady=0, side=Tk.LEFT)
-        self.label2 = Tk.Label(self, text="Address:")
+        self.subframe3=Tk.Frame(self.subframe1)
+        self.subframe3.pack()
+        self.label2 = Tk.Label(self.subframe3, text="DCC Address:")
         self.label2.pack(padx=0, pady=0, side=Tk.LEFT)
-        self.dccaddress = common.integer_entry_box(self, width=6, min_value=0, max_value=10239,
+        self.dccaddress = common.integer_entry_box(self.subframe3, width=6, min_value=0, max_value=10239,
                    tool_tip="Specify the DCC address of the locomotive")
         self.dccaddress.pack(padx=0, pady=0, side=Tk.LEFT)
         self.functions = row_of_function_key_entries(self)
@@ -124,7 +134,10 @@ class roster_entry(Tk.Frame):
 
     def validate(self):
         valid = True
-        if not self.locomotive.validate(): valid = False
+        if len(self.locomotive.get()) > 15:
+            self.locomotive.TT.text = ("Can only specify up to 15 characters")
+            valid = False
+        self.locomotive.set_validation_status(valid)
         if not self.dccaddress.validate(): valid = False
         if not self.functions.validate(): valid=False
         return(valid)
@@ -200,6 +213,9 @@ class edit_roster():
             self.load_state()
 
     def get_roster_data(self):
+        # The roster_data saved/retrieved from settings comprises a dictionary of locomotives
+        # (with the loco name as the key) {"loco":[address:int, [list_of_function_settings] }
+        # where each function setting comprises [key_name:str, latching:bool]
         new_roster_entries = self.rosterentries.get_values()
         new_locomotive_roster = {}
         for new_entry in new_roster_entries:
@@ -208,6 +224,9 @@ class edit_roster():
         return(new_locomotive_roster)
     
     def set_roster_data(self, roster_data:dict):
+        # The roster_data saved/retrieved from settings comprises a dictionary of locomotives
+        # (with the loco name as the key) {"loco":[address:int, [list_of_function_settings] }
+        # where each function setting comprises [key_name:str, latching:bool]
         values_to_set=[]
         for locomotive, roster_entry in roster_data.items():
             dcc_address = roster_entry[0]
@@ -218,7 +237,7 @@ class edit_roster():
     def export_roster(self):
         if self.rosterentries.validate():
             filename_to_save=Tk.filedialog.asksaveasfilename(parent=self.window, title='Export Roster', 
-                                          filetypes=(('Roster files','*.rst'),('all files','*.*')))
+                            filetypes=(('Roster files','*.rst'),('all files','*.*')), initialdir=".")
             # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
             if filename_to_save == (): filename_to_save = ""
             # If the filename is not blank enforce the '.rst' extention
@@ -245,7 +264,7 @@ class edit_roster():
     def import_roster(self):
         # Open the file chooser dialog to select a file
         filename_to_load = Tk.filedialog.askopenfilename(parent=self.window, title='Import Roster',
-                                    filetypes=(('rst files','*.rst'),('all files','*.*')))
+                        filetypes=(('rst files','*.rst'),('all files','*.*')), initialdir=".")
         # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
         if filename_to_load == (): filename_to_load = ""
         # Only continue (to load the file) if the filename is not blank
