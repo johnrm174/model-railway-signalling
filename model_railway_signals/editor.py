@@ -209,10 +209,10 @@ class main_menubar:
                 command=lambda:menubar.import_layout(self.root, self.import_schematic))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
-        self.utilities_menu.add_command(label =" MQTT Subscriptions...",
-                command=lambda:menubar.mqtt_subscriptions(self.root))
         self.utilities_menu.add_command(label =" Locomotive Control...",
                 command=lambda:menubar.loco_control(self.root))
+        self.utilities_menu.add_command(label =" MQTT Subscriptions...",
+                command=lambda:menubar.mqtt_subscriptions(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -226,6 +226,8 @@ class main_menubar:
                 command=lambda:menubar.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
                 command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_update))
+        self.settings_menu.add_command(label =" Roster...",
+                command=lambda:menubar.edit_roster(self.root))
         self.settings_menu.add_command(label =" Sounds...",
                 command=lambda:menubar.edit_sounds_settings(self.root, self.sounds_update))
         self.settings_menu.add_command(label =" SPROG...",

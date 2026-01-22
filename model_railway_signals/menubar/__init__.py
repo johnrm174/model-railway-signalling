@@ -13,6 +13,7 @@
 #    edit_canvas_settings(root, canvas_update_callback)
 #    edit_gpio_settings(root, gpio_update_callback)
 #    edit_sounds_settings(root, sounds_update_callback)
+#    edit_roster(root)
 #
 #    edit_section_styles(root)
 #    edit_route_styles(root)
@@ -66,6 +67,7 @@ from .menubar_utilities import exercise_points
 from .menubar_subscriptions import mqtt_subscriptions
 
 from .menubar_loco_control import loco_control
+from .menubar_loco_control import edit_roster
 
 __all__ = [
     'display_help',
@@ -94,6 +96,7 @@ __all__ = [
     'import_layout',
     'exercise_points',
     'mqtt_subscriptions',
-    'loco_control']
+    'loco_control',
+    'edit_roster']
 
 ##############################################################################################################
