@@ -152,7 +152,6 @@ def find_local_ip_address():
     try:
         test_socket.connect(('10.255.255.255', 1))
         ip_address = test_socket.getsockname()[0]
-        logging.debug("MQTT-Client: Local IP address is "+ip_address)
     except:
         logging.error("MQTT-Client: Could not retrieve local IP address")
         ip_address = "<unknown>"
