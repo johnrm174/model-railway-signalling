@@ -946,7 +946,7 @@ def run_editor():
     root.protocol("WM_DELETE_WINDOW", main_window_menubar.quit_schematic)
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
     ################################################## START THROTTLE SERVER ############################################
-    throttle_server.start_throttle_server(main_window_menubar.sprog_power_state)
+    throttle_server.start_throttle_server(["Nokia G22", "ip6-localhost"], True, main_window_menubar.sprog_power_state)
     ################################################## START THROTTLE SERVER ############################################
     try: root.mainloop()
     except KeyboardInterrupt:
