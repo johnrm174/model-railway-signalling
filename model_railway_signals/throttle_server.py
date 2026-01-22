@@ -264,7 +264,6 @@ async def handle_client(reader, writer):
                             address_match = re.search(r"\+(.*?)<;>", rest_of_message)
                             raw_address = address_match.group(1) if address_match else "3"
                             # Split prefix (S or L) from the Raw Address to get the numerical DCC Address
-                            address_type = raw_address[0] if raw_address and raw_address[0] in ("S", "L") else ""
                             dcc_address_str = re.sub(r"\D", "", raw_address)  # numeric-only address for AS messages
                             dcc_address_int = int(dcc_address_str)
                             # See if we have been given a loco name (preserve leading 'H' if client provided it)
@@ -513,7 +512,7 @@ async def throttle_Server_thread():
             logging.info("Throttle Server: Clean Shutdown complete")
     else:
         aiozc, server = None, None
-        logging.error(f"Throttle Server: Could not start Throttle server as IP address could not be retrieved")
+        logging.error("Throttle Server: Could not start Throttle server as IP address could not be retrieved")
     return()
 
 #-----------------------------------------------------------------------------------------------
