@@ -165,9 +165,20 @@ async def handle_client(reader, writer):
         while True:
             # If no data then the client has disconnected. Exception handling is to cover
             # the case of a client being killed before we close the server-side connection
-            try: data = await reader.read(1024)
-            except: data = None
-            if not data: break
+            try:
+                # Wait up to 30 seconds for data (3x the heartbeat interval)
+                data = await asyncio.wait_for(reader.read(1024), timeout=30.0)
+            except asyncio.TimeoutError:
+                # Still no data after 30s - Drop the connection
+                logging.warning(f"Throttle Server: Connection timed out for {client_name}")
+                break
+            except Exception as e:
+                # Handle connections killed by closing the server
+                logging.error(f"Throttle Server: Read error: {e}")
+                break
+            if not data:
+                # No Data - that means the clinet has closed the connection
+                break
             # We have data so we go on to parse the messages
             messages = data.decode('utf-8', errors='ignore').split('\n')
             for message in messages:
@@ -464,10 +475,9 @@ def find_local_ip_address():
     try:
         test_socket.connect(('10.255.255.255', 1))
         ip_address = test_socket.getsockname()[0]
-        logging.debug("MQTT-Client: Local IP address is "+ip_address)
     except:
-        logging.error("MQTT-Client: Could not retrieve local IP address")
-        ip_address = "<unknown>"
+        logging.error("Throttle Server: Could not retrieve local IP address")
+        ip_address = None
     finally:
         test_socket.close()
     return(ip_address)
@@ -504,7 +514,6 @@ async def throttle_Server_thread():
             await stop_event.wait()
             logging.info(f"Throttle Server: Throttle Server {server_name} Shutdown initiated")
             serve_task.cancel()
-            
         finally:
             if aiozc: await aiozc.async_close()
             if server: server.close()
@@ -527,14 +536,20 @@ def start_throttle_server(allow_list:list, use_allow_list:bool, dcc_power:bool):
     dcc_power_state = dcc_power
     enforce_allow_list = use_allow_list
     list_of_allowed_clients = allow_list
-    # This inner function runs inside the new thread
-    def run_loop(): asyncio.run(throttle_Server_thread())
-    server_thread = threading.Thread(target=run_loop, daemon=True)
-    server_thread.setDaemon(True)
-    server_thread.start()
-    # Register for DCC Power update callbacks from the SPROG
-    library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
-    return()
+    # Only start the server if we are connected to a network
+    if find_local_ip_address is None:
+        success_code = 1
+        # This inner function runs inside the new thread
+        def run_loop(): asyncio.run(throttle_Server_thread())
+        server_thread = threading.Thread(target=run_loop, daemon=True)
+        server_thread.setDaemon(True)
+        server_thread.start()
+        # Register for DCC Power update callbacks from the SPROG
+        library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
+    else:
+        logging.error(f"Throttle Server: Could not Start Throttle server - No network connection")
+        success_code = 0
+    return(success_code)
 
 #-----------------------------------------------------------------------------------------------
 # This is the function called to stop the WiThrottle Server cleanly (threadsafe)
