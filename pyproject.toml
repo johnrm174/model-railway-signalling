@@ -15,7 +15,7 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: OS Independent",
 ]
-dependencies = [ "pyserial", "paho-mqtt", ]
+dependencies = [ "pyserial", "paho-mqtt", "zeroconf"]
 
 [tool.hatch.build.targets.sdist]
 include = [ "/model_railway_signals", ]
