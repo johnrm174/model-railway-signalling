@@ -168,6 +168,7 @@ def redraw_object(object_id):
 def redraw_all_objects():
     for object_id in objects_common.schematic_objects:
         redraw_object(object_id)
+        objects_common.root.update_idletasks()
     return()
 
 #------------------------------------------------------------------------------------
@@ -402,6 +403,7 @@ def delete_object(object_id):
 def delete_objects(list_of_object_ids:list):
     for object_id in list_of_object_ids:
         delete_object(object_id)
+        objects_common.root.update_idletasks()
     # Save the schematic state (for undo/redo) and initialise the layout
     save_schematic_state()
     run_layout.initialise_layout()
