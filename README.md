@@ -61,7 +61,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons)
-* TBD, TBD
+* Improved initial synchronisation of layout state following DCC connect
+* Added ability to inhibit flashing aspects for signal approach control
+* Added ability to specify the same GPIO sensor for signal passed and signal approached
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
