@@ -15,7 +15,9 @@
 #
 # API Functions (for the Editor to call)
 #    dcc_power_status_updated(dcc_power:bool) - this is the registered callback for DCC power changes
-#    start_throttle_server(allow_list:[name1:str, name2:str, etc], use_allow_list:bool, dcc_power:bool)
+#    subscribe_to_server_status_callbacks(callback_to_register)
+#    unsubscribe_from_server_status_callbacks(callback_to_deregister)
+#    start_throttle_server(allow_list:[name1:str, name2:str, etc], use_allow_list:bool)
 #    stop_throttle_server()
 #
 # Calls the following library functions (for the pi-SPROG interface):
@@ -46,6 +48,9 @@ from . import settings
 # Global parameters used by the WiThrottle Server
 #-----------------------------------------------------------------------------------------------
 
+# This is the flag we use to synchronise between the main thread and the server thread on 'stop'
+server_thread_handle = None
+
 # Keep track of active writers (connections) and the server loop
 connected_clients = set()
 server_loop = None
@@ -60,6 +65,8 @@ server_port_number = 12021
 server_debug = False
 dcc_power_state = None
 maximum_no_of_functions = 13
+server_status_callbacks = []
+list_of_connected_clients = []
 
 # Connection Security - simple whitelist
 enforce_allow_list = True
@@ -202,6 +209,8 @@ async def handle_client(reader, writer):
                         else:
                             # Connection is allowed
                             logging.info(f"Throttle Server: Connected WiThrottle Client is '{client_name}'")
+                            if client_name not in list_of_connected_clients: list_of_connected_clients.append(client_name)
+                            make_server_status_updated_callbacks()
                     if message.startswith("HU") and server_debug: logging.debug("Throttle Server: Handling Hardware Update Message")
                     # Send Hardware info and server name
                     hardware_type_response = f"HT{server_name}\n"
@@ -438,7 +447,10 @@ async def handle_client(reader, writer):
             try:
                 session_id = wi_sessions[index]["session_id"]
                 dcc_address = wi_sessions[index]["addr_str"]
-                # Release the loco in the Pi-SPROG hardware
+                # Stop the loco, reset all the functions and Release the loco
+                library.set_loco_speed_and_direction(session_id, 0, False)
+                for function in range(maximum_no_of_functions):
+                    library.set_loco_function(session_id, function, False)
                 library.release_loco_session(session_id)
                 if server_debug: logging.debug(f"Throttle Server: Released session {session_id} for loco {dcc_address}")
             except Exception as e:
@@ -451,6 +463,9 @@ async def handle_client(reader, writer):
             logging.info(f"Throttle Server: Session for {peer_ip_address}:{peer_port_number} ('{client_name}') has been terminated")    
         except Exception as e:
             logging.error(f"Throttle Server: Error closing socket: {e}")
+        # Remove the client from the list of active connections
+        list_of_connected_clients.remove(client_name)
+        make_server_status_updated_callbacks()
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -486,7 +501,7 @@ def find_local_ip_address():
 # The actual WiThrottle Server runs in a seperate thread to the main Tkinter thread
 #-----------------------------------------------------------------------------------------------
 
-async def throttle_Server_thread():
+async def throttle_server_thread(ready_event):
     global server_loop, stop_event
     server_loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
@@ -510,7 +525,9 @@ async def throttle_Server_thread():
             # Start the server but don't block forever
             serve_task = asyncio.create_task(server.serve_forever())
             logging.info(f"Throttle Server: Throttle Server '{server_name}' registered successfully")
-            # This is the key: The thread "hangs" here until stop_event.set() is called
+            # Signal back to the main thread that the server is up and running
+            ready_event.set()
+            # The thread waits here until stop_event.set() is called
             await stop_event.wait()
             logging.info(f"Throttle Server: Throttle Server {server_name} Shutdown initiated")
             serve_task.cancel()
@@ -518,7 +535,6 @@ async def throttle_Server_thread():
             if aiozc: await aiozc.async_close()
             if server: server.close()
             await server.wait_closed()
-            logging.info("Throttle Server: Clean Shutdown complete")
     else:
         aiozc, server = None, None
         logging.error("Throttle Server: Could not start Throttle server as IP address could not be retrieved")
@@ -528,28 +544,41 @@ async def throttle_Server_thread():
 # This is the function called to start the WiThrottle Server (which runs in a seperate thread)
 #-----------------------------------------------------------------------------------------------
 
-def start_throttle_server(allow_list:list, use_allow_list:bool, dcc_power:bool):  
+def start_throttle_server(allow_list:list, use_allow_list:bool):
     global dcc_power_state
     global enforce_allow_list
     global list_of_allowed_clients
+    global server_thread_handle
+    logging.info("Throttle Server: Starting Throttle Server")
     # Set the global variables
-    dcc_power_state = dcc_power
     enforce_allow_list = use_allow_list
     list_of_allowed_clients = allow_list
+    # If the server is already running then Stop and re-start the server with the new settings
+    if server_loop is not None: stop_throttle_server()
     # Only start the server if we are connected to a network
-    if find_local_ip_address is None:
-        success_code = 1
+    if find_local_ip_address is not None:
+        if server_debug: logging.debug("Throttle Server: Starting Throttle Server Thread")
+        # Create the synchronisation event (that tells us the server is running)
+        server_ready = threading.Event()
         # This inner function runs inside the new thread
-        def run_loop(): asyncio.run(throttle_Server_thread())
-        server_thread = threading.Thread(target=run_loop, daemon=True)
-        server_thread.setDaemon(True)
-        server_thread.start()
-        # Register for DCC Power update callbacks from the SPROG
-        library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
+        def run_loop(): asyncio.run(throttle_server_thread(server_ready))
+        server_thread_handle = threading.Thread(target=run_loop, daemon=True)
+        server_thread_handle.setDaemon(True)
+        server_thread_handle.start()
+        # Wait  until the server thread signals the server is fully up and running
+        if server_debug: logging.debug("Throttle Server: Waiting for server thread to initialise...")
+        is_started = server_ready.wait(timeout=5.0) # 5s timeout just in case of port conflict
+        if is_started:
+            logging.info("Throttle Server: Throttle Server has been Started")
+            # Register for DCC Power updates and report back server status
+            dcc_power_state = library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
+            make_server_status_updated_callbacks()
+        else:
+            logging.error("Throttle Server: Server thread initialisation timed out")
+            stop_throttle_server()
     else:
-        logging.error(f"Throttle Server: Could not Start Throttle server - No network connection")
-        success_code = 0
-    return(success_code)
+        logging.error("Throttle Server: Could not start Throttle Server - No network connection")
+    return()
 
 #-----------------------------------------------------------------------------------------------
 # This is the function called to stop the WiThrottle Server cleanly (threadsafe)
@@ -557,22 +586,59 @@ def start_throttle_server(allow_list:list, use_allow_list:bool, dcc_power:bool):
 
 def stop_throttle_server():
     global server_loop
-    logging.info("Throttle Server: Stopping Throttle Server")
+    logging.info("Throttle Server: Terminating Throttle Server")
     if server_loop and server_loop.is_running() and stop_event:
-        if server_debug: logging.debug("Throttle Server: Stopping Throttle Server Thread")
+        if server_debug: logging.debug("Throttle Server: Shutting down throttle server thread")
+        # Trigger the asyncio.Event inside the thread
         server_loop.call_soon_threadsafe(stop_event.set)
-    server_loop = None
-    # De Register for DCC Power update callbacks from the SPROG
-    library.unsubscribe_from_dcc_power_updates(dcc_power_status_updated)
+        # Wait for the thread to actually finish
+        if server_thread_handle and server_thread_handle.is_alive():
+            if server_debug: logging.debug("Throttle Server: Waiting for server thread to shut down...")
+            # Use a Timeout so we don't hang Tkinter forever if something deadlocks
+            server_thread_handle.join(timeout=3.0)
+            if server_thread_handle.is_alive():
+                if server_debug: logging.debug("Throttle Server: Server thread shutdown timed out")
+            else:
+                if server_debug: logging.debug("Throttle Server: Server thread shut down successfully")
     logging.info("Throttle Server: Throttle Server has been Terminated")
+    server_loop = None
+    # De register for DCC Power updates and report the updated server status
+    library.unsubscribe_from_dcc_power_updates(dcc_power_status_updated)
+    make_server_status_updated_callbacks()
     return()
 
 #-----------------------------------------------------------------------------------------------
-# This is the function called to stop the WiThrottle Server cleanly (threadsafe)
+# Functions to subscribe to and unsubscribe from server status updates
+#-----------------------------------------------------------------------------------------------
+
+def subscribe_to_server_status_callbacks(status_callback):
+    global server_status_callbacks
+    if status_callback not in server_status_callbacks:
+        server_status_callbacks.append(status_callback)
+    # Report the current Server state back to the newly registered callback
+    # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
+    server_running = server_loop and server_loop.is_running()
+    library.execute_function_in_tkinter_thread(status_callback(server_running, list_of_connected_clients))
+
+def unsubscribe_from_server_status_callbacks(status_callback):
+    global server_status_callbacks
+    if status_callback in server_status_callbacks:
+        server_status_callbacks.remove(status_callback)
+
+def make_server_status_updated_callbacks():
+    # Report Server Startup to the registered callbacks (registered when calling server_start)
+    # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
+    server_running = server_loop and server_loop.is_running()
+    for server_status_callback in server_status_callbacks:
+        library.execute_function_in_tkinter_thread(server_status_callback(server_running, list_of_connected_clients))
+
+#-----------------------------------------------------------------------------------------------
+# This is the callback function to handle DCC power updates (triggered by anything)
 #-----------------------------------------------------------------------------------------------
 
 def dcc_power_status_updated(dcc_power:bool):
     global dcc_power_state
+    dcc_power_state = dcc_power
     if server_loop and server_loop.is_running():
         if dcc_power:  message1, message2 = "PPA1", "PW1"
         else: message1,message2 = "PPA0", "PW0"    
