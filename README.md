@@ -60,6 +60,12 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
 > You have been warned!
 
+* DCC Loco control - Now the DCC Signalling system can be used as a full Command Station:
+    * Ideal for smaller layouts if you don't want the expense of a seperate DCC command station.
+    * Add your DCC locos to the Roster, defining DCC address and functions (up to 12 functions).
+    * Control your Locos via on-screen throttles (fully compatible with touchscreens).
+    * Start the built-in WiThrottle server and control your locos from your smartphone.
+    * Both Android (Engine Driver App) and iPhone (Withrottle App) are supported
 * Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons)
 * Improved initial synchronisation of layout state following DCC connect
 * Added ability to inhibit flashing aspects for signal approach control

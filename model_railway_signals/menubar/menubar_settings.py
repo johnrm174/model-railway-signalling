@@ -44,6 +44,7 @@
 
 import tkinter as Tk
 from tkinter import ttk
+from tkinter import font as TkFont
 
 import time
 import datetime
@@ -52,6 +53,7 @@ import logging
 from .. import common
 from .. import settings
 from .. import library
+from .. import throttle_server
 
 #------------------------------------------------------------------------------------
 # Class for a quick scroll button entry This is for large layouts, with a bigger
@@ -1319,7 +1321,6 @@ class edit_general_settings():
         global edit_general_settings_window
         edit_general_settings_window = None
         self.window.destroy()
-
 #------------------------------------------------------------------------------------
 # Class for the Sound Settings toolbar window. Note the init function takes
 # in a callback so it can apply the updated settings in the main editor application.
@@ -1433,4 +1434,128 @@ class edit_sounds_settings():
         edit_sounds_settings_window = None
         self.window.destroy()
 
+#------------------------------------------------------------------------------------
+# Class for the Throttle Server toolbar window.
+# Note that if a window is already open then we just raise it and exit.
+#------------------------------------------------------------------------------------
+
+edit_throttle_server_settings_window = None
+
+class edit_server_settings():
+    def __init__(self, root_window):
+        global edit_throttle_server_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_throttle_server_settings_window is not None and edit_throttle_server_settings_window.winfo_exists():
+            edit_throttle_server_settings_window.lift()
+            edit_throttle_server_settings_window.state('normal')
+            edit_throttle_server_settings_window.focus_force()
+        else:
+            # Create the (non resizable) top level window for the General Settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Throttle Server")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_throttle_server_settings_window = self.window
+            #----------------------------------------------------------------------------------
+            # Create a Label Frame for the General settings
+            #----------------------------------------------------------------------------------
+            self.frame1 = Tk.LabelFrame(self.window, text="General Settings")
+            self.frame1.pack(padx=5, pady=5, fill="x")
+            self.serverdebugging = common.check_box(self.frame1, label="Enhanced Server Debug Logging",
+                    tool_tip="Select to enable enhanced debugging (Layout log level must also be set to 'debug')")
+            self.serverdebugging.pack(padx=2,pady=2)
+            self.serverstartup = common.check_box(self.frame1, label="Start Server on Layout Load",
+                    tool_tip="Select to start the WiThrottle Server on layout load")
+            self.serverstartup.pack(padx=2,pady=2)
+            #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Whitelisting settings
+            #----------------------------------------------------------------------------------
+            self.frame2 = Tk.LabelFrame(self.window, text="Allowed Connections")
+            self.frame2.pack(padx=5, pady=5, fill="x")
+            self.serverenforceallow = common.check_box(self.frame2, label="Enforce allow list",
+                    tool_tip="Select to ensure only named WiThrottle clients can connect to the server "+
+                         "(if unchecked then connections from any client will be allowed)")
+            self.serverenforceallow.pack(padx=2,pady=2)
+            self.serverallowlist = common.grid_of_generic_entry_boxes(self.frame2, common.entry_box, columns=1, width=20,
+                                    tool_tip="Enter the WiThrottle client name to allow a connection from the device")
+            self.serverallowlist.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------------
+            # Create Server Controls
+            #----------------------------------------------------------------------------------
+            self.frame2 = Tk.LabelFrame(self.window, text="Server Controls/Staus")
+            self.frame2.pack(padx=5, pady=5, fill="x")
+            self.serverstatus = Tk.Label(self.frame2, width=20)
+            self.serverstatus.pack(padx=2, pady=2)
+            self.subframe1 = Tk.Frame(self.frame2)
+            self.subframe1.pack()
+            self.B1 = Tk.Button(self.subframe1, text="Apply and Start Server", command=self.apply_and_start_server)
+            self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.B1TT = common.CreateToolTip(self.B1, text="Click to apply the curent settings and start the WiThrottle Server")
+            self.B2 = Tk.Button(self.subframe1, text="Stop Server", command = self.stop_server)
+            self.B2.pack(side=Tk.RIGHT, padx=2, pady=2)
+            self.B1TT = common.CreateToolTip(self.B2, text="Click to Stop the WiThrottle Server")
+            self.label = Tk.Label(self.frame2, text="Active connections:")
+            self.label.pack(padx=2, pady=2)
+            self.bold_font = TkFont.Font(font=self.label.cget("font"))
+            self.bold_font.configure(weight="bold")
+
+            # This is the reference to the Frame we use to hold the list of connected clients
+            self.connected_clients = None
+            #----------------------------------------------------------------------------------
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #----------------------------------------------------------------------------------
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
+            throttle_server.subscribe_to_server_status(self.update_server_status)
+
+    def update_server_status(self, status:bool, list_of_connected_clients:list):
+        if status: self.serverstatus.config(text="Server Status: Running", fg="green4", font=self.bold_font)
+        else: self.serverstatus.config(text="Server Status: Stopped", fg="red", font=self.bold_font)
+        # Update the list of connected clients:
+        if self.connected_clients is not None: self.connected_clients.destroy()
+        self.connected_clients = Tk.Frame(self.frame2)
+        self.connected_clients.pack()
+        if len(list_of_connected_clients) > 0:
+            for connected_client in list_of_connected_clients:
+                client = Tk.Label(self.connected_clients, text=connected_client, font=self.bold_font)
+                client.pack()
+        else:
+            client = Tk.Label(self.connected_clients, text="No Clients Connected", font=self.bold_font)
+            client.pack()
+
+    def apply_and_start_server(self):
+        throttle_server.start_throttle_server(self.serverdebugging.get_value(),
+            self.serverallowlist.get_values(), self.serverenforceallow.get_value())
+        self.save_state(close_window=False)
+
+    def stop_server(self):
+        throttle_server.stop_throttle_server()
+
+    def load_state(self):
+        self.serverdebugging.set_value(settings.get_control("serverdebugging"))
+        self.serverstartup.set_value(settings.get_control("serverstartup"))
+        self.serverallowlist.set_values(settings.get_control("serverallowlist"))
+        self.serverenforceallow.set_value(settings.get_control("serverenforceallow"))
+
+    def save_state(self, close_window:bool):
+        settings.set_control("serverdebugging", self.serverdebugging.get_value())
+        settings.set_control("serverstartup", self.serverstartup.get_value())
+        settings.set_control("serverallowlist", self.serverallowlist.get_values())
+        settings.set_control("serverenforceallow", self.serverenforceallow.get_value())
+        if close_window: self.close_window()
+        else: self.load_state()
+
+    # This gets called when the user closes the window (also with ok or cancel)
+    def close_window(self):
+        global edit_throttle_server_settings_window
+        self.destroy()
+        edit_throttle_server_settings_window = None
+        self.window.destroy()
+
+    def destroy(self):
+        throttle_server.unsubscribe_from_server_status(self.update_server_status)
+
 #############################################################################################
+

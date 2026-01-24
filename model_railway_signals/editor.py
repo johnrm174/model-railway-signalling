@@ -113,12 +113,11 @@ from . import run_layout
 from . import run_routes
 from . import menubar
 from . import library
-from . import throttle_server #####################################################
+from . import throttle_server
 
 # The following imports are only used for the advanced debugging functions
 import linecache
 import tracemalloc
-
 
 #------------------------------------------------------------------------------------
 # Top level class for the toolbar window
@@ -126,9 +125,13 @@ import tracemalloc
 
 class main_menubar:
     def __init__(self, root):
-        # The following parameters keep track of the SPROG connection/power status
+        # The following parameters keep track of state
+        self.throttle_server_state = False
         self.sprog_connection_state = False
-        self.sprog_power_state = None # Unknown
+        self.sprog_power_state = None  # Unknown
+        # Subscribe to DCC Power state changes and throttle server
+        library.subscribe_to_dcc_power_updates(self.dcc_power_state_updated)
+        throttle_server.subscribe_to_server_status(self.throttle_server_state_updated)
         # Configure the logger (log level gets set later)
         logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
@@ -228,6 +231,8 @@ class main_menubar:
                 command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_update))
         self.settings_menu.add_command(label =" Roster...",
                 command=lambda:menubar.edit_roster(self.root))
+        self.settings_menu.add_command(label =" Server...",
+                command=lambda:menubar.edit_server_settings(self.root))
         self.settings_menu.add_command(label =" Sounds...",
                 command=lambda:menubar.edit_sounds_settings(self.root, self.sounds_update))
         self.settings_menu.add_command(label =" SPROG...",
@@ -375,6 +380,7 @@ class main_menubar:
         # want to close down everything before re-opening everything from scratch
         if self.sprog_power_state: self.dcc_power_off()
         if self.sprog_connection_state:self.sprog_disconnect()
+        if self.throttle_server_state: throttle_server.stop_throttle_server()
         if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         self.reset_mqtt_pub_sub_configuration()
         # Initialise the MQTT networking at startup (even if they are blank as
@@ -408,10 +414,25 @@ class main_menubar:
             sprog_connected = self.sprog_connect()
             if sprog_connected and settings.get_sprog("power"):
                 self.dcc_power_on()
+        # Start the WiThrottle server if it is configured to start at layout load:
+        if settings.get_control("serverstartup"):
+            debugging = settings.get_control("serverdebugging")
+            allow_list = settings.get_control("serverallowlist")
+            enforce_allow_list = settings.get_control("serverenforceallow")
+            throttle_server.start_throttle_server(debugging, allow_list, enforce_allow_list)
+
+    # --------------------------------------------------------------------------------------
+    # Callback function to handle state changes for the throttle server. We only care about
+    # this for shutdown and file load operations so we can change the state deterministically
+    # --------------------------------------------------------------------------------------
+
+    def throttle_server_state_updated(self, server_state:bool, connected_clients:list):
+        self.throttle_server_state = server_state
 
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
     # --------------------------------------------------------------------------------------
+
     def handle_canvas_event(self, event=None):
         # Note that event.keysym returns the character (event.state would be 'Control')
         if event.keysym == 'm':
@@ -430,12 +451,12 @@ class main_menubar:
     #------------------------------------------------------------------------------------------
     # Mode menubar functions
     #------------------------------------------------------------------------------------------
-        
+
     def automation_enable(self):
         new_label = "Automation:On"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
-        settings.set_general("automation", True)
+       model_railway_signals/editor.py settings.set_general("automation", True)
         run_layout.configure_automation(True)
         run_routes.configure_automation(True)
         run_layout.initialise_layout()
@@ -532,16 +553,12 @@ class main_menubar:
         debug = settings.get_sprog("debug")
         self.sprog_connection_state = library.sprog_connect(port, baud, address_mode, debug)
         self.update_sprog_menubar_controls()
-        # Subscribe to DCC Power state changes
-        if self.sprog_connection_state: library.subscribe_to_dcc_power_updates(self.dcc_power_state_updated)
         return(self.sprog_connection_state)
     
     def sprog_disconnect(self, show_popup:bool=True):
         # The disconnect request returns True if successful
         self.sprog_connection_state = not library.sprog_disconnect()
         self.update_sprog_menubar_controls()
-        # Unsubscribe from to DCC Power state changes
-        library.unsubscribe_from_dcc_power_updates(self.dcc_power_state_updated)
         if show_popup and self.sprog_connection_state:
             Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
                 message="Error disconnecting from Serial Port - try rebooting")
@@ -739,11 +756,11 @@ class main_menubar:
             # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
             # power and disconnect from the serial port, Revert all GPIO ports to their default states
             # and then wait until all scheduled Tkinter tasks have completed before destroying root)
-            ################################################## START THROTTLE SERVER ############################################
-            throttle_server.stop_throttle_server()
-            ################################################## START THROTTLE SERVER ############################################
+            # Also stop the Throttle Server (as its the right thing to do)
             schematic.shutdown()
             library.orderly_shutdown()
+            if self.throttle_server_state:
+                throttle_server.stop_throttle_server()
         return()
                 
     def new_schematic(self, ask_for_confirm:bool=True):
@@ -947,21 +964,18 @@ def run_editor():
     # Bind the close window event to the editor quit function to perform an orderly shutdown
     root.protocol("WM_DELETE_WINDOW", main_window_menubar.quit_schematic)
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
-    ################################################## START THROTTLE SERVER ############################################
-    throttle_server.start_throttle_server(["Nokia G22", "ip6-localhost"], True, main_window_menubar.sprog_power_state)
-    ################################################## START THROTTLE SERVER ############################################
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
-        ################################################## START THROTTLE SERVER ############################################
-        throttle_server.stop_throttle_server()
-        ################################################## START THROTTLE SERVER ############################################
         # Kill off the PhotoImage objects so we don't get spurious exceptions on window close and
         # perform an instant shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
         # power and disconnect from the serial port, Revert all GPIO ports to their default states
         # and then wait until all scheduled Tkinter tasks have completed before destroying root
+        # Also stop the Throttle Server (as its the right thing to do)
         schematic.shutdown()
         library.instant_shutdown()
+        if self.throttle_server_state:
+            throttle_server.stop_throttle_server()
     print("Exiting Model Railway Signalling application")
 
 ####################################################################################

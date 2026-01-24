@@ -13,6 +13,7 @@
 #    edit_canvas_settings(root, canvas_update_callback)
 #    edit_gpio_settings(root, gpio_update_callback)
 #    edit_sounds_settings(root, sounds_update_callback)
+#    edit_server_settings(root)
 #    edit_roster(root)
 #
 #    edit_section_styles(root)
@@ -47,6 +48,7 @@ from .menubar_settings import edit_logging_settings
 from .menubar_settings import edit_canvas_settings
 from .menubar_settings import edit_gpio_settings
 from .menubar_settings import edit_sounds_settings
+from .menubar_settings import edit_server_settings
 
 from .menubar_styles import edit_section_styles
 from .menubar_styles import edit_route_styles
@@ -81,6 +83,7 @@ __all__ = [
     'edit_logging_settings',
     'edit_canvas_settings',
     'edit_gpio_settings',
+    'edit_server_settings',
     'edit_section_styles',
     'edit_route_styles',
     'edit_switch_styles',
