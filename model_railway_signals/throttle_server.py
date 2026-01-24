@@ -129,7 +129,8 @@ async def send_roster(writer):
             roster_entries.append(entry)
         # Join all loco entries using the entry separator
         roster_message = f"RL{len(roster_entries)}{entry_sep}{entry_sep.join(roster_entries)}\n"
-        writer.write(roster_message.encode())
+    # Write out the message (whether zero length or with entries)
+    writer.write(roster_message.encode())
     if server_debug: logging.debug(f"Throttle Server: Sent Roster: {roster_message!r}")
     await writer.drain()
 
@@ -456,7 +457,7 @@ async def handle_client(reader, writer):
             except Exception as e:
                 logging.error(f"Throttle Server: Error releasing session during cleanup: {e}")
         # Close the socket properly
-        connected_clients.remove(writer)
+        connected_clients.discard(writer)
         try:
             writer.close()
             await writer.wait_closed()
@@ -506,8 +507,8 @@ async def throttle_server_thread(ready_event):
     global server_loop, stop_event
     server_loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
-    server_ip_address = socket.inet_aton(find_local_ip_address())
-    if server_ip_address is not None:
+    if find_local_ip_address() is not None:
+        server_ip_address = socket.inet_aton(find_local_ip_address())
         aiozc = None # Initialize for finally block safety
         server = None
         try:
@@ -572,7 +573,7 @@ def start_throttle_server(debugging:bool, allow_list:list, use_allow_list:bool):
     # Always attempt a clean stop of previous server loop instances first
     if server_loop: stop_throttle_server()
     # Only start the server if we are connected to a network
-    if find_local_ip_address is not None:
+    if find_local_ip_address() is not None:
         if server_debug: logging.debug("Throttle Server: Starting Throttle Server Thread")
         # Create the synchronisation event (that tells us the server is running)
         # Call the function to get the IP, don't just check the function reference
@@ -638,14 +639,11 @@ def subscribe_to_server_status(status_callback):
     global server_status_callbacks
     if status_callback not in server_status_callbacks:
         server_status_callbacks.append(status_callback)
-    # Report the current Server state back to the newly registered callback
-    # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
-    server_running = server_loop and server_loop.is_running()
-    library.execute_function_in_tkinter_thread(status_callback(server_running, list_of_connected_clients))
+    make_server_status_updated_callbacks()
 
 def unsubscribe_from_server_status(status_callback):
     global server_status_callbacks
-    if status_callback in server_status_callbacks:
+    if status_callback not in server_status_callbacks:
         server_status_callbacks.remove(status_callback)
 
 def make_server_status_updated_callbacks():
@@ -653,7 +651,7 @@ def make_server_status_updated_callbacks():
     # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
     server_running = server_loop and server_loop.is_running()
     for server_status_callback in server_status_callbacks:
-        library.execute_function_in_tkinter_thread(server_status_callback(server_running, list_of_connected_clients))
+        library.execute_function_in_tkinter_thread(lambda:server_status_callback(server_running, list_of_connected_clients))
 
 #-----------------------------------------------------------------------------------------------
 # This is the callback function to handle DCC power updates (triggered by anything)

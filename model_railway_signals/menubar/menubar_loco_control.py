@@ -241,7 +241,7 @@ class edit_roster():
             # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
             if filename_to_save == (): filename_to_save = ""
             # If the filename is not blank enforce the '.rst' extention
-            if filename_to_save != "" and not filename_to_save.endswith(".rst"): filename_to_save.append(".rst")
+            if filename_to_save != "" and not filename_to_save.lower().endswith(".rst"): filename_to_save.append(".rst")
             # Only continue (to save the file) if the filename is not blank
             if filename_to_save != "":
                 # Create a json structure to save the data 

@@ -456,7 +456,7 @@ class main_menubar:
         new_label = "Automation:On"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
-       model_railway_signals/editor.py settings.set_general("automation", True)
+        settings.set_general("automation", True)
         run_layout.configure_automation(True)
         run_routes.configure_automation(True)
         run_layout.initialise_layout()
@@ -974,7 +974,7 @@ def run_editor():
         # Also stop the Throttle Server (as its the right thing to do)
         schematic.shutdown()
         library.instant_shutdown()
-        if self.throttle_server_state:
+        if main_window_menubar.throttle_server_state:
             throttle_server.stop_throttle_server()
     print("Exiting Model Railway Signalling application")
 
