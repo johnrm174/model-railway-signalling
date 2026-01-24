@@ -137,6 +137,7 @@ address_mode = 1
 
 # Global variable to hold the SPROG status callback reference
 status_callback = None
+dcc_power_is_on = None
 
 #------------------------------------------------------------------------------
 # Common function used by the main thread to wait for responses in other threads.
@@ -694,6 +695,7 @@ def query_command_station_status():
 
 #------------------------------------------------------------------------------
 # Externally Called Function to Register for DCC power status updates
+# Returns immediately with the current state (None if unknown)
 #------------------------------------------------------------------------------
 
 registered_dcc_power_state_callbacks = []
@@ -702,11 +704,19 @@ def subscribe_to_dcc_power_updates(callback):
     global registered_dcc_power_state_callbacks
     if callback not in registered_dcc_power_state_callbacks:
         registered_dcc_power_state_callbacks.append(callback)
+    callback(dcc_power_is_on)
+    return()
 
 def unsubscribe_from_dcc_power_updates(callback):
     global registered_dcc_power_state_callbacks
     if callback in registered_dcc_power_state_callbacks:
         registered_dcc_power_state_callbacks.remove(callback)
+    return()
+
+def make_dcc_power_updated_callbacks():
+    for power_status_changed_callback in registered_dcc_power_state_callbacks:
+        power_status_changed_callback(dcc_power_is_on)
+    return()
 
 #------------------------------------------------------------------------------
 # Externally Called Function to turn on the track power
@@ -714,6 +724,7 @@ def unsubscribe_from_dcc_power_updates(callback):
 
 def request_dcc_power_on():
     global ton_response
+    global dcc_power_is_on
     def response_received(): return(ton_response)
     ton_response = False
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
@@ -724,19 +735,19 @@ def request_dcc_power_on():
         send_cbus_command (mj_pri=0, min_pri=0, op_code=0x09)
         # Wait for the response (with a 1 second timeout)
         wait_for_response(5.0, response_received)
-        if ton_response: logging.info("Pi-SPROG: Track power has been turned ON")
-        else: logging.error("Pi-SPROG: Request to turn on Track Power failed")
         # Give things time to get established before sending out any commands
-        time.sleep (0.2)
         # Tell the application to send out any DCC commands that may have been 'issued' before
         # DCC Power was turned on but not transmitted (as they would have been silently ignored)
         # We also transmit the DCC power state to anyone who has registered a callback
         if ton_response:
-            for power_status_changed_callback in registered_dcc_power_state_callbacks:
-                power_status_changed_callback(True)
+            dcc_power_is_on = True
+            make_dcc_power_updated_callbacks()
+            logging.info("Pi-SPROG: Track power has been turned ON")
             # Wait until things have stabilised before sending out any messages
             # Testing on my layout has indicated we need at least a second to be sure
             common.root_window.after(1000, common.sprog_transmit_all)
+        else:
+            logging.error("Pi-SPROG: Request to turn on Track Power failed")
     return(ton_response)
 
 #------------------------------------------------------------------------------
@@ -745,6 +756,7 @@ def request_dcc_power_on():
 
 def request_dcc_power_off():
     global tof_response
+    global dcc_power_is_on
     def response_received(): return(tof_response)
     tof_response = False
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
@@ -756,10 +768,9 @@ def request_dcc_power_off():
         # Wait for the response (with a 1 second timeout)
         wait_for_response(5.0, response_received)
         if tof_response:
+            dcc_power_is_on = False
+            make_dcc_power_updated_callbacks()
             logging.info("Pi-SPROG: Track power has been turned OFF")
-            # We transmit the DCC power state to anyone who has registered a callback
-            for power_status_changed_callback in registered_dcc_power_state_callbacks:
-                power_status_changed_callback(False)
         else:
             logging.error("Pi-SPROG: Request to turn off Track Power failed")
     return(tof_response)
