@@ -241,7 +241,8 @@ class edit_roster():
             # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
             if filename_to_save == (): filename_to_save = ""
             # If the filename is not blank enforce the '.rst' extention
-            if filename_to_save != "" and not filename_to_save.lower().endswith(".rst"): filename_to_save.append(".rst")
+            if filename_to_save != "" and not filename_to_save.lower().endswith(".rst"):
+                filename_to_save += ".rst"
             # Only continue (to save the file) if the filename is not blank
             if filename_to_save != "":
                 # Create a json structure to save the data 
@@ -271,7 +272,6 @@ class edit_roster():
         if filename_to_load != "":
             try:
                 with open (filename_to_load,'r') as file: loaded_data=file.read()
-                file.close
             except Exception as exception:
                 Tk.messagebox.showerror(parent=self.window, title="File Load Error", message=str(exception))
             else:
@@ -280,9 +280,14 @@ class edit_roster():
                 except Exception as exception:
                     Tk.messagebox.showerror(parent=self.window, title="File Parse Error", message=str(exception))
                 else:
-                    self.loaded_file = filename_to_load
-                    locomotive_roster = loaded_data["roster"]
-                    self.set_roster_data(locomotive_roster)
+                    if "roster" not in loaded_data.keys():
+                        Tk.messagebox.showerror(parent=self.window, title="File Load Error", message="Not a roster file")
+                    elif not isinstance(locomotive_roster, dict):
+                        Tk.messagebox.showerror(parent=self.window, title="File Load Error", message="Roster file corrupted")
+                    else:
+                        self.loaded_file = filename_to_load
+                        locomotive_roster = loaded_data["roster"]
+                        self.set_roster_data(locomotive_roster)
 
     def load_state(self):
         locomotive_roster = settings.get_control("locomotiveroster")

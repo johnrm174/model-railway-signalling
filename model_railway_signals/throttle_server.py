@@ -169,24 +169,30 @@ async def handle_client(reader, writer):
     if server_debug: logging.debug(f"Throttle Server: Sent Protocol Version: {protocol_version!r}")    
     await writer.drain()
     # Put exception handling around the client loop just in case
-    try: 
+    try:
+        read_buffer = ""
         while True:
             # If no data then the client has disconnected. Exception handling is to cover
             # the case of a client being killed before we close the server-side connection
             try:
                 # Wait up to 30 seconds for data (3x the heartbeat interval)
                 data = await asyncio.wait_for(reader.read(1024), timeout=30.0)
+            # If no data after 30s - Drop the connection
             except asyncio.TimeoutError:
-                # Still no data after 30s - Drop the connection
                 logging.warning(f"Throttle Server: Connection timed out for {client_name}")
                 break
+            # Handle connections killed by closing the server
             except Exception as e:
-                # Handle connections killed by closing the server
                 logging.error(f"Throttle Server: Read error: {e}")
                 break
-            if not data:
-                # No Data - that means the clinet has closed the connection
-                break
+            # No Data - that means the client has closed the connection
+            if not data: break
+            # Ensure we don't have any incomplete/trailing message fragments  
+            buffer += data.decode('utf-8', errors='ignore')
+            while '\n' in buffer:
+                line, buffer = buffer.split('\n', 1)
+                message = line.strip()
+                if not message: continue
             # We have data so we go on to parse the messages
             messages = data.decode('utf-8', errors='ignore').split('\n')
             for message in messages:
@@ -475,14 +481,17 @@ async def handle_client(reader, writer):
 #-----------------------------------------------------------------------------------------------
 
 def broadcast_to_all(message):
-    if not message.endswith('\n'): message += '\n'
-    for writer in connected_clients:
+    if not message.endswith('\n'):
+        message += '\n'
+    for writer in list(connected_clients):  # iterate a snapshot copy
         try:
             writer.write(message.encode("utf-8"))
-        except Exception as e:
-            logging.error(f"Throttle Server: failed to Broadcast message to client: {e}")
-    return()
-
+            if server_loop and server_loop.is_running():
+                # schedule a drain task on the server event loop
+                server_loop.call_soon_threadsafe(lambda w=writer: server_loop.create_task(w.drain()))
+        except Exception:
+            logging.exception("Throttle Server: failed to broadcast message to client")
+            
 #-----------------------------------------------------------------------------------------------
 # Find the local IP address of the machine we are running on
 #-----------------------------------------------------------------------------------------------
@@ -573,36 +582,45 @@ def start_throttle_server(debugging:bool, allow_list:list, use_allow_list:bool):
     # Always attempt a clean stop of previous server loop instances first
     if server_loop: stop_throttle_server()
     # Only start the server if we are connected to a network
-    if find_local_ip_address() is not None:
-        if server_debug: logging.debug("Throttle Server: Starting Throttle Server Thread")
+    server_ip_str = find_local_ip_address()
+    if server_ip_str is not None:
+        try:
+            server_ip_address = socket.inet_aton(server_ip_str)
+        except Exception:
+            server_ip_address = None
+        else:
+            server_ip_address = None
         # Create the synchronisation event (that tells us the server is running)
         # Call the function to get the IP, don't just check the function reference
-        if find_local_ip_address() is not None:
+        if server_ip_address is not None:
+            if server_debug: logging.debug("Throttle Server: Starting Throttle Server Thread")
             server_ready = threading.Event()
-        # This inner function runs inside the new thread
-        def run_loop():
-            try:
-                asyncio.run(throttle_server_thread(server_ready))
-            except Exception as e:
-                logging.error(f"Throttle Server: Asyncio Loop Error: {e}")
-                server_ready.set() # Prevent hang
-        server_thread_handle = threading.Thread(target=run_loop, daemon=True)
-        server_thread_handle.setDaemon(True)
-        server_thread_handle.start()
-        # TIMEOUT 4: 5 seconds is plenty for a local socket bind
-        if server_debug: logging.debug("Throttle Server: Waiting for server thread to initialise...")
-        if server_ready.wait(timeout=5.0):
-            # Check if it actually started or just timed out inside the thread
-            if server_loop and server_loop.is_running():
-                dcc_power_state = library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
-                make_server_status_updated_callbacks()
-                logging.info("Throttle Server: Throttle Server has been Started")
+            # This inner function runs inside the new thread
+            def run_loop():
+                try:
+                    asyncio.run(throttle_server_thread(server_ready))
+                except Exception as e:
+                    logging.error(f"Throttle Server: Asyncio Loop Error: {e}")
+                    server_ready.set() # Prevent hang
+            server_thread_handle = threading.Thread(target=run_loop, daemon=True)
+            server_thread_handle.setDaemon(True)
+            server_thread_handle.start()
+            # TIMEOUT 4: 5 seconds is plenty for a local socket bind
+            if server_debug: logging.debug("Throttle Server: Waiting for server thread to initialise...")
+            if server_ready.wait(timeout=5.0):
+                # Check if it actually started or just timed out inside the thread
+                if server_loop and server_loop.is_running():
+                    dcc_power_state = library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
+                    make_server_status_updated_callbacks()
+                    logging.info("Throttle Server: Throttle Server has been Started")
+                else:
+                    logging.error("Throttle Server: Throttle Server Thread started but loop is not running")
             else:
-                logging.error("Throttle Server: Throttle Server Thread started but loop is not running")
+                logging.error("Throttle Server: Server thread initialisation timed out")
         else:
-            logging.error("Throttle Server: Server thread initialisation timed out")
+            logging.exception(f"Throttle Server: Invalid local IP address '{server_ip_str}'")
     else:
-        logging.error("Throttle Server: Could not start Throttle Server - No network connection")
+        logging.exception(f"Throttle Server: Local IP address could not be retrieved")
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -643,13 +661,13 @@ def subscribe_to_server_status(status_callback):
 
 def unsubscribe_from_server_status(status_callback):
     global server_status_callbacks
-    if status_callback not in server_status_callbacks:
+    if status_callback in server_status_callbacks:
         server_status_callbacks.remove(status_callback)
 
 def make_server_status_updated_callbacks():
     # Report Server Startup to the registered callbacks (registered when calling server_start)
     # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
-    server_running = server_loop and server_loop.is_running()
+    server_running = bool(server_loop and server_loop.is_running())
     for server_status_callback in server_status_callbacks:
         library.execute_function_in_tkinter_thread(lambda:server_status_callback(server_running, list_of_connected_clients))
 
@@ -660,14 +678,14 @@ def make_server_status_updated_callbacks():
 def dcc_power_status_updated(dcc_power:bool):
     global dcc_power_state
     dcc_power_state = dcc_power
-    if server_loop and server_loop.is_running():
-        if dcc_power:  message1, message2 = "PPA1", "PW1"
-        else: message1,message2 = "PPA0", "PW0"    
+    message1 = "PPA1" if dcc_power else "PPA0"
+    message2 = "PW1"  if dcc_power else "PW0"
     try:
-        if server_loop: server_loop.call_soon_threadsafe(broadcast_to_all, message1)
-        if server_loop: server_loop.call_soon_threadsafe(broadcast_to_all, message2)
-    except:
-        pass
+        if server_loop and server_loop.is_running():
+            call_soon_threadsafe(broadcast_to_all, message1)
+            call_soon_threadsafe(broadcast_to_all, message2)
+    except Exception as e:
+        logging.exception("Throttle Server: Exception scheduling DCC power broadcast")
     return()
 
 ########################################################################################################################################
