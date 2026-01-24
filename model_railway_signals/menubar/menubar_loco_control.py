@@ -258,7 +258,6 @@ class edit_roster():
                     # write the json structure to file
                     try:
                         with open (filename_to_save,'w') as file: file.write(file_contents)
-                        file.close
                     except Exception as exception:
                         Tk.messagebox.showerror(parent=self.window, title="File Save Error", message=str(exception))
                         
@@ -282,7 +281,7 @@ class edit_roster():
                 else:
                     if "roster" not in loaded_data.keys():
                         Tk.messagebox.showerror(parent=self.window, title="File Load Error", message="Not a roster file")
-                    elif not isinstance(locomotive_roster, dict):
+                    elif not isinstance(loaded_data["roster"], dict):
                         Tk.messagebox.showerror(parent=self.window, title="File Load Error", message="Roster file corrupted")
                     else:
                         self.loaded_file = filename_to_load
