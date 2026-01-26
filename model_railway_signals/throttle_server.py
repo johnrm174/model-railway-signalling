@@ -502,66 +502,40 @@ def find_local_ip_address():
 # The actual WiThrottle Server runs in a seperate thread to the main Tkinter thread
 #-----------------------------------------------------------------------------------------------
 
-async def throttle_server_thread(ready_event):
+async def throttle_server_thread(ready_event, ip_str, ip_bytes):
     global server_loop, stop_event
-    # Retrieve the local IP address and Validate
-    server_ip_str = find_local_ip_address()
-    server_ip_address = None
-    # Get the han
     server_loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
-    if server_ip_str is not None:
-        try:
-            server_ip_address = socket.inet_aton(server_ip_str)
-        except Exception:
-            logging.exception(f"Throttle Server: Invalid local IP address '{server_ip_str}'")
-        else:
-            if server_ip_address is not None:
-                # Only proceed if we have a valid IP address
-                aiozc = None # Initialize for finally block safety
-                server = None
-                try:
-                    readable_ip_address = socket.inet_ntoa(server_ip_address)
-                    logging.info(f"Throttle Server: Starting Throttle Server on {readable_ip_address}:{server_port_number}")
-                    aiozc = AsyncZeroconf()
-                    # Start the server and configure the service entry (for discovery)
-                    server = await asyncio.start_server(handle_client, "0.0.0.0", server_port_number)
-                    info = AsyncServiceInfo(
-                        "_withrottle._tcp.local.",
-                        f"{server_name}._withrottle._tcp.local.",
-                        addresses=[server_ip_address],
-                        port=server_port_number,
-                        properties={"roster": "1"},
-                        server=server_name)
-                    # TIMEOUT 1: Zeroconf registration can occasionally hang on bad networks
-                    await asyncio.wait_for(aiozc.zeroconf.async_register_service(info), timeout=3.0)
-                    # Start the server but don't block forever
-                    serve_task = asyncio.create_task(server.serve_forever())
-                    logging.info(f"Throttle Server: Throttle Server '{server_name}' registered successfully")
-                    # Signal back to the main thread that the server is up and running
-                    ready_event.set()
-                    # The thread waits here until stop_event.set() is called
-                    await stop_event.wait()
-                    logging.info(f"Throttle Server: Throttle Server {server_name} Shutdown initiated")
-                    serve_task.cancel()
-                except Exception as e:
-                    logging.error(f"Throttle Server: Startup error: {e}")
-                finally:
-                    # TIMEOUT 2: Ensure cleanup doesn't block the thread joining process
-                    if aiozc:
-                        await aiozc.async_close()
-                    if server:
-                        server.close()
-                        try:
-                            await asyncio.wait_for(server.wait_closed(), timeout=2.0)
-                        except asyncio.TimeoutError:
-                            logging.warning("Throttle Server: Socket wait_closed timed out")
-                    # Ensure the event is ALWAYS set so start_throttle_server doesn't hang
-                    ready_event.set()
-    else:
-        ready_event.set() # Release the main thread even if IP fails
-        aiozc, server = None, None
-        logging.error("Throttle Server: Could not start Throttle server as IP address could not be retrieved")
+    aiozc = None
+    try:
+        logging.info(f"Throttle Server: Starting Throttle Server on {ip_str}:{server_port_number}")
+        aiozc = AsyncZeroconf()
+        # Start the server and configure the service entry (for discovery)
+        server = await asyncio.start_server(handle_client, "0.0.0.0", server_port_number)
+        info = AsyncServiceInfo(
+            "_withrottle._tcp.local.",
+            f"{server_name}._withrottle._tcp.local.",
+            addresses=[ip_bytes],
+            port=server_port_number,
+            properties={"roster": "1"},
+            server=server_name)
+        # Wait for Zeroconf registration (with timeout) - can occasionally hang on bad networks
+        await asyncio.wait_for(aiozc.zeroconf.async_register_service(info), timeout=3.0)
+        # Start the server but don't block forever
+        serve_task = asyncio.create_task(server.serve_forever())
+        logging.info(f"Throttle Server: Throttle Server '{server_name}' registered successfully")
+        # Signal back to the main thread that the server is up and running
+        ready_event.set()
+        # The thread waits here until stop_event.set() is called
+        await stop_event.wait()
+        logging.info(f"Throttle Server: Throttle Server {server_name} Shutdown initiated")
+        serve_task.cancel()
+    except Exception as e:
+        logging.error(f"Throttle Server: Startup error: {e}")
+    finally:
+        # Ensure GUI never hangs if there has been an exception
+        if aiozc: await aiozc.async_close()
+        ready_event.set()
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -569,53 +543,36 @@ async def throttle_server_thread(ready_event):
 #-----------------------------------------------------------------------------------------------
 
 def start_throttle_server(debugging:bool, allow_list:list, use_allow_list:bool):
-    global dcc_power_state
     global server_debug
     global enforce_allow_list
     global list_of_allowed_clients
     global server_thread_handle
-    # Set the global variables
-    enforce_allow_list = use_allow_list
-    list_of_allowed_clients = allow_list
-    server_debug = debugging
     # Always attempt a clean stop of previous server loop instances first
     if server_loop: stop_throttle_server()
     # Retrieve the local IP address and Validate
-    server_ip_address = None
-    server_ip_str = find_local_ip_address()
-    if server_ip_str is not None:
-        try:
-            server_ip_address = socket.inet_aton(server_ip_str)
-        except Exception:
-            logging.exception(f"Throttle Server: Invalid local IP address '{server_ip_str}'")
-        # Only proceed if we have a valid IP address
-        else:
-            if server_debug: logging.debug("Throttle Server: Starting Throttle Server Thread")
-            server_ready = threading.Event()
-            # This inner function runs inside the new thread
-            def run_loop():
-                try:
-                    asyncio.run(throttle_server_thread(server_ready))
-                except Exception as e:
-                    logging.error(f"Throttle Server: Asyncio Loop Error: {e}")
-                    server_ready.set() # Prevent hang
-            server_thread_handle = threading.Thread(target=run_loop, daemon=True)
-            server_thread_handle.setDaemon(True)
-            server_thread_handle.start()
-            # TIMEOUT 4: 5 seconds is plenty for a local socket bind
-            if server_debug: logging.debug("Throttle Server: Waiting for server thread to initialise...")
-            if server_ready.wait(timeout=5.0):
-                # Check if it actually started or just timed out inside the thread
-                if server_loop and server_loop.is_running():
-                    dcc_power_state = library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
-                    make_server_status_updated_callbacks()
-                    logging.info("Throttle Server: Throttle Server has been Started")
-                else:
-                    logging.error("Throttle Server: Throttle Server Thread started but loop is not running")
-            else:
-                logging.error("Throttle Server: Server thread initialisation timed out")
+    ip_str = find_local_ip_address()
+    try:
+        ip_bytes = socket.inet_aton(ip_str)
+    except:
+        logging.exception(f"Throttle Server: Invalid local IP address '{ip_str}'")
     else:
-        logging.exception(f"Throttle Server: Local IP address could not be retrieved")
+        # Set the global variables
+        enforce_allow_list = use_allow_list
+        list_of_allowed_clients = allow_list
+        server_debug = debugging
+        if server_debug: logging.debug("Throttle Server: Starting Throttle Server Thread")
+        server_ready = threading.Event()
+        # Start the server thread
+        server_thread_handle = threading.Thread(target=lambda: asyncio.run(throttle_server_thread(server_ready, ip_str, ip_bytes)),daemon=True)
+        server_thread_handle.start()
+        # TIMEOUT 4: 5 seconds is plenty for a local socket bind
+        if server_debug: logging.debug("Throttle Server: Waiting for server thread to initialise...")
+        if server_ready.wait(timeout=5.0) and server_loop and server_loop.is_running():
+            dcc_power_state = library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
+            make_server_status_updated_callbacks()
+            logging.info("Throttle Server: Throttle Server has been Started")
+        else:
+            logging.error("Throttle Server: Throttle Server Thread could not be started")
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -628,7 +585,8 @@ def stop_throttle_server():
     if server_loop and server_loop.is_running():
         if server_debug: logging.debug("Throttle Server: Shutting down throttle server thread")
         # Trigger the asyncio.Event inside the thread
-        server_loop.call_soon_threadsafe(stop_event.set)
+        try: server_loop.call_soon_threadsafe(stop_event.set)
+        except: pass
         if server_thread_handle and server_thread_handle.is_alive():
             if server_debug: logging.debug("Throttle Server: Waiting for server thread to shut down...")
             # TIMEOUT 3: Don't let the GUI hang for more than 2 seconds
