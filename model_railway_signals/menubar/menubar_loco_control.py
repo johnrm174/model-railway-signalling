@@ -361,14 +361,18 @@ class loco_control(Tk.Toplevel):
         self.session_id = 0
         self.direction= None
         self.roster_entry = None
+        self.dcc_power_state = None
         # Set the window attributes
         self.title("Throttle")
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.resizable(False, False)
         self.wm_attributes("-topmost", True)
+        # Create the DCC Power State label
+        self.dccpower = Tk.Label(self, width=15)
+        self.dccpower.pack(padx=2, pady=2)
         # Create a frame For the Roster selection (frame1)
         self.frame1 = Tk.LabelFrame(self, text="Locomotive")
-        self.frame1.pack(padx=5,pady=5, fill="x")
+        self.frame1.pack(padx=5,pady=2, fill="x")
         self.default_selection = "<Select Loco>"
         self.loco_selection = Tk.StringVar(self, "")
         self.loco_selection.set(self.default_selection)
@@ -379,7 +383,7 @@ class loco_control(Tk.Toplevel):
         self.dccaddress.pack(padx=2, pady=2)
         # Create a frame to hold the Speed buttons, function buttons and slider (frame2)
         self.frame2 = Tk.LabelFrame(self, text="Speed")
-        self.frame2.pack(padx=5,pady=5, fill="x")
+        self.frame2.pack(padx=5,pady=2, fill="x")
         # Create subframes to arrange the UI elements
         self.subframe1 = Tk.Frame(self.frame2)
         self.subframe1.pack(side=Tk.LEFT, fill="y")
@@ -417,7 +421,7 @@ class loco_control(Tk.Toplevel):
         self.throttle.pack(padx=5, pady=5)
         # Create a frame for the Forward and reverse buttons (frame3)
         self.frame3 = Tk.LabelFrame(self, text="Direction")
-        self.frame3.pack(padx=5,pady=5, fill="x")
+        self.frame3.pack(padx=5,pady=2, fill="x")
         self.reverse = Tk.Button(self.frame3, width=3, text="Rev", command=lambda:self.direction_updated(False))
         self.reverse.pack(side=Tk.LEFT, padx=5, pady=5)
         self.forward = Tk.Button(self.frame3, width=3, text="Fwd", command=lambda:self.direction_updated(True))
@@ -426,7 +430,7 @@ class loco_control(Tk.Toplevel):
         self.reverse.configure(font=button_font)
         # Create a frame For the Emergency Stop Button (frame4)
         self.frame4 = Tk.LabelFrame(self, text="Emergency Stop")
-        self.frame4.pack(padx=5,pady=5, fill="x")
+        self.frame4.pack(padx=5,pady=2, fill="x")
         self.emergencystop = Tk.Button(self.frame4, text="Stop", bg="pink2", activebackground="pink1",
                                         width=8, command=self.emergency_stop)
         self.emergencystop.pack(padx=5, pady=5, fill="x")
@@ -447,6 +451,16 @@ class loco_control(Tk.Toplevel):
         self.roster_updated()
         # Register the callback for future roster updates
         registered_callbacks.append(self.roster_updated)
+        # Register for DCC Power status changes
+        library.subscribe_to_dcc_power_updates(self.dcc_power_status_updated)
+
+    def dcc_power_status_updated(self, dcc_power_state:bool):
+        self.dcc_power_state = dcc_power_state
+        self.bold_font = TkFont.Font(font=self.dccpower.cget("font"))
+        self.bold_font.configure(weight="bold")
+        if dcc_power_state == True: self.dccpower.config(text="DCC Power: ON", fg="green4", font=self.bold_font)
+        elif dcc_power_state == False: self.dccpower.config(text="DCC Power: OFF", fg="red", font=self.bold_font)
+        else: self.dccpower.config(text="DCC Power: ????", fg="orange3", font=self.bold_font)
 
     #--------------------------------------------------------------------
     # Function to update the available loco selections from the Roster
