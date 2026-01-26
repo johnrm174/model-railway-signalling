@@ -1482,11 +1482,11 @@ class edit_server_settings():
             #----------------------------------------------------------------------------------
             # Create Server Controls
             #----------------------------------------------------------------------------------
-            self.frame2 = Tk.LabelFrame(self.window, text="Server Controls/Staus")
-            self.frame2.pack(padx=5, pady=5, fill="x")
-            self.serverstatus = Tk.Label(self.frame2, width=20)
+            self.frame3 = Tk.LabelFrame(self.window, text="Server Controls/Staus")
+            self.frame3.pack(padx=5, pady=5, fill="x")
+            self.serverstatus = Tk.Label(self.frame3, width=20)
             self.serverstatus.pack(padx=2, pady=2)
-            self.subframe1 = Tk.Frame(self.frame2)
+            self.subframe1 = Tk.Frame(self.frame3)
             self.subframe1.pack()
             self.B1 = Tk.Button(self.subframe1, text="Apply and Start Server", command=self.apply_and_start_server)
             self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
