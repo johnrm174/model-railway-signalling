@@ -50,13 +50,14 @@
 #   enable_status_reporting(callback) - Enable reporting
 #   disable_status_reporting() - Disable Reporting
 #
-#   subscribe_to_dcc_power_updates (callback) - subscribe to DCC power state changes
-#   unsubscribe_from_dcc_power_updates - unsubscribe from DCC power state changes
+#   subscribe_to_dcc_power_updates(callback) - subscribe to DCC power state changes
+#   unsubscribe_from_dcc_power_updates(callback) - unsubscribe from DCC power state changes
 #
 #   request_loco_session(dcc_address) - generates a loco session and returns session_id
 #   release_loco_session(session_id) - releases the locomotive session
 #   set_loco_speed_and_direction(session_id:int, speed:int, forward:bool)
 #   send_emergency_stop(session_id) - Emergency Stops the loco
+#   set_loco_function(session_id:int, function_id:int, state:bool)
 #
 # API functions used associated with DCC-command-triggered sounds:
 #   add_dcc_sound_mapping(address:int, state:bool, fully_qualified_sound_filename:str):
@@ -113,7 +114,6 @@ debug = False                       # Enhanced Debug logging - set by the sprog_
 ton_response = False                # Flag to confirm that we have had a response that track power is on
 tof_response = False                # Flag to confirm that we have had a response that track power is off
 rstat_response = False              # Flag to confirm we have had a RSTAT response (on initialisation)
-qnn_response = False                # Flag to confirm we have had a PNN response
 service_mode_response = None        # The response code from the sstat response (program a CV)
 service_mode_cv_value = None        # The returned value from the pcvs response (query a CV)
 service_mode_cv_address = None      # The reported CV address from the pcvs response
@@ -135,9 +135,17 @@ output_buffer = queue.Queue()
 # short accessory commands (1 = No Offset, 2 = Plus 4 Offset, 3 = minus 4 Offset)
 address_mode = 1
 
-# Global variable to hold the SPROG status callback reference
-status_callback = None
+# Global variable to hold the SPROG connectionstatus callback reference
+sprog_status_callback = None
+
+# locomotive_sessions is a dict, comprising an entry for each session
+# {"loco_address": session_id:int, heartbeat:tkinter_reference}
+locomotive_sessions={}
+
+# Global variable to hold the SPROG/DCC Power status and callback references
+registered_dcc_power_state_callbacks = []
 dcc_power_is_on = None
+
 
 #------------------------------------------------------------------------------
 # Common function used by the main thread to wait for responses in other threads.
@@ -282,7 +290,7 @@ def thread_to_read_received_data ():
 #------------------------------------------------------------------------------
 
 def report_status(status:dict):
-    if status_callback is not None: status_callback(status)
+    if sprog_status_callback is not None: sprog_status_callback(status)
 
 #------------------------------------------------------------------------------
 # Internal function to process Accessory Data Commands (Voltage / Current reporting)
@@ -645,7 +653,7 @@ def sprog_disconnect():
     pi_sprog_disconnected = False
     if serial_port.is_open:
         # Ensure Status reporting is turned off before we disconnect
-        if status_callback is not None:
+        if sprog_status_callback is not None:
             disable_status_reporting()
             time.sleep(0.3)
         if debug: logging.debug("Pi-SPROG: Shutting down Tx and Rx Threads")
@@ -698,8 +706,6 @@ def query_command_station_status():
 # Returns immediately with the current state (None if unknown)
 #------------------------------------------------------------------------------
 
-registered_dcc_power_state_callbacks = []
-
 def subscribe_to_dcc_power_updates(callback):
     global registered_dcc_power_state_callbacks
     if callback not in registered_dcc_power_state_callbacks:
@@ -734,17 +740,16 @@ def request_dcc_power_on():
         # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
         send_cbus_command (mj_pri=0, min_pri=0, op_code=0x09)
         # Wait for the response (with a 1 second timeout)
-        wait_for_response(5.0, response_received)
-        # Give things time to get established before sending out any commands
-        # Tell the application to send out any DCC commands that may have been 'issued' before
-        # DCC Power was turned on but not transmitted (as they would have been silently ignored)
-        # We also transmit the DCC power state to anyone who has registered a callback
+        wait_for_response(1.0, response_received)
         if ton_response:
             dcc_power_is_on = True
-            make_dcc_power_updated_callbacks()
             logging.info("Pi-SPROG: Track power has been turned ON")
-            # Wait until things have stabilised before sending out any messages
-            # Testing on my layout has indicated we need at least a second to be sure
+            # Transmit the DCC power state to all registered callbacks
+            make_dcc_power_updated_callbacks()
+            # Tell the application to send out any DCC commands that may have been 'issued' before
+            # DCC Power was turned on but not transmitted (as they would have been silently ignored)
+            # We wait until things have stabilised before sending out any messages - Testing on my
+            # layout has indicated that we need up to a second before DCC commands will be accepted
             common.root_window.after(1000, common.sprog_transmit_all)
         else:
             logging.error("Pi-SPROG: Request to turn on Track Power failed")
@@ -766,11 +771,12 @@ def request_dcc_power_off():
         # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
         send_cbus_command(mj_pri=0, min_pri=0, op_code=0x08)
         # Wait for the response (with a 1 second timeout)
-        wait_for_response(5.0, response_received)
+        wait_for_response(1.0, response_received)
         if tof_response:
             dcc_power_is_on = False
-            make_dcc_power_updated_callbacks()
             logging.info("Pi-SPROG: Track power has been turned OFF")
+            # Transmit the DCC power state to all registered callbacks
+            make_dcc_power_updated_callbacks()
         else:
             logging.error("Pi-SPROG: Request to turn off Track Power failed")
     return(tof_response)
@@ -781,7 +787,7 @@ def request_dcc_power_off():
 #------------------------------------------------------------------------------
 
 def request_status_report():
-    if status_callback is not None and serial_port.is_open:
+    if sprog_status_callback is not None and serial_port.is_open:
         if debug: logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
         send_cbus_command(mj_pri=0, min_pri=0, op_code=0x0C)
         # Schedule the next poll in 2000ms (2 seconds)
@@ -789,8 +795,8 @@ def request_status_report():
     return()
 
 def enable_status_reporting(callback):
-    global status_callback
-    status_callback = callback
+    global sprog_status_callback
+    sprog_status_callback = callback
     if serial_port.is_open:
         # NVSET (OpCode 0x96) - Write to Node Variable 10 to enable telemetry
         # Logic: mj_pri=0, min_pri=2, op_code=0x96, Data: NN_high, NN_low, NV_index, NV_value
@@ -804,8 +810,8 @@ def enable_status_reporting(callback):
         return()
 
 def disable_status_reporting():
-    global status_callback
-    status_callback = None
+    global sprog_status_callback
+    sprog_status_callback = None
     if serial_port.is_open:
         logging.debug("Pi-SPROG: Disabling SPROG Telemetry Reporting (NVSET Command)")
         # NVSET (OpCode 0x96) - Write 0 to Node Variable 10 to disable telemetry
@@ -977,13 +983,9 @@ def service_mode_write_cv(cv:int, value:int):
 #     Session Keep Alive (DKEEP) - Opcode 0x23
 #     Release Locomotove (KLOC) - Opcode 0x21
 #     Set Loco Speed and Direction (DSPD) - Opcode 0x47
-#     set_loco_function  (DFNON/DFNOF) - Opcodes 0x49/0x4A
+#     set_loco_function (DFNON/DFNOF) - Opcodes 0x49/0x4A
 #
 #########################################################################################
-
-# locomotive_sessions is a dict, comprising an entry for each session
-# {"loco_address": session_id:int, heartbeat:tkinter_reference}
-locomotive_sessions={}
 
 #------------------------------------------------------------------------------
 # Internal Helper function to find the dcc address for a session (0 if not found)
@@ -1003,6 +1005,7 @@ def find_dcc_address_for_session(session_id:int):
 #------------------------------------------------------------------------------
 
 def request_loco_session(dcc_address:int):
+    global locomotive_sessions
     def response_received(): return(locomotive_sessions[str(dcc_address)]["sessionid"] > 0)
     session_id_to_return = 0
     if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
@@ -1065,6 +1068,7 @@ def send_loco_keep_alive(session_id:int):
 #------------------------------------------------------------------------------
 
 def release_loco_session(session_id:int):
+    global locomotive_sessions
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: release_loco_session - Invalid Session ID {session_id} - must be an int")
     else:
@@ -1090,6 +1094,7 @@ def release_loco_session(session_id:int):
 #------------------------------------------------------------------------------
 
 def process_ploc_message(byte_string):
+    global locomotive_sessions
     logging.debug("Pi-SPROG: Rx thread - Received PLOC (Engine Report) message")
     # Process the message (with exception handling just in case)
     try:
