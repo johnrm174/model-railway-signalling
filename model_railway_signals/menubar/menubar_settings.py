@@ -1498,7 +1498,6 @@ class edit_server_settings():
             self.label.pack(padx=2, pady=2)
             self.bold_font = TkFont.Font(font=self.label.cget("font"))
             self.bold_font.configure(weight="bold")
-
             # This is the reference to the Frame we use to hold the list of connected clients
             self.connected_clients = None
             #----------------------------------------------------------------------------------
