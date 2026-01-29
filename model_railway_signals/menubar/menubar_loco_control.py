@@ -14,6 +14,7 @@
 import json
 import tkinter as Tk
 from tkinter import font as TkFont
+from tkinter import ttk
 
 from .. import common
 from .. import library
@@ -33,12 +34,26 @@ registered_callbacks=[]
 # Class for a function_key_entry (Function name and momentary/latching)
 #------------------------------------------------------------------------------------
 
+class function_key_name_entry(common.entry_box):
+    def __init__(self, parent):
+        super().__init__(parent, width=10, tool_tip="Enter the label for the function key (or leave blank to disable)")
+        
+    def validate(self):
+        if len(self.get()) > 10:
+            self.TT.text = ("Can only specify up to 10 characters")
+            valid = False
+        else:
+            valid = True
+        self.set_validation_status(valid)            
+        return(valid)
+    
+    
 class function_key_entry(Tk.LabelFrame):
     def __init__(self, parent_frame, label:str):
         super().__init__(parent_frame)
         self.label = Tk.Label(self, text=label, width=3)
         self.label.pack(side=Tk.LEFT, padx=0, pady=0)
-        self.funcname = common.entry_box(self, width=10, tool_tip="Enter the label for the function key (or leave blank to disable)")
+        self.funcname = function_key_name_entry(self)
         self.funcname.pack(side=Tk.LEFT, padx=0, pady=0)
         self.latching=common.check_box(self, label="", tool_tip="Check for Latching function (uncheck for momentary function)")
         self.latching.pack(side=Tk.LEFT, padx=0, pady=0)
@@ -52,13 +67,7 @@ class function_key_entry(Tk.LabelFrame):
         return( [self.funcname.get_value(), self.latching.get_value()] )
     
     def validate(self):
-        if len(self.funcname.get()) > 12:
-            self.funcname.TT.text = ("Can only specify up to 12 characters")
-            valid = False
-        else:
-            valid = True
-        self.funcname.set_validation_status(valid)            
-        return(valid)
+        return(self.funcname.validate())
 
 #------------------------------------------------------------------------------------
 # Class for a row of 11 function_key_entries (F0-F10)
@@ -168,6 +177,64 @@ class grid_of_roster_entries(common.grid_of_widgets):
                 values_to_return.append(entered_value)
         return(values_to_return)
 
+
+#------------------------------------------------------------------------------------
+# Class for a variable length list of Roster Tabs (each with a grid of roster entries
+#------------------------------------------------------------------------------------
+
+class roster_tabs(Tk.Frame):
+    def __init__(self, parent_window):
+        super().__init__(parent_window)
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(expand=True, fill="both")
+        self.list_of_roster_tabs = []
+
+    def set_values(self, list_of_roster_entries: list):
+        # Clear existing tabs down
+        for tab in self.list_of_roster_tabs:
+            self.notebook.forget(tab)
+            tab.destroy()
+        self.list_of_roster_tabs = []
+        # Handle the empty list case - If no data, we create one empty chunk
+        if not list_of_roster_entries:
+            display_chunks = [[]] 
+        else:
+            items_per_tab = 8
+            # Create a list of chunks (lists of 8)
+            display_chunks = [list_of_roster_entries[i : i + items_per_tab] 
+                              for i in range(0, len(list_of_roster_entries), items_per_tab)]
+        # Create the tabs to display each chunk (as many tabs as we need
+        for index, chunk in enumerate(display_chunks):
+            new_grid = grid_of_roster_entries(self.notebook)
+            # Populate the grid (it will just be empty if chunk is [])
+            new_grid.set_values(chunk)
+            self.list_of_roster_tabs.append(new_grid)
+            self.notebook.add(new_grid, text=f"Page {index + 1}")
+            
+    def get_values(self):
+        entries_to_return = []
+        for roster_grid in self.list_of_roster_tabs:
+            tab_data = roster_grid.get_values()
+            if isinstance(tab_data, list):
+                entries_to_return.extend(tab_data)
+        return(entries_to_return)
+
+    def add_blank_tab(self):
+        new_grid = grid_of_roster_entries(self.notebook)
+        # Pass an empty list to initialize a blank grid
+        new_grid.set_values([]) 
+        self.list_of_roster_tabs.append(new_grid)
+        tab_label = f"Page {len(self.list_of_roster_tabs)}"
+        self.notebook.add(new_grid, text=tab_label)
+        # Switch focus to the newly created tab
+        self.notebook.select(new_grid)
+
+    def validate(self):
+        valid = True
+        for index, roster_grid in enumerate(self.list_of_roster_tabs):
+            if not roster_grid.validate(): valid = False
+        return(valid)
+    
 #------------------------------------------------------------------------------------
 # Class for the Roster window - We only allow a single window to be opened.
 #------------------------------------------------------------------------------------
@@ -193,8 +260,8 @@ class edit_roster():
             self.frame1 = Tk.LabelFrame(self.window, text="Available locomotives")
             self.frame1.pack(padx=5, pady=5)
             # Create the grid of Roster entries
-            self.rosterentries = grid_of_roster_entries(self.frame1)
-            self.rosterentries.pack(padx=5,pady=5)
+            self.rosterentries = roster_tabs(self.frame1)
+            self.rosterentries.pack(padx=5, pady=5)
             # Create the Import/Export andcommon Apply/OK/Reset/Cancel buttons for the window
             self.frame2 = Tk.Frame(self.window)
             self.frame2.pack(fill=Tk.X, pady=5) # Allow frame to stretch across the window
@@ -203,19 +270,21 @@ class edit_roster():
             self.frame2.columnconfigure(0, weight=1, uniform="group1")
             self.frame2.columnconfigure(1, weight=0) # Center column stays tight to content
             self.frame2.columnconfigure(2, weight=1, uniform="group1")
-            # 1. Import/Export Group (Left Side)
+            # Import/Export Function Buttons (Left Side)
             self.left_group = Tk.Frame(self.frame2)
             self.left_group.grid(row=0, column=0, sticky="w", padx=5)
             self.B1 = Tk.Button(self.left_group, text="Import Roster from file", command=self.import_roster)
             self.B1.pack(side=Tk.LEFT, padx=2)
             self.B2 = Tk.Button(self.left_group, text="Export Roster to File", command=self.export_roster)
             self.B2.pack(side=Tk.LEFT, padx=2)
-            # 2. Control Buttons (Center)
+            # Standard window Control Buttons (Center)
             self.controls = common.window_controls(self.frame2, self.load_state, self.save_state, self.close_window)
             self.controls.grid(row=0, column=1, padx=2, pady=2)
-            # 3. Dummy spacer (Right Side)
-            self.right_spacer = Tk.Frame(self.frame2)
-            self.right_spacer.grid(row=0, column=2, sticky="e")
+            # New Tab Button (Right Side)
+            self.right_group = Tk.Frame(self.frame2)
+            self.right_group.grid(row=0, column=2, sticky="e", padx=5)
+            self.B3 = Tk.Button(self.right_group, text="New Roster Tab", command=self.rosterentries.add_blank_tab)
+            self.B3.pack(side=Tk.RIGHT)
             # Load the initial UI state
             self.load_state()
 
@@ -587,7 +656,6 @@ class loco_control(Tk.Toplevel):
     # Callback function for the Function Buttons
     def function_updated(self, function_id:int, button_id: int):
         button_state = self.function_buttons[button_id].state
-        print(function_id, button_state)
         library.set_loco_function(self.session_id, function_id, button_state)
 
     #-------------------------------------------------------------------------------------------
