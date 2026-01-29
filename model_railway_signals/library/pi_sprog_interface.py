@@ -1210,6 +1210,30 @@ def set_loco_function(session_id:int, function_id:int, state:bool):
                    (2 if locomotive["functions"].get("10") else 0) | \
                    (1 if locomotive["functions"].get("9") else 0)
             send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+        # Range 4: F13, F14, F15, F16, F17, F18, F19, F20
+        elif 13 <= function_id <= 20:
+            range_id = 4
+            mask = (128 if locomotive["functions"].get("20") else 0) | \
+                   (64  if locomotive["functions"].get("19") else 0) | \
+                   (32  if locomotive["functions"].get("18") else 0) | \
+                   (16  if locomotive["functions"].get("17") else 0) | \
+                   (8   if locomotive["functions"].get("16") else 0) | \
+                   (4   if locomotive["functions"].get("15") else 0) | \
+                   (2   if locomotive["functions"].get("14") else 0) | \
+                   (1   if locomotive["functions"].get("13") else 0)
+            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+        # Range 5: F21, F22, F23, F24, F25, F26, F27, F28
+        elif 21 <= function_id <= 28:
+            range_id = 5
+            mask = (128 if locomotive["functions"].get("28") else 0) | \
+                   (64  if locomotive["functions"].get("27") else 0) | \
+                   (32  if locomotive["functions"].get("26") else 0) | \
+                   (16  if locomotive["functions"].get("25") else 0) | \
+                   (8   if locomotive["functions"].get("24") else 0) | \
+                   (4   if locomotive["functions"].get("23") else 0) | \
+                   (2   if locomotive["functions"].get("22") else 0) | \
+                   (1   if locomotive["functions"].get("21") else 0)
+            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
         logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
     else:
         logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
