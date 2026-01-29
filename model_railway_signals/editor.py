@@ -101,10 +101,13 @@
 #------------------------------------------------------------------------------------
 
 import os
+import sys
 import tkinter as Tk
 import logging
 import argparse
 import pathlib
+import queue
+from logging.handlers import QueueHandler, QueueListener
 
 from . import objects
 from . import settings
@@ -132,8 +135,6 @@ class main_menubar:
         # Subscribe to DCC Power state changes and throttle server
         library.subscribe_to_dcc_power_updates(self.dcc_power_state_updated)
         throttle_server.subscribe_to_server_status(self.throttle_server_state_updated)
-        # Configure the logger (log level gets set later)
-        logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
         self.root = root
         self.mainmenubar = Tk.Menu(self.root)
@@ -940,7 +941,29 @@ class main_menubar:
 
 def run_editor():
     print("Starting Model Railway Signalling application")
+    #---------------------------------------------------------------------------------
+    # Set up the logging (we use queues to avoind locking problems betweeen threads)
+    #---------------------------------------------------------------------------------
+    # Get the root logger
+    current_logger = logging.getLogger()
+    # REMOVE any existing handlers to prevent duplicates
+    while current_logger.handlers: current_logger.removeHandler(current_logger.handlers[0])
+    # Create a queue for log records
+    log_queue = queue.Queue(-1) # Infinite size
+    # Setup the Terminal Handler (StreamHandler)
+    console_handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+    console_handler.setFormatter(formatter)
+    # Create the Listener that runs in the background
+    # This listener will pull logs from the queue and send them to the file_handler
+    log_listener = QueueListener(log_queue, console_handler)
+    log_listener.start()
+    # Configure the root logger to use the QueueHandler
+    root_logger = logging.getLogger()
+    root_logger.addHandler(QueueHandler(log_queue))
+    #---------------------------------------------------------------------------------
     # Create the Main Root Window
+    #---------------------------------------------------------------------------------
     root = Tk.Tk()
     # Configure Tkinter to not show hidden files in the file open/save dialogs
     # Full credit to Stack Overflow for the solution to this problem
@@ -963,7 +986,9 @@ def run_editor():
     main_window_menubar = main_menubar(root)
     # Bind the close window event to the editor quit function to perform an orderly shutdown
     root.protocol("WM_DELETE_WINDOW", main_window_menubar.quit_schematic)
+    #---------------------------------------------------------------------------------
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
+    #---------------------------------------------------------------------------------
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
