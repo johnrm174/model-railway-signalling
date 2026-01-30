@@ -262,8 +262,8 @@ async def handle_client(reader, writer):
                 if message.startswith("M"):
                     # Get the Index for our internal dictionary of registered locos
                     throttle_index = message[1] 
-                    # Get the Full Key (for replying to the app, e.g., '0' or 'T0')
-                    full_key_match = re.match(r"M([^+\-VRFL<q]+)", message)
+                    # Get the Full Key (for replying to the app, e.g., '0' or 'T0') - allow the '*' wildcard
+                    full_key_match = re.match(r"M([^+\-VRFL<q*]+|[*])", message)
                     full_key = full_key_match.group(1) if full_key_match else throttle_index
                     # Get the Action part of the message
                     match = re.search(r"[+\-VRFL<q].*", message)
@@ -300,8 +300,12 @@ async def handle_client(reader, writer):
                             # Note that we only care about the DCC address here (not the loco_name)
                             session_id = library.request_loco_session(dcc_address_int)
                             if session_id > 0:
-                                # Session was successfully acquired - save it in the dict we use to track
-                                wi_sessions[throttle_index] = {"session_id": session_id,"addr_str": raw_address,"speed": 0,"forward": True}
+                                # Session was successfully acquired - save it in the dict we use to track 
+                                if throttle_index not in wi_sessions:
+                                    wi_sessions[throttle_index] = []
+                                # Append the new session to the list for this throttle
+                                wi_sessions[throttle_index].append({"session_id": session_id,
+                                            "addr_str": raw_address, "speed": 0, "forward": True })
                                 # Echo the loco acquisition back to the client 
                                 address_to_send = f"M{full_key}+{raw_address}<;>\n"
                                 writer.write(address_to_send.encode())
@@ -357,70 +361,63 @@ async def handle_client(reader, writer):
                     #-----------------------------------------------------------------------
                     # CONTROL & QUERIES (V, R, F, q, -) ---
                     #-----------------------------------------------------------------------
-                    if throttle_index in wi_sessions:
-                        session = wi_sessions[throttle_index]
-                        session_id = session["session_id"]
-                        address_str = session["addr_str"]
-                        # Handle Queries (qV, qR)
-                        if "qV" in rest_of_message:
-                            if server_debug:logging.debug("Throttle Server: Handling Query Speed Request")
-                            speed_response = f"M{full_key}AS{address_str}<;>V{session['speed']}\n"
-                            writer.write(speed_response.encode())
-                            if server_debug: logging.debug(f"Throttle Server: Sent Speed Response: {speed_response!r}")
-                            await writer.drain()
-                            continue
-                        if "qR" in rest_of_message:
-                            if server_debug:logging.debug("Throttle Server: Handling Query Direction Request")
-                            direction_value = 1 if session["forward"] else 0
-                            direction_response = f"M{full_key}AS{address_str}<;>R{direction_value}\n"
-                            writer.write(direction_response.encode())
-                            if server_debug: logging.debug(f"Throttle Server: Sent direction Response: {direction_response!r}")
-                            await writer.drain()
-                            continue
-                        # Clean the action string for control commands
-                        clean_action = rest_of_message.replace("<;>", "")
-                        # SPEED (V)
-                        if clean_action.startswith("V"):
-                            if server_debug:logging.debug("Throttle Server: Handling Speed Change Request")
-                            speed_value = int(clean_action[1:])
-                            session["speed"] = speed_value
-                            library.set_loco_speed_and_direction(session_id, session["speed"], session["forward"])
-                        # DIRECTION (R)
-                        elif clean_action.startswith("R"):
-                            if server_debug:logging.debug("Throttle Server: Handling Direction Change Request")
-                            direction_value = int(clean_action[1:])
-                            session["forward"] = (direction_value == 1)
-                            library.set_loco_speed_and_direction(session_id, session["speed"], session["forward"])
-                        # FUNCTION (F)
-                        elif clean_action.upper().startswith("F"):
-                            if server_debug:logging.debug("Throttle Server: Handling Function Change Request")
-                            try:
-                                state = (clean_action[1] == '1')
-                                func_id = int(clean_action[2:])
-                                library.set_loco_function(session_id, func_id, state)
-                                # Echo back to keep app buttons in sync
-                                function_response = f"M{full_key}AS{address_str}<;>{clean_action.upper()}\n"
-                                writer.write(function_response.encode())
-                                if server_debug: logging.debug(f"Throttle Server: Sent Function Response: {function_response!r}")
-                                await writer.drain()
-                            except Exception as e:
-                                logging.error(f"Function Error: {e}")
-                        # RELEASE (-)
-                        elif clean_action.startswith("-"):
-                            if server_debug:logging.debug("Throttle Server: Handling Release Locomotive Request")
-                            # Force Loco to stop and turn off functions in hardware before releasing
-                            library.set_loco_speed_and_direction(session_id, 0, False) # Speed 0, Reverse
-                            for function in range(maximum_no_of_functions):
-                                library.set_loco_function(session_id, function, False)
-                            # Release from the Pi-SPROG session
-                            library.release_loco_session(session_id)
-                            # Inform client the loco has been released
-                            release_loco_response = f"M{full_key}-*\n"
-                            writer.write(release_loco_response.encode())
-                            if server_debug:logging.debug(f"Throttle Server: Sent Release Locomotive response: {release_loco_response!r}")
-                            await writer.drain()
-                            # Remove the Session from the dict of sessions
-                            del wi_sessions[throttle_index]
+                    # 1. Parse the target: Is it a wildcard '*' or a specific address (e.g., 'S8')?
+                    target_match = re.search(r"A([^<;>]+)", message)
+                    msg_target = target_match.group(1) if target_match else "*"
+                    target_keys = [throttle_index] if throttle_index != "*" else list(wi_sessions.keys())
+                    for t_key in target_keys:
+                        if t_key in wi_sessions:
+                            for session in wi_sessions[t_key][:]:
+                                # Check if this specific session is the target
+                                is_target = (msg_target == "*" or msg_target == session["addr_str"])
+                                if not is_target:
+                                    continue
+                                session_id = session["session_id"]
+                                address_str = session["addr_str"]
+                                clean_action = rest_of_message.replace("<;>", "")
+                                # --- QUERY HANDLERS (Fixed) ---
+                                if "qV" in clean_action:
+                                    if server_debug: logging.debug(f"Throttle Server: Replying to Speed Query for {address_str}")
+                                    writer.write(f"M{full_key}AS{address_str}<;>V{session['speed']}\n".encode())
+                                    continue # Move to next session in consist
+                                if "qR" in clean_action:
+                                    if server_debug: logging.debug(f"Throttle Server: Replying to Direction Query for {address_str}")
+                                    dir_val = 1 if session["forward"] else 0
+                                    writer.write(f"M{full_key}AS{address_str}<;>R{dir_val}\n".encode())
+                                    continue
+                                # --- CONTROL HANDLERS ---
+                                # SPEED (V)
+                                if clean_action.startswith("V"):
+                                    speed_value = int(clean_action[1:])
+                                    session["speed"] = speed_value
+                                    library.set_loco_speed_and_direction(session_id, speed_value, session["forward"])
+                                    if server_debug: logging.debug(f"Consist Speed: {speed_value} for {address_str} (Fwd={session['forward']})")
+                                # DIRECTION (R)
+                                elif clean_action.startswith("R"):
+                                    direction_value = int(clean_action[1:])
+                                    session["forward"] = (direction_value == 1)
+                                    library.set_loco_speed_and_direction(session_id, session["speed"], session["forward"])
+                                    if server_debug: logging.debug(f"Consist Orientation: {address_str} set to {'Forward' if session['forward'] else 'Reverse'}")
+                                # FUNCTION (F)
+                                elif clean_action.upper().startswith("F"):
+                                    try:
+                                        state = (clean_action[1] == '1')
+                                        func_id = int(clean_action[2:])
+                                        library.set_loco_function(session_id, func_id, state)
+                                        writer.write(f"M{full_key}AS{address_str}<;>{clean_action.upper()}\n".encode())
+                                    except Exception as e:
+                                        logging.error(f"Function Error: {e}")
+                                # RELEASE (-)
+                                elif clean_action.startswith("-"):
+                                    library.set_loco_speed_and_direction(session_id, 0, False)
+                                    library.release_loco_session(session_id)
+                                    wi_sessions[t_key].remove(session)
+                                    writer.write(f"M{full_key}-{address_str}\n".encode())
+
+                            if not wi_sessions[t_key]:
+                                del wi_sessions[t_key]
+                    # IMPORTANT: This ensures the queries (and commands) actually get sent to the network
+                    await writer.drain()         
                     continue
                 #---------------------------------------------------------------------------
                 # Handle Quit notification (Client has gracefully disconnected)
@@ -439,19 +436,27 @@ async def handle_client(reader, writer):
                     continue
     finally:
         # This code runs no matter HOW the loop exits (Quit command, crash, or disconnect)
-        if server_debug: logging.debug(f"Throttle Server: Cleaning up session for {peer_ip_address}:{peer_port_number} ('{client_name}')")
-        for index in list(wi_sessions.keys()):
-            try:
-                session_id = wi_sessions[index]["session_id"]
-                dcc_address = wi_sessions[index]["addr_str"]
-                # Stop the loco, reset all the functions and Release the loco
-                library.set_loco_speed_and_direction(session_id, 0, False)
-                for function in range(maximum_no_of_functions):
-                    library.set_loco_function(session_id, function, False)
-                library.release_loco_session(session_id)
-                if server_debug: logging.debug(f"Throttle Server: Released session {session_id} for loco {dcc_address}")
-            except Exception as e:
-                logging.error(f"Throttle Server: Error releasing session during cleanup: {e}")
+        if server_debug: logging.debug(f"Throttle Server: Cleaning up all consists for {peer_ip_address}:{peer_port_number} ('{client_name}')")
+        # Iterate through every throttle key (e.g., '0', '1', 'T1')
+        for t_key in list(wi_sessions.keys()):
+            # Iterate through every locomotive in that throttle's consist
+            for session in wi_sessions[t_key]:
+                try:
+                    s_id = session["session_id"]
+                    dcc_addr = session["addr_str"]
+                    # 1. Emergency Stop the loco
+                    library.set_loco_speed_and_direction(s_id, 0, False)
+                    # 2. Kill all functions
+                    for f_idx in range(maximum_no_of_functions):
+                        library.set_loco_function(s_id, f_idx, False)
+                    # 3. Release the session in the Pi-SPROG hardware
+                    library.release_loco_session(s_id)
+                    if server_debug: 
+                        logging.debug(f"Throttle Server: Cleanup Released Session {s_id} for loco {dcc_addr}")
+                except Exception as e:
+                    logging.error(f"Throttle Server: Error cleaning up session {s_id}: {e}")
+            # Remove the throttle key after its consist is cleared
+            del wi_sessions[t_key]                
         # Close the socket properly
         connected_clients.discard(writer)
         try:
