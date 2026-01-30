@@ -1,6 +1,6 @@
 {
    "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/lenz_standard_v2_8pin.cvc",
-   "documentation": "CV Configuraation for a Lenz Standard +v2 8 pin decoder\nCV29 Bits are: 0 direction (0=Norm), 1 Speed Steps (1=28/128), 2 Analogue (0=DCC only)\n           3 Railcom (0=disabled), 4 Speed Curve (0=use CV 2/5/6), 5 Addressing (0=short)",
+   "documentation": "CV Configuraation for a Lenz Standard +v2 8 pin decoder\nCV29 Bits are: 0 direction (0=Norm), 1 Speed Steps (1=28/128), 2 Analogue (0=DCC only)\n        3 Railcom (0=disabled), 4 Speed Curve (0=use CV 2/5/6), 5 Addressing (0=short)",
    "configuration": [
       [
          1,
