@@ -462,9 +462,9 @@ class loco_control(Tk.Toplevel):
         self.subframe3 = Tk.Frame(self.frame2)
         self.subframe4 = Tk.Frame(self.frame2)
         # Create the speed increase/decrease buttons (subframe1)
-        self.increase = Function_button(self.subframe1, width=5, text="+" )
+        self.increase = Function_button(self.subframe1, width=2, text="+" )
         self.increase.pack(side=Tk.TOP, padx=5, pady=5)
-        self.decrease = Function_button(self.subframe1, width=5, text="-")
+        self.decrease = Function_button(self.subframe1, width=2, text="-")
         self.decrease.pack(side=Tk.BOTTOM, padx=5, pady=5)
         button_font = TkFont.Font(font=self.increase.cget("font"))
         button_font.configure(weight="bold",size=18)
@@ -782,20 +782,22 @@ class loco_control(Tk.Toplevel):
     # This is the callback function for the (+) and (-) buttons.
     # Note we 'throttle' the rate of change to once every 25ms
     def inc_dec_speed(self, increase:bool=None, stop:bool=False):
-        # Always cancel the next event
-        if self.next_event is not None:
-            self.after_cancel(self.next_event)
-            self.next_event = None
-        if stop: return()
-        # Update the speed
-        current_speed_value = self.throttle.get()
-        if increase == True and current_speed_value < 127: current_speed_value += 1
-        if increase == False and current_speed_value > 0: current_speed_value -= 1
-        # Set the Throttle Slider to the new Value
-        self.throttle.set(current_speed_value)
-        self.speed_updated(current_speed_value)
-        # Schedule the next speed command transmititon (in 25 ms)
-        self.next_event = self.after(25, lambda:self.inc_dec_speed(increase, stop))
+        # Only process the change if the buttons are enabled
+        if self.increase.cget("state") !="disabled":
+            # Always cancel the next event
+            if self.next_event is not None:
+                self.after_cancel(self.next_event)
+                self.next_event = None
+            if stop: return()
+            # Update the speed
+            current_speed_value = self.throttle.get()
+            if increase == True and current_speed_value < 127: current_speed_value += 1
+            if increase == False and current_speed_value > 0: current_speed_value -= 1
+            # Set the Throttle Slider to the new Value
+            self.throttle.set(current_speed_value)
+            self.speed_updated(current_speed_value)
+            # Schedule the next speed command transmititon (in 25 ms)
+            self.next_event = self.after(25, lambda:self.inc_dec_speed(increase, stop))
 
     # This is the callback function for the Throttle Slider. It also gets called
     # from the function above if the slider has been changed by the + or - buttons
