@@ -1022,12 +1022,15 @@ def request_loco_session(dcc_address:int):
                 locomotive_sessions[str(dcc_address)]["functions"][str(function_id)] = False
             # Range of Addresses that can be used is 1 to 10239
             if dcc_address < 128:
-                # Standard Short Address - Use 0x01 to set the 'Steal' bit on high byte
-                addr_hi = 0x01
+                # Short Address (Standard)
+                # CBUS expects the high byte to be 0 for short addresses
+                addr_hi = 0x00
                 addr_lo = dcc_address
             else:
-                # Extended Addresses - Use raw hex and set the steal bit
-                addr_hi = (dcc_address >> 8) | 0xC1
+                # Long Address (Extended)
+                # CBUS requires the top two bits of the 16-bit word to be 11 (0xC0)
+                # This identifies it to the command station as a Long Address.
+                addr_hi = (dcc_address >> 8) | 0xC0
                 addr_lo = dcc_address & 0xFF
             # Request the session and wait for a response
             send_cbus_command(2, 2, 0x40, addr_hi, addr_lo)
@@ -1146,19 +1149,20 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_
         logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid Session ID {session_id} - must be an int")
     elif not isinstance(speed, int) or speed < 0 or speed > 127:
         logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid speed for session {session_id} - must be an int (0-127)")
-    # Inhibit the Emergency Stop (unless overridden in the function call)
-    if not allow_emergency_stop and speed == 1: speed = 0
-    # Direction bit: 1 for Forward, 0 for Reverse
-    # Speed is in the range 0-127 where 0 is normal Stop and 1 is Emergency Stop
-    dcc_address = find_dcc_address_for_session(session_id)
-    if dcc_address > 0:
-        dir_val = 128 if forward else 0
-        # DCC Speed 1 is usually Emergency Stop, so we map 0-127
-        speed_byte = (speed & 0x7F) | dir_val
-        logging.debug(f"Pi-SPROG: Locomotive Session {session_id} Speed {speed} Forward {forward}")
-        send_cbus_command(2, 2, 0x47, session_id, speed_byte)
     else:
-        logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Session {session_id} not found")
+        # Inhibit the Emergency Stop (unless overridden in the function call)
+        if not allow_emergency_stop and speed == 1: speed = 0
+        # Direction bit: 1 for Forward, 0 for Reverse
+        # Speed is in the range 0-127 where 0 is normal Stop and 1 is Emergency Stop
+        dcc_address = find_dcc_address_for_session(session_id)
+        if dcc_address > 0:
+            dir_val = 128 if forward else 0
+            # DCC Speed 1 is usually Emergency Stop, so we map 0-127
+            speed_byte = (speed & 0x7F) | dir_val
+            logging.debug(f"Pi-SPROG: Locomotive Session {session_id} Speed {speed} Forward {forward}")
+            send_cbus_command(2, 2, 0x47, session_id, speed_byte)
+        else:
+            logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Session {session_id} not found")
     return()
 
 #------------------------------------------------------------------------------
@@ -1177,66 +1181,67 @@ def send_emergency_stop(session_id:int):
 def set_loco_function(session_id:int, function_id:int, state:bool):
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: set_loco_function - Invalid Session ID {session_id} - must be an int")
-    elif not isinstance(function_id, int) or function_id < 0 or function_id > 12:
+    elif not isinstance(function_id, int) or function_id < 0 or function_id > 28:
         logging.error(f"Pi-SPROG: set_loco_function - Invalid function ID {function_id} for session {session_id} - must be 0-28")
-    # Check if the session is valid before sending
-    dcc_address = find_dcc_address_for_session(session_id)
-    if dcc_address > 0:
-        # Update the persistant state in the local dictionary:
-        locomotive_sessions[str(dcc_address)]["functions"][str(function_id)] = state
-        locomotive = locomotive_sessions[str(dcc_address)]
-        # Range 1: F0, F1, F2, F3, F4
-        if 0 <= function_id <= 4:
-            range_id = 1
-            mask = (16 if locomotive["functions"].get("0") else 0) | \
-                   (8  if locomotive["functions"].get("4") else 0) | \
-                   (4  if locomotive["functions"].get("3") else 0) | \
-                   (2  if locomotive["functions"].get("2") else 0) | \
-                   (1  if locomotive["functions"].get("1") else 0)
-            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
-        # Range 2: F5, F6, F7, F8
-        elif 5 <= function_id <= 8:
-            range_id = 2
-            mask = (8 if locomotive["functions"].get("8") else 0) | \
-                   (4 if locomotive["functions"].get("7") else 0) | \
-                   (2 if locomotive["functions"].get("6") else 0) | \
-                   (1 if locomotive["functions"].get("5") else 0)
-            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)        
-        # Range 3: F9, F10, F11, F12
-        elif 9 <= function_id <= 12:
-            range_id = 3
-            mask = (8 if locomotive["functions"].get("12") else 0) | \
-                   (4 if locomotive["functions"].get("11") else 0) | \
-                   (2 if locomotive["functions"].get("10") else 0) | \
-                   (1 if locomotive["functions"].get("9") else 0)
-            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
-        # Range 4: F13, F14, F15, F16, F17, F18, F19, F20
-        elif 13 <= function_id <= 20:
-            range_id = 4
-            mask = (128 if locomotive["functions"].get("20") else 0) | \
-                   (64  if locomotive["functions"].get("19") else 0) | \
-                   (32  if locomotive["functions"].get("18") else 0) | \
-                   (16  if locomotive["functions"].get("17") else 0) | \
-                   (8   if locomotive["functions"].get("16") else 0) | \
-                   (4   if locomotive["functions"].get("15") else 0) | \
-                   (2   if locomotive["functions"].get("14") else 0) | \
-                   (1   if locomotive["functions"].get("13") else 0)
-            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
-        # Range 5: F21, F22, F23, F24, F25, F26, F27, F28
-        elif 21 <= function_id <= 28:
-            range_id = 5
-            mask = (128 if locomotive["functions"].get("28") else 0) | \
-                   (64  if locomotive["functions"].get("27") else 0) | \
-                   (32  if locomotive["functions"].get("26") else 0) | \
-                   (16  if locomotive["functions"].get("25") else 0) | \
-                   (8   if locomotive["functions"].get("24") else 0) | \
-                   (4   if locomotive["functions"].get("23") else 0) | \
-                   (2   if locomotive["functions"].get("22") else 0) | \
-                   (1   if locomotive["functions"].get("21") else 0)
-            send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
-        logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
     else:
-        logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
+        # Check if the session is valid before sending
+        dcc_address = find_dcc_address_for_session(session_id)
+        if dcc_address > 0:
+            # Update the persistant state in the local dictionary:
+            locomotive_sessions[str(dcc_address)]["functions"][str(function_id)] = state
+            locomotive = locomotive_sessions[str(dcc_address)]
+            # Range 1: F0, F1, F2, F3, F4
+            if 0 <= function_id <= 4:
+                range_id = 1
+                mask = (16 if locomotive["functions"].get("0") else 0) | \
+                       (8  if locomotive["functions"].get("4") else 0) | \
+                       (4  if locomotive["functions"].get("3") else 0) | \
+                       (2  if locomotive["functions"].get("2") else 0) | \
+                       (1  if locomotive["functions"].get("1") else 0)
+                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+            # Range 2: F5, F6, F7, F8
+            elif 5 <= function_id <= 8:
+                range_id = 2
+                mask = (8 if locomotive["functions"].get("8") else 0) | \
+                       (4 if locomotive["functions"].get("7") else 0) | \
+                       (2 if locomotive["functions"].get("6") else 0) | \
+                       (1 if locomotive["functions"].get("5") else 0)
+                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+            # Range 3: F9, F10, F11, F12
+            elif 9 <= function_id <= 12:
+                range_id = 3
+                mask = (8 if locomotive["functions"].get("12") else 0) | \
+                       (4 if locomotive["functions"].get("11") else 0) | \
+                       (2 if locomotive["functions"].get("10") else 0) | \
+                       (1 if locomotive["functions"].get("9") else 0)
+                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+            # Range 4: F13, F14, F15, F16, F17, F18, F19, F20
+            elif 13 <= function_id <= 20:
+                range_id = 4
+                mask = (128 if locomotive["functions"].get("20") else 0) | \
+                       (64  if locomotive["functions"].get("19") else 0) | \
+                       (32  if locomotive["functions"].get("18") else 0) | \
+                       (16  if locomotive["functions"].get("17") else 0) | \
+                       (8   if locomotive["functions"].get("16") else 0) | \
+                       (4   if locomotive["functions"].get("15") else 0) | \
+                       (2   if locomotive["functions"].get("14") else 0) | \
+                       (1   if locomotive["functions"].get("13") else 0)
+                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+            # Range 5: F21, F22, F23, F24, F25, F26, F27, F28
+            elif 21 <= function_id <= 28:
+                range_id = 5
+                mask = (128 if locomotive["functions"].get("28") else 0) | \
+                       (64  if locomotive["functions"].get("27") else 0) | \
+                       (32  if locomotive["functions"].get("26") else 0) | \
+                       (16  if locomotive["functions"].get("25") else 0) | \
+                       (8   if locomotive["functions"].get("24") else 0) | \
+                       (4   if locomotive["functions"].get("23") else 0) | \
+                       (2   if locomotive["functions"].get("22") else 0) | \
+                       (1   if locomotive["functions"].get("21") else 0)
+                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+            logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
+        else:
+            logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
     return()
 
 #------------------------------------------------------------------------------
