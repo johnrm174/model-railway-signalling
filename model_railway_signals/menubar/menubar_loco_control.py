@@ -177,64 +177,53 @@ class grid_of_roster_entries(common.grid_of_widgets):
                 values_to_return.append(entered_value)
         return(values_to_return)
 
-
 #------------------------------------------------------------------------------------
-# Class for a variable length list of Roster Tabs (each with a grid of roster entries
+# Class for a Scrollable frame (to hold the grid of Roster entries)
 #------------------------------------------------------------------------------------
 
-class roster_tabs(Tk.Frame):
-    def __init__(self, parent_window):
-        super().__init__(parent_window)
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(expand=True, fill="both")
-        self.list_of_roster_tabs = []
-
-    def set_values(self, list_of_roster_entries: list):
-        # Clear existing tabs down
-        for tab in self.list_of_roster_tabs:
-            self.notebook.forget(tab)
-            tab.destroy()
-        self.list_of_roster_tabs = []
-        # Handle the empty list case - If no data, we create one empty chunk
-        if not list_of_roster_entries:
-            display_chunks = [[]] 
+class ScrollableFrame(Tk.Frame):
+    def __init__(self, parent, max_height=400, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.max_height = max_height
+        self.last_height = 0  # Track the height to detect growth
+        self.canvas = Tk.Canvas(self, borderwidth=0, highlightthickness=0)
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.interior = Tk.Frame(self.canvas)
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.interior, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.interior.bind("<Configure>", self.on_interior_configure)
+        # Mousewheel bindings
+        self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
+        self.canvas.bind_all("<Button-4>", self.on_mousewheel)
+        self.canvas.bind_all("<Button-5>", self.on_mousewheel)
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        
+    def on_interior_configure(self, event):
+        req_width = self.interior.winfo_reqwidth()
+        req_height = self.interior.winfo_reqheight()
+        # 1. Update the canvas and scrollregion
+        self.canvas.configure(scrollregion=(0, 0, req_width, req_height), width=req_width)
+        # 2. Handle height capping
+        if req_height < self.max_height:
+            self.canvas.configure(height=req_height)
         else:
-            items_per_tab = 8
-            # Create a list of chunks (lists of 8)
-            display_chunks = [list_of_roster_entries[i : i + items_per_tab] 
-                              for i in range(0, len(list_of_roster_entries), items_per_tab)]
-        # Create the tabs to display each chunk (as many tabs as we need
-        for index, chunk in enumerate(display_chunks):
-            new_grid = grid_of_roster_entries(self.notebook)
-            # Populate the grid (it will just be empty if chunk is [])
-            new_grid.set_values(chunk)
-            self.list_of_roster_tabs.append(new_grid)
-            self.notebook.add(new_grid, text=f"Page {index + 1}")
-            
-    def get_values(self):
-        entries_to_return = []
-        for roster_grid in self.list_of_roster_tabs:
-            tab_data = roster_grid.get_values()
-            if isinstance(tab_data, list):
-                entries_to_return.extend(tab_data)
-        return(entries_to_return)
+            self.canvas.configure(height=self.max_height)
+        # 3. AUTO-SCROLL LOGIC
+        # If the new height is greater than the last known height, 
+        # it means a row was added (+ button was clicked).
+        if req_height > self.last_height:
+            # Scroll to the bottom (1.0 is 100% down)
+            self.canvas.yview_moveto(1.0)
+        # Update the tracker
+        self.last_height = req_height
 
-    def add_blank_tab(self):
-        new_grid = grid_of_roster_entries(self.notebook)
-        # Pass an empty list to initialize a blank grid
-        new_grid.set_values([]) 
-        self.list_of_roster_tabs.append(new_grid)
-        tab_label = f"Page {len(self.list_of_roster_tabs)}"
-        self.notebook.add(new_grid, text=tab_label)
-        # Switch focus to the newly created tab
-        self.notebook.select(new_grid)
+    def on_mousewheel(self, event):
+        if event.num == 4 or event.delta > 0:
+            self.canvas.yview_scroll(-1, "units")
+        elif event.num == 5 or event.delta < 0:
+            self.canvas.yview_scroll(1, "units")
 
-    def validate(self):
-        valid = True
-        for index, roster_grid in enumerate(self.list_of_roster_tabs):
-            if not roster_grid.validate(): valid = False
-        return(valid)
-    
 #------------------------------------------------------------------------------------
 # Class for the Roster window - We only allow a single window to be opened.
 #------------------------------------------------------------------------------------
@@ -259,8 +248,13 @@ class edit_roster():
             # Create a labelframe for everything to make it look nice
             self.frame1 = Tk.LabelFrame(self.window, text="Available locomotives")
             self.frame1.pack(padx=5, pady=5)
-            # Create the grid of Roster entries
-            self.rosterentries = roster_tabs(self.frame1)
+            # Create the grid of Roster entries in the scrollable frame
+            # Define max_height in pixels (e.g., 400px)
+            self.scroller = ScrollableFrame(self.frame1, max_height=600)
+            self.scroller.pack(fill=Tk.BOTH, expand=True, padx=5, pady=5)
+            # Instantiate the existing grid class inside the scroller's interior
+            # Note: We pass self.scroller.interior as the parent_frame
+            self.rosterentries = grid_of_roster_entries(self.scroller.interior)
             self.rosterentries.pack(padx=5, pady=5)
             # Create the Import/Export andcommon Apply/OK/Reset/Cancel buttons for the window
             self.frame2 = Tk.Frame(self.window)
@@ -283,8 +277,6 @@ class edit_roster():
             # New Tab Button (Right Side)
             self.right_group = Tk.Frame(self.frame2)
             self.right_group.grid(row=0, column=2, sticky="e", padx=5)
-            self.B3 = Tk.Button(self.right_group, text="New Roster Tab", command=self.rosterentries.add_blank_tab)
-            self.B3.pack(side=Tk.RIGHT)
             # Load the initial UI state
             self.load_state()
 
