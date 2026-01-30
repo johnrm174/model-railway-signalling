@@ -766,6 +766,12 @@ def request_dcc_power_off():
     tof_response = False
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
+        # Release any active loco sessions (and then delay before switching off power):
+        if len(locomotive_sessions) > 0:
+            active_session_ids = [data["sessionid"] for data in locomotive_sessions.values()]
+            for session_id in active_session_ids:
+                release_loco_session(session_id)
+            time.sleep(0.1)
         # Send the command to switch on the Track Supply (to the DCC Bus)
         logging.debug("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
         # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
