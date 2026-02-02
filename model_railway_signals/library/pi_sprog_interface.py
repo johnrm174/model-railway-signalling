@@ -1047,6 +1047,11 @@ def request_loco_session(dcc_address:int):
                 heartbeat = common.root_window.after(5000, lambda:send_loco_keep_alive(locomotive_sessions[str(dcc_address)]["sessionid"]))
                 locomotive_sessions[str(dcc_address)]["heartbeat"] = heartbeat
                 session_id_to_return = locomotive_sessions[str(dcc_address)]["sessionid"]
+                # Set speed and direction to zero (to force a known state)
+                set_loco_speed_and_direction(session_id, 0, False)
+                # Turn all the functions off (to force a known state)
+                for function in range(29): set_loco_function(session_id, function, False)
+                # Finally - send the release locomotive command
             else:
                 # Return Session ID of zero (could not create session)
                 logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
@@ -1085,11 +1090,16 @@ def release_loco_session(session_id:int):
         # Check that the session is still active (in our list of active sessions)
         dcc_address = find_dcc_address_for_session(session_id)
         if dcc_address > 0:
-            # Kill the heartbeat thread and send the release locomotive command
+            # Set speed and direction to zero (to force a known state)
+            set_loco_speed_and_direction(session_id, 0, False)
+            # Turn all the functions off (to force a known state)
+            for function in range(29): set_loco_function(session_id, function, False)
+            # Kill the heartbeat thread 
             heartbeat = locomotive_sessions[str(dcc_address)]["heartbeat"]
             common.root_window.after_cancel(heartbeat)
             locomotive_sessions[str(dcc_address)]["heartbeat"] = None
             locomotive_sessions[str(dcc_address)]["sessionid"] = None
+            # Finally - send the release locomotive command
             send_cbus_command(2, 2, 0x21, session_id)
             # Delete the Session entry from the list of active sessions
             del(locomotive_sessions[str(dcc_address)])
