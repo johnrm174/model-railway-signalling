@@ -431,6 +431,7 @@ class loco_control(Tk.Toplevel):
         self.direction= None
         self.roster_entry = None
         self.dcc_power_state = None
+        self.speed_var = Tk.IntVar(value=0)
         # Set the window attributes
         self.title("Throttle")
         self.protocol("WM_DELETE_WINDOW", self.destroy)
@@ -475,8 +476,8 @@ class loco_control(Tk.Toplevel):
         self.decrease.bind("<Button-1>", lambda e:self.inc_dec_speed(increase=False, stop=False))
         self.decrease.bind("<ButtonRelease-1>", lambda e:self.inc_dec_speed(stop=True))
         # Create the throttle slider (subframe1)
-        self.throttle = Tk.Scale(self.subframe1, from_=127, to=0, orient="vertical", showvalue=0,
-                    width=60, length=230, sliderlength=40,command=self.speed_updated)
+        self.throttle = Tk.Scale(self.subframe1, from_=127, to=0, orient="vertical", showvalue=0, width=60,
+                    length=230, sliderlength=40, variable=self.speed_var, command=self.speed_updated)
         self.throttle.pack(padx=5, pady=5)
         # Create the function buttons (F0-F28) - Note that we don't pack them here
         # They are packed/unpacked dynamically on locomotive selection
@@ -523,11 +524,20 @@ class loco_control(Tk.Toplevel):
 
     def dcc_power_status_updated(self, dcc_power_state:bool):
         self.dcc_power_state = dcc_power_state
+        # Update the DCC power indication
         self.bold_font = TkFont.Font(font=self.dccpower.cget("font"))
         self.bold_font.configure(weight="bold")
         if dcc_power_state == True: self.dccpower.config(text="DCC Power: ON", fg="green4", font=self.bold_font)
         elif dcc_power_state == False: self.dccpower.config(text="DCC Power: OFF", fg="red", font=self.bold_font)
         else: self.dccpower.config(text="DCC Power: ????", fg="orange3", font=self.bold_font)
+        # if DCC power is off then clear down any selections and inhibit UI
+        if dcc_power_state:
+            self.enable_loco_selection()
+        else:
+            self.deselect_and_disable_all()
+            self.disable_loco_selection()
+            self.loco_selection.set(self.default_selection)
+            self.session_id = 0
 
     #--------------------------------------------------------------------
     # Function to update the available loco selections from the Roster
@@ -542,7 +552,7 @@ class loco_control(Tk.Toplevel):
         # Add the default option (no loco selected)
         loco_options.add_command(label=self.default_selection, command=lambda value=self.default_selection:
                             [self.loco_updated(value), self.loco_selection.set(value)])
-        # Add allthe other entries from the roster
+        # Add all the other entries from the roster
         for roster_entry in new_roster.keys():
             loco_options.add_command(label=roster_entry, command=lambda value=roster_entry:
                             [self.loco_updated(value), self.loco_selection.set(value)])
@@ -655,30 +665,28 @@ class loco_control(Tk.Toplevel):
     #-------------------------------------------------------------------------------------------
 
     def loco_updated(self, selection):
-        # Unpack the function keys associated with the deselected loco
-        for function_button in self.function_buttons:
-            function_button.pack_forget()
+        # Deselect and disable all UI elements on a new selection
+        self.deselect_and_disable_all()
+        # Unpack the function keys (if a new session, only the defined function keys will be packed)
+        for function_button in self.function_buttons: function_button.pack_forget()
         self.subframe1.pack_forget()
         self.subframe2.pack_forget()
         self.subframe3.pack_forget()
         self.subframe4.pack_forget()
         number_of_function_buttons = 0
-        # If there is an existing session, Force any functions to OFF and Release theloco
-        if self.session_id > 0:
-            self.deselect_all_function_buttons()
-            self.force_all_loco_functions_to_off()
-            self.release_loco_session()
+        # If there is an existing session then release the session
+        if self.session_id > 0: self.release_loco_session()
         # Retrieve the current Roster
         roster = settings.get_control("locomotiveroster")
         # Check it is a de-selection or a new selection (valid roster entry)
         if selection not in roster.keys():
-            # Its a de-selection - reset the UI
-            self.deselect_and_disable_all()
+            # This is a de-selection. The loco has already been released
             # Change the loco selection and DCC address elements to Black (valid)
             self.locomotive.config(fg="black")
             self.dccaddress.config(fg="black")
         else:
-            # Get the loco DCC Address and function key definitions from the roster
+            # this is the case of a new loco being selected - We need to get the new
+            # DCC Address and function key definitions from the roster/
             # Key is the loco name - data comprises [dcc_address:int, loco_functions:list]
             # Each loco function entry comprises [label:str, latching:bool]
             self.roster_entry = roster[selection]
@@ -700,26 +708,23 @@ class loco_control(Tk.Toplevel):
                                     buttonid=button_id: self.function_updated(funcid, buttonid))
                         button_id = button_id + 1
                 number_of_function_buttons = button_id
-                # Enable Fwd/Rev, the function buttons and emergency stop
+                # Enable Fwd/Rev, the function buttons and emergency stop. The Speed controls
+                #  are only selectable when a direction (forward or reverse) has been set
                 self.enable_forward_and_reverse()
                 self.enable_all_function_buttons()
                 self.enable_emergency_stop()
-                # Set the speed to zero and all functions to OFF (in case we have stolen the engine)
-                library.set_loco_speed_and_direction(self.session_id, 0, False)
-                self.force_all_loco_functions_to_off()
-                self.deselect_all_function_buttons()
-                # Display the DCC Address (Black = Valid)
+                # Set the speed slider to zero (speed is always set to zero for a new session)
+                self.speed_var.set(0)
+                # Display the DCC Address for the new loco(Black = Valid)
                 self.dccaddress.config(text=f"DCC Address: {self.roster_entry[0]:05}", fg="black")
                 self.locomotive.config(fg="black")
             else:
-                # The loco session was not created - reset the UI
-                self.deselect_and_disable_all()
                 # Change the loco selection and DCC address elements to Red (invalid)
                 self.locomotive.config(fg="red")
                 self.dccaddress.config(fg="red")
                 Tk.messagebox.showerror(parent=self, title="Error",
                     message="Could not create\ncontrol session")
-        # Pack the elements to match the number of function keys
+        # Pack the Frames we need to hold the defined function keys
         if number_of_function_buttons == 0:
             self.subframe1.pack(side=Tk.TOP)
         else:

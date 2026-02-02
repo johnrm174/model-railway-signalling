@@ -155,6 +155,8 @@ async def handle_client(reader, writer):
     # Format of each entry: {"T1": {"session_id":2, "dcc_address":3, "addr_type":"S", "speed":0, "forward":True},}
     # Where T1 is the Throttle ID sent by the client and session_id is the session ID returned by the Pi-SPROG
     wi_sessions = {}
+    # Attach the session dict to the writer object so it's accessible globally
+    writer.wi_sessions = wi_sessions
     # Retrieve the basic client details
     peer = writer.get_extra_info("peername")
     peer_ip_address = peer[0]
@@ -349,12 +351,6 @@ async def handle_client(reader, writer):
                                 writer.write(f"M{full_key}AS{dcc_address_str}<;>s1\n".encode())
                                 await writer.drain()
                                 if server_debug: logging.debug(f"Throttle Server: Sent Initial Speed/Direction/Steps for DCC Address: {dcc_address_str!r}")
-                                # Finally, Send Messages to the Pi-SPROG to turn off all supported functions and 
-                                # set thespeed to zero so we start the session in a known state (just in case)
-                                library.set_loco_speed_and_direction(session_id, 0, False)
-                                # Send Function OFF commands to the Pi-SPROG interface
-                                for function in range(maximum_no_of_functions):
-                                    library.set_loco_function(session_id, function, False)
                         except Exception as e:
                             logging.error(f"Acquisition error: {e}")
                         continue
@@ -409,11 +405,9 @@ async def handle_client(reader, writer):
                                         logging.error(f"Function Error: {e}")
                                 # RELEASE (-)
                                 elif clean_action.startswith("-"):
-                                    library.set_loco_speed_and_direction(session_id, 0, False)
                                     library.release_loco_session(session_id)
                                     wi_sessions[t_key].remove(session)
                                     writer.write(f"M{full_key}-{address_str}\n".encode())
-
                             if not wi_sessions[t_key]:
                                 del wi_sessions[t_key]
                     # IMPORTANT: This ensures the queries (and commands) actually get sent to the network
@@ -636,6 +630,7 @@ def make_server_status_updated_callbacks():
 def dcc_power_status_updated(dcc_power:bool):
     global dcc_power_state
     dcc_power_state = dcc_power
+    # Broadcast the current DCC power state
     message1 = "PPA1" if dcc_power else "PPA0"
     message2 = "PW1"  if dcc_power else "PW0"
     try:
@@ -643,7 +638,29 @@ def dcc_power_status_updated(dcc_power:bool):
             server_loop.call_soon_threadsafe(broadcast_to_all, message1)
             server_loop.call_soon_threadsafe(broadcast_to_all, message2)
     except Exception as e:
-        logging.exception("Throttle Server: Exception scheduling DCC power broadcast")
+        logging.exception(f"Throttle Server: Exception scheduling DCC power broadcast: {e}")
+    # Notify all WiThrottle clients to drop their current sessions
+    if not dcc_power:
+        try:
+            # We iterate through the writers for each client
+            for writer in list(connected_clients):
+                # Retrieve the sessions we attached to this writer
+                sessions = getattr(writer, 'wi_sessions', {})
+                # WiThrottle clients can have multiple throttles (usually T and S)
+                # active_locos should be a dict like {'T': 'L4401', 'S': 'S3'}
+                for t_key in list(sessions.keys()):
+                    for session in sessions[t_key]:
+                        session_id = session["session_id"]
+                        address_str = session["addr_str"]
+                        # Notify the WiThrottle Client to release the UI
+                        # Format: M<throttle>-<address> e.g. MT-L4701
+                        release_message = f"M{t_key}-{address_str}\n"
+                        if server_loop and server_loop.is_running():
+                            server_loop.call_soon_threadsafe(writer.write, release_message.encode())
+                    # Clear the local tracking for this client
+                    del sessions[t_key]
+        except Exception as e:
+            logging.error(f"Throttle Server: Error releasing sessions on power off: {e}")
     return()
 
 ########################################################################################################################################
