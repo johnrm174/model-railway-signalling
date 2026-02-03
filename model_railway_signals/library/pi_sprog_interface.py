@@ -771,13 +771,13 @@ def request_dcc_power_off():
             active_session_ids = [data["sessionid"] for data in locomotive_sessions.values()]
             for session_id in active_session_ids:
                 release_loco_session(session_id)
-            time.sleep(0.1)
         # Send the command to switch on the Track Supply (to the DCC Bus)
         logging.debug("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
         # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
         send_cbus_command(mj_pri=0, min_pri=0, op_code=0x08)
-        # Wait for the response (with a 1 second timeout)
-        wait_for_response(1.0, response_received)
+        # Wait for the response (with a 5 second timeout as the power off
+        # command may be queued behind all the loco release messages)
+        wait_for_response(5.0, response_received)
         if tof_response:
             dcc_power_is_on = False
             logging.info("Pi-SPROG: Track power has been turned OFF")
@@ -1048,10 +1048,9 @@ def request_loco_session(dcc_address:int):
                 locomotive_sessions[str(dcc_address)]["heartbeat"] = heartbeat
                 session_id_to_return = locomotive_sessions[str(dcc_address)]["sessionid"]
                 # Set speed and direction to zero (to force a known state)
-                set_loco_speed_and_direction(session_id, 0, False)
+                set_loco_speed_and_direction(session_id_to_return, 0, False)
                 # Turn all the functions off (to force a known state)
-                for function in range(29): set_loco_function(session_id, function, False)
-                # Finally - send the release locomotive command
+                for function in range(29): set_loco_function(session_id_to_return, function, False)
             else:
                 # Return Session ID of zero (could not create session)
                 logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
