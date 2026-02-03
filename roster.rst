@@ -2,12 +2,12 @@
    "filename": "/home/john/model-railway-signalling/roster.rst",
    "fileinfo": "DCC Signallisng system Roster File",
    "roster": {
-      "HST Set 1": [
-         1,
+      "20046": [
+         7,
          [
             [
-               "Lights",
-               true
+               "",
+               false
             ],
             [
                "",
@@ -123,12 +123,12 @@
             ]
          ]
       ],
-      "HST Set 2": [
-         2,
+      "20058": [
+         8,
          [
             [
-               "Lights",
-               true
+               "",
+               false
             ],
             [
                "",
@@ -143,7 +143,128 @@
                true
             ],
             [
-               " /Inertia",
+               "/ Inertia",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               true
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ]
+         ]
+      ],
+      "37238": [
+         5,
+         [
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "Shunt",
+               true
+            ],
+            [
+               "/ Inertia",
                true
             ],
             [
@@ -486,127 +607,6 @@
             ]
          ]
       ],
-      "37238": [
-         5,
-         [
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "Shunt",
-               true
-            ],
-            [
-               "/ Inertia",
-               true
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ]
-         ]
-      ],
       "6752 (37)": [
          6,
          [
@@ -728,12 +728,12 @@
             ]
          ]
       ],
-      "20046": [
-         7,
+      "HST Set 1": [
+         1,
          [
             [
-               "",
-               false
+               "Lights",
+               true
             ],
             [
                "",
@@ -849,8 +849,129 @@
             ]
          ]
       ],
-      "20058": [
-         8,
+      "HST Set 2": [
+         2,
+         [
+            [
+               "Lights",
+               true
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "Shunt",
+               true
+            ],
+            [
+               " /Inertia",
+               true
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ]
+         ]
+      ],
+      "25083": [
+         9,
          [
             [
                "",
@@ -869,36 +990,36 @@
                true
             ],
             [
-               "/ Inertia",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
-               false
-            ],
-            [
-               "",
+               "/Inertia",
                true
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
             ],
             [
                "",
