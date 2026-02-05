@@ -321,15 +321,17 @@ def process_message(msg):
                 node_config["shutdown_callback"]()
             elif node_config["enhanced_debugging"]:
                 logging.debug("MQTT-Client: Ignoring Shutdown message (not configured to shutdown)")
-        # Make the callback (that was registered when the calling programme subscribed to the feed)
-        # Note that we also need to test to see if the the topic is a partial match to cover the
-        # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
-        elif msg.topic in node_config["callbacks"]:
-            node_config["callbacks"][msg.topic] (unpacked_json)
-        elif msg.topic.rpartition('/')[0]+"/+" in node_config["callbacks"]:
-            node_config["callbacks"][msg.topic.rpartition('/')[0]+"/+"] (unpacked_json)
         else:
-            logging.warning("MQTT-Client: unhandled message topic: "+str(msg.topic))
+            if node_config["enhanced_debugging"]: logging.debug(f"MQTT-Client: Received Message - Topic:{msg.topic}, Message:{unpacked_json}")
+            # Make the callback (that was registered when the calling programme subscribed to the feed)
+            # Note that we also need to test to see if the the topic is a partial match to cover the
+            # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
+            if msg.topic in node_config["callbacks"]:
+                node_config["callbacks"][msg.topic] (unpacked_json)
+            elif msg.topic.rpartition('/')[0]+"/+" in node_config["callbacks"]:
+                node_config["callbacks"][msg.topic.rpartition('/')[0]+"/+"] (unpacked_json)
+            else:
+                logging.warning("MQTT-Client: unhandled message topic: "+str(msg.topic))
     return()
 
 #-----------------------------------------------------------------------------------------------
