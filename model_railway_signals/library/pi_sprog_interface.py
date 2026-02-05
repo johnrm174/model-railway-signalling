@@ -50,8 +50,8 @@
 #   enable_status_reporting(callback) - Enable reporting
 #   disable_status_reporting() - Disable Reporting
 #
-#   subscribe_to_dcc_power_updates(callback) - subscribe to DCC power state changes
-#   unsubscribe_from_dcc_power_updates(callback) - unsubscribe from DCC power state changes
+#   subscribe_to_local_dcc_power_updates(callback) - subscribe to DCC power state changes
+#   unsubscribe_from_local_dcc_power_updates(callback) - unsubscribe from DCC power state changes
 #
 #   request_loco_session(dcc_address) - generates a loco session and returns session_id
 #   release_loco_session(session_id) - releases the locomotive session
@@ -706,14 +706,14 @@ def query_command_station_status():
 # Returns immediately with the current state (None if unknown)
 #------------------------------------------------------------------------------
 
-def subscribe_to_dcc_power_updates(callback):
+def subscribe_to_local_dcc_power_updates(callback):
     global registered_dcc_power_state_callbacks
     if callback not in registered_dcc_power_state_callbacks:
         registered_dcc_power_state_callbacks.append(callback)
     callback(dcc_power_is_on)
     return()
 
-def unsubscribe_from_dcc_power_updates(callback):
+def unsubscribe_from_local_dcc_power_updates(callback):
     global registered_dcc_power_state_callbacks
     if callback in registered_dcc_power_state_callbacks:
         registered_dcc_power_state_callbacks.remove(callback)
