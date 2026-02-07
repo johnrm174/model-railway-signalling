@@ -93,8 +93,7 @@
 # the existing pub/sub configuration, followed by 'set_node_to_publish_dcc_commands' (either True or False)
 # and 'subscribe_to_dcc_command_feed' for each REMOTE DCC Node (DCC Command feed subscribed).
 #
-#   reset_dcc_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
-#
+#   reset_dcc_accessory_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
 #   set_node_to_publish_dcc_accessory_commands(publish_dcc_commands:bool) - Enable publishing of DCC accessory commands
 #           All DCC accessory commands will then be published to the MQTT broker for consumption by other nodes
 #   subscribe_to_dcc_accessory_command_feed(*nodes:str) - Subcribes to DCC accessory commands from other network nodes.
@@ -869,7 +868,7 @@ def sprog_send_all_dcc_command_states_on_sprog_connect():
 # via the 'subscribe_to_dcc_command_feed' & 'set_node_to_publish_dcc_commands' functions.
 #----------------------------------------------------------------------------------------------------
 
-def reset_dcc_mqtt_configuration():
+def reset_dcc_accessory_mqtt_configuration():
     global publish_dcc_accessory_commands_to_mqtt_broker
     global local_dcc_accessory_commands
     logging.debug("DCC Control: Resetting MQTT publish and subscribe configuration")

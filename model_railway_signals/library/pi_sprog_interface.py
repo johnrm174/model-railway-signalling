@@ -53,12 +53,6 @@
 #   subscribe_to_local_dcc_power_updates(callback) - subscribe to DCC power state changes
 #   unsubscribe_from_local_dcc_power_updates(callback) - unsubscribe from DCC power state changes
 #
-#   request_loco_session(dcc_address) - generates a loco session and returns session_id
-#   release_loco_session(session_id) - releases the locomotive session
-#   set_loco_speed_and_direction(session_id:int, speed:int, forward:bool)
-#   send_emergency_stop(session_id) - Emergency Stops the loco
-#   set_loco_function(session_id:int, function_id:int, state:bool)
-#
 # API functions used associated with DCC-command-triggered sounds:
 #   add_dcc_sound_mapping(address:int, state:bool, fully_qualified_sound_filename:str):
 #   reset_dcc_sound_mappings() - Delete all current mappings
@@ -67,6 +61,12 @@
 #
 #   send_accessory_short_event(address:int, active:bool) - sends out a CBUS command to the
 #          Pi-Sprog to be translated into a DCC command for transmission on the DCC Bus
+#
+#   request_loco_session(dcc_address) - generates a loco session and returns session_id
+#   release_loco_session(session_id) - releases the locomotive session
+#   set_loco_speed_and_direction(session_id:int, speed:int, forward:bool)
+#   send_emergency_stop(session_id) - Emergency Stops the loco
+#   set_loco_function(session_id:int, function_id:int, state:bool)
 #
 # --------------------------------------------------------------------------------------------
 #
@@ -636,8 +636,12 @@ def sprog_connect (port_name:str="/dev/serial0",
                 tx_thread.start()
             # Short delay to allow the threads to fully start up before we continue
             time.sleep(0.1)
-            # To verify full connectivity, we query the command station status
-            # query_command_station_status will return TRUE if a response was received
+            # To verify full connectivity, we query_command_station_status. This function
+            # will return TRUE if a response was received within the specified timeout (5 seconds)
+            ######################################################################################
+            # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+            # the connection, not much else will realistically be going on until connected
+            ######################################################################################
             pi_sprog_connected = query_command_station_status()
             if pi_sprog_connected: logging.info("Pi-SPROG: Successfully connected to Pi-SPROG")
     return(pi_sprog_connected)
@@ -659,6 +663,10 @@ def sprog_disconnect():
         if debug: logging.debug("Pi-SPROG: Shutting down Tx and Rx Threads")
         port_close_initiated = True
         # Wait until we get confirmation the Threads have been terminated
+        ######################################################################################
+        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+        # the disconnect, not much else will realistically be going on until disconnected
+        ######################################################################################
         wait_for_response(1.0, response_received)
         if not tx_thread_terminated: logging.error("Pi-SPROG: Tx thread failed to terminate")
         if not rx_thread_terminated: logging.error("Pi-SPROG: Rx thread failed to terminate") 
@@ -694,6 +702,10 @@ def query_command_station_status():
         # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
         send_cbus_command(mj_pri=0, min_pri=0, op_code=0x0C)
         # Wait for the response (with a 5 second timeout)
+        ######################################################################################
+        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+        # the query, not much else will realistically be going on until we get a response
+        ######################################################################################
         wait_for_response(5.0, response_received)
         if rstat_response: logging.debug ("Pi-SPROG: Received STAT (Command Station Status Report)")
         else: logging.error("Pi-SPROG: Request Command Station Status failed")
@@ -702,7 +714,7 @@ def query_command_station_status():
     return(rstat_response)
 
 #------------------------------------------------------------------------------
-# Externally Called Function to Register for DCC power status updates
+# API Functions to Register for DCC power status updates from the SPROG
 # Returns immediately with the current state (None if unknown)
 #------------------------------------------------------------------------------
 
@@ -718,6 +730,10 @@ def unsubscribe_from_local_dcc_power_updates(callback):
     if callback in registered_dcc_power_state_callbacks:
         registered_dcc_power_state_callbacks.remove(callback)
     return()
+
+#------------------------------------------------------------------------------
+# Internal Function to publish DCC Power updates to the registered callbacks
+#------------------------------------------------------------------------------
 
 def make_dcc_power_updated_callbacks():
     for power_status_changed_callback in registered_dcc_power_state_callbacks:
@@ -740,6 +756,10 @@ def request_dcc_power_on():
         # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
         send_cbus_command (mj_pri=0, min_pri=0, op_code=0x09)
         # Wait for the response (with a 1 second timeout)
+        ######################################################################################
+        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+        # the power on, not much else will realistically be going on until we get a response
+        ######################################################################################
         wait_for_response(1.0, response_received)
         if ton_response:
             dcc_power_is_on = True
@@ -777,6 +797,10 @@ def request_dcc_power_off():
         send_cbus_command(mj_pri=0, min_pri=0, op_code=0x08)
         # Wait for the response (with a 5 second timeout as the power off
         # command may be queued behind all the loco release messages)
+        ######################################################################################
+        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+        # the power off, not much else will realistically be going on until we get a response
+        ######################################################################################
         wait_for_response(5.0, response_received)
         if tof_response:
             dcc_power_is_on = False
@@ -905,6 +929,10 @@ def service_mode_read_cv(cv:int):
         # Command 0x84 (132 Decimal) - Read CV in Service Mode (QCVS)
         send_cbus_command(2, 2, 0x84, byte1, byte2, byte3, byte4)
         # Wait for the response (5 second timeout as service mode reads involve physical DCC pulses)
+        ######################################################################################
+        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+        # the query, not much else will realistically be going on until we get a response
+        ######################################################################################
         if wait_for_response(5.0, response_received):
             logging.debug(f"Pi-SPROG: Received PCVS (Report CV) - Session:{service_mode_session_id}, CV:{service_mode_cv_address}, Value:{service_mode_cv_value}")
             # Validation checks to ensure the response matches the request
@@ -957,6 +985,10 @@ def service_mode_write_cv(cv:int, value:int):
         # Command 0xA2 (162 Decimal) - Write CV in Service mode (WCVS)
         send_cbus_command(2, 2, 0xA2, byte1, byte2, byte3, byte4, byte5)
         # Wait for the response (5 second timeout for programming acknowledgment)
+        ######################################################################################
+        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
+        # the write, not much else will realistically be going on until we get a response
+        ######################################################################################
         if wait_for_response(5.0, response_received):
             logging.debug(f"Pi-SPROG: Received SSTAT (Service Mode Status) - Session:{service_mode_session_id}, Status:{service_mode_response}")
             # Validation checks
@@ -1040,6 +1072,10 @@ def request_loco_session(dcc_address:int):
                 addr_lo = dcc_address & 0xFF
             # Request the session and wait for a response
             send_cbus_command(2, 2, 0x40, addr_hi, addr_lo)
+            ######################################################################################
+            # We currently BLOCK whilst awaiting the response but this is certainly a candidate
+            # to re-factor at some stage as this this is very much part of normal operations
+            ######################################################################################
             if wait_for_response(2.0, response_received):
                 # The Pi-SPROG 3 has a hardware timeout (often set to 20 seconds). If it does not receive a
                 # command (speed change, function toggle, or KLOC) for a specific session within that window,
@@ -1159,14 +1195,12 @@ def process_ploc_message(byte_string):
 # CBUS Command is Set Loco Speed and Direction (DSPD) - Opcode 0x47
 #------------------------------------------------------------------------------
 
-def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_emergency_stop:bool=False):
+def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool):
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid Session ID {session_id} - must be an int")
     elif not isinstance(speed, int) or speed < 0 or speed > 127:
         logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid speed for session {session_id} - must be an int (0-127)")
     else:
-        # Inhibit the Emergency Stop (unless overridden in the function call)
-        if not allow_emergency_stop and speed == 1: speed = 0
         # Direction bit: 1 for Forward, 0 for Reverse
         # Speed is in the range 0-127 where 0 is normal Stop and 1 is Emergency Stop
         dcc_address = find_dcc_address_for_session(session_id)
@@ -1178,14 +1212,6 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_
             send_cbus_command(2, 2, 0x47, session_id, speed_byte)
         else:
             logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Session {session_id} not found")
-    return()
-
-#------------------------------------------------------------------------------
-# API function for the Locomotive Emergency Stop
-#------------------------------------------------------------------------------
-
-def send_emergency_stop(session_id:int):
-    set_loco_speed_and_direction(session_id, speed=1, forward=True, allow_emergency_stop=True)
     return()
 
 #------------------------------------------------------------------------------

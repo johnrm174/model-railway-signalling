@@ -298,9 +298,31 @@ async def handle_client(reader, writer):
                                     loco_name = rest_of_message.split("<;>E")[1]
                                 else:
                                     loco_name = ""
-                            # Request a new session for the DCC Address from the Pi-SPROG interface
-                            # Note that we only care about the DCC address here (not the loco_name)
-                            session_id = library.request_loco_session(dcc_address_int)
+                            #-------------------------------------------------------------------------
+                            # The acquire_loco_session function now works on a callback to accommodate
+                            # controlling locos on a remote SPROG node from a wi-throttle client connected
+                            # to this node - We therefore need to set up the callback and wait for the
+                            # the response (with an appropriate callback)
+                            #-------------------------------------------------------------------------
+                            # Create a Future object to bridge the callback back to this async loop
+                            loop = asyncio.get_running_loop()
+                            session_future = loop.create_future()
+                            # Define the callback that the loco_control module will call
+                            def session_response_callback(returned_address, returned_id):
+                                # Use call_soon_threadsafe as the callback will be in the main thread
+                                loop.call_soon_threadsafe(session_future.set_result, returned_id)
+                            # Request the loco session, passing in the above callback
+                            library.request_loco_session(dcc_address_int, session_response_callback)
+                            try:
+                                # Await the result - This pauses THIS client handler but NOT the whole server.
+                                session_id = await asyncio.wait_for(session_future, timeout=10.0)
+                            except asyncio.TimeoutError:
+                                logging.error(f"Throttle Server: Timeout waiting for session for address {dcc_address_int}")
+                                # Inform the client and continue
+                                writer.write(f"HMTimeout acquiring {dcc_address_int}\n".encode())
+                                await writer.drain()
+                                continue
+                            # Process the session result
                             if session_id > 0:
                                 # Session was successfully acquired - save it in the dict we use to track 
                                 if throttle_index not in wi_sessions:

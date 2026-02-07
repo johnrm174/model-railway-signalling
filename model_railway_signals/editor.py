@@ -72,14 +72,18 @@
 #    library.sprog_disconnect() - Disconnect from the Pi-SPROG
 #    library.request_dcc_power_off() - To turn off the track power
 #    library.request_dcc_power_on() - To turn on the track power
+#    library.subscribe_to_local_dcc_power_updates() - Subscribe to the DCC power status
 #
 #    library.configure_mqtt_client(settings) - configure client network details
 #    library.mqtt_broker_connect(url, port, user, password) - Connect to MQTT broker
 #    library.mqtt_broker_disconnect() - Disconnect from MQTT broker
 #
-#    library.reset_dcc_mqtt_configuration() - Resets the publish/subscribe configuration
-#    library.set_node_to_publish_dcc_commands(publish) - set note to publish DCC command feed
-#    library.subscribe_to_dcc_command_feed(nodes) - subscribe to DCC command feeds from other nodes
+#    library.reset_dcc_accessory_configuration() - Resets the publish/subscribe configuration
+#    library.reset_dcc_locomotive_configuration() - Resets the publish/subscribe configuration
+#    library.set_node_to_publish_dcc_accessory_commands(publish) - set note to publish DCC accessory commands
+#    library.subscribe_to_dcc_accessory_command_feed(nodes) - subscribe to DCC accessory commands from other nodes
+#    library.set_node_to_publish_dcc_locomotive_commands(publish) - set node to publish locomotive DCC commands
+#    library.subscribe_to_dcc_locomotive_command_feed(nodes) - subscribe to DCC locomotive commands from other nodes
 #
 #    library.gpio_interface_enabled() - is the app running on a Raspberry Pi
 #    library.reset_gpio_mqtt_configuration() - Resets the publish/subscribe configuration
@@ -133,7 +137,7 @@ class main_menubar:
         self.sprog_connection_state = False
         self.sprog_power_state = None  # Unknown
         # Subscribe to DCC Power state changes and throttle server
-        library.subscribe_to_dcc_power_updates(self.dcc_power_state_updated)
+        library.subscribe_to_local_dcc_power_updates(self.dcc_power_state_updated)
         throttle_server.subscribe_to_server_status(self.throttle_server_state_updated)
         # Create the menu bar
         self.root = root
@@ -638,22 +642,27 @@ class main_menubar:
                         shutdown_callback = lambda:self.quit_schematic(ask_for_confirm=False))
         
     def reset_mqtt_pub_sub_configuration(self):
-        library.reset_dcc_mqtt_configuration()
+        library.reset_dcc_accessory_mqtt_configuration()
+        library.reset_dcc_locomotive_mqtt_configuration()
         library.reset_gpio_mqtt_configuration()
         library.reset_signals_mqtt_configuration()
         library.reset_sections_mqtt_configuration()
         library.reset_instruments_mqtt_configuration()
         
     def apply_new_mqtt_pub_sub_configuration(self):
-        library.set_node_to_publish_dcc_commands(settings.get_mqtt("pubdcc"))
-        library.subscribe_to_dcc_command_feed(*settings.get_mqtt("subdccnodes"))
+        # Publish Configuration
+        library.set_node_to_publish_dcc_accessory_commands(settings.get_mqtt("pubdcc"))
+        library.set_node_to_publish_dcc_locomotive_commands(settings.get_mqtt("publoco"))
         library.set_gpio_sensors_to_publish_state(*settings.get_mqtt("pubsensors"))
-        library.subscribe_to_remote_gpio_sensors(*settings.get_mqtt("subsensors"))
         library.set_signals_to_publish_state(*settings.get_mqtt("pubsignals"))
-        library.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_mqtt("subsignals"))
         library.set_sections_to_publish_state(*settings.get_mqtt("pubsections"))
-        library.subscribe_to_remote_sections(*settings.get_mqtt("subsections"))
         library.set_instruments_to_publish_state(*settings.get_mqtt("pubinstruments"))
+        # Subscribe Configuration
+        library.subscribe_to_dcc_accessory_command_feed(*settings.get_mqtt("subdccnodes"))
+        library.subscribe_to_dcc_locomotive_command_feed(*settings.get_mqtt("subloconodes"))
+        library.subscribe_to_remote_gpio_sensors(*settings.get_mqtt("subsensors"))
+        library.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_mqtt("subsignals"))
+        library.subscribe_to_remote_sections(*settings.get_mqtt("subsections"))
         library.subscribe_to_remote_instruments(*settings.get_mqtt("subinstruments"))
         objects.configure_remote_gpio_sensor_event_mappings()
 

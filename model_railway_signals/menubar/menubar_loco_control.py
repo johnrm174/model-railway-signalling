@@ -191,12 +191,11 @@ class ScrollableFrame(Tk.Frame):
         self.canvas_window = self.canvas.create_window((0, 0), window=self.interior, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.interior.bind("<Configure>", self.on_interior_configure)
-        # Mousewheel bindings
-        self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
-        self.canvas.bind_all("<Button-4>", self.on_mousewheel)
-        self.canvas.bind_all("<Button-5>", self.on_mousewheel)
+        # Bind enter/leave events to the canvas to enable/disable scrolling
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
+        self.canvas.bind('<Enter>', self.bind_mousewheel)
+        self.canvas.bind('<Leave>', self.unbind_mousewheel)
         
     def on_interior_configure(self, event):
         req_width = self.interior.winfo_reqwidth()
@@ -218,10 +217,21 @@ class ScrollableFrame(Tk.Frame):
         self.last_height = req_height
 
     def on_mousewheel(self, event):
-        if event.num == 4 or event.delta > 0:
-            self.canvas.yview_scroll(-1, "units")
-        elif event.num == 5 or event.delta < 0:
-            self.canvas.yview_scroll(1, "units")
+        if self.canvas.winfo_exists():
+            if event.num == 4 or event.delta > 0:
+                self.canvas.yview_scroll(-1, "units")
+            elif event.num == 5 or event.delta < 0:
+                self.canvas.yview_scroll(1, "units")
+
+    def bind_mousewheel(self, event):
+        self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
+        self.canvas.bind_all("<Button-4>", self.on_mousewheel)
+        self.canvas.bind_all("<Button-5>", self.on_mousewheel)
+
+    def unbind_mousewheel(self, event):
+        self.canvas.unbind_all("<MouseWheel>")
+        self.canvas.unbind_all("<Button-4>")
+        self.canvas.unbind_all("<Button-5>")
 
 #------------------------------------------------------------------------------------
 # Class for the Roster window - We only allow a single window to be opened.
@@ -447,7 +457,6 @@ class loco_control(Tk.Toplevel):
         self.next_event = None
         self.direction= None
         self.dcc_power_state = None
-        self.speed_var = Tk.IntVar(value=0)
         # Set the window attributes
         self.title("Throttle")
         self.protocol("WM_DELETE_WINDOW", self.destroy)
@@ -497,6 +506,7 @@ class loco_control(Tk.Toplevel):
         self.decrease.bind("<Button-1>", lambda e:self.inc_dec_speed(increase=False, stop=False))
         self.decrease.bind("<ButtonRelease-1>", lambda e:self.inc_dec_speed(stop=True))
         # Create the throttle slider (subframe1)
+        self.speed_var = Tk.IntVar(value=0)
         self.throttle = Tk.Scale(self.subframe1, from_=127, to=0, orient="vertical", showvalue=0, width=60,
                     length=230, sliderlength=40, variable=self.speed_var, command=self.speed_updated)
         self.throttle.pack(padx=5, pady=5)
@@ -540,8 +550,15 @@ class loco_control(Tk.Toplevel):
         self.roster_updated()
         # Register the callback for future roster updates
         registered_callbacks.append(self.roster_updated)
-        # Register for DCC Power status changes
+        # Register for DCC power updates (from the local or remote SPROG interface)
         library.subscribe_to_dcc_power_updates(self.dcc_power_status_updated)
+
+    #--------------------------------------------------------------------
+    # Callback Function to update the UI after a DCC power on/off event.
+    # If DCC Power is ON then Loco selections will be enabled
+    # If DCC power is OFF then the UI will be updated to reflect the
+    # fact that all locos will have been released prior to power off
+    #--------------------------------------------------------------------
 
     def dcc_power_status_updated(self, dcc_power_state:bool):
         self.dcc_power_state = dcc_power_state
@@ -568,7 +585,7 @@ class loco_control(Tk.Toplevel):
             self.disable_loco_selection()
 
     #--------------------------------------------------------------------
-    # Function to update the available loco selections from the Roster
+    # Callback Function to update the available loco selections from the Roster
     # Called from the edit_roster class if the roster has been updated
     #--------------------------------------------------------------------
 
@@ -653,7 +670,7 @@ class loco_control(Tk.Toplevel):
         self.direction = None
 
     #--------------------------------------------------------------------
-    # User selection callback for "Add loco"
+    # User selection callback when user makes a roster dropdown selection
     #--------------------------------------------------------------------
 
     def loco_selected(self, selection:str):
@@ -667,55 +684,79 @@ class loco_control(Tk.Toplevel):
                break
         # Only add the loco if a valid roster selection and not already selected
         if selection in roster.keys() and not loco_already_selected:
-            # We need to get the DCC Address and function key definitions from the roster
+            # We need to get the DCC Address for the locomotive from the roster entry
             # Key is the loco name - data comprises [dcc_address:int, loco_functions:list]
             # Each loco function entry comprises [label:str, latching:bool]
-            roster_entry = roster[selection]
-            loco_address = roster_entry[0]
-            loco_functions = roster_entry[1]
-            # Request a session form the Pi Sprog Library function. This will
-            # return the Session_ID (zero if the session could not be created)
-            session_id = library.request_loco_session(loco_address)
-            if session_id > 0:
-                # Pack the frame that is going to display the selected locos
-                self.locoframe.pack()
-                # If this is the 'first' loco then we use the function key 
-                # definitions forthat loco and assume that subsequent locos 
-                # added to the consist also support the same functions.
-                if len(self.selected_locos) == 0:
-                    # Pack the function keys that are supported by the loco (as defined in the roster)
-                    button_id = 0
-                    for function_id, function_definition in enumerate(loco_functions):
-                        # The function key definitions comprise [label:str,latching:bool)
-                        # If the function key label is not defined, the function is unsupported
-                        if function_definition[0] != "":
-                            self.function_buttons[button_id].pack(padx=2, pady=2)
-                            self.function_buttons[button_id].config(text=function_definition[0])
-                            self.function_buttons[button_id].config(latching=function_definition[1])
-                            self.function_buttons[button_id].config(command=lambda funcid=function_id,
-                                        buttonid=button_id: self.function_updated(funcid, buttonid))
-                            button_id = button_id + 1
-                    # Pack the Frames we need to hold the function keys that are defined for the loco
-                    # Again, we only pack what we need to hold the defined function keys
-                    if button_id > 0: self.subframe2.pack(side=Tk.LEFT)
-                    if button_id > 10: self.subframe3.pack(side=Tk.LEFT)
-                    if button_id > 20: self.subframe4.pack(side=Tk.LEFT)
-                    # Enable Fwd/Rev and emergency stop (function buttons are already enabled). note that the 
-                    # Speed controls are only selectable when a direction (forward or reverse) has been set
-                    self.enable_forward_and_reverse()
-                    self.enable_emergency_stop()
-                    # Set the speed slider to zero (speed is always set to zero for a new session)
-                    self.speed_var.set(0)
-                # Create the loco Entry (which also holds the data about the session)
-                self.selected_locos[session_id] = selected_locomotive(self.locoframe,
-                    loco_name=selection, session_id=session_id, release_callback=self.release_loco)
-                self.selected_locos[session_id].pack(padx=2, pady=2)
-            else:
-                Tk.messagebox.showerror(parent=self, title="Error",
-                    message=f"Could not create\ncontrol session for\n{selection}")
-        # Always set the dropdown back to the default selection
-        self.after(0, lambda:self.locomotive.config(text=self.default_selection))
+            dcc_address = roster[selection][0]
+            # Request a loco session and specify the callback for the response
+            library.request_loco_session(dcc_address, callback=self.handle_session_response)
+            # Always set the dropdown back to the default selection
+            self.after(0, lambda:self.locomotive.config(text=self.default_selection))
+            ################################################################################
+            #### TODO - Maybe we start a timeout - for the case where we are requesting
+            #### a session from a remote node and we never get a response
+            ################################################################################
+
+    #--------------------------------------------------------------------
+    # Function called on new loco selection (see function above) as
+    # soon as we get a response from the loco_control module
+    #--------------------------------------------------------------------
+
+    def handle_session_response(self, dcc_address:int, session_id:int):
+        # Retrieve the current Roster
+        roster = settings.get_control("locomotiveroster")
+        # Find the details from the roster (loco name and functions:
+        # Key is the loco name - data comprises [dcc_address:int, loco_functions:list]
+        # Each loco function entry comprises [label:str, latching:bool]
+        loco_name, loco_data = None, None
+        for loco_name, loco_data in roster.items():
+            if loco_data[0] == dcc_address:
+                selected_loco_name = loco_name
+                selected_loco_functions = loco_data[1]
+                break
+        # Only add the loco to the consist if the session was created
+        if loco_name is not None and loco_data is not None and session_id > 0:
+            # Pack the frame that is going to display the selected locos
+            self.locoframe.pack()
+            # If this is the 'first' loco then we use the function key
+            # definitions forthat loco and assume that subsequent locos
+            # added to the consist also support the same functions.
+            if len(self.selected_locos) == 0:
+                # Pack the function keys that are supported by the loco (as defined in the roster)
+                button_id = 0
+                for function_id, function_definition in enumerate(selected_loco_functions):
+                    # The function key definitions comprise [label:str,latching:bool)
+                    # If the function key label is not defined, the function is unsupported
+                    if function_definition[0] != "":
+                        self.function_buttons[button_id].pack(padx=2, pady=2)
+                        self.function_buttons[button_id].config(text=function_definition[0])
+                        self.function_buttons[button_id].config(latching=function_definition[1])
+                        self.function_buttons[button_id].config(command=lambda funcid=function_id,
+                                    buttonid=button_id: self.function_updated(funcid, buttonid))
+                        button_id = button_id + 1
+                # Pack the Frames we need to hold the function keys that are defined for the loco
+                # Again, we only pack what we need to hold the defined function keys
+                if button_id > 0: self.subframe2.pack(side=Tk.LEFT)
+                if button_id > 10: self.subframe3.pack(side=Tk.LEFT)
+                if button_id > 20: self.subframe4.pack(side=Tk.LEFT)
+                # Enable Fwd/Rev and emergency stop (function buttons are already enabled). note that the
+                # Speed controls are only selectable when a direction (forward or reverse) has been set
+                self.enable_forward_and_reverse()
+                self.enable_emergency_stop()
+                # Set the speed slider to zero (speed is always set to zero for a new session)
+                self.speed_var.set(0)
+            # Create the loco Entry (which also holds the data about the session)
+            self.selected_locos[session_id] = selected_locomotive(self.locoframe, loco_name=selected_loco_name,
+                                               session_id=session_id, release_callback=self.release_loco)
+            self.selected_locos[session_id].pack(padx=2, pady=2)
+        else:
+            Tk.messagebox.showerror(parent=self, title="Error",
+                message=f"Could not create\ncontrol session for\n{selected_loco_name}")
         
+    #-------------------------------------------------------------------------------------------
+    # User selection callback for Locomotive released
+    #-------------------------------------------------------------------------------------------
+
     def release_loco(self, loco_object):
         # Release the loco session (the pi-SPROG function will set all functions
         # to off and set the speed to zero just in case (to give a known state)
