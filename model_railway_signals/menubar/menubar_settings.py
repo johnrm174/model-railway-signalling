@@ -725,11 +725,16 @@ class mqtt_configuration_tab():
 class mqtt_subscribe_tab():
     def __init__(self, parent_tab):
         # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
+        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC Accessory commands")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
-            tool_tip="Specify the remote network nodes to take a DCC command feed from")
-        self.dcc.pack(padx=2, pady=2, fill='x')
+        self.dccaccessory = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
+            tool_tip="Specify the remote network nodes to take the DCC Accessory command feed from")
+        self.dccaccessory.pack(padx=2, pady=2, fill='x')
+        self.frame1a = Tk.LabelFrame(parent_tab, text="DCC Locomotive commands")
+        self.frame1a.pack(padx=2, pady=2, fill='x')
+        self.dcclocomotive = common.grid_of_generic_entry_boxes(self.frame1a, base_class=common.entry_box, columns=4, width=8,
+            tool_tip="Specify the remote network nodes to take the DCC Locomotive command feed from")
+        self.dcclocomotive.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
@@ -752,8 +757,8 @@ class mqtt_subscribe_tab():
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
-        return (self.dcc.validate() and self.signals.validate() and self.sections.validate()
-                and self.instruments.validate() and self.sensors.validate())
+        return (self.dccaccessory.validate() and self.signals.validate() and self.sections.validate()
+                and self.instruments.validate() and self.sensors.validate() and self.dcclocomotive.validate())
     
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'Publish' Tab
@@ -762,13 +767,23 @@ class mqtt_subscribe_tab():
 class mqtt_publish_tab():
     def __init__(self, parent_tab):
         # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
+        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC Accessory commands")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = common.check_box(self.frame1, label="Publish DCC command feed",
-                tool_tip="Select to publish all DCC commands from this node via the "+
-                    "MQTT Network (so the feed can be picked up by the node hosting "+
-                    "the Pi-SPROG DCC interface) and sent out to the layout")
-        self.dcc.pack(padx=2, pady=2, fill='x')
+        self.dccaccessory = common.check_box(self.frame1, label="Publish the DCC Accessory command feed",
+                tool_tip="Select to publish all DCC Accessory commands to the MQTT Network (so the feed can be picked "+
+                    "up by the node hosting the Pi-SPROG DCC Interface and sent out to the layout). Note that when "+
+                    "selected, DCC Accessory commands WILL NOT be sent out to the local Pi-SPROG interface" )
+        self.dccaccessory.pack(padx=2, pady=2, fill='x')
+        self.frame1a = Tk.LabelFrame(parent_tab, text="DCC Locomotive commands")
+        self.frame1a.pack(padx=2, pady=2, fill='x')
+        self.subframe1 = Tk.Frame(self.frame1a)
+        self.subframe1.pack()
+        self.locolabel = Tk.Label(self.subframe1, text="Node hosting track bus interface:")
+        self.locolabel.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.dcclocomotive = common.entry_box(self.subframe1, width=8, tool_tip="Specify the remote network node "+
+                    "hosting the Pi-SPROG interface responsible for driving the Track Bus). Note that when a remote node "+
+                    "is specified, DCC Locomotive commands WILL NOT be sent out to the local Pi-SPROG interface")
+        self.dcclocomotive.pack(padx=2, pady=2, side=Tk.LEFT)
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=10, width=3,
@@ -791,7 +806,7 @@ class mqtt_publish_tab():
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
-        return (self.signals.validate() and self.sections.validate()
+        return (self.signals.validate() and self.sections.validate() and self.dcclocomotive.validate()
             and self.instruments.validate() and self.sensors.validate())
 
 
@@ -904,13 +919,15 @@ class edit_mqtt_settings():
         self.config.pubshutdown.set_value(settings.get_mqtt("pubshutdown"))
         self.config.subshutdown.set_value(settings.get_mqtt("subshutdown"))
         # Populate the subscribe tab
-        self.subscribe.dcc.set_values(settings.get_mqtt("subdccnodes"))
+        self.subscribe.dccaccessory.set_values(settings.get_mqtt("subdccnodes"))
+        self.subscribe.dcclocomotive.set_values(settings.get_mqtt("subloconodes"))
         self.subscribe.signals.set_values(settings.get_mqtt("subsignals"))
         self.subscribe.sections.set_values(settings.get_mqtt("subsections"))
         self.subscribe.instruments.set_values(settings.get_mqtt("subinstruments"))
         self.subscribe.sensors.set_values(settings.get_mqtt("subsensors"))
         # Populate the publish tab
-        self.publish.dcc.set_value(settings.get_mqtt("pubdcc"))
+        self.publish.dccaccessory.set_value(settings.get_mqtt("pubdcc"))
+        self.publish.dcclocomotive.set_value(settings.get_mqtt("publoco"))
         self.publish.signals.set_values(settings.get_mqtt("pubsignals"))
         self.publish.sections.set_values(settings.get_mqtt("pubsections"))
         self.publish.instruments.set_values(settings.get_mqtt("pubinstruments"))
@@ -934,13 +951,15 @@ class edit_mqtt_settings():
             settings.set_mqtt("pubshutdown", self.config.pubshutdown.get_value())
             settings.set_mqtt("subshutdown", self.config.subshutdown.get_value())
             # Save the Subscribe settings
-            settings.set_mqtt("subdccnodes", self.subscribe.dcc.get_values())
+            settings.set_mqtt("subdccnodes", self.subscribe.dccaccessory.get_values())
+            settings.set_mqtt("subloconodes", self.subscribe.dcclocomotive.get_values())
             settings.set_mqtt("subsignals", self.subscribe.signals.get_values())
             settings.set_mqtt("subsections", self.subscribe.sections.get_values())
             settings.set_mqtt("subinstruments", self.subscribe.instruments.get_values())
             settings.set_mqtt("subsensors", self.subscribe.sensors.get_values())
             # Save the publish settings
-            settings.set_mqtt("pubdcc", self.publish.dcc.get_value())
+            settings.set_mqtt("pubdcc", self.publish.dccaccessory.get_value())
+            settings.set_mqtt("publoco", self.publish.dcclocomotive.get_value())
             settings.set_mqtt("pubsignals", self.publish.signals.get_values())
             settings.set_mqtt("pubsections", self.publish.sections.get_values())
             settings.set_mqtt("pubinstruments", self.publish.instruments.get_values())
