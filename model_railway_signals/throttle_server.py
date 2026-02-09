@@ -589,7 +589,7 @@ def start_throttle_server(debugging:bool, allow_list:list, use_allow_list:bool):
         # TIMEOUT 4: 5 seconds is plenty for a local socket bind
         if server_debug: logging.debug("Throttle Server: Waiting for server thread to initialise...")
         if server_ready.wait(timeout=5.0) and server_loop and server_loop.is_running():
-            dcc_power_state = library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
+            library.subscribe_to_dcc_power_updates(dcc_power_status_updated)
             make_server_status_updated_callbacks()
             logging.info("Throttle Server: Throttle Server has been Started")
         else:
@@ -672,7 +672,6 @@ def dcc_power_status_updated(dcc_power:bool):
                 # active_locos should be a dict like {'T': 'L4401', 'S': 'S3'}
                 for t_key in list(sessions.keys()):
                     for session in sessions[t_key]:
-                        session_id = session["session_id"]
                         address_str = session["addr_str"]
                         # Notify the WiThrottle Client to release the UI
                         # Format: M<throttle>-<address> e.g. MT-L4701
