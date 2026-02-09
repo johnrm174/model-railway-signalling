@@ -75,7 +75,7 @@ def subscribe_to_dcc_power_updates(callback):
     else:
         # Subscribe to updates from the local SPROG interface. this will trigger
         # an immediate callback to let the client know the current powerstate.
-        pi_sprog_interface.subscribe_to_loco_dcc_power_updates(callback)
+        pi_sprog_interface.subscribe_to_local_dcc_power_updates(callback)
     return()
 
 def unsubscribe_from_dcc_power_updates(callback):
