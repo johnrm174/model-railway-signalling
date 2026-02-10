@@ -765,6 +765,14 @@ def route_button_selected_callback(route_button_id:int):
     # Process the callback depending on the type of the route
     if not route_object["entrybutton"] and not route_object["exitbutton"]:
         logging.debug("RUN ROUTES - ONE-CLICK Route Button "+str(route_button_id)+" has been selected")
+        # Clear down any NX Route selection that might be in progress
+        if activated_entry_button_id > 0:
+            activated_entry_button_data = library.get_button_data(activated_entry_button_id)
+            unhighlight_possible_routes(activated_entry_button_id)
+            # Toggle the activated_entry_button OFF unless it is an Exit button on an active route
+            if library.button_state(activated_entry_button_id) and activated_entry_button_data["entrybutton"] == 0:
+                library.toggle_button(activated_entry_button_id)
+                logging.debug("RUN ROUTES - Deselecting Activated Entry Button: "+str(activated_entry_button_id))
         logging.info("RUN ROUTES - Initiating set-up of ONE-CLICK Route from Button "+str(route_button_id))
         # For 'one click' buttons we use the first route definition (index=0). There is no
         # Exit button for these routes, so we set the exit button ID to 0.
