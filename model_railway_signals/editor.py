@@ -207,8 +207,7 @@ class main_menubar:
         self.utilities_menu.add_command(label =" Application Upgrade...",
                 command=lambda:menubar.application_upgrade(self.root))
         self.utilities_menu.add_command(label =" DCC Programming...",
-                command=lambda:menubar.dcc_programming(self.root, self.dcc_programming_enabled,
-                                                         self.dcc_power_off, self.dcc_power_on))
+                command=lambda:menubar.dcc_programming(self.root))
         self.utilities_menu.add_command(label =" DCC Mappings...",
                 command=lambda:menubar.dcc_mappings(self.root))
         self.utilities_menu.add_command(label =" Exercise Points...",

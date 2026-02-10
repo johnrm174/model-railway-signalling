@@ -62,7 +62,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 * DCC Loco control - Now the DCC Signalling system can be used as a full Command Station:
     * Ideal for smaller layouts if you don't want the expense of a seperate DCC command station.
-    * Add your DCC locos to the Roster, defining DCC address and functions (up to 12 functions).
+    * Add your DCC locos to the Roster, defining DCC address and DCC functions.
     * Control your Locos via on-screen throttles (fully compatible with touchscreens).
     * Start the built-in WiThrottle server and control your locos from your smartphone.
     * Both Android (Engine Driver App) and iPhone (Withrottle App) are supported
@@ -70,6 +70,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Improved initial synchronisation of layout state following DCC connect
 * Added ability to inhibit flashing aspects for signal approach control
 * Added ability to specify the same GPIO sensor for signal passed and signal approached
+* Minor Improvements to the DCC Programming utility
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
