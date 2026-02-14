@@ -1,10 +1,10 @@
 {
    "filename": "/home/john/model-railway-signalling/model_railway_signals/examples/rails_connect_21_pin.cvc",
-   "documentation": "CV Configuraation for a Hornby R8249 8 pin decoder\nCV29 Bits are: 0 direction (0=Fwd), 1 Speed Steps (1=28/128), 2 Analogue (0=DCC only)\n           3 Railcom (0=disabled), 4 Speed Curve (0=use CV 2/5/6), 5 Addressing (0=short)",
+   "documentation": "CV Configuraation for a Rails Connect 21 pin decoder\nCV29 Bits are: 0 direction (0=Fwd), 1 Speed Steps (1=28/128), 2 Analogue (0=DCC only)\n           3 Railcom (0=disabled), 4 Speed Curve (0=use CV 2/5/6), 5 Addressing (0=short)",
    "configuration": [
       [
          1,
-         2,
+         10,
          "Short Loco Address"
       ],
       [
