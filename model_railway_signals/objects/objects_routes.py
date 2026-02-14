@@ -435,9 +435,11 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
+    ### Note that we now allow the actual route definitions to be copied across to make it
+    ### easier for the user who is defining multiple routes that are broadly similar
+    ### objects_common.schematic_objects[new_object_id]["routedefinitions"] = default_route_object["routedefinitions"]
     objects_common.schematic_objects[new_object_id]["routedescription"] = default_route_object["routedescription"]
     objects_common.schematic_objects[new_object_id]["setupsensor"] = default_route_object["setupsensor"]
-    objects_common.schematic_objects[new_object_id]["routedefinitions"] = default_route_object["routedefinitions"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create the associated library objects
