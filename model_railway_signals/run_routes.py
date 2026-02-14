@@ -871,14 +871,14 @@ def route_button_selected_callback(route_button_id:int):
             # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
             # As ENTRY Buttons are disabled unless there is one or more valid routes available
             ########################################################################################################
-            logging.error("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
+            logging.debug("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
             library.toggle_button(route_button_id)
     else:
         ########################################################################################################
         # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
         # As EXIT-ONLY Buttons should be disabled unless a route selection has been initiated
         ########################################################################################################
-        logging.error("RUN ROUTES - EXIT Button "+str(route_button_id)+" has been Selected - but no ENTRY button is active")
+        logging.debug("RUN ROUTES - EXIT Button "+str(route_button_id)+" has been Selected - but no ENTRY button is active")
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
         print("########## Took "+str(time_in_ms)+" milliseconds")
