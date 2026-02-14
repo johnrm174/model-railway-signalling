@@ -775,9 +775,13 @@ class timed_sequence():
                 # 'passed'event triggering a timed sequence for another signal. In this case we
                 # generate a 'passed' callback for signal rather than an 'updated' callback.
                 if self.start_delay > 0:                 
+                    # Note that we only update the signal AFTER the signal passed callback as we
+                    # need to let the 'run layout' processing handle the event in terms of any
+                    # track occupancy changes before updating the signal to its overridden aspect.
+                    # If we updated prior to the callback we would get a spurious SPAD
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    update_semaphore_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
+                    update_semaphore_signal(self.sig_id)
                 else:
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
                     update_semaphore_signal(self.sig_id)

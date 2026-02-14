@@ -644,7 +644,10 @@ class timed_sequence():
                 # generate a 'passed' callback for signal rather than an 'updated' callback.
                 if self.start_delay > 0: 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    update_colour_light_signal(self.sig_id)
+                    # Note that we don't update the signal here - instead we make the signal passed
+                    # callback and then let the 'run layout' processing handle the event in terms
+                    # of any track occupancy changes before it calls the update_colour_light_signal
+                    # function - If we updated prior to the callback we would get a spurious SPAD.
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
                 else:
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
