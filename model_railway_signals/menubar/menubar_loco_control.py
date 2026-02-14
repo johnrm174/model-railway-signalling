@@ -395,35 +395,34 @@ class Function_button(Tk.Button):
         self.state = False
         self.callback = kwargs.pop('command', None)
         self.latching = kwargs.pop('latching', False)
-        super().__init__(parent, **kwargs)
-        self.bind("<ButtonPress-1>", self.on_press)
+        super().__init__(parent, command=self.internal_callback, **kwargs)
         self.bind("<ButtonRelease-1>", self.on_release)
-        
+        self.bind("<ButtonPress-1>", self.on_press)
+
     def config(self, **kwargs):
         if "latching" in kwargs: self.latching = kwargs.pop('latching')
         if "command" in kwargs: self.callback = kwargs.pop('command')
         super().config(**kwargs)
 
-    def on_press(self, function_id:int):
+    def internal_callback(self):
         if self.latching:
-            if self.state:
-                self.config(relief="raised")
-                self.state = False
-                if self.callback: self.callback()
-            else:
-                self.config(relief="sunken")
-                self.state = True
-                if self.callback: self.callback()
-            # Tell Tkinter not to process its 'normal' logic for changing the button
-            return("break")
-        else:
-            self.state = True
+            # Toggle state
+            self.state = not self.state
+            new_relief = "sunken" if self.state else "raised"
+            self.config(relief=new_relief)
+            # Execute the user's logic
             if self.callback: self.callback()
-            
+
     def on_release(self, function_id:int):
         if not self.latching:
             self.state = False
             if self.callback: self.callback()
+
+    def on_press(self, function_id:int):
+        if not self.latching:
+            self.state = True
+            if self.callback: self.callback()
+
 
 #------------------------------------------------------------------------------------
 # Class for a Grid of Locomotives (Rows can be added/deleted as required)
