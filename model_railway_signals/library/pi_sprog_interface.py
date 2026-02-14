@@ -611,6 +611,7 @@ def sprog_connect (port_name:str="/dev/serial0",
         serial_port.baudrate = baud_rate
         serial_port.bytesize = 8
         serial_port.timeout = 0  # Non blocking - returns immediately
+        serial_port.write_timeout = 0.5
         serial_port.parity = serial.PARITY_NONE
         serial_port.stopbits = serial.STOPBITS_ONE
         # Try to open the serial port (catching any exceptions)
