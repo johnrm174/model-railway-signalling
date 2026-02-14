@@ -241,10 +241,11 @@ class cv_programming_element():
             # Note that these library calls are synchronous (unless they timeout)
             library.request_dcc_power_off()
             library.request_dcc_power_on()
-            # re-enable the buttons (update first to get rid of any ghost clicks)
-            self.parent_frame.update()
-            self.B1.config(state="normal")
-            self.B2.config(state="normal")
+        # re-enable the buttons (update first to get rid of any ghost clicks)
+        self.parent_frame.update()
+        self.parent_frame.focus()
+        self.B1.config(state="normal")
+        self.B2.config(state="normal")
 
     def write_all_cvs(self):
         # Inhibit the buttons to stop another read/write being triggered
@@ -287,10 +288,11 @@ class cv_programming_element():
             # Note that these library calls are synchronous (unless they timeout)
             library.request_dcc_power_off()
             library.request_dcc_power_on()
-            # re-enable the buttons (update first to get rid of any ghost clicks)
-            self.parent_frame.update()
-            self.B1.config(state="normal")
-            self.B2.config(state="normal")
+        # re-enable the buttons (update first to get rid of any ghost clicks)
+        self.parent_frame.update()
+        self.parent_frame.focus()
+        self.B1.config(state="normal")
+        self.B2.config(state="normal")
 
     def save_config(self, save_as:bool):
         self.B4.focus_set()
