@@ -115,10 +115,10 @@
         "22": {
             "buttondata": {
                 "entrybutton": 0,
-                "exitbutton": 32,
-                "route": 1
+                "exitbutton": 0,
+                "route": null
             },
-            "selected": true
+            "selected": false
         },
         "25": {
             "buttondata": {
@@ -170,11 +170,11 @@
         },
         "32": {
             "buttondata": {
-                "entrybutton": 22,
+                "entrybutton": 0,
                 "exitbutton": 0,
                 "route": null
             },
-            "selected": true
+            "selected": false
         },
         "33": {
             "buttondata": {
@@ -270,7 +270,7 @@
     "levers": {},
     "objects": {
         "0148c4d4-8a20-45c2-9a32-a1eb5e532d9f": {
-            "bbox": 2805,
+            "bbox": 1962,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -300,7 +300,7 @@
                 0,
                 0
             ],
-            "bbox": 2813,
+            "bbox": 1970,
             "colour": "Black",
             "endx": 600.0,
             "endy": 475.0,
@@ -315,7 +315,7 @@
         },
         "02aaa6bf-c249-45ed-965f-047262cad8a5": {
             "background": "",
-            "bbox": 2816,
+            "bbox": 1973,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -335,7 +335,7 @@
         "03ccf15b-26d2-414f-b4b4-03687c25c1c9": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 2824,
+            "bbox": 1981,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 121,
@@ -371,7 +371,7 @@
                 0,
                 0
             ],
-            "bbox": 2832,
+            "bbox": 1989,
             "colour": "Black",
             "endx": 325.0,
             "endy": 225.0,
@@ -387,7 +387,7 @@
         "058012a1-4cb8-40e0-9c67-55c0139c064a": {
             "alsoswitch": 34,
             "automatic": false,
-            "bbox": 2841,
+            "bbox": 1998,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 105,
@@ -480,7 +480,7 @@
         "05daf194-7943-4c0b-8540-b574716ce9ca": {
             "alsoswitch": 32,
             "automatic": false,
-            "bbox": 2850,
+            "bbox": 2007,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 106,
@@ -565,7 +565,7 @@
                 0,
                 0
             ],
-            "bbox": 2858,
+            "bbox": 2015,
             "colour": "Black",
             "endx": 1450.0,
             "endy": 375.0,
@@ -579,7 +579,7 @@
             "tags": "line24"
         },
         "07855090-b43b-4a56-b100-9e84091c591e": {
-            "bbox": 2862,
+            "bbox": 2019,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -616,7 +616,7 @@
                 false,
                 ""
             ],
-            "bbox": 2882,
+            "bbox": 2039,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1061,7 +1061,7 @@
                 20,
                 5
             ],
-            "bbox": 2890,
+            "bbox": 2047,
             "colour": "#000000",
             "endx": 545.0,
             "endy": 285.0,
@@ -1075,7 +1075,7 @@
             "tags": "line83"
         },
         "0c478e20-2869-4daa-9de6-0bf9ceaa5af9": {
-            "bbox": 2896,
+            "bbox": 2053,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -1137,7 +1137,7 @@
                 0,
                 0
             ],
-            "bbox": 2904,
+            "bbox": 2061,
             "colour": "Black",
             "endx": 875.0,
             "endy": 150.0,
@@ -1164,7 +1164,7 @@
                 false,
                 ""
             ],
-            "bbox": 2916,
+            "bbox": 2073,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1537,7 +1537,7 @@
                 20,
                 5
             ],
-            "bbox": 2924,
+            "bbox": 2081,
             "colour": "#000000",
             "endx": 1351.0,
             "endy": 303.0,
@@ -1557,7 +1557,7 @@
                 20,
                 5
             ],
-            "bbox": 2932,
+            "bbox": 2089,
             "colour": "Black",
             "endx": 1575.0,
             "endy": 375.0,
@@ -1571,7 +1571,7 @@
             "tags": "line64"
         },
         "137241a7-96c0-439d-896c-fe9bd64e7a93": {
-            "bbox": 2938,
+            "bbox": 2095,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -1632,7 +1632,7 @@
                 0,
                 0
             ],
-            "bbox": 2946,
+            "bbox": 2103,
             "colour": "Black",
             "endx": 175.0,
             "endy": 325.0,
@@ -1646,7 +1646,7 @@
             "tags": "line67"
         },
         "19b1e613-f33d-4fdc-a8e6-0c545434f590": {
-            "bbox": 2952,
+            "bbox": 2109,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -1697,7 +1697,7 @@
         "1ab8c048-bc7a-4a3b-a14c-b02afcafcaa4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 2959,
+            "bbox": 2116,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -1740,7 +1740,7 @@
                 false,
                 ""
             ],
-            "bbox": 2979,
+            "bbox": 2136,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2168,7 +2168,7 @@
                 0,
                 0
             ],
-            "bbox": 2987,
+            "bbox": 2144,
             "colour": "Black",
             "endx": 1425.0,
             "endy": 325.0,
@@ -2188,7 +2188,7 @@
                 1,
                 1
             ],
-            "bbox": 2995,
+            "bbox": 2152,
             "colour": "Black",
             "endx": 1150.0,
             "endy": 175.0,
@@ -2202,7 +2202,7 @@
             "tags": "line38"
         },
         "1ea1c584-3232-408c-8ab8-ca746f4c7498": {
-            "bbox": 3001,
+            "bbox": 2158,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -2256,7 +2256,7 @@
             ]
         },
         "1f2b5db8-d6e7-4459-bb03-380971978559": {
-            "bbox": 3007,
+            "bbox": 2164,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -2324,7 +2324,7 @@
                 false,
                 ""
             ],
-            "bbox": 3029,
+            "bbox": 2186,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2719,10 +2719,10 @@
                     0
                 ],
                 [
-                    false,
-                    0,
-                    0,
-                    0
+                    true,
+                    12,
+                    15,
+                    10
                 ],
                 [
                     false,
@@ -2800,7 +2800,7 @@
                 1,
                 1
             ],
-            "bbox": 3037,
+            "bbox": 2194,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 250.0,
@@ -2814,7 +2814,7 @@
             "tags": "line17"
         },
         "22a63804-92ab-4d6a-89fb-c5b3eed7e475": {
-            "bbox": 3041,
+            "bbox": 2198,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -2838,7 +2838,7 @@
             ]
         },
         "23d1f525-9fc8-4f92-acbb-9b86c3c0e7bf": {
-            "bbox": 3047,
+            "bbox": 2204,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -2984,7 +2984,7 @@
         "24bd0e5e-c7ff-4973-a245-365953dc5bda": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3055,
+            "bbox": 2212,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 118,
@@ -3014,7 +3014,7 @@
             "ybuttonoffset": 0
         },
         "2545aaf4-dd96-46ca-9a9d-fedba054eb3b": {
-            "bbox": 3061,
+            "bbox": 2218,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -3131,7 +3131,7 @@
         "25bde8e4-dc58-4917-b214-70b236a0e316": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 3069,
+            "bbox": 2226,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 104,
@@ -3236,7 +3236,7 @@
         "2660e87b-743d-4bf5-b5c9-33eb079c533c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3077,
+            "bbox": 2234,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 111,
@@ -3297,7 +3297,7 @@
                 0,
                 0
             ],
-            "bbox": 3085,
+            "bbox": 2242,
             "colour": "Black",
             "endx": 1600.0,
             "endy": 325.0,
@@ -3311,7 +3311,7 @@
             "tags": "line63"
         },
         "280ffb82-b4eb-49d3-96d3-9de9160072b7": {
-            "bbox": 3089,
+            "bbox": 2246,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -3335,7 +3335,7 @@
             ]
         },
         "29f85e73-35b2-4fa3-83bc-8d9db311ae3f": {
-            "bbox": 3095,
+            "bbox": 2252,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -3405,7 +3405,7 @@
                 1,
                 1
             ],
-            "bbox": 3103,
+            "bbox": 2260,
             "colour": "Black",
             "endx": 200.0,
             "endy": 200.0,
@@ -3432,7 +3432,7 @@
                 false,
                 ""
             ],
-            "bbox": 3123,
+            "bbox": 2280,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3779,7 +3779,7 @@
         },
         "2ea41ff5-d1c7-4c38-bb25-53eeadc25735": {
             "background": "",
-            "bbox": 3126,
+            "bbox": 2283,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -3799,7 +3799,7 @@
         "2fa461e9-d2d1-4ee1-b327-f646eef2e2fd": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3134,
+            "bbox": 2291,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 119,
@@ -3829,7 +3829,7 @@
             "ybuttonoffset": -30
         },
         "361ecfcc-84ff-4733-a6e5-574872bfe159": {
-            "bbox": 3140,
+            "bbox": 2297,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -3898,7 +3898,7 @@
                 0,
                 0
             ],
-            "bbox": 3148,
+            "bbox": 2305,
             "colour": "Black",
             "endx": 400.0,
             "endy": 375.0,
@@ -3918,7 +3918,7 @@
                 0,
                 0
             ],
-            "bbox": 3156,
+            "bbox": 2313,
             "colour": "Black",
             "endx": 450.0,
             "endy": 150.0,
@@ -3932,7 +3932,7 @@
             "tags": "line69"
         },
         "37716476-045e-4efc-a8d0-dc30b5f9ccbb": {
-            "bbox": 3160,
+            "bbox": 2317,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -3958,7 +3958,7 @@
         "37fbb878-e6fd-4629-96f8-5912ec2ab8d3": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3169,
+            "bbox": 2326,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 108,
@@ -4014,7 +4014,7 @@
                 false,
                 ""
             ],
-            "bbox": 3191,
+            "bbox": 2348,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4320,10 +4320,10 @@
                     0
                 ],
                 [
-                    false,
-                    0,
-                    0,
-                    0
+                    true,
+                    12,
+                    15,
+                    10
                 ],
                 [
                     false,
@@ -4397,7 +4397,7 @@
         "391992d3-4a81-413f-8526-ea1f578b4768": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3199,
+            "bbox": 2356,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 115,
@@ -4433,7 +4433,7 @@
                 20,
                 5
             ],
-            "bbox": 3207,
+            "bbox": 2364,
             "colour": "Black",
             "endx": 300.0,
             "endy": 425.0,
@@ -4453,7 +4453,7 @@
                 0,
                 0
             ],
-            "bbox": 3215,
+            "bbox": 2372,
             "colour": "Black",
             "endx": 1000.0,
             "endy": 475.0,
@@ -4467,7 +4467,7 @@
             "tags": "line13"
         },
         "3b13a91b-6906-40a4-854a-660b9cb157a4": {
-            "bbox": 3221,
+            "bbox": 2378,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -4521,7 +4521,7 @@
             ]
         },
         "3b9c9266-3dfe-4349-84a3-c7b9b9185cae": {
-            "bbox": 3225,
+            "bbox": 2382,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -4547,7 +4547,7 @@
         "3e21b1c6-4357-460f-bb55-19b5aef1ecbe": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3233,
+            "bbox": 2390,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 109,
@@ -4577,7 +4577,7 @@
             "ybuttonoffset": 0
         },
         "3e561b33-829f-4790-8e78-600b3026d83b": {
-            "bbox": 3239,
+            "bbox": 2396,
             "buttoncolour": "#d8cd80",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -4637,7 +4637,7 @@
                 1,
                 1
             ],
-            "bbox": 3247,
+            "bbox": 2404,
             "colour": "Black",
             "endx": 850.0,
             "endy": 125.0,
@@ -4651,7 +4651,7 @@
             "tags": "line43"
         },
         "42fb9550-fc70-4b2c-8e24-99dd713818ea": {
-            "bbox": 3253,
+            "bbox": 2410,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": false,
@@ -4705,7 +4705,7 @@
                 false,
                 ""
             ],
-            "bbox": 3275,
+            "bbox": 2432,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5044,7 +5044,7 @@
                 [
                     true,
                     17,
-                    15,
+                    20,
                     10
                 ],
                 [
@@ -5099,7 +5099,7 @@
             "ybuttonoffset": 0
         },
         "438c73dc-9d58-4f2a-ac60-c930ea1433f7": {
-            "bbox": 3279,
+            "bbox": 2436,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -5125,7 +5125,7 @@
         "44ba7fde-6643-4a13-8016-12dce8062d68": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3286,
+            "bbox": 2443,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -5161,7 +5161,7 @@
                 0,
                 0
             ],
-            "bbox": 3294,
+            "bbox": 2451,
             "colour": "Black",
             "endx": 975.0,
             "endy": 250.0,
@@ -5177,7 +5177,7 @@
         "47a9ea55-623c-48d0-af0d-6a4be22cc19f": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 3303,
+            "bbox": 2460,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 102,
@@ -5286,7 +5286,7 @@
                 0,
                 0
             ],
-            "bbox": 3311,
+            "bbox": 2468,
             "colour": "Black",
             "endx": 1000.0,
             "endy": 425.0,
@@ -5306,7 +5306,7 @@
                 20,
                 5
             ],
-            "bbox": 3319,
+            "bbox": 2476,
             "colour": "Black",
             "endx": 1550.0,
             "endy": 425.0,
@@ -5326,7 +5326,7 @@
                 20,
                 5
             ],
-            "bbox": 3327,
+            "bbox": 2484,
             "colour": "#000000",
             "endx": 912.0,
             "endy": 287.0,
@@ -5346,7 +5346,7 @@
                 20,
                 5
             ],
-            "bbox": 3335,
+            "bbox": 2492,
             "colour": "#000000",
             "endx": 965.0,
             "endy": 287.0,
@@ -5360,7 +5360,7 @@
             "tags": "line80"
         },
         "4fd68316-8c13-429b-9ed7-079233fbd239": {
-            "bbox": 3341,
+            "bbox": 2498,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -5482,7 +5482,7 @@
                 0,
                 0
             ],
-            "bbox": 3349,
+            "bbox": 2506,
             "colour": "Black",
             "endx": 475.0,
             "endy": 425.0,
@@ -5502,7 +5502,7 @@
                 1,
                 1
             ],
-            "bbox": 3357,
+            "bbox": 2514,
             "colour": "Black",
             "endx": 200.0,
             "endy": 250.0,
@@ -5522,7 +5522,7 @@
                 1,
                 1
             ],
-            "bbox": 3365,
+            "bbox": 2522,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 50.0,
@@ -5542,7 +5542,7 @@
                 0,
                 0
             ],
-            "bbox": 3373,
+            "bbox": 2530,
             "colour": "Black",
             "endx": 1050.0,
             "endy": 325.0,
@@ -5562,7 +5562,7 @@
                 0,
                 0
             ],
-            "bbox": 3381,
+            "bbox": 2538,
             "colour": "Black",
             "endx": 1125.0,
             "endy": 400.0,
@@ -5582,7 +5582,7 @@
                 1,
                 1
             ],
-            "bbox": 3389,
+            "bbox": 2546,
             "colour": "Black",
             "endx": 275.0,
             "endy": 125.0,
@@ -5596,7 +5596,7 @@
             "tags": "line50"
         },
         "595ed0bf-b5ac-458a-a4a4-6c8d4ad3da1a": {
-            "bbox": 3395,
+            "bbox": 2552,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -5657,7 +5657,7 @@
                 0,
                 0
             ],
-            "bbox": 3403,
+            "bbox": 2560,
             "colour": "Black",
             "endx": 650.0,
             "endy": 150.0,
@@ -5677,7 +5677,7 @@
                 1,
                 1
             ],
-            "bbox": 3411,
+            "bbox": 2568,
             "colour": "Black",
             "endx": 225.0,
             "endy": 225.0,
@@ -5697,7 +5697,7 @@
                 20,
                 5
             ],
-            "bbox": 3419,
+            "bbox": 2576,
             "colour": "Black",
             "endx": 25.0,
             "endy": 425.0,
@@ -5717,7 +5717,7 @@
                 0,
                 0
             ],
-            "bbox": 3427,
+            "bbox": 2584,
             "colour": "Black",
             "endx": 400.0,
             "endy": 325.0,
@@ -5744,7 +5744,7 @@
                 false,
                 ""
             ],
-            "bbox": 3439,
+            "bbox": 2596,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6127,7 +6127,7 @@
         "5fd84d01-3fc8-4592-923c-968e38f13c80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3446,
+            "bbox": 2603,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -6170,7 +6170,7 @@
                 false,
                 ""
             ],
-            "bbox": 3465,
+            "bbox": 2622,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -6257,7 +6257,7 @@
             "pointinterlock": [
                 [
                     [],
-                    "5",
+                    "",
                     0
                 ],
                 [
@@ -6497,7 +6497,7 @@
                 1,
                 1
             ],
-            "bbox": 3473,
+            "bbox": 2630,
             "colour": "Black",
             "endx": 300.0,
             "endy": 75.0,
@@ -6513,7 +6513,7 @@
         "637560c0-d541-41f5-a16a-771b028d9595": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3481,
+            "bbox": 2638,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 122,
@@ -6549,7 +6549,7 @@
                 0,
                 0
             ],
-            "bbox": 3489,
+            "bbox": 2646,
             "colour": "Black",
             "endx": 900.0,
             "endy": 300.0,
@@ -6563,7 +6563,7 @@
             "tags": "line30"
         },
         "65e3e158-6700-4ae4-a1bc-a2bf779a8c4f": {
-            "bbox": 3495,
+            "bbox": 2652,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -6747,7 +6747,7 @@
                 20,
                 5
             ],
-            "bbox": 3503,
+            "bbox": 2660,
             "colour": "#000000",
             "endx": 76.0,
             "endy": 301.0,
@@ -6767,7 +6767,7 @@
                 0,
                 0
             ],
-            "bbox": 3511,
+            "bbox": 2668,
             "colour": "Black",
             "endx": 600.0,
             "endy": 250.0,
@@ -6787,7 +6787,7 @@
                 20,
                 5
             ],
-            "bbox": 3519,
+            "bbox": 2676,
             "colour": "Black",
             "endx": 50.0,
             "endy": 375.0,
@@ -6807,7 +6807,7 @@
                 0,
                 0
             ],
-            "bbox": 3527,
+            "bbox": 2684,
             "colour": "Black",
             "endx": 1225.0,
             "endy": 425.0,
@@ -6821,7 +6821,7 @@
             "tags": "line6"
         },
         "6d90d7a5-359a-4320-8109-e9e0a9350043": {
-            "bbox": 3533,
+            "bbox": 2690,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -6890,7 +6890,7 @@
                 0,
                 0
             ],
-            "bbox": 3541,
+            "bbox": 2698,
             "colour": "Black",
             "endx": 1050.0,
             "endy": 450.0,
@@ -6917,7 +6917,7 @@
                 false,
                 ""
             ],
-            "bbox": 3563,
+            "bbox": 2720,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -7356,7 +7356,7 @@
             "ybuttonoffset": 0
         },
         "7189da3b-f611-493b-b453-4c18190325b3": {
-            "bbox": 3567,
+            "bbox": 2724,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -7380,7 +7380,7 @@
             ]
         },
         "72d9a7ab-03e3-4862-9edc-e4b1b0669d8a": {
-            "bbox": 3571,
+            "bbox": 2728,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -7410,7 +7410,7 @@
                 0,
                 0
             ],
-            "bbox": 3579,
+            "bbox": 2736,
             "colour": "Black",
             "endx": 900.0,
             "endy": 250.0,
@@ -7430,7 +7430,7 @@
                 1,
                 1
             ],
-            "bbox": 3587,
+            "bbox": 2744,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 150.0,
@@ -7446,7 +7446,7 @@
         "771fd5da-2c58-423c-9b29-d181501dca9b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3594,
+            "bbox": 2751,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -7482,7 +7482,7 @@
                 20,
                 5
             ],
-            "bbox": 3602,
+            "bbox": 2759,
             "colour": "#000000",
             "endx": 909.0,
             "endy": 236.0,
@@ -7496,7 +7496,7 @@
             "tags": "line77"
         },
         "78c8911f-a18a-41bf-961d-3a43893854d4": {
-            "bbox": 3606,
+            "bbox": 2763,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -7521,7 +7521,7 @@
         },
         "7aa34fb1-3039-4be1-b71a-9d85fa38f112": {
             "background": "",
-            "bbox": 3609,
+            "bbox": 2766,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -7539,7 +7539,7 @@
             ]
         },
         "7ae03bb9-e5ee-4d6a-9e15-c44076ff05e4": {
-            "bbox": 3615,
+            "bbox": 2772,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -7632,7 +7632,7 @@
         "7da047bd-7926-4d3b-bfee-5cdc23309cfe": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3623,
+            "bbox": 2780,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 114,
@@ -7668,7 +7668,7 @@
                 1,
                 1
             ],
-            "bbox": 3631,
+            "bbox": 2788,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 75.0,
@@ -7682,7 +7682,7 @@
             "tags": "line41"
         },
         "7ebb9105-8599-41da-8f8b-53c16b248355": {
-            "bbox": 3637,
+            "bbox": 2794,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -7747,7 +7747,7 @@
                 0,
                 0
             ],
-            "bbox": 3645,
+            "bbox": 2802,
             "colour": "Black",
             "endx": 1600.0,
             "endy": 375.0,
@@ -7763,7 +7763,7 @@
         "7f925596-94a5-43a6-b260-ce4bd63caaad": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3652,
+            "bbox": 2809,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -7799,7 +7799,7 @@
                 0,
                 0
             ],
-            "bbox": 3660,
+            "bbox": 2817,
             "colour": "Black",
             "endx": 900.0,
             "endy": 375.0,
@@ -7819,7 +7819,7 @@
                 1,
                 1
             ],
-            "bbox": 3668,
+            "bbox": 2825,
             "colour": "Black",
             "endx": 225.0,
             "endy": 175.0,
@@ -7834,7 +7834,7 @@
         },
         "846b5450-3bb8-443d-9552-644e650b10dd": {
             "background": "#d9d9b1",
-            "bbox": 3671,
+            "bbox": 2828,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -7853,7 +7853,7 @@
         },
         "84a2cb6e-79ed-42c2-ae61-55e5c92be7db": {
             "background": "",
-            "bbox": 3674,
+            "bbox": 2831,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -7884,7 +7884,7 @@
                 false,
                 ""
             ],
-            "bbox": 3686,
+            "bbox": 2843,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -8258,7 +8258,7 @@
         "863d3601-5fe0-491d-b694-ce9e34508990": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3694,
+            "bbox": 2851,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 113,
@@ -8288,7 +8288,7 @@
             "ybuttonoffset": 0
         },
         "880085c4-3709-4fca-b6ce-fcf1ab8d799d": {
-            "bbox": 3700,
+            "bbox": 2857,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -8446,7 +8446,7 @@
                 0,
                 0
             ],
-            "bbox": 3708,
+            "bbox": 2865,
             "colour": "Black",
             "endx": 1200.0,
             "endy": 325.0,
@@ -8466,7 +8466,7 @@
                 0,
                 0
             ],
-            "bbox": 3716,
+            "bbox": 2873,
             "colour": "Black",
             "endx": 475.0,
             "endy": 250.0,
@@ -8486,7 +8486,7 @@
                 0,
                 0
             ],
-            "bbox": 3724,
+            "bbox": 2881,
             "colour": "Black",
             "endx": 375.0,
             "endy": 225.0,
@@ -8500,7 +8500,7 @@
             "tags": "line52"
         },
         "8cfc6c4f-9b8d-41d1-b82c-a3f081761d9b": {
-            "bbox": 3730,
+            "bbox": 2887,
             "buttoncolour": "#d8cd80",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -8585,7 +8585,7 @@
         "8dd3b375-d8ae-401c-be4f-02fc1c97f524": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3738,
+            "bbox": 2895,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 123,
@@ -8621,7 +8621,7 @@
                 1,
                 1
             ],
-            "bbox": 3746,
+            "bbox": 2903,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 200.0,
@@ -8636,7 +8636,7 @@
         },
         "93d61cb6-a272-45a4-be73-7fcd8ae70932": {
             "background": "",
-            "bbox": 3749,
+            "bbox": 2906,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -8660,7 +8660,7 @@
                 0,
                 0
             ],
-            "bbox": 3757,
+            "bbox": 2914,
             "colour": "Black",
             "endx": 1100.0,
             "endy": 375.0,
@@ -8680,7 +8680,7 @@
                 0,
                 0
             ],
-            "bbox": 3765,
+            "bbox": 2922,
             "colour": "Black",
             "endx": 325.0,
             "endy": 425.0,
@@ -8696,7 +8696,7 @@
         "9dcab729-9273-4ede-9329-f6adc2ff05fb": {
             "alsoswitch": 17,
             "automatic": false,
-            "bbox": 3774,
+            "bbox": 2931,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 103,
@@ -8751,7 +8751,7 @@
             "ybuttonoffset": 0
         },
         "a1c194c5-d2c6-4319-96a9-9ac896b712e9": {
-            "bbox": 3780,
+            "bbox": 2937,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -8823,7 +8823,7 @@
                 0,
                 0
             ],
-            "bbox": 3788,
+            "bbox": 2945,
             "colour": "Black",
             "endx": 250.0,
             "endy": 325.0,
@@ -8843,7 +8843,7 @@
                 1,
                 1
             ],
-            "bbox": 3796,
+            "bbox": 2953,
             "colour": "Black",
             "endx": 475.0,
             "endy": 475.0,
@@ -8858,7 +8858,7 @@
         },
         "a824704b-6fde-49ba-ba05-933b6f7fe189": {
             "background": "",
-            "bbox": 3799,
+            "bbox": 2956,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -8882,7 +8882,7 @@
                 0,
                 0
             ],
-            "bbox": 3807,
+            "bbox": 2964,
             "colour": "Black",
             "endx": 1150.0,
             "endy": 375.0,
@@ -8902,7 +8902,7 @@
                 20,
                 5
             ],
-            "bbox": 3815,
+            "bbox": 2972,
             "colour": "#000000",
             "endx": 598.0,
             "endy": 285.0,
@@ -8916,7 +8916,7 @@
             "tags": "line84"
         },
         "adcea36a-3374-4060-abee-2fbb52dc236b": {
-            "bbox": 3821,
+            "bbox": 2978,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -8975,7 +8975,7 @@
                 0,
                 0
             ],
-            "bbox": 3829,
+            "bbox": 2986,
             "colour": "Black",
             "endx": 1600.0,
             "endy": 425.0,
@@ -8995,7 +8995,7 @@
                 0,
                 0
             ],
-            "bbox": 3837,
+            "bbox": 2994,
             "colour": "Black",
             "endx": 325.0,
             "endy": 375.0,
@@ -9011,7 +9011,7 @@
         "b0f29657-f391-457d-85b7-6a5ec41b0d13": {
             "alsoswitch": 12,
             "automatic": false,
-            "bbox": 3846,
+            "bbox": 3003,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 100,
@@ -9108,7 +9108,7 @@
                 0,
                 0
             ],
-            "bbox": 3854,
+            "bbox": 3011,
             "colour": "Black",
             "endx": 1075.0,
             "endy": 250.0,
@@ -9124,7 +9124,7 @@
         "b183f1e5-229f-45eb-b72e-e240590e2042": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3861,
+            "bbox": 3018,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -9156,7 +9156,7 @@
         "b19e9bb3-f25b-4771-b01b-eff1afd6e6ac": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3869,
+            "bbox": 3026,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 124,
@@ -9199,7 +9199,7 @@
                 false,
                 ""
             ],
-            "bbox": 3889,
+            "bbox": 3046,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -9450,7 +9450,7 @@
                 [
                     true,
                     17,
-                    15,
+                    20,
                     10
                 ],
                 [
@@ -9542,7 +9542,7 @@
                 false,
                 ""
             ],
-            "bbox": 3901,
+            "bbox": 3058,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -9911,7 +9911,7 @@
             "ybuttonoffset": 0
         },
         "b4b48b41-bcbe-4829-ad16-09eeee4e81a5": {
-            "bbox": 3907,
+            "bbox": 3064,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -9985,7 +9985,7 @@
                 false,
                 ""
             ],
-            "bbox": 3927,
+            "bbox": 3084,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -10256,7 +10256,7 @@
                 [
                     true,
                     12,
-                    15,
+                    20,
                     10
                 ],
                 [
@@ -10335,7 +10335,7 @@
             "ybuttonoffset": 0
         },
         "b7c8c16f-24db-459a-83cf-8a2af023c3e9": {
-            "bbox": 3933,
+            "bbox": 3090,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -10399,7 +10399,7 @@
         "b8051e97-038e-43a2-8054-f051a39b4fe6": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3941,
+            "bbox": 3098,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 116,
@@ -10435,7 +10435,7 @@
                 0,
                 0
             ],
-            "bbox": 3949,
+            "bbox": 3106,
             "colour": "Black",
             "endx": 375.0,
             "endy": 150.0,
@@ -10455,7 +10455,7 @@
                 0,
                 0
             ],
-            "bbox": 3957,
+            "bbox": 3114,
             "colour": "Black",
             "endx": 275.0,
             "endy": 175.0,
@@ -10482,7 +10482,7 @@
                 false,
                 ""
             ],
-            "bbox": 3976,
+            "bbox": 3133,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -10569,7 +10569,7 @@
             "pointinterlock": [
                 [
                     [],
-                    "6",
+                    "",
                     0
                 ],
                 [
@@ -10803,7 +10803,7 @@
             "ybuttonoffset": 0
         },
         "c044dc4d-fe4e-4542-b801-12e07053537d": {
-            "bbox": 3982,
+            "bbox": 3139,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": false,
@@ -10850,7 +10850,7 @@
                 0,
                 0
             ],
-            "bbox": 3990,
+            "bbox": 3147,
             "colour": "Black",
             "endx": 250.0,
             "endy": 295.0,
@@ -10873,7 +10873,7 @@
                 0,
                 0
             ],
-            "bbox": 3998,
+            "bbox": 3155,
             "colour": "Black",
             "endx": 600.0,
             "endy": 300.0,
@@ -10887,7 +10887,7 @@
             "tags": "line34"
         },
         "c583f5c4-3857-43ba-96d3-b1c5f2bb251b": {
-            "bbox": 4004,
+            "bbox": 3161,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -11014,7 +11014,7 @@
                 20,
                 5
             ],
-            "bbox": 4012,
+            "bbox": 3169,
             "colour": "#000000",
             "endx": 599.0,
             "endy": 234.0,
@@ -11034,7 +11034,7 @@
                 20,
                 5
             ],
-            "bbox": 4020,
+            "bbox": 3177,
             "colour": "#000000",
             "endx": 1298.0,
             "endy": 303.0,
@@ -11054,7 +11054,7 @@
                 1,
                 1
             ],
-            "bbox": 4028,
+            "bbox": 3185,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 100.0,
@@ -11068,7 +11068,7 @@
             "tags": "line42"
         },
         "c7aea3d8-5728-4458-b791-347a06eb479c": {
-            "bbox": 4034,
+            "bbox": 3191,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -11130,7 +11130,7 @@
         "c867d2f6-3d89-490c-a3f9-b8cdd535ae99": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4042,
+            "bbox": 3199,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 110,
@@ -11160,7 +11160,7 @@
             "ybuttonoffset": 40
         },
         "c9d70646-364e-454c-95de-978d995c6c8e": {
-            "bbox": 4046,
+            "bbox": 3203,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -11184,7 +11184,7 @@
             ]
         },
         "ca9a0626-6d24-4239-ab94-524319645b85": {
-            "bbox": 4052,
+            "bbox": 3209,
             "buttoncolour": "#d8cd80",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -11243,7 +11243,7 @@
                 1,
                 1
             ],
-            "bbox": 4060,
+            "bbox": 3217,
             "colour": "Black",
             "endx": 250.0,
             "endy": 150.0,
@@ -11263,7 +11263,7 @@
                 0,
                 0
             ],
-            "bbox": 4068,
+            "bbox": 3225,
             "colour": "Black",
             "endx": 1075.0,
             "endy": 375.0,
@@ -11283,7 +11283,7 @@
                 0,
                 0
             ],
-            "bbox": 4076,
+            "bbox": 3233,
             "colour": "Black",
             "endx": 475.0,
             "endy": 300.0,
@@ -11303,7 +11303,7 @@
                 20,
                 5
             ],
-            "bbox": 4084,
+            "bbox": 3241,
             "colour": "#000000",
             "endx": 546.0,
             "endy": 234.0,
@@ -11318,7 +11318,7 @@
         },
         "d0851e1f-b423-4626-8ad3-905a34ef190d": {
             "background": "#d9d9b1",
-            "bbox": 4087,
+            "bbox": 3244,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -11337,7 +11337,7 @@
         },
         "d1ea5d31-ba4e-47d7-b3a1-b91f9224b2b6": {
             "background": "",
-            "bbox": 4090,
+            "bbox": 3247,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -11361,7 +11361,7 @@
                 20,
                 5
             ],
-            "bbox": 4098,
+            "bbox": 3255,
             "colour": "#000000",
             "endx": 23.0,
             "endy": 301.0,
@@ -11381,7 +11381,7 @@
                 0,
                 0
             ],
-            "bbox": 4106,
+            "bbox": 3263,
             "colour": "Black",
             "endx": 1025.0,
             "endy": 425.0,
@@ -11397,7 +11397,7 @@
         "d433fb55-7016-4bc9-ac60-9cf142605fa8": {
             "alsoswitch": 13,
             "automatic": false,
-            "bbox": 4115,
+            "bbox": 3272,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 101,
@@ -11488,7 +11488,7 @@
             "ybuttonoffset": 0
         },
         "d4a3a8dc-b0f1-4ada-b934-36b9646a17b7": {
-            "bbox": 4119,
+            "bbox": 3276,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -11512,7 +11512,7 @@
             ]
         },
         "d50f5e30-09c8-4e0d-a222-c91f7a749fab": {
-            "bbox": 4125,
+            "bbox": 3282,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -11600,29 +11600,6 @@
                 "bold "
             ]
         },
-        "d8829222-2ac7-4f4b-9895-c18a502f9c94": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 4133,
-            "colour": "Black",
-            "endx": 425.0,
-            "endy": 25.0,
-            "item": "line",
-            "itemid": 85,
-            "linestyle": [
-                6,
-                2
-            ],
-            "linewidth": 1,
-            "posx": 450.0,
-            "posy": 25.0,
-            "selection": "line85selected",
-            "tags": "line85"
-        },
         "d958c76b-b258-4077-bdc8-3fd77ccdaa79": {
             "arrowends": 0,
             "arrowtype": [
@@ -11630,7 +11607,7 @@
                 0,
                 0
             ],
-            "bbox": 4141,
+            "bbox": 3290,
             "colour": "Black",
             "endx": 125.0,
             "endy": 425.0,
@@ -11650,7 +11627,7 @@
                 20,
                 5
             ],
-            "bbox": 4149,
+            "bbox": 3298,
             "colour": "#000000",
             "endx": 962.0,
             "endy": 236.0,
@@ -11670,7 +11647,7 @@
                 0,
                 0
             ],
-            "bbox": 4157,
+            "bbox": 3306,
             "colour": "Black",
             "endx": 425.0,
             "endy": 150.0,
@@ -11685,7 +11662,7 @@
         },
         "dc76be86-9ae4-46c1-8479-69663e17cac4": {
             "background": "",
-            "bbox": 4160,
+            "bbox": 3309,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -11704,7 +11681,7 @@
         },
         "ddb09cbe-5c7d-4810-b27b-0b64e588e56b": {
             "background": "",
-            "bbox": 4163,
+            "bbox": 3312,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -11728,7 +11705,7 @@
                 0,
                 0
             ],
-            "bbox": 4171,
+            "bbox": 3320,
             "colour": "Black",
             "endx": 525.0,
             "endy": 225.0,
@@ -11748,7 +11725,7 @@
                 0,
                 0
             ],
-            "bbox": 4179,
+            "bbox": 3328,
             "colour": "Black",
             "endx": 300.0,
             "endy": 250.0,
@@ -11764,7 +11741,7 @@
         "dec5f273-15d3-4ba7-a029-16028a9936e9": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4186,
+            "bbox": 3335,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -11800,7 +11777,7 @@
                 0,
                 0
             ],
-            "bbox": 4194,
+            "bbox": 3343,
             "colour": "Black",
             "endx": 975.0,
             "endy": 150.0,
@@ -11814,7 +11791,7 @@
             "tags": "line21"
         },
         "e234b7a0-f5c6-48bb-a9d3-cfeb92adf401": {
-            "bbox": 4198,
+            "bbox": 3347,
             "buttoncolour": "Black",
             "buttonwidth": 8,
             "defaultlabel": "XXXXX",
@@ -11838,7 +11815,7 @@
             ]
         },
         "e36ddda7-ba76-4409-a1b5-f24db2cf4aab": {
-            "bbox": 4204,
+            "bbox": 3353,
             "buttoncolour": "#d8cd80",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -11898,7 +11875,7 @@
                 1,
                 1
             ],
-            "bbox": 4212,
+            "bbox": 3361,
             "colour": "Black",
             "endx": 1250.0,
             "endy": 125.0,
@@ -11918,7 +11895,7 @@
                 0,
                 0
             ],
-            "bbox": 4220,
+            "bbox": 3369,
             "colour": "Black",
             "endx": 1025.0,
             "endy": 475.0,
@@ -11934,7 +11911,7 @@
         "e5eea518-6f34-47d9-8a17-ca314e06a52d": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 4227,
+            "bbox": 3376,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 0,
@@ -11977,7 +11954,7 @@
                 false,
                 ""
             ],
-            "bbox": 4247,
+            "bbox": 3396,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -12396,7 +12373,7 @@
             "ybuttonoffset": 0
         },
         "e92709eb-fc1c-415f-8534-ab68569f0911": {
-            "bbox": 4253,
+            "bbox": 3402,
             "buttoncolour": "#d8cd80",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -12490,7 +12467,7 @@
                 false,
                 ""
             ],
-            "bbox": 4273,
+            "bbox": 3422,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -12761,7 +12738,7 @@
                 [
                     true,
                     12,
-                    15,
+                    20,
                     10
                 ],
                 [
@@ -12840,7 +12817,7 @@
             "ybuttonoffset": 0
         },
         "eaa1962b-39ec-4dcb-8267-dbf54f93f8a6": {
-            "bbox": 4279,
+            "bbox": 3428,
             "buttoncolour": "#8ec8ff",
             "buttonwidth": 10,
             "entrybutton": false,
@@ -12895,7 +12872,7 @@
         "eaed2508-4646-46cc-83fa-b9ef8ee2848b": {
             "alsoswitch": 7,
             "automatic": false,
-            "bbox": 4288,
+            "bbox": 3437,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 107,
@@ -12988,7 +12965,7 @@
         "ebeacf5e-7f87-4057-8d71-24b9c06b90a5": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4296,
+            "bbox": 3445,
             "buttoncolour": "#d9d9b9",
             "colour": "Black",
             "dccaddress": 117,
@@ -13024,7 +13001,7 @@
                 0,
                 0
             ],
-            "bbox": 4304,
+            "bbox": 3453,
             "colour": "Black",
             "endx": 600.0,
             "endy": 425.0,
@@ -13044,7 +13021,7 @@
                 0,
                 0
             ],
-            "bbox": 4312,
+            "bbox": 3461,
             "colour": "Black",
             "endx": 975.0,
             "endy": 300.0,
@@ -13058,7 +13035,7 @@
             "tags": "line3"
         },
         "fa086459-4f31-4a4d-87b2-d7d650386d29": {
-            "bbox": 4318,
+            "bbox": 3467,
             "buttoncolour": "#ff888c",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -13128,7 +13105,7 @@
                 false,
                 ""
             ],
-            "bbox": 4340,
+            "bbox": 3489,
             "buttoncolour": "#e4b1a4",
             "clearancedelay": 0,
             "dccaspects": [
@@ -13501,7 +13478,7 @@
                 [
                     true,
                     17,
-                    15,
+                    20,
                     10
                 ],
                 [
@@ -13562,7 +13539,7 @@
                 0,
                 0
             ],
-            "bbox": 4348,
+            "bbox": 3497,
             "colour": "Black",
             "endx": 1100.0,
             "endy": 425.0,
@@ -13739,35 +13716,35 @@
             "occupied": false
         },
         "10": {
-            "labeltext": "XXXXX",
+            "labeltext": "hst set 2",
             "occupied": false
         },
         "11": {
-            "labeltext": "XXXXX",
+            "labeltext": "class 20s",
             "occupied": false
         },
         "17": {
-            "labeltext": "XXXXX",
+            "labeltext": "108 dmu",
             "occupied": false
         },
         "19": {
-            "labeltext": "XXXXX",
-            "occupied": false
+            "labeltext": "108 dmu",
+            "occupied": true
         },
         "2": {
-            "labeltext": "XXXXX",
+            "labeltext": "108 dmu",
             "occupied": false
         },
         "21": {
-            "labeltext": "XXXXX",
+            "labeltext": "hst set 2",
             "occupied": false
         },
         "3": {
-            "labeltext": "XXXXX",
+            "labeltext": "108 dmu",
             "occupied": false
         },
         "4": {
-            "labeltext": "XXXXX",
+            "labeltext": "108 dmu",
             "occupied": false
         },
         "5": {
@@ -13775,15 +13752,15 @@
             "occupied": false
         },
         "6": {
-            "labeltext": "XXXXX",
+            "labeltext": "hst set 2",
             "occupied": false
         },
         "7": {
-            "labeltext": "XXXXX",
+            "labeltext": "47",
             "occupied": false
         },
         "8": {
-            "labeltext": "XXXXX",
+            "labeltext": "47",
             "occupied": false
         },
         "BOX2-24": {
@@ -13803,19 +13780,1590 @@
             "gridcolour": "#999",
             "height": 550,
             "scrollbuttons": [],
-            "snaptogrid": false,
+            "snaptogrid": true,
             "width": 1600
         },
         "control": {
             "dccsoundmappings": [],
             "locomotiveroster": {
-                "Loco1": 123,
-                "Loco2": 345
+                "20046": [
+                    7,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "20058": [
+                    8,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "25052": [
+                    10,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "25083": [
+                    9,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "37238": [
+                    5,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "47148": [
+                    3,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "55020": [
+                    4,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "6752 (37)": [
+                    6,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "Class 105 DMU": [
+                    11,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "Class108 DMU": [
+                    12,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "HST Set 1": [
+                    1,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "HST Set 2": [
+                    2,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            " /Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "TEST": [
+                    111,
+                    [
+                        [
+                            "F0",
+                            true
+                        ],
+                        [
+                            "F1",
+                            true
+                        ],
+                        [
+                            "F2",
+                            true
+                        ],
+                        [
+                            "F3",
+                            true
+                        ],
+                        [
+                            "F4",
+                            true
+                        ],
+                        [
+                            "F5",
+                            true
+                        ],
+                        [
+                            "F6",
+                            true
+                        ],
+                        [
+                            "F7",
+                            true
+                        ],
+                        [
+                            "F8",
+                            true
+                        ],
+                        [
+                            "F9",
+                            true
+                        ],
+                        [
+                            "F10",
+                            true
+                        ],
+                        [
+                            "F11",
+                            true
+                        ],
+                        [
+                            "F12",
+                            true
+                        ],
+                        [
+                            "F13",
+                            true
+                        ],
+                        [
+                            "F14",
+                            true
+                        ],
+                        [
+                            "F15",
+                            true
+                        ],
+                        [
+                            "F16",
+                            true
+                        ],
+                        [
+                            "F17",
+                            true
+                        ],
+                        [
+                            "F18",
+                            true
+                        ],
+                        [
+                            "F19",
+                            true
+                        ],
+                        [
+                            "F20",
+                            true
+                        ],
+                        [
+                            "F21",
+                            true
+                        ],
+                        [
+                            "F22",
+                            true
+                        ],
+                        [
+                            "F23",
+                            true
+                        ],
+                        [
+                            "F24",
+                            true
+                        ],
+                        [
+                            "F25",
+                            true
+                        ],
+                        [
+                            "F26",
+                            true
+                        ],
+                        [
+                            "F27",
+                            true
+                        ],
+                        [
+                            "F28",
+                            true
+                        ]
+                    ]
+                ]
             },
             "serverallowlist": [],
             "serverdebugging": false,
             "serverenforceallow": false,
-            "serverstartup": false
+            "serverstartup": true
         },
         "general": {
             "automation": true,
@@ -13878,7 +15426,7 @@
                     27
                 ]
             ],
-            "timeoutperiod": 0.5,
+            "timeoutperiod": 2.0,
             "triggerdelay": 0.01
         },
         "logging": {
@@ -13892,7 +15440,7 @@
             "port": 1883,
             "pubdcc": false,
             "pubinstruments": [],
-            "publoco": "",
+            "publoco": "BOX2",
             "pubsections": [
                 6,
                 8,
@@ -14139,7 +15687,7 @@
             "overridesub": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 1,
+            "routeset": 2,
             "sigclear": false,
             "siglocked": true,
             "subclear": false,
