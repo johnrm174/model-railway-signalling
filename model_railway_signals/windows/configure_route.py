@@ -359,15 +359,16 @@ class route_definition_tab(Tk.Frame):
         self.exitbutton = common.int_item_id_entry_box(self.frame1subframe1, tool_tip="Enter the ID of the exit "+
                "button (or entry / exit button) associated with this route", exists_function=objects.route_exists)
         self.exitbutton.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.frame1Label2 = Tk.Label(self.frame1subframe1, text="     ")
-        self.frame1Label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.addbutton = Tk.Button(self.frame1subframe1, text="+", command=lambda:add_route_callback(tab_id))
+        self.addbutton = Tk.Button(self.frame1subframe1, text="+", command=lambda:add_route_callback(tab_id, copy=False))
         self.addbutton.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.addbutton, text="Select to add a new NX route definition tab")
         self.deletebutton = Tk.Button(self.frame1subframe1, text="-", command=lambda:delete_route_callback(tab_id))
         self.deletebutton.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = common.CreateToolTip(self.deletebutton, text="Select to delete the current NX route definition tab")
         if tab_id == 0: self.deletebutton.config(state="disabled")
+        self.copybutton = Tk.Button(self.frame1subframe1, text="C", command=lambda:add_route_callback(tab_id, copy=True))
+        self.copybutton.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT3 = common.CreateToolTip(self.copybutton, text="Select to create a copy of this NX route definition tab")
         #----------------------------------------------------------------------------------
         # Create a Label Frame for the Route Colour chooser (Frame 3)
         #----------------------------------------------------------------------------------
@@ -565,10 +566,10 @@ class route_definition_tabs():
             self.list_of_routes.append(route_definition_tab(self.notebook_object, index, self.add_route, self.delete_route))
             self.list_of_routes[-1].set_values(route_definition)
 
-    def add_route(self, after_tab:int):
-        self.list_of_routes.append(route_definition_tab(self.notebook_object, len(self.list_of_routes),
-                                                         self.add_route, self.delete_route))
-        self.list_of_routes[-1].reset_values(colour=self.list_of_routes[0].routecolour.get_value())
+    def add_route(self, after_tab:int, copy:bool):
+        self.list_of_routes.append(route_definition_tab(self.notebook_object, len(self.list_of_routes), self.add_route, self.delete_route))
+        if copy: self.list_of_routes[-1].set_values(self.list_of_routes[after_tab].get_values())
+        else: self.list_of_routes[-1].reset_values(colour=self.list_of_routes[0].routecolour.get_value())
         if self.entry_button or self.exit_button: self.list_of_routes[-1].enable()
         else: self.list_of_routes[-1].disable()
         self.notebook_object.select(self.list_of_routes[-1])
