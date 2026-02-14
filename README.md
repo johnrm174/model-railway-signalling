@@ -70,6 +70,10 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Improved initial synchronisation of layout state following DCC connect
 * Added ability to inhibit flashing aspects for signal approach control
 * Added ability to specify the same GPIO sensor for signal passed and signal approached
+* New functionality to allow copying of route definitions and route buttons:
+    * NX route definitions can now be copied within the Route Button configuration.
+    * Copying of Route Buttons will now bring across all individual route definitions.
+    * Makes it easier to define laddered routes with minor differences between them.
 * Minor Improvements to the DCC Programming utility
 
 
