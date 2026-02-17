@@ -348,15 +348,20 @@ def initialise_all_schematic_routes():
             library.toggle_button(activated_entry_button_id)
             route_button_deselected_callback(activated_entry_button_id)
     activated_entry_button_id = 0
-    # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
+    # In RUN mode, any schematic routes that are still selected need to remain highlighted
+    # (layout load use case) De-selected routes are be cleared down.
     if run_mode:
         for str_route_button_id in objects.route_index.keys():
             if not library.button_state(int(str_route_button_id)):
                 reset_route_highlighting(int(str_route_button_id))
-                complete_route_cleardown(int(str_route_button_id))
+                # We set 'dont_enable_disable_schematic_routes' to true so we dont loop through
+                # all otherroute buttons to enable/disable them until we are finished
+                complete_route_cleardown(int(str_route_button_id), dont_enable_disable_schematic_routes=True)
         for str_route_button_id in objects.route_index.keys():
             if library.button_state(int(str_route_button_id)):
-                complete_route_setup(int(str_route_button_id))
+                # We set 'dont_enable_disable_schematic_routes' to true so we dont loop through
+                # all otherroute buttons to enable/disable them until we are finished
+                complete_route_setup(int(str_route_button_id), dont_enable_disable_schematic_routes=True)
     # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
     # We also clear down all signals along the route (otherwise NX routes can get into a funny state)
     else:
@@ -378,7 +383,11 @@ def initialise_all_schematic_routes():
                 # Toggle the button OFF and finish clearing down the route
                 library.toggle_button(int(str_route_button_id))
                 reset_route_highlighting(int(str_route_button_id))
-                complete_route_cleardown(int(str_route_button_id))
+                # We set 'dont_enable_disable_schematic_routes' to true so we dont loop through
+                # all otherroute buttons to enable/disable them until we are finished
+                complete_route_cleardown(int(str_route_button_id), dont_enable_disable_schematic_routes=True)
+    # Enable/disable all route buttons as required (now we have updated all buttons)
+    enable_disable_schematic_routes()
     return()
 
 #------------------------------------------------------------------------------------
@@ -595,7 +604,7 @@ def set_point_state(route_button_id:int, point_id:int, state:bool):
             root.update_idletasks()
     return()
 
-def complete_route_setup(route_button_id:int):
+def complete_route_setup(route_button_id:int, dont_enable_disable_schematic_routes:bool=False):
     # Signify that the route setup is now progress
     set_setup_in_progress_flag(route_button_id, False)
     # Find the applicable route definition and exit button ID (stored as the route button data)
@@ -651,11 +660,13 @@ def complete_route_setup(route_button_id:int):
         # Unlock the route button(s) now processing is complete
         library.unlock_button(route_button_id)
         if exit_button_id > 0: library.unlock_button(exit_button_id)
-        # Enable/disable all route buttons (including this one) as required
-        enable_disable_schematic_routes()
+    # Enable/disable all route buttons (including this one) as required
+    # Only if we are not in the middle of changing between run and edit
+    # modes - in which case hold off until we have reset all buttons
+    if not dont_enable_disable_schematic_routes: enable_disable_schematic_routes()
     return()
 
-def complete_route_cleardown(route_button_id:int):
+def complete_route_cleardown(route_button_id:int, dont_enable_disable_schematic_routes:bool=False):
     # Note that this function will get executed in both EDIT and RUN Modes
     # Find out if there is an Exit button associated with this route
     # Stored route data is {"route", "entrybutton", "exitbutton",}
@@ -674,7 +685,9 @@ def complete_route_cleardown(route_button_id:int):
     # Unlock the route button(s) now processing is complete
     library.unlock_button(route_button_id)
     # Enable/disable all route buttons (including this one) as required
-    enable_disable_schematic_routes()
+    # Only if we are not in the middle of changing between run and edit
+    # modes - in which case hold off until we have reset all buttons
+    if not dont_enable_disable_schematic_routes: enable_disable_schematic_routes()
     logging.info("RUN ROUTES - Clear-down of Route "+str(route_button_id)+" is now complete **********************************")
     return()
 
