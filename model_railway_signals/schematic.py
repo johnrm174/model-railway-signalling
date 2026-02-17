@@ -276,9 +276,10 @@ def delete_all_objects():
     # (probably because I'm not using the mainloop) - Note we re-draw the grid afterwards
     # Note we do it here to speed things up for the user
     canvas.delete("all")
-    # Select and delete all objects from the schematic
+    # Select and delete all objects from the schematic. Note that as everything will
+    # have been deleted, we don't need to initialise the schematic
     select_all_objects()
-    objects.delete_objects(schematic_state["selectedobjects"])
+    objects.delete_objects(schematic_state["selectedobjects"], initialise_layout=False)
     # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
     redraw_canvas_grid()

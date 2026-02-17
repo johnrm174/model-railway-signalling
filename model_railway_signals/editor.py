@@ -25,7 +25,6 @@
 #    run_layout.configure_spad_popups() - On settings update or load
 #    run_layout.signal_updated_callback() - When applying the new pub/sub configuration
 #    run_layout.reset_layout() - Reset the schematic back to its default state
-#    run_routes.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    settings.check_for_import_conflicts() - Check for conflicts with existing settings
 #    settings.get_all() - Get all settings (for save)
@@ -369,7 +368,7 @@ class main_menubar:
     # --------------------------------------------------------------------------------------
     # Common initialisation functions (called on editor start or layout load or new layout)
     # initialise_editor1 is called prior to creating the schematic objects (layout load)
-    # initialise_editor2 is called after creating the schematic objects (layout load
+    # initialise_editor2 is called after creating the schematic objects (layout load)
     # --------------------------------------------------------------------------------------
     
     def initialise_editor1(self):
@@ -392,12 +391,11 @@ class main_menubar:
         # The "connect on startup" flag is the 8th parameter returned.
         self.mqtt_reconfigure_client()
         self.apply_new_mqtt_pub_sub_configuration()
-        # Both the automation_enable and automation_disable calls will update the 'run_layout' module
-        if settings.get_general("automation"): self.automation_enable()
-        else: self.automation_disable()
-        # Both the "edit_mode" and "run_mode" calls will update the 'run_layout' module
-        if settings.get_general("editmode"): self.edit_mode()
-        else: self.run_mode()
+        # Update the mode and automatiojn indications to reflect the new selections
+        # Note that we don't initialise anything based on these settings just yet
+        # This will be done when any schematic objects have been created
+        self.update_automation_indication()
+        self.update_mode_indication()
         # Create all the track sensor objects that have been defined. This needs to be 
         # done after the objects have been created but before the MQTT configuration
         self.gpio_update()
@@ -424,6 +422,13 @@ class main_menubar:
             allow_list = settings.get_control("serverallowlist")
             enforce_allow_list = settings.get_control("serverenforceallow")
             throttle_server.start_throttle_server(debugging, allow_list, enforce_allow_list)
+        # Initialise the schematic
+        schematic.configure_edit_mode(settings.get_general("editmode"))
+        library.configure_edit_mode(settings.get_general("editmode"))
+        run_layout.configure_edit_mode(settings.get_general("editmode"))
+        run_routes.configure_edit_mode(settings.get_general("editmode"))
+        run_layout.configure_automation(settings.get_general("automation"))
+        run_layout.initialise_layout()
 
     # --------------------------------------------------------------------------------------
     # Callback function to handle state changes for the throttle server. We only care about
@@ -456,60 +461,62 @@ class main_menubar:
     # Mode menubar functions
     #------------------------------------------------------------------------------------------
 
-    def automation_enable(self):
-        new_label = "Automation:On"
+    def update_automation_indication(self):
+        if settings.get_general("automation"): new_label = "Automation:On"
+        else: new_label = "Automation:Off"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
-        settings.set_general("automation", True)
-        run_layout.configure_automation(True)
-        run_routes.configure_automation(True)
-        run_layout.initialise_layout()
+
+    def automation_enable(self):
+        if not settings.get_general("automation"):
+            settings.set_general("automation", True)
+            run_layout.configure_automation(True)
+            run_layout.initialise_layout()
+            self.update_automation_indication()
 
     def automation_disable(self):
-        new_label = "Automation:Off"
-        self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
-        self.auto_label = new_label
-        settings.set_general("automation", False)
-        run_layout.configure_automation(False)
-        run_routes.configure_automation(False)
-        run_layout.initialise_layout()
+        if settings.get_general("automation"):
+            settings.set_general("automation", False)
+            run_layout.configure_automation(False)
+            run_layout.initialise_layout()
+            self.update_automation_indication()
+
+    def update_mode_indication(self):
+        if settings.get_general("editmode"):
+            new_label = "Mode:Edit"
+            # Disable the automation menubar selection and set to "off" (automation is always disabled
+            # in Run mode so we just need to update the indication (no need to update 'run_layout')
+            new_label1 = "Automation:N/A"
+            self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
+            self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
+            self.auto_label = new_label1
+        else:
+            new_label = "Mode:Run"
+            # Enable the the automation menubar selection and update to reflect the current setting
+            self.mainmenubar.entryconfigure(self.auto_label, state="normal")
+            self.update_automation_indication()
+        self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
+        self.mode_label = new_label
 
     def edit_mode(self):
-        if self.mode_label != "Mode:Edit":
-            new_label = "Mode:Edit"
-            self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
-            self.mode_label = new_label
+        if not settings.get_general("editmode"):
             settings.set_general("editmode", True)
             schematic.configure_edit_mode(True)
             library.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
             run_routes.configure_edit_mode(True)
             run_layout.initialise_layout()
-        # Disable the automation menubar selection and set to "off" (automation is always disabled
-        # in Run mode so we just need to update the indication (no need to update 'run_layout')
-        new_label1 = "Automation:N/A"
-        self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
-        self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
-        self.auto_label = new_label1
+            self.update_mode_indication()
         
     def run_mode(self):
-        if self.mode_label != "Mode:Run":
-            new_label = "Mode:Run"
-            self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
-            self.mode_label = new_label
+        if settings.get_general("editmode"):
             settings.set_general("editmode", False)
             schematic.configure_edit_mode(False)
             library.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
             run_routes.configure_edit_mode(False)
             run_layout.initialise_layout()
-        # Enable the the automation menubar selection and update to reflect the current setting
-        # (This will be enabled or disabled according to the current setting)
-        if settings.get_general("automation"): new_label1 = "Automation:On"
-        else: new_label1 = "Automation:Off"
-        self.mainmenubar.entryconfigure(self.auto_label, state="normal")
-        self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
-        self.auto_label = new_label1
+            self.update_mode_indication()
 
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
@@ -937,6 +944,8 @@ class main_menubar:
                             self.gpio_update()
                             logging.info("CREATING-NEW-OBJECTS*****************************************************************************")
                             objects.extend(layout_state["objects"], xoffset=xoffset, yoffset=yoffset)
+                            # Re-initialise the editor for the new settings to take effect
+                            self.initialise_editor2()
             else:
                 logging.error("LOAD LAYOUT - File does not contain all required elements")
                 Tk.messagebox.showerror(parent=self.root, title="Load Error", 

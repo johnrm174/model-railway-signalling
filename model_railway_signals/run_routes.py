@@ -71,14 +71,13 @@ from . import objects
 from . import run_layout
 
 #------------------------------------------------------------------------------------
-# The Tkinter Root and Canvas Objects are saved as global variables for easy referencing
-# The automation_enabled and run_mode flags control the behavior of run_layout
+# The Tkinter Root and Canvas Objects are saved as global variables for easy
+# referencing. The run_mode flags control the behavior of the route buttons
 #------------------------------------------------------------------------------------
 
 root = None
 canvas = None
 run_mode = None
-automation_enabled = None
 
 enhanced_debugging = False
 
@@ -110,15 +109,6 @@ def initialise(root_window, canvas_object):
 def configure_edit_mode(edit_mode:bool):
     global run_mode
     run_mode = not edit_mode
-    # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
-    # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
-    enable_disable_schematic_routes()
-    initialise_all_schematic_routes()
-    return()
-
-def configure_automation(automation:bool):
-    global automation_enabled
-    automation_enabled = automation
     return()
 
 #------------------------------------------------------------------------------------

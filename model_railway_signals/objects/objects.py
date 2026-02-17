@@ -408,14 +408,15 @@ def delete_object(object_id):
     if delete_function: delete_function(object_id)
     return()
 
-def delete_objects(list_of_object_ids:list):
+def delete_objects(list_of_object_ids:list, initialise_layout:bool=True):
     for object_id in list_of_object_ids:
         delete_object(object_id)
     # Force a display refresh at this point (user experience)
     objects_common.root.update_idletasks()
     # Save the schematic state (for undo/redo) and initialise the layout
     save_schematic_state()
-    run_layout.initialise_layout()
+    # Don't initialise the layout after a delete all (on file new or part of file load)
+    if initialise_layout: run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -751,8 +752,6 @@ def extend(new_objects:dict, xoffset:int=0, yoffset:int=0):
     # Recalculate point interlocking tables as a 'belt and braces' measure (they should
     # have been loaded with the rest of the configuration but we do this just in case)
     objects_points.reset_point_interlocking_tables()
-    # Initialise the layout (interlocking changes, signal aspects etc)
-    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -859,8 +858,6 @@ def set_all(new_objects:dict):
     objects_points.reset_point_interlocking_tables()
     # save the current state (for undo/redo) - deleting all previous history
     save_schematic_state(reset_pointer=True)
-    # Initialise the layout (interlocking changes, signal aspects etc)
-    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
