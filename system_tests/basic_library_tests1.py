@@ -806,16 +806,16 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_switch(2, False)
     dcc_control.update_dcc_switch(3, True)   # Not Mapped
     dcc_control.update_dcc_switch(3, False)  # Not Mapped
-    print("Library Tests - set_node_to_publish_dcc_commands - 1 Error will be generated ")
-    dcc_control.set_node_to_publish_dcc_commands("True") # Error
-    dcc_control.set_node_to_publish_dcc_commands(True) 
+    print("Library Tests - set_node_to_publish_dcc_accessory_commands - 1 Error will be generated ")
+    dcc_control.set_node_to_publish_dcc_accessory_commands("True") # Error
+    dcc_control.set_node_to_publish_dcc_accessory_commands(True) 
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
-    print("Library Tests - subscribe_to_dcc_command_feed - 1 Error will be generated")
-    dcc_control.subscribe_to_dcc_command_feed(100) # Error
-    dcc_control.subscribe_to_dcc_command_feed("Box1")
+    print("Library Tests - subscribe_to_dcc_accessory_command_feed - 1 Error will be generated")
+    dcc_control.subscribe_to_dcc_accessory_command_feed(100) # Error
+    dcc_control.subscribe_to_dcc_accessory_command_feed("Box1")
     print("Library Tests - reset_mqtt_configuration - No warnings or errors")
-    dcc_control.reset_dcc_mqtt_configuration()
+    dcc_control.reset_dcc_accessory_mqtt_configuration()
     print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors - DCC Commands should be sent out")
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccstate": True}) # Error
@@ -850,8 +850,8 @@ def run_dcc_control_tests(baud_rate):
     assert pi_sprog_interface.sprog_disconnect()
     print("Library Tests - DCC control Tests - sending of commands before Sprog connected/power on and MQTT Connect")
     # Queue up some 'remote' DCC commands
-    dcc_control.reset_dcc_mqtt_configuration()
-    dcc_control.subscribe_to_dcc_command_feed("box1")
+    dcc_control.reset_dcc_accessory_mqtt_configuration()
+    dcc_control.subscribe_to_dcc_accessory_command_feed("box1")
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": True})
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": False})
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1001, "dccstate": False})
@@ -870,12 +870,12 @@ def run_dcc_control_tests(baud_rate):
     assert pi_sprog_interface.sprog_connect()
     assert pi_sprog_interface.request_dcc_power_on()
     print("Library Tests - DCC control Tests - MQTT Broker Connect")
-    dcc_control.set_node_to_publish_dcc_commands(True)
+    dcc_control.set_node_to_publish_dcc_accessory_commands(True)
     mqtt_interface.configure_mqtt_client("network1","node1") # Success
     mqtt_interface.mqtt_broker_connect("127.0.0.1",1883) # success
     time.sleep(5.0)
     logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
-    dcc_control.reset_dcc_mqtt_configuration()
+    dcc_control.reset_dcc_accessory_mqtt_configuration()
     print("Library Tests - delete_signal_mapping - 2 Errors should be generated")
     assert len(dcc_control.dcc_signal_mappings) == 2
     dcc_control.delete_signal_mapping("100") # Error

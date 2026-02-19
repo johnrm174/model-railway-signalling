@@ -692,7 +692,14 @@ def run_timed_signal_tests():
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
     assert signals.signal_state(6) == signals.signal_state_type.PROCEED
     assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    # Note that we need to update colour light signals for the aspects to be updated
+    # After a signal passed event (generated after a delayed start)
     time.sleep(1.1)
+    signals.update_colour_light_signal(1)
+    signals.update_colour_light_signal(2)
+    signals.update_colour_light_signal(3)
+    signals.update_colour_light_signal(4)
+    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
