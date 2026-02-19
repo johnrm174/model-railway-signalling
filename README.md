@@ -61,7 +61,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > You have been warned!
 
 * DCC Loco control - Now the DCC Signalling system can be used as a full Command Station:
-    * Ideal for smaller layouts if you don't want the expense of a seperate DCC command station.
+    * Ideal for smaller layouts if you don't want the to use a seperate DCC command station.
     * Add your DCC locos to the Roster, defining DCC address and DCC functions.
     * Control your Locos via on-screen throttles (fully compatible with touchscreens).
     * Start the built-in WiThrottle server and control your locos from your smartphone.
@@ -74,7 +74,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * NX route definitions can now be copied within the Route Button configuration.
     * Copying of Route Buttons will now bring across all individual route definitions.
     * Makes it easier to define laddered routes with minor differences between them.
-* Minor Improvements to the DCC Programming utility
+* Performance improvements when editing or initialising very large schematics.
+* Minor Improvements to the DCC Programming utility.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
