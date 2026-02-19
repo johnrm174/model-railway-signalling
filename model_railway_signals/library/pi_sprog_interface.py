@@ -1032,7 +1032,7 @@ def service_mode_write_cv(cv:int, value:int):
 
 def find_dcc_address_for_session(session_id:int):
     dcc_address = 0
-    for str_dcc_address, locomotive_session in locomotive_sessions.items():
+    for str_dcc_address, locomotive_session in list(locomotive_sessions.items()):
         if locomotive_session["sessionid"] == session_id:
             dcc_address = int(str_dcc_address)
             break

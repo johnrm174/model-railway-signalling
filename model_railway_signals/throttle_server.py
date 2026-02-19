@@ -109,7 +109,7 @@ async def send_roster(writer):
         roster_message = "RL0\n"
     else:
         roster_entries = []
-        for name, data in ROSTER.items():
+        for name, data in list(ROSTER.items()):
             # We need to generate a list of function_names from the list_of_function_settings
             # Remember - each entry is [address, [ [key_name, latching], [key_name, latching] ] ]
             address = data[0]
