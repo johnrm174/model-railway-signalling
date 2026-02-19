@@ -898,10 +898,13 @@ def set_node_to_publish_dcc_accessory_commands(publish_dcc_commands:bool=False):
 
 def subscribe_to_dcc_accessory_command_feed(*nodes:str):
     for node in nodes:
-        # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
-        # as each DCC address will appear on a different topic from the remote MQTT node.
-        mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events", node, 0,
-                                handle_mqtt_dcc_accessory_short_event,subtopics=True)
+        if not isinstance(node, str):
+            logging.error("DCC Control: subscribe_to_dcc_command_feed - invalid node "+str(node))
+        else:
+            # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
+            # as each DCC address will appear on a different topic from the remote MQTT node.
+            mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events", node, 0,
+                                    handle_mqtt_dcc_accessory_short_event,subtopics=True)
     return() 
 
 #####################################################################################################
