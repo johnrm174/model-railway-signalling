@@ -39,6 +39,14 @@
 #   handle_mqtt_dcc_locomotive_control_event(message)
 #----------------------------------------------------------------------------------------------------
 
+
+#########################################################################################################
+#### TODO - Request power on and off from a remote SPROG Node ###########################################
+#### This is the use case of the WiThrottle being used on a seperate node to the SPROG loco node ########
+#### Loco control commands are sent to/from the network OK as are dcc power status messages #############
+#### But at the moment, Power ON/OFF commands from the WiThrottle are only sent to the local SPROG ######
+#### An alternative would be to inhibit power on/off commands at the WiThrottle Server layer ############
+#########################################################################################################
 import logging
 
 from . import pi_sprog_interface
@@ -50,12 +58,14 @@ from . import common
 #----------------------------------------------------------------------------------------------------
 
 # Define the Flag to control whether DCC Commands are published to the MQTT Broker
-publish_dcc_locomotive_commands_to_mqtt_broker:bool = False
-
+publish_dcc_locomotive_commands_to_mqtt_broker = False
+# Define the flag to control whether we need to send a DCC power message on broker connect
+notify_other_network_clients_of_dcc_power_updates = False
 # Other global variables we need to track
 session_acknowledgement_callbacks = {}
 registered_dcc_power_state_callbacks = []
 remote_dcc_power_is_on = None   # Unknown
+local_dcc_power_is_on = None   # Unknown
 
 #----------------------------------------------------------------------------------------------------
 # API Functions to register/unregister for DCC power status updates (local or remote)
@@ -205,7 +215,7 @@ def send_mqtt_dcc_locomotive_control_event(message:dict):
 #----------------------------------------------------------------------------------------------------
 
 def send_dcc_power_status_update_events(power_state):
-    mqtt_interface.send_mqtt_message("dcc_power_events", 0, data={"dccpower": power_state}, retain=False, 
+    mqtt_interface.send_mqtt_message("dcc_power_events", 0, data={"dccpower": power_state}, retain=True,
                     log_message=f"Loco Control: Publishing DCC Power message to broker: Power={power_state}")
     return()
 
@@ -326,17 +336,34 @@ def set_node_to_publish_dcc_locomotive_commands(sprog_node:str):
 #----------------------------------------------------------------------------------------------------
 # API Function to "subscribe" to the published DCC command feed from other remote MQTT nodes
 # This function is called by the editor on "Apply' of the MQTT pub/sub configuration.
+# Note that we need to configure 'this' node to publish the state of the local DCC power
+# back to the remote node(s) that are sending the DCC loco commands. This includes subscribing
+# to the local DCC command state and publishing this immediately after Broker Connect
 #----------------------------------------------------------------------------------------------------
 
+def send_local_dcc_power_state_on_broker_connect():
+    global local_dcc_power_is_on
+    if notify_other_network_clients_of_dcc_power_updates:
+        send_dcc_power_status_update_events(local_dcc_power_is_on)
+
+def local_dcc_power_state_updated(power_state):
+    global local_dcc_power_is_on
+    local_dcc_power_is_on = power_state
+    send_dcc_power_status_update_events(local_dcc_power_is_on)
+
 def subscribe_to_dcc_locomotive_command_feed(*nodes:str):
+    global notify_other_network_clients_of_dcc_power_updates
     for node in nodes:
         mqtt_interface.subscribe_to_mqtt_messages("dcc_locomotive_control_events", node, 0, handle_mqtt_dcc_locomotive_control_event)
     # If this node is subscribing to one or more DCC loco control command feeds (from other nodes)
     # Then the other nodes need to know the current DCC power state (on or OFF). We therefore subscribe
     # to updates from the local SPROG interface with a callback to transmit updates via the network
-    if len(nodes) > 0: pi_sprog_interface.subscribe_to_local_dcc_power_updates(send_dcc_power_status_update_events)
-    else: pi_sprog_interface.unsubscribe_from_local_dcc_power_updates(send_dcc_power_status_update_events)
+    if len(nodes) > 0:
+        notify_other_network_clients_of_dcc_power_updates = True
+        pi_sprog_interface.subscribe_to_local_dcc_power_updates(local_dcc_power_state_updated)
+    else:
+        notify_other_network_clients_of_dcc_power_updates = False
+        pi_sprog_interface.unsubscribe_from_local_dcc_power_updates(local_dcc_power_state_updated)
     return() 
-
 
 #####################################################################################################

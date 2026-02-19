@@ -56,6 +56,7 @@ from . import track_sections
 from . import text_boxes
 from . import block_instruments
 from . import dcc_control
+from . import loco_control
 from . import buttons
 from . import points
 from . import levers
@@ -204,6 +205,7 @@ def mqtt_transmit_all_now_things_should_have_stabilised():
     track_sections.mqtt_send_all_section_states_on_broker_connect()
     signals.mqtt_send_all_signal_states_on_broker_connect()
     dcc_control.mqtt_send_all_dcc_command_states_on_broker_connect()
+    loco_control.send_local_dcc_power_state_on_broker_connect()
     return()
 
 #-------------------------------------------------------------------------
