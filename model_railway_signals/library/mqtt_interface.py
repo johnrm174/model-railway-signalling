@@ -487,7 +487,7 @@ def mqtt_broker_disconnect():
         if len(node_config["list_of_published_topics"])>0:
             logging.debug("MQTT-Client: Purging retained messages")
         for topic in node_config["list_of_published_topics"]:
-            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
+            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: NULL")
             mqtt_client.publish(topic,payload=None,retain=True,qos=1)
         # Wait for everything to be published to the broker (with a sleep) and disconnect
         # I'd rather use a PAHO MQTT check and timeout but there doesn't seem to be one
@@ -531,7 +531,7 @@ def mqtt_publish_shutdown_message():
             # Payload for the shutdown message is a dictionary comprising the source node
             shutdown_message = {"node":node_config["node_identifier"]}
             payload = json.dumps(shutdown_message)
-            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+str(payload))
+            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: "+str(payload))
             mqtt_client.publish(topic,payload,retain=False,qos=1)
     return()
 
@@ -584,7 +584,7 @@ def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=No
         payload = json.dumps(data)
         if log_message is not None: logging.debug(log_message)
         if node_config["enhanced_debugging"]:
-            logging.debug("MQTT-Client: Publishing: "+str(topic)+str(payload))
+            logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: "+str(payload))
         # Publish the message to the broker
         mqtt_client.publish(topic,payload,retain=retain,qos=1)
         # Add to the list of published topics so we can 'Clean up'
