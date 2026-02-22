@@ -728,12 +728,14 @@ class mqtt_subscribe_tab():
         self.frame1 = Tk.LabelFrame(parent_tab, text="DCC Accessory commands")
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.dccaccessory = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
-            tool_tip="Specify the remote network nodes to take the DCC Accessory command feed from")
+            tool_tip="Specify the network node publishing its DCC Accessory command feed "+
+                        "(Received commands will be sent out to the local SPROG interface)")
         self.dccaccessory.pack(padx=2, pady=2, fill='x')
         self.frame1a = Tk.LabelFrame(parent_tab, text="DCC Locomotive commands")
         self.frame1a.pack(padx=2, pady=2, fill='x')
         self.dcclocomotive = common.grid_of_generic_entry_boxes(self.frame1a, base_class=common.entry_box, columns=4, width=8,
-            tool_tip="Specify the remote network nodes to take the DCC Locomotive command feed from")
+            tool_tip="Specify the network node publishing its DCC Locomotive command feed "+
+                        "(Received commands will be sent out to the local SPROG interface)")
         self.dcclocomotive.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
@@ -757,9 +759,33 @@ class mqtt_subscribe_tab():
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
-        return (self.dccaccessory.validate() and self.signals.validate() and self.sections.validate()
-                and self.instruments.validate() and self.sensors.validate() and self.dcclocomotive.validate())
-    
+        valid = True
+        if not self.signals.validate(): valid=False
+        if not self.sections.validate(): valid=False
+        if not self.instruments.validate(): valid=False
+        if not self.sensors.validate(): valid=False
+        if not self.dccaccessory.validate(): valid=False
+        if not self.dcclocomotive.validate(): valid=False
+        return(valid)
+
+#------------------------------------------------------------------------------------
+# Class for a sprog_node_entry_box - Based on the common entry box but must not
+# be empty if the entrybox is enabled (as the Pi-Sprog node must be specified)
+#------------------------------------------------------------------------------------
+
+class sprog_node_entry_box(common.entry_box):
+    def __init__(self, *args, **kwargs):
+        super().__init__( *args, **kwargs)
+
+    def validate(self):
+        valid = super().validate()
+        if self.enabled0 and len(self.get_value()) == 0 or self.get_value() == "---":
+            self.set_value("---")
+            self.TT.text="Must specify the network node hosting the DCC Track Bus Interface"
+            valid = False
+        self.set_validation_status(valid)
+        return(valid)
+
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'Publish' Tab
 #------------------------------------------------------------------------------------    
@@ -770,20 +796,23 @@ class mqtt_publish_tab():
         self.frame1 = Tk.LabelFrame(parent_tab, text="DCC Accessory commands")
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.dccaccessory = common.check_box(self.frame1, label="Publish the DCC Accessory command feed",
-                tool_tip="Select to publish all DCC Accessory commands to the MQTT Network (so the feed can be picked "+
-                    "up by the node hosting the Pi-SPROG DCC Interface and sent out to the layout). Note that when "+
-                    "selected, DCC Accessory commands WILL NOT be sent out to the local Pi-SPROG interface" )
+                tool_tip="Select to publish all DCC Accessory commands to the MQTT Network. Note that when "+
+                    "selected, DCC Accessory commands WILL NOT be sent out to the local SPROG interface." )
         self.dccaccessory.pack(padx=2, pady=2, fill='x')
         self.frame1a = Tk.LabelFrame(parent_tab, text="DCC Locomotive commands")
         self.frame1a.pack(padx=2, pady=2, fill='x')
+        self.dcclocomotive = common.check_box(self.frame1a, label="Publish the DCC Locomotive command feed",
+                tool_tip="Select to publish all DCC Locomotive commands to the MQTT Network. Note that when "+
+                    "selected, DCC Locomotive commands WILL NOT be sent out to the local SPROG interface.",
+                                    callback = self.dcc_loco_selection_updated)
+        self.dcclocomotive.pack(padx=2, pady=2, fill='x')
         self.subframe1 = Tk.Frame(self.frame1a)
         self.subframe1.pack()
         self.locolabel = Tk.Label(self.subframe1, text="Node hosting track bus interface:")
         self.locolabel.pack(padx=2, pady=2, side=Tk.LEFT)
-        self.dcclocomotive = common.entry_box(self.subframe1, width=8, tool_tip="Specify the remote network node "+
-                    "hosting the Pi-SPROG interface responsible for driving the Track Bus). Note that when a remote node "+
-                    "is specified, DCC Locomotive commands WILL NOT be sent out to the local Pi-SPROG interface")
-        self.dcclocomotive.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.dccloconode = sprog_node_entry_box(self.subframe1, width=8, tool_tip="Specify the network node "+
+                    "configured to drive the DCC Track Bus (two-way comminication is required for loco control)")
+        self.dccloconode.pack(padx=2, pady=2, side=Tk.LEFT)
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=10, width=3,
@@ -805,10 +834,20 @@ class mqtt_publish_tab():
             tool_tip="Enter the IDs of the GPIO sensors to publish via the MQTT network")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
-    def validate(self):
-        return (self.signals.validate() and self.sections.validate() and self.dcclocomotive.validate()
-            and self.instruments.validate() and self.sensors.validate())
+    def dcc_loco_selection_updated(self):
+        if self.dcclocomotive.get_value():
+            self.dccloconode.enable()
+        else:
+            self.dccloconode.disable()
 
+    def validate(self):
+        valid = True
+        if not self.signals.validate(): valid=False
+        if not self.sections.validate(): valid=False
+        if not self.instruments.validate(): valid=False
+        if not self.sensors.validate(): valid=False
+        if not self.dccloconode.validate(): valid=False
+        return(valid)
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'status' Tab showing a list of connected nodes
@@ -928,10 +967,12 @@ class edit_mqtt_settings():
         # Populate the publish tab
         self.publish.dccaccessory.set_value(settings.get_mqtt("pubdcc"))
         self.publish.dcclocomotive.set_value(settings.get_mqtt("publoco"))
+        self.publish.dccloconode.set_value(settings.get_mqtt("publoconode"))
         self.publish.signals.set_values(settings.get_mqtt("pubsignals"))
         self.publish.sections.set_values(settings.get_mqtt("pubsections"))
         self.publish.instruments.set_values(settings.get_mqtt("pubinstruments"))
         self.publish.sensors.set_values(settings.get_mqtt("pubsensors"))
+        self.publish.dcc_loco_selection_updated()
         
     def save_state(self, close_window:bool, apply_and_connect:bool=False):
         # Validate the entries to "accept" the current values before reading
@@ -960,6 +1001,7 @@ class edit_mqtt_settings():
             # Save the publish settings
             settings.set_mqtt("pubdcc", self.publish.dccaccessory.get_value())
             settings.set_mqtt("publoco", self.publish.dcclocomotive.get_value())
+            settings.set_mqtt("publoconode", self.publish.dccloconode.get_value())
             settings.set_mqtt("pubsignals", self.publish.signals.get_values())
             settings.set_mqtt("pubsections", self.publish.sections.get_values())
             settings.set_mqtt("pubinstruments", self.publish.instruments.get_values())

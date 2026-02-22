@@ -564,8 +564,8 @@ class loco_control(Tk.Toplevel):
         # Update the DCC power indication
         self.bold_font = TkFont.Font(font=self.dccpower.cget("font"))
         self.bold_font.configure(weight="bold")
-        if dcc_power_state == True: self.dccpower.config(text="DCC Power: ON", fg="green4", font=self.bold_font)
-        elif dcc_power_state == False: self.dccpower.config(text="DCC Power: OFF", fg="red", font=self.bold_font)
+        if dcc_power_state == True: self.dccpower.config(text="Track Bus: ON", fg="green4", font=self.bold_font)
+        elif dcc_power_state == False: self.dccpower.config(text="Track Bus: OFF", fg="red", font=self.bold_font)
         else: self.dccpower.config(text="DCC Power: ????", fg="orange3", font=self.bold_font)
         # if DCC power is off then clear down any selections and inhibit UI
         if dcc_power_state:

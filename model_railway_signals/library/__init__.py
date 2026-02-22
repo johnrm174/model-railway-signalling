@@ -163,6 +163,8 @@ from .dcc_control import reset_dcc_accessory_mqtt_configuration
 from .dcc_control import set_node_to_publish_dcc_accessory_commands
 from .dcc_control import subscribe_to_dcc_accessory_command_feed
 
+from .loco_control import request_track_power_on
+from .loco_control import request_track_power_off
 from .loco_control import subscribe_to_dcc_power_updates
 from .loco_control import unsubscribe_from_dcc_power_updates
 from .loco_control import request_loco_session
@@ -376,6 +378,8 @@ __all__ = [
         'set_node_to_publish_dcc_locomotive_commands',
         'subscribe_to_dcc_power_updates',
         'unsubscribe_from_dcc_power_updates',
+        'request_track_power_on',
+        'request_track_power_off',
       # Public DCC Accessory control functions
         'get_dcc_address_mappings',
         'dcc_address_mapping',

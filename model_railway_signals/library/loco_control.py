@@ -14,39 +14,35 @@
 #
 #   reset_dcc_loco_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
 #
-#   set_node_to_publish_dcc_locomotive_commands(sprog_node) - set node to publish loco commands to the SPROG Node
-#           All DCC locomotive commands will then be published to the MQTT broker for consumption by other nodes
+#   set_node_to_publish_dcc_locomotive_commands(publish:bool, destination_node) - set node to publish loco commands
+#           If Publish=True then all DCC locomotive commands will then be published to the MQTT broker (not the local SPROG )
+#           Similarly, requests for DC power on/off (from the throttles) will be sent to the MQTT Broker (not the local SPROG)
+#           The destination node is required to subscribe to loco command acknowledgement messages and DCC power updates
 #
 #   subscribe_to_dcc_locomotive_command_feed(nodes) - subscribe to DCC locomotive commands from other nodes
 #           All received DCC locomotive commands will then be automatically forwarded to the local SPROG interface.
+#           The SPROG DCC Power state and all acknowledgement messages will be sent to the broker
 #
-#    subscribe_to_dcc_power_updates(callback) - subscribe to DCC power state
-#    unsubscribe_from_dcc_power_updates(callback) - unsubscribe from DCC power state
-#        Note that this will be either the local of remote SPROG interface depending
-#        on whether the publish_dcc_locomotive_commands_to_mqtt_broker is set
+#   subscribe_to_dcc_power_updates(callback) - subscribe to DCC power state
+#   unsubscribe_from_dcc_power_updates(callback) - unsubscribe from DCC power state
+#        Note that these functions will interact with either the local of remote SPROG interface
+#        depending on whether the publish_dcc_locomotive_commands_to_mqtt_broker flag is set
+#
+#   request_track_power_on() - Request DCC Track Power On
+#   request_track_power_off() - Request DCC Track Power Off
 #
 #   request_loco_session(dcc_address) - generates a loco session and returns session_id
 #   release_loco_session(session_id) - releases the locomotive session
 #   set_loco_speed_and_direction(session_id:int, speed:int, forward:bool)
 #   send_emergency_stop(session_id) - Emergency Stops the loco
 #   set_loco_function(session_id:int, function_id:int, state:bool)
-
 #
 # Internal API - classes and functions (used by the other library modules):
 #
-#   handle_mqtt_dcc_power_event(message)
-#   handle_mqtt_dcc_acknowledge_event(message)
-#   handle_mqtt_dcc_locomotive_control_event(message)
+#   handle_mqtt_dcc_locomotive_control_response(message)
+#   handle_mqtt_dcc_locomotive_control_request(message)
 #----------------------------------------------------------------------------------------------------
 
-
-#########################################################################################################
-#### TODO - Request power on and off from a remote SPROG Node ###########################################
-#### This is the use case of the WiThrottle being used on a seperate node to the SPROG loco node ########
-#### Loco control commands are sent to/from the network OK as are dcc power status messages #############
-#### But at the moment, Power ON/OFF commands from the WiThrottle are only sent to the local SPROG ######
-#### An alternative would be to inhibit power on/off commands at the WiThrottle Server layer ############
-#########################################################################################################
 import logging
 
 from . import pi_sprog_interface
@@ -68,10 +64,13 @@ remote_dcc_power_is_on = None   # Unknown
 local_dcc_power_is_on = None   # Unknown
 
 #----------------------------------------------------------------------------------------------------
-# API Functions to register/unregister for DCC power status updates (local or remote)
+# API Functions to register/unregister for DCC power status updates. This will subscribe to either
+# local SPROG power state updates or remote SPROG power state updates depending on whether this
+# Node is configured to be a remote throttle (publish_dcc_locomotive_commands_to_mqtt_broker=True)
 #----------------------------------------------------------------------------------------------------
 
 def subscribe_to_dcc_power_updates(callback):
+    global registered_dcc_power_state_callbacks
     if publish_dcc_locomotive_commands_to_mqtt_broker:
         # Register the callback for DCC Power updates from the remote SPROG
         if callback not in registered_dcc_power_state_callbacks:
@@ -84,7 +83,7 @@ def subscribe_to_dcc_power_updates(callback):
         callback(remote_dcc_power_is_on)
     else:
         # Subscribe to updates from the local SPROG interface. this will trigger
-        # an immediate callback to let the client know the current powerstate.
+        # an immediate callback to let the client know the current power state.
         pi_sprog_interface.subscribe_to_local_dcc_power_updates(callback)
     return()
 
@@ -99,27 +98,123 @@ def unsubscribe_from_dcc_power_updates(callback):
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Callback for handling DCC power updates received from the remote SPROG node. This will apply to
-# situations where we are a remote client of a SPROG Node somewhere out on the MQTT network.
-# We need to know the power state of the SPROG node in order to update our Throttle UIs.
-# A node subscribes to these updates when configured to subscribe to remote DCC loco feeds
-# A node publishes the initial power state when configured to publish the loco feed
+# API Functions to request DCC power ON/OFF. These requests will be sent to either the local
+# SPROG or the remote SPROG power sdepending on whether this Node is configured to be a remote
+# throttle (publish_dcc_locomotive_commands_to_mqtt_broker=True) or a local throttle
 #----------------------------------------------------------------------------------------------------
 
-def handle_mqtt_dcc_power_event(message):
-    global remote_dcc_power_is_on
-    if "sourceidentifier" not in message.keys() or "dccpower" not in message.keys():
-        logging.error (f"Loco Control: Unhandled MQTT Message - {message}")
+def request_track_power_on():
+    # Send the command either to the local SPROG interface or the remote SPROG node. We will either
+    # get a callback from the local SPROG or an acknowledgement message from the remote node
+    if publish_dcc_locomotive_commands_to_mqtt_broker:
+        mqtt_message = {"requestdccpower": True}
+        mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
+                log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
     else:
-        # All Messages include the following mandatory elements
-        source_node = message["sourceidentifier"]
-        dcc_power = message["dccpower"]
-        logging.debug(f"Loco Control: Received DCC Power message from {source_node}: power={dcc_power}")
-        # Update the global remote power status
-        remote_dcc_power_is_on = dcc_power
-        # Make the callbacks to all registered clients
-        for power_status_changed_callback in registered_dcc_power_state_callbacks:
-            power_status_changed_callback(remote_dcc_power_is_on)
+        session_id = pi_sprog_interface.request_dcc_power_on()
+    return()
+
+def request_track_power_off():
+    # Send the command either to the local SPROG interface or the remote SPROG node. We will either
+    # get a callback from the local SPROG or an acknowledgement message from the remote node
+    if publish_dcc_locomotive_commands_to_mqtt_broker:
+        mqtt_message = {"requestdccpower": False}
+        mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
+                log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
+    else:
+        session_id = pi_sprog_interface.request_dcc_power_off()
+    return()
+
+#------------------------------------------------------------------------------
+# API function to request a loco session (returns session ID or 0 if unsuccessful)
+#------------------------------------------------------------------------------
+
+def request_loco_session(dcc_address:int, callback):
+    global locomotive_sessions
+    if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
+        logging.error(f"Loco Control: request_loco_session - Invalid DCC Address {dcc_address} - must be an int (1-10239)")
+    else:
+        logging.debug(f"Loco Control: Requesting Loco Session for DCC address {dcc_address}")
+        # Store the callback for session acknowledgement
+        session_acknowledgement_callbacks[dcc_address] = callback
+        # Send the command either to the local SPROG interface or the remote SPROG node. If sending
+        # to the remote node, we wait for the callback - otherwise schedule the callback immediately
+        # as the SPROG interface call waits for the response (with an appropriate timeout)
+        if publish_dcc_locomotive_commands_to_mqtt_broker:
+            # To Request a remote session we send the DCC Address with a Session ID of zero
+            mqtt_message = {"dccaddress": dcc_address, "sessionid": 0}
+            mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
+                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+        else:
+            session_id = pi_sprog_interface.request_loco_session(dcc_address)
+            common.root_window.after(0, lambda:callback(dcc_address, session_id))
+    return()
+
+#------------------------------------------------------------------------------
+# API function to release a loco session (local or remote)
+#------------------------------------------------------------------------------
+
+def release_loco_session(session_id:int):
+    global locomotive_sessions
+    if not isinstance(session_id, int):
+        logging.error(f"Loco Control: release_loco_session - Invalid Session ID {session_id} - must be an int")
+    else:
+        logging.debug(f"Loco Control: Releasing Loco Session {session_id}")
+        # Send the command either to the local SPROG interface or the remote SPROG node.
+        if publish_dcc_locomotive_commands_to_mqtt_broker:
+            # To Release a remote session we send the Session ID with DCC address of zero.
+            # There is no callback here - it will either happen or it won't
+            mqtt_message = {"dccaddress": 0, "sessionid": session_id}
+            mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
+                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+        else:
+            pi_sprog_interface.release_loco_session(session_id)
+    return()
+
+#------------------------------------------------------------------------------
+# API function to set loco speed and direction (local or remote)
+#------------------------------------------------------------------------------
+
+def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_emergency_stop:bool=False):
+    if not isinstance(session_id, int):
+        logging.error(f"Loco Control: set_loco_speed_and_direction - Invalid Session ID {session_id} - must be an int")
+    elif not isinstance(speed, int) or speed < 0 or speed > 127:
+        logging.error(f"Loco Control: set_loco_speed_and_direction - Invalid speed for session {session_id} - must be an int (0-127)")
+    else:
+        # Inhibit the Emergency Stop (unless overridden in the function call)
+        if not allow_emergency_stop and speed == 1: speed = 0
+        # Publish the Speed/Direction change message to either the local SPROG or the remote SPROG
+        if publish_dcc_locomotive_commands_to_mqtt_broker:
+            # Speed/Direction messages include the Session ID, Speed value and Direction Flag
+            mqtt_message = {"sessionid": session_id, "speed": speed, "direction": forward}
+            mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
+                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+        else:
+            pi_sprog_interface.set_loco_speed_and_direction(session_id, speed, forward)
+    return()
+
+def send_emergency_stop(session_id:int):
+    set_loco_speed_and_direction(session_id, speed=1, forward=True, allow_emergency_stop=True)
+    return()
+
+#------------------------------------------------------------------------------
+# API function to set a loco function (local or remote)
+#------------------------------------------------------------------------------
+
+def set_loco_function(session_id:int, function_id:int, state:bool):
+    if not isinstance(session_id, int):
+        logging.error(f"Pi-SPROG: set_loco_function - Invalid Session ID {session_id} - must be an int")
+    elif not isinstance(function_id, int) or function_id < 0 or function_id > 28:
+        logging.error(f"Pi-SPROG: set_loco_function - Invalid function ID {function_id} for session {session_id} - must be 0-28")
+    else:
+        # Publish the Loco Function change message to either the local SPROG or the remote SPROG
+        if publish_dcc_locomotive_commands_to_mqtt_broker:
+            # Loco Function messages incluse the Session ID, Function ID and Function state Flag
+            mqtt_message = {"sessionid": session_id, "functionid": function_id, "functionstate": state}
+            mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=message, retain=True,
+                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+        else:
+            pi_sprog_interface.set_loco_function(session_id, function_id, state)
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -128,16 +223,26 @@ def handle_mqtt_dcc_power_event(message):
 # We make the callback to update the client on the status of the session request
 #----------------------------------------------------------------------------------------------------
 
-def handle_mqtt_dcc_acknowledge_event(message):
-    message
-    if "sourceidentifier" not in message.keys() or "dccaddress" not in message.keys() or "sessionid" not in message.keys():
-        logging.error (f"Loco Control: Unhandled MQTT Message - {message}")
+def handle_mqtt_dcc_locomotive_control_response(message):
+    global remote_dcc_power_is_on
+    if "sourceidentifier" not in message.keys():
+        logging.error (f"Loco Control: Unhandled MQTT Response Message - {message}")
     else:
         # All Messages include the following mandatory elements
         source_node = message["sourceidentifier"]
-        dcc_address = message["dccaddress"]
-        session_id = message["sessionid"]
-        if dcc_address in session_acknowledgement_callbacks.keys():
+        # The following elements are optional - if not present then the values will be set to none
+        dcc_address = message.get("dccaddress")
+        session_id = message.get("sessionid")
+        dcc_power_state = message.get("dccpowerstate")
+        # Handle a DCC Power is ON or OFF message
+        if dcc_power_state is not None:
+            logging.debug(f"Loco Control: Received DCC Power State medssage from {source_node} "
+                               +f" - DCC Power state: {dcc_power_state}")
+            remote_dcc_power_is_on = dcc_power_state
+            for power_status_changed_callback in registered_dcc_power_state_callbacks:
+                power_status_changed_callback(dcc_power_state)
+        # Handle a Loco Session acknowledgement message
+        elif dcc_address is not None and session_id is not None and dcc_address in session_acknowledgement_callbacks.keys():
             logging.debug(f"Loco Control: Received session acknowledgement from {source_node}: "
                                +f"DCC Address {dcc_address}, Session ID is {session_id}")
             session_acknowledgement_callbacks[dcc_address] (dcc_address, session_id)
@@ -157,148 +262,47 @@ def handle_mqtt_dcc_acknowledge_event(message):
 #   This node - Sends session_id with dcc_address=0 (to report the session terminated)
 #----------------------------------------------------------------------------------------------------
 
-def handle_mqtt_dcc_locomotive_control_event(message):
-    if "sourceidentifier" not in message.keys() or "dccaddress" not in message.keys() or "sessionid" not in message.keys():
-        logging.error ("Loco Control: Unhandled MQTT Message - "+str(message))
+def handle_mqtt_dcc_locomotive_control_command(message):
+    if "sourceidentifier" not in message.keys():
+        logging.error ("Loco Control: Unhandled MQTT Control Message - "+str(message))
     else:
         # All Messages include the following mandatory elements
         source_node = message["sourceidentifier"]
-        dcc_address = message["dccaddress"]
-        session_id = message["sessionid"]
         # The following elements are optional - if not present then the values will be set to none
-        speed = message.get("speed")
+        dcc_address = message.get("dccaddress")
+        session_id = message.get("sessionid")
+        loco_speed = message.get("speed")
         direction = message.get("direction")
-        func_id = message.get("functionid")
+        function_id = message.get("functionid")
         func_state = message.get("functionstate")
+        request_dcc_power = message.get("requestdccpower")
         # Handle speed/direction commands from a remote throttle
-        # Note that Direction of None is a valid "state" as far as the UI is concerned
-        if speed is not None:
-            logging.debug (f"Loco Control: Received message for Session {session_id} on {source_node}: speed={speed}, forward={direction}")
-            pi_sprog_interface.set_loco_speed_and_direction(session_id, speed, direction)
+        if session_id is not None and loco_speed is not None and direction is not None:
+            logging.debug (f"Loco Control: Received message for Session {session_id} on {source_node}: speed={loco_speed}, forward={direction}")
+            pi_sprog_interface.set_loco_speed_and_direction(session_id, loco_speed, direction)
         # Handle loco function commands from a remote throttle
-        elif func_id is not None and func_state is not None:
-            logging.debug (f"Loco Control: Received message for Session {session_id} on {source_node}: function={func_id}, state={func_state}")
-            pi_sprog_interface.set_loco_function(session_id, func_id, func_state)
+        elif session_id is not None and function_id is not None and func_state is not None:
+            logging.debug (f"Loco Control: Received message for Session {session_id} on {source_node}: function={function_id}, state={func_state}")
+            pi_sprog_interface.set_loco_function(session_id, function_id, func_state)
+        # Handle a DCC power On Request - No acknowledgement required (made via a seperate callback)
+        elif request_dcc_power is not None and request_dcc_power:
+            pi_sprog_interface.request_dcc_power_on()
+        # Handle a DCC power Off Request  - No acknowledgement required (made via a seperate callback)
+        elif request_dcc_power is not None and not request_dcc_power:
+            pi_sprog_interface.request_dcc_power_off()
         # Handle loco session request from a remote throttle
-        elif dcc_address > 0 and session_id == 0:
+        elif dcc_address is not None and dcc_address > 0 and session_id is not None and session_id == 0:
             logging.debug (f"Loco Control: Received Session Request message for DCC Address {dcc_address} from {source_node}")
             loco_session = pi_sprog_interface.request_loco_session(dcc_address)
             # Acknowledge the session back to the client (session ID will be zero if unsuccessful)
-            mqtt_interface.send_mqtt_message("dcc_acknowledge_events", 0, retain=True,
+            mqtt_interface.send_mqtt_message("dcc_locomotive_acknowledgements", 0, retain=True,
                         data={"dccaddress": dcc_address, "sessionid": loco_session},
-                        log_message="Loco Control: Publishing session acknowledgement message to broker")
+                        log_message=f"Loco Control: Publishing acknowledgement message to broker - Session ID is {loco_session}")
         # Handle loco session release request from a remote node
-        elif dcc_address == 0 and session_id > 0:
+        elif dcc_address is not None and dcc_address == 0 and session_id is not None and session_id > 0:
             logging.debug (f"Loco Control: Received Session Release message for Session {session_id} from {source_node}")
             pi_sprog_interface.release_loco_session(session_id)
     return()
-
-#----------------------------------------------------------------------------------------------------
-# Internal Function to send a Loco Control event to the SPROG Node. This will apply to situations
-# where we are a remote client of a SPROG Node somewhere out there on the MQTT network.
-# Mandatory Elements are "sourceidentifier", "dccaddress" and "sessionid"
-# Optional elements are "speed", "direction", "functionid", "functionstate"
-#----------------------------------------------------------------------------------------------------
-
-def send_mqtt_dcc_locomotive_control_event(message:dict):
-    if "dccaddress" not in message.keys() and "sessionid" not in message.keys():
-        logging.error ("Loco Control: Invalid loco control Message - "+str(message))
-    elif publish_dcc_locomotive_commands_to_mqtt_broker:
-        mqtt_interface.send_mqtt_message("dcc_locomotive_control_events", 0, data=message, retain=True,
-                log_message=f"Loco Control: Publishing loco control message to broker :{message}")
-    return()
-
-#----------------------------------------------------------------------------------------------------
-# Internal Function to forward the current DCC power state to remote nodes. This will apply to
-# situations where we are The SPROG Node and there are remote throttle nodes on the MQTT network.
-# This function will be called by the SPROG interface (where we have registered a callback)
-#----------------------------------------------------------------------------------------------------
-
-def send_dcc_power_status_update_events(power_state):
-    mqtt_interface.send_mqtt_message("dcc_power_events", 0, data={"dccpower": power_state}, retain=True,
-                    log_message=f"Loco Control: Publishing DCC Power message to broker: Power={power_state}")
-    return()
-
-#------------------------------------------------------------------------------
-# API function to request a loco session (returns session ID or 0 if unsuccessful)
-#------------------------------------------------------------------------------
-
-def request_loco_session(dcc_address:int, callback):
-    global locomotive_sessions
-    def response_received(): return(locomotive_sessions[str(dcc_address)]["sessionid"] > 0)
-    if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
-        logging.error(f"Loco Control: request_loco_session - Invalid DCC Address {dcc_address} - must be an int (1-10239)")
-    else:
-        logging.debug(f"Loco Control: Requesting Loco Session for DCC address {dcc_address}")
-        session_acknowledgement_callbacks[dcc_address] = callback
-        # Send the command either to the local SPROG interface or the remote node. If sending to
-        # the remote node, we wait for the callback - otherwise schedule the callback immediately.
-        # To Request a session we send the DCC Address with a Session ID of zero
-        if publish_dcc_locomotive_commands_to_mqtt_broker:
-            mqtt_message = {"dccaddress": dcc_address, "sessionid": 0}
-            send_mqtt_dcc_locomotive_control_event(mqtt_message)
-        else:
-            session_id = pi_sprog_interface.request_loco_session(dcc_address)
-            common.root_window.after(0, lambda:callback(dcc_address, session_id))
-    return()
-
-#------------------------------------------------------------------------------
-# API function to release a loco session (local or remote)
-#------------------------------------------------------------------------------
-
-def release_loco_session(session_id:int):
-    global locomotive_sessions
-    if not isinstance(session_id, int):
-        logging.error(f"Loco Control: release_loco_session - Invalid Session ID {session_id} - must be an int")
-    else:
-        logging.debug(f"Loco Control: Releasing Loco Session {session_id}")
-        # Send the command either to the local SPROG interface or the remote node.
-        # To Release a session we send the Session ID with DCC address of zero
-        if publish_dcc_locomotive_commands_to_mqtt_broker:
-            mqtt_message = {"dccaddress": 0, "sessionid": session_id}
-            send_mqtt_dcc_locomotive_control_event(mqtt_message)
-        else:
-            pi_sprog_interface.release_loco_session(session_id)
-    return()
-
-#------------------------------------------------------------------------------
-# API function to set loco speed and direction (local or remote)
-#------------------------------------------------------------------------------
-
-def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_emergency_stop:bool=False):
-    if not isinstance(session_id, int):
-        logging.error(f"Loco Control: set_loco_speed_and_direction - Invalid Session ID {session_id} - must be an int")
-    elif not isinstance(speed, int) or speed < 0 or speed > 127:
-        logging.error(f"Loco Control: set_loco_speed_and_direction - Invalid speed for session {session_id} - must be an int (0-127)")
-    else:
-        # Inhibit the Emergency Stop (unless overridden in the function call)
-        if not allow_emergency_stop and speed == 1: speed = 0
-        if publish_dcc_locomotive_commands_to_mqtt_broker:
-            mqtt_message = {"dccaddress": 0, "sessionid": session_id, "speed": speed, "direction": forward}
-            send_mqtt_dcc_locomotive_control_event(mqtt_message)
-        else:
-            pi_sprog_interface.set_loco_speed_and_direction(session_id, speed, forward)
-    return()
-
-def send_emergency_stop(session_id:int):
-    set_loco_speed_and_direction(session_id, speed=1, forward=True, allow_emergency_stop=True)
-    return()
-
-#------------------------------------------------------------------------------
-# API function to set a loco function (local or remote)
-#------------------------------------------------------------------------------
-
-def set_loco_function(session_id:int, function_id:int, state:bool):
-    if not isinstance(session_id, int):
-        logging.error(f"Pi-SPROG: set_loco_function - Invalid Session ID {session_id} - must be an int")
-    elif not isinstance(function_id, int) or function_id < 0 or function_id > 28:
-        logging.error(f"Pi-SPROG: set_loco_function - Invalid function ID {function_id} for session {session_id} - must be 0-28")
-    else:
-        if publish_dcc_locomotive_commands_to_mqtt_broker:
-            mqtt_message = {"dccaddress": 0, "sessionid": session_id, "functionid": function_id, "functionstate": state}
-            send_mqtt_dcc_locomotive_control_event(mqtt_message)
-        else:
-            pi_sprog_interface.set_loco_function(session_id, function_id, state)
 
 #----------------------------------------------------------------------------------------------------
 # API function to reset the published/subscribed DCC loco control feeds. This function is called by
@@ -310,51 +314,51 @@ def reset_dcc_locomotive_mqtt_configuration():
     global publish_dcc_locomotive_commands_to_mqtt_broker
     logging.debug("Loco Control: Resetting MQTT publish and subscribe configuration")
     publish_dcc_locomotive_commands_to_mqtt_broker = False
-    mqtt_interface.unsubscribe_from_message_type("dcc_power_events")
-    mqtt_interface.unsubscribe_from_message_type("dcc_acknowledge_events")
-    mqtt_interface.unsubscribe_from_message_type("dcc_locomotive_control_events")
+    mqtt_interface.unsubscribe_from_message_type("dcc_locomotive_control_commands")
+    mqtt_interface.unsubscribe_from_message_type("dcc_locomotive_control_responses")
     return()
 
 #----------------------------------------------------------------------------------------------------
-# API Function to set this Signalling node to publish all DCC LOCO commands to remote MQTT
+# API Function to set this Signalling node to publish all DCC LOCOMOTIVE commands to remote MQTT
 # nodes. This function is called by the editor on 'Apply' of the MQTT pub/sub configuration.
+# Note that this node also needs to subscribe to the DCC power state of the remote node
+# and all DCC loco control acknowledgement messages (e.g. request session)
 #----------------------------------------------------------------------------------------------------
 
-def set_node_to_publish_dcc_locomotive_commands(sprog_node:str):
+def set_node_to_publish_dcc_locomotive_commands(publish_dcc_commands:bool, destination_node:str):
     global publish_dcc_locomotive_commands_to_mqtt_broker
-    if len(sprog_node) > 0:
-        logging.debug(f"Loco Control: Configuring Application to publish Loco Control Commands to Node {sprog_node}")
+    publish_dcc_locomotive_commands_to_mqtt_broker = publish_dcc_commands
+    if publish_dcc_locomotive_commands_to_mqtt_broker:
+        logging.debug(f"Loco Control: Configuring Application to publish Loco Control Commands to Node {destination_node}")
         # If this node is publishing its DCC loco control command feed (to a remote SPROG node)
         # Then we need to know the current DCC power state (on or OFF) of the remote node.
         # We use a global subscription on the assumption there is only one SPROG node on
         # the network that is subscribing to dcc locomotive command feeds
-        mqtt_interface.subscribe_to_mqtt_messages("dcc_power_events", sprog_node, 0, handle_mqtt_dcc_power_event)
-        mqtt_interface.subscribe_to_mqtt_messages("dcc_acknowledge_events", sprog_node, 0, handle_mqtt_dcc_acknowledge_event)
-    publish_dcc_locomotive_commands_to_mqtt_broker = len(sprog_node) > 0
+        mqtt_interface.subscribe_to_mqtt_messages("dcc_locomotive_control_responses", destination_node, 0, handle_mqtt_dcc_locomotive_control_response)
     return()
 
 #----------------------------------------------------------------------------------------------------
-# API Function to "subscribe" to the published DCC command feed from other remote MQTT nodes
+# API Function to "subscribe" to the published DCC loco command feed (from other MQTT nodes)
 # This function is called by the editor on "Apply' of the MQTT pub/sub configuration.
-# Note that we need to configure 'this' node to publish the state of the local DCC power
-# back to the remote node(s) that are sending the DCC loco commands. This includes subscribing
-# to the local DCC command state and publishing this immediately after Broker Connect
+# Note that we need to configure 'this' node to publish the local SPROG DCC power state
+# back to the remote node(s) that are sending the DCC loco commands. This needs to be done
+# immediately on broker connect and then every time the power state changes
 #----------------------------------------------------------------------------------------------------
 
 def send_local_dcc_power_state_on_broker_connect():
-    global local_dcc_power_is_on
     if notify_other_network_clients_of_dcc_power_updates:
-        send_dcc_power_status_update_events(local_dcc_power_is_on)
+        local_dcc_power_state_updated(local_dcc_power_is_on)
 
 def local_dcc_power_state_updated(power_state):
     global local_dcc_power_is_on
     local_dcc_power_is_on = power_state
-    send_dcc_power_status_update_events(local_dcc_power_is_on)
+    mqtt_interface.send_mqtt_message("dcc_locomotive_control_responses", 0, data={"dccpowerstate": power_state}, retain=True,
+                log_message=f"Loco Control: Publishing DCC Power state response to broker: Power={power_state}")
 
 def subscribe_to_dcc_locomotive_command_feed(*nodes:str):
     global notify_other_network_clients_of_dcc_power_updates
     for node in nodes:
-        mqtt_interface.subscribe_to_mqtt_messages("dcc_locomotive_control_events", node, 0, handle_mqtt_dcc_locomotive_control_event)
+        mqtt_interface.subscribe_to_mqtt_messages("dcc_locomotive_control_commands", node, 0, handle_mqtt_dcc_locomotive_control_command)
     # If this node is subscribing to one or more DCC loco control command feeds (from other nodes)
     # Then the other nodes need to know the current DCC power state (on or OFF). We therefore subscribe
     # to updates from the local SPROG interface with a callback to transmit updates via the network

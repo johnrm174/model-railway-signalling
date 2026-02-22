@@ -22,8 +22,8 @@
 #
 # Calls the following library functions (for the pi-SPROG interface):
 #    library.set_loco_speed_and_direction
-#    library.request_dcc_power_on
-#    library.request_dcc_power_off
+#    library.request_track_power_on
+#    library.request_track_power_off
 #    library.request_loco_session
 #    library.set_loco_function
 #    library.release_loco_session
@@ -251,10 +251,10 @@ async def handle_client(reader, writer):
                     state = message[3:]
                     if state == "1":
                         if server_debug:logging.debug("Throttle Server: Handling Power ON Request")
-                        library.request_dcc_power_on()
+                        library.request_track_power_on()
                     else:
                         if server_debug:logging.debug("Throttle Server: Handling Power OFF Request")
-                        library.request_dcc_power_off()
+                        library.request_track_power_off()
                     # Note that we don't acknowledge the power state change back to app or update the
                     # global dcc_power_state here - we wait for callback confirmation
                     continue

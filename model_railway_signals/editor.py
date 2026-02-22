@@ -658,7 +658,7 @@ class main_menubar:
     def apply_new_mqtt_pub_sub_configuration(self):
         # Publish Configuration
         library.set_node_to_publish_dcc_accessory_commands(settings.get_mqtt("pubdcc"))
-        library.set_node_to_publish_dcc_locomotive_commands(settings.get_mqtt("publoco"))
+        library.set_node_to_publish_dcc_locomotive_commands(settings.get_mqtt("publoco"), settings.get_mqtt("publoconode"))
         library.set_gpio_sensors_to_publish_state(*settings.get_mqtt("pubsensors"))
         library.set_signals_to_publish_state(*settings.get_mqtt("pubsignals"))
         library.set_sections_to_publish_state(*settings.get_mqtt("pubsections"))

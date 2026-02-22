@@ -456,9 +456,9 @@ class dcc_programming():
             self.frame2.columnconfigure(1, weight=0) # Center column stays tight to content
             self.frame2.columnconfigure(2, weight=1, uniform="group1")
             # DCC Power Function Buttons (Left Side)
-            self.B1 = Tk.Button(self.frame2, width=18, command=self.toggle_power)
+            self.B1 = Tk.Button(self.frame2, width=25, command=self.toggle_power)
             self.B1.grid(row=0, column=0, sticky="w", padx=5)
-            self.B1TT = common.CreateToolTip(self.B1, text="Click to toggle DCC Power state")
+            self.B1TT = common.CreateToolTip(self.B1, text="Click to toggle the DCC Power state on this SPROG Node")
             # Standard window Control Buttons (Center)
             self.B3 = Tk.Button (self.frame2, text = "Ok / Close", command=self.destroy)
             self.B3.grid(row=0, column=1, padx=2, pady=2)
@@ -473,8 +473,8 @@ class dcc_programming():
         if self.window.winfo_exists():
             self.cv_programming.dcc_power_updated(state)
             self.one_touch_programming.dcc_power_updated(state)
-            if state: self.B1.config(text="DCC Power On", bg="green2", activebackground="green2")
-            else: self.B1.config(text="DCC Power Off", bg="tomato", activebackground="tomato")
+            if state: self.B1.config(text="Local DCC Power is On", bg="green2", activebackground="green2")
+            else: self.B1.config(text="Local DCC Power is Off", bg="tomato", activebackground="tomato")
 
     def toggle_power(self):
         if self.dcc_power_state: library.request_dcc_power_off()
