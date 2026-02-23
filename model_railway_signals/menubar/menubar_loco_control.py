@@ -462,8 +462,11 @@ class loco_control(Tk.Toplevel):
         self.resizable(False, False)
         self.wm_attributes("-topmost", True)
         # Create the DCC Power State label
-        self.dccpower = Tk.Label(self, width=15)
+        self.frame0 = Tk.LabelFrame(self, text="DCC Track Power")
+        self.frame0.pack(padx=5,pady=2, fill="x")
+        self.dccpower = Tk.Button(self.frame0, width=15, command=self.toggle_track_power)
         self.dccpower.pack(padx=2, pady=2)
+        self.dccpowerTT = common.CreateToolTip(self.dccpower, text="Click to toggle The Track Bus On/Off (on the local or remote SPROG Node)")
         # Create a frame For the Roster selection (frame1)
         self.frame1 = Tk.LabelFrame(self, text="Locomotives")
         self.frame1.pack(padx=5,pady=2, fill="x")
@@ -553,6 +556,16 @@ class loco_control(Tk.Toplevel):
         library.subscribe_to_dcc_power_updates(self.dcc_power_status_updated)
 
     #--------------------------------------------------------------------
+    # Callback Function to toggle the state of the Track Power by calling
+    # The appropriate library functions (which will send the request to
+    # either the local SPROG or a remote SPROG depending on configuration
+    #--------------------------------------------------------------------
+
+    def toggle_track_power(self):
+        if self.dcc_power_state: library.request_track_power_off()
+        else: library.request_track_power_on()
+
+    #--------------------------------------------------------------------
     # Callback Function to update the UI after a DCC power on/off event.
     # If DCC Power is ON then Loco selections will be enabled
     # If DCC power is OFF then the UI will be updated to reflect the
@@ -564,9 +577,9 @@ class loco_control(Tk.Toplevel):
         # Update the DCC power indication
         self.bold_font = TkFont.Font(font=self.dccpower.cget("font"))
         self.bold_font.configure(weight="bold")
-        if dcc_power_state == True: self.dccpower.config(text="Track Bus: ON", fg="green4", font=self.bold_font)
-        elif dcc_power_state == False: self.dccpower.config(text="Track Bus: OFF", fg="red", font=self.bold_font)
-        else: self.dccpower.config(text="DCC Power: ????", fg="orange3", font=self.bold_font)
+        if dcc_power_state == True: self.dccpower.config(text="Track Bus is On", bg="green2", activebackground="green2", relief="sunken")
+        elif dcc_power_state == False: self.dccpower.config(text="Track Bus is Off", bg="tomato", activebackground="tomato", relief="raised")
+        else: self.dccpower.config(text="Track Bus: ????", bg="orange2", activebackground="orange2", relief="raised" )
         # if DCC power is off then clear down any selections and inhibit UI
         if dcc_power_state:
             # if DCC power is On then enable the loco selection dropdown

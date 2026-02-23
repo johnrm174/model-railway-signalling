@@ -458,7 +458,7 @@ class dcc_programming():
             # DCC Power Function Buttons (Left Side)
             self.B1 = Tk.Button(self.frame2, width=25, command=self.toggle_power)
             self.B1.grid(row=0, column=0, sticky="w", padx=5)
-            self.B1TT = common.CreateToolTip(self.B1, text="Click to toggle the DCC Power state on this SPROG Node")
+            self.B1TT = common.CreateToolTip(self.B1, text="Click to toggle local DCC Power On/Off (on this SPROG Node)")
             # Standard window Control Buttons (Center)
             self.B3 = Tk.Button (self.frame2, text = "Ok / Close", command=self.destroy)
             self.B3.grid(row=0, column=1, padx=2, pady=2)
@@ -468,13 +468,14 @@ class dcc_programming():
             # Subscribe to DCC Power updates from the local SPROG Interface
             library.subscribe_to_local_dcc_power_updates(self.dcc_power_updated)
 
-    def dcc_power_updated(self, state:bool):
-        self.dcc_power_state = state
+    def dcc_power_updated(self, dcc_power_state:bool):
+        self.dcc_power_state = dcc_power_state
         if self.window.winfo_exists():
-            self.cv_programming.dcc_power_updated(state)
-            self.one_touch_programming.dcc_power_updated(state)
-            if state: self.B1.config(text="Local DCC Power is On", bg="green2", activebackground="green2")
-            else: self.B1.config(text="Local DCC Power is Off", bg="tomato", activebackground="tomato")
+            self.cv_programming.dcc_power_updated(dcc_power_state)
+            self.one_touch_programming.dcc_power_updated(dcc_power_state)
+            if dcc_power_state == True: self.B1.config(text="Local DCC Power is On", bg="green2", activebackground="green2", relief="sunken")
+            elif dcc_power_state == False: self.B1.config(text="Local DCC Power is Off", bg="tomato", activebackground="tomato", relief="raised")
+            else: self.B1.config(text="Local DCC Power ????", bg="orange2", activebackground="orange2", relief="raised" )
 
     def toggle_power(self):
         if self.dcc_power_state: library.request_dcc_power_off()
