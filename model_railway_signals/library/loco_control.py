@@ -144,7 +144,7 @@ def request_loco_session(dcc_address:int, callback):
             # To Request a remote session we send the DCC Address with a Session ID of zero
             mqtt_message = {"dccaddress": dcc_address, "sessionid": 0}
             mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
-                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+                    log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
         else:
             session_id = pi_sprog_interface.request_loco_session(dcc_address)
             common.root_window.after(0, lambda:callback(dcc_address, session_id))
@@ -166,7 +166,7 @@ def release_loco_session(session_id:int):
             # There is no callback here - it will either happen or it won't
             mqtt_message = {"dccaddress": 0, "sessionid": session_id}
             mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
-                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+                    log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
         else:
             pi_sprog_interface.release_loco_session(session_id)
     return()
@@ -188,7 +188,7 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool, allow_
             # Speed/Direction messages include the Session ID, Speed value and Direction Flag
             mqtt_message = {"sessionid": session_id, "speed": speed, "direction": forward}
             mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
-                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+                    log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
         else:
             pi_sprog_interface.set_loco_speed_and_direction(session_id, speed, forward)
     return()
@@ -211,14 +211,14 @@ def set_loco_function(session_id:int, function_id:int, state:bool):
         if publish_dcc_locomotive_commands_to_mqtt_broker:
             # Loco Function messages incluse the Session ID, Function ID and Function state Flag
             mqtt_message = {"sessionid": session_id, "functionid": function_id, "functionstate": state}
-            mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=message, retain=True,
-                    log_message=f"Loco Control: Publishing loco control message to broker :{message}")
+            mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
+                    log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
         else:
             pi_sprog_interface.set_loco_function(session_id, function_id, state)
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Callback for handling DCC session acknowledgements received from the SPROG Node
+# Callback for handling DCC session responses received from the SPROG Node
 # in response to a session request from a throttle running on this machine.
 # We make the callback to update the client on the status of the session request
 #----------------------------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ def handle_mqtt_dcc_locomotive_control_command(message):
             logging.debug (f"Loco Control: Received Session Request message for DCC Address {dcc_address} from {source_node}")
             loco_session = pi_sprog_interface.request_loco_session(dcc_address)
             # Acknowledge the session back to the client (session ID will be zero if unsuccessful)
-            mqtt_interface.send_mqtt_message("dcc_locomotive_acknowledgements", 0, retain=True,
+            mqtt_interface.send_mqtt_message("dcc_locomotive_control_responses", 0, retain=True,
                         data={"dccaddress": dcc_address, "sessionid": loco_session},
                         log_message=f"Loco Control: Publishing acknowledgement message to broker - Session ID is {loco_session}")
         # Handle loco session release request from a remote node
@@ -312,10 +312,12 @@ def handle_mqtt_dcc_locomotive_control_command(message):
 
 def reset_dcc_locomotive_mqtt_configuration():
     global publish_dcc_locomotive_commands_to_mqtt_broker
+    global session_acknowledgement_callbacks
     logging.debug("Loco Control: Resetting MQTT publish and subscribe configuration")
     publish_dcc_locomotive_commands_to_mqtt_broker = False
     mqtt_interface.unsubscribe_from_message_type("dcc_locomotive_control_commands")
     mqtt_interface.unsubscribe_from_message_type("dcc_locomotive_control_responses")
+    session_acknowledgement_callbacks.clear()
     return()
 
 #----------------------------------------------------------------------------------------------------
