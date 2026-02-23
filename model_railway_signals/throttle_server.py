@@ -319,11 +319,15 @@ async def handle_client(reader, writer):
                             except asyncio.TimeoutError:
                                 logging.error(f"Throttle Server: Timeout waiting for session for address {dcc_address_int}")
                                 # Inform the client and continue
-                                writer.write(f"HMTimeout acquiring {dcc_address_int}\n".encode())
+                                writer.write(f"HMTimeout acquiring DCC address {dcc_address_int}\n".encode())
                                 await writer.drain()
                                 continue
                             # Process the session result
-                            if session_id > 0:
+                            if session_id == 0:
+                                writer.write(f"HMDCC address {dcc_address_int} could not be acquired\n".encode())
+                                await writer.drain()
+                                continue
+                            else:
                                 # Session was successfully acquired - save it in the dict we use to track 
                                 if throttle_index not in wi_sessions:
                                     wi_sessions[throttle_index] = []
