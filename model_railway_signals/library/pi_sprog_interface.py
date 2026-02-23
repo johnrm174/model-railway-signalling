@@ -1087,7 +1087,7 @@ def request_loco_session(dcc_address:int):
                 # Set speed and direction to zero (to force a known state)
                 set_loco_speed_and_direction(session_id_to_return, 0, False)
                 # Turn all the functions off (to force a known state)
-                for function in range(29): set_loco_function(session_id_to_return, function, False)
+                for function in range(29): set_loco_function(session_id_to_return, function, False, suppress_logging=True)
             else:
                 # Return Session ID of zero (could not create session)
                 logging.error(f"Pi-SPROG: request_loco_session - Timeout awaiting response for DCC address {dcc_address}")
@@ -1129,7 +1129,7 @@ def release_loco_session(session_id:int):
             # Set speed and direction to zero (to force a known state)
             set_loco_speed_and_direction(session_id, 0, False)
             # Turn all the functions off (to force a known state)
-            for function in range(29): set_loco_function(session_id, function, False)
+            for function in range(29): set_loco_function(session_id, function, False, suppress_logging=True)
             # Kill the heartbeat thread 
             heartbeat = locomotive_sessions[str(dcc_address)]["heartbeat"]
             common.root_window.after_cancel(heartbeat)
@@ -1220,7 +1220,7 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool):
 # OpCode is  0x60 (DFUN)
 #------------------------------------------------------------------------------
 
-def set_loco_function(session_id:int, function_id:int, state:bool):
+def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logging:bool=False):
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: set_loco_function - Invalid Session ID {session_id} - must be an int")
     elif not isinstance(function_id, int) or function_id < 0 or function_id > 28:
@@ -1281,7 +1281,8 @@ def set_loco_function(session_id:int, function_id:int, state:bool):
                        (2   if locomotive["functions"].get("22") else 0) | \
                        (1   if locomotive["functions"].get("21") else 0)
                 send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
-            logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
+            if not suppress_logging:
+                logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
         else:
             logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
     return()
