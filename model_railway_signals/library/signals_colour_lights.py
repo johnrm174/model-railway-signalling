@@ -718,8 +718,12 @@ def trigger_timed_colour_light_signal(sig_id:int,start_delay:int=0,time_delay:in
     # Create a new instnce of the time signal class - this should have the effect of "destroying"
     # the old instance when it goes out of scope, leaving us with the newly created instance
     signals.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
-    # Schedule the start of the sequence (i.e. signal to danger)
-    common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    # Schedule the start of the sequence (i.e. signal to danger). Note that if a start delay of zero is
+    # specified, we start the sequence straight away (before any temporary overrides get set)
+    if start_delay > 0:
+        common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    else:
+        signals.signals[str(sig_id)]["timedsequence"][route.value].start()
     return()
 
 ###############################################################################
