@@ -65,7 +65,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Add your DCC locos to the Roster, defining DCC address and DCC functions.
     * Control your Locos via on-screen throttles (fully compatible with touchscreens).
     * Start the built-in WiThrottle server and control your locos from your smartphone.
-    * Both Android (Engine Driver App) and iPhone (Withrottle App) are supported
+    * Tested and fully supported for Android (Engine Driver App) - iphone - tbc.
 * Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons)
 * Improved initial synchronisation of layout state following DCC connect
 * Added ability to inhibit flashing aspects for signal approach control
