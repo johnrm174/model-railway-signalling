@@ -340,6 +340,32 @@ class route_configuration_tab():
         self.route_type_updated_callback()
 
 #####################################################################################
+# Class for a subsidiary signal entry box - builds on the common.int_item_id_entry_box
+# Additional validation performed to ensure the signal has an associated subsidiary
+#####################################################################################
+
+class subsidiary_entry_box(common.int_item_id_entry_box):
+    def __init__(self, *args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+    def validate(self):
+        # Perform the normal validation (is an int, signal exists)
+        valid = super().validate()
+        # Validate that the signal has a subsidiary
+        if valid and self.get_value() > 0:
+            signal_object = objects.schematic_objects[objects.signal(self.get_value())]
+            valid = ( signal_object["subsidary"][0] or
+                      signal_object["sigarms"][0][1][0] or
+                      signal_object["sigarms"][1][1][0] or
+                      signal_object["sigarms"][2][1][0] or
+                      signal_object["sigarms"][3][1][0] or
+                      signal_object["sigarms"][4][1][0] )
+            if not valid:
+                self.TT.text = ("Signal must be a main Semaphore or Colour Light type with an associated subsidiary aspect")
+        self.set_validation_status(valid)
+        return(valid)
+
+#####################################################################################
 # Top level Class for a route definition tab
 #####################################################################################
 
@@ -398,12 +424,12 @@ class route_definition_tab(Tk.Frame):
         self.frame7 = Tk.LabelFrame(self, text="Main signals to clear")
         self.frame7.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame7, base_class=common.int_item_id_entry_box,
-                        columns=12, width=3, exists_function = library.signal_exists, tool_tip=
-                        "Specify the main signals that need "+ "to be cleared for the route")
+                    columns=12, width=3, exists_function = library.signal_exists, tool_tip="Specify the signals "+
+                    "(colour light, semaphore, ground position or ground disc) that need to be cleared for the route")
         self.signals.pack(padx=2, pady=2, fill='x')
         self.frame8 = Tk.LabelFrame(self, text="Subsidiary signals to clear")
         self.frame8.pack(padx=2, pady=2, fill='x')
-        self.subsidaries = common.grid_of_generic_entry_boxes(self.frame8, base_class=common.int_item_id_entry_box,
+        self.subsidaries = common.grid_of_generic_entry_boxes(self.frame8, base_class=subsidiary_entry_box,
                         columns=12, width=3, exists_function = library.signal_exists, tool_tip="Specify the "+
                         "subsidiary signals (associated with a main signal) that need to be cleared for the route")
         self.subsidaries.pack(padx=2, pady=2, fill='x')
