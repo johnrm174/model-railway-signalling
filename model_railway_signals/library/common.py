@@ -407,4 +407,52 @@ def execute_function_in_tkinter_thread(callback_function):
     return()
 
 ##################################################################################################
+# Probe function to detect main thread freezes and write them out to file
+##################################################################################################
+
+import threading
+import time
+import sys
+import traceback
+
+# A thread-safe flag to track if the GUI is responsive
+gui_responsive = threading.Event()
+gui_responsive.set()
+
+# Set up a dedicated freeze log
+logger = logging.getLogger("FreezeDetector")
+handler = logging.FileHandler("freeze_diagnostics.log")
+logger.addHandler(handler)
+
+def probe_callback():
+    gui_responsive.set()
+
+def watchdog_monitor():
+    while True:
+        gui_responsive.clear()
+        execute_function_in_tkinter_thread(probe_callback)
+        success = gui_responsive.wait(timeout=10)
+        if not success: capture_diagnostic_snapshot()
+        time.sleep(5)
+
+def capture_diagnostic_snapshot():
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    header = f"\n{'='*30}\nFREEZE SNAPSHOT: {timestamp}\n{'='*30}\n"
+    output = [header]
+    # sys._current_frames() returns {thread_id: stack_frame}
+    for thread_id, frame in sys._current_frames().items():
+        # Identify which thread is which
+        thread_name = "Unknown"
+        for t in threading.enumerate():
+            if t.ident == thread_id:
+                thread_name = t.name
+                break
+        output.append(f"\nTHREAD: {thread_name} (ID: {thread_id})")
+        output.append("".join(traceback.format_stack(frame)))
+    logger.error("".join(output))
+    logging.error("Application Freeze Detected - Diagnodstics written to 'freeze_diagnostics.log'")
+
+threading.Thread(target=watchdog_monitor, daemon=True).start()
+
+##################################################################################################
 
