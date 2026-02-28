@@ -111,7 +111,7 @@ def request_track_power_on():
         mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
                 log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
     else:
-        session_id = pi_sprog_interface.request_dcc_power_on()
+        pi_sprog_interface.request_dcc_power_on()
     return()
 
 def request_track_power_off():
@@ -122,7 +122,7 @@ def request_track_power_off():
         mqtt_interface.send_mqtt_message("dcc_locomotive_control_commands", 0, data=mqtt_message, retain=True,
                 log_message=f"Loco Control: Publishing loco control message to broker :{mqtt_message}")
     else:
-        session_id = pi_sprog_interface.request_dcc_power_off()
+        pi_sprog_interface.request_dcc_power_off()
     return()
 
 #------------------------------------------------------------------------------
