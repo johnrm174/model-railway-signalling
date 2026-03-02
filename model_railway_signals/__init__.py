@@ -38,6 +38,13 @@ from .scripting import simulate_gpio_triggered
 from .scripting import simulate_gpio_on
 from .scripting import simulate_gpio_off
 from .scripting import simulate_button_clicked
+from .scripting import request_loco_session
+from .scripting import release_loco_session
+from .scripting import set_loco_speed_and_direction
+from .scripting import send_emergency_stop
+from .scripting import set_loco_function
+from .scripting import get_button_state
+from .scripting import get_gpio_port_state
 
 __all__ = [ 'run_editor',
             'initialise_application',
@@ -69,4 +76,11 @@ __all__ = [ 'run_editor',
             'simulate_gpio_triggered',
             'simulate_gpio_on',
             'simulate_gpio_off',
-            'simulate_button_clicked' ]
+            'simulate_button_clicked',
+            'request_loco_session',
+            'release_loco_session',
+            'set_loco_speed_and_direction',
+            'send_emergency_stop',
+            'set_loco_function',
+            'get_button_state',
+            'get_gpio_port_state' ]

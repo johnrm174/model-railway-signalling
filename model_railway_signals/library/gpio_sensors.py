@@ -234,6 +234,18 @@ def report_gpio_port_status(gpio_port:Union[int,str], status:int):
         gpio_port_subscriptions[str(gpio_port)] (status)
     return()
 
+#---------------------------------------------------------------------------------------------
+# API Function to query the GPIO port status - This is only used by the scripting engine
+# To query the state of the GPIO ports (similar to how the state of buttons is queried)
+#---------------------------------------------------------------------------------------------
+
+def get_gpio_port_state(gpio_port_id:int):
+    print(gpio_port_id)
+    if str(gpio_port_id) in gpio_port_mappings.keys():
+        return(gpio_port_mappings[str(gpio_port_id)]["sensor_state"])
+    else:
+        return(None)
+
 #---------------------------------------------------------------------------------------------------
 # Event queue and internal thread that provides the circuit breaker function for each of the
 # GPIO Ports. Every time a trigger or release event is received, this is notified to the
