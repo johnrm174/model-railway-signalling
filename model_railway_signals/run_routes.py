@@ -908,10 +908,9 @@ def unhighlight_possible_routes(route_button_id:int):
     library.reset_button_flashing(route_button_id)
     # Find the applicable route definition
     route_object = objects.schematic_objects[objects.route(route_button_id)]
-    # Find out what routes are viable and set them to flash
+    # Reset all route buttons - whether they are viable or not
     for route_definition in route_object["routedefinitions"]:
-        route_tooltip, route_viable = check_route_viable(route_definition)
-        if route_viable and route_definition["exitbutton"] > 0:
+        if route_definition["exitbutton"] > 0:
             library.reset_button_flashing(route_definition["exitbutton"])
     return()
 
