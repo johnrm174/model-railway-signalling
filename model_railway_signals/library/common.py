@@ -69,8 +69,6 @@ from . import signals
 
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
-# Global flag to indicate that the application is closing
-shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
 # Global flag to track the mode (set via the configure_edit_mode function)
@@ -255,21 +253,20 @@ def set_root_window(root):
 #-------------------------------------------------------------------------
 
 def instant_shutdown():
-    global shutdown_initiated
-    if not shutdown_initiated:
+    if not shutdown_event.is_set():
         logging.info ("Initiating Instant Application Shutdown")
-        shutdown_initiated = True
+        shutdown_event.set()
         mqtt_interface.mqtt_publish_shutdown_message()
         mqtt_interface.mqtt_broker_disconnect()
+        mqtt_interface.mqtt_publish_queue.put(None)
         pi_sprog_interface.request_dcc_power_off()
         pi_sprog_interface.sprog_disconnect()
         root_window.destroy()
 
 def orderly_shutdown():
-    global shutdown_initiated
-    if not shutdown_initiated:
+    if not shutdown_event.is_set():
         logging.info ("Initiating Orderly Application Shutdown")
-        shutdown_initiated = True
+        shutdown_event.set()
         root_window.after(0, lambda:shutdown_step1())
         return()
 
@@ -280,8 +277,9 @@ def shutdown_step1():
     return()
 
 def shutdown_step2():
-    # Clear out any retained messages and disconnect from broker
+    # Disconnect from the broker and shutdown the MQTT publishing thread
     mqtt_interface.mqtt_broker_disconnect()
+    mqtt_interface.mqtt_publish_queue.put(None)
     root_window.after(100, lambda:shutdown_step3())
     return()
 
@@ -415,6 +413,8 @@ import time
 import sys
 import traceback
 
+# A thread-safe flag to trigger a shut down of the diagnostic thread
+shutdown_event = threading.Event()
 # A thread-safe flag to track if the GUI is responsive
 gui_responsive = threading.Event()
 gui_responsive.set()
@@ -425,15 +425,23 @@ handler = logging.FileHandler("freeze_diagnostics.log")
 logger.addHandler(handler)
 
 def probe_callback():
+    # This function runs in the main tkinter thread
     gui_responsive.set()
 
 def watchdog_monitor():
-    while True:
+    while not shutdown_event.is_set(): # Check flag every loop
         gui_responsive.clear()
         execute_function_in_tkinter_thread(probe_callback)
-        success = gui_responsive.wait(timeout=10)
-        if not success: capture_diagnostic_snapshot()
-        time.sleep(5)
+        # Using wait() for an instant exit when the shutdown_event is triggered.
+        if shutdown_event.wait(timeout=10):
+            # Break on shutdown command from main thread
+            break
+        if not gui_responsive.is_set():
+            # Log the diagnostic snapshot once and then break
+            capture_diagnostic_snapshot()
+            break
+        # Wait for the remainder of the 5-second cycle
+        shutdown_event.wait(timeout=5)
 
 def capture_diagnostic_snapshot():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
