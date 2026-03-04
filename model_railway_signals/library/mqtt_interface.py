@@ -89,6 +89,8 @@ import time
 import paho.mqtt.client
 import socket
 import tkinter as Tk
+import queue
+import threading
 
 from . import common
 
@@ -160,6 +162,49 @@ def find_local_ip_address():
     return(ip_address)
 
 #-----------------------------------------------------------------------------------------------
+# Thread to publish MQTT Messages (to ensure the main Tkinter thread is non-blocking)
+#-----------------------------------------------------------------------------------------------
+
+mqtt_publish_queue = queue.Queue()
+
+def mqtt_publish_thread():
+    while True:
+        try:
+            # Get the next message from the queue:
+            task = mqtt_publish_queue.get()
+            # 'None' is the kill signal for the thread
+            if task is None: break
+            # Get the parameters we need
+            topic, payload, retain, qos = task
+            success, retries = False, 0
+            # Attempt the publish (with up to 3 re-tries)
+            while not success and retries < 3:
+                try:
+                    info = mqtt_client.publish(topic, payload, retain=retain, qos=qos)
+                    # Wait with a strict timeout - This prevents a permanent hang
+                    info.wait_for_publish(timeout=2.0)
+                    # Check whether we have successfully published the message or not
+                    if info.is_published():
+                        success = True
+                    else:
+                        retries += 1
+                        logging.warning(f"MQTT Interface: Publish failed (attempt {retries}) - Retrying...")
+                        time.sleep(0.5)
+                except Exception as exception:
+                    retries += 1
+                    logging.error(f"MQTT Interface: Exception during publish: {exception}")
+                    time.sleep(1.0) # Wait for network to stabilize
+            if not success:
+                logging.error(f"MQTT Interface: Permanently failed to publish to {topic}")
+        except Exception as exception:
+            # This catches the "unthinkable" errors (e.g. 'task' unpacking failed)
+            logging.critical(f"MQTT Interface: CRITICAL THREAD ERROR: {exception}")
+            # Brief sleep to prevent a "rapid-fire" crash loop if the error persists
+            time.sleep(1.0)
+
+threading.Thread(target=mqtt_publish_thread, daemon=True).start()
+
+#-----------------------------------------------------------------------------------------------
 # Internal function to send out a heartbeat message from the node and then schedule a
 # subsequent call to the function (according to the 'heartbeat_frequency') via the
 # root.after method.Initially called by the 'on_connect' function.
@@ -175,10 +220,7 @@ def publish_heartbeat_message():
                              "host":node_config["local_hostname"],
                              "ip":node_config["local_ip_address"]}
         payload = json.dumps(heartbeat_message)
-        # We put exception handling around the publish so the heartbeat
-        # 'psudo thread' won't get killed if the publish inadvertantly errors
-        try: mqtt_client.publish(topic,payload,retain=False,qos=1)
-        except: pass
+        mqtt_publish_queue.put((topic,payload,False,1))
     # The heartbeat_frequency is an integer in seconds. The root.after() function uses milliseconds
     common.root_window.after(node_config["heartbeat_frequency"]*1000,publish_heartbeat_message)
     return()
@@ -287,7 +329,9 @@ def on_connect(mqtt_client, userdata, flags, rc):
 def on_message(mqtt_client, obj, msg):
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
-    if msg.payload: common.execute_function_in_tkinter_thread(lambda:process_message(msg))
+    if msg.payload:
+        topic, payload = msg.topic, msg.payload.decode()
+        common.execute_function_in_tkinter_thread(lambda:process_message(topic, payload))
     return()
 
 #--------------------------------------------------------------------------------------------------------
@@ -297,16 +341,16 @@ def on_message(mqtt_client, obj, msg):
 # If we don't know the main root window then the function is executed in the current mqtt event thread.
 #--------------------------------------------------------------------------------------------------------
 
-def process_message(msg):
+def process_message(topic, payload):
     global heartbeats
     # Unpack the json message so we can extract the contents (with exception handling)
     try:
-        unpacked_json = json.loads(msg.payload)
+        unpacked_json = json.loads(payload)
     except Exception as exception:
         logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
     else:
         # If it is a heartbeat message then we just update the list of connected nodes
-        if msg.topic.startswith("heartbeat"):
+        if topic.startswith("heartbeat"):
             ###############################################################################################
             ### Handle case of receiving a heartbeat message from an older version of the application #####
             ### (version 5.2.2 or before, which didn't include the hostname element #######################
@@ -315,7 +359,7 @@ def process_message(msg):
             ###############################################################################################
             heartbeats[unpacked_json["node"]] = [unpacked_json["host"], unpacked_json["ip"], int(time.time())]
         # If it is a shutdown message we only act on it if configured to do so
-        elif msg.topic.startswith("shutdown"):
+        elif topic.startswith("shutdown"):
             if node_config["act_on_shutdown"] and node_config["shutdown_callback"] is not None:
                 logging.info("MQTT-Client - Shutdown message received - Triggering application shutdown")
                 node_config["shutdown_callback"]()
@@ -488,10 +532,10 @@ def mqtt_broker_disconnect():
             logging.debug("MQTT-Client: Purging retained messages")
         for topic in node_config["list_of_published_topics"]:
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: NULL")
-            mqtt_client.publish(topic,payload=None,retain=True,qos=1)
+            mqtt_publish_queue.put((topic,None,True,1))
         # Wait for everything to be published to the broker (with a sleep) and disconnect
         # I'd rather use a PAHO MQTT check and timeout but there doesn't seem to be one
-        time.sleep(0.2)
+        time.sleep(0.5) ###############################################
         logging.debug("MQTT-Client: Disconnecting from broker")
         node_config["disconnection_in_progress"] = True
         node_config["connected_to_broker"] = False
@@ -532,7 +576,7 @@ def mqtt_publish_shutdown_message():
             shutdown_message = {"node":node_config["node_identifier"]}
             payload = json.dumps(shutdown_message)
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: "+str(payload))
-            mqtt_client.publish(topic,payload,retain=False,qos=1)
+            mqtt_publish_queue.put((topic,payload,False,1))
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -586,7 +630,7 @@ def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=No
         if node_config["enhanced_debugging"]:
             logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: "+str(payload))
         # Publish the message to the broker
-        mqtt_client.publish(topic,payload,retain=retain,qos=1)
+        mqtt_publish_queue.put((topic,payload,retain,1))
         # Add to the list of published topics so we can 'Clean up'
         # the MQTT broker by publishing empty messages on shutdown
         if topic not in node_config["list_of_published_topics"]:
