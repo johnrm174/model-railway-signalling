@@ -525,17 +525,14 @@ class loco_control(Tk.Toplevel):
         self.frame3.pack(padx=5,pady=2, fill="x")
         self.reverse = Tk.Button(self.frame3, width=3, text="Rev", command=lambda:self.direction_updated(False))
         self.reverse.pack(side=Tk.LEFT, padx=5, pady=5)
+        self.reverse.configure(font=button_font)
+        self.emergencystop = Tk.Button(self.frame3, text="Stop", bg="pink2", activebackground="pink1",
+                                        width=4, command=self.emergency_stop)
+        self.emergencystop.pack(side=Tk.LEFT, padx=5, pady=5, fill="x", expand=True)
+        self.emergencystop.configure(font=button_font)
         self.forward = Tk.Button(self.frame3, width=3, text="Fwd", command=lambda:self.direction_updated(True))
         self.forward.pack(side=Tk.RIGHT, padx=5, pady=5)
         self.forward.configure(font=button_font)
-        self.reverse.configure(font=button_font)
-        # Create a frame For the Emergency Stop Button (frame4)
-        self.frame4 = Tk.LabelFrame(self, text="Emergency Stop")
-        self.frame4.pack(padx=5,pady=2, fill="x")
-        self.emergencystop = Tk.Button(self.frame4, text="Stop", bg="pink2", activebackground="pink1",
-                                        width=8, command=self.emergency_stop)
-        self.emergencystop.pack(padx=5, pady=5, fill="x")
-        self.emergencystop.configure(font=button_font)
         # Create a frame For the Roster and OK buttons
         self.frame5 = Tk.Frame(self)
         self.frame5.pack()
