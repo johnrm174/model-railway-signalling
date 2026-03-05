@@ -219,7 +219,7 @@ def telegraph_key_button(inst_id:int):
     logging.debug("Instrument "+str(inst_id)+": Telegraph key operated *******************************************")
     # Provide a visual indication of the key being pressed (and schedule the button reset)
     instruments[str(inst_id)]["bellbutton"].config(relief="sunken")
-    common.root_window.after(10,lambda:reset_telegraph_button(inst_id))
+    common.root_window.after(200,lambda:reset_telegraph_button(inst_id))
     # Sound the "clack" of the telegraph key - We put exception handling around this as the function can raise
     # exceptions if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
     if instruments[str(inst_id)]["telegraphsound"] is not None:
