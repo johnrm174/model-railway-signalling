@@ -392,9 +392,9 @@ class edit_roster():
 
 class Function_button(Tk.Button):
     def __init__(self, parent, **kwargs):
-        self.state = False
         self.callback = kwargs.pop('command', None)
         self.latching = kwargs.pop('latching', False)
+        self.function = kwargs.pop('function', None)
         super().__init__(parent, command=self.internal_callback, **kwargs)
         self.bind("<ButtonRelease-1>", self.on_release)
         self.bind("<ButtonPress-1>", self.on_press)
@@ -402,6 +402,7 @@ class Function_button(Tk.Button):
     def config(self, **kwargs):
         if "latching" in kwargs: self.latching = kwargs.pop('latching')
         if "command" in kwargs: self.callback = kwargs.pop('command')
+        if "function" in kwargs: self.function = kwargs.pop('function')
         super().config(**kwargs)
 
     def internal_callback(self):
@@ -422,7 +423,6 @@ class Function_button(Tk.Button):
         if not self.latching:
             self.state = True
             if self.callback: self.callback()
-
 
 #------------------------------------------------------------------------------------
 # Class for a Grid of Locomotives (Rows can be added/deleted as required)
@@ -661,17 +661,18 @@ class loco_control(Tk.Toplevel):
     def deselect_and_disable_all(self):
         # Unpack all the function keys (and their parent subframes) to hide them. note that 
         # only the function keys that have been defined will be packed on a new selection
-        for function_button in self.function_buttons: function_button.pack_forget()
+        for function_button in self.function_buttons:
+            function_button.pack_forget()
+            function_button.config(function=None)
+            function_button.config(relief="raised")
+            function_button.state = False
         self.subframe2.pack_forget()
         self.subframe3.pack_forget()
         self.subframe4.pack_forget()
         # Unpack the frame used to display the currently selected locos
         self.locoframe.pack_forget()
-        # Change the loco control ui elements to show the de-selected state
         # Speed must be zero for the user to be able to select/deselect a loco
-        # So we only need to deselect FWD, REV and the function buttons
-        for index, function_id in enumerate(self.function_buttons):
-            self.function_buttons[index].config(relief="raised")
+        # So we only need to deselect FWD and REV buttons
         self.forward.config(relief="raised")
         self.reverse.config(relief="raised")
         # Disable all the loco control UI elements
@@ -743,6 +744,7 @@ class loco_control(Tk.Toplevel):
                         self.function_buttons[button_id].pack(padx=2, pady=2)
                         self.function_buttons[button_id].config(text=function_definition[0])
                         self.function_buttons[button_id].config(latching=function_definition[1])
+                        self.function_buttons[button_id].config(function=function_id)
                         self.function_buttons[button_id].config(command=lambda funcid=function_id,
                                     buttonid=button_id: self.function_updated(funcid, buttonid))
                         button_id = button_id + 1
@@ -836,6 +838,38 @@ class loco_control(Tk.Toplevel):
             for loco_object in self.selected_locos.values():
                 direction_to_set = not self.direction if loco_object.reversed.get_value() else self.direction
                 library.set_loco_speed_and_direction(loco_object.session, self.throttle.get(), direction_to_set)
+
+    #-------------------------------------------------------------------------------------------
+    # Scripting engine API function to smoothly change the speed to a new value
+    #-------------------------------------------------------------------------------------------
+
+    def change_speed(self, target_speed: int):
+        # Ensure target is within bounds
+        target_speed = max(0, min(127, target_speed))
+        current_speed = int(self.throttle.get())
+        if current_speed != target_speed:
+            # Determine direction of change
+            new_speed = current_speed + 1 if target_speed > current_speed else current_speed - 1
+            # Update the UI and the hardware
+            self.throttle.set(new_speed)
+            # Schedule the next step - 50ms provides a smooth but visible transition
+            self.after(25, lambda: self.change_speed(target_speed))
+
+    #-------------------------------------------------------------------------------------------
+    # Scripting engine API function to set a function (updating the button state as required)
+    #-------------------------------------------------------------------------------------------
+
+    def set_function(self, function_id:int, state:bool):
+        # Find the button assigned to this ID
+        for function_button in self.function_buttons:
+            if function_button.function == function_id:
+                # Update visual UI
+                function_button.state = state
+                if function_button.latching: function_button.config(relief="sunken" if state else "raised")
+                # Send out the command
+                button_index = self.function_buttons.index(function_button)
+                self.function_updated(function_id, button_index)
+                break
 
     #-------------------------------------------------------------------------------------------
     # User selection callbacks for the speed controls (+/- buttons and the throttle slider)

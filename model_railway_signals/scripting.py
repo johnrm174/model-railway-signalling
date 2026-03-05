@@ -4,11 +4,13 @@
 # Application Initialisation Functions:
 #    initialise_application(script_to_run)
 #
-# Scripting API functions (to be called from the script)
+# General Scripting API functions:
 #    delay(delay)
 #    reset_layout()
 #    load_layout(fully qualified filename, delay)
 #    save_layout(delay)
+#
+# Scripting API functions to trigger layout events:
 #    set_lever_on(leverid, delay)
 #    set_lever_off(leverid, delay)
 #    set_signal_on(sigid, delay)
@@ -30,17 +32,31 @@
 #    set_instrument_occupied(instrumentid, delay)
 #    set_instrument_clear(instrumentid, delay)
 #    click_telegraph_key(instrumentid, delay)
+#    send_telegraph_code(instrumentid, signal_box_code:list, delay)
 #    simulate_gpio_triggered(gpioid, delay)
 #    simulate_gpio_on(gpioid, delay)
 #    simulate_gpio_off(gpioid, delay)
 #    simulate_button_clicked(buttonid, delay)
+#
+# Scripting API functions to query layout state:
+#    get_button_state(button_id, delay)
+#    get_gpio_port_state(gpio_port_id, delay)
+#
+# Scripting API functions for loco control (direct via pi-sprog interface):
 #    request_loco_session(dcc_address, delay)
 #    release_loco_session(session_i, delay)
 #    set_loco_speed_and_direction(session_id, speed, forward, delay)
 #    send_emergency_stop(session_id, delay)
 #    set_loco_function(session_id, function_id, state, delay)
-#    get_button_state(button_id, delay)
-#    get_gpio_port_state(gpio_port_id, delay)
+#
+# API class for a throttle loco_control (via a Throttle Window):
+#    create_throttle(delay) - Returns ID of throttle instance
+#    set_throttle_loco(throttle_id,loco_name, delay)
+#    set_throttle_speed(throttle_id, speed, delay)
+#    set_throttle_direction(throttle_id, forward, delay)
+#    set_throttle_function(throttle_id, function_id, state, delay)
+#    set_throttle_stop(throttle_id, delay)
+#    destroy_throttle(throttle_id)
 #
 #------------------------------------------------------------------------------
 
@@ -52,6 +68,7 @@ import time
 from . import editor
 from . import schematic
 
+from model_railway_signals.menubar import menubar_loco_control
 from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
@@ -142,39 +159,47 @@ def initialise_application(*scripts_to_run):
 
 def run_function(function, delay:float=0.0):
     # Container for any return value
-    result_container = []
-#     try:
-    # Create an Event (to signal back into this thread when the function has completed)
-    done_event1 = threading.Event()
-    done_event2 = threading.Event()
-    # Create a function Wrapper that will always set the event when the function has completed)
-    def function_wrapper1():
-        try: result_container.append(function())
-        finally: done_event1.set()
-    # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
-    common.execute_function_in_tkinter_thread(function_wrapper1)
-    # Wait for the event to complete before returning
-    # wait() returns True if the flag is set, False if it timed out
-    successfully_completed = done_event1.wait(timeout=5.0)
-    if not successfully_completed: raise_test_warning("Script function timed out after 5.0 seconds")
-    # Some application functions schedule events via the root.after() method to
-    # complete all required actions (e.g. reset_layout, signal_passed events etc.
-    # We therefore ensure any 'immediate' events that have been added to the queue
-    # are processed as required before we hand back execution to the calling programme
-    def function_wrapper2():
-        done_event2.set()
-    common.execute_function_in_tkinter_thread(function_wrapper2)
-    successfully_completed = done_event2.wait(timeout=5.0)
-    if not successfully_completed:
-        raise_test_warning("Secondary script function events timed out after 5.0 seconds")
-    # delay if the user has specified a delay
-    time.sleep(delay)
-    # Return the captured value to the calling script
-    return result_container[0] if result_container else None
-#     except Exception as exception:
-#         raise_test_warning("Exception raised during function processing:")
-#         raise_test_warning(exception)
-#         return None
+    response = {"result": None, "exception": None}
+    try:
+        # Create an Event (to signal back into this thread when the function has completed)
+        done_event1 = threading.Event()
+        done_event2 = threading.Event()
+        # Create a function Wrapper that will always set the event when the function has completed)
+        def function_wrapper1():
+            try: response["result"] = function()
+            except Exception as exception: response["exception"] = exception
+            finally: done_event1.set()
+        # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
+        common.execute_function_in_tkinter_thread(function_wrapper1)
+        # Wait for the event to complete before returning
+        # wait() returns True if the flag is set, False if it timed out
+        successfully_completed = done_event1.wait(timeout=5.0)
+        if not successfully_completed:
+            raise_test_warning("Script function timed out after 5.0 seconds")
+            return None
+        # Check if an exception occurred in the Tkinter thread and report it
+        if response["exception"]:
+            raise_test_warning(f"Exception in Tkinter thread: {response['exception']}")
+            return None
+        # Some application functions schedule events via the root.after() method to
+        # complete all required actions (e.g. reset_layout, signal_passed events etc.
+        # We therefore ensure any 'immediate' events that have been added to the queue
+        # are processed as required before we hand back execution to the calling programme
+        def function_wrapper2():
+            done_event2.set()
+        common.execute_function_in_tkinter_thread(function_wrapper2)
+        successfully_completed = done_event2.wait(timeout=5.0)
+        if not successfully_completed:
+            raise_test_warning("Secondary script function events timed out after 5.0 seconds")
+            return None
+        # delay if the user has specified a delay
+        time.sleep(delay)
+        # Return the captured value to the calling script
+        return response["result"]
+    except Exception as exception:
+        raise_test_warning("Exception raised during function processing:")
+        raise_test_warning(exception)
+        return None
 
 #------------------------------------------------------------------------------
 # API Function to allow pauses to be included between scripting steps
@@ -197,9 +222,9 @@ def save_layout(delay:float=default_delay_time):
     print ("Scripting: Saving current Scematic")
     run_function(lambda:main_menubar_instance.save_schematic(), delay)
     
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # API Functions to trigger layout 'events' 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     
 def set_lever_on(leverid:int, delay:float=default_delay_time):
     if str(leverid) not in levers.levers.keys():
@@ -371,6 +396,13 @@ def click_telegraph_key(instid:int, delay:float=default_delay_time):
     else:
         run_function(lambda:block_instruments.telegraph_key_button(instid), delay)
 
+def send_telegraph_code(instid:int, signal_box_code:list, delay:float=default_delay_time):
+    for code_element in signal_box_code:
+        for key_press in range(code_element):
+            click_telegraph_key(instid, delay=0.25)
+        time.sleep(0.75)
+    time.sleep(delay)
+
 def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
@@ -396,7 +428,27 @@ def simulate_button_clicked(buttonid:int, delay:float=default_delay_time):
         raise_test_warning("simulate_button_clicked - Button: "+str(buttonid)+" does not exist")
     else:
         run_function(lambda:buttons.button_event(buttonid), delay)
-        
+
+#------------------------------------------------------------------------------
+# API Functions to query layout state
+#------------------------------------------------------------------------------
+
+def get_button_state(button_id:int, delay:float=default_delay_time):
+    button_state = run_function(lambda:buttons.button_state(button_id), delay)
+    if button_state is None:
+        raise_test_warning("get_button_state - button "+str(button_id)+" returned a state of None")
+    return(button_state)
+
+def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
+    gpio_state = run_function(lambda:gpio_sensors.get_gpio_port_state(gpio_port_id), delay)
+    if gpio_state is None:
+        raise_test_warning("get_gpio_port_state - Port "+str(gpio_port_id)+" returned a state of None")
+    return(gpio_state)
+
+#------------------------------------------------------------------------------
+# API Functions for loco control - direct to the Pi Sprog Interface
+#------------------------------------------------------------------------------
+
 def request_loco_session(dcc_address:int, delay:float=default_delay_time):
     session_id = run_function(lambda:pi_sprog_interface.request_loco_session(dcc_address), delay)
     if session_id == 0:
@@ -414,18 +466,38 @@ def send_emergency_stop(session_id:int, delay:float=default_delay_time):
     
 def set_loco_function(session_id:int, function_id:int, state:bool, delay:float=default_delay_time):
     run_function(lambda:set_loco_function(session_id, function_id, state), delay)
-    
-def get_button_state(button_id:int, delay:float=default_delay_time):
-    button_state = run_function(lambda:buttons.button_state(button_id), delay)
-    if button_state is None:
-        raise_test_warning("get_button_state - button "+str(button_id)+" returned a state of None")
-    return(button_state)
 
-def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
-    gpio_state = run_function(lambda:gpio_sensors.get_gpio_port_state(gpio_port_id), delay)
-    if gpio_state is None:
-        raise_test_warning("get_gpio_port_state - Port "+str(gpio_port_id)+" returned a state of None")
-    return(gpio_state)
+#------------------------------------------------------------------------------
+# API Functions for loco control - via throttle windows
+#------------------------------------------------------------------------------
+
+def create_throttle(delay:float=default_delay_time):
+    # We pass the constructor via a lambda to run_function
+    # 'root' is the global reference created in initialise_application
+    throttle_instance = run_function(lambda:menubar_loco_control.loco_control(root), delay)
+    return(throttle_instance)
+
+def set_throttle_loco(throttle_instance, loco_name:str, delay:float=default_delay_time):
+    run_function(lambda:throttle_instance.loco_selected(loco_name), delay)
+
+def set_throttle_direction(throttle_instance, direction:bool, delay:float=default_delay_time):
+    # To call a method, we wrap the instance method call
+    run_function(lambda:throttle_instance.direction_updated(direction), delay)
+
+def set_throttle_speed(throttle_instance, speed:int, delay:float=default_delay_time):
+    # To call a method, we wrap the instance method call
+    run_function(lambda:throttle_instance.change_speed(speed), delay)
+    
+def set_throttle_stop(throttle_instance, delay:float=default_delay_time):
+    # To call a method, we wrap the instance method call
+    run_function(lambda:throttle_instance.emergency_stop(), delay)
+
+def set_throttle_function(throttle_instance, function_id:int, state:bool, delay:float=default_delay_time):
+    # To call a method, we wrap the instance method call
+    run_function(lambda:throttle_instance.set_function(function_id, state), delay)
+
+def destroy_throttle(throttle_instance, delay:float=default_delay_time):
+    run_function(lambda:throttle_instance.destroy(), delay)
 
 #############################################################################################
 
