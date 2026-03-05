@@ -240,7 +240,6 @@ def report_gpio_port_status(gpio_port:Union[int,str], status:int):
 #---------------------------------------------------------------------------------------------
 
 def get_gpio_port_state(gpio_port_id:int):
-    print(gpio_port_id)
     if str(gpio_port_id) in gpio_port_mappings.keys():
         return(gpio_port_mappings[str(gpio_port_id)]["sensor_state"])
     else:
