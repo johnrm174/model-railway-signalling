@@ -768,7 +768,7 @@
             ]
         },
         "35ce9703-bbb2-48ae-a1e6-f760e33d1a4c": {
-            "bbox": 936,
+            "bbox": 296,
             "buttoncolour": "SkyBlue2",
             "buttonwidth": 12,
             "dccoffcommands": [],
@@ -797,7 +797,7 @@
                 0,
                 0
             ],
-            "bbox": 298,
+            "bbox": 304,
             "colour": "Black",
             "endx": 650.0,
             "endy": 275.0,
@@ -817,7 +817,7 @@
                 20,
                 5
             ],
-            "bbox": 306,
+            "bbox": 312,
             "colour": "black",
             "endx": 650.0,
             "endy": 300.0,
@@ -832,7 +832,7 @@
         },
         "43fd9649-cff7-437a-b405-2811fc777a5f": {
             "background": "",
-            "bbox": 309,
+            "bbox": 315,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -851,7 +851,7 @@
         },
         "4576da32-1464-4dad-92d8-5e3e06ee59e3": {
             "background": "#18bbd9",
-            "bbox": 312,
+            "bbox": 318,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -870,7 +870,7 @@
         },
         "4b216f18-e467-4992-9461-0a00736f5057": {
             "background": "",
-            "bbox": 315,
+            "bbox": 321,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -894,7 +894,7 @@
                 20,
                 5
             ],
-            "bbox": 323,
+            "bbox": 329,
             "colour": "Black",
             "endx": 231.0,
             "endy": 461.0,
@@ -908,7 +908,7 @@
             "tags": "line27"
         },
         "4cad991f-b771-41c9-8fde-39b6791f3759": {
-            "bbox": 333,
+            "bbox": 339,
             "buttoncolour": "Grey85",
             "buttonlabel": "",
             "framecolour": "Grey40",
@@ -962,7 +962,7 @@
                 false,
                 ""
             ],
-            "bbox": 359,
+            "bbox": 365,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1301,7 +1301,7 @@
             "ybuttonoffset": 0
         },
         "542da270-2447-43ef-8967-3a3f27df22b6": {
-            "bbox": 363,
+            "bbox": 369,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1331,7 +1331,7 @@
                 20,
                 5
             ],
-            "bbox": 371,
+            "bbox": 377,
             "colour": "black",
             "endx": 550.0,
             "endy": 500.0,
@@ -1346,7 +1346,7 @@
         },
         "62c713b5-69b3-4781-b0b6-ee2fabc894b5": {
             "background": "#000000",
-            "bbox": 374,
+            "bbox": 380,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1364,7 +1364,7 @@
             ]
         },
         "635bf94a-91d2-4ec3-98c3-9d92b3bba589": {
-            "bbox": 384,
+            "bbox": 390,
             "buttoncolour": "Grey85",
             "buttonlabel": "",
             "framecolour": "Grey40",
@@ -1405,7 +1405,7 @@
             "ybuttonoffset": 0
         },
         "6788feaa-a049-4d62-978c-faa6f4dfd967": {
-            "bbox": 388,
+            "bbox": 394,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1435,7 +1435,7 @@
                 20,
                 5
             ],
-            "bbox": 396,
+            "bbox": 402,
             "colour": "Black",
             "endx": 56.0,
             "endy": 435.0,
@@ -1449,7 +1449,7 @@
             "tags": "line25"
         },
         "6f705b1a-e264-4bb7-a979-4520901eec1b": {
-            "bbox": 402,
+            "bbox": 408,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "entrybutton": false,
@@ -1508,7 +1508,7 @@
         },
         "7089d2bf-07f7-4ebb-a560-6dfe934a2321": {
             "background": "#18bbd9",
-            "bbox": 405,
+            "bbox": 411,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -1526,7 +1526,7 @@
             ]
         },
         "7d296b0a-a9b5-4d61-8b0e-a1abbf11db93": {
-            "bbox": 420,
+            "bbox": 426,
             "bellsound": "bell-ring-02.wav",
             "item": "instrument",
             "itemid": 2,
@@ -1544,7 +1544,7 @@
                 0,
                 0
             ],
-            "bbox": 428,
+            "bbox": 434,
             "colour": "Black",
             "endx": 650.0,
             "endy": 700.0,
@@ -1567,7 +1567,7 @@
                 0,
                 0
             ],
-            "bbox": 436,
+            "bbox": 442,
             "colour": "Black",
             "endx": 650.0,
             "endy": 475.0,
@@ -1584,7 +1584,7 @@
             "tags": "line20"
         },
         "80eee15f-da85-4a94-8521-a7d0441ace80": {
-            "bbox": 442,
+            "bbox": 448,
             "buttoncolour": "#fbf090",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -1639,7 +1639,7 @@
         },
         "87f435df-8da5-4999-b3ef-e7ea67977c03": {
             "background": "",
-            "bbox": 445,
+            "bbox": 451,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1657,7 +1657,7 @@
             ]
         },
         "8b30ec58-239b-4fd8-b821-fc2bc2eae7ab": {
-            "bbox": 449,
+            "bbox": 455,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1681,7 +1681,7 @@
             ]
         },
         "8fdae5c5-373f-4e9c-a0c7-f19d690d26a9": {
-            "bbox": 453,
+            "bbox": 459,
             "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
@@ -1765,7 +1765,7 @@
                 false,
                 ""
             ],
-            "bbox": 479,
+            "bbox": 485,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2110,7 +2110,7 @@
                 1,
                 1
             ],
-            "bbox": 487,
+            "bbox": 493,
             "colour": "black",
             "endx": 25.0,
             "endy": 500.0,
@@ -2130,7 +2130,7 @@
                 1,
                 1
             ],
-            "bbox": 495,
+            "bbox": 501,
             "colour": "Black",
             "endx": 275.0,
             "endy": 250.0,
@@ -2144,7 +2144,7 @@
             "tags": "line13"
         },
         "95c7ba00-c76e-4e40-9008-eceac9a5ea23": {
-            "bbox": 499,
+            "bbox": 505,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2168,7 +2168,7 @@
             ]
         },
         "970e8948-a116-4023-847b-2e9269c0fa74": {
-            "bbox": 503,
+            "bbox": 509,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -2194,7 +2194,7 @@
         "990769c5-58eb-435b-befb-21b9263321b4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 510,
+            "bbox": 516,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 0,
@@ -2226,7 +2226,7 @@
         "9aba139f-f037-43a4-a0e6-d80866c7a56d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 519,
+            "bbox": 525,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 1001,
@@ -2306,7 +2306,7 @@
                 false,
                 ""
             ],
-            "bbox": 547,
+            "bbox": 553,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -2669,7 +2669,7 @@
                 0,
                 0
             ],
-            "bbox": 555,
+            "bbox": 561,
             "colour": "Black",
             "endx": 275.0,
             "endy": 550.0,
@@ -2683,7 +2683,7 @@
             "tags": "line23"
         },
         "a596c91d-8a93-4f9c-91dd-34f7df1caa30": {
-            "bbox": 561,
+            "bbox": 567,
             "buttoncolour": "#fb9190",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -2769,7 +2769,7 @@
         },
         "a5e39187-4b5d-4118-be4f-ae98a461cd41": {
             "background": "",
-            "bbox": 564,
+            "bbox": 570,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -2793,7 +2793,7 @@
                 20,
                 5
             ],
-            "bbox": 572,
+            "bbox": 578,
             "colour": "Black",
             "endx": 291.0,
             "endy": 461.0,
@@ -2820,7 +2820,7 @@
                 false,
                 ""
             ],
-            "bbox": 584,
+            "bbox": 590,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3171,7 +3171,7 @@
             "ybuttonoffset": 0
         },
         "abc1ad1d-e1b2-4129-a1eb-e33844a0166d": {
-            "bbox": 588,
+            "bbox": 594,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3201,7 +3201,7 @@
                 1,
                 1
             ],
-            "bbox": 596,
+            "bbox": 602,
             "colour": "Black",
             "endx": 275.0,
             "endy": 300.0,
@@ -3215,7 +3215,7 @@
             "tags": "line15"
         },
         "ad079731-44fd-4ed8-8de5-3a214ac8358c": {
-            "bbox": 606,
+            "bbox": 612,
             "buttoncolour": "Grey85",
             "buttonlabel": "",
             "framecolour": "Grey40",
@@ -3269,7 +3269,7 @@
                 false,
                 ""
             ],
-            "bbox": 628,
+            "bbox": 634,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -3643,7 +3643,7 @@
         "b3241207-0377-4e6e-aeac-6cb08691c888": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 637,
+            "bbox": 643,
             "buttoncolour": "Grey85",
             "colour": "black",
             "dccaddress": 1000,
@@ -3728,7 +3728,7 @@
                 0,
                 0
             ],
-            "bbox": 645,
+            "bbox": 651,
             "colour": "Black",
             "endx": 400.0,
             "endy": 300.0,
@@ -3748,7 +3748,7 @@
                 20,
                 5
             ],
-            "bbox": 653,
+            "bbox": 659,
             "colour": "Black",
             "endx": 116.0,
             "endy": 435.0,
@@ -3763,7 +3763,7 @@
         },
         "b8e26668-ce95-4bff-83fd-53c0b28761c9": {
             "background": "#18bbd9",
-            "bbox": 656,
+            "bbox": 662,
             "borderwidth": 1,
             "hidden": false,
             "item": "textbox",
@@ -3787,7 +3787,7 @@
                 0,
                 0
             ],
-            "bbox": 664,
+            "bbox": 670,
             "colour": "Black",
             "endx": 300.0,
             "endy": 275.0,
@@ -3801,7 +3801,7 @@
             "tags": "line14"
         },
         "ba270887-4ea5-4a2f-b76e-9755a69a87a1": {
-            "bbox": 668,
+            "bbox": 674,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -3831,7 +3831,7 @@
                 20,
                 8
             ],
-            "bbox": 676,
+            "bbox": 682,
             "colour": "Black",
             "endx": 700.0,
             "endy": 150.0,
@@ -3858,7 +3858,7 @@
                 false,
                 ""
             ],
-            "bbox": 702,
+            "bbox": 708,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4185,7 +4185,7 @@
                 20,
                 8
             ],
-            "bbox": 710,
+            "bbox": 716,
             "colour": "Black",
             "endx": 400.0,
             "endy": 150.0,
@@ -4199,7 +4199,7 @@
             "tags": "line30"
         },
         "c622073d-27c0-4f32-aecb-f95dfebb93a0": {
-            "bbox": 716,
+            "bbox": 722,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "entrybutton": false,
@@ -4257,7 +4257,7 @@
             ]
         },
         "cd62c2e4-38eb-486e-a067-047e11858d8a": {
-            "bbox": 720,
+            "bbox": 726,
             "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
@@ -4341,7 +4341,7 @@
                 false,
                 ""
             ],
-            "bbox": 740,
+            "bbox": 746,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -4722,7 +4722,7 @@
             "ybuttonoffset": 0
         },
         "d8b6707b-abf3-406f-b7fb-319c1eb54e33": {
-            "bbox": 746,
+            "bbox": 752,
             "buttoncolour": "#fb9190",
             "buttonwidth": 2,
             "entrybutton": true,
@@ -4779,7 +4779,7 @@
             ]
         },
         "d97425eb-ae7c-4c74-9929-fef42f61b8a0": {
-            "bbox": 750,
+            "bbox": 756,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -4803,7 +4803,7 @@
             ]
         },
         "da49f189-a72b-4e08-969a-d222c5609644": {
-            "bbox": 756,
+            "bbox": 762,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "entrybutton": false,
@@ -4865,7 +4865,7 @@
                 0,
                 0
             ],
-            "bbox": 764,
+            "bbox": 770,
             "colour": "Black",
             "endx": 650.0,
             "endy": 275.0,
@@ -4882,7 +4882,7 @@
             "tags": "line32"
         },
         "df3dcf3e-6882-4e86-84d9-f07049ac7129": {
-            "bbox": 770,
+            "bbox": 776,
             "buttoncolour": "SeaGreen3",
             "buttonwidth": 15,
             "entrybutton": false,
@@ -4944,7 +4944,7 @@
                 20,
                 5
             ],
-            "bbox": 778,
+            "bbox": 784,
             "colour": "black",
             "endx": 400.0,
             "endy": 500.0,
@@ -4971,7 +4971,7 @@
                 false,
                 ""
             ],
-            "bbox": 798,
+            "bbox": 804,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5338,7 +5338,7 @@
                 false,
                 ""
             ],
-            "bbox": 818,
+            "bbox": 824,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -5680,7 +5680,7 @@
                 0,
                 0
             ],
-            "bbox": 826,
+            "bbox": 832,
             "colour": "Black",
             "endx": 325.0,
             "endy": 550.0,
@@ -5694,7 +5694,7 @@
             "tags": "line17"
         },
         "e5907c82-c5e4-4c93-ad8c-0f1a92117b45": {
-            "bbox": 830,
+            "bbox": 836,
             "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
@@ -5771,7 +5771,7 @@
                 0,
                 0
             ],
-            "bbox": 838,
+            "bbox": 844,
             "colour": "Black",
             "endx": 625.0,
             "endy": 450.0,
@@ -5791,7 +5791,7 @@
                 1,
                 1
             ],
-            "bbox": 846,
+            "bbox": 852,
             "colour": "black",
             "endx": 25.0,
             "endy": 550.0,
@@ -5811,7 +5811,7 @@
                 0,
                 0
             ],
-            "bbox": 854,
+            "bbox": 860,
             "colour": "Black",
             "endx": 275.0,
             "endy": 500.0,
@@ -5831,7 +5831,7 @@
                 0,
                 0
             ],
-            "bbox": 862,
+            "bbox": 868,
             "colour": "Black",
             "endx": 625.0,
             "endy": 550.0,
@@ -5851,7 +5851,7 @@
                 20,
                 5
             ],
-            "bbox": 870,
+            "bbox": 876,
             "colour": "black",
             "endx": 650.0,
             "endy": 500.0,
@@ -5866,7 +5866,7 @@
         },
         "f5db86e4-0b03-40da-995e-c202d9deabdf": {
             "background": "",
-            "bbox": 873,
+            "bbox": 879,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -5884,7 +5884,7 @@
             ]
         },
         "f6aaf8c1-2657-430f-8247-fd624b6edcf0": {
-            "bbox": 877,
+            "bbox": 883,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5908,7 +5908,7 @@
             ]
         },
         "f815d488-0723-4885-8792-0f52332be423": {
-            "bbox": 887,
+            "bbox": 893,
             "buttoncolour": "Grey85",
             "buttonlabel": "",
             "framecolour": "Grey40",
@@ -5955,7 +5955,7 @@
                 0,
                 0
             ],
-            "bbox": 895,
+            "bbox": 901,
             "colour": "Black",
             "endx": 650.0,
             "endy": 325.0,
@@ -5969,7 +5969,7 @@
             "tags": "line11"
         },
         "fc5c18e4-b05c-4941-9c64-476d0ae651a2": {
-            "bbox": 899,
+            "bbox": 905,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -5999,7 +5999,7 @@
                 0,
                 0
             ],
-            "bbox": 907,
+            "bbox": 913,
             "colour": "Black",
             "endx": 650.0,
             "endy": 325.0,
@@ -6019,7 +6019,7 @@
                 0,
                 0
             ],
-            "bbox": 915,
+            "bbox": 921,
             "colour": "Black",
             "endx": 826.0,
             "endy": 500.0,
@@ -6036,7 +6036,7 @@
             "tags": "line29"
         },
         "ffed7f14-0e34-449c-9241-cea733a1b685": {
-            "bbox": 930,
+            "bbox": 936,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -6129,10 +6129,1579 @@
         "control": {
             "dccsoundmappings": [],
             "locomotiveroster": {
-                "123": 123,
-                "456": 456,
-                "Loco1": 123,
-                "Loco2": 345
+                "20046": [
+                    7,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "20058": [
+                    8,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "25052": [
+                    10,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "25083": [
+                    9,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "37238": [
+                    5,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "47148": [
+                    3,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "55020": [
+                    4,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "6752 (37)": [
+                    6,
+                    [
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "Class 105 DMU": [
+                    11,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "Class108 DMU": [
+                    12,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "HST Set 1": [
+                    1,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            "/ Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "HST Set 2": [
+                    2,
+                    [
+                        [
+                            "Lights",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "Shunt",
+                            true
+                        ],
+                        [
+                            " /Inertia",
+                            true
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ],
+                        [
+                            "",
+                            false
+                        ]
+                    ]
+                ],
+                "TEST": [
+                    111,
+                    [
+                        [
+                            "F0",
+                            true
+                        ],
+                        [
+                            "F1",
+                            true
+                        ],
+                        [
+                            "F2",
+                            true
+                        ],
+                        [
+                            "F3",
+                            true
+                        ],
+                        [
+                            "F4",
+                            true
+                        ],
+                        [
+                            "F5",
+                            true
+                        ],
+                        [
+                            "F6",
+                            true
+                        ],
+                        [
+                            "F7",
+                            true
+                        ],
+                        [
+                            "F8",
+                            true
+                        ],
+                        [
+                            "F9",
+                            true
+                        ],
+                        [
+                            "F10",
+                            true
+                        ],
+                        [
+                            "F11",
+                            true
+                        ],
+                        [
+                            "F12",
+                            true
+                        ],
+                        [
+                            "F13",
+                            true
+                        ],
+                        [
+                            "F14",
+                            true
+                        ],
+                        [
+                            "F15",
+                            true
+                        ],
+                        [
+                            "F16",
+                            true
+                        ],
+                        [
+                            "F17",
+                            true
+                        ],
+                        [
+                            "F18",
+                            true
+                        ],
+                        [
+                            "F19",
+                            true
+                        ],
+                        [
+                            "F20",
+                            true
+                        ],
+                        [
+                            "F21",
+                            true
+                        ],
+                        [
+                            "F22",
+                            true
+                        ],
+                        [
+                            "F23",
+                            true
+                        ],
+                        [
+                            "F24",
+                            true
+                        ],
+                        [
+                            "F25",
+                            true
+                        ],
+                        [
+                            "F26",
+                            true
+                        ],
+                        [
+                            "F27",
+                            true
+                        ],
+                        [
+                            "F28",
+                            true
+                        ]
+                    ]
+                ]
             },
             "serverallowlist": [],
             "serverdebugging": false,
@@ -6142,7 +7711,7 @@
         "general": {
             "automation": true,
             "baseitemid": 1,
-            "editmode": false,
+            "editmode": true,
             "filename": "demo_layout.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
@@ -6221,11 +7790,11 @@
         },
         "sprog": {
             "addressmode": 1,
-            "baud": 460800,
+            "baud": 115200,
             "debug": false,
             "port": "/dev/serial0",
-            "power": true,
-            "startup": true
+            "power": false,
+            "startup": false
         },
         "styles": {
             "dccswitches": {
