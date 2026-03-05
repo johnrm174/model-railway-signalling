@@ -388,16 +388,14 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
 #-------------------------------------------------------------------------
 
 def process_external_events():
-    # Check how many items are waiting
-    backlog = event_queue.qsize()
-    # Process only what is currently in the queue (max 10 events at a time)
-    # This ensures a flood of event data doesn't starve the GUI thread.
-    for item in range(min(backlog, 20)):
+    try:
+        # Try to get one item from the queue - will raise exception if queue is empty
         callback = event_queue.get_nowait()
         try: callback()
         except: pass
-    # Schedule next check. 10ms seems to give good performance
-    root_window.after(10, process_external_events)
+    except queue.Empty:pass
+    # Check again in 20ms
+    root_window.after(20, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
@@ -445,7 +443,10 @@ def watchdog_monitor():
 
 def capture_diagnostic_snapshot():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    header = f"\n{'='*30}\nFREEZE SNAPSHOT: {timestamp}\n{'='*30}\n"
+    # Capture the queue depth at the moment of the freeze
+    try: current_queue_size = event_queue.qsize()
+    except: current_queue_size = "Unknown/Error"
+    header = (f"\n{'='*30}\nFREEZE SNAPSHOT: {timestamp}\nQueue Backlog: {current_queue_size} items\n{'='*30}\n")
     output = [header]
     # sys._current_frames() returns {thread_id: stack_frame}
     for thread_id, frame in sys._current_frames().items():
