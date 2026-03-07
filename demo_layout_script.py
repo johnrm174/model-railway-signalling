@@ -60,7 +60,7 @@ def my_script1():
             set_lever_off(6, delay=2.0)
             set_lever_off(2, delay=2.0)
             # Drive the train from Platform 2 into the FY
-            set_throttle_direction(False, delay=2)
+            set_throttle_direction(throttle1, False, delay=2)
             set_throttle_speed(throttle1, 50)
             # Wait until the FY sensor is triggered
             while not get_gpio_port_state(5): delay(0.1)
