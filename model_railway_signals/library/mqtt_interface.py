@@ -168,6 +168,7 @@ def find_local_ip_address():
 mqtt_publish_queue = queue.Queue()
 
 def mqtt_publish_thread():
+    global node_config
     while True:
         try:
             # Get the next message from the queue:
@@ -176,26 +177,31 @@ def mqtt_publish_thread():
             if task is None: break
             # Get the parameters we need
             topic, payload, retain, qos = task
-            success, retries = False, 0
-            # Attempt the publish (with up to 3 re-tries)
-            while not success and retries < 3:
-                try:
-                    info = mqtt_client.publish(topic, payload, retain=retain, qos=qos)
-                    # Wait with a strict timeout - This prevents a permanent hang
-                    info.wait_for_publish(timeout=2.0)
-                    # Check whether we have successfully published the message or not
-                    if info.is_published():
-                        success = True
-                    else:
+            # This is the signal to disconnect from the broker after all current messages have been published
+            if topic == "DISCONNECT":
+                node_config["disconnection_in_progress"] = True
+                common.execute_function_in_tkinter_thread(lambda:mqtt_disconnect_stage0())
+            else:
+                success, retries = False, 0
+                # Attempt the publish (with up to 3 re-tries)
+                while not success and retries < 3:
+                    try:
+                        info = mqtt_client.publish(topic, payload, retain=retain, qos=qos)
+                        # Wait with a strict timeout - This prevents a permanent hang
+                        info.wait_for_publish(timeout=2.0)
+                        # Check whether we have successfully published the message or not
+                        if info.is_published():
+                            success = True
+                        else:
+                            retries += 1
+                            logging.warning(f"MQTT Interface: Publish failed (attempt {retries}) - Retrying...")
+                            time.sleep(0.5)
+                    except Exception as exception:
                         retries += 1
-                        logging.warning(f"MQTT Interface: Publish failed (attempt {retries}) - Retrying...")
-                        time.sleep(0.5)
-                except Exception as exception:
-                    retries += 1
-                    logging.error(f"MQTT Interface: Exception during publish: {exception}")
-                    time.sleep(1.0) # Wait for network to stabilize
-            if not success:
-                logging.error(f"MQTT Interface: Permanently failed to publish to {topic}")
+                        logging.error(f"MQTT Interface: Exception during publish: {exception}")
+                        time.sleep(1.0) # Wait for network to stabilize
+                if not success:
+                    logging.error(f"MQTT Interface: Permanently failed to publish to {topic}")
         except Exception as exception:
             # This catches the "unthinkable" errors (e.g. 'task' unpacking failed)
             logging.critical(f"MQTT Interface: CRITICAL THREAD ERROR: {exception}")
@@ -533,17 +539,26 @@ def mqtt_broker_disconnect():
         for topic in node_config["list_of_published_topics"]:
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: NULL")
             mqtt_publish_queue.put((topic,None,True,1))
-        # Wait for everything to be published to the broker (with a sleep) and disconnect
-        # I'd rather use a PAHO MQTT check and timeout but there doesn't seem to be one
-        time.sleep(0.5) ###############################################
-        logging.debug("MQTT-Client: Disconnecting from broker")
-        node_config["disconnection_in_progress"] = True
-        node_config["connected_to_broker"] = False
-        common.root_window.after(100,lambda:mqtt_disconnect_stage1())
-        # Cancel the connection_timeout_check (scheduled from the connect function)
-        connection_timeout_check_scheduled = node_config["connection_check_event"]
-        node_config["connection_check_event"] = None
-        if connection_timeout_check_scheduled: common.root_window.after_cancel(connection_timeout_check_scheduled)
+        # Signal the publish thread to disconnect from the broker when the publish queue is empty
+        mqtt_publish_queue.put(("DISCONNECT",None,True,1))
+        # Wait for up to 10 seconds for the disconnect to begin
+        timeout = time.time()+10
+        while time.time() < timeout:
+            if node_config["disconnection_in_progress"]: break
+            time.sleep(0.01)
+        if not node_config["disconnection_in_progress"]:
+            logging.error("MQTT-Client: Timeout publishing shutdown messages to broker - initiating disconnect anyway")
+            mqtt_disconnect_stage1()
+    return()
+
+def mqtt_disconnect_stage0():
+    logging.debug("MQTT-Client: Disconnecting from broker")
+    node_config["connected_to_broker"] = False
+    common.root_window.after(100,lambda:mqtt_disconnect_stage1())
+    # Cancel the connection_timeout_check (scheduled from the connect function)
+    connection_timeout_check_scheduled = node_config["connection_check_event"]
+    node_config["connection_check_event"] = None
+    if connection_timeout_check_scheduled: common.root_window.after_cancel(connection_timeout_check_scheduled)
     return()
 
 def mqtt_disconnect_stage1():
