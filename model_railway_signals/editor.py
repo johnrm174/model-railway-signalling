@@ -132,6 +132,7 @@ import tracemalloc
 class main_menubar:
     def __init__(self, root):
         # The following parameters keep track of state
+        self.broker_connection_state = False
         self.throttle_server_state = False
         self.sprog_connection_state = False
         self.sprog_power_state = None  # Unknown
@@ -384,14 +385,13 @@ class main_menubar:
         if self.sprog_power_state: self.dcc_power_off()
         if self.sprog_connection_state:self.sprog_disconnect()
         if self.throttle_server_state: throttle_server.stop_throttle_server()
-        if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
+        if self.broker_connection_state: self.mqtt_disconnect()
         self.reset_mqtt_pub_sub_configuration()
         # Initialise the MQTT networking at startup (even if they are blank as
-        # the pub/sub configuration needs to be applied prior to object creation.
-        # The "connect on startup" flag is the 8th parameter returned.
+        # the pub/sub configuration needs to be applied prior to object creation)
         self.mqtt_reconfigure_client()
         self.apply_new_mqtt_pub_sub_configuration()
-        # Update the mode and automatiojn indications to reflect the new selections
+        # Update the mode and automation indications to reflect the new selections
         # Note that we don't initialise anything based on these settings just yet
         # This will be done when any schematic objects have been created
         self.update_automation_indication()
@@ -591,7 +591,7 @@ class main_menubar:
     def sprog_update(self):
         # Only update the configuration if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
-        if self.sprog_label == "SPROG:Connected": self.sprog_connect()
+        if self.sprog_connection_state: self.sprog_connect()
 
     def dcc_power_state_updated(self, dcc_power:bool):
         self.sprog_power_state = dcc_power
@@ -606,13 +606,16 @@ class main_menubar:
     # the connect/disconnect functions to return (with the status)
     #------------------------------------------------------------------------------------------
 
-    def update_mqtt_menubar_controls(self, connected:bool):
-        if connected:
+    def update_mqtt_menubar_controls(self, broker_connection_state):
+        self.broker_connection_state = broker_connection_state
+        if self.broker_connection_state:
             new_label = "MQTT:Connected"
+            self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+            self.mqtt_label = new_label
         else:
             new_label = "MQTT:Disconnected"
-        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
-        self.mqtt_label = new_label
+            self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+            self.mqtt_label = new_label
 
     def mqtt_connect(self):
         url = settings.get_mqtt("url")
@@ -621,7 +624,6 @@ class main_menubar:
         password = settings.get_mqtt("password")
         library.mqtt_broker_connect(url, port, broker_username=username, broker_password=password,
                                         status_callback=self.update_mqtt_menubar_controls)
-        return()
 
     def mqtt_disconnect(self):
         library.mqtt_broker_disconnect()
@@ -634,7 +636,7 @@ class main_menubar:
         # Only reset the broker connection if we are already connected or if the
         # user has clicked the "apply and connect" button in the UI - otherwise
         # do nothing (wait until the next time the user attempts to connect)
-        if apply_and_connect or self.mqtt_label == "MQTT:Connected" : self.mqtt_connect()
+        if apply_and_connect or self.broker_connection_state : self.mqtt_connect()
         # Reconfigure all publish and subscribe settings
         self.apply_new_mqtt_pub_sub_configuration()
         
