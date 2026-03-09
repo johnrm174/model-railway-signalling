@@ -116,6 +116,21 @@ class stoppable_thread(threading.Thread):
         return self.stop_event.is_set()
 
 #------------------------------------------------------------------------------
+# Wrapper for scripts to handle the thread stop signal.
+#------------------------------------------------------------------------------
+
+class ThreadStopException(Exception):
+    pass
+
+def script_wrapper(script_to_run):
+    try:
+        script_to_run()
+    except ThreadStopException:
+        logging.info("Scripting: Script thread exited gracefully")
+    except Exception as exception:
+        logging.error(f"Scripting: Script crashed with error: {exception}")
+        
+#------------------------------------------------------------------------------
 # API Function to initialise the application (in the main thread (because tkinter
 # should always run in the main thread) and then kick off another thread to load
 # the specified schematic and run the specified script. Subsequent API calls
@@ -137,7 +152,7 @@ def initialise_application(*scripts_to_run):
     script_threads=[]
     for script_to_run in scripts_to_run:
         # Start the seperate threads to run the specified scripts
-        script_thread = stoppable_thread(target=lambda:script_to_run())
+        script_thread = stoppable_thread(target=script_wrapper, args=(script_to_run,))
         script_thread.setDaemon(True)
         script_thread.start()
         script_threads.append(script_thread)
@@ -149,7 +164,8 @@ def initialise_application(*scripts_to_run):
     # Stop the threads running the scripts
     for script_thread in script_threads:
         script_thread.stop()
-    # Function will only return when the application is shut down
+    # Short pause (to let the shutdown messages print) before exiting
+    print("Scripting: Application Shutdown complete")
     return()
 
 #------------------------------------------------------------------------------
@@ -160,7 +176,13 @@ def initialise_application(*scripts_to_run):
 def run_function(function, delay:float=0.0):
     # Container for any return value
     response = {"result": None, "exception": None}
+    # Check for the thread stop command
+    current_thread = threading.current_thread()
     try:
+        # Exit immediately if the Stop Thread signal has been received
+        # We do this Before running the User Event in the Tkinter Thread
+        if hasattr(current_thread, 'stopped') and current_thread.stopped():
+            raise ThreadStopException("Thread stop signal received.")
         # Create an Event (to signal back into this thread when the function has completed)
         done_event1 = threading.Event()
         done_event2 = threading.Event()
@@ -181,6 +203,10 @@ def run_function(function, delay:float=0.0):
         if response["exception"]:
             raise_test_warning(f"Exception in Tkinter thread: {response['exception']}")
             return None
+        # Exit immediately if the Stop Thread signal has been received
+        # We do this Before running any subsequent Tkinter Events
+        if hasattr(current_thread, 'stopped') and current_thread.stopped():
+            raise ThreadStopException("Thread stop signal received.")
         # Some application functions schedule events via the root.after() method to
         # complete all required actions (e.g. reset_layout, signal_passed events etc.
         # We therefore ensure any 'immediate' events that have been added to the queue
@@ -192,10 +218,14 @@ def run_function(function, delay:float=0.0):
         if not successfully_completed:
             raise_test_warning("Secondary script function events timed out after 5.0 seconds")
             return None
-        # delay if the user has specified a delay
-        time.sleep(delay)
+        # Wait if the user has specified a delay
+        if delay > 0:
+            stopped_early = current_thread.stop_event.wait(timeout=delay)
+            if stopped_early: raise ThreadStopException("Thread stop signal received during delay.")
         # Return the captured value to the calling script
         return response["result"]
+    except ThreadStopException:
+        raise
     except Exception as exception:
         raise_test_warning("Exception raised during function processing:")
         raise_test_warning(exception)
