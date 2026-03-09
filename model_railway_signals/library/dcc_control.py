@@ -874,9 +874,6 @@ def reset_dcc_accessory_mqtt_configuration():
     logging.debug("DCC Control: Resetting MQTT publish and subscribe configuration")
     publish_dcc_accessory_commands_to_mqtt_broker = False
     mqtt_interface.unsubscribe_from_message_type("dcc_accessory_short_events")
-    # Purge all retained 'remote' DCC commands. The dict will be re-populated on
-    # re-subscribe if/when we receive the latest retained messages from the broker
-    local_dcc_accessory_commands = {}
     return()
 
 #----------------------------------------------------------------------------------------------------
