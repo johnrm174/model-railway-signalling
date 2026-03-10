@@ -122,11 +122,6 @@ service_mode_session_id = None      # The reported session ID from the sstat/pcv
 # Global 'one up' session ID (to match up the CV programming responses with the requests)
 session_id = 1
 
-# Global variables to coordinate serial port access between the various threads
-port_close_initiated = False        # Signal to the Rx/Tx threads to shut down
-rx_thread_terminated = True         # Rx thread terminated flag
-tx_thread_terminated = True         # Tx thread terminated flag
-
 # The global output buffer for messages sent from the main thread to the SPROG Tx Thread
 # We use a seperate thread so we can throttle the Tx rate without blocking the main thread
 output_buffer = queue.Queue()
@@ -135,7 +130,7 @@ output_buffer = queue.Queue()
 # short accessory commands (1 = No Offset, 2 = Plus 4 Offset, 3 = minus 4 Offset)
 address_mode = 1
 
-# Global variable to hold the SPROG connectionstatus callback reference
+# Global variable to hold the SPROG connection status callback reference
 sprog_status_callback = None
 
 # locomotive_sessions is a dict, comprising an entry for each session
@@ -146,6 +141,14 @@ locomotive_sessions={}
 registered_dcc_power_state_callbacks = []
 dcc_power_is_on = None
 
+#------------------------------------------------------------------------------
+# Internal function running in the main Tkinter Thread to handle status
+# and current telemetry updates from the SPROG. Returned data comprises a
+# dictionary of Values that have been updated
+#------------------------------------------------------------------------------
+
+def report_status(status:dict):
+    if sprog_status_callback is not None: sprog_status_callback(status)
 
 #------------------------------------------------------------------------------
 # Common function used by the main thread to wait for responses in other threads.
@@ -158,7 +161,7 @@ def wait_for_response(timeout:float,test_for_response_function):
     while time.time() < timeout_end:
         response_received = test_for_response_function()
         if response_received: break
-        time.sleep(0.002)
+        time.sleep(0.01)
     return(response_received)
 
 #------------------------------------------------------------------------------
@@ -169,128 +172,104 @@ def wait_for_response(timeout:float,test_for_response_function):
 #------------------------------------------------------------------------------
 
 def thread_to_send_buffered_data():
-    global tx_thread_terminated
-    # Reset the output buffer and clear down the queue to be on the safe side
-    if serial_port.is_open: serial_port.reset_output_buffer()
-    output_buffer.queue.clear()
-    # The main thread triggers a shutdown of this thread by setting port_close_initiated to TRUE
-    # Just before this thread exits, it sets tx_thread_active to FALSE to confirm thread is exiting
-    tx_thread_terminated = False
-    while not (port_close_initiated and output_buffer.empty()):
-        # Get the next message to transmit from the buffer
-        if not output_buffer.empty():
-            command_string = output_buffer.get()
-            # Write the CBUS Message to the serial port (as long as the port is open)
+    while True:
+        try:
+            # Block until data is available, with a timeout
+            command_string = output_buffer.get(timeout=0.1)
             if serial_port.is_open:
-                try:
-                    serial_port.write(bytes(command_string,"Ascii"))
-                    # Print the Transmitted message (if the appropriate debug level is set)
-                    if debug: logging.debug("Pi-SPROG: Tx thread - Sent CBUS Message: "+command_string)
-                except Exception as exception:
-                    logging.error("Pi-SPROG: Tx thread - Error sending CBUS Message: "+command_string+" - "+str(exception))
-                    time.sleep(1.0)
+                serial_port.write(bytes(command_string, "Ascii"))
+                # Print the Transmitted message (if the appropriate debug level is set)
+                if debug: logging.debug("Pi-SPROG: Tx thread - Sent CBUS Message: "+command_string)
+                # Throttle The transmission (some decoders need this)
+                time.sleep(transmit_delay)
             else:
                 if debug: logging.debug("Pi-SPROG: Tx thread - Not sending CBUS Message: "+command_string+" - port is closed")
-        # Sleep (transmit_delay) before sending the next CBUS message (to throttle the Tx rate). 
-        # This also ensures the thread doesn't hog all the CPU time
-        time.sleep(transmit_delay)
-    if debug: logging.debug("Pi-SPROG: Tx Thread - exiting")
-    tx_thread_terminated = True
-    return()
-    
+        except queue.Empty:
+            continue
+        except Exception as exception:
+            logging.error("Pi-SPROG: Tx thread - Exception: "+str(exception))
+            time.sleep(1.0)
+
+tx_thread = threading.Thread(target=thread_to_send_buffered_data, daemon=True)
+tx_thread.start()
+
 #------------------------------------------------------------------------------
-# Internal thread to read CBUS messages from the Serial Port and process them
+# Internal thread to read CBUS messages from the Serial Port and hand them
+# off to the function that will process them (running in the same thread)
+#------------------------------------------------------------------------------
+
+def thread_to_read_received_data():
+    while True:
+        try:
+            if serial_port.is_open and serial_port.in_waiting > 0:
+                # Blocks efficiently until ';' is received or the connection drops
+                byte_string = serial_port.read_until(b';')
+                if byte_string:
+                    if debug: logging.debug(f"Pi-SPROG: Rx thread - Received: {byte_string.decode('Ascii', errors='ignore')}")
+                    process_received_data(byte_string)
+            else:
+                # Small sleep to yield to other threads when no data is arriving
+                time.sleep(0.01)
+        except Exception as exception:
+            logging.error(f"Pi-SPROG: Rx thread - Exception: {exception}")
+            time.sleep(1.0)
+
+rx_thread = threading.Thread(target=thread_to_read_received_data, daemon=True)
+rx_thread.start()
+
+#------------------------------------------------------------------------------
+# Internal function to process received CBUS messages (received as a byte string)
+# This function (and the functions it calls)runs in the receive data thread
 # We are only really interested in the response from byte_string [7] onwards
 # byte_string[7] and byte_string[8] are the Hex representation of the 1 byte OPCODE 
 # The remaining characters represent the data bytes (0 to 7 associated with the OPCODE)
 # Finally the string is terminated with a ';' (Note there is no '\r' required)
 #------------------------------------------------------------------------------
 
-def thread_to_read_received_data ():
-    global rx_thread_terminated
-    # Reset the input buffer to be on the safe side
-    if serial_port.is_open: serial_port.reset_input_buffer()
-    # The main thread triggers a shutdown of this thread by setting port_close_initiated to TRUE
-    # Just before this thread exits, it sets rx_thread_active to FALSE to confirm thread is exiting
-    rx_thread_terminated = False
-    while not port_close_initiated:
-        # Read the serial port to retrieve the bytes in the Rx buffer (as long as the port is open)
-        if serial_port.is_open:
-            # Read from the port until we get the GridConnect Protocol message termination character
-            # Or we get notified to shutdown (main thread sets port_close_initiated to True)
-            byte_string = bytearray()
-            while not port_close_initiated:
-                if serial_port.in_waiting > 0:
-                    try:
-                        received_data = serial_port.read()
-                    except Exception as exception:
-                        logging.error("Pi-SPROG: Rx thread - Error reading serial port - "+str(exception))
-                        time.sleep(1.0)
-                    else:
-                        byte_string = byte_string + received_data
-                        if chr(byte_string[-1]) == ";": break
-                # Ensure the loop doesn't hog all the CPU time
-                time.sleep(0.001)
-            # Process the GridConnect Protocol message (as long as it is complete)
-            if len(byte_string) > 0 and chr(byte_string[-1]) == ";":
-                # Log the Received message (if the appropriate debug level is set)
-                if debug: logging.debug("Pi-SPROG: Rx thread - Received CBUS Message: "+byte_string.decode('Ascii')+"\r")
-                # Note that there is exception handling around the decoding of the message to
-                # deal with any "edge-case" exceptions we might get with corrupted messages
-                try:
-                    # Convert to String and remove the start/end markers
-                    msg_str = byte_string.decode('Ascii').strip(':;')
-                    # Find where the OpCode is in the message (depending on the message type)
-                    # Normal(N): N [Data...] - Opcode position is variable - Position of 'N' + 1
-                    # Standard (S): S hhhh [OpCode] ...5 (S + 4 hex digits for 11-bit ID)
-                    # Extended (X): X hhhhhhhh [OpCode] ...9 (X + 8 hex digits for 29-bit ID)
-                    if 'N' in msg_str:
-                        start_pos = msg_str.find('N') + 1
-                    elif msg_str.startswith('S'):
-                        start_pos = 5
-                    elif msg_str.startswith('X'):
-                        start_pos = 9
-                    else:
-                        start_pos = 0
-                        logging.warning("Pi-SPROG: Rx thread - Unhandled Message Type: "+byte_string.decode('Ascii')+"\r")
-                    if start_pos > 0:
-                        # Extract exactly 2 characters for the OpCode
-                        op_hex = msg_str[start_pos : start_pos + 2]
-                        op_code = int(op_hex, 16)
-                        # Command Station Status Report (0xE3 = 227 decimal)
-                        if op_code == 0xE3: process_stat_message(byte_string)
-                        # Response to confirm Track Power is OFF (0x04 = 4 decimal)
-                        elif op_code == 0x04: process_tof_message(byte_string)
-                        # Response to confirm Track Power is ON (0x05 = 5 decimal)
-                        elif op_code == 0x05: process_ton_message(byte_string)
-                        # Report CV value in service programming mode (0x85 = 133 decimal)
-                        elif op_code == 0x85: process_pcvs_message(byte_string)
-                        # Report Service Mode Status response (0x4C = 76 decimal)
-                        elif op_code == 0x4C: process_sstat_message(byte_string)
-                        # Accessory Data Command for multimeter mode (0xD0 = 208 decimal) 
-                        elif op_code == 0xD0: process_accessory_data(byte_string)
-                        # Engine Report / Response to DLOC (0xE1 = 225 decimal)
-                        elif op_code == 0xE1: process_ploc_message(byte_string)
-                        # Error Code (from request session) ERR (0x63)
-                        elif op_code == 0x63: process_error_message(byte_string)
-                except:
-                    # Ignore any heartbeat or Bus Sync Messages
-                    if msg_str not in ("S4"):
-                        logging.warning("Pi-SPROG: Rx thread - Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
-        # Ensure the thread doesn't hog all the CPU time
-        time.sleep(0.001)
-    if debug: logging.debug("Pi-SPROG: Rx Thread - exiting")
-    rx_thread_terminated = True
+def process_received_data(byte_string):
+    # Note that there is exception handling around the decoding of the message to
+    # deal with any "edge-case" exceptions we might get with corrupted messages
+    try:
+        # Convert to String and remove the start/end markers
+        msg_str = byte_string.decode('Ascii').strip(':;')
+        # Find where the OpCode is in the message (depending on the message type)
+        # Normal(N): N [Data...] - Opcode position is variable - Position of 'N' + 1
+        # Standard (S): S hhhh [OpCode] ...5 (S + 4 hex digits for 11-bit ID)
+        # Extended (X): X hhhhhhhh [OpCode] ...9 (X + 8 hex digits for 29-bit ID)
+        if 'N' in msg_str:
+            start_pos = msg_str.find('N') + 1
+        elif msg_str.startswith('S'):
+            start_pos = 5
+        elif msg_str.startswith('X'):
+            start_pos = 9
+        else:
+            start_pos = 0
+            logging.warning("Pi-SPROG: Rx thread - Unhandled Message Type: "+byte_string.decode('Ascii')+"\r")
+        if start_pos > 0:
+            # Extract exactly 2 characters for the OpCode
+            op_hex = msg_str[start_pos : start_pos + 2]
+            op_code = int(op_hex, 16)
+            # Command Station Status Report (0xE3 = 227 decimal)
+            if op_code == 0xE3: process_stat_message(byte_string)
+            # Response to confirm Track Power is OFF (0x04 = 4 decimal)
+            elif op_code == 0x04: process_tof_message(byte_string)
+            # Response to confirm Track Power is ON (0x05 = 5 decimal)
+            elif op_code == 0x05: process_ton_message(byte_string)
+            # Report CV value in service programming mode (0x85 = 133 decimal)
+            elif op_code == 0x85: process_pcvs_message(byte_string)
+            # Report Service Mode Status response (0x4C = 76 decimal)
+            elif op_code == 0x4C: process_sstat_message(byte_string)
+            # Accessory Data Command for multimeter mode (0xD0 = 208 decimal)
+            elif op_code == 0xD0: process_accessory_data(byte_string)
+            # Engine Report / Response to DLOC (0xE1 = 225 decimal)
+            elif op_code == 0xE1: process_ploc_message(byte_string)
+            # Error Code (from request session) ERR (0x63)
+            elif op_code == 0x63: process_error_message(byte_string)
+    except:
+        # Ignore any heartbeat or Bus Sync Messages
+        if msg_str not in ("S4"):
+            logging.warning("Pi-SPROG: Rx thread - Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
     return()
-
-#------------------------------------------------------------------------------
-# Internal function running in the main Tkinter Thread to handle status
-# and current telemetry updates from the SPROG. Returned data comprises a
-# dictionary of Values that have been updated
-#------------------------------------------------------------------------------
-
-def report_status(status:dict):
-    if sprog_status_callback is not None: sprog_status_callback(status)
 
 #------------------------------------------------------------------------------
 # Internal function to process Accessory Data Commands (Voltage / Current reporting)
@@ -610,7 +589,7 @@ def sprog_connect (port_name:str="/dev/serial0",
         serial_port.port = port_name
         serial_port.baudrate = baud_rate
         serial_port.bytesize = 8
-        serial_port.timeout = 0  # Non blocking - returns immediately
+        serial_port.timeout = 0.5
         serial_port.write_timeout = 0.5
         serial_port.parity = serial.PARITY_NONE
         serial_port.stopbits = serial.STOPBITS_ONE
@@ -618,30 +597,19 @@ def sprog_connect (port_name:str="/dev/serial0",
         logging.debug("Pi-SPROG: Opening Serial Port: "+port_name+" - baud: "+str(baud_rate))
         try:
             serial_port.open()
+            # Clear any residual data from previous sessions or hardware restarts
+            serial_port.reset_input_buffer()
+            serial_port.reset_output_buffer()
         except Exception as exception:
             # If the attempt to open the serial port fails then we catch the exception (and return)
             logging.error("Pi-SPROG: Error opening Serial Port - "+str(exception))
         else:
-            # The port has been successfully opened. We now start the Rx and Tx threads.
-            # These are shut down in a controlled manner by the sprog_disconnect function but
-            # if all else fails we set to Daemon so they will terminate with the main programme
-            if rx_thread_terminated:
-                if debug: logging.debug("Pi-SPROG: Starting Rx Thread")
-                rx_thread = threading.Thread (target=thread_to_read_received_data)
-                rx_thread.setDaemon(True)
-                rx_thread.start()
-            if tx_thread_terminated:
-                if debug: logging.debug("Pi-SPROG: Starting Tx Thread")
-                tx_thread = threading.Thread (target=thread_to_send_buffered_data)
-                tx_thread.setDaemon(True)
-                tx_thread.start()
-            # Short delay to allow the threads to fully start up before we continue
-            time.sleep(0.1)
             # To verify full connectivity, we query_command_station_status. This function
             # will return TRUE if a response was received within the specified timeout (5 seconds)
             ######################################################################################
             # We BLOCK whilst awaiting the response on the basis that if the user has initiated
             # the connection, not much else will realistically be going on until connected
+            # And if it doesn't connect within the timeout then its never going to connect
             ######################################################################################
             pi_sprog_connected = query_command_station_status()
             if pi_sprog_connected: logging.info("Pi-SPROG: Successfully connected to Pi-SPROG")
@@ -653,35 +621,22 @@ def sprog_connect (port_name:str="/dev/serial0",
 #------------------------------------------------------------------------------
 
 def sprog_disconnect():
-    global port_close_initiated
-    def response_received(): return(rx_thread_terminated and tx_thread_terminated)
     pi_sprog_disconnected = False
     if serial_port.is_open:
         # Ensure Status reporting is turned off before we disconnect
         if sprog_status_callback is not None:
             disable_status_reporting()
             time.sleep(0.3)
-        if debug: logging.debug("Pi-SPROG: Shutting down Tx and Rx Threads")
-        port_close_initiated = True
-        # Wait until we get confirmation the Threads have been terminated
-        ######################################################################################
-        # We BLOCK whilst awaiting the response on the basis that if the user has initiated
-        # the disconnect, not much else will realistically be going on until disconnected
-        ######################################################################################
-        wait_for_response(1.0, response_received)
-        if not tx_thread_terminated: logging.error("Pi-SPROG: Tx thread failed to terminate")
-        if not rx_thread_terminated: logging.error("Pi-SPROG: Rx thread failed to terminate") 
         # Try to close the serial port (with exception handling)
         if debug: logging.debug ("Pi-SPROG: Closing Serial Port")
         try:
             serial_port.close()
         except Exception as exception:
-            logging.error("Pi-SPROG: Error closing Serial Port - "+str(exception))
+            logging.error("Pi-SPROG: Exception closing Serial Port: "+str(exception))
     if not serial_port.is_open:
         logging.info("Pi-SPROG: Successfully disconnected from Pi-SPROG")
         pi_sprog_disconnected = True
     # Reset the port_close_initiated flag (ready for the next time)
-    port_close_initiated = False
     return(pi_sprog_disconnected)
 
 #------------------------------------------------------------------------------

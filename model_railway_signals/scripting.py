@@ -64,6 +64,9 @@ import threading
 import logging
 import tkinter
 import time
+import queue
+import sys
+from logging.handlers import QueueHandler, QueueListener
 
 from . import editor
 from . import schematic
@@ -139,9 +142,23 @@ def script_wrapper(script_to_run):
 
 def initialise_application(*scripts_to_run):
     global main_menubar_instance, root
-    # Set the logging level to the default
-    logging.basicConfig(format='%(levelname)s: %(message)s')
-    logging.getLogger().setLevel(logging.WARNING)
+    # Get the root logger
+    current_logger = logging.getLogger()
+    # REMOVE any existing handlers to prevent duplicates
+    while current_logger.handlers: current_logger.removeHandler(current_logger.handlers[0])
+    # Create a queue for log records
+    log_queue = queue.Queue(-1) # Infinite size
+    # Setup the Terminal Handler (StreamHandler)
+    console_handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+    console_handler.setFormatter(formatter)
+    # Create the Listener that runs in the background
+    # This listener will pull logs from the queue and send them to the file_handler
+    log_listener = QueueListener(log_queue, console_handler)
+    log_listener.start()
+    # Configure the root logger to use the QueueHandler
+    root_logger = logging.getLogger()
+    root_logger.addHandler(QueueHandler(log_queue))
     # Start the application in the main thread
     root = tkinter.Tk()
     main_menubar_instance = editor.main_menubar(root)
@@ -176,19 +193,19 @@ def initialise_application(*scripts_to_run):
 def run_function(function, delay:float=0.0):
     # Container for any return value
     response = {"result": None, "exception": None}
-    # Check for the thread stop command
-    current_thread = threading.current_thread()
     try:
+        current_thread = threading.current_thread()
         # Exit immediately if the Stop Thread signal has been received
         # We do this Before running the User Event in the Tkinter Thread
         if hasattr(current_thread, 'stopped') and current_thread.stopped():
-            raise ThreadStopException("Thread stop signal received.")
+            raise ThreadStopException("Scripting: Thread stop signal received.")
         # Create an Event (to signal back into this thread when the function has completed)
         done_event1 = threading.Event()
         done_event2 = threading.Event()
         # Create a function Wrapper that will always set the event when the function has completed)
         def function_wrapper1():
-            try: response["result"] = function()
+            try:
+                response["result"] = function()
             except Exception as exception: response["exception"] = exception
             finally: done_event1.set()
         # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
@@ -197,16 +214,16 @@ def run_function(function, delay:float=0.0):
         # wait() returns True if the flag is set, False if it timed out
         successfully_completed = done_event1.wait(timeout=5.0)
         if not successfully_completed:
-            raise_test_warning("Script function timed out after 5.0 seconds")
+            raise_test_warning("Scripting: function timed out after 5.0 seconds")
             return None
         # Check if an exception occurred in the Tkinter thread and report it
         if response["exception"]:
-            raise_test_warning(f"Exception in Tkinter thread: {response['exception']}")
+            raise_test_warning(f"Scripting: Exception in Tkinter thread: {response['exception']}")
             return None
         # Exit immediately if the Stop Thread signal has been received
         # We do this Before running any subsequent Tkinter Events
         if hasattr(current_thread, 'stopped') and current_thread.stopped():
-            raise ThreadStopException("Thread stop signal received.")
+            raise ThreadStopException("Scripting: Thread stop signal received.")
         # Some application functions schedule events via the root.after() method to
         # complete all required actions (e.g. reset_layout, signal_passed events etc.
         # We therefore ensure any 'immediate' events that have been added to the queue
@@ -216,12 +233,12 @@ def run_function(function, delay:float=0.0):
         common.execute_function_in_tkinter_thread(function_wrapper2)
         successfully_completed = done_event2.wait(timeout=5.0)
         if not successfully_completed:
-            raise_test_warning("Secondary script function events timed out after 5.0 seconds")
+            raise_test_warning("Scripting: Secondary script function events timed out after 5.0 seconds")
             return None
         # Wait if the user has specified a delay
         if delay > 0:
             stopped_early = current_thread.stop_event.wait(timeout=delay)
-            if stopped_early: raise ThreadStopException("Thread stop signal received during delay.")
+            if stopped_early: raise ThreadStopException
         # Return the captured value to the calling script
         return response["result"]
     except ThreadStopException:
@@ -258,135 +275,135 @@ def save_layout(delay:float=default_delay_time):
     
 def set_lever_on(leverid:int, delay:float=default_delay_time):
     if str(leverid) not in levers.levers.keys():
-        raise_test_warning("set_lever_on - Lever: "+str(leverid)+" does not exist")
+        raise_test_warning("Scripting: set_lever_on - Lever: "+str(leverid)+" does not exist")
     elif not levers.lever_switched(leverid):
-        raise_test_warning("set_lever_on - Lever: "+str(leverid)+" is already ON")
+        raise_test_warning("Scripting: set_lever_on - Lever: "+str(leverid)+" is already ON")
     else:
         run_function(lambda:levers.change_button_event(leverid), delay)
 
 def set_lever_off(leverid:int, delay:float=default_delay_time):
     if str(leverid) not in levers.levers.keys():
-        raise_test_warning("set_lever_off - Lever: "+str(leverid)+" does not exist")
+        raise_test_warning("Scripting: set_lever_off - Lever: "+str(leverid)+" does not exist")
     elif levers.lever_switched(leverid):
-        raise_test_warning("set_lever_off - Lever: "+str(leverid)+" is already OFF")
+        raise_test_warning("Scripting: set_lever_off - Lever: "+str(leverid)+" is already OFF")
     else:
         run_function(lambda:levers.change_button_event(leverid), delay)
             
 def set_signal_on(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signal_clear(sigid):
-        raise_test_warning("set_subsidiary_on - Signal: "+str(sigid)+" is already ON")
+        raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" is already ON")
     else:
         run_function(lambda:signals.signal_button_event(sigid), delay)
 
 def set_signal_off(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
     elif signals.signal_clear(sigid):
-        raise_test_warning("set_subsidiary_off - Signal: "+str(sigid)+" is already OFF")
+        raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" is already OFF")
     else:
         run_function(lambda:signals.signal_button_event(sigid), delay)
 
 def set_subsidiary_on(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signals[str(sigid)]["hassubsidary"]:
-        raise_test_warning("set_subsidiary_on - Signal: "+str(sigid)+" does not have a subsidiary")
+        raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not have a subsidiary")
     elif not signals.subsidary_clear(sigid):
-        raise_test_warning("set_subsidiary_on - Signal: "+str(sigid)+" - subsidiary is already ON")
+        raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" - subsidiary is already ON")
     else:
         run_function(lambda:signals.subsidary_button_event(sigid), delay)
 
 def set_subsidiary_off(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
     elif not signals.signals[str(sigid)]["hassubsidary"]:
-        raise_test_warning("set_subsidiary_off - Signal: "+str(sigid)+" does not have a subsidiary")
+        raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" does not have a subsidiary")
     elif signals.subsidary_clear(sigid):
-        raise_test_warning("set_subsidiary_off - Signal: "+str(sigid)+" - subsidiary is already OFF")
+        raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" - subsidiary is already OFF")
     else:
         run_function(lambda:signals.subsidary_button_event(sigid), delay)
 
 def set_secondary_dist_on(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("set_secondary_dist_on - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: set_secondary_dist_on - Signal: "+str(sigid)+" does not exist")
     elif str(sigid+100) not in signals.signals.keys():
-        raise_test_warning("set_secondary_dist_on - Signal: "+str(sigid)+" does not have a secondary distant")
+        raise_test_warning("Scripting: set_secondary_dist_on - Signal: "+str(sigid)+" does not have a secondary distant")
     elif not signals.signal_clear(sigid+100):
-        raise_test_warning("set_secondary_dist_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
+        raise_test_warning("Scripting: set_secondary_dist_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
     else:
         run_function(lambda:signals.signal_button_event(sigid+100), delay)
 
 def set_secondary_dist_off(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("set_secondary_dist_off - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: set_secondary_dist_off - Signal: "+str(sigid)+" does not exist")
     elif str(sigid+100) not in signals.signals.keys():
-        raise_test_warning("set_secondary_dist_off - Signal: "+str(sigid)+" does not have a secondary distant")
+        raise_test_warning("Scripting: set_secondary_dist_off - Signal: "+str(sigid)+" does not have a secondary distant")
     elif signals.signal_clear(sigid+100):
-        raise_test_warning("set_secondary_dist_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
+        raise_test_warning("Scripting: set_secondary_dist_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
     else:
         run_function(lambda:signals.signal_button_event(sigid+100), delay)
 
 def trigger_signal_passed(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("trigger_signal_passed - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: trigger_signal_passed - Signal: "+str(sigid)+" does not exist")
     else:
         run_function(lambda:signals.sig_passed_button_event(sigid), delay)
                                                
 def trigger_signal_released(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
-        raise_test_warning("trigger_signal_released - Signal: "+str(sigid)+" does not exist")
+        raise_test_warning("Scripting: trigger_signal_released - Signal: "+str(sigid)+" does not exist")
     else:
         run_function(lambda:signals.approach_release_button_event(sigid), delay)
 
 def trigger_sensor_passed(sensorid:int, delay:float=default_delay_time):
     if str(sensorid) not in track_sensors.track_sensors.keys():
-        raise_test_warning("trigger_sensor_passed - Track Sensor: "+str(sensorid)+" does not exist")
+        raise_test_warning("Scripting: trigger_sensor_passed - Track Sensor: "+str(sensorid)+" does not exist")
     else:
         run_function(lambda:track_sensors.track_sensor_triggered(sensorid), delay)
 
 def set_point_switched(pointid:int, delay:float=default_delay_time):
     if str(pointid) not in points.points.keys():
-        raise_test_warning("set_point_switched - Point: "+str(pointid)+" does not exist")
+        raise_test_warning("Scripting: set_point_switched - Point: "+str(pointid)+" does not exist")
     elif points.point_switched(pointid):
-        raise_test_warning("set_point_switched - Point: "+str(pointid)+" is already switched")
+        raise_test_warning("Scripting: set_point_switched - Point: "+str(pointid)+" is already switched")
     else:
         run_function(lambda:points.change_button_event(pointid))
                                                
 def set_point_unswitched(pointid:int, delay:float=default_delay_time):
     if str(pointid) not in points.points.keys():
-        raise_test_warning("set_point_normal - Point: "+str(pointid)+" does not exist")
+        raise_test_warning("Scripting: set_point_normal - Point: "+str(pointid)+" does not exist")
     elif not points.point_switched(pointid):
-        raise_test_warning("set_point_normal - Point: "+str(pointid)+" is already normal")
+        raise_test_warning("Scripting: set_point_normal - Point: "+str(pointid)+" is already normal")
     else:
         run_function(lambda:points.change_button_event(pointid), delay)
 
 def set_fpl_on(pointid:int, delay:float=default_delay_time):
     if str(pointid) not in points.points.keys():
-        raise_test_warning("set_fpl_on - Point: "+str(pointid)+" does not exist")
+        raise_test_warning("Scripting: set_fpl_on - Point: "+str(pointid)+" does not exist")
     elif not points.points[str(pointid)]["hasfpl"]:
-        raise_test_warning("set_fpl_on - Point: "+str(pointid)+" does not have a FPL")
+        raise_test_warning("Scripting: set_fpl_on - Point: "+str(pointid)+" does not have a FPL")
     elif points.fpl_active(pointid):
-        raise_test_warning("set_fpl_on - Point: "+str(pointid)+" - FPL is already ON")
+        raise_test_warning("Scripting: set_fpl_on - Point: "+str(pointid)+" - FPL is already ON")
     else:
         run_function(lambda:points.fpl_button_event(pointid), delay)
 
 def set_fpl_off(pointid:int, delay:float=default_delay_time):
     if str(pointid) not in points.points.keys():
-        raise_test_warning("set_fpl_off - Point: "+str(pointid)+" - does not exist on the schematic")
+        raise_test_warning("Scripting: set_fpl_off - Point: "+str(pointid)+" - does not exist on the schematic")
     elif not points.points[str(pointid)]["hasfpl"]:
-        raise_test_warning("set_fpl_off - Point: "+str(pointid)+" does not have a FPL")
+        raise_test_warning("Scripting: set_fpl_off - Point: "+str(pointid)+" does not have a FPL")
     elif not points.fpl_active(pointid):
-        raise_test_warning("set_fpl_off - Point: "+str(pointid)+" - FPL is already OFF")
+        raise_test_warning("Scripting: set_fpl_off - Point: "+str(pointid)+" - FPL is already OFF")
     else:
         run_function(lambda:points.fpl_button_event(pointid), delay)
 
 def set_section_occupied(secid:int, identifier:str="OCCUPIED", delay:float=default_delay_time):
     if str(secid) not in track_sections.sections.keys():
-        raise_test_warning ("set_section_occupied - Section: "+str(secid)+" does not exist")
+        raise_test_warning ("Scripting: set_section_occupied - Section: "+str(secid)+" does not exist")
     elif track_sections.section_occupied(secid):
-        raise_test_warning("set_section_occupied - Section: "+str(secid)+" is already OCCUPIED")
+        raise_test_warning("Scripting: set_section_occupied - Section: "+str(secid)+" is already OCCUPIED")
     else:
         # Two calls are needed - we first set the label using the 'update_label' function
         # then we call the section callback library function to simulate the 'click'
@@ -395,34 +412,34 @@ def set_section_occupied(secid:int, identifier:str="OCCUPIED", delay:float=defau
 
 def set_section_clear(secid:int, delay:float=default_delay_time):
     if str(secid) not in track_sections.sections.keys():
-        raise_test_warning("set_section_clear - Section: "+str(secid)+" does not exist")
+        raise_test_warning("Scripting: set_section_clear - Section: "+str(secid)+" does not exist")
     else:
         if not track_sections.section_occupied(secid):
-            raise_test_warning("set_section_clear - Section: "+str(secid)+" is already CLEAR")
+            raise_test_warning("Scripting: set_section_clear - Section: "+str(secid)+" is already CLEAR")
         else:
             run_function(lambda:track_sections.section_state_toggled(secid), delay)
     
 def set_instrument_blocked(instid:int, delay:float=default_delay_time):
     if str(instid) not in block_instruments.instruments.keys():
-        raise_test_warning("set_instrument_blocked - Instrument: "+str(instid)+" does not exist")
+        raise_test_warning("Scripting: set_instrument_blocked - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.blocked_button_event(instid), delay)
     
 def set_instrument_occupied(instid:int, delay:float=default_delay_time):
     if str(instid) not in block_instruments.instruments.keys():
-        raise_test_warning("set_instrument_occupied - Instrument: "+str(instid)+" does not exist")
+        raise_test_warning("Scripting: set_instrument_occupied - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.occup_button_event(instid), delay)
     
 def set_instrument_clear(instid:int, delay:float=default_delay_time):
     if str(instid) not in block_instruments.instruments.keys():
-        raise_test_warning("set_instrument_clear - Instrument: "+str(instid)+" does not exist")
+        raise_test_warning("Scripting: set_instrument_clear - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.clear_button_event(instid), delay)
 
 def click_telegraph_key(instid:int, delay:float=default_delay_time):
     if str(instid) not in block_instruments.instruments.keys():
-        raise_test_warning("click_telegraph_key - Instrument: "+str(instid)+" does not exist")
+        raise_test_warning("Scripting: click_telegraph_key - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.telegraph_key_button(instid), delay)
 
@@ -435,7 +452,7 @@ def send_telegraph_code(instid:int, signal_box_code:list, delay:float=default_de
 
 def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
-            raise_test_warning("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
+            raise_test_warning("Scripting: simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
@@ -443,19 +460,19 @@ def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
 
 def simulate_gpio_on(gpioid:int, delay:float=default_delay_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
-        raise_test_warning("simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
+        raise_test_warning("Scripting: simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
     else:
         run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid), delay)
 
 def simulate_gpio_off(gpioid:int, delay:float=default_delay_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
-        raise_test_warning("simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
+        raise_test_warning("Scripting: simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
     else:
         run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid), delay)
 
 def simulate_button_clicked(buttonid:int, delay:float=default_delay_time):
     if str(buttonid) not in buttons.buttons.keys():
-        raise_test_warning("simulate_button_clicked - Button: "+str(buttonid)+" does not exist")
+        raise_test_warning("Scripting: simulate_button_clicked - Button: "+str(buttonid)+" does not exist")
     else:
         run_function(lambda:buttons.button_event(buttonid), delay)
 
@@ -464,15 +481,17 @@ def simulate_button_clicked(buttonid:int, delay:float=default_delay_time):
 #------------------------------------------------------------------------------
 
 def get_button_state(button_id:int, delay:float=default_delay_time):
-    button_state = run_function(lambda:buttons.button_state(button_id), delay)
-    if button_state is None:
-        raise_test_warning("get_button_state - button "+str(button_id)+" returned a state of None")
+    # Note that as we are just querying the state of the button we don't
+    # need to hand this off to the main tkinter thread
+    button_state = buttons.button_state(button_id)
+    time.sleep(delay)
     return(button_state)
 
 def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
-    gpio_state = run_function(lambda:gpio_sensors.get_gpio_port_state(gpio_port_id), delay)
-    if gpio_state is None:
-        raise_test_warning("get_gpio_port_state - Port "+str(gpio_port_id)+" returned a state of None")
+    # Note that as we are just querying the state of the button we don't
+    # need to hand this off to the main tkinter thread
+    gpio_state = gpio_sensors.get_gpio_port_state(gpio_port_id)
+    time.sleep(delay)
     return(gpio_state)
 
 #------------------------------------------------------------------------------
@@ -482,7 +501,7 @@ def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
 def request_loco_session(dcc_address:int, delay:float=default_delay_time):
     session_id = run_function(lambda:pi_sprog_interface.request_loco_session(dcc_address), delay)
     if session_id == 0:
-        raise_test_warning("request_loco_session - Could not acquire session for address "+str(dcc_address))
+        raise_test_warning("Scripting: request_loco_session - Could not acquire session for address "+str(dcc_address))
     return(session_id)
 
 def release_loco_session(session_id:int, delay:float=default_delay_time):

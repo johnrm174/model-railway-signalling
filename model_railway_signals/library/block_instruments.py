@@ -78,6 +78,8 @@ import os
 import logging
 import pathlib
 import tkinter as Tk
+import threading
+import queue
 from typing import Union
 
 from . import common
@@ -117,6 +119,29 @@ instruments = {}
 # --------------------------------------------------------------------------------
 
 list_of_instruments_to_publish = []
+
+# --------------------------------------------------------------------------------
+# Thread to play sounds - to minimise risk of segmentation errors
+# --------------------------------------------------------------------------------
+
+audio_queue = queue.Queue()
+
+def audio_playback_thread():
+    active_sound = None
+    while True:
+        try:
+            sound_object = audio_queue.get()
+            # If a sound is currently playing, stop it (or skip)
+            if active_sound is not None and active_sound.is_playing():
+                active_sound.stop()
+            active_sound = sound_object.play()
+        except Exception as exception:
+            logging.error(f"Block Instruments - Audio playback error: {exception}")
+
+threading.Thread(target=audio_playback_thread, daemon=True).start()
+
+def play_sound_object(sound_object):
+    audio_queue.put(sound_object)
 
 # --------------------------------------------------------------------------------
 # Internal Function to Open a window containing a list of common signal box bell
@@ -220,11 +245,9 @@ def telegraph_key_button(inst_id:int):
     # Provide a visual indication of the key being pressed (and schedule the button reset)
     instruments[str(inst_id)]["bellbutton"].config(relief="sunken")
     common.root_window.after(200,lambda:reset_telegraph_button(inst_id))
-    # Sound the "clack" of the telegraph key - We put exception handling around this as the function can raise
-    # exceptions if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
+    # Sound the "clack" of the telegraph key
     if instruments[str(inst_id)]["telegraphsound"] is not None:
-        try: instruments[str(inst_id)]["telegraphsound"].play()
-        except: pass
+        play_sound_object(instruments[str(inst_id)]["telegraphsound"])
     # If linked to another instrument then call the function to ring the bell on the other instrument or
     # Publish the "bell ring event" to the broker (for other nodes to consume). Note that events will only
     # be published if the MQTT interface has been configured and we are connected to the broker
@@ -248,8 +271,7 @@ def ring_section_bell(inst_id:int):
     # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
     # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
     if instruments[str(inst_id)]["bellsound"] is not None:
-        try: instruments[str(inst_id)]["bellsound"].play()
-        except: pass
+        play_sound_object(instruments[str(inst_id)]["bellsound"])
     return()
 
 def reset_telegraph_button(inst_id:int):

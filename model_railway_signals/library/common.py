@@ -45,6 +45,10 @@ import math
 import logging
 import queue
 import tkinter as Tk
+import time
+import threading
+import sys
+import traceback
 
 from datetime import datetime
 
@@ -388,14 +392,13 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
 #-------------------------------------------------------------------------
 
 def process_external_events():
-    try:
-        # Try to get one item from the queue - will raise exception if queue is empty
-        callback = event_queue.get_nowait()
-        try: callback()
-        except: pass
-    except queue.Empty:pass
-    # Check again in 20ms
-    root_window.after(20, process_external_events)
+    while not event_queue.empty():
+        try:
+            callback = event_queue.get_nowait()
+            callback()
+        except Exception as exception:
+            logging.error(f"Exception processing event in Tkinter Thread: {exception}")
+    root_window.after(50, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
@@ -405,11 +408,6 @@ def execute_function_in_tkinter_thread(callback_function):
 ##################################################################################################
 # Probe function to detect main thread freezes and write them out to file
 ##################################################################################################
-
-import threading
-import time
-import sys
-import traceback
 
 # A thread-safe flag to trigger a shut down of the diagnostic thread
 shutdown_event = threading.Event()
@@ -431,6 +429,9 @@ def watchdog_monitor():
         gui_responsive.clear()
         execute_function_in_tkinter_thread(probe_callback)
         # Using wait() for an instant exit when the shutdown_event is triggered.
+        # Log the current thread count for diagnostic purposes
+        active_count = threading.active_count()
+        if active_count > 15: logging.warning(f"Watchdog Alert: High thread count detected: {active_count}")
         if shutdown_event.wait(timeout=10):
             # Break on shutdown command from main thread
             break
