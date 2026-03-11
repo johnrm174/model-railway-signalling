@@ -333,10 +333,20 @@ def signal_exists(sig_id:Union[int,str]):
 
 def signal_button_event(sig_id:int):
     logging.info("Signal "+str(sig_id)+": Signal Change Button Event *************************************************")
-    # Toggle the signal state (and the tkinter button object)
-    toggle_signal(sig_id)
-    # Make the external callback
-    signals[str(sig_id)]['sigswitchedcallback'] (sig_id)
+    if ( ("releaseonred" in signals[str(sig_id)].keys() and signals[str(sig_id)]["releaseonred"]) or
+         ("releaseonyel" in signals[str(sig_id)].keys() and signals[str(sig_id)]["releaseonyel"]) ):
+        # Deal with the case of "releasing" a signal stuck in approach control mode
+        # We want the button click to "release" the signal rather than toggle it
+        signals[str(sig_id)]["released"] = True
+        clear_approach_control(sig_id)
+        update_signal_aspect(sig_id)
+        # Make the external callback
+        signals[str(sig_id)]['sigreleasedcallback'] (sig_id)
+    else:
+        # Toggle the signal state (and the tkinter button object)
+        toggle_signal(sig_id)
+        # Make the external callback
+        signals[str(sig_id)]['sigswitchedcallback'] (sig_id)
     return ()
 
 def subsidary_button_event(sig_id:int):
