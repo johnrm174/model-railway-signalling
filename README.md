@@ -65,11 +65,14 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Add your DCC locos to the Roster, defining DCC address and DCC functions.
     * Control your Locos via on-screen throttles (fully compatible with touchscreens).
     * Start the built-in WiThrottle server and control your locos from your smartphone.
-    * Tested and fully supported for Android (Engine Driver App) - iphone - tbc.
+    * Tested and fully supported for Android (third party 'Engine Driver' App).
+* Scripting interface improved and extended to include locomotive control
+    * Entire layouts can now be fully automated via python scripting
 * Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons)
 * Improved initial synchronisation of layout state following DCC connect
 * Added ability to inhibit flashing aspects for signal approach control
-* Added ability to specify the same GPIO sensor for signal passed and signal approached
+* Added ability to click on signals subject to approach control to 'release' them
+* Added ability to specify the same GPIO sensor for signal passed and signal approach events
 * New functionality to allow copying of route definitions and route buttons:
     * NX route definitions can now be copied within the Route Button configuration.
     * Copying of Route Buttons will now bring across all individual route definitions.
