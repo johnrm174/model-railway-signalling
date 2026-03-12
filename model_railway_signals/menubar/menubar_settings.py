@@ -1209,8 +1209,8 @@ class edit_gpio_settings():
             # Circuit breaker threahold entry
             self.label3 = Tk.Label(self.subframe2, text="  Max events per second:")
             self.label3.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            self.maxevents = common.integer_entry_box(self.subframe2, width=5, min_value=10, max_value=1000, allow_empty=False, 
-                tool_tip="Enter the maximum number of events per second for each GPIO port (10-1000). If a GPIO port exceeds "+
+            self.maxevents = common.integer_entry_box(self.subframe2, width=5, min_value=10, max_value=100, allow_empty=False,
+                tool_tip="Enter the maximum number of events per second for each GPIO port (10-100). If a GPIO port exceeds "+
                             "this rate then the GPIO port will be locked out to protect the application.")
             self.maxevents.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             #---------------------------------------------------------------------
