@@ -311,11 +311,31 @@ circuit_breaker_thread.start()
 # so we don't have to check the gpio_port_mapping entry still exists before querying it.
 #---------------------------------------------------------------------------------------------------
 
+# Use a dictionary to keep track of active trigger timer objects
+pending_triggers_lock = threading.Lock()
+pending_triggers = {}
+
 def gpio_triggered_callback(gpio_port:int):
     global gpio_port_mappings
     if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-        event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
-        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_initial_trigger(gpio_port))
+        with pending_triggers_lock:
+            # Cancel any previous trigger timers if a rapid fire of triggers occurs
+            if gpio_port in pending_triggers:pending_triggers[gpio_port].cancel()
+            # Start a new timer for the trigger period (this will call the validate_trigger function)
+            trigger_period = gpio_port_mappings[str(gpio_port)]["trigger_period"]
+            timer_thread = threading.Timer(trigger_period, validate_trigger, args=[gpio_port])
+            pending_triggers[gpio_port] = timer_thread
+            timer_thread.start()
+        # Register the event to the event queue for the circuit breaker thread
+        event_queue.put(gpio_port)
+    return()
+
+def validate_trigger(gpio_port: int):
+    with pending_triggers_lock:
+            if gpio_port in pending_triggers:
+                del pending_triggers[gpio_port]
+    # This runs in a background thread exactly when the timer expires
+    common.execute_function_in_tkinter_thread(lambda: gpio_sensor_triggered(gpio_port))
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -328,8 +348,17 @@ def gpio_triggered_callback(gpio_port:int):
 def gpio_released_callback(gpio_port:int):
     global gpio_port_mappings
     if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-        event_queue.put(gpio_port) # This is the event queue for the circuit breaker thread
-        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
+        was_pending = False
+        with pending_triggers_lock:
+            # Cancel any ongoing trigger timer for the port
+            if gpio_port in pending_triggers:
+                pending_triggers[gpio_port].cancel()
+                del pending_triggers[gpio_port]
+                was_pending = True
+        # Register the event to the event queue for the circuit breaker thread
+        event_queue.put(gpio_port)
+        if not was_pending:
+            common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -338,15 +367,6 @@ def gpio_released_callback(gpio_port:int):
 # If the sensor is re-triggered within the timeout period then the timeout period is extended. This is
 # to handle optical sensors which might Fall and Rise as each carriage/waggon passes the sensor.
 #---------------------------------------------------------------------------------------------------
-
-def gpio_sensor_initial_trigger(gpio_port:int):
-    trigger_period = gpio_port_mappings[str(gpio_port)]["trigger_period"]
-    # We use a lambda to delay the "actual" triggering logic
-    common.root_window.after(int(trigger_period*1000), lambda: check_gpio_sensor_still_triggered(gpio_port))
-
-def check_gpio_sensor_still_triggered(gpio_port:int):
-    if gpio_port_mappings[str(gpio_port)]["sensor_device"].is_active:
-        gpio_sensor_triggered(gpio_port)
 
 def gpio_sensor_triggered(gpio_port:int):
     global gpio_port_mappings
@@ -394,7 +414,7 @@ def gpio_sensor_released(gpio_port:int):
             sensor_object = gpio_port_mappings[str(gpio_port)]["sensor_device"]
             # Only process the event if the GPIO input is released and 'our' sensor state is still
             # active. This is to cope with the case where we might have had multiple additional
-            # trigger/release events during the timeout period which have extended 'out' sensor
+            # trigger/release events during the timeout period which have extended 'our' sensor
             # active time and resulted in additional re-scheduled release events. This is to ensure
             # we only make a single callback for the release event after the timeout period
             if not sensor_object.is_active and gpio_port_mappings[str(gpio_port)]["sensor_state"]:
