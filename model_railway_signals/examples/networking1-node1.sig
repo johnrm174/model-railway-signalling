@@ -136,6 +136,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 12,
@@ -506,6 +507,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 10,
@@ -883,6 +885,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 2,
@@ -1260,6 +1263,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 1,
@@ -1686,6 +1690,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 11,
@@ -1981,7 +1986,12 @@
             "width": 1000
         },
         "control": {
-            "dccsoundmappings": []
+            "dccsoundmappings": [],
+            "locomotiveroster": {},
+            "serverallowlist": [],
+            "serverdebugging": false,
+            "serverenforceallow": false,
+            "serverstartup": false
         },
         "general": {
             "automation": true,
@@ -1994,7 +2004,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.1.0"
+            "version": "Version 6.1.6"
         },
         "gpio": {
             "maxevents": 100,
@@ -2032,6 +2042,8 @@
             "pubinstruments": [
                 1
             ],
+            "publoco": false,
+            "publoconode": "",
             "pubsections": [
                 3
             ],
@@ -2048,6 +2060,7 @@
             "subinstruments": [
                 "Node2-2"
             ],
+            "subloconodes": [],
             "subsections": [
                 "Node2-4"
             ],

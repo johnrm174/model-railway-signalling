@@ -343,6 +343,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 2,
@@ -726,6 +727,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 9,
@@ -1146,6 +1148,7 @@
             "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 16,
@@ -1479,6 +1482,7 @@
             "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 6,
@@ -1822,6 +1826,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 8,
@@ -2155,6 +2160,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 1,
@@ -2530,6 +2536,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 14,
@@ -2873,6 +2880,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 7,
@@ -3363,6 +3371,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 12,
@@ -3706,6 +3715,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 5,
@@ -4059,6 +4069,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 3,
@@ -4392,6 +4403,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 4,
@@ -4737,6 +4749,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 13,
@@ -5114,6 +5127,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 11,
@@ -5467,7 +5481,7 @@
         },
         "10": {
             "labeltext": "XXXXX",
-            "occupied": true
+            "occupied": false
         },
         "2": {
             "labeltext": "378",
@@ -5522,7 +5536,12 @@
             "width": 1000
         },
         "control": {
-            "dccsoundmappings": []
+            "dccsoundmappings": [],
+            "locomotiveroster": {},
+            "serverallowlist": [],
+            "serverdebugging": false,
+            "serverenforceallow": false,
+            "serverstartup": false
         },
         "general": {
             "automation": true,
@@ -5535,7 +5554,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.1.0"
+            "version": "Version 6.1.6"
         },
         "gpio": {
             "maxevents": 100,
@@ -5578,6 +5597,8 @@
                 1,
                 2
             ],
+            "publoco": false,
+            "publoconode": "",
             "pubsections": [
                 1,
                 2
@@ -5605,6 +5626,7 @@
                 "Box1-1",
                 "Box1-2"
             ],
+            "subloconodes": [],
             "subsections": [
                 "Box1-1",
                 "Box1-2"
