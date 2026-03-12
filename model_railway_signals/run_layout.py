@@ -56,7 +56,7 @@
 # Makes the following external API calls to library modules:
 #    library.toggle_signal(signal_id) - Change the state of a signal (to match a lever state)
 #    library.signal_state(sig_id) - For testing the current displayed aspect
-#    library.update_colour_light_signal(sig_id, sig_ahead_id) - To update the signal aspect
+#    library.signal_aspect(sig_id, sig_ahead_id) - To update the signal aspect
 #    library.signal_clear(sig_id, sig_route) - To test if a signal is clear
 #    library.subsidary_clear(sig_id) - to test if a subsidary is clear
 #    library.lock_signal(sig_id) - To lock a signal
@@ -109,7 +109,7 @@ run_mode = None
 automation_enabled = None
 spad_popups = False
 
-enhanced_debugging = False
+enhanced_debugging = True
 
 #------------------------------------------------------------------------------------
 # The initialise function is called at application startup (on canvas creation)
@@ -363,7 +363,7 @@ def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:in
                 # Fnd the displayed aspect of the signal (before any changes)
                 initial_signal_aspect = library.signal_state(int_signal_behind_id)
                 # Update the signal behind based on the signal we called into the function with
-                library.update_colour_light_signal(int_signal_behind_id, int_or_str_signal_id)
+                library.update_signal_aspect(int_signal_behind_id, int_or_str_signal_id)
                 # If the aspect has changed then we need to continute working backwards 
                 if library.signal_state(int_signal_behind_id) != initial_signal_aspect:
                     update_signal_behind(int_signal_behind_id, recursion_level+1)
@@ -372,25 +372,30 @@ def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:in
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to update a colour light signal aspect based on the displayed aspect
-# of the signal ahead and then to work back along the set route to update any other colour
+# Internal function to update a signal aspect based on the displayed aspect of the
+# signal ahead and then to work back along the set route to update any other colour
 # light signals signals need changing. Note that the signal ID could be LOCAL or REMOTE.
 # We only update on the signal ahead for LOCAL signals (as we have no idea of the signal
-# ahead on the other schematic) but update the signals behind for LOCAL or REMOTE library.
+# ahead on the other schematic) but update the signals behind for LOCAL or REMOTE.
 #------------------------------------------------------------------------------------
 
 def process_signal_aspect_update(int_or_str_signal_id:Union[int,str]):
     # First update on the signal ahead (only if it is a LOCAL colour light signal)
-    # Other local signal types will always display the appropriate aspect
+    # Other local signal types will always display their appropriate aspect
+    # The update signal function works with local and remote signal IDs
     if is_local_id(int_or_str_signal_id) and int(int_or_str_signal_id) < 1000:
         signal_object = objects.schematic_objects[objects.signal(int_or_str_signal_id)]
         if signal_object["itemtype"] == library.signal_type.colour_light.value:
             str_signal_ahead_id = find_signal_ahead(int(int_or_str_signal_id))
             if str_signal_ahead_id is not None:
-                # The update signal function works with local and remote signal IDs
-                library.update_colour_light_signal(int(int_or_str_signal_id), str_signal_ahead_id)
+                # Colour Light Signal, with a signal ahead specified
+                library.update_signal_aspect(int(int_or_str_signal_id), str_signal_ahead_id)
             else:
-                library.update_colour_light_signal(int(int_or_str_signal_id))
+                # Colour light signal with no signal ahead specified
+                library.update_signal_aspect(int(int_or_str_signal_id))
+        else:
+            # Other signal type (wedon't care about the signal ahead)
+            library.update_signal_aspect(int(int_or_str_signal_id))
     # Now work back along the route to update signals behind. Note that we do this for
     # all signal types as there could be colour light signals behind this signal
     update_signal_behind(int_or_str_signal_id)
@@ -475,8 +480,7 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
                     library.clear_approach_control(int_signal_id)
             else:
                 library.clear_approach_control(int_signal_id)
-            # Update the signal aspect (for colour light signals) and work back along the route to change the displayed
-            # aspect of any colour light signals behind (if the displayed aspect of the current signal has changed)
+            # Update the displayed signal aspect (Semaphore and colour light signals)
             process_signal_aspect_update(int_signal_id)    
             # If the displayed aspect has changed then we also need to work back along the route to update
             # the approach control status of any signals behind (for the semaphore approach control use case)
@@ -484,6 +488,9 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
                 int_signal_behind_id = find_signal_behind(int_signal_id)
                 if int_signal_behind_id is not None:
                     update_signal_approach_control(int_signal_behind_id, False, recursion_level+1)
+        else:
+            # Update the displayed signal aspect (Ground Position or Ground Disc signals)
+            process_signal_aspect_update(int_signal_id)
     else:
         logging.error("RUN LAYOUT - Update Approach Control on signals ahead - Maximum recursion level reached")
     return()
@@ -1225,36 +1232,69 @@ def reset_layout(switch_delay:int=0):
 # set up or clear down a route won't trigger a route re-set - eg set FPL off to change a point
 ##################################################################################################
 
+##################################################################################################
+# A note on tech debt to address at some stage going forward:
+#
+# At the moment, if we are in Run Mode with Automation On, the displayed aspect of the signal could
+# be influenced by changes to track occupancy (overridden on sections ahead occupied), its approach
+# control state (release on Red or Release on Yellow) and, for distant signals only, whether the
+# signal is overridden on the state of all home signals ahead.
+#
+# The code tries to avoid multiple changes to the displayed aspect of the signal (and dcc commands
+# being sent out until all this processing is complete - otherwise you might get instances of a
+# semaphore being 'cleared' as soon as the button is clicked, only to be then set back to ON once
+# we have established it is subject to approach control.The signals library therefore only updates
+# the signal when the 'update_signal_aspect' function is called (not on the initial button press)
+#
+# Its therefore up to this run_layout code to decide when to update the signal, but the problem
+# is that a change to the displayed aspect of one signal may result in the need to updated the
+# displayed aspect of any signals behind. As any depending on the changed state of other signals
+# (e.g. When setting approach control, the signal aspect may change and if it does, then the
+# displayed aspect of signals behind will also need to change. The processing sequence is:
+#
+#    Initial event - Will give us the initial (least restrictive) aspect
+#    trigger_timed_signal_sequence(signal_id) - aspect could be more restrictive
+#    override_signals_based_on_track_sections_ahead() - aspect could be more restrictive
+#    update_approach_control_status_for_all_signals(signal_id) - aspect could be more restrictive
+#         #### This is the point we update the signal aspect (and then update the signals behind)
+#         #### Will depend on: Sig ON/OFF, overrides, Timed Sequence, approach control
+#    override_distant_signals_based_on_signals_ahead()
+#         #### Once the aspect of all signals has been updated, we need to make a second pass
+#         #### To update any distants that have a Home signal showing danger on the route ahead
+#
+# Ideally, we want to do all the processing to set the INTENDED aspect of each signal, looping
+# Through as many times as we need to - to update the INTENDED aspect based on the INTENDED
+# aspect of other signals - And then set the DISPLAYED aspect to the INTENDED aspect once 
+##################################################################################################
+
 def point_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging:
-        print("########## point_switched_callback "+str(point_id))
+        logging.debug("############################## point_switched_callback "+str(point_id))
         start_time = time.time()
     configure_all_signal_routes()
-    if run_mode and automation_enabled:
-        override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
     update_all_signalbox_levers()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging:
-        print("########## fpl_switched_callback "+str(point_id))
+        logging.debug("############################## fpl_switched_callback "+str(point_id))
         start_time = time.time()
     process_all_signal_interlocking()
     run_routes.check_routes_valid_after_point_change(point_id, route_id)
     update_all_signalbox_levers()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_updated_callback(signal_id:Union[int,str]):
     if enhanced_debugging:
-        print("########## signal_updated_callback "+str(signal_id))
+        logging.debug("############################## signal_updated_callback "+str(signal_id))
         start_time = time.time()
     if run_mode and automation_enabled:
         update_approach_control_status_for_all_signals()
@@ -1265,13 +1305,13 @@ def signal_updated_callback(signal_id:Union[int,str]):
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_switched_callback(signal_id:int, route_id:int=0):
     start_time = time.time()
     if enhanced_debugging:
-        print("########## signal_switched_callback "+str(signal_id))
+        logging.debug("############################## signal_switched_callback "+str(signal_id))
         start_time = time.time()
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
@@ -1286,12 +1326,12 @@ def signal_switched_callback(signal_id:int, route_id:int=0):
     update_all_signalbox_levers()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def subsidary_switched_callback(signal_id:int, route_id:int=0):
     if enhanced_debugging:
-        print("########## subsidary_switched_callback "+str(signal_id))
+        logging.debug("############################## subsidary_switched_callback "+str(signal_id))
         start_time = time.time()
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
@@ -1302,7 +1342,7 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
     update_all_signalbox_levers()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 # Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
@@ -1312,7 +1352,7 @@ def subsidary_switched_callback(signal_id:int, route_id:int=0):
 # During this period the signal is overridden to DANGER.
 def signal_passed_callback(signal_id:int):
     if enhanced_debugging:
-        print("########## signal_passed_callback "+str(signal_id))
+        logging.debug("############################## signal_passed_callback "+str(signal_id))
         start_time = time.time()
     # Work out what the track occupancy changes will be and schedule an event to update them.
     # Any timed signal sequences are triggered immediately after the signal is passed
@@ -1332,12 +1372,12 @@ def signal_passed_callback(signal_id:int):
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_released_callback(signal_id:int):
     if enhanced_debugging:
-        print("########## signal_released_callback "+str(signal_id))
+        logging.debug("############################## signal_released_callback "+str(signal_id))
         start_time = time.time()
     if run_mode and automation_enabled:
         update_approach_control_status_for_all_signals()    
@@ -1348,7 +1388,7 @@ def signal_released_callback(signal_id:int):
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 # Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
@@ -1357,7 +1397,7 @@ def signal_released_callback(signal_id:int):
 # changes will be and schedules the actual update for after the clearance delay.
 def sensor_passed_callback(sensor_id:int):
     if enhanced_debugging:
-        print("########## sensor_passed_callback "+str(sensor_id))
+        logging.debug("############################## sensor_passed_callback "+str(sensor_id))
         start_time = time.time()
     # Work out what the track occupancy changes will be and schedule an event to update them.
     # Any timed signal sequences are triggered immediately after the signal is passed
@@ -1366,12 +1406,12 @@ def sensor_passed_callback(sensor_id:int):
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
         
 def section_updated_callback(section_id:int):
     if enhanced_debugging:
-        print("########## section_updated_callback "+str(section_id))
+        logging.debug("############################## section_updated_callback "+str(section_id))
         start_time = time.time()
     if run_mode:
         update_route_highlighting_for_sections()
@@ -1384,33 +1424,33 @@ def section_updated_callback(section_id:int):
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def instrument_updated_callback(instrument_id:int):
     if enhanced_debugging:
-        print("########## instrument_updated_callback "+str(instrument_id))
+        logging.debug("############################## instrument_updated_callback "+str(instrument_id))
         start_time = time.time()
     process_all_signal_interlocking()
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def switch_updated_callback(switch_id:int, route_id:int=0):
     if enhanced_debugging:
-        print("########## switch_updated_callback "+str(switch_id))
+        logging.debug("############################## switch_updated_callback "+str(switch_id))
         start_time = time.time()
     run_routes.check_routes_valid_after_switch_change(switch_id,route_id)
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def lever_switched_callback(lever_id:int):
     if enhanced_debugging:
-        print("########## lever_switched_callback "+str(lever_id))
+        logging.debug("############################## lever_switched_callback "+str(lever_id))
         start_time = time.time()
     lever_object = objects.schematic_objects[objects.lever(lever_id)]
     lever_switched = library.lever_switched(lever_id)
@@ -1462,7 +1502,7 @@ def lever_switched_callback(lever_id:int):
             fpl_switched_callback(linked_point)
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        print("########## Took "+str(time_in_ms)+" milliseconds")
+        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 ##################################################################################################

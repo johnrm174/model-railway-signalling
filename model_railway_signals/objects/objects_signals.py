@@ -52,7 +52,6 @@
 #    library.ground_disc_subtype - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
-#    library.update_colour_light_signal(id) - To set the initial colour light signal aspect following creation
 #    library.set_route(id,route) - To set the initial route for a signal following creation
 #    library.create_colour_light_signal - To create the library object (create or redraw)
 #    library.create_semaphore_signal - To create the library object (create or redraw)
@@ -654,8 +653,6 @@ def redraw_signal_object(object_id):
         if objects_common.schematic_objects[object_id]["theatreroute"]:
             library.set_route(sig_id = objects_common.schematic_objects[object_id]["itemid"],
                     theatre_text = objects_common.schematic_objects[object_id]["dcctheatre"][1][0])
-        # update the signal to show the initial aspect
-        library.update_colour_light_signal(objects_common.schematic_objects[object_id]["itemid"])
     elif sig_type == library.signal_type.semaphore:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = library.semaphore_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])

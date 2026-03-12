@@ -152,7 +152,7 @@
 #
 #   trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int) - Trigger a timed signal sequence
 #
-#   update_colour_light_signal(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
+#   update_signal_aspect(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
 #                 into account the internal state of the signal and displayed aspect of the signal ahead
 #
 #   update_signal_styles - Update the general styles of a signal
@@ -339,7 +339,6 @@ def signal_button_event(sig_id:int):
         # We want the button click to "release" the signal rather than toggle it
         signals[str(sig_id)]["released"] = True
         clear_approach_control(sig_id)
-        update_signal_aspect(sig_id)
         # Make the external callback
         signals[str(sig_id)]['sigreleasedcallback'] (sig_id)
     else:
@@ -689,23 +688,32 @@ def enable_disable_theatre_route_indication(sig_id:int, sig_at_danger:bool):
     return()
 
 # -------------------------------------------------------------------------
-# Internal functions to update the displayed aspect of a signal following a state
+# API function to update the displayed aspect of a signal following a state
 # update (e.g. signal switched, approach control etc). These functions call into
 # the type-specific functions (i.e. specific to the signal type being updated)
 # -------------------------------------------------------------------------
 
-def update_signal_aspect(sig_id:int):
-    # Call the signal type-specific functions to update semaphore, ground position and
-    # ground disc signals. Note that we don't update colour light signals as the aspect
-    # they need to display may depend on the signal ahead - in this case, the calling
-    # programme needs to call 'signals_colour_lights.update_colour_light_signal' with
-    # the ID of the signal to update and the ID of the signal on the route ahead
-    if signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
+def update_signal_aspect(sig_id:int, sig_ahead_id:Union[int,str]=None):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": update_signal_aspect - Signal ID must be an int")
+    elif sig_ahead_id is not None and not isinstance(sig_ahead_id, str) and not isinstance(sig_ahead_id, int):
+        logging.error("Signal "+str(sig_id)+": update_signal_aspect - Signal Ahead ID must be an int or str")
+    elif not signal_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": update_signal_aspect - Signal does not exist")
+    elif sig_ahead_id is not None and str(sig_ahead_id).casefold() != "STOP".casefold() and not signal_exists(sig_ahead_id):
+        logging.error ("Signal "+str(sig_id)+": update_signal_aspect - Signal ahead "+str(sig_ahead_id)+" does not exist")
+    elif str(sig_id) == str(sig_ahead_id):
+        logging.error ("Signal "+str(sig_id)+": update_signal_aspect - Signal ahead "+str(sig_ahead_id)+" is the same ID")
+    # Call the signal type-specific functions to signals.
+    elif signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
         signals_ground_position.update_ground_position_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         signals_semaphores.update_semaphore_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.ground_disc:
         signals_ground_disc.update_ground_disc_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
+        signals_colour_lights.update_colour_light_signal(sig_id)
     return()
 
 def update_subsidary_aspect(sig_id:int):
@@ -764,14 +772,12 @@ def toggle_signal(sig_id:int):
             if not signals[str(sig_id)]["automatic"]:
                 signals[str(sig_id)]["sigbutton"].config(relief="raised")
                 signals[str(sig_id)]["sigbutton"].config(background=signals[str(sig_id)]["deselectedcolour"])
-                update_signal_aspect(sig_id)
         else:
             logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
             signals[str(sig_id)]["sigclear"] = True
             if not signals[str(sig_id)]["automatic"]:
                 signals[str(sig_id)]["sigbutton"].config(relief="sunken")
                 signals[str(sig_id)]["sigbutton"].config(background=signals[str(sig_id)]["selectedcolour"])
-                update_signal_aspect(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -848,12 +854,10 @@ def set_approach_control(sig_id:int, release_on_yellow:bool=False, force_set:boo
             logging.info("Signal "+str(sig_id)+": Setting approach control (release on yellow)")
             signals[str(sig_id)]["releaseonyel"] = True
             signals[str(sig_id)]["releaseonred"] = False
-            update_signal_aspect(sig_id)
         elif not release_on_yellow and not signals[str(sig_id)]["releaseonred"]:
             logging.info("Signal "+str(sig_id)+": Setting approach control (release on red)")
             signals[str(sig_id)]["releaseonred"] = True
             signals[str(sig_id)]["releaseonyel"] = False
-            update_signal_aspect(sig_id)
         # Give an indication that the approach control has been set by underlining the button text
         # We do this by adding " underline" to the style element of the current font tuple
         font, size, style = signals[str(sig_id)]["buttonfont"]
@@ -881,7 +885,6 @@ def clear_approach_control(sig_id:int):
         logging.info("Signal "+str(sig_id)+": Clearing approach control")
         signals[str(sig_id)]["releaseonyel"] = False
         signals[str(sig_id)]["releaseonred"] = False
-        update_signal_aspect(sig_id)
         # Give an indication that the approach control has been cleared by removing the underline from the
         # button text - we do this by re-applying the current font tuple (with the default style element)
         font, size, style = signals[str(sig_id)]["buttonfont"]
@@ -907,11 +910,9 @@ def set_signal_override(sig_id:int, temp_override:bool=False):
         if temp_override and not signals[str(sig_id)]["override2"]:
             logging.info("Signal "+str(sig_id)+": Setting temp signal override")
             signals[str(sig_id)]["override2"] = True
-            update_signal_aspect(sig_id)
         elif not temp_override and not signals[str(sig_id)]["override"]:
             logging.info("Signal "+str(sig_id)+": Setting signal override")
             signals[str(sig_id)]["override"] = True
-            update_signal_aspect(sig_id)
         if signals[str(sig_id)]["override"] or signals[str(sig_id)]["override2"]:
             signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
     return()
@@ -927,11 +928,9 @@ def clear_signal_override(sig_id:int, temp_override:bool=False):
         if temp_override and signals[str(sig_id)]["override2"]:
             logging.info("Signal "+str(sig_id)+": Clearing temp signal override")
             signals[str(sig_id)]["override2"] = False
-            update_signal_aspect(sig_id)
         elif not temp_override and signals[str(sig_id)]["override"]:
             logging.info("Signal "+str(sig_id)+": Clearing signal override")
             signals[str(sig_id)]["override"] = False
-            update_signal_aspect(sig_id)
         if not signals[str(sig_id)]["override"] or not signals[str(sig_id)]["override2"]:
             text_colour = signals[str(sig_id)]["textcolour"]
             signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
@@ -1005,7 +1004,6 @@ def set_signal_override_caution(sig_id:int):
         # Set the Signal Override Caution and update the displayed aspect
         logging.info("Signal "+str(sig_id)+": Setting override CAUTION")
         signals[str(sig_id)]["overcaution"] = True
-        update_signal_aspect(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -1031,7 +1029,6 @@ def clear_signal_override_caution(sig_id:int):
         # Clear the Signal Override Caution and update the displayed aspect
         logging.info("Signal "+str(sig_id)+": Clearing override CAUTION")
         signals[str(sig_id)]["overcaution"] = False
-        update_signal_aspect(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -1310,28 +1307,6 @@ def set_route(sig_id:int, route:route_type=None, theatre_text:str=""):
                 update_theatre_route_indication(sig_id, theatre_text)
     return()
 
-#-----------------------------------------------------------------------------------------------
-# API Function to update remote colour light signals based on the signal ahead. This function
-# just dos the validation - the main function is in the signals_colour_lights module
-#-----------------------------------------------------------------------------------------------
-
-def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
-    # Validate the parameters we have been given as this is a library API function
-    if not isinstance(sig_id, int):
-        logging.error("Signal "+str(sig_id)+": update_colour_light_signal - Signal ID must be an int")
-    elif sig_ahead_id is not None and not isinstance(sig_ahead_id, str) and not isinstance(sig_ahead_id, int):
-        logging.error("Signal "+str(sig_id)+": update_colour_light_signal - Signal Ahead ID must be an int or str")
-    elif not signal_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal does not exist")
-    elif sig_ahead_id is not None and str(sig_ahead_id).casefold() != "STOP".casefold() and not signal_exists(sig_ahead_id):
-        logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
-    elif str(sig_id) == str(sig_ahead_id): 
-        logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
-    elif signals[str(sig_id)]["sigtype"] != signal_type.colour_light:
-        logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Not a colour light signal")
-    else:
-        signals_colour_lights.update_colour_light_signal(sig_id, sig_ahead_id)
-    return()
 
 #---------------------------------------------------------------------------------------------
 # API function to delete a Signal library object (including all the drawing objects)

@@ -263,6 +263,8 @@ def create_colour_light_signal (canvas, sig_id:int,
         if loaded_state["sigclear"] or fully_automatic: signals.toggle_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals.lock_signal(sig_id)
+        # Update the signal to show the initial aspect (and send out DCC/MQTT commands)
+        update_colour_light_signal(sig_id)
         # Now set the inoitial state of the subsidary (if one has been specified)
         if has_subsidary:
             # If the loaded state is 'Clear' then toggle the subsidary to 'OFF' (which will update the

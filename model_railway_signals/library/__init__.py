@@ -49,7 +49,7 @@ from .signals import subsidary_clear
 from .signals import signal_state
 from .signals import subsidary_state
 from .signals import trigger_timed_signal
-from .signals import update_colour_light_signal
+from .signals import update_signal_aspect
 from .signals import reset_signals_mqtt_configuration
 from .signals import subscribe_to_remote_signals
 from .signals import set_signals_to_publish_state
@@ -313,7 +313,7 @@ __all__ = [
         'signal_state',
         'subsidary_state',
         'trigger_timed_signal',
-        'update_colour_light_signal',
+        'update_signal_aspect',
         'reset_signals_mqtt_configuration',
         'subscribe_to_remote_signals',
         'set_signals_to_publish_state',
