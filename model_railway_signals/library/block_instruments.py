@@ -78,8 +78,6 @@ import os
 import logging
 import pathlib
 import tkinter as Tk
-import threading
-import queue
 from typing import Union
 
 from . import common
@@ -121,27 +119,18 @@ instruments = {}
 list_of_instruments_to_publish = []
 
 # --------------------------------------------------------------------------------
-# Thread to play sounds - to minimise risk of segmentation errors
+# Function to play sounds - with exception handling just in case
 # --------------------------------------------------------------------------------
 
-audio_queue = queue.Queue()
-
-def audio_playback_thread():
-    active_sound = None
-    while True:
+def play_sound_file(sound_file):
+    if audio_enabled:
         try:
-            sound_object = audio_queue.get()
-            # If a sound is currently playing, stop it (or skip)
-            if active_sound is not None and active_sound.is_playing():
-                active_sound.stop()
-            active_sound = sound_object.play()
+            audio_object = simpleaudio.WaveObject.from_wave_file(sound_file)
+            audio_object.play()
         except Exception as exception:
-            logging.error(f"Block Instruments - Audio playback error: {exception}")
-
-threading.Thread(target=audio_playback_thread, daemon=True).start()
-
-def play_sound_object(sound_object):
-    audio_queue.put(sound_object)
+            logging.error("Block Instruments: Error playing sound file: "+sound_file)
+            logging.error("Block Instruments: Reported exception: "+str(exception))
+    return()
 
 # --------------------------------------------------------------------------------
 # Internal Function to Open a window containing a list of common signal box bell
@@ -247,7 +236,7 @@ def telegraph_key_button(inst_id:int):
     common.root_window.after(200,lambda:reset_telegraph_button(inst_id))
     # Sound the "clack" of the telegraph key
     if instruments[str(inst_id)]["telegraphsound"] is not None:
-        play_sound_object(instruments[str(inst_id)]["telegraphsound"])
+        play_sound_file(instruments[str(inst_id)]["telegraphsound"])
     # If linked to another instrument then call the function to ring the bell on the other instrument or
     # Publish the "bell ring event" to the broker (for other nodes to consume). Note that events will only
     # be published if the MQTT interface has been configured and we are connected to the broker
@@ -271,7 +260,7 @@ def ring_section_bell(inst_id:int):
     # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
     # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
     if instruments[str(inst_id)]["bellsound"] is not None:
-        play_sound_object(instruments[str(inst_id)]["bellsound"])
+        play_sound_file(instruments[str(inst_id)]["bellsound"])
     return()
 
 def reset_telegraph_button(inst_id:int):
@@ -555,27 +544,17 @@ def create_block_indicator(canvas:int, x:int, y:int, canvas_tag):
 # If the filename isn't fully qualified then it assume a file in the resources folder
 # --------------------------------------------------------------------------------
 
-def load_audio_file(audio_filename):
-    audio_object = None
+def get_audio_path(audio_filename):
     if os.path.split(audio_filename)[1] == audio_filename:
         current_folder = pathlib.Path(__file__).parent
         fully_qualified_file_name = current_folder / 'resources' / audio_filename
-        try:
-            audio_object = simpleaudio.WaveObject.from_wave_file(str(fully_qualified_file_name))
-        except Exception as exception:
-            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
-                            message="Error loading audio resource file '"+str(audio_filename)+"'")
-            logging.error("Block Instruments: Error loading audio resource file '"+str(audio_filename)+"'"+
-                           " \nReported Exception: "+str(exception))       
-    else:        
-        try:
-            audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
-        except Exception as exception:
-            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
-                            message="Error loading audio file '"+str(audio_filename)+"'")
-            logging.error("Block Instruments: Error loading audio file '"+str(audio_filename)+"'"+
-                           " \nReported Exception: "+str(exception))       
-    return(audio_object)
+    else:
+        fully_qualified_file_name = pathlib.Path(audio_filename)
+    if fully_qualified_file_name.exists():
+        return(str(fully_qualified_file_name))
+    else:
+        logging.error(f"Block Instruments: Audio file not found: {fully_qualified_file_name}")
+        return(None)
 
 # --------------------------------------------------------------------------------
 # Public API function to create a Block  Instrument (drawing objects and internal state)
@@ -639,13 +618,13 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
             rep_ind_block, rep_ind_clear, rep_ind_occup = my_ind_block, my_ind_clear, my_ind_occup
         else:
             rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator(canvas, x, y-55, canvas_tag)
-        # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
-        # if these fail to load for any reason then no sounds will be produced on these events
+        # Try to find the specified audio files for the bell rings and telegraph key if audio is enabled
+        # if these cannot be found then no sounds will be produced on these events
         if audio_enabled:
-            bell_audio = load_audio_file(bell_sound_file)
-            telegraph_audio = load_audio_file(telegraph_sound_file)
+            bell_audio = get_audio_path(bell_sound_file)
+            telegraph_audio = get_audio_path(telegraph_sound_file)
         else:
-            logging.warning ("Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
+            logging.warning ("Instruments - Not running on Linux - Sound is disabled")
             bell_audio = None
             telegraph_audio = None
         # Create the dictionary of elements that we need to track
@@ -667,8 +646,8 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         instruments[str(inst_id)]["repeatindicatorclear"] = rep_ind_clear    # Tkinter Drawing object
         instruments[str(inst_id)]["repeatindicatoroccup"] = rep_ind_occup    # Tkinter Drawing object
         instruments[str(inst_id)]["repeatindicatorblock"] = rep_ind_block    # Tkinter Drawing object
-        instruments[str(inst_id)]["telegraphsound"] = telegraph_audio        # Sound file for the telegraph "clack"
-        instruments[str(inst_id)]["bellsound"] = bell_audio                  # Sound file for the bell "Ting"
+        instruments[str(inst_id)]["telegraphsound"] = telegraph_audio        # Filename for the telegraph "clack"
+        instruments[str(inst_id)]["bellsound"] = bell_audio                  # Filename for the bell "Ting"
         instruments[str(inst_id)]["tags"] = canvas_tag                       # Canvas Tags for all drawing objects
         # Get the initial state for the instrument (if layout state has been loaded)
         # if nothing has been loaded then the default state (of LINE BLOCKED) will be applied
