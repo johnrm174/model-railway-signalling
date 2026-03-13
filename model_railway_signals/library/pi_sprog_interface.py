@@ -202,17 +202,21 @@ tx_thread.start()
 def thread_to_read_received_data():
     while True:
         try:
-            if serial_port.is_open and serial_port.in_waiting > 0:
-                # Blocks efficiently until ';' is received or the connection drops
-                byte_string = serial_port.read_until(b';')
-                if byte_string:
-                    if debug: logging.debug(f"Pi-SPROG: Rx thread - Received: {byte_string.decode('Ascii', errors='ignore')}")
-                    process_received_data(byte_string)
+            if serial_port and serial_port.is_open:
+                if serial_port.in_waiting > 0:
+                    # Blocks efficiently until ';' is received or the connection drops
+                    byte_string = serial_port.read_until(b';')
+                    if byte_string:
+                        if debug: logging.debug(f"Pi-SPROG: Rx thread - Received: {byte_string.decode('Ascii', errors='ignore')}")
+                        process_received_data(byte_string)
+                else:
+                    # Small sleep to yield to other threads when no data is arriving
+                    time.sleep(0.01)
             else:
-                # Small sleep to yield to other threads when no data is arriving
-                time.sleep(0.01)
+                # Port is closed, just sleep and wait for it to be re-opened
+                time.sleep(0.1)
         except Exception as exception:
-             if debug: logging.error(f"Pi-SPROG: Rx thread - Exception: {exception}")
+            pass
 
 rx_thread = threading.Thread(target=thread_to_read_received_data, daemon=True)
 rx_thread.start()
