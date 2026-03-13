@@ -406,7 +406,7 @@ def initialise_test_harness(filename=None):
         run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),timeout=2.0)
     else:
         # Ensure any queued tkinter events have completed
-        print ("System Tests: Load Scematic: '",filename,"'")
+        print ("System Tests: Load Scematic: '"+str(filename)+"'")
         run_function(lambda:main_menubar.load_schematic(filename),timeout=5.0)
 
 # ------------------------------------------------------------------------------
@@ -417,8 +417,8 @@ def initialise_test_harness(filename=None):
 def report_results():
     print ("")
     print ("##################################################################################################################")
-    print ("Tests Run:"+str(tests_executed)+ "  Tests Passed:"+str(tests_executed-test_failures)+
-           "  Test failures"+str(test_failures)+"  Test Warnings"+str(test_warnings))
+    print ("Tests Run: "+str(tests_executed)+ "  Tests Passed: "+str(tests_executed-test_failures)+
+           "  Test failures: "+str(test_failures)+"  Test Warnings: "+str(test_warnings))
     print ("##################################################################################################################")
     print ("")
     
