@@ -1383,6 +1383,7 @@ class edit_general_settings():
         global edit_general_settings_window
         edit_general_settings_window = None
         self.window.destroy()
+
 #------------------------------------------------------------------------------------
 # Class for the Sound Settings toolbar window. Note the init function takes
 # in a callback so it can apply the updated settings in the main editor application.
@@ -1425,7 +1426,9 @@ class sound_file_mapping(Tk.Frame):
     def get_value(self):
         # Returned value is a list comprising [filename:str, dcc_command]
         # The DCC command is a list comprising [dcc_address:int, dcc_state:bool]
-        return([self.soundfile.get_value(), self.dcccommand.get_value()])
+        if self.soundfile.get_value() == "": value_to_return = None
+        else: value_to_return = [self.soundfile.get_value(), self.dcccommand.get_value()]
+        return(value_to_return)
 
     def set_value(self, value_to_set:list):
         # value_to_set is a list comprising [filename:str, dcc_command]
@@ -1475,7 +1478,13 @@ class edit_sounds_settings():
     def save_state(self, close_window:bool):
         if self.dccmappings.validate():
             self.validation_error.pack_forget()
-            settings.set_control("dccsoundmappings",self.dccmappings.get_values())
+            # Only extract valid entries
+            values_to_set = []
+            entered_values = self.dccmappings.get_values()
+            for entered_value in entered_values:
+                if entered_value is not None:
+                    values_to_set.append(entered_value)
+            settings.set_control("dccsoundmappings",values_to_set)
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )

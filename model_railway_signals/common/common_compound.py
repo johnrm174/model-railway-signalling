@@ -32,7 +32,7 @@ class sound_file_entry(Tk.Frame):
     def __init__(self, parent_frame, label:str, tool_tip:str, base_folder:str):
         super().__init__(parent_frame)
         self.base_folder = base_folder
-        self.full_filename = None
+        self.full_filename = ""
         # Flag to test if a load file or error dialog is open or not
         self.child_windows_open = False
         # Create the various UI elements
@@ -67,7 +67,7 @@ class sound_file_entry(Tk.Frame):
         self.EB.set_value(file_name)
 
     def get_value(self):
-        return(self.full_filename)
+        return(str(self.full_filename))
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a validated_dcc_command_entry [address:int, state:bool].

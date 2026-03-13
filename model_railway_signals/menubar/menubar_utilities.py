@@ -481,11 +481,14 @@ class dcc_programming():
         if self.dcc_power_state: library.request_dcc_power_off()
         else: library.request_dcc_power_on()
 
-    def destroy(self):
+    def close_window(self):
         global dcc_programming_window
         library.unsubscribe_from_local_dcc_power_updates(self.dcc_power_updated)
         dcc_programming_window = None
         self.window.destroy()
+
+    def destroy(self):
+        self.close_window()
 
 #############################################################################################
 
