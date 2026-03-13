@@ -40,6 +40,7 @@ def sig_passed(signal_id):
     logging.info(logging_string)
     
 def run_library_api_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library API Tests - Signal Objects")
     canvas = schematic.canvas
@@ -453,10 +454,6 @@ def run_library_api_tests():
     signals.toggle_subsidary(2)    
     assert not signals.subsidary_clear(1)
     print("Library Tests - signal_state (validation failures) - will generate 2 errors:")
-    # Colour light signals do not update their aspects on creation (state defaults to 'None'
-    # they rely on the 'update_colour_light_signal' function being called
-    assert signals.signal_state("1") == None                               # Valid - ID str
-    signals.update_colour_light_signal(1)                                  # Valid - ID must be an int
     assert signals.signal_state("1") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.signal_state("2") == signals.signal_state_type.DANGER   # Valid - ID str
     assert signals.signal_state("3") == signals.signal_state_type.CAUTION  # Valid - ID str
@@ -491,7 +488,7 @@ def run_library_api_tests():
     # Theatre Route indication (note we need to update the signal aspect after creation
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
     signals.set_route(10, theatre_text="1") # Success
     signals.set_route(10, theatre_text="2") # Success
     signals.delete_signal(10)
@@ -507,17 +504,17 @@ def run_library_api_tests():
     # Create an additional signal with a theatre route indicator for this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250,
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated, theatre_route_indicator=True)
-    signals.update_colour_light_signal(1,sig_ahead_id=10)    # Success
-    signals.update_colour_light_signal(1,sig_ahead_id="10")  # Success
-    signals.update_colour_light_signal("1",sig_ahead_id=10)  # Fail - Sig ID not an int
-    signals.update_colour_light_signal(1,sig_ahead_id=10.1)  # Fail - Sig ahead ID not an int or str
-    signals.update_colour_light_signal(6,sig_ahead_id=10)    # Fail - Sig ID does not exist
-    signals.update_colour_light_signal(1,sig_ahead_id=6)     # Fail - Sig ahead ID does not exist
-    signals.update_colour_light_signal(1,sig_ahead_id=1)     # Fail - Sig ahead ID is same as sig ID
-    signals.update_colour_light_signal(2,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
-    signals.update_colour_light_signal(3,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
-    signals.update_colour_light_signal(4,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
-    signals.update_colour_light_signal(5,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
+    signals.update_signal_aspect(1,sig_ahead_id=10)    # Success
+    signals.update_signal_aspect(1,sig_ahead_id="10")  # Success
+    signals.update_signal_aspect("1",sig_ahead_id=10)  # Fail - Sig ID not an int
+    signals.update_signal_aspect(1,sig_ahead_id=10.1)  # Fail - Sig ahead ID not an int or str
+    signals.update_signal_aspect(6,sig_ahead_id=10)    # Fail - Sig ID does not exist
+    signals.update_signal_aspect(1,sig_ahead_id=6)     # Fail - Sig ahead ID does not exist
+    signals.update_signal_aspect(1,sig_ahead_id=1)     # Fail - Sig ahead ID is same as sig ID
+    signals.update_signal_aspect(2,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
+    signals.update_signal_aspect(3,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
+    signals.update_signal_aspect(4,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
+    signals.update_signal_aspect(5,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
     # Delete the additional signal we created for this test
     signals.delete_signal(10)
     print("Library Tests - trigger_timed_signal (validation failures) - will generate 8 errors:")
@@ -576,6 +573,11 @@ def run_library_api_tests():
     signals.delete_signal(3)
     signals.delete_signal(2)
     signals.delete_signal(1)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 128
+    assert system_test_harness.get_warning_logs_generated() == 12
     return()
     
 #---------------------------------------------------------------------------------------------------------
@@ -583,6 +585,7 @@ def run_library_api_tests():
 #---------------------------------------------------------------------------------------------------------
     
 def run_timed_signal_tests():
+    system_test_harness.reset_log_counters()
     print("Library Tests - Timed Signals")
     canvas = schematic.canvas
     # Set up the initial test conditions
@@ -601,16 +604,6 @@ def run_timed_signal_tests():
     create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100,
                             sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     # Note that colour light signals need to be updated to display the correct aspect
-    assert signals.signal_state(1) == None
-    assert signals.signal_state(2) == None
-    assert signals.signal_state(3) == None
-    assert signals.signal_state(4) == None
-    assert signals.signal_state(5) == None
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -625,11 +618,13 @@ def run_timed_signal_tests():
     signals.toggle_signal(5)
     signals.toggle_signal(6)
     signals.toggle_signal(7)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -695,11 +690,11 @@ def run_timed_signal_tests():
     # Note that we need to update colour light signals for the aspects to be updated
     # After a signal passed event (generated after a delayed start)
     time.sleep(1.1)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -728,6 +723,11 @@ def run_timed_signal_tests():
     signals.delete_signal(5)
     signals.delete_signal(6)
     signals.delete_signal(7)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -735,6 +735,7 @@ def run_timed_signal_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_signal_aspect_tests():
+    system_test_harness.reset_log_counters()
     canvas = schematic.canvas
     print("Library Tests - signal aspect tests - no errors")
     # Set up the initial test conditions
@@ -752,16 +753,6 @@ def run_signal_aspect_tests():
     create_ground_disc_signal(canvas, 12, signals.ground_disc_subtype.standard, 500, 200, sig_switched, sig_passed)
     create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 600, 200, sig_switched, sig_passed)
     # All signals ON (note that colour light signals need to be updated to display the correct aspect
-    assert signals.signal_state(1) == None
-    assert signals.signal_state(2) == None
-    assert signals.signal_state(3) == None
-    assert signals.signal_state(4) == None
-    assert signals.signal_state(5) == None
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -789,11 +780,19 @@ def run_signal_aspect_tests():
     signals.toggle_signal(11)
     signals.toggle_signal(12)
     signals.toggle_signal(13)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -821,11 +820,19 @@ def run_signal_aspect_tests():
     signals.set_signal_override(11)
     signals.set_signal_override(12)
     signals.set_signal_override(13)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -852,11 +859,19 @@ def run_signal_aspect_tests():
     signals.clear_signal_override(11)
     signals.clear_signal_override(12)
     signals.clear_signal_override(13)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -876,10 +891,19 @@ def run_signal_aspect_tests():
     signals.set_signal_override_caution(3)
     signals.set_signal_override_caution(4)
     signals.set_signal_override_caution(7)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.CAUTION
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -890,10 +914,19 @@ def run_signal_aspect_tests():
     signals.clear_signal_override_caution(3)
     signals.clear_signal_override_caution(4)
     signals.clear_signal_override_caution(7)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(4)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -905,10 +938,19 @@ def run_signal_aspect_tests():
     signals.set_approach_control(3,release_on_yellow=False)
     signals.set_approach_control(5,release_on_yellow=False)
     signals.set_approach_control(6,release_on_yellow=False)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.DANGER
     assert signals.signal_state(2) == signals.signal_state_type.DANGER
     assert signals.signal_state(3) == signals.signal_state_type.DANGER
@@ -919,10 +961,19 @@ def run_signal_aspect_tests():
     signals.clear_approach_control(3)
     signals.clear_approach_control(5)
     signals.clear_approach_control(6)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
-    signals.update_colour_light_signal(3)
-    signals.update_colour_light_signal(5)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
+    signals.update_signal_aspect(3)
+    signals.update_signal_aspect(4)
+    signals.update_signal_aspect(5)
+    signals.update_signal_aspect(6)
+    signals.update_signal_aspect(7)
+    signals.update_signal_aspect(8)
+    signals.update_signal_aspect(9)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -931,14 +982,14 @@ def run_signal_aspect_tests():
     # Signals subject to 'Release on Yellow' approach control
     signals.set_approach_control(1,release_on_yellow=True)
     signals.set_approach_control(2,release_on_yellow=True)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
     assert signals.signal_state(1) == signals.signal_state_type.CAUTION_APP_CNTL
     assert signals.signal_state(2) == signals.signal_state_type.CAUTION_APP_CNTL
     signals.clear_approach_control(1)
     signals.clear_approach_control(2)
-    signals.update_colour_light_signal(1)
-    signals.update_colour_light_signal(2)
+    signals.update_signal_aspect(1)
+    signals.update_signal_aspect(2)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     # Slotting for secondary distant semaphore signals
@@ -949,16 +1000,20 @@ def run_signal_aspect_tests():
     assert signals.signal_state(16) == signals.signal_state_type.CAUTION
     assert signals.signal_state(6) == signals.signal_state_type.CAUTION
     signals.toggle_signal(16)
+    signals.update_signal_aspect(16)
     assert signals.signal_state(16) == signals.signal_state_type.PROCEED
     assert signals.signal_state(6) == signals.signal_state_type.PROCEED
     signals.toggle_signal(6)
+    signals.update_signal_aspect(6)
     # When the home arm is at danger the distant arm will be set to CAUTION
     assert signals.signal_state(16) == signals.signal_state_type.CAUTION
     assert signals.signal_state(6) == signals.signal_state_type.DANGER
     signals.toggle_signal(6)
+    signals.update_signal_aspect(6)
     assert signals.signal_state(16) == signals.signal_state_type.PROCEED
     assert signals.signal_state(6) == signals.signal_state_type.PROCEED
     signals.toggle_signal(16)
+    signals.update_signal_aspect(16)
     assert signals.signal_state(16) == signals.signal_state_type.CAUTION
     assert signals.signal_state(6) == signals.signal_state_type.CAUTION
     signals.delete_signal(16)
@@ -969,11 +1024,11 @@ def run_signal_aspect_tests():
                                sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     # First aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.PROCEED
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -981,11 +1036,11 @@ def run_signal_aspect_tests():
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.DANGER
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.CAUTION
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -993,11 +1048,11 @@ def run_signal_aspect_tests():
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.CAUTION
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.PRELIM_CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -1005,11 +1060,11 @@ def run_signal_aspect_tests():
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.PRELIM_CAUTION
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -1017,11 +1072,11 @@ def run_signal_aspect_tests():
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.CAUTION_APP_CNTL
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.FLASH_CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.FLASH_CAUTION
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION         # Red/Yellow - so no flashing aspect
@@ -1031,11 +1086,11 @@ def run_signal_aspect_tests():
     time.sleep(2.0)
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_CAUTION
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.FLASH_PRELIM_CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -1045,11 +1100,11 @@ def run_signal_aspect_tests():
     time.sleep(2.0)
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_PRELIM_CAUTION
-    signals.update_colour_light_signal(1,20)
-    signals.update_colour_light_signal(2,20)
-    signals.update_colour_light_signal(3,20)
-    signals.update_colour_light_signal(4,20)
-    signals.update_colour_light_signal(5,20)
+    signals.update_signal_aspect(1,20)
+    signals.update_signal_aspect(2,20)
+    signals.update_signal_aspect(3,20)
+    signals.update_signal_aspect(4,20)
+    signals.update_signal_aspect(5,20)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     assert signals.signal_state(2) == signals.signal_state_type.PROCEED
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -1057,11 +1112,11 @@ def run_signal_aspect_tests():
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
     # Signal ahead specified as "STOP"
     signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_PRELIM_CAUTION
-    signals.update_colour_light_signal(1,"STOP")
-    signals.update_colour_light_signal(2,"STOP")
-    signals.update_colour_light_signal(3,"STOP")
-    signals.update_colour_light_signal(4,"STOP")
-    signals.update_colour_light_signal(5,"STOP") # Home signal
+    signals.update_signal_aspect(1,"STOP")
+    signals.update_signal_aspect(2,"STOP")
+    signals.update_signal_aspect(3,"STOP")
+    signals.update_signal_aspect(4,"STOP")
+    signals.update_signal_aspect(5,"STOP") # Home signal
     assert signals.signal_state(1) == signals.signal_state_type.CAUTION
     assert signals.signal_state(2) == signals.signal_state_type.CAUTION
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
@@ -1082,6 +1137,11 @@ def run_signal_aspect_tests():
     signals.delete_signal(11)
     signals.delete_signal(12)
     signals.delete_signal(13)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1089,6 +1149,7 @@ def run_signal_aspect_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_signal_route_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     print("Library Tests - signal route tests - no errors")
@@ -1217,6 +1278,11 @@ def run_signal_route_tests():
     signals.delete_signal(3)
     signals.delete_signal(4)
     signals.delete_signal(5)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1224,6 +1290,7 @@ def run_signal_route_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_signal_button_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     print("Library Tests - signal button tests - Will generate 4 Errors")
@@ -1300,6 +1367,11 @@ def run_signal_button_tests():
     signals.delete_signal(3)
     signals.delete_signal(4)
     signals.delete_signal(5)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 4
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1307,6 +1379,7 @@ def run_signal_button_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_mode_change_tests():
+    system_test_harness.reset_log_counters()
     canvas = schematic.canvas
     print("Library Tests - Run Mode change tests (hidden buttons)")
     # Create signals in Run Mode (This is the default mode and we haven't changed it in any other tests)
@@ -1454,6 +1527,11 @@ def run_mode_change_tests():
     signals.delete_signal(18)
     signals.delete_signal(19)
     signals.delete_signal(20)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1461,6 +1539,7 @@ def run_mode_change_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_style_update_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     print("Library Tests - Run Style Update tests - will generate 2 Errors")
@@ -1527,6 +1606,11 @@ def run_style_update_tests():
     # Clean up
     signals.delete_signal(1)
     signals.configure_edit_mode(edit_mode=False)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 2
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
     
 #---------------------------------------------------------------------------------------------------------
@@ -1534,6 +1618,7 @@ def run_style_update_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_approach_control_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     # Create some signals for this test
@@ -1545,12 +1630,14 @@ def run_approach_control_tests():
     # Set up the initial test conditions (for Approach Control Release on Red)
     signals.toggle_signal(10)
     signals.toggle_signal(11)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     assert signals.signal_state(11) == signals.signal_state_type.PROCEED
     signals.set_approach_control(10, release_on_yellow=False, force_set=False)
     signals.set_approach_control(11, release_on_yellow=False, force_set=False)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert signals.signals["10"]["releaseonred"]
     assert signals.signals["11"]["releaseonred"]
     assert not signals.signals["10"]["released"]
@@ -1560,7 +1647,8 @@ def run_approach_control_tests():
     # Test the signals are released on signal approach events
     signals.approach_release_button_event(10)
     signals.approach_release_button_event(11)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["releaseonred"]
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signals["10"]["released"]
@@ -1570,7 +1658,8 @@ def run_approach_control_tests():
     # Test that approach control cannot normally be reset between approach and passed events
     signals.set_approach_control(10, release_on_yellow=False, force_set=False)
     signals.set_approach_control(11, release_on_yellow=False, force_set=False)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["releaseonred"]
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signals["10"]["released"]
@@ -1580,12 +1669,14 @@ def run_approach_control_tests():
     # Test that approach control can be normally reset after a signal passed event
     signals.sig_passed_button_event(10)
     signals.sig_passed_button_event(11)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["released"]
     assert not signals.signals["11"]["released"]
     signals.set_approach_control(10, release_on_yellow=False, force_set=False)
     signals.set_approach_control(11, release_on_yellow=False, force_set=False)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["released"]
     assert not signals.signals["11"]["released"]    
     assert signals.signals["10"]["releaseonred"]
@@ -1595,7 +1686,8 @@ def run_approach_control_tests():
     # Test that approach control can be 'force set' between approach and release events
     signals.approach_release_button_event(10)
     signals.approach_release_button_event(11)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert signals.signals["10"]["released"]
     assert signals.signals["11"]["released"]    
     assert not signals.signals["10"]["releaseonred"]
@@ -1604,20 +1696,23 @@ def run_approach_control_tests():
     assert signals.signal_state(11) == signals.signal_state_type.PROCEED
     signals.set_approach_control(10, release_on_yellow=False, force_set=True)
     signals.set_approach_control(11, release_on_yellow=False, force_set=True)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["released"]
     assert not signals.signals["11"]["released"]    
     assert signals.signals["10"]["releaseonred"]
     assert signals.signals["11"]["releaseonred"]
     assert signals.signal_state(10) == signals.signal_state_type.DANGER
     assert signals.signal_state(11) == signals.signal_state_type.DANGER
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     # Put everything back to normal for the next test
     signals.approach_release_button_event(10)
     signals.approach_release_button_event(11)
     signals.sig_passed_button_event(10)
     signals.sig_passed_button_event(11)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["releaseonred"]
     assert not signals.signals["11"]["releaseonred"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
@@ -1626,45 +1721,57 @@ def run_approach_control_tests():
     # Set up the initial test conditions (for Approach Control Release on Yellow)
     # We can only test this for colour light signals (not supported by semaphores)
     signals.set_approach_control(10, release_on_yellow=True, force_set=False)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert signals.signals["10"]["releaseonyel"]
     assert not signals.signals["10"]["released"]
     assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
     # Test the signal is released on signal approach events
     signals.approach_release_button_event(10)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["releaseonyel"]
     assert signals.signals["10"]["released"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     # Test that approach control cannot normally be reset between approach and passed events
     signals.set_approach_control(10, release_on_yellow=True, force_set=False)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["releaseonyel"]
     assert signals.signals["10"]["released"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     # Test that approach control can be normally reset after a signal passed event
     signals.sig_passed_button_event(10)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["released"]
     signals.set_approach_control(10, release_on_yellow=True, force_set=False)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["released"]
     assert signals.signals["10"]["releaseonyel"]
     assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
     # Test that approach control can be 'force set' between approach and release events
     signals.approach_release_button_event(10)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert signals.signals["10"]["released"]
     assert not signals.signals["10"]["releaseonyel"]
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     signals.set_approach_control(10, release_on_yellow=True, force_set=True)
-    signals.update_colour_light_signal(10)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert not signals.signals["10"]["released"]
     assert signals.signals["10"]["releaseonyel"]
     assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
     # Clean up
     signals.delete_signal(10)
     signals.delete_signal(11)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1672,16 +1779,16 @@ def run_approach_control_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def color_sig_switched(sig_id:int):
-    signals.update_colour_light_signal(sig_id)
+    signals.update_signal_aspect(sig_id)
 
 def run_ground_signal_slotting_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     print("Library Tests - Slotting of ground signals with main signals - 4 errors")
     # Create some main signals (before the ground signals) for this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 100,
-                    color_sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
-    signals.update_colour_light_signal(10)
+                    sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 100,
                     sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     # Create the ground signals
@@ -1704,7 +1811,6 @@ def run_ground_signal_slotting_tests():
     # Create some main signals (after the ground signals) for this test
     create_colour_light_signal(canvas, 16, signals.signal_subtype.four_aspect, 500, 100,
                     color_sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
-    signals.update_colour_light_signal(16)
     create_semaphore_signal(canvas, 17, signals.semaphore_subtype.home, 650, 100,
                     sig_switched, sub_switched, sig_released, sig_passed, sig_updated)
     # Test the basic signal slotting
@@ -1714,21 +1820,29 @@ def run_ground_signal_slotting_tests():
     assert signals.signal_state(15) == signals.signal_state_type.DANGER
     # Change the main signal to clear - the subsidary should also change to clear
     signals.signal_button_event(10)
+    signals.update_signal_aspect(10)
     assert signals.signal_state(12) == signals.signal_state_type.PROCEED
     signals.signal_button_event(11)
+    signals.update_signal_aspect(11)
     assert signals.signal_state(13) == signals.signal_state_type.PROCEED
     signals.signal_button_event(16)
+    signals.update_signal_aspect(16)
     assert signals.signal_state(14) == signals.signal_state_type.PROCEED
     signals.signal_button_event(17)
+    signals.update_signal_aspect(17)
     assert signals.signal_state(15) == signals.signal_state_type.PROCEED
     # Change the main signal back to danger - the subsidary should also change back to danger
     signals.signal_button_event(10)
+    signals.update_signal_aspect(10)
     assert signals.signal_state(12) == signals.signal_state_type.DANGER
     signals.signal_button_event(11)
+    signals.update_signal_aspect(11)
     assert signals.signal_state(13) == signals.signal_state_type.DANGER
     signals.signal_button_event(16)
+    signals.update_signal_aspect(16)
     assert signals.signal_state(14) == signals.signal_state_type.DANGER
     signals.signal_button_event(17)
+    signals.update_signal_aspect(17)
     assert signals.signal_state(15) == signals.signal_state_type.DANGER
     print("Library Tests - Update slotting of ground signals with main signals - 7 errors")
     # Negative testing of validation
@@ -1741,6 +1855,7 @@ def run_ground_signal_slotting_tests():
     signals.update_slotted_signal(11, 17)     # Fail - invalid signal type
     # Positive testing (main signal at DANGER and main signal at PROCEED)
     signals.signal_button_event(10)
+    signals.update_signal_aspect(10)
     assert signals.signal_state(10) == signals.signal_state_type.PROCEED
     assert signals.signal_state(11) == signals.signal_state_type.DANGER
     assert signals.signal_state(12) == signals.signal_state_type.PROCEED
@@ -1753,7 +1868,9 @@ def run_ground_signal_slotting_tests():
     assert signals.signal_state(13) == signals.signal_state_type.PROCEED
     # Change signals to check all is OK
     signals.signal_button_event(10)
+    signals.update_signal_aspect(10)
     signals.signal_button_event(11)
+    signals.update_signal_aspect(11)
     assert signals.signal_state(10) == signals.signal_state_type.DANGER
     assert signals.signal_state(11) == signals.signal_state_type.PROCEED
     assert signals.signal_state(12) == signals.signal_state_type.PROCEED
@@ -1767,6 +1884,11 @@ def run_ground_signal_slotting_tests():
     signals.delete_signal(15)
     signals.delete_signal(16)
     signals.delete_signal(17)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 11
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1775,6 +1897,7 @@ def run_ground_signal_slotting_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_signal_theate_route_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
     print("Library Tests - signal route tests - no errors")
@@ -1795,8 +1918,8 @@ def run_signal_theate_route_tests():
     signals.set_route(11, theatre_text="B")
     signals.set_route(12, theatre_text="C")
     signals.set_route(13, theatre_text="D")
-    signals.update_colour_light_signal(10)
-    signals.update_colour_light_signal(11)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     # Test the initial state
     assert signals.signals["10"]["theatretext"] == "A"
     assert signals.signals["11"]["theatretext"] == "B"
@@ -1811,8 +1934,8 @@ def run_signal_theate_route_tests():
     signals.set_route(11, theatre_text="F")
     signals.set_route(12, theatre_text="G")
     signals.set_route(13, theatre_text="H")
-    signals.update_colour_light_signal(10)
-    signals.update_colour_light_signal(11)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
     assert signals.signals["10"]["theatretext"] == "E"
     assert signals.signals["11"]["theatretext"] == "F"
     assert signals.signals["12"]["theatretext"] == "G"
@@ -1826,8 +1949,10 @@ def run_signal_theate_route_tests():
     signals.toggle_signal(11)
     signals.toggle_signal(12)
     signals.toggle_signal(13)
-    signals.update_colour_light_signal(10)
-    signals.update_colour_light_signal(11)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signals["10"]["theatretext"] == "E"
     assert signals.signals["11"]["theatretext"] == "F"
     assert signals.signals["12"]["theatretext"] == "G"
@@ -1850,8 +1975,10 @@ def run_signal_theate_route_tests():
     signals.toggle_signal(11)
     signals.toggle_signal(12)
     signals.toggle_signal(13)
-    signals.update_colour_light_signal(10)
-    signals.update_colour_light_signal(11)
+    signals.update_signal_aspect(10)
+    signals.update_signal_aspect(11)
+    signals.update_signal_aspect(12)
+    signals.update_signal_aspect(13)
     assert signals.signals["10"]["theatretext"] == "J"
     assert signals.signals["11"]["theatretext"] == "K"
     assert signals.signals["12"]["theatretext"] == "L"
@@ -1883,6 +2010,11 @@ def run_signal_theate_route_tests():
     signals.delete_signal(11)
     signals.delete_signal(12)
     signals.delete_signal(13)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 #---------------------------------------------------------------------------------------------------------
