@@ -96,6 +96,7 @@ import serial
 import time
 import logging
 import queue
+import os
 
 from . import common
 
@@ -1418,12 +1419,9 @@ def send_emergency_stop_all():
 # testing I've done, this doesn't seem to have any real impact on performance.
 ###################################################################################
 
-# The global flag to indicate if audio is enabled or not
-try:
-    import simpleaudio
-    audio_enabled = True
-except Exception:
-    audio_enabled = False
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+import pygame
+pygame.mixer.init()
 
 # The global dictionary to hold the sound file mappings. The key is the DCC
 # address. Each entry comprises a list of [state:bool, sound_file:str]
@@ -1443,16 +1441,15 @@ def reset_dcc_sound_mappings():
 
 # Internal function to play a sound file if a mapping exists for the DCC command
 def play_dcc_sound_file(address:int, active:bool):
-    if audio_enabled:
-        if address in dcc_sound_mappings.keys() and active == dcc_sound_mappings[address][0]:
-            dcc_sound_file_to_load_and_play = dcc_sound_mappings[address][1]
-            logging.debug("Pi-SPROG: Triggering sound file: "+dcc_sound_file_to_load_and_play)
-            try:
-                audio_object = simpleaudio.WaveObject.from_wave_file(dcc_sound_file_to_load_and_play)
-                audio_object.play()
-            except Exception as exception:
-                logging.error("Pi-SPROG: Error playing sound file: "+dcc_sound_file_to_load_and_play)
-                logging.error("Pi-SPROG: Reported exception: "+str(exception))
+    if address in dcc_sound_mappings.keys() and active == dcc_sound_mappings[address][0]:
+        dcc_sound_file_to_load_and_play = dcc_sound_mappings[address][1]
+        logging.debug("Pi-SPROG: Triggering sound file: "+dcc_sound_file_to_load_and_play)
+        try:
+            audio_object = pygame.mixer.Sound(str(dcc_sound_file_to_load_and_play))
+            audio_object.play()
+        except Exception as exception:
+            logging.error("Pi-SPROG: Error playing sound file: "+dcc_sound_file_to_load_and_play)
+            logging.error("Pi-SPROG: Reported exception: "+str(exception))
     return()
 
 ######################################################################################

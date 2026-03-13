@@ -46,6 +46,7 @@ import tkinter as Tk
 from tkinter import ttk
 from tkinter import font as TkFont
 
+import os
 import time
 import datetime
 import logging
@@ -1388,11 +1389,9 @@ class edit_general_settings():
 # Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
 
-try:
-    import simpleaudio
-    audio_enabled = True
-except Exception:
-    audio_enabled = False
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+import pygame
+pygame.mixer.init()
 
 class sound_file_mapping(Tk.Frame):
     def __init__(self, parent_frame):
@@ -1403,9 +1402,6 @@ class sound_file_mapping(Tk.Frame):
         self.testbutton = Tk.Button(self, text="Test", command=self.play)
         self.testbutton.pack(side=Tk.LEFT)
         self.testbuttonTT = common.CreateToolTip(self.testbutton, "Test playback of the audio file")
-        if not audio_enabled:
-            self.testbutton.configure(state="disabled")
-            self.testbuttonTT.text = "Playback disabled - The simpleaudio package is not installed"
         self.label1 = Tk.Label(self, text="Trigger:")
         self.label1.pack(side=Tk.LEFT)
         self.dcccommand = common.validated_dcc_command_entry(self, item_type="sound",
@@ -1415,15 +1411,13 @@ class sound_file_mapping(Tk.Frame):
         self.label.pack(side=Tk.LEFT)
 
     def play(self):
+        filename = self.soundfile.get_value()
         try:
-            filename = self.soundfile.get_value()
-            audio_object = simpleaudio.WaveObject.from_wave_file(filename)
+            audio_object = pygame.mixer.Sound(str(filename))
             audio_object.play()
         except Exception as exception:
-            logging.error("Error Playing file '"+str(filename)+"'")
-            logging.error("Reported Exception: "+str(exception))
-            Tk.messagebox.showerror(parent=self, title="Load Error",
-                        message="Error playing audio file '"+str(filename)+"'")
+            Tk.messagebox.showerror(parent=self, title="Load Error", message="Error playing audio file '"+str(filename)+"'")
+            logging.error(f"Exception playing audio file {fully_qualified_file_name}: {exception}")
 
     def validate(self):
         return(self.dcccommand.validate())
