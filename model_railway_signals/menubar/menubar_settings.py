@@ -1417,7 +1417,7 @@ class sound_file_mapping(Tk.Frame):
             audio_object.play()
         except Exception as exception:
             Tk.messagebox.showerror(parent=self, title="Load Error", message="Error playing audio file '"+str(filename)+"'")
-            logging.error(f"Exception playing audio file {fully_qualified_file_name}: {exception}")
+            logging.error(f"Exception playing audio file {filename}: {exception}")
 
     def validate(self):
         return(self.dcccommand.validate())

@@ -14,7 +14,6 @@
 #------------------------------------------------------------------------------------
 
 import os
-import logging
 import tkinter as Tk
 
 from . import common_simple
@@ -293,7 +292,7 @@ class signal_route_selections(Tk.Frame):
         self.EB.pack(side=Tk.LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value)
         if self.read_only: self.EB.configure(state="disabled")
-        self.routes = common_compound.route_selections(self, tool_tip, read_only)
+        self.routes = route_selections(self, tool_tip, read_only)
         self.routes.pack(side=Tk.LEFT)
         # Add a spacer to improve the UI appearnace when used in a grid
         self.label2 = Tk.Label(self, width=1)
