@@ -332,8 +332,8 @@ def gpio_triggered_callback(gpio_port:int):
 
 def validate_trigger(gpio_port: int):
     with pending_triggers_lock:
-            if gpio_port in pending_triggers:
-                del pending_triggers[gpio_port]
+        if gpio_port in pending_triggers:
+            del pending_triggers[gpio_port]
     # This runs in a background thread exactly when the timer expires
     common.execute_function_in_tkinter_thread(lambda: gpio_sensor_triggered(gpio_port))
     return()
