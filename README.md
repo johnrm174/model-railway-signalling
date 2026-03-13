@@ -142,18 +142,6 @@ these packages can be installed seperately (prior to installing the model-railwa
 $ pip install paho-mqtt
 $ pip install pyserial
 </pre>
-If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
-then you will also need to install the 'simpleaudio' package. If 'simpleaudio' is not installed then 
-the application will still function correctly (just without sound).
-<pre>
-$ pip install simpleaudio
-</pre>
-If you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
-<pre>
-$ sudo apt-get install libasound2-dev
-</pre>
-Note that for Windows, the 'simpleaudio' it has a dependency  on Microsoft Visual C++ 14.0 or greater 
-(so you will need to ensure Visual Studio 2015 is installed first).
 
 ## Running the application
 
