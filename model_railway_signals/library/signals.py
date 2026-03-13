@@ -713,7 +713,7 @@ def update_signal_aspect(sig_id:int, sig_ahead_id:Union[int,str]=None):
     elif signals[str(sig_id)]["sigtype"] == signal_type.ground_disc:
         signals_ground_disc.update_ground_disc_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
-        signals_colour_lights.update_colour_light_signal(sig_id)
+        signals_colour_lights.update_colour_light_signal(sig_id, sig_ahead_id)
     return()
 
 def update_subsidary_aspect(sig_id:int):
