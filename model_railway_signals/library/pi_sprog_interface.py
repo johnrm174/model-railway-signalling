@@ -212,8 +212,7 @@ def thread_to_read_received_data():
                 # Small sleep to yield to other threads when no data is arriving
                 time.sleep(0.01)
         except Exception as exception:
-            logging.error(f"Pi-SPROG: Rx thread - Exception: {exception}")
-            time.sleep(1.0)
+             if debug: logging.error(f"Pi-SPROG: Rx thread - Exception: {exception}")
 
 rx_thread = threading.Thread(target=thread_to_read_received_data, daemon=True)
 rx_thread.start()
@@ -245,7 +244,7 @@ def process_received_data(byte_string):
             start_pos = 9
         else:
             start_pos = 0
-            logging.warning("Pi-SPROG: Rx thread - Unhandled Message Type: "+byte_string.decode('Ascii')+"\r")
+            if debug: logging.warning("Pi-SPROG: Rx thread - Unhandled Message Type: "+byte_string.decode('Ascii')+"\r")
         if start_pos > 0:
             # Extract exactly 2 characters for the OpCode
             op_hex = msg_str[start_pos : start_pos + 2]
