@@ -20,6 +20,7 @@ from model_railway_signals.editor import schematic
 #---------------------------------------------------------------------------------------------------------
 
 def run_gpio_sensor_library_api_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - GPIO Sensors")
     canvas = schematic.canvas
@@ -154,7 +155,7 @@ def run_gpio_sensor_library_api_tests():
     assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,10,0,0]
     assert gpio_sensors.get_gpio_sensor_callback("box1-23") == [0,0,0,10]
     # Test the triggering of remote sensors:
-    print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 4 errors (objects not existing) and 3 warnings")
+    print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 4 errors (objects not existing) and 7 warnings")
     # Test the latest Message formats (include 'state' and 'connectionevent'
     gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20", "state":True, "tripped":False, "connectionevent":True})
     gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21", "state":False, "tripped":False, "connectionevent":True})
@@ -172,7 +173,7 @@ def run_gpio_sensor_library_api_tests():
     gpio_sensors.handle_mqtt_gpio_sensor_event({"wrongkey": "box1-20"})         # Fail - spurious message
     gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-15"}) # warning - not subscribed
     # Test the circuit breaker tripped message
-    print ("GPIO Sensors - Remote sensor circuit breaker tripped - will generate 2 Errors")
+    print ("GPIO Sensors - Remote sensor circuit breaker tripped - will generate 10 Errors")
     gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-20", "state":False, "tripped":True, "connectionevent":True})
     gpio_sensors.handle_mqtt_gpio_sensor_event({"sourceidentifier": "box1-21", "state":True, "tripped":True, "connectionevent":True})
     # set_gpio_sensors_to_publish_state
@@ -186,12 +187,14 @@ def run_gpio_sensor_library_api_tests():
     print ("GPIO Sensors - Test Publishing of Sensors")
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
-    # Note we have to trigger/release the sensor in the Main Tkinter thread
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(4))   # Sensor 10
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))   # Sensor 11
+    # Trigger the sensor and then wait for the debounce delay (default of 20ms)
+    gpio_sensors.gpio_triggered_callback(4)   # Sensor 10
+    gpio_sensors.gpio_triggered_callback(5)   # Sensor 11
+    time.sleep(0.200)
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(4))    # Sensor 10
+    gpio_sensors.gpio_released_callback(4)    # Sensor 10
+    time.sleep(0.200)
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
     # Transmit all GPIO Sensor stated
@@ -232,9 +235,15 @@ def run_gpio_sensor_library_api_tests():
     print ("GPIO Sensors - gpio_sensor_triggered / gpio_sensor_released - 2 Errors")
     gpio_sensors.gpio_sensor_triggered(1.5)
     gpio_sensors.gpio_sensor_released(1.5)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 51
+    assert system_test_harness.get_warning_logs_generated() == 10
     return()
 
 def run_gpio_triggering_tests():
+    system_test_harness.reset_log_counters()
     #------------------------------------------------------------------------------------------------------
     print ("GPIO Sensors - Basic Sensor triggering/release tests - Triggering Sensors 10, 11, 12, 13")
     print ("GPIO Sensors - Will generate 8 Errors (signals / Track Sensors / Track Sections not existing)")
@@ -257,12 +266,17 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["8"]["sensor_state"] == False
     # Trigger the GPIO inputs
+    # Test An immediate trigger then release won't be detected (as debounce delay is 10ms
+    gpio_sensors.gpio_triggered_callback(5)
+    gpio_sensors.gpio_released_callback(5)
+    time.sleep(0.3)    
+    assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
     # Note we have to trigger/release the sensor in the Main Tkinter thread
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(8))  # Port number for GPIO Sensor 14 (timeout=4.0)
+    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
     time.sleep(0.3)
     # Test the state of the GPIO sensors shortly after triggering (to let the event be processed)
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == True
@@ -271,13 +285,13 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["8"]["sensor_state"] == True
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(8))  # Port number for GPIO Sensor 14 (timeout=4.0)
-    time.sleep(0.1)
+    gpio_sensors.gpio_released_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
     # Test the sensor timeouts 0.1 seconds after release - Port 4 should have been released
+    time.sleep(0.1)
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
     assert gpio_sensors.gpio_port_mappings["6"]["sensor_state"] == True
@@ -313,28 +327,28 @@ def run_gpio_triggering_tests():
     #------------------------------------------------------------------------------------------------------
     print ("GPIO Sensors - Sensor Re-triggering tests (extending trigger timeouts) - Triggering Sensors 10, 11, 12, 13,14")
     print ("  ----  Initial trigger (time=0.0) - Will generate 6 Errors (signals / Track Sensors / Track Sections not existing)")
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(8))  # Port number for GPIO Sensor 14 (timeout=4.0)
+    gpio_sensors.gpio_triggered_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(8)  # Port number for GPIO Sensor 14 (timeout=4.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(4))  # Port number for GPIO Sensor 10 (timeout=0.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(8))  # Port number for GPIO Sensor 14 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(4)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(8)  # Port number for GPIO Sensor 14 (timeout=3.0)
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=0.5) - No errors (trigger periods extended)")
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -342,14 +356,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True    
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=1.0) - No errors (trigger periods extended)")
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -357,14 +371,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True    
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=1.5) - No errors (trigger periods extended)")
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -372,14 +386,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True    
     time.sleep(0.5)
     print ("  ----  Re-trigger Sensors 11,12,13 (time=2.0) - No errors (trigger periods extended)")
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -387,14 +401,14 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == True     
     print ("  ----  Re-trigger Sensors 11,12,13 (time=2.5) - No errors (trigger periods extended)")
     time.sleep(0.5)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_triggered_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_triggered_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_triggered_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_triggered_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Release the GPIO inputs
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(5))  # Port number for GPIO Sensor 11 (timeout=1.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(6))  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.run_function(lambda:gpio_sensors.gpio_released_callback(9))  # Port number for GPIO Sensor 13 (timeout=3.0)
+    gpio_sensors.gpio_released_callback(5)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_released_callback(6)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    gpio_sensors.gpio_released_callback(9)  # Port number for GPIO Sensor 13 (timeout=3.0)
     time.sleep(0.1)
     # Test the sensor state is still true
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == True
@@ -418,6 +432,11 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == False
     # Clean up
     gpio_sensors.delete_all_local_gpio_sensors() 
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 15
+    assert system_test_harness.get_warning_logs_generated() == 0
     return()
 
 def gpio_port_10_status_reporting_callback(status):
@@ -429,6 +448,7 @@ def gpio_port_10_status_reporting_callback(status):
     return()
 
 def run_gpio_circuit_breaker_tests():
+    system_test_harness.reset_log_counters()
     # Note we don't pass triggering/release of sensors into the Main tkinter thread
     # As we want to 'Flood' the system with events faster than they can be processed
     print ("GPIO Sensors - Enable status reporting - Will generate 3 Errors and one 'No Mapping' report")
@@ -436,64 +456,69 @@ def run_gpio_circuit_breaker_tests():
     gpio_sensors.subscribe_to_gpio_port_status(0, gpio_port_10_status_reporting_callback)       # Error (not in list of local ports)
     gpio_sensors.subscribe_to_gpio_port_status("box1", gpio_port_10_status_reporting_callback)  # Error (not a valid remote ID)
     gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)      # No Mapping Report
-    print ("GPIO Sensors - Status Reporting Tests- Will report 'Inactive' => 'Active' => 'Inactive'")
-    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.03, max_events_per_second=100)
+    print ("GPIO Sensors - Status Reporting Tests- Will generate the following reports: 'Inactive' => 'Active' => 'Inactive'")
+    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.100, max_events_per_second=100)
     gpio_sensors.gpio_triggered_callback(10)
+    time.sleep(0.005)
     gpio_sensors.gpio_released_callback(10)
-    time.sleep(1.0)
+    time.sleep(0.500)
     print ("GPIO Sensors - Disable status reporting - Will generate 1 Error")
     assert len
     gpio_sensors.unsubscribe_from_gpio_port_status(4.0) # Error (not an int or str)
     gpio_sensors.unsubscribe_from_gpio_port_status(10) # Port is Mapped, port will be unmapped successfully
     gpio_sensors.unsubscribe_from_gpio_port_status(20) # Port isnt mapped but No Error will be generated
     time.sleep(1.0)
-    print ("GPIO Sensors - Circuit Breaker tests 1 - Will report 'Inactive' => 'Active'")
+    print ("GPIO Sensors - Circuit Breaker tests 1 - will generate the following reports: 'Inactive' => 'Active' => 'Inactive'")
+    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)      # Inactive
     assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
     # 100 or less events in a second shouldn't trip the breaker 
     for count in range(45):
         gpio_sensors.gpio_triggered_callback(10)
+        time.sleep(0.005)
         gpio_sensors.gpio_released_callback(10)
-        time.sleep(0.001)
-    time.sleep(0.1)
+        time.sleep(0.005)
+    time.sleep(0.500)
     assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
-    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)      # Inactive
     gpio_sensors.unsubscribe_from_gpio_port_status(10)
     time.sleep(1.0)
-    print ("GPIO Sensors - Circuit Breaker tests 2 - Will report TRIP and then 'Tripped'")
+    print ("GPIO Sensors - Circuit Breaker tests 2 - will TRIP (7 error messages)and generate a 'Tripped' report")
     # More than 100 events in a second should trip the breaker
     for count in range(55):
         gpio_sensors.gpio_triggered_callback(10)
+        time.sleep(0.005)
         gpio_sensors.gpio_released_callback(10)
-        time.sleep(0.001)
-    time.sleep(0.1)
+        time.sleep(0.005)
+    time.sleep(1.0)
     assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == True
     gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)      # Tripped
     gpio_sensors.unsubscribe_from_gpio_port_status(10)
     time.sleep(1.0)
-    print ("GPIO Sensors - Circuit Breaker tests 3 - Will report 'Inactive' => 'Active' => TRIP => 'Tripped'")
+    print ("GPIO Sensors - Circuit Breaker tests 3 - will generate the following reports: 'Inactive' => 'Active' => 'Inactive'")
     # Check we can re-set the breaker
     gpio_sensors.delete_all_local_gpio_sensors() 
-    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.03, max_events_per_second=100)
+    gpio_sensors.create_gpio_sensor(10, 10, trigger_period=0.001, sensor_timeout=0.100, max_events_per_second=100)
+    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)
     assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
     # 100 or less events in a second shouldn't trip the breaker
     for count in range(45):
         gpio_sensors.gpio_triggered_callback(10)
+        time.sleep(0.005)
         gpio_sensors.gpio_released_callback(10)
-        time.sleep(0.001)
-    time.sleep(0.1)
-    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
-    gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)      # Inactive
-    gpio_sensors.unsubscribe_from_gpio_port_status(10)
+        time.sleep(0.005)
     time.sleep(1.0)
+    assert gpio_sensors.gpio_port_mappings["10"]["breaker_tripped"] == False
+    gpio_sensors.unsubscribe_from_gpio_port_status(10)
+    print ("GPIO Sensors - Circuit Breaker tests 4 - will TRIP (7 error messages) and generate a 'Tripped' report")
     # 101 or more events in a second should trip the breaker
     for count in range(55):
         gpio_sensors.gpio_triggered_callback(10)
+        time.sleep(0.005)
         gpio_sensors.gpio_released_callback(10)
-        time.sleep(0.001)
+        time.sleep(0.005)
     time.sleep(0.1)
     gpio_sensors.subscribe_to_gpio_port_status(10, gpio_port_10_status_reporting_callback)      # Tripped
     gpio_sensors.unsubscribe_from_gpio_port_status(10)
-    print ("GPIO Sensors - test callbacks received after circuit breaker tripped are handled gracefully")
+   # test callbacks received after circuit breaker tripped are handled gracefully
     gpio_sensors.gpio_triggered_callback(10)
     gpio_sensors.gpio_released_callback(10)
     gpio_sensors.gpio_sensor_triggered(10)
@@ -502,6 +527,11 @@ def run_gpio_circuit_breaker_tests():
     # Clean up
     gpio_sensors.unsubscribe_from_all_gpio_port_status()
     gpio_sensors.delete_all_local_gpio_sensors() 
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 18
+    assert system_test_harness.get_warning_logs_generated() == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -511,14 +541,14 @@ def run_gpio_circuit_breaker_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def sprog_status_callback(status):
-    print("Library Tests - Received SPROG Status Mesage: ", status)
+    print("Library Tests - Received SPROG Status Mesage: "+str(status))
     return()
-    
 
 def run_pi_sprog_interface_tests(baud_rate):
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Pi Sprog Interface Tests")
-    print("Library Tests - sprog_connect - 5 Errors will be generated")
+    print("Library Tests - sprog_connect - 6 Errors will be generated")
     assert not pi_sprog_interface.sprog_connect (0, 115200)                              # Fail - Port name not a str
     assert not pi_sprog_interface.sprog_connect ("/dev/serial0", "115200")               # Fail - Baud Rate not an int
     assert not pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, "Mode1")     # Fail - DCC Address Mode not an int
@@ -542,7 +572,9 @@ def run_pi_sprog_interface_tests(baud_rate):
     assert pi_sprog_interface.sprog_disconnect()
     print("Library Tests - service_mode_read_cv - 2 Errors should be generated")
     assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 1, False)     # Success
+    time.sleep(0.25)
     assert pi_sprog_interface.request_dcc_power_on()
+    time.sleep(0.5)
     assert pi_sprog_interface.service_mode_read_cv("1") is None   # Fail
     assert pi_sprog_interface.service_mode_read_cv(1024) is None  # Fail
     cv1_value = pi_sprog_interface.service_mode_read_cv(1)        # Success
@@ -598,12 +630,12 @@ def run_pi_sprog_interface_tests(baud_rate):
     time.sleep(1.0)
     print("Library Tests - send_accessory_short_event - Test different addressing modes")
     assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 2, True)
-    pi_sprog_interface.send_accessory_short_event(1, True)
-    pi_sprog_interface.send_accessory_short_event(1, False)
+    pi_sprog_interface.send_accessory_short_event(5, True)
+    pi_sprog_interface.send_accessory_short_event(5, False)
     time.sleep(0.5)
     assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 3, True)
-    pi_sprog_interface.send_accessory_short_event(1, True)
-    pi_sprog_interface.send_accessory_short_event(1, False)
+    pi_sprog_interface.send_accessory_short_event(5, True)
+    pi_sprog_interface.send_accessory_short_event(5, False)
     time.sleep(0.5)
     print("Library Tests - negative tests - sending commands when port is closed - 2 Warnings will be generated")
     assert pi_sprog_interface.sprog_disconnect()
@@ -621,6 +653,11 @@ def run_pi_sprog_interface_tests(baud_rate):
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=-1)     # Invalid op_code
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=256)    # Invalid op_code
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=8)      # Valid but port is closed
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 21
+    assert system_test_harness.get_warning_logs_generated() == 2
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -630,6 +667,7 @@ def run_pi_sprog_interface_tests(baud_rate):
 #---------------------------------------------------------------------------------------------------------
 
 def run_dcc_control_tests(baud_rate):
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - DCC control Tests - connecting to SPROG first")
     assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate)
@@ -715,7 +753,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_dcc_point(6, 2048, False)   # Fail - Invalid address 
     assert len(dcc_control.dcc_point_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 22
-    print("Library Tests - map_dcc_switch - Two Debug messages - 7 error messages should be generated")
+    print("Library Tests - map_dcc_switch - Two Debug messages - 6 error messages should be generated")
     assert len(dcc_control.dcc_switch_mappings) == 0
     dcc_control.map_dcc_switch(1, on_commands = [[40,True], [41,True]], off_commands = [[40,False], [41,False]])
     dcc_control.map_dcc_switch(2, on_commands = [[42,True], [43,True]], off_commands = [[42,False], [43,False]])
@@ -742,7 +780,7 @@ def run_dcc_control_tests(baud_rate):
     assert dcc_control.dcc_address_mapping(50) is None
     assert dcc_control.dcc_address_mapping("40") is None  # Error - not an int
     assert dcc_control.dcc_address_mapping(2048) is None  # Error - out of range
-    print("Library Tests - update_dcc_point (no errors or warnings - but DCC commands should be sent)")
+    print("Library Tests - update_dcc_point - no errors or warnings - DCC commands should be sent out")
     logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     dcc_control.update_dcc_point(1, True)
     dcc_control.update_dcc_point(1, False)
@@ -750,6 +788,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_point(2, False)
     dcc_control.update_dcc_point(3, True)
     dcc_control.update_dcc_point(3, False)
+    print("Library Tests - update_dcc_signal_aspects - 2 errors (wrong signal types) - DCC commands should be sent out")
     dcc_control.update_dcc_signal_aspects(2, signals.signal_state_type.DANGER) # Error - wrong type
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
@@ -759,11 +798,11 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.FLASH_PRELIM_CAUTION)
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
     dcc_control.update_dcc_signal_aspects(3, signals.signal_state_type.DANGER)
-    print("Library Tests - update_dcc_signal_subsidary - 1 Error - DCC commands should be sent")
+    print("Library Tests - update_dcc_signal_subsidary - 1 Error (wrong signal type) - DCC commands should be sent out")
     dcc_control.update_dcc_signal_subsidary(1, True) # OK
     dcc_control.update_dcc_signal_subsidary(2, True) # Error - wrong type
     dcc_control.update_dcc_signal_subsidary(10, True) # Not Mapped
-    print("Library Tests - update_dcc_signal_element - 2 Errors - DCC commands should be sent")
+    print("Library Tests - update_dcc_signal_element - 2 Errors (wrong signal type) - DCC commands should be sent out")
     dcc_control.update_dcc_signal_element(1, True, element="main_signal")     # error
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")  # error
     dcc_control.update_dcc_signal_element(2, True, element="main_signal")
@@ -777,7 +816,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, True, element="rh2_signal")
     dcc_control.update_dcc_signal_element(2, True, element="rh2_subsidary")
     dcc_control.update_dcc_signal_element(3, True, element="main_subsidary")
-    print("Library Tests - update_dcc_signal_route - 1 Error - DCC commands should be sent)")
+    print("Library Tests - update_dcc_signal_route - 1 Error (wrong signal type) - DCC commands should be sent out")
     dcc_control.update_dcc_signal_route(2,signals.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals.route_type.LH1, True, False)
@@ -788,7 +827,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, False, True)
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, False, False)
     dcc_control.update_dcc_signal_route(3,signals.route_type.MAIN, False, False)
-    print("Library Tests - update_dcc_signal_theatre (no errors or warnings - DCC commands should be sent)")
+    print("Library Tests - update_dcc_signal_theatre - no errors or warnings - DCC commands should be sent out")
     dcc_control.update_dcc_signal_theatre(1,"#", True, False)
     dcc_control.update_dcc_signal_theatre(1,"1", True, False)
     dcc_control.update_dcc_signal_theatre(1,"2", True, False)
@@ -799,7 +838,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_theatre(1,"1", False, True)
     dcc_control.update_dcc_signal_theatre(1,"1", False, False)
     dcc_control.update_dcc_signal_theatre(3,"1", False, False)
-    print("Library Tests - update_dcc_switch (no errors or warnings - but DCC commands should be sent)")
+    print("Library Tests - update_dcc_switch - no errors or warnings - DCC commands should be sent out")
     dcc_control.update_dcc_switch(1, True)
     dcc_control.update_dcc_switch(1, False)
     dcc_control.update_dcc_switch(2, True)
@@ -811,12 +850,12 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.set_node_to_publish_dcc_accessory_commands(True) 
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
-    print("Library Tests - subscribe_to_dcc_accessory_command_feed - 1 Error will be generated")
+    print("Library Tests - subscribe_to_dcc_accessory_command_feed - 1 Error (Invalid Node) will be generated")
     dcc_control.subscribe_to_dcc_accessory_command_feed(100) # Error
     dcc_control.subscribe_to_dcc_accessory_command_feed("Box1")
     print("Library Tests - reset_mqtt_configuration - No warnings or errors")
     dcc_control.reset_dcc_accessory_mqtt_configuration()
-    print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors - DCC Commands should be sent out")
+    print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors (unhandled messages) - DCC Commands should be sent out")
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccstate": True}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"dccaddress": 1000, "dccstate": True}) # Error
@@ -893,6 +932,15 @@ def run_dcc_control_tests(baud_rate):
     assert pi_sprog_interface.request_dcc_power_off()
     assert pi_sprog_interface.sprog_disconnect()
     mqtt_interface.mqtt_broker_disconnect()
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    print("Number of INFO Logs Generated: "+str(system_test_harness.get_info_logs_generated()))
+    print("Number of DEBUG Logs Generated: "+str(system_test_harness.get_debug_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 138
+    assert system_test_harness.get_warning_logs_generated() == 0
+    assert system_test_harness.get_info_logs_generated() == 3
+    assert system_test_harness.get_debug_logs_generated() == 115
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -912,9 +960,10 @@ mqtt_connected = False
 def mqtt_status_callback(connection_status:bool):
     global mqtt_connected
     mqtt_connected = connection_status
-    print("Library Tests - MQTT connection_status is: ",connection_status)
+    print("Library Tests - MQTT connection_status is: " + str(connection_status))
 
 def run_mqtt_interface_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - MQTT Interface Tests")
     print("Library Tests - split_remote_item_identifier")
@@ -1002,6 +1051,11 @@ def run_mqtt_interface_tests():
     # Cleanup
     mqtt_interface.mqtt_broker_disconnect()   
     time.sleep(1.0)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 9
+    assert system_test_harness.get_warning_logs_generated() == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
