@@ -24,6 +24,7 @@ from model_railway_signals.editor import schematic
 #---------------------------------------------------------------------------------------------------------
     
 def run_text_box_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Text Box Objects")
     canvas = schematic.canvas
@@ -99,6 +100,11 @@ def run_text_box_library_tests():
     text_boxes.delete_text_box(4)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(text_boxes.text_boxes) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 8
+    assert system_test_harness.get_warning_logs_generated() == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -112,6 +118,7 @@ def track_sensor_callback(sensor_id):
     logging.info(logging_string)
     
 def run_track_sensor_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Track Sensor Objects")
     canvas = schematic.canvas
@@ -161,6 +168,11 @@ def run_track_sensor_library_tests():
     track_sensors.delete_track_sensor(21)     # success
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(track_sensors.track_sensors) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 8
+    assert system_test_harness.get_warning_logs_generated() == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -181,6 +193,7 @@ def track_section_callback(section_id):
     logging.info(logging_string)
     
 def run_track_section_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Track Section Objects")
     canvas = schematic.canvas
@@ -478,6 +491,11 @@ def run_track_section_library_tests():
     track_sections.delete_section(2)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(track_sections.sections) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 36
+    assert system_test_harness.get_warning_logs_generated() == 8
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -495,6 +513,7 @@ def fpl_callback(point_id):
     logging.info(logging_string)
     
 def run_point_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Point Objects")
     canvas = schematic.canvas
@@ -934,6 +953,11 @@ def run_point_library_tests():
     system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/complex_trackwork.sig")
     # Now clear down the layout for the next series of tests
     system_test_harness.initialise_test_harness()
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 48
+    assert system_test_harness.get_warning_logs_generated() == 6
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -947,6 +971,7 @@ def instrument_callback(instrument_id):
     logging.info(logging_string)
     
 def run_instrument_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Instrument Objects")
     canvas = schematic.canvas
@@ -1242,6 +1267,11 @@ def run_instrument_library_tests():
     block_instruments.delete_instrument(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(block_instruments.instruments) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 31
+    assert system_test_harness.get_warning_logs_generated() == 22
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1251,6 +1281,7 @@ def run_instrument_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_line_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Line Objects")
     canvas = schematic.canvas
@@ -1387,6 +1418,11 @@ def run_line_library_tests():
     lines.delete_line(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(lines.lines) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 20
+    assert system_test_harness.get_warning_logs_generated() == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1404,6 +1440,7 @@ def deselected_callback(button_id):
     logging.info(logging_string)
 
 def run_button_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Button Objects")
     # Ensure we start off in Run Mode
@@ -1505,15 +1542,15 @@ def run_button_library_tests():
     assert buttons.get_button_data(1) == {"data":1}   # success
     print("Library Tests Flash Button - will generate 4 Errors")
     # Note that set/reset button flashing functions need to be executed in the main tkinter thread
-    system_test_harness.run_function(buttons.set_button_flashing("1")) # Fail - ID ot an Int
-    system_test_harness.run_function(buttons.set_button_flashing(10))  # Fail - ID does not exist
-    system_test_harness.run_function(buttons.set_button_flashing(1))   # success
+    buttons.set_button_flashing("1") # Fail - ID ot an Int
+    buttons.set_button_flashing(10)  # Fail - ID does not exist
+    buttons.set_button_flashing(1)   # success
     assert buttons.buttons[str(1)]["flashevent"] is not None
     # Test the next flash event is scheduled and then Let it flash for a bit to excersise the code
-    time.sleep(1.0)
-    system_test_harness.run_function(buttons.reset_button_flashing("1")) # Fail - ID ot an Int
-    system_test_harness.run_function(buttons.reset_button_flashing(10))  # Fail - ID does not exist
-    system_test_harness.run_function(buttons.reset_button_flashing(1))   # success
+    time.sleep(1.2)
+    buttons.reset_button_flashing("1") # Fail - ID ot an Int
+    buttons.reset_button_flashing(10)  # Fail - ID does not exist
+    buttons.reset_button_flashing(1)   # success
     assert buttons.buttons[str(1)]["flashevent"] is None
     print("Library Tests - configure_edit_mode - Creation in Edit Mode - No errors:")
     buttons.configure_edit_mode(edit_mode=True)
@@ -1673,6 +1710,11 @@ def run_button_library_tests():
     buttons.delete_button(1)
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(buttons.buttons) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 29
+    assert system_test_harness.get_warning_logs_generated() == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1691,6 +1733,7 @@ class dummy_event():
         self.keycode = keycode
     
 def run_lever_library_tests():
+    system_test_harness.reset_log_counters()
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Lever Objects")
     canvas = schematic.canvas
@@ -1838,6 +1881,11 @@ def run_lever_library_tests():
     # Clean up
     levers.delete_lever(1)
     assert len(levers.levers) == 0
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 24
+    assert system_test_harness.get_warning_logs_generated() == 4
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1847,6 +1895,7 @@ def run_lever_library_tests():
 #---------------------------------------------------------------------------------------------------------
     
 def run_library_common_tests():
+    system_test_harness.reset_log_counters()
     print("Library Common Tests - interlocking_warning_window")
     canvas = schematic.canvas
     canvas.update_idletasks()
@@ -1863,6 +1912,13 @@ def run_library_common_tests():
     print("Library Common Tests - show/hide item IDs (just to exersise the code)")
     common.toggle_item_ids()
     common.toggle_item_ids()
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
+    print("----------------------------------------------------------------------------------------")
+    print("")
     return()
     
 #---------------------------------------------------------------------------------------------------------
