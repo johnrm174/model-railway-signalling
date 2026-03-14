@@ -192,6 +192,8 @@ def mqtt_publish_thread():
                             info.wait_for_publish(timeout=2.0)
                             # Check whether we have successfully published the message or not
                             if info.is_published():
+                                success = True
+                            else:
                                 logging.warning(f"MQTT Interface: Publish failed (attempt {retries})")
                                 retries = retries + 1
                                 time.sleep(0.5)
