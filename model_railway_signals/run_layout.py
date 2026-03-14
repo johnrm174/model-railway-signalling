@@ -383,19 +383,23 @@ def process_signal_aspect_update(int_or_str_signal_id:Union[int,str]):
     # First update on the signal ahead (only if it is a LOCAL colour light signal)
     # Other local signal types will always display their appropriate aspect
     # The update signal function works with local and remote signal IDs
-    if is_local_id(int_or_str_signal_id) and int(int_or_str_signal_id) < 1000:
-        signal_object = objects.schematic_objects[objects.signal(int_or_str_signal_id)]
-        if signal_object["itemtype"] == library.signal_type.colour_light.value:
-            str_signal_ahead_id = find_signal_ahead(int(int_or_str_signal_id))
-            if str_signal_ahead_id is not None:
-                # Colour Light Signal, with a signal ahead specified
-                library.update_signal_aspect(int(int_or_str_signal_id), str_signal_ahead_id)
+    if is_local_id(int_or_str_signal_id):
+        if int(int_or_str_signal_id) < 1000:
+            signal_object = objects.schematic_objects[objects.signal(int_or_str_signal_id)]
+            if signal_object["itemtype"] == library.signal_type.colour_light.value:
+                str_signal_ahead_id = find_signal_ahead(int(int_or_str_signal_id))
+                if str_signal_ahead_id is not None:
+                    # Colour Light Signal, with a signal ahead specified
+                    library.update_signal_aspect(int(int_or_str_signal_id), str_signal_ahead_id)
+                else:
+                    # Colour light signal with no signal ahead specified
+                    library.update_signal_aspect(int(int_or_str_signal_id))
             else:
-                # Colour light signal with no signal ahead specified
+                # Other signal types (we don't care about the signal ahead)
                 library.update_signal_aspect(int(int_or_str_signal_id))
         else:
-            # Other signal type (wedon't care about the signal ahead)
-            library.update_signal_aspect(int(int_or_str_signal_id))
+            # This must be a secondary distant (with an ID > 1000
+            library.update_signal_aspect(int(int_or_str_signal_id))   
     # Now work back along the route to update signals behind. Note that we do this for
     # all signal types as there could be colour light signals behind this signal
     update_signal_behind(int_or_str_signal_id)
@@ -481,7 +485,7 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
             else:
                 library.clear_approach_control(int_signal_id)
             # Update the displayed signal aspect (Semaphore and colour light signals)
-            process_signal_aspect_update(int_signal_id)    
+            process_signal_aspect_update(int_signal_id)
             # If the displayed aspect has changed then we also need to work back along the route to update
             # the approach control status of any signals behind (for the semaphore approach control use case)
             if library.signal_state(int_signal_id) != initial_signal_aspect:
@@ -990,15 +994,17 @@ def override_distant_signals_based_on_signals_ahead():
             if distant_signal_ahead_at_caution(int_signal_id) or home_signal_ahead_at_danger(int_signal_id):
                 if has_distant_arms(int_signal_id):
                     library.set_signal_override_caution(int_signal_id+1000)
+                    process_signal_aspect_update(int_signal_id+1000)
                 else:
                     library.set_signal_override_caution(int_signal_id)
+                    process_signal_aspect_update(int_signal_id)
             else:
                 if has_distant_arms(int_signal_id):
                     library.clear_signal_override_caution(int_signal_id+1000)
+                    process_signal_aspect_update(int_signal_id+1000)
                 else:
                     library.clear_signal_override_caution(int_signal_id)
-            # Update the signal aspect and propogate any aspect updates back along the route
-            process_signal_aspect_update(int_signal_id)
+                    process_signal_aspect_update(int_signal_id)
     return()
 
 #------------------------------------------------------------------------------------
