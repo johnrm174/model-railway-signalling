@@ -311,6 +311,7 @@ def run_object_deletion_tests():
 ######################################################################################################
 
 def run_all_mqtt_networking_tests():
+    reset_log_counters()
     initialise_test_harness(filename="./test_mqtt_networking.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -320,6 +321,11 @@ def run_all_mqtt_networking_tests():
     run_remote_gpio_sensor_tests()
     run_specific_signal_ahead_tests()
     run_object_deletion_tests()
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+    assert get_error_logs_generated() == 0
+    assert get_warning_logs_generated() == 0
     report_results()
     
 if __name__ == "__main__":
