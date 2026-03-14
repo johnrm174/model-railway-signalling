@@ -398,8 +398,8 @@ def process_signal_aspect_update(int_or_str_signal_id:Union[int,str]):
                 # Other signal types (we don't care about the signal ahead)
                 library.update_signal_aspect(int(int_or_str_signal_id))
         else:
-            # This must be a secondary distant (with an ID > 1000
-            library.update_signal_aspect(int(int_or_str_signal_id))   
+            # This must be a secondary distant (with an ID > 1000)
+            library.update_signal_aspect(int(int_or_str_signal_id))
     # Now work back along the route to update signals behind. Note that we do this for
     # all signal types as there could be colour light signals behind this signal
     update_signal_behind(int_or_str_signal_id)
