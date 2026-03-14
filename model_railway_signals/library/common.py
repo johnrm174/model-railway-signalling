@@ -262,7 +262,6 @@ def instant_shutdown():
         shutdown_event.set()
         mqtt_interface.mqtt_publish_shutdown_message()
         mqtt_interface.mqtt_broker_disconnect()
-        mqtt_interface.mqtt_publish_queue.put(None)
         pi_sprog_interface.request_dcc_power_off()
         pi_sprog_interface.sprog_disconnect()
         root_window.destroy()
@@ -283,7 +282,6 @@ def shutdown_step1():
 def shutdown_step2():
     # Disconnect from the broker and shutdown the MQTT publishing thread
     mqtt_interface.mqtt_broker_disconnect()
-    mqtt_interface.mqtt_publish_queue.put(None)
     root_window.after(100, lambda:shutdown_step3())
     return()
 

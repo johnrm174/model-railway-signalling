@@ -173,8 +173,6 @@ def mqtt_publish_thread():
         try:
             # Get the next message from the queue:
             task = mqtt_publish_queue.get()
-            # 'None' is the kill signal for the thread
-            if task is None: break
             # Get the parameters we need
             topic, payload, retain, qos = task
             # This is the signal to disconnect from the broker after all current messages have been published
@@ -183,30 +181,39 @@ def mqtt_publish_thread():
                 common.execute_function_in_tkinter_thread(lambda:mqtt_disconnect_stage0())
             else:
                 success, retries = False, 0
-                # Attempt the publish (with up to 3 re-tries)
-                while not success and retries < 3:
-                    try:
-                        info = mqtt_client.publish(topic, payload, retain=retain, qos=qos)
-                        # Wait with a strict timeout - This prevents a permanent hang
-                        info.wait_for_publish(timeout=2.0)
-                        # Check whether we have successfully published the message or not
-                        if info.is_published():
-                            success = True
-                        else:
-                            retries += 1
-                            logging.warning(f"MQTT Interface: Publish failed (attempt {retries}) - Retrying...")
+                # Only attempt the publish if we are connected to the broker. as we might have disconnected
+                # between the time the message was put on the publish queue and the time we go to publish it.
+                # We attempt to publish 5 times before discarding the message
+                while not success and retries < 5:
+                    if node_config["connected_to_broker"]:
+                        try:
+                            info = mqtt_client.publish(topic, payload, retain=retain, qos=qos)
+                            # Wait with a strict timeout - This prevents a permanent hang
+                            info.wait_for_publish(timeout=2.0)
+                            # Check whether we have successfully published the message or not
+                            if info.is_published():
+                                logging.warning(f"MQTT Interface: Publish failed (attempt {retries})")
+                                retries = retries + 1
+                                time.sleep(0.5)
+                        except Exception as exception:
+                            logging.error(f"MQTT Interface: Publish Exception: {exception} (attempt {retries})")
+                            retries = retries + 1
                             time.sleep(0.5)
-                    except Exception as exception:
-                        retries += 1
-                        logging.error(f"MQTT Interface: Exception during publish: {exception}")
-                        time.sleep(1.0) # Wait for network to stabilize
+                    else:
+                        # Wait until we are connected to the broker before attempting publish
+                        # It has to be an assumption that we will re-connect at some stage
+                        time.sleep(0.5)
                 if not success:
-                    logging.error(f"MQTT Interface: Permanently failed to publish to {topic}")
+                    if node_config["connected_to_broker"]:
+                        logging.error(f"MQTT Interface: Permanently failed to publish to {topic} - Broker still connected")
+                    else:
+                        logging.error(f"MQTT Interface: Permanently failed to publish to {topic} - Broker has disconnected")
+
         except Exception as exception:
             # This catches the "unthinkable" errors (e.g. 'task' unpacking failed)
             logging.critical(f"MQTT Interface: CRITICAL THREAD ERROR: {exception}")
             # Brief sleep to prevent a "rapid-fire" crash loop if the error persists
-            time.sleep(1.0)
+            time.sleep(0.5)
 
 threading.Thread(target=mqtt_publish_thread, daemon=True).start()
 
