@@ -635,14 +635,17 @@ def click_telegraph_key(*instrumentids):
             run_function(lambda:block_instruments.telegraph_key_button(instid))
 
 def simulate_gpio_triggered(*gpioids):
+    def dummy_function(): pass
     for gpioid in gpioids:
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
             run_function(lambda:gpio_sensors.gpio_triggered_callback(gpioid))
-            # Wait 25ms (default GPIO sensor debounce delay = 20ms
-            time.sleep(0.025)
+            # Wait 30ms (default GPIO sensor debounce delay = 20ms
+            time.sleep(0.030)
             run_function(lambda:gpio_sensors.gpio_released_callback(gpioid))
+            # Wait for the event loop to come round again, so we are sure any secondary events have finished
+            run_function(lambda:dummy_function())
 
 def simulate_gpio_on(*gpioids):
     for gpioid in gpioids:
