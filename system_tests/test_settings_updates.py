@@ -91,9 +91,16 @@ def test_gpio_settings_update_functions():
 ######################################################################################################
 
 def run_all_settings_update_tests():
+    system_test_harness.reset_log_counters()
     initialise_test_harness()
     set_edit_mode()
     test_gpio_settings_update_functions()
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
+    assert system_test_harness.get_error_logs_generated() == 0
+    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.report_results()
     report_results()
     
 if __name__ == "__main__":

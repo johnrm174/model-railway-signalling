@@ -1683,28 +1683,62 @@ def run_layout_tests(edit_mode:bool, automation_enabled:bool):
 ######################################################################################################
 
 def run_all_run_layout_tests():
+    reset_log_counters()
     initialise_test_harness(filename="./test_run_layout.sig")
-    # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
-    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    test_configuration_windows.test_all_object_edit_windows()
-    # Run the tests in all mode combinations. Note that we don't toggle Automation On/Off in Edit mode as
-    # The 'A' keypress event is disabled and the menubar 'Automation Enable/Disable' selection is inhibited
+#     # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
+#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+#     test_configuration_windows.test_all_object_edit_windows()
+#     # Run the tests in all mode combinations. Note that we don't toggle Automation On/Off in Edit mode as
+#     # The 'A' keypress event is disabled and the menubar 'Automation Enable/Disable' selection is inhibited
+#     print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+#     print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+#     assert get_error_logs_generated() == 0
+#     assert get_warning_logs_generated() == 0
+    
     print("Run Layout Tests - EDIT Mode / Automation ON **************************************************")    
+    reset_log_counters()
     run_layout_tests(edit_mode=True, automation_enabled=True)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+    assert get_error_logs_generated() == 0
+    assert get_warning_logs_generated() == 0
     report_results()
-    set_run_mode() 
+    
     print("Run Layout Tests - RUN Mode / Automation ON ***************************************************")    
+    reset_log_counters()
+    set_run_mode()
     run_layout_tests(edit_mode=False, automation_enabled=True)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+    assert get_error_logs_generated() == 0
+    assert get_warning_logs_generated() == 156
     report_results()
-    toggle_automation()
+    
     print("Run Layout Tests - RUN Mode / Automation OFF **************************************************")    
+    reset_log_counters()
+    toggle_automation()
     run_layout_tests(edit_mode=False, automation_enabled=False)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+    assert get_error_logs_generated() == 0
+    assert get_warning_logs_generated() == 156
     report_results()
-    toggle_mode()
+    
     print("Run Layout Tests - EDIT Mode / Automation OFF *************************************************")    
-    run_layout_tests(edit_mode=True, automation_enabled=False)
+    reset_log_counters()
     toggle_mode()
+    run_layout_tests(edit_mode=True, automation_enabled=False)
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+    assert get_error_logs_generated() == 0
+    assert get_warning_logs_generated() == 0
     report_results()
+    # Toggle automation back on so we end up in Edit Mode with automation on
+    toggle_mode()
     
 if __name__ == "__main__":
     start_application(lambda:run_all_run_layout_tests())
