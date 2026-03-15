@@ -515,10 +515,16 @@ def run_signal_lever_route_tests():
 ##########################################################################################################################
     
 def run_all_signalbox_lever_tests():
+    reset_log_counters()
     initialise_test_harness()
     run_basic_point_lever_tests()
     run_basic_signal_lever_tests()
     run_signal_lever_route_tests()
+    # Check the total number of Log Messages generated
+    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
+    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
+    assert get_error_logs_generated() == 0
+    assert get_warning_logs_generated() == 28
     report_results()
                 
 if __name__ == "__main__":
