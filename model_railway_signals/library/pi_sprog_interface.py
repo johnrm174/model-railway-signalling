@@ -188,8 +188,7 @@ def thread_to_send_buffered_data():
         except queue.Empty:
             continue
         except Exception as exception:
-            logging.error("Pi-SPROG: Tx thread - Exception: "+str(exception))
-            time.sleep(1.0)
+            time.sleep(0.5)
 
 tx_thread = threading.Thread(target=thread_to_send_buffered_data, daemon=True)
 tx_thread.start()
@@ -216,7 +215,7 @@ def thread_to_read_received_data():
                 # Port is closed, just sleep and wait for it to be re-opened
                 time.sleep(0.1)
         except Exception as exception:
-            pass
+            time.sleep(0.5)
 
 rx_thread = threading.Thread(target=thread_to_read_received_data, daemon=True)
 rx_thread.start()
@@ -236,6 +235,12 @@ def process_received_data(byte_string):
     try:
         # Convert to String and remove the start/end markers
         msg_str = byte_string.decode('Ascii').strip(':;')
+        # Handle short status messages (e.g. :S4; :S5;)that we get when switching telementry on/off
+        # These are interface status reports, not CBUS messages with OpCodes/ We don't really care
+        # about them so we ignore them (so they don't impact the automated system tests)
+        if len(msg_str) == 2 and msg_str.startswith('S'):
+            if debug: logging.debug("Pi-SPROG: CAN Controller State Change - "+msg_str+"\r")
+            return()
         # Find where the OpCode is in the message (depending on the message type)
         # Normal(N): N [Data...] - Opcode position is variable - Position of 'N' + 1
         # Standard (S): S hhhh [OpCode] ...5 (S + 4 hex digits for 11-bit ID)
@@ -267,6 +272,8 @@ def process_received_data(byte_string):
             elif op_code == 0xD0: process_accessory_data(byte_string)
             # Engine Report / Response to DLOC (0xE1 = 225 decimal)
             elif op_code == 0xE1: process_ploc_message(byte_string)
+            # Error Code (from request session) ERR (0x63)
+            elif op_code == 0x63: process_error_message(byte_string)
             # Error Code (from request session) ERR (0x63)
             elif op_code == 0x63: process_error_message(byte_string)
     except:
