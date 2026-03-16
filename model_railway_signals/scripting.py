@@ -294,8 +294,15 @@ def set_signal_on(sigid:int, delay:float=default_delay_time):
         raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signal_clear(sigid):
         raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" is already ON")
+    elif ( ("releaseonred" in signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonred"]) or
+             ("releaseonyel" in  signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonyel"]) ):
+        # From Release 6.2, we allow approach control to be manually released by clicking the signal button
+        # Therefore for this test function, we need to test if the signal is in an  signal approach control
+        # state and click the signal button twice (once to release the signal, once to set it to ON
+        run_function(lambda:signals.signal_button_event(sigid))
+        run_function(lambda:signals.signal_button_event(sigid))
     else:
-        run_function(lambda:signals.signal_button_event(sigid), delay)
+        run_function(lambda:signals.signal_button_event(sigid))
 
 def set_signal_off(sigid:int, delay:float=default_delay_time):
     if str(sigid) not in signals.signals.keys():
