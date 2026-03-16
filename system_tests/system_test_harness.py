@@ -201,19 +201,39 @@ class LogCounterHandler(logging.Handler):
 log_counter = LogCounterHandler()
 
 # API Functions for querying the Log counts
+
 def reset_log_counters():
     log_counter.reset()
-def get_warning_logs_generated():
-    # Returns 0 if 'WARNING' key is missing, otherwise returns the count
-    return(log_counter.get_report().get('WARNING', 0))
-def get_error_logs_generated():
-    return(log_counter.get_report().get('ERROR', 0))
-def get_debug_logs_generated():
-    return(log_counter.get_report().get('DEBUG', 0))
-def get_info_logs_generated():
-    return(log_counter.get_report().get('INFO', 0))
-def get_test_harness_logs_generated():
-    return(log_counter.get_report().get('HARNESS', 0))
+    
+def assert_warning_logs_generated(expected:int):
+    actual = log_counter.get_report().get('WARNING', 0)
+    if expected != actual:
+        raise_test_error (f"assert_warning_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_error_logs_generated(expected:int):
+    actual = log_counter.get_report().get('ERROR', 0)
+    if expected != actual:
+        raise_test_error (f"assert_error_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_debug_logs_generated(expected:int):
+    actual = log_counter.get_report().get('DEBUG', 0)
+    if expected != actual:
+        raise_test_error (f"assert_debug_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_info_logs_generated(expected:int):
+    actual = log_counter.get_report().get('INFO', 0)
+    if expected != actual:
+        raise_test_error (f"assert_info_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_test_harness_logs_generated(expected:int):
+    actual = log_counter.get_report().get('HARNESS', 0)
+    if expected != actual:
+        raise_test_error (f"assert_test_harness_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
 
 # ------------------------------------------------------------------------------
 # Custom Logger
@@ -457,6 +477,13 @@ def set_signals_on(*sigids):
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" does not exist")
         elif not signals.signal_clear(sigid):
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" is already ON")
+        elif ( ("releaseonred" in signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonred"]) or
+                 ("releaseonyel" in  signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonyel"]) ):
+            # From Release 6.2, we allow approach control to be manually released by clicking the signal button
+            # Therefore for this test function, we need to test if the signal is in an  signal approach control
+            # state and click the signal button twice (once to release the signal, once to set it to ON
+            run_function(lambda:signals.signal_button_event(sigid))
+            run_function(lambda:signals.signal_button_event(sigid))
         else:
             run_function(lambda:signals.signal_button_event(sigid))
 

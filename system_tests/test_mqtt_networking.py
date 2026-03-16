@@ -237,7 +237,7 @@ def run_remote_gpio_sensor_tests():
     sleep(network_delay+gpio_trigger_delay)
     assert_sections_occupied(8)
     assert_sections_clear(5,6,7,9)
-    simulate_gpio_triggered(7)
+    simulate_gpio_triggered(9)
     sleep(network_delay+gpio_trigger_delay)
     assert_sections_occupied(9)
     assert_sections_clear(5,6,7,8)
@@ -317,15 +317,16 @@ def run_all_mqtt_networking_tests():
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
     set_run_mode()
+    # Give plenty of time for the broker to connect and synchronisation of initial state
+    sleep(5.0)
     run_basic_networking_tests()
     run_remote_gpio_sensor_tests()
     run_specific_signal_ahead_tests()
     run_object_deletion_tests()
+    time.sleep(1.0)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
-    assert get_error_logs_generated() == 0
-    assert get_warning_logs_generated() == 0
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
 if __name__ == "__main__":

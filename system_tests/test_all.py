@@ -27,11 +27,17 @@ import test_load_layout_failures
 def run_all_tests():
     print("*** Running tests from 'basic_library_tests1.py' ***")
     basic_library_tests1.run_all_basic_library_tests()
-    print("*** Running tests from 'basic_library_tests2.py' ***")
-    basic_library_tests2.run_all_basic_library_tests()
-    print("*** Running tests from 'basic_library_tests3.py' ***")
-    basic_library_tests3.run_all_basic_library_tests()
     system_test_harness.report_results()
+    
+    if system_test_harness.test_failures == 0:
+        print("*** Running tests from 'basic_library_tests2.py' ***")
+        basic_library_tests2.run_all_basic_library_tests()
+        system_test_harness.report_results()
+        
+    if system_test_harness.test_failures == 0:
+        print("*** Running tests from 'basic_library_tests3.py' ***")
+        basic_library_tests3.run_all_basic_library_tests()
+        system_test_harness.report_results()
     
     if system_test_harness.test_failures == 0:
 
@@ -65,8 +71,6 @@ def run_all_tests():
 
         print("*** Running tests from 'test_load_layout_failures.py' ***")
         test_load_layout_failures.run_all_load_layout_negative_tests()
-
-        system_test_harness.report_results()
 
 # The main code starts here
 system_test_harness.start_application(run_all_tests)

@@ -574,10 +574,8 @@ def run_library_api_tests():
     signals.delete_signal(2)
     signals.delete_signal(1)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 128
-    assert system_test_harness.get_warning_logs_generated() == 12
+    system_test_harness.assert_error_logs_generated(128)
+    system_test_harness.assert_warning_logs_generated(12)
     return()
     
 #---------------------------------------------------------------------------------------------------------
@@ -724,10 +722,8 @@ def run_timed_signal_tests():
     signals.delete_signal(6)
     signals.delete_signal(7)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1138,10 +1134,8 @@ def run_signal_aspect_tests():
     signals.delete_signal(12)
     signals.delete_signal(13)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1279,10 +1273,8 @@ def run_signal_route_tests():
     signals.delete_signal(4)
     signals.delete_signal(5)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1368,10 +1360,8 @@ def run_signal_button_tests():
     signals.delete_signal(4)
     signals.delete_signal(5)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 4
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(4)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1528,10 +1518,8 @@ def run_mode_change_tests():
     signals.delete_signal(19)
     signals.delete_signal(20)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1607,10 +1595,8 @@ def run_style_update_tests():
     signals.delete_signal(1)
     signals.configure_edit_mode(edit_mode=False)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 2
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(2)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
     
 #---------------------------------------------------------------------------------------------------------
@@ -1768,10 +1754,8 @@ def run_approach_control_tests():
     signals.delete_signal(10)
     signals.delete_signal(11)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1885,10 +1869,8 @@ def run_ground_signal_slotting_tests():
     signals.delete_signal(16)
     signals.delete_signal(17)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 11
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(11)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -2011,10 +1993,8 @@ def run_signal_theate_route_tests():
     signals.delete_signal(12)
     signals.delete_signal(13)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 #---------------------------------------------------------------------------------------------------------

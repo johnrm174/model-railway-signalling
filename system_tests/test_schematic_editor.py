@@ -1017,7 +1017,7 @@ def run_toggle_of_item_id_tests():
 ######################################################################################################
 
 def run_all_schematic_editor_tests():
-    system_test_harness.reset_log_counters()
+    reset_log_counters()
     initialise_test_harness()
     set_edit_mode()
     run_create_and_place_tests()
@@ -1041,10 +1041,8 @@ def run_all_schematic_editor_tests():
     run_delete_object_tests()
     run_undo_and_redo_tests()
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
 if __name__ == "__main__":

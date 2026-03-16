@@ -68,7 +68,7 @@ def test_all_object_edit_windows():
 ######################################################################################################
 
 def run_all_configuration_window_tests():
-    system_test_harness.reset_log_counters()
+    reset_log_counters()
     initialise_test_harness()
     # Test the basic object edit windows (at creation)
     test_edit_object_windows()
@@ -78,11 +78,8 @@ def run_all_configuration_window_tests():
     initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
     really_do_test_all_object_edit_windows()
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
-    system_test_harness.report_results()
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
 if __name__ == "__main__":

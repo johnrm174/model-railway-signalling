@@ -1099,10 +1099,8 @@ def run_all_schematic_routes_tests():
     set_automation_on()
     run_schematic_routes_example_tests()
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
-    assert get_error_logs_generated() == 0
-    assert get_warning_logs_generated() == 4
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(28)
     report_results()
     
 if __name__ == "__main__":

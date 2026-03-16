@@ -235,11 +235,9 @@ def run_gpio_sensor_library_api_tests():
     print ("GPIO Sensors - gpio_sensor_triggered / gpio_sensor_released - 2 Errors")
     gpio_sensors.gpio_sensor_triggered(1.5)
     gpio_sensors.gpio_sensor_released(1.5)
-    # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 51
-    assert system_test_harness.get_warning_logs_generated() == 10
+    # Check the total number of Log Messages Generated
+    system_test_harness.assert_error_logs_generated(51)
+    system_test_harness.assert_warning_logs_generated(10)
     return()
 
 def run_gpio_triggering_tests():
@@ -432,11 +430,9 @@ def run_gpio_triggering_tests():
     assert gpio_sensors.gpio_port_mappings["9"]["sensor_state"] == False
     # Clean up
     gpio_sensors.delete_all_local_gpio_sensors() 
-    # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 15
-    assert system_test_harness.get_warning_logs_generated() == 0
+    # Check the total number of Log Messages Generated
+    system_test_harness.assert_error_logs_generated(15)
+    system_test_harness.assert_warning_logs_generated(0)
     return()
 
 def gpio_port_10_status_reporting_callback(status):
@@ -527,11 +523,9 @@ def run_gpio_circuit_breaker_tests():
     # Clean up
     gpio_sensors.unsubscribe_from_all_gpio_port_status()
     gpio_sensors.delete_all_local_gpio_sensors() 
-    # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 18
-    assert system_test_harness.get_warning_logs_generated() == 0
+    # Check the total number of Log Messages Generated
+    system_test_harness.assert_error_logs_generated(18)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -653,11 +647,9 @@ def run_pi_sprog_interface_tests(baud_rate):
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=-1)     # Invalid op_code
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=256)    # Invalid op_code
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=8)      # Valid but port is closed
-    # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 21
-    assert system_test_harness.get_warning_logs_generated() == 2
+    # Check the total number of Log Messages Generated
+    system_test_harness.assert_error_logs_generated(21)
+    system_test_harness.assert_warning_logs_generated(2)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -932,15 +924,11 @@ def run_dcc_control_tests(baud_rate):
     assert pi_sprog_interface.request_dcc_power_off()
     assert pi_sprog_interface.sprog_disconnect()
     mqtt_interface.mqtt_broker_disconnect()
-    # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    print("Number of INFO Logs Generated: "+str(system_test_harness.get_info_logs_generated()))
-    print("Number of DEBUG Logs Generated: "+str(system_test_harness.get_debug_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 138
-    assert system_test_harness.get_warning_logs_generated() == 0
-    assert system_test_harness.get_info_logs_generated() == 3
-    assert system_test_harness.get_debug_logs_generated() == 115
+    # Check the total number of Log Messages Generated
+    system_test_harness.assert_error_logs_generated(138)
+    system_test_harness.assert_warning_logs_generated(0)
+    system_test_harness.assert_info_logs_generated(3)
+    system_test_harness.assert_debug_logs_generated(115)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1051,11 +1039,9 @@ def run_mqtt_interface_tests():
     # Cleanup
     mqtt_interface.mqtt_broker_disconnect()   
     time.sleep(1.0)
-    # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 9
-    assert system_test_harness.get_warning_logs_generated() == 0
+    # Check the total number of Log Messages Generated
+    system_test_harness.assert_error_logs_generated(9)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()

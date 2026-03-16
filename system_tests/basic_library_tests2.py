@@ -101,10 +101,8 @@ def run_text_box_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(text_boxes.text_boxes) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 8
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(8)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -169,10 +167,8 @@ def run_track_sensor_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(track_sensors.track_sensors) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 8
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(8)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -492,10 +488,8 @@ def run_track_section_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(track_sections.sections) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 36
-    assert system_test_harness.get_warning_logs_generated() == 8
+    system_test_harness.assert_error_logs_generated(36)
+    system_test_harness.assert_warning_logs_generated(8)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -954,10 +948,8 @@ def run_point_library_tests():
     # Now clear down the layout for the next series of tests
     system_test_harness.initialise_test_harness()
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 48
-    assert system_test_harness.get_warning_logs_generated() == 6
+    system_test_harness.assert_error_logs_generated(48)
+    system_test_harness.assert_warning_logs_generated(6)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1268,10 +1260,8 @@ def run_instrument_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(block_instruments.instruments) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 31
-    assert system_test_harness.get_warning_logs_generated() == 22
+    system_test_harness.assert_error_logs_generated(31)
+    system_test_harness.assert_warning_logs_generated(22)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1419,10 +1409,8 @@ def run_line_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(lines.lines) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 20
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(20)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1711,10 +1699,8 @@ def run_button_library_tests():
     # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(buttons.buttons) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 29
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(29)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1882,10 +1868,8 @@ def run_lever_library_tests():
     levers.delete_lever(1)
     assert len(levers.levers) == 0
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 24
-    assert system_test_harness.get_warning_logs_generated() == 4
+    system_test_harness.assert_error_logs_generated(24)
+    system_test_harness.assert_warning_logs_generated(4)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1913,10 +1897,8 @@ def run_library_common_tests():
     common.toggle_item_ids()
     common.toggle_item_ids()
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(system_test_harness.get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(system_test_harness.get_warning_logs_generated()))
-    assert system_test_harness.get_error_logs_generated() == 0
-    assert system_test_harness.get_warning_logs_generated() == 0
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
