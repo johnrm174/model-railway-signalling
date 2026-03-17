@@ -772,7 +772,7 @@ def run_dcc_control_tests(baud_rate):
     assert dcc_control.dcc_address_mapping(50) is None
     assert dcc_control.dcc_address_mapping("40") is None  # Error - not an int
     assert dcc_control.dcc_address_mapping(2048) is None  # Error - out of range
-    print("Library Tests - update_dcc_point - no errors or warnings - DCC commands should be sent out")
+    print("Library Tests - update_dcc_point - no errors or warnings - 4 DCC commands should be sent out")
     logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     dcc_control.update_dcc_point(1, True)
     dcc_control.update_dcc_point(1, False)
@@ -780,7 +780,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_point(2, False)
     dcc_control.update_dcc_point(3, True)
     dcc_control.update_dcc_point(3, False)
-    print("Library Tests - update_dcc_signal_aspects - 2 errors (wrong signal types) - DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_aspects - 2 errors (wrong signal types) - 18 DCC commands should be sent out")
     dcc_control.update_dcc_signal_aspects(2, signals.signal_state_type.DANGER) # Error - wrong type
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)
@@ -790,11 +790,11 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.FLASH_PRELIM_CAUTION)
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
     dcc_control.update_dcc_signal_aspects(3, signals.signal_state_type.DANGER)
-    print("Library Tests - update_dcc_signal_subsidary - 1 Error (wrong signal type) - DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_subsidary - 1 Error (wrong signal type) - 1 DCC command should be sent out")
     dcc_control.update_dcc_signal_subsidary(1, True) # OK
     dcc_control.update_dcc_signal_subsidary(2, True) # Error - wrong type
     dcc_control.update_dcc_signal_subsidary(10, True) # Not Mapped
-    print("Library Tests - update_dcc_signal_element - 2 Errors (wrong signal type) - DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_element - 2 Errors (wrong signal type) - 10 DCC commands should be sent out")
     dcc_control.update_dcc_signal_element(1, True, element="main_signal")     # error
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")  # error
     dcc_control.update_dcc_signal_element(2, True, element="main_signal")
@@ -808,7 +808,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, True, element="rh2_signal")
     dcc_control.update_dcc_signal_element(2, True, element="rh2_subsidary")
     dcc_control.update_dcc_signal_element(3, True, element="main_subsidary")
-    print("Library Tests - update_dcc_signal_route - 1 Error (wrong signal type) - DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_route - 1 Error (wrong signal type) - 21 DCC commands should be sent out")
     dcc_control.update_dcc_signal_route(2,signals.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals.route_type.LH1, True, False)
@@ -819,7 +819,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, False, True)
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, False, False)
     dcc_control.update_dcc_signal_route(3,signals.route_type.MAIN, False, False)
-    print("Library Tests - update_dcc_signal_theatre - no errors or warnings - DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_theatre - no errors or warnings - 24 DCC commands should be sent out")
     dcc_control.update_dcc_signal_theatre(1,"#", True, False)
     dcc_control.update_dcc_signal_theatre(1,"1", True, False)
     dcc_control.update_dcc_signal_theatre(1,"2", True, False)
@@ -830,13 +830,14 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_theatre(1,"1", False, True)
     dcc_control.update_dcc_signal_theatre(1,"1", False, False)
     dcc_control.update_dcc_signal_theatre(3,"1", False, False)
-    print("Library Tests - update_dcc_switch - no errors or warnings - DCC commands should be sent out")
+    print("Library Tests - update_dcc_switch - no errors or warnings - 8 DCC commands should be sent out")
     dcc_control.update_dcc_switch(1, True)
     dcc_control.update_dcc_switch(1, False)
     dcc_control.update_dcc_switch(2, True)
     dcc_control.update_dcc_switch(2, False)
     dcc_control.update_dcc_switch(3, True)   # Not Mapped
     dcc_control.update_dcc_switch(3, False)  # Not Mapped
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
     print("Library Tests - set_node_to_publish_dcc_accessory_commands - 1 Error will be generated ")
     dcc_control.set_node_to_publish_dcc_accessory_commands("True") # Error
     dcc_control.set_node_to_publish_dcc_accessory_commands(True) 
@@ -847,7 +848,8 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.subscribe_to_dcc_accessory_command_feed("Box1")
     print("Library Tests - reset_mqtt_configuration - No warnings or errors")
     dcc_control.reset_dcc_accessory_mqtt_configuration()
-    print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors (unhandled messages) - DCC Commands should be sent out")
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
+    print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors (unhandled messages) - 2 messages should be output/published (4 log messages)")
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccstate": True}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"dccaddress": 1000, "dccstate": True}) # Error
@@ -896,15 +898,20 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, True, element="main_subsidary")
     dcc_control.update_dcc_signal_element(2, False, element="main_signal")
     dcc_control.update_dcc_signal_element(2, False, element="main_subsidary")
-    logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
-    print("Library Tests - DCC control Tests - Sprog connected/power on")
+    time.sleep (5.0) 
+    print("Library Tests - DCC control Tests - Sprog connected/power on - 20 DCC commands should be sent out (22 DEBUG and 1 INFO log messages) ")
     assert pi_sprog_interface.sprog_connect()
+    logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
     assert pi_sprog_interface.request_dcc_power_on()
-    print("Library Tests - DCC control Tests - MQTT Broker Connect")
+    # DCC commands are transmitted after 1 second (and then at 250ms intervals) - we wait for this to complete
+    time.sleep (10.0) 
+    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
+    print("Library Tests - DCC control Tests - MQTT Broker Connect - 12 DCC commands should be published (13 DEBUG and 1 INFO log messages)")
     dcc_control.set_node_to_publish_dcc_accessory_commands(True)
     mqtt_interface.configure_mqtt_client("network1","node1") # Success
+    logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
     mqtt_interface.mqtt_broker_connect("127.0.0.1",1883) # success
-    time.sleep(5.0)
+    time.sleep(10.0)
     logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
     dcc_control.reset_dcc_accessory_mqtt_configuration()
     print("Library Tests - delete_signal_mapping - 2 Errors should be generated")
@@ -927,8 +934,8 @@ def run_dcc_control_tests(baud_rate):
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(138)
     system_test_harness.assert_warning_logs_generated(0)
-    system_test_harness.assert_info_logs_generated(3)
-    system_test_harness.assert_debug_logs_generated(115)
+    system_test_harness.assert_info_logs_generated(2)
+    system_test_harness.assert_debug_logs_generated(131)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
