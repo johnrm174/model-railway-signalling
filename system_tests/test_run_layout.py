@@ -1697,8 +1697,8 @@ def run_all_run_layout_tests():
     reset_log_counters()
     run_layout_tests(edit_mode=True, automation_enabled=True)
     # Check the total number of Log Messages generated
-    asser_error_logs_generated(0)
-    asser_warning_logs_generated(0)
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
     print("Run Layout Tests - RUN Mode / Automation ON ***************************************************")    
