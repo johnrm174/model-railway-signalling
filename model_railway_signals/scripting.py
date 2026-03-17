@@ -2,7 +2,7 @@
 # Scripting Interface - to support the writing of scripts to excersise the application
 #
 # Application Initialisation Functions:
-#    initialise_application(script_to_run)
+#    initialise_application(scripts_to_run)
 #
 # General Scripting API functions:
 #    delay(delay)
@@ -462,6 +462,7 @@ def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
             raise_test_warning("Scripting: simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
             run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+            time.delay(0.3)
             run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
             time.delay(0.2)
 
