@@ -1262,10 +1262,8 @@ def run_all_automation_example_tests(delay:float=0.0):
     run_main_line_approach_control_tests(delay)
     run_loop_line_approach_control_tests(delay)
     # Check the total number of Log Messages generated
-    print("Number of ERROR Logs Generated: "+str(get_error_logs_generated()))
-    print("Number of WARNING Logs Generated: "+str(get_warning_logs_generated()))
-    assert get_error_logs_generated() == 0
-    assert get_warning_logs_generated() == 0
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
 if __name__ == "__main__":
