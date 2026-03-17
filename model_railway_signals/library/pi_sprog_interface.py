@@ -842,7 +842,7 @@ def send_accessory_short_event(address:int, active:bool):
         if (address_to_send < 1 or address_to_send > 2047):
             logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address)+offset_text)
         # Only bother sending commands to the Pi Sprog if the serial port has been opened
-        elif serial_port.is_open:
+        elif serial_port.is_open and dcc_power_is_on:
             # Split Node ID and Address into High/Low bytes
             # pi_cbus_node is usually the fixed node ID of the command station
             node_hi = (pi_cbus_node >> 8) & 0xFF
@@ -861,9 +861,6 @@ def send_accessory_short_event(address:int, active:bool):
             # Note we log the address we have been given - not the one with offsets applied
             state_label = "ASON" if active else "ASOF"
             logging.debug(f"Pi-SPROG: Discarding {state_label} command to DCC address: {address}{offset_text} - SPROG disconnected")
-            if active: log_string ="Discarding ASON command to DCC address: "+ str(address)+offset_text
-            else: log_string = "Discarding ASOF command to DCC address: "+ str(address)+offset_text
-            logging.debug("Pi-SPROG: "+log_string+" - SPROG is disconnected")
         # Play any sound files that are triggered by the DCC command
         play_dcc_sound_file(address, active)
     return ()
