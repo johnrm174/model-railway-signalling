@@ -49,6 +49,7 @@ import time
 import threading
 import sys
 import traceback
+import os
 
 from datetime import datetime
 
@@ -79,6 +80,9 @@ event_queue = queue.Queue()
 editing_enabled = False
 # Global Flag to enable or disable the processing of keypress events
 keypresses_enabled = True
+
+# A thread-safe flag to indicate shutdown has been initiated
+shutdown_event = threading.Event()
 
 #---------------------------------------------------------------------------------------------
 # Popup window for displaying Run Layout Warnings. Used by the Levers library module to
@@ -407,38 +411,59 @@ def execute_function_in_tkinter_thread(callback_function):
 # Probe function to detect main thread freezes and write them out to file
 ##################################################################################################
 
-# A thread-safe flag to trigger a shut down of the diagnostic thread
-shutdown_event = threading.Event()
 # A thread-safe flag to track if the GUI is responsive
 gui_responsive = threading.Event()
 gui_responsive.set()
 
 # Set up a dedicated freeze log
-logger = logging.getLogger("FreezeDetector")
-handler = logging.FileHandler("freeze_diagnostics.log")
-logger.addHandler(handler)
+handler = logging.FileHandler("freeze_diagnostics.log", mode='w')
+freeze_logger = logging.getLogger("FreezeDetector")
+freeze_logger.propagate = False
+freeze_logger.addHandler(handler)
 
 def probe_callback():
     # This function runs in the main tkinter thread
     gui_responsive.set()
 
+def flush_to_disk():
+    handler.flush()
+    try: os.fsync(handler.stream.fileno())
+    except (AttributeError, ValueError): pass
+
 def watchdog_monitor():
-    while not shutdown_event.is_set(): # Check flag every loop
-        gui_responsive.clear()
-        execute_function_in_tkinter_thread(probe_callback)
-        # Using wait() for an instant exit when the shutdown_event is triggered.
-        # Log the current thread count for diagnostic purposes
-        active_count = threading.active_count()
-        if active_count > 15: logging.warning(f"Watchdog Alert: High thread count detected: {active_count}")
-        if shutdown_event.wait(timeout=10):
-            # Break on shutdown command from main thread
-            break
-        if not gui_responsive.is_set():
-            # Log the diagnostic snapshot once and then break
-            capture_diagnostic_snapshot()
-            break
-        # Wait for the remainder of the 5-second cycle
-        shutdown_event.wait(timeout=5)
+    heartbeat_count = 0
+    freeze_logger.error(f"Watchdog Started at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    while True:
+        try:
+            # Start a new line with a timestamp if we are at the beginning
+            if heartbeat_count == 0:
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                handler.stream.write(f"{timestamp} - HEARTBEAT: ")
+                flush_to_disk()
+            # Clear the shutdown event and execute the probe function in the main thread
+            gui_responsive.clear()
+            execute_function_in_tkinter_thread(probe_callback)
+            # Wait 15 seconds OR until shutdown_event.set() is called.
+            if shutdown_event.wait(timeout=15): break
+            # If the probe_callback hasn't finished then we know the tkinter main_loop has hung
+            if not gui_responsive.is_set():
+                print("Application Freeze Detected - Capturing diagnostic snapshot")
+                handler.stream.write(" [FREEZE DETECTED]\n")
+                flush_to_disk()
+                capture_diagnostic_snapshot()
+                break
+            # Heartbeat Logic (Write one dot every 30s cycle)
+            handler.stream.write(".")
+            heartbeat_count += 1
+            flush_to_disk()
+            if heartbeat_count >= 100:
+                handler.stream.write("\n")
+                flush_to_disk()
+                heartbeat_count = 0
+        except Exception as exception:
+            freeze_logger.error(f"Watchdog Monitor - Exception processing heartbeat: {exception}")
+            time.sleep (1.0)
+    return()
 
 def capture_diagnostic_snapshot():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -457,8 +482,8 @@ def capture_diagnostic_snapshot():
                 break
         output.append(f"\nTHREAD: {thread_name} (ID: {thread_id})")
         output.append("".join(traceback.format_stack(frame)))
-    logger.error("".join(output))
-    logging.error("Application Freeze Detected - Diagnodstics written to 'freeze_diagnostics.log'")
+    freeze_logger.error("".join(output))
+    print("Application Freeze Detected - Diagnodstic snapshot written to 'freeze_diagnostics.log'")
 
 threading.Thread(target=watchdog_monitor, daemon=True).start()
 

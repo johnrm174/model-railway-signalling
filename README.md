@@ -64,7 +64,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Ideal for smaller layouts if you don't want the to use a seperate DCC command station.
     * Add your DCC locos to the Roster, defining DCC address and DCC functions.
     * Control your Locos via on-screen throttles (fully compatible with touchscreens).
-    * Start the built-in WiThrottle server and control your locos from your smartphone.
+    * Start the built-in Throttle server and control your locos from your smartphone.
     * Tested and fully supported for Android (third party 'Engine Driver' App).
 * Scripting interface improved and extended to include locomotive control
     * Entire layouts can now be fully automated via python scripting
@@ -78,6 +78,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * Copying of Route Buttons will now bring across all individual route definitions.
     * Makes it easier to define laddered routes with minor differences between them.
 * Performance improvements when editing or initialising very large schematics.
+* Improved logging - logs are now also written to disk to aid subsequent diagnostics.
 * Minor Improvements to the DCC Programming utility.
 
 

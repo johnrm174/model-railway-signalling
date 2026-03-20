@@ -969,13 +969,15 @@ def run_editor():
     while current_logger.handlers: current_logger.removeHandler(current_logger.handlers[0])
     # Create a queue for log records
     log_queue = queue.Queue(-1) # Infinite size
-    # Setup the Terminal Handler (StreamHandler)
-    console_handler = logging.StreamHandler(sys.stdout)
+    # Set a formatter for the logs
     formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+    # Setup the Terminal Handler (StreamHandler) and file handler
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
-    # Create the Listener that runs in the background
-    # This listener will pull logs from the queue and send them to the file_handler
-    log_listener = QueueListener(log_queue, console_handler)
+    file_log_handler = logging.FileHandler("model_railway_signalling.log", mode='w')
+    file_log_handler.setFormatter(formatter)
+    # Create the Listener that runs in the background, pull logs from the queue and send them to the handlers
+    log_listener = QueueListener(log_queue, console_handler, file_log_handler)
     log_listener.start()
     # Configure the root logger to use the QueueHandler
     root_logger = logging.getLogger()
