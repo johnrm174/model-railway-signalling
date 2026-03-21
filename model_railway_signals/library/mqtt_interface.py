@@ -116,6 +116,7 @@ node_config["connection_check_event"] = None            # The scheduled 'after' 
 node_config["local_ip_address"] = ""                    # Set by the 'on_connect' function
 node_config["local_hostname"] = ""                      # Set by the 'on_connect' function
 node_config["connected_to_broker"] = False              # Set by the 'on_connect' / 'on_disconnect functions
+node_config["unexpected_disconnection"] = False         # Set by the 'on_disconnect' functios
 node_config["disconnection_in_progress"] = False        # Set/cleared by the mqtt_disconnect function
 node_config["heartbeat_thread_started"] = False         # Set by the 'on_connect' function
 node_config["list_of_published_topics"] = []
@@ -185,32 +186,32 @@ def mqtt_publish_thread():
                 # between the time the message was put on the publish queue and the time we go to publish it.
                 # We attempt to publish 5 times before discarding the message
                 while not success and retries < 5:
-                    if node_config["connected_to_broker"]:
+                    if node_config["connected_to_broker"] and not node_config["disconnection_in_progress"]:
                         try:
                             info = mqtt_client.publish(topic, payload, retain=retain, qos=qos)
-                            # Wait with a strict timeout - This prevents a permanent hang
-                            info.wait_for_publish(timeout=2.0)
+                            # Wait with a timeout 0f 5 seconds (prevents a permanent hang)
+                            # With a QOS of 1, this waits for the PUBACK message from the broker
+                            info.wait_for_publish(timeout=1.0)
                             # Check whether we have successfully published the message or not
                             if info.is_published():
                                 success = True
+                                if retries > 0:
+                                    logging.warning(f"MQTT Interface: Publish succeeded (attempt {retries})")
                             else:
                                 logging.warning(f"MQTT Interface: Publish failed (attempt {retries})")
-                                retries = retries + 1
-                                time.sleep(0.5)
+                                retries += 1
                         except Exception as exception:
                             logging.error(f"MQTT Interface: Publish Exception: {exception} (attempt {retries})")
-                            retries = retries + 1
-                            time.sleep(0.5)
+                            retries += 1
+                            time.sleep(1.0)
                     else:
-                        # Wait until we are connected to the broker before attempting publish
-                        # It has to be an assumption that we will re-connect at some stage
-                        time.sleep(0.5)
+                        time.sleep(1.0)
+                        retries += 1
                 if not success:
                     if node_config["connected_to_broker"]:
                         logging.error(f"MQTT Interface: Permanently failed to publish to {topic} - Broker still connected")
                     else:
-                        logging.error(f"MQTT Interface: Permanently failed to publish to {topic} - Broker has disconnected")
-
+                        logging.error(f"MQTT Interface: Permanently failed to publish to {topic} - Broker is disconnected")
         except Exception as exception:
             # This catches the "unthinkable" errors (e.g. 'task' unpacking failed)
             logging.critical(f"MQTT Interface: CRITICAL THREAD ERROR: {exception}")
@@ -277,8 +278,12 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 
 def on_disconnect(mqtt_client, userdata, rc):
     global node_config
-    if rc==0: logging.info("MQTT-Client - Broker connection successfully terminated")
-    else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
+    if rc==0:
+        logging.info("MQTT-Client - Broker connection successfully terminated")
+        node_config["unexpected_disconnection"] = False
+    else:
+        logging.warning("MQTT-Client: Unexpected disconnection from broker")
+        node_config["unexpected_disconnection"] = True
     node_config["connected_to_broker"] = False
     # Update the main application on the status of the connection
     if node_config["status_callback"] is not None:
@@ -292,10 +297,14 @@ def on_disconnect(mqtt_client, userdata, rc):
 def on_connect(mqtt_client, userdata, flags, rc):
     global node_config
     if rc == 0:
-        logging.info("MQTT-Client - Successfully connected to MQTT Broker")
+        if node_config["unexpected_disconnection"] == True:
+            logging.warning("MQTT-Client - Successfully connected to MQTT Broker after unexpected disconnect")
+        else:
+            logging.info("MQTT-Client - Successfully connected to MQTT Broker")
         # Find the hostname and assigned IP address of the machine we are running on (for the heartbeat messages)
         node_config["local_ip_address"] = find_local_ip_address()
         node_config["local_hostname"] = socket.gethostname()
+        node_config["unexpected_disconnection"] = False
         # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
         # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
         # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
