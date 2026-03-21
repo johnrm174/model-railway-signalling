@@ -110,6 +110,7 @@ import logging
 import argparse
 import pathlib
 import queue
+import time
 from logging.handlers import QueueHandler, QueueListener
 
 from . import objects
@@ -982,6 +983,12 @@ def run_editor():
     # Configure the root logger to use the QueueHandler
     root_logger = logging.getLogger()
     root_logger.addHandler(QueueHandler(log_queue))
+    # Add a header into the file:
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    file_log_handler.stream.write(f"{timestamp} - Starting Model Railway Signals application\n")
+    file_log_handler.flush()
+    try: os.fsync(file_log_handler.stream.fileno())
+    except (AttributeError, ValueError): pass
     #---------------------------------------------------------------------------------
     # Create the Main Root Window
     #---------------------------------------------------------------------------------
