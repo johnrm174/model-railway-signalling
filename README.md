@@ -3,8 +3,11 @@
 A DCC model railway signalling application written in Python, enabling automated and interlocked layout 
 signalling schemes to be designed and configured via the UI without the need to write any code. The
 application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
-without some of the Raspberry-Pi specific interfacing functions). 
+without some of the Raspberry-Pi specific interfacing functions).
 
+* Provides a full DCC Command station for your model railway layout:
+    * Control your locos via on-screen throttles or via your smartphone.
+    * Control all your DCC accessories intuitively via the on-screen schematic.
 * Enables signalling schematics to be easily created with route lines, points and signals:
     * Supports most types of UK colour light signals, semaphore signals, and ground signals.
     * Supports complex trackwork formations such as crossovers, slips and 3-way points.
@@ -52,33 +55,34 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 6.x.x:
+## What's new for Release 6.2.0:
 
 > [!IMPORTANT]
-> Release 6.x.x will only support the loading of layout files created by Release 6.0.0 or later.
+> Release 6.2.0 will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.2.0.
 > You have been warned!
 
-* DCC Loco control - Now the DCC Signalling system can be used as a full Command Station:
-    * Ideal for smaller layouts if you don't want the to use a seperate DCC command station.
+* DCC Loco control - Now the DCC Signalling system can be used as a full DCC Command Station:
+    * Ideal for smaller layouts if you don't want the to use a seperate command station.
     * Add your DCC locos to the Roster, defining DCC address and DCC functions.
     * Control your Locos via on-screen throttles (fully compatible with touchscreens).
     * Start the built-in Throttle server and control your locos from your smartphone.
     * Tested and fully supported for Android (third party 'Engine Driver' App).
-* Scripting interface improved and extended to include locomotive control
-    * Entire layouts can now be fully automated via python scripting
-* Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons)
-* Improved initial synchronisation of layout state following DCC connect
-* Added ability to inhibit flashing aspects for signal approach control
-* Added ability to click on signals subject to approach control to 'release' them
-* Added ability to specify the same GPIO sensor for signal passed and signal approach events
+* Scripting interface improved and extended to include locomotive control:
+    * Entire layouts can now be fully automated via python scripting.
+* Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons).
+* Improved initial synchronisation of layout state following DCC connect.
+* Added ability to inhibit flashing aspects for signal approach control.
+* Added ability to click on signals subject to approach control to 'release' them.
+* Added ability to specify the same GPIO sensor for signal passed and signal approach events.
 * New functionality to allow copying of route definitions and route buttons:
     * NX route definitions can now be copied within the Route Button configuration.
     * Copying of Route Buttons will now bring across all individual route definitions.
     * Makes it easier to define laddered routes with minor differences between them.
 * Performance improvements when editing or initialising very large schematics.
-* Improved logging - logs are now also written to disk to aid subsequent diagnostics.
+* Improved logging - logs are now also written to disk to aid subsequent diagnostics:
+    * If you encounter problems you can now easily email us the logs for diagnosis.
 * Minor Improvements to the DCC Programming utility.
 
 

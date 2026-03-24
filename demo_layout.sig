@@ -781,14 +781,14 @@
             ],
             "bbox": 327,
             "colour": "Black",
-            "endx": 231.0,
-            "endy": 461.0,
+            "endx": 248.0,
+            "endy": 561.0,
             "item": "line",
             "itemid": 27,
             "linestyle": [],
             "linewidth": 3,
-            "posx": 206.0,
-            "posy": 461.0,
+            "posx": 273.0,
+            "posy": 561.0,
             "selection": "line27selected",
             "tags": "line27"
         },
@@ -1323,14 +1323,14 @@
             ],
             "bbox": 400,
             "colour": "Black",
-            "endx": 56.0,
-            "endy": 435.0,
+            "endx": 404.0,
+            "endy": 485.0,
             "item": "line",
             "itemid": 25,
             "linestyle": [],
             "linewidth": 3,
-            "posx": 31.0,
-            "posy": 435.0,
+            "posx": 429.0,
+            "posy": 485.0,
             "selection": "line25selected",
             "tags": "line25"
         },
@@ -2607,14 +2607,14 @@
             ],
             "bbox": 572,
             "colour": "Black",
-            "endx": 291.0,
-            "endy": 461.0,
+            "endx": 216.0,
+            "endy": 561.0,
             "item": "line",
             "itemid": 28,
             "linestyle": [],
             "linewidth": 3,
-            "posx": 266.0,
-            "posy": 461.0,
+            "posx": 241.0,
+            "posy": 561.0,
             "selection": "line28selected",
             "tags": "line28"
         },
@@ -3562,14 +3562,14 @@
             ],
             "bbox": 653,
             "colour": "Black",
-            "endx": 116.0,
-            "endy": 435.0,
+            "endx": 372.0,
+            "endy": 485.0,
             "item": "line",
             "itemid": 26,
             "linestyle": [],
             "linewidth": 3,
-            "posx": 91.0,
-            "posy": 435.0,
+            "posx": 397.0,
+            "posy": 485.0,
             "selection": "line26selected",
             "tags": "line26"
         },
@@ -5733,35 +5733,35 @@
     },
     "sections": {
         "1": {
-            "labeltext": "6752",
-            "occupied": true
+            "labeltext": "XXXXX",
+            "occupied": false
         },
         "10": {
-            "labeltext": "25083",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "11": {
-            "labeltext": "25083",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "12": {
-            "labeltext": "25083",
-            "occupied": true
+            "labeltext": "XXXXX",
+            "occupied": false
         },
         "2": {
-            "labeltext": "6752",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "3": {
-            "labeltext": "6752",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "4": {
-            "labeltext": "6752",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "5": {
-            "labeltext": "6752",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "6": {
@@ -5777,7 +5777,7 @@
             "occupied": false
         },
         "9": {
-            "labeltext": "25083",
+            "labeltext": "XXXXX",
             "occupied": false
         }
     },
@@ -7378,14 +7378,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": false,
-            "filename": "demo_layout.sig",
+            "filename": "/home/john/model-railway-signalling/demo_layout.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": true,
-            "version": "Version 6.1.5"
+            "version": "Version 6.2.0"
         },
         "gpio": {
             "maxevents": 100,
