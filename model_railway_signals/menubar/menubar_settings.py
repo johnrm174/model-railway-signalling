@@ -44,7 +44,9 @@
 
 import tkinter as Tk
 from tkinter import ttk
+from tkinter import font as TkFont
 
+import os
 import time
 import datetime
 import logging
@@ -52,6 +54,7 @@ import logging
 from .. import common
 from .. import settings
 from .. import library
+from .. import throttle_server
 
 #------------------------------------------------------------------------------------
 # Class for a quick scroll button entry This is for large layouts, with a bigger
@@ -723,11 +726,18 @@ class mqtt_configuration_tab():
 class mqtt_subscribe_tab():
     def __init__(self, parent_tab):
         # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
+        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC Accessory commands")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
-            tool_tip="Specify the remote network nodes to take a DCC command feed from")
-        self.dcc.pack(padx=2, pady=2, fill='x')
+        self.dccaccessory = common.grid_of_generic_entry_boxes(self.frame1, base_class=common.entry_box, columns=4, width=8,
+            tool_tip="Specify the network node publishing its DCC Accessory command feed "+
+                        "(Received commands will be sent out to the local SPROG interface)")
+        self.dccaccessory.pack(padx=2, pady=2, fill='x')
+        self.frame1a = Tk.LabelFrame(parent_tab, text="DCC Locomotive commands")
+        self.frame1a.pack(padx=2, pady=2, fill='x')
+        self.dcclocomotive = common.grid_of_generic_entry_boxes(self.frame1a, base_class=common.entry_box, columns=4, width=8,
+            tool_tip="Specify the network node publishing its DCC Locomotive command feed "+
+                        "(Received commands will be sent out to the local SPROG interface)")
+        self.dcclocomotive.pack(padx=2, pady=2, fill='x')
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.str_item_id_entry_box, columns=4, width=8,
@@ -750,9 +760,33 @@ class mqtt_subscribe_tab():
         self.sensors.pack(padx=2, pady=2, fill='x')
 
     def validate(self):
-        return (self.dcc.validate() and self.signals.validate() and self.sections.validate()
-                and self.instruments.validate() and self.sensors.validate())
-    
+        valid = True
+        if not self.signals.validate(): valid=False
+        if not self.sections.validate(): valid=False
+        if not self.instruments.validate(): valid=False
+        if not self.sensors.validate(): valid=False
+        if not self.dccaccessory.validate(): valid=False
+        if not self.dcclocomotive.validate(): valid=False
+        return(valid)
+
+#------------------------------------------------------------------------------------
+# Class for a sprog_node_entry_box - Based on the common entry box but must not
+# be empty if the entrybox is enabled (as the Pi-Sprog node must be specified)
+#------------------------------------------------------------------------------------
+
+class sprog_node_entry_box(common.entry_box):
+    def __init__(self, *args, **kwargs):
+        super().__init__( *args, **kwargs)
+
+    def validate(self):
+        valid = super().validate()
+        if self.enabled0 and len(self.get_value()) == 0 or self.get_value() == "---":
+            self.set_value("---")
+            self.TT.text="Must specify the network node hosting the DCC Track Bus Interface"
+            valid = False
+        self.set_validation_status(valid)
+        return(valid)
+
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'Publish' Tab
 #------------------------------------------------------------------------------------    
@@ -760,13 +794,26 @@ class mqtt_subscribe_tab():
 class mqtt_publish_tab():
     def __init__(self, parent_tab):
         # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC command feed")
+        self.frame1 = Tk.LabelFrame(parent_tab, text="DCC Accessory commands")
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.dcc = common.check_box(self.frame1, label="Publish DCC command feed",
-                tool_tip="Select to publish all DCC commands from this node via the "+
-                    "MQTT Network (so the feed can be picked up by the node hosting "+
-                    "the Pi-SPROG DCC interface) and sent out to the layout")
-        self.dcc.pack(padx=2, pady=2, fill='x')
+        self.dccaccessory = common.check_box(self.frame1, label="Publish the DCC Accessory command feed",
+                tool_tip="Select to publish all DCC Accessory commands to the MQTT Network. Note that when "+
+                    "selected, DCC Accessory commands WILL NOT be sent out to the local SPROG interface." )
+        self.dccaccessory.pack(padx=2, pady=2, fill='x')
+        self.frame1a = Tk.LabelFrame(parent_tab, text="DCC Locomotive commands")
+        self.frame1a.pack(padx=2, pady=2, fill='x')
+        self.dcclocomotive = common.check_box(self.frame1a, label="Publish the DCC Locomotive command feed",
+                tool_tip="Select to publish all DCC Locomotive commands to the MQTT Network. Note that when "+
+                    "selected, DCC Locomotive commands WILL NOT be sent out to the local SPROG interface.",
+                                    callback = self.dcc_loco_selection_updated)
+        self.dcclocomotive.pack(padx=2, pady=2, fill='x')
+        self.subframe1 = Tk.Frame(self.frame1a)
+        self.subframe1.pack()
+        self.locolabel = Tk.Label(self.subframe1, text="Node hosting track bus interface:")
+        self.locolabel.pack(padx=2, pady=2, side=Tk.LEFT)
+        self.dccloconode = sprog_node_entry_box(self.subframe1, width=8, tool_tip="Specify the network node "+
+                    "configured to drive the DCC Track Bus (two-way comminication is required for loco control)")
+        self.dccloconode.pack(padx=2, pady=2, side=Tk.LEFT)
         self.frame2 = Tk.LabelFrame(parent_tab, text="Signals")
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame2, base_class=common.int_item_id_entry_box, columns=10, width=3,
@@ -788,10 +835,20 @@ class mqtt_publish_tab():
             tool_tip="Enter the IDs of the GPIO sensors to publish via the MQTT network")
         self.sensors.pack(padx=2, pady=2, fill='x')
 
-    def validate(self):
-        return (self.signals.validate() and self.sections.validate()
-            and self.instruments.validate() and self.sensors.validate())
+    def dcc_loco_selection_updated(self):
+        if self.dcclocomotive.get_value():
+            self.dccloconode.enable()
+        else:
+            self.dccloconode.disable()
 
+    def validate(self):
+        valid = True
+        if not self.signals.validate(): valid=False
+        if not self.sections.validate(): valid=False
+        if not self.instruments.validate(): valid=False
+        if not self.sensors.validate(): valid=False
+        if not self.dccloconode.validate(): valid=False
+        return(valid)
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'status' Tab showing a list of connected nodes
@@ -902,17 +959,21 @@ class edit_mqtt_settings():
         self.config.pubshutdown.set_value(settings.get_mqtt("pubshutdown"))
         self.config.subshutdown.set_value(settings.get_mqtt("subshutdown"))
         # Populate the subscribe tab
-        self.subscribe.dcc.set_values(settings.get_mqtt("subdccnodes"))
+        self.subscribe.dccaccessory.set_values(settings.get_mqtt("subdccnodes"))
+        self.subscribe.dcclocomotive.set_values(settings.get_mqtt("subloconodes"))
         self.subscribe.signals.set_values(settings.get_mqtt("subsignals"))
         self.subscribe.sections.set_values(settings.get_mqtt("subsections"))
         self.subscribe.instruments.set_values(settings.get_mqtt("subinstruments"))
         self.subscribe.sensors.set_values(settings.get_mqtt("subsensors"))
         # Populate the publish tab
-        self.publish.dcc.set_value(settings.get_mqtt("pubdcc"))
+        self.publish.dccaccessory.set_value(settings.get_mqtt("pubdcc"))
+        self.publish.dcclocomotive.set_value(settings.get_mqtt("publoco"))
+        self.publish.dccloconode.set_value(settings.get_mqtt("publoconode"))
         self.publish.signals.set_values(settings.get_mqtt("pubsignals"))
         self.publish.sections.set_values(settings.get_mqtt("pubsections"))
         self.publish.instruments.set_values(settings.get_mqtt("pubinstruments"))
         self.publish.sensors.set_values(settings.get_mqtt("pubsensors"))
+        self.publish.dcc_loco_selection_updated()
         
     def save_state(self, close_window:bool, apply_and_connect:bool=False):
         # Validate the entries to "accept" the current values before reading
@@ -932,13 +993,16 @@ class edit_mqtt_settings():
             settings.set_mqtt("pubshutdown", self.config.pubshutdown.get_value())
             settings.set_mqtt("subshutdown", self.config.subshutdown.get_value())
             # Save the Subscribe settings
-            settings.set_mqtt("subdccnodes", self.subscribe.dcc.get_values())
+            settings.set_mqtt("subdccnodes", self.subscribe.dccaccessory.get_values())
+            settings.set_mqtt("subloconodes", self.subscribe.dcclocomotive.get_values())
             settings.set_mqtt("subsignals", self.subscribe.signals.get_values())
             settings.set_mqtt("subsections", self.subscribe.sections.get_values())
             settings.set_mqtt("subinstruments", self.subscribe.instruments.get_values())
             settings.set_mqtt("subsensors", self.subscribe.sensors.get_values())
             # Save the publish settings
-            settings.set_mqtt("pubdcc", self.publish.dcc.get_value())
+            settings.set_mqtt("pubdcc", self.publish.dccaccessory.get_value())
+            settings.set_mqtt("publoco", self.publish.dcclocomotive.get_value())
+            settings.set_mqtt("publoconode", self.publish.dccloconode.get_value())
             settings.set_mqtt("pubsignals", self.publish.signals.get_values())
             settings.set_mqtt("pubsections", self.publish.sections.get_values())
             settings.set_mqtt("pubinstruments", self.publish.instruments.get_values())
@@ -1146,8 +1210,8 @@ class edit_gpio_settings():
             # Circuit breaker threahold entry
             self.label3 = Tk.Label(self.subframe2, text="  Max events per second:")
             self.label3.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-            self.maxevents = common.integer_entry_box(self.subframe2, width=5, min_value=10, max_value=1000, allow_empty=False, 
-                tool_tip="Enter the maximum number of events per second for each GPIO port (10-1000). If a GPIO port exceeds "+
+            self.maxevents = common.integer_entry_box(self.subframe2, width=5, min_value=10, max_value=100, allow_empty=False,
+                tool_tip="Enter the maximum number of events per second for each GPIO port (10-100). If a GPIO port exceeds "+
                             "this rate then the GPIO port will be locked out to protect the application.")
             self.maxevents.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             #---------------------------------------------------------------------
@@ -1326,11 +1390,9 @@ class edit_general_settings():
 # Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
 
-try:
-    import simpleaudio
-    audio_enabled = True
-except Exception:
-    audio_enabled = False
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+import pygame
+pygame.mixer.init()
 
 class sound_file_mapping(Tk.Frame):
     def __init__(self, parent_frame):
@@ -1341,9 +1403,6 @@ class sound_file_mapping(Tk.Frame):
         self.testbutton = Tk.Button(self, text="Test", command=self.play)
         self.testbutton.pack(side=Tk.LEFT)
         self.testbuttonTT = common.CreateToolTip(self.testbutton, "Test playback of the audio file")
-        if not audio_enabled:
-            self.testbutton.configure(state="disabled")
-            self.testbuttonTT.text = "Playback disabled - The simpleaudio package is not installed"
         self.label1 = Tk.Label(self, text="Trigger:")
         self.label1.pack(side=Tk.LEFT)
         self.dcccommand = common.validated_dcc_command_entry(self, item_type="sound",
@@ -1353,15 +1412,13 @@ class sound_file_mapping(Tk.Frame):
         self.label.pack(side=Tk.LEFT)
 
     def play(self):
+        filename = self.soundfile.get_value()
         try:
-            filename = self.soundfile.get_value()
-            audio_object = simpleaudio.WaveObject.from_wave_file(filename)
+            audio_object = pygame.mixer.Sound(str(filename))
             audio_object.play()
         except Exception as exception:
-            logging.error("Error Playing file '"+str(filename)+"'")
-            logging.error("Reported Exception: "+str(exception))
-            Tk.messagebox.showerror(parent=self, title="Load Error",
-                        message="Error playing audio file '"+str(filename)+"'")
+            Tk.messagebox.showerror(parent=self, title="Load Error", message="Error playing audio file '"+str(filename)+"'")
+            logging.error(f"Exception playing audio file {filename}: {exception}")
 
     def validate(self):
         return(self.dcccommand.validate())
@@ -1369,7 +1426,9 @@ class sound_file_mapping(Tk.Frame):
     def get_value(self):
         # Returned value is a list comprising [filename:str, dcc_command]
         # The DCC command is a list comprising [dcc_address:int, dcc_state:bool]
-        return([self.soundfile.get_value(), self.dcccommand.get_value()])
+        if self.soundfile.get_value() == "": value_to_return = None
+        else: value_to_return = [self.soundfile.get_value(), self.dcccommand.get_value()]
+        return(value_to_return)
 
     def set_value(self, value_to_set:list):
         # value_to_set is a list comprising [filename:str, dcc_command]
@@ -1419,7 +1478,13 @@ class edit_sounds_settings():
     def save_state(self, close_window:bool):
         if self.dccmappings.validate():
             self.validation_error.pack_forget()
-            settings.set_control("dccsoundmappings",self.dccmappings.get_values())
+            # Only extract valid entries
+            values_to_set = []
+            entered_values = self.dccmappings.get_values()
+            for entered_value in entered_values:
+                if entered_value is not None:
+                    values_to_set.append(entered_value)
+            settings.set_control("dccsoundmappings",values_to_set)
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK )
@@ -1433,4 +1498,127 @@ class edit_sounds_settings():
         edit_sounds_settings_window = None
         self.window.destroy()
 
+#------------------------------------------------------------------------------------
+# Class for the Throttle Server toolbar window.
+# Note that if a window is already open then we just raise it and exit.
+#------------------------------------------------------------------------------------
+
+edit_throttle_server_settings_window = None
+
+class edit_server_settings():
+    def __init__(self, root_window):
+        global edit_throttle_server_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_throttle_server_settings_window is not None and edit_throttle_server_settings_window.winfo_exists():
+            edit_throttle_server_settings_window.lift()
+            edit_throttle_server_settings_window.state('normal')
+            edit_throttle_server_settings_window.focus_force()
+        else:
+            # Create the (non resizable) top level window for the General Settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Throttle Server")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_throttle_server_settings_window = self.window
+            #----------------------------------------------------------------------------------
+            # Create a Label Frame for the General settings
+            #----------------------------------------------------------------------------------
+            self.frame1 = Tk.LabelFrame(self.window, text="General Settings")
+            self.frame1.pack(padx=5, pady=5, fill="x")
+            self.serverdebugging = common.check_box(self.frame1, label="Enhanced Server Debug Logging",
+                    tool_tip="Select to enable enhanced debugging (Layout log level must also be set to 'debug')")
+            self.serverdebugging.pack(padx=2,pady=2)
+            self.serverstartup = common.check_box(self.frame1, label="Start Server on Layout Load",
+                    tool_tip="Select to start the WiThrottle Server on layout load")
+            self.serverstartup.pack(padx=2,pady=2)
+            #----------------------------------------------------------------------------------
+            # Create a Label Frame for the Whitelisting settings
+            #----------------------------------------------------------------------------------
+            self.frame2 = Tk.LabelFrame(self.window, text="Allowed Connections")
+            self.frame2.pack(padx=5, pady=5, fill="x")
+            self.serverenforceallow = common.check_box(self.frame2, label="Enforce allow list",
+                    tool_tip="Select to ensure only named WiThrottle clients can connect to the server "+
+                         "(if unchecked then connections from any client will be allowed)")
+            self.serverenforceallow.pack(padx=2,pady=2)
+            self.serverallowlist = common.grid_of_generic_entry_boxes(self.frame2, common.entry_box, columns=1, width=20,
+                                    tool_tip="Enter the WiThrottle client name to allow a connection from the device")
+            self.serverallowlist.pack(padx=2, pady=2)
+            #----------------------------------------------------------------------------------
+            # Create Server Controls
+            #----------------------------------------------------------------------------------
+            self.frame3 = Tk.LabelFrame(self.window, text="Server Controls/Staus")
+            self.frame3.pack(padx=5, pady=5, fill="x")
+            self.serverstatus = Tk.Label(self.frame3, width=20)
+            self.serverstatus.pack(padx=2, pady=2)
+            self.subframe1 = Tk.Frame(self.frame3)
+            self.subframe1.pack()
+            self.B1 = Tk.Button(self.subframe1, text="Apply and Start Server", command=self.apply_and_start_server)
+            self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.B1TT = common.CreateToolTip(self.B1, text="Click to apply the curent settings and start the WiThrottle Server")
+            self.B2 = Tk.Button(self.subframe1, text="Stop Server", command = self.stop_server)
+            self.B2.pack(side=Tk.RIGHT, padx=2, pady=2)
+            self.B1TT = common.CreateToolTip(self.B2, text="Click to Stop the WiThrottle Server")
+            self.label = Tk.Label(self.frame2, text="Active connections:")
+            self.label.pack(padx=2, pady=2)
+            self.bold_font = TkFont.Font(font=self.label.cget("font"))
+            self.bold_font.configure(weight="bold")
+            # This is the reference to the Frame we use to hold the list of connected clients
+            self.connected_clients = None
+            #----------------------------------------------------------------------------------
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #----------------------------------------------------------------------------------
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
+            throttle_server.subscribe_to_server_status(self.update_server_status)
+
+    def update_server_status(self, status:bool, list_of_connected_clients:list):
+        if status: self.serverstatus.config(text="Server Status: Running", fg="green4", font=self.bold_font)
+        else: self.serverstatus.config(text="Server Status: Stopped", fg="red", font=self.bold_font)
+        # Update the list of connected clients:
+        if self.connected_clients is not None: self.connected_clients.destroy()
+        self.connected_clients = Tk.Frame(self.frame2)
+        self.connected_clients.pack()
+        if len(list_of_connected_clients) > 0:
+            for connected_client in list_of_connected_clients:
+                client = Tk.Label(self.connected_clients, text=connected_client, font=self.bold_font)
+                client.pack()
+        else:
+            client = Tk.Label(self.connected_clients, text="No Clients Connected", font=self.bold_font)
+            client.pack()
+
+    def apply_and_start_server(self):
+        throttle_server.start_throttle_server(self.serverdebugging.get_value(),
+            self.serverallowlist.get_values(), self.serverenforceallow.get_value())
+        self.save_state(close_window=False)
+
+    def stop_server(self):
+        throttle_server.stop_throttle_server()
+
+    def load_state(self):
+        self.serverdebugging.set_value(settings.get_control("serverdebugging"))
+        self.serverstartup.set_value(settings.get_control("serverstartup"))
+        self.serverallowlist.set_values(settings.get_control("serverallowlist"))
+        self.serverenforceallow.set_value(settings.get_control("serverenforceallow"))
+
+    def save_state(self, close_window:bool):
+        settings.set_control("serverdebugging", self.serverdebugging.get_value())
+        settings.set_control("serverstartup", self.serverstartup.get_value())
+        settings.set_control("serverallowlist", self.serverallowlist.get_values())
+        settings.set_control("serverenforceallow", self.serverenforceallow.get_value())
+        if close_window: self.close_window()
+        else: self.load_state()
+
+    # This gets called when the user closes the window (also with ok or cancel)
+    def close_window(self):
+        global edit_throttle_server_settings_window
+        self.destroy()
+        edit_throttle_server_settings_window = None
+        self.window.destroy()
+
+    def destroy(self):
+        throttle_server.unsubscribe_from_server_status(self.update_server_status)
+
 #############################################################################################
+

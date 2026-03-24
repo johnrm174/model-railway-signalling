@@ -42,7 +42,7 @@ class signal_event_frame(Tk.Frame):
         self.sensor = common.validated_gpio_sensor_entry_box(self.subframe, item_type="Signal", callback=callback,
                            tool_tip="Specify the ID of a GPIO Sensor to trigger the event (or leave blank) - "+
                                 "This can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
-                                "which has been subscribed to via MQTT networking")
+                                "which has been subscribed to via MQTT networking", event_type=event_type)
         self.sensor.pack(padx=2, side=Tk.LEFT)
         self.button = common.check_box(self.subframe, label="'"+event_type+"' button",tool_tip="Select to "+
                                 "create a small button at the base of the signal to simulate '"+event_type+
@@ -688,7 +688,13 @@ class approach_control_frame(Tk.LabelFrame):
         self.rh1=approach_control_route_element(self.subframe, label="RH1")
         self.rh2=approach_control_route_element(self.subframe, label="RH2")
         self.rh3=approach_control_route_element(self.subframe, label="RH3")
-        
+        # Create the 'inhibit flashingg for signals behind' checkbox
+        self.inhibitflashing=common.check_box(self.subframe, label="Inhibit flashing aspects for signals behind",
+                    tool_tip="Signals in the rear of a signal subject to 'release on yellow' approach control normally "+
+                             "display flashing aspects to give the driver an advance warning. Select this checkbox if "+
+                             "you want these signals to display their 'normal' (non flashing) aspects")
+        self.inhibitflashing.pack(padx=2, pady=2)
+
     def enable_release_on_red(self):
         self.main.enable_red()
         self.lh1.enable_red()
@@ -715,6 +721,7 @@ class approach_control_frame(Tk.LabelFrame):
         self.rh1.enable_yel()
         self.rh2.enable_yel()
         self.rh3.enable_yel()
+        self.inhibitflashing.enable()
         
     def disable_release_on_yel(self):
         self.main.disable_yel()
@@ -724,6 +731,7 @@ class approach_control_frame(Tk.LabelFrame):
         self.rh1.disable_yel()
         self.rh2.disable_yel()
         self.rh3.disable_yel()
+        self.inhibitflashing.disable()
         
     def enable_release_on_red_sig_ahead(self):
         self.main.enable_sig_ahead()
@@ -743,7 +751,7 @@ class approach_control_frame(Tk.LabelFrame):
         self.rh2.disable_sig_ahead()
         self.rh3.disable_sig_ahead()
         
-    def set_values(self, approach_control:[int,]):
+    def set_values(self, approach_control:[int,], inhibit_flashing:bool):
         # Approach_Control comprises a list of routes [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
         # Each element represents the approach control mode that has been set
         # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
@@ -754,6 +762,7 @@ class approach_control_frame(Tk.LabelFrame):
         self.rh1.set_values(approach_control[4])
         self.rh2.set_values(approach_control[5])
         self.rh3.set_values(approach_control[6])
+        self.inhibitflashing.set_value(inhibit_flashing)
 
     def get_values(self):
         # Approach_Control comprises a list of routes [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
@@ -765,7 +774,8 @@ class approach_control_frame(Tk.LabelFrame):
                     self.lh3.get_values(),
                     self.rh1.get_values(),
                     self.rh2.get_values(),
-                    self.rh3.get_values()] )
+                    self.rh3.get_values() ],
+                    self.inhibitflashing.get_value() )
     
     def is_selected(self):
         return ( self.main.approach_control_selected() or

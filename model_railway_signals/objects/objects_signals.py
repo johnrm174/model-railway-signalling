@@ -52,7 +52,6 @@
 #    library.ground_disc_subtype - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
-#    library.update_colour_light_signal(id) - To set the initial colour light signal aspect following creation
 #    library.set_route(id,route) - To set the initial route for a signal following creation
 #    library.create_colour_light_signal - To create the library object (create or redraw)
 #    library.create_semaphore_signal - To create the library object (create or redraw)
@@ -101,6 +100,9 @@ default_signal_object["flipped"] = False
 default_signal_object["xbuttonoffset"] = 0
 default_signal_object["ybuttonoffset"] = 0
 default_signal_object["hidebuttons"] = False
+# This is the flag to inhibit flashing signal indications behind when the
+# signal is subject to 'release on yellow' approachg control
+default_signal_object["inhibitflashing"] = False
 # The 'sigroutes' and 'subroutes' elements comprise a list_of_signal_routes: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
 # Each signal_route element is a flag to specify the route is 'available' for the signal/subsidary
 default_signal_object["sigroutes"] = [True,False,False,False,False,False,False]
@@ -637,6 +639,7 @@ def redraw_signal_object(object_id):
                     theatre_route_indicator = objects_common.schematic_objects[object_id]["theatreroute"],
                     theatre_route_subsidary = objects_common.schematic_objects[object_id]["theatresubsidary"],
                     fully_automatic = objects_common.schematic_objects[object_id]["fullyautomatic"],
+                    inhibit_flashing = objects_common.schematic_objects[object_id]["inhibitflashing"],
                     button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                     button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                     hide_buttons =  objects_common.schematic_objects[object_id]["hidebuttons"],
@@ -650,8 +653,6 @@ def redraw_signal_object(object_id):
         if objects_common.schematic_objects[object_id]["theatreroute"]:
             library.set_route(sig_id = objects_common.schematic_objects[object_id]["itemid"],
                     theatre_text = objects_common.schematic_objects[object_id]["dcctheatre"][1][0])
-        # update the signal to show the initial aspect
-        library.update_colour_light_signal(objects_common.schematic_objects[object_id]["itemid"])
     elif sig_type == library.signal_type.semaphore:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = library.semaphore_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])

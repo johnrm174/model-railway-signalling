@@ -145,13 +145,9 @@ class cv_programming_grid():
 #------------------------------------------------------------------------------------
 
 class cv_programming_element():
-    def __init__(self, root_window, parent_window, parent_frame, dcc_programming_enabled_function,
-                       dcc_power_off_function, dcc_power_on_function):
-        self.dcc_programming_enabled_function = dcc_programming_enabled_function
-        self.dcc_power_off_function = dcc_power_off_function
-        self.dcc_power_on_function = dcc_power_on_function
-        self.root_window = root_window
-        self.parent_window = parent_window
+    def __init__(self, parent_frame):
+        self.dcc_power_state = False
+        self.parent_frame = parent_frame
         # Default CV configuration filename
         self.loaded_file = ""
         # Create the warning text
@@ -164,13 +160,15 @@ class cv_programming_element():
         self.subframe1 = Tk.Frame(parent_frame)
         self.subframe1.pack()
         self.B1 = Tk.Button (self.subframe1, text = "Read CVs",command=self.read_all_cvs)
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B1.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT1 = common.CreateToolTip(self.B1, "Read all CVs to retrieve / refresh the current values")
         self.B2 = Tk.Button (self.subframe1, text = "Write CVs",command=self.write_all_cvs)
-        self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B2.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT2 = common.CreateToolTip(self.B2, "Write all CVs to set the new values")
-        self.status = Tk.Label(self.subframe1, width=45,  borderwidth=1, relief="solid")
-        self.status.pack(side=Tk.LEFT, padx=2, pady=2, expand='y')
+        self.label1 = Tk.Label(self.subframe1, text="Status:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=5)
+        self.status = Tk.Label(self.subframe1, width=50,  borderwidth=1, relief="solid")
+        self.status.pack(side=Tk.LEFT, padx=2, pady=5, fill='y')
         self.statusTT = common.CreateToolTip(self.status, "Displays the CV Read / Write progress and status")
         # Create the notes/documentation text entry
         self.notes = common.scrollable_text_frame(parent_frame, max_height=10, max_width=38,
@@ -179,40 +177,50 @@ class cv_programming_element():
         self.notes.set_value("Document your CV configuration here")
         # Create the Save/load Buttons and the filename label in a subframe to center them
         self.subframe2 = Tk.Frame(parent_frame)
-        self.subframe2.pack(fill='y')
+        self.subframe2.pack()
         self.B3a = Tk.Button (self.subframe2, text = "Examples",command=lambda:self.load_config(examples=True))
-        self.B3a.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B3a.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT3a = common.CreateToolTip(self.B3a, "Open the folder containing example CV configuration files")
         self.B3b = Tk.Button (self.subframe2, text = "Open",command=self.load_config)
-        self.B3b.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B3b.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT3b = common.CreateToolTip(self.B3b, "Load a CV configuration from file")
         self.B4 = Tk.Button (self.subframe2, text = "Save",command=lambda:self.save_config(save_as=False))
-        self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B4.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT4 = common.CreateToolTip(self.B4, "Save the current CV configuration to file")
         self.B5 = Tk.Button (self.subframe2, text = "Save as",command=lambda:self.save_config(save_as=True))
-        self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B5.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT5 = common.CreateToolTip(self.B5, "Save the current CV configuration as a new file")
+        self.label2 = Tk.Label(self.subframe2, text="CV File:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=5)
         self.name=Tk.Label(self.subframe2, width=45, borderwidth=1, relief="solid")
-        self.name.pack(side=Tk.LEFT, padx=2, pady=2, expand='y')
+        self.name.pack(side=Tk.LEFT, padx=2, pady=5, fill='y')
         self.nameTT = common.CreateToolTip(self.name, "Displays the name of the CV config file after save or load")
-    
+
+    def dcc_power_updated(self, state:bool):
+        self.dcc_power_state = state
+        if self.dcc_power_state and self.status.cget("text") == "Enable DCC power to program":
+            self.status.config(text="", fg="black")
+
     def read_all_cvs(self):
+        # Inhibit the buttons to stop another read/write being triggered
+        self.B1.config(state="disabled")
+        self.B2.config(state="disabled")
         # Force a focus out event to "accept" all values before programming (if the focus out
         # event is processed after programming it will be interpreted as the CV being updated
         # which will then set the read value back to blank as the CV value may have been changed
         self.B1.focus_set()
-        self.root_window.update()
+        self.parent_frame.update_idletasks()
         # Check programmng is enabled (DCC power on - which implies SPROG is connected
-        if not self.dcc_programming_enabled_function():
-            self.status.config(text="Connect to SPROG and enable DCC power to read CVs", fg="red")            
+        if not self.dcc_power_state:
+            self.status.config(text="Enable DCC power to program", fg="red")
         elif not self.cv_grid.validate():
             self.status.config(text="Entries on form need correcting", fg="red")            
         else:
-            self.status.config(text="Reading CVs", fg="black")
+            self.status.config(text="Reading Specified CVs", fg="black")
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_entry_element.current_value.set_value("")
             # Update idletasks to update the display (we're not returning to the main loop yet)
-            self.root_window.update_idletasks()
+            self.parent_frame.update_idletasks()
             read_errors = False
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_to_read = cv_entry_element.configuration_variable.get_value()
@@ -224,32 +232,41 @@ class cv_programming_element():
                         cv_entry_element.current_value.set_value("---")
                         read_errors = True
                     # Update idletasks to update the display (we're not returning to the main loop yet)
-                    self.root_window.update_idletasks()
+                    self.parent_frame.update_idletasks()
             if read_errors:
                 self.status.config(text="One or more CVs could not be read", fg="red")
             else:
-                self.status.config(text="")
+                self.status.config(text="All CVs have been read successfully", fg="green")
             # Cycle the power to enable the changes (revert back to normal operation)
+            # Note that these library calls are synchronous (unless they timeout)
             library.request_dcc_power_off()
             library.request_dcc_power_on()
+        # re-enable the buttons (update first to get rid of any ghost clicks)
+        self.parent_frame.update()
+        self.parent_frame.focus()
+        self.B1.config(state="normal")
+        self.B2.config(state="normal")
 
     def write_all_cvs(self):
+        # Inhibit the buttons to stop another read/write being triggered
+        self.B1.config(state="disabled")
+        self.B2.config(state="disabled")
         # Force a focus out event to "accept" all values before programming (if the focus out
         # event is processed after programming it will be interpreted as the value being updated
         # which will then set the colour of the value back to black as it may have been changed
         self.B1.focus_set()
-        self.root_window.update()
+        self.parent_frame.update_idletasks()
         # Check programmng is enabled (DCC power on - which implies SPROG is connected
-        if not self.dcc_programming_enabled_function():
-            self.status.config(text="Connect to SPROG and enable DCC power to write CVs", fg="red")            
+        if not self.dcc_power_state:
+            self.status.config(text="Enable DCC power to program", fg="red")
         elif not self.cv_grid.validate():
             self.status.config(text="Entries on form need correcting", fg="red")            
         else:
-            self.status.config(text="Writing CVs", fg="black")
+            self.status.config(text="Writing Specified CVs", fg="black")
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_entry_element.value_to_set.config(fg="black")
             # Update idletasks to update the display (we're not returning to the main loop yet)
-            self.root_window.update_idletasks()
+            self.parent_frame.update_idletasks()
             write_errors = False
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_to_write = cv_entry_element.configuration_variable.get_value()
@@ -262,18 +279,24 @@ class cv_programming_element():
                         cv_entry_element.value_to_set.config(fg="red")
                         write_errors = True
                     # Update idletasks to update the display (we're not returning to the main loop yet)
-                    self.root_window.update_idletasks()
+                    self.parent_frame.update_idletasks()
             if write_errors:
                 self.status.config(text="One or more CVs could not be written", fg="red")
             else:
-                self.status.config(text="")
+                self.status.config(text="All CVs have been written successfully", fg="green")
             # Cycle the power to enable the changes (revert back to normal operation)
+            # Note that these library calls are synchronous (unless they timeout)
             library.request_dcc_power_off()
             library.request_dcc_power_on()
+        # re-enable the buttons (update first to get rid of any ghost clicks)
+        self.parent_frame.update()
+        self.parent_frame.focus()
+        self.B1.config(state="normal")
+        self.B2.config(state="normal")
 
     def save_config(self, save_as:bool):
         self.B4.focus_set()
-        self.root_window.update()
+        self.parent_frame.update_idletasks()
         if not self.cv_grid.validate():
             self.status.config(text="Entries on form need correcting", fg="red")
         else:
@@ -281,16 +304,16 @@ class cv_programming_element():
             # Filename to save is the filename loaded - or ask the user
             if self.loaded_file == "" or save_as:
                 initial_filename = os.path.split(self.loaded_file)[1]
-                filename_to_save=Tk.filedialog.asksaveasfilename(title='Save CV Configuration', parent=self.parent_window,
+                filename_to_save=Tk.filedialog.asksaveasfilename(title='Save CV Configuration', parent=self.parent_frame,
                       filetypes=(('CV configuration files','*.cvc'),('all files','*.*')),initialfile=initial_filename)
                 # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
                 if filename_to_save == (): filename_to_save = ""
                 # If the filename is not blank enforce the '.cvc' extention
-                if filename_to_save != "" and not filename_to_save.endswith(".cvc"): filename_to_save.append(".cvc")
+                if filename_to_save != "" and not filename_to_save.endswith(".cvc"): filename_to_save += ".cvc"
             else:
                 filename_to_save = self.loaded_file
-            # Only continue (to save the file) if the filename is not blank
-            if filename_to_save != "":
+            # Only continue (to save the file) if the filename is not blank (empty tuple, empty string or None)
+            if filename_to_save:
                 # Create a json structure to save the data 
                 data_to_save = {}
                 data_to_save["filename"] = filename_to_save
@@ -304,21 +327,21 @@ class cv_programming_element():
                 try:
                     file_contents = json.dumps(data_to_save,indent=3,sort_keys=False)
                 except Exception as exception:
-                    Tk.messagebox.showerror(parent=self.parent_window,title="Data Error",message=str(exception))
+                    Tk.messagebox.showerror(parent=self.parent_frame,title="Data Error",message=str(exception))
                 else:
                     # write the json structure to file
                     try:
                         with open (filename_to_save,'w') as file: file.write(file_contents)
                         file.close
                     except Exception as exception:
-                        Tk.messagebox.showerror(parent=self.parent_window,title="File Save Error",message=str(exception))
+                        Tk.messagebox.showerror(parent=self.parent_frame,title="File Save Error",message=str(exception))
                     else:
                         self.loaded_file = filename_to_save
                         self.name.config(text="Configuration file: "+os.path.split(self.loaded_file)[1])
 
     def load_config(self, examples:bool=False):
         self.B4.focus_set()
-        self.root_window.update()
+        self.parent_frame.update_idletasks()
         # Set the initial path to the examples directory if required
         if examples:
             library_sub_package_folder = pathlib.Path(__file__)
@@ -326,22 +349,19 @@ class cv_programming_element():
         else:
             path = "."
         # Open the file chooser dialog to select a file
-        filename_to_load = Tk.filedialog.askopenfilename(parent=self.parent_window,title='Load CV configuration',
+        filename_to_load = Tk.filedialog.askopenfilename(parent=self.parent_frame,title='Load CV configuration',
                 filetypes=(('cvc files','*.cvc'),('all files','*.*')),initialdir = path)
-        # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
-        if filename_to_load == (): filename_to_load = ""
-        # Only continue (to load the file) if the filename is not blank
-        if filename_to_load != "":
+        # Only continue (to load the file) if the filename is not blank (empty tuple, empty string or None)
+        if filename_to_load:
             try:
                 with open (filename_to_load,'r') as file: loaded_data=file.read()
-                file.close
             except Exception as exception:
-                Tk.messagebox.showerror(parent=self.parent_window,title="File Load Error", message=str(exception))
+                Tk.messagebox.showerror(parent=self.parent_frame,title="File Load Error", message=str(exception))
             else:
                 try:
                     loaded_data = json.loads(loaded_data)
                 except Exception as exception:
-                    Tk.messagebox.showerror(parent=self.parent_window,title="File Parse Error", message=str(exception))
+                    Tk.messagebox.showerror(parent=self.parent_frame,title="File Parse Error", message=str(exception))
                 else:
                     self.loaded_file = filename_to_load
                     self.name.config(text="Configuration file: "+os.path.split(self.loaded_file)[1])
@@ -357,36 +377,44 @@ class cv_programming_element():
 #------------------------------------------------------------------------------------
 
 class one_touch_programming_element():
-    def __init__(self, parent_frame, dcc_programming_enabled_function):
-        self.dcc_programming_enabled_function = dcc_programming_enabled_function
+    def __init__(self, parent_frame):
+        self.dcc_power_state = False
         # Create the Address and entry Buttons (in a subframe to center them)
         self.subframe = Tk.Frame(parent_frame)
         self.subframe.pack()
-        self.label = Tk.Label(self.subframe, text="Address to program")
-        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label = Tk.Label(self.subframe, text="DCC Address:")
+        self.label.pack(side=Tk.LEFT, padx=2, pady=5)
         self.entry = common.dcc_entry_box(self.subframe, tool_tip="Enter the DCC address to program (1-2047)")
-        self.entry.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.entry.pack(side=Tk.LEFT, padx=2, pady=5)
         self.B1 = Tk.Button (self.subframe, text = "On (fwd)",command=lambda:self.send_command(True))
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B1.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT1 = common.CreateToolTip(self.B1, "Send an ON command to the selected DCC address")
         self.B2 = Tk.Button (self.subframe, text = "Off (rev)",command=lambda:self.send_command(False))
-        self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.B2.pack(side=Tk.LEFT, padx=2, pady=5)
         self.TT2 = common.CreateToolTip(self.B2, "Send an OFF command to the selected DCC address")
          # Create the Status Label
-        self.status = Tk.Label(self.subframe, width=45, borderwidth=1,  relief="solid", text="")
-        self.status.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label1 = Tk.Label(self.subframe, text="Status:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=5)
+        self.status = Tk.Label(self.subframe, width=50, borderwidth=1,  relief="solid", text="")
+        self.status.pack(side=Tk.LEFT, padx=2, pady=5, fill="y")
         self.statusTT = common.CreateToolTip(self.status, "Displays any programming error messages")
-    
+
+    def dcc_power_updated(self, state:bool):
+        self.dcc_power_state = state
+        if self.dcc_power_state and self.status.cget("text") == "Enable DCC power to program":
+            self.status.config(text="", fg="black")
+
     def send_command(self, command):
         self.subframe.focus_set()
         # Check programmng is enabled (DCC power on - which implies SPROG is connected
-        if not self.dcc_programming_enabled_function():
-            self.status.config(text="Connect to SPROG and enable DCC power to programme", fg="red")            
+        if not self.dcc_power_state:
+            self.status.config(text="Enable DCC power to program", fg="red")
         elif not self.entry.validate() or self.entry.get_value() < 1:
             self.status.config(text="Entered DCC address is invalid", fg="red")            
         else:
-            self.status.config(text="")
-            library.send_accessory_short_event(self.entry.get_value(), command)
+            address = self.entry.get_value()
+            self.status.config(text=f"DCC Command: ({address:04d}:{command}) sent out to the DCC bus", fg="green")
+            library.send_accessory_short_event(address, command)
  
 #------------------------------------------------------------------------------------
 # Class for the "DCC Programming" window - Uses the classes above
@@ -395,7 +423,7 @@ class one_touch_programming_element():
 dcc_programming_window = None
 
 class dcc_programming():
-    def __init__(self, root_window, dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function):
+    def __init__(self, root_window):
         global dcc_programming_window
         # If there is already a dcc programming window open then we just make it jump to the top and exit
         if dcc_programming_window is not None and dcc_programming_window.winfo_exists():
@@ -406,27 +434,61 @@ class dcc_programming():
             # Create the top level window for DCC Programming 
             self.window = Tk.Toplevel(root_window)
             self.window.title("DCC Programming")
-            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.protocol("WM_DELETE_WINDOW", self.destroy)
             self.window.resizable(False, False)
             dcc_programming_window = self.window
+            # Global variable to track state of DCC power
+            self.dcc_power_state = False
             # Create the labelframe for "one Touch" DCC Programming
             self.labelframe1 = Tk.LabelFrame(self.window, text="DCC One Touch Programming")
             self.labelframe1.pack(padx=2, pady=2, fill='x')
-            self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_programming_enabled_function)
+            self.one_touch_programming = one_touch_programming_element(self.labelframe1)
             # Create the labelframe for CV Programming
             self.labelframe2 = Tk.LabelFrame(self.window, text="DCC Configuration Variable (CV) Programming")
             self.labelframe2.pack(padx=2, pady=2, fill='both', expand=True)
-            self.cv_programming = cv_programming_element(root_window, self.window, self.labelframe2,
-                    dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function)        
-            # Create the ok/close button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.close_window)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
-            self.B1.pack(padx=5, pady=5)
+            self.cv_programming = cv_programming_element(self.labelframe2)
+            # Create the DCC Power ON/OFF buttons and ok/close button
+            self.frame2 = Tk.Frame(self.window)
+            self.frame2.pack(fill="x", pady=5) # Allow frame to stretch across the window
+            # Configure column weights to handle centering
+            # Column 0 (Left) and Column 2 (Right) get weight=1 to push Column 1 to the center
+            self.frame2.columnconfigure(0, weight=1, uniform="group1")
+            self.frame2.columnconfigure(1, weight=0) # Center column stays tight to content
+            self.frame2.columnconfigure(2, weight=1, uniform="group1")
+            # DCC Power Function Buttons (Left Side)
+            self.B1 = Tk.Button(self.frame2, width=25, command=self.toggle_power)
+            self.B1.grid(row=0, column=0, sticky="w", padx=5)
+            self.B1TT = common.CreateToolTip(self.B1, text="Click to toggle local DCC Power On/Off (on this SPROG Node)")
+            # Standard window Control Buttons (Center)
+            self.B3 = Tk.Button (self.frame2, text = "Ok / Close", command=self.destroy)
+            self.B3.grid(row=0, column=1, padx=2, pady=2)
+            # Placeholder (Right Side)
+            self.placeholder = Tk.Label(self.frame2)
+            self.placeholder.grid(row=0, column=2, sticky="e", padx=5)
+            # Subscribe to DCC Power updates from the local SPROG Interface
+            library.subscribe_to_local_dcc_power_updates(self.dcc_power_updated)
+
+    def dcc_power_updated(self, dcc_power_state:bool):
+        self.dcc_power_state = dcc_power_state
+        if self.window.winfo_exists():
+            self.cv_programming.dcc_power_updated(dcc_power_state)
+            self.one_touch_programming.dcc_power_updated(dcc_power_state)
+            if dcc_power_state == True: self.B1.config(text="Local DCC Power is On", bg="green2", activebackground="green2", relief="sunken")
+            elif dcc_power_state == False: self.B1.config(text="Local DCC Power is Off", bg="tomato", activebackground="tomato", relief="raised")
+            else: self.B1.config(text="Local DCC Power ????", bg="orange2", activebackground="orange2", relief="raised" )
+
+    def toggle_power(self):
+        if self.dcc_power_state: library.request_dcc_power_off()
+        else: library.request_dcc_power_on()
 
     def close_window(self):
         global dcc_programming_window
+        library.unsubscribe_from_local_dcc_power_updates(self.dcc_power_updated)
         dcc_programming_window = None
         self.window.destroy()
+
+    def destroy(self):
+        self.close_window()
 
 #############################################################################################
 

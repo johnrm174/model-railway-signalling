@@ -91,9 +91,13 @@ def test_gpio_settings_update_functions():
 ######################################################################################################
 
 def run_all_settings_update_tests():
+    reset_log_counters()
     initialise_test_harness()
     set_edit_mode()
     test_gpio_settings_update_functions()
+    # Check the total number of Log Messages generated
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
 if __name__ == "__main__":

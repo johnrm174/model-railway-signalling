@@ -71,14 +71,13 @@ from . import objects
 from . import run_layout
 
 #------------------------------------------------------------------------------------
-# The Tkinter Root and Canvas Objects are saved as global variables for easy referencing
-# The automation_enabled and run_mode flags control the behavior of run_layout
+# The Tkinter Root and Canvas Objects are saved as global variables for easy
+# referencing. The run_mode flags control the behavior of the route buttons
 #------------------------------------------------------------------------------------
 
 root = None
 canvas = None
 run_mode = None
-automation_enabled = None
 
 enhanced_debugging = False
 
@@ -110,15 +109,6 @@ def initialise(root_window, canvas_object):
 def configure_edit_mode(edit_mode:bool):
     global run_mode
     run_mode = not edit_mode
-    # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
-    # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
-    enable_disable_schematic_routes()
-    initialise_all_schematic_routes()
-    return()
-
-def configure_automation(automation:bool):
-    global automation_enabled
-    automation_enabled = automation
     return()
 
 #------------------------------------------------------------------------------------
@@ -358,15 +348,20 @@ def initialise_all_schematic_routes():
             library.toggle_button(activated_entry_button_id)
             route_button_deselected_callback(activated_entry_button_id)
     activated_entry_button_id = 0
-    # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
+    # In RUN mode, any schematic routes that are still selected need to remain highlighted
+    # (layout load use case) De-selected routes are be cleared down.
     if run_mode:
         for str_route_button_id in objects.route_index.keys():
             if not library.button_state(int(str_route_button_id)):
                 reset_route_highlighting(int(str_route_button_id))
-                complete_route_cleardown(int(str_route_button_id))
+                # We set 'dont_enable_disable_schematic_routes' to true so we dont loop through
+                # all otherroute buttons to enable/disable them until we are finished
+                complete_route_cleardown(int(str_route_button_id), dont_enable_disable_schematic_routes=True)
         for str_route_button_id in objects.route_index.keys():
             if library.button_state(int(str_route_button_id)):
-                complete_route_setup(int(str_route_button_id))
+                # We set 'dont_enable_disable_schematic_routes' to true so we dont loop through
+                # all otherroute buttons to enable/disable them until we are finished
+                complete_route_setup(int(str_route_button_id), dont_enable_disable_schematic_routes=True)
     # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
     # We also clear down all signals along the route (otherwise NX routes can get into a funny state)
     else:
@@ -388,7 +383,11 @@ def initialise_all_schematic_routes():
                 # Toggle the button OFF and finish clearing down the route
                 library.toggle_button(int(str_route_button_id))
                 reset_route_highlighting(int(str_route_button_id))
-                complete_route_cleardown(int(str_route_button_id))
+                # We set 'dont_enable_disable_schematic_routes' to true so we dont loop through
+                # all otherroute buttons to enable/disable them until we are finished
+                complete_route_cleardown(int(str_route_button_id), dont_enable_disable_schematic_routes=True)
+    # Enable/disable all route buttons as required (now we have updated all buttons)
+    enable_disable_schematic_routes()
     return()
 
 #------------------------------------------------------------------------------------
@@ -605,7 +604,7 @@ def set_point_state(route_button_id:int, point_id:int, state:bool):
             root.update_idletasks()
     return()
 
-def complete_route_setup(route_button_id:int):
+def complete_route_setup(route_button_id:int, dont_enable_disable_schematic_routes:bool=False):
     # Signify that the route setup is now progress
     set_setup_in_progress_flag(route_button_id, False)
     # Find the applicable route definition and exit button ID (stored as the route button data)
@@ -661,11 +660,13 @@ def complete_route_setup(route_button_id:int):
         # Unlock the route button(s) now processing is complete
         library.unlock_button(route_button_id)
         if exit_button_id > 0: library.unlock_button(exit_button_id)
-        # Enable/disable all route buttons (including this one) as required
-        enable_disable_schematic_routes()
+    # Enable/disable all route buttons (including this one) as required
+    # Only if we are not in the middle of changing between run and edit
+    # modes - in which case hold off until we have reset all buttons
+    if not dont_enable_disable_schematic_routes: enable_disable_schematic_routes()
     return()
 
-def complete_route_cleardown(route_button_id:int):
+def complete_route_cleardown(route_button_id:int, dont_enable_disable_schematic_routes:bool=False):
     # Note that this function will get executed in both EDIT and RUN Modes
     # Find out if there is an Exit button associated with this route
     # Stored route data is {"route", "entrybutton", "exitbutton",}
@@ -684,7 +685,9 @@ def complete_route_cleardown(route_button_id:int):
     # Unlock the route button(s) now processing is complete
     library.unlock_button(route_button_id)
     # Enable/disable all route buttons (including this one) as required
-    enable_disable_schematic_routes()
+    # Only if we are not in the middle of changing between run and edit
+    # modes - in which case hold off until we have reset all buttons
+    if not dont_enable_disable_schematic_routes: enable_disable_schematic_routes()
     logging.info("RUN ROUTES - Clear-down of Route "+str(route_button_id)+" is now complete **********************************")
     return()
 
@@ -765,6 +768,14 @@ def route_button_selected_callback(route_button_id:int):
     # Process the callback depending on the type of the route
     if not route_object["entrybutton"] and not route_object["exitbutton"]:
         logging.debug("RUN ROUTES - ONE-CLICK Route Button "+str(route_button_id)+" has been selected")
+        # Clear down any NX Route selection that might be in progress
+        if activated_entry_button_id > 0:
+            activated_entry_button_data = library.get_button_data(activated_entry_button_id)
+            unhighlight_possible_routes(activated_entry_button_id)
+            # Toggle the activated_entry_button OFF unless it is an Exit button on an active route
+            if library.button_state(activated_entry_button_id) and activated_entry_button_data["entrybutton"] == 0:
+                library.toggle_button(activated_entry_button_id)
+                logging.debug("RUN ROUTES - Deselecting Activated Entry Button: "+str(activated_entry_button_id))
         logging.info("RUN ROUTES - Initiating set-up of ONE-CLICK Route from Button "+str(route_button_id))
         # For 'one click' buttons we use the first route definition (index=0). There is no
         # Exit button for these routes, so we set the exit button ID to 0.
@@ -863,14 +874,14 @@ def route_button_selected_callback(route_button_id:int):
             # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
             # As ENTRY Buttons are disabled unless there is one or more valid routes available
             ########################################################################################################
-            logging.error("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
+            logging.debug("RUN ROUTES - Deselecting ENTRY Button "+str(route_button_id)+" as no available routes")
             library.toggle_button(route_button_id)
     else:
         ########################################################################################################
         # DEFENSIVE PROGRAMMING - This case should never Happen in normal operation
         # As EXIT-ONLY Buttons should be disabled unless a route selection has been initiated
         ########################################################################################################
-        logging.error("RUN ROUTES - EXIT Button "+str(route_button_id)+" has been Selected - but no ENTRY button is active")
+        logging.debug("RUN ROUTES - EXIT Button "+str(route_button_id)+" has been Selected - but no ENTRY button is active")
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
         print("########## Took "+str(time_in_ms)+" milliseconds")
@@ -897,10 +908,9 @@ def unhighlight_possible_routes(route_button_id:int):
     library.reset_button_flashing(route_button_id)
     # Find the applicable route definition
     route_object = objects.schematic_objects[objects.route(route_button_id)]
-    # Find out what routes are viable and set them to flash
+    # Reset all route buttons - whether they are viable or not
     for route_definition in route_object["routedefinitions"]:
-        route_tooltip, route_viable = check_route_viable(route_definition)
-        if route_viable and route_definition["exitbutton"] > 0:
+        if route_definition["exitbutton"] > 0:
             library.reset_button_flashing(route_definition["exitbutton"])
     return()
 

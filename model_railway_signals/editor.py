@@ -25,7 +25,6 @@
 #    run_layout.configure_spad_popups() - On settings update or load
 #    run_layout.signal_updated_callback() - When applying the new pub/sub configuration
 #    run_layout.reset_layout() - Reset the schematic back to its default state
-#    run_routes.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    settings.check_for_import_conflicts() - Check for conflicts with existing settings
 #    settings.get_all() - Get all settings (for save)
@@ -72,14 +71,18 @@
 #    library.sprog_disconnect() - Disconnect from the Pi-SPROG
 #    library.request_dcc_power_off() - To turn off the track power
 #    library.request_dcc_power_on() - To turn on the track power
+#    library.subscribe_to_local_dcc_power_updates() - Subscribe to the DCC power status
 #
 #    library.configure_mqtt_client(settings) - configure client network details
 #    library.mqtt_broker_connect(url, port, user, password) - Connect to MQTT broker
 #    library.mqtt_broker_disconnect() - Disconnect from MQTT broker
 #
-#    library.reset_dcc_mqtt_configuration() - Resets the publish/subscribe configuration
-#    library.set_node_to_publish_dcc_commands(publish) - set note to publish DCC command feed
-#    library.subscribe_to_dcc_command_feed(nodes) - subscribe to DCC command feeds from other nodes
+#    library.reset_dcc_accessory_configuration() - Resets the publish/subscribe configuration
+#    library.reset_dcc_locomotive_configuration() - Resets the publish/subscribe configuration
+#    library.set_node_to_publish_dcc_accessory_commands(publish) - set note to publish DCC accessory commands
+#    library.subscribe_to_dcc_accessory_command_feed(nodes) - subscribe to DCC accessory commands from other nodes
+#    library.set_node_to_publish_dcc_locomotive_commands(publish) - set node to publish locomotive DCC commands
+#    library.subscribe_to_dcc_locomotive_command_feed(nodes) - subscribe to DCC locomotive commands from other nodes
 #
 #    library.gpio_interface_enabled() - is the app running on a Raspberry Pi
 #    library.reset_gpio_mqtt_configuration() - Resets the publish/subscribe configuration
@@ -101,10 +104,14 @@
 #------------------------------------------------------------------------------------
 
 import os
+import sys
 import tkinter as Tk
 import logging
 import argparse
 import pathlib
+import queue
+import time
+from logging.handlers import QueueHandler, QueueListener
 
 from . import objects
 from . import settings
@@ -113,6 +120,7 @@ from . import run_layout
 from . import run_routes
 from . import menubar
 from . import library
+from . import throttle_server
 
 # The following imports are only used for the advanced debugging functions
 import linecache
@@ -124,8 +132,14 @@ import tracemalloc
 
 class main_menubar:
     def __init__(self, root):
-        # Configure the logger (log level gets set later)
-        logging.basicConfig(format='%(levelname)s: %(message)s')
+        # The following parameters keep track of state
+        self.broker_connection_state = False
+        self.throttle_server_state = False
+        self.sprog_connection_state = False
+        self.sprog_power_state = None  # Unknown
+        # Subscribe to DCC Power state changes and throttle server
+        library.subscribe_to_local_dcc_power_updates(self.dcc_power_state_updated)
+        throttle_server.subscribe_to_server_status(self.throttle_server_state_updated)
         # Create the menu bar
         self.root = root
         self.mainmenubar = Tk.Menu(self.root)
@@ -194,8 +208,7 @@ class main_menubar:
         self.utilities_menu.add_command(label =" Application Upgrade...",
                 command=lambda:menubar.application_upgrade(self.root))
         self.utilities_menu.add_command(label =" DCC Programming...",
-                command=lambda:menubar.dcc_programming(self.root, self.dcc_programming_enabled,
-                                                         self.dcc_power_off, self.dcc_power_on))
+                command=lambda:menubar.dcc_programming(self.root))
         self.utilities_menu.add_command(label =" DCC Mappings...",
                 command=lambda:menubar.dcc_mappings(self.root))
         self.utilities_menu.add_command(label =" Exercise Points...",
@@ -204,6 +217,8 @@ class main_menubar:
                 command=lambda:menubar.import_layout(self.root, self.import_schematic))
         self.utilities_menu.add_command(label =" Item Renumbering...",
                 command=lambda:menubar.bulk_renumbering(self.root))
+        self.utilities_menu.add_command(label =" Locomotive Control...",
+                command=lambda:menubar.loco_control(self.root))
         self.utilities_menu.add_command(label =" MQTT Subscriptions...",
                 command=lambda:menubar.mqtt_subscriptions(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
@@ -219,6 +234,10 @@ class main_menubar:
                 command=lambda:menubar.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
                 command=lambda:menubar.edit_mqtt_settings(self.root, self.mqtt_update))
+        self.settings_menu.add_command(label =" Roster...",
+                command=lambda:menubar.edit_roster(self.root))
+        self.settings_menu.add_command(label =" Server...",
+                command=lambda:menubar.edit_server_settings(self.root))
         self.settings_menu.add_command(label =" Sounds...",
                 command=lambda:menubar.edit_sounds_settings(self.root, self.sounds_update))
         self.settings_menu.add_command(label =" SPROG...",
@@ -282,7 +301,8 @@ class main_menubar:
         elif args.log_level == "DEBUG": settings.set_logging("level", 4)
         self.logging_update()
         # Initialise the editor configuration at startup (using the default settings)
-        self.initialise_editor()
+        self.initialise_editor1()
+        self.initialise_editor2()
         # The following code is to help with advanced debugging (start the app with the -d flag)
         if args.debug_mode:
             self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -349,9 +369,11 @@ class main_menubar:
     
     # --------------------------------------------------------------------------------------
     # Common initialisation functions (called on editor start or layout load or new layout)
+    # initialise_editor1 is called prior to creating the schematic objects (layout load)
+    # initialise_editor2 is called after creating the schematic objects (layout load)
     # --------------------------------------------------------------------------------------
     
-    def initialise_editor(self):
+    def initialise_editor1(self):
         # Set the root window label to the name of the current file (split from the dir path)
         # The filename returned from get_settings is the fully qualified filename
         path, name = os.path.split(settings.get_general("filename"))
@@ -361,37 +383,66 @@ class main_menubar:
         # Reset the SPROG and MQTT connecions to their default states - the MQTT and SPROG
         # configuration settings in the loaded file may be completely different so we
         # want to close down everything before re-opening everything from scratch
-        if self.power_label == "DCC Power:On": self.dcc_power_off()
-        if self.sprog_label == "SPROG:Connected":self.sprog_disconnect()
-        if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
-        # Initialise the SPROG (if configured). Note that we use the menubar functions
-        # for connection and the DCC power so these are correctly reflected in the UI
-        if settings.get_sprog("startup"):
-            sprog_connected = self.sprog_connect()
-            if sprog_connected and settings.get_sprog("power"):
-                self.dcc_power_on()
-        # Initialise the MQTT networking (if configured). Note that we use the menubar
-        # functionfor connection so the state is correctly reflected in the UI.
-        # The "connect on startup" flag is the 8th parameter returned.
+        if self.sprog_power_state: self.dcc_power_off()
+        if self.sprog_connection_state:self.sprog_disconnect()
+        if self.throttle_server_state: throttle_server.stop_throttle_server()
+        if self.broker_connection_state: self.mqtt_disconnect()
         self.reset_mqtt_pub_sub_configuration()
+        # Initialise the MQTT networking at startup (even if they are blank as
+        # the pub/sub configuration needs to be applied prior to object creation)
         self.mqtt_reconfigure_client()
-        if settings.get_mqtt("startup"): self.mqtt_connect()
         self.apply_new_mqtt_pub_sub_configuration()
-        # Both the automation_enable and automation_disable calls will update the 'run_layout' module
-        if settings.get_general("automation"): self.automation_enable()
-        else: self.automation_disable()
-        # Both the "edit_mode" and "run_mode" calls will update the 'run_layout' module
-        if settings.get_general("editmode"): self.edit_mode()
-        else: self.run_mode()
-        # Create all the track sensor objects that have been defined
+        # Update the mode and automation indications to reflect the new selections
+        # Note that we don't initialise anything based on these settings just yet
+        # This will be done when any schematic objects have been created
+        self.update_automation_indication()
+        self.update_mode_indication()
+        # Create all the track sensor objects that have been defined. This needs to be 
+        # done after the objects have been created but before the MQTT configuration
         self.gpio_update()
         # Apply any other general settings
         self.general_settings_update()
         self.sounds_update()
-        
+
+    def initialise_editor2(self):
+        # Connect the MQTT Broker on startup (if configured). We do this after
+        # creating all the objects so any DCC command messages generated are
+        # queued, and we can control the rate of this initial transmission
+        if settings.get_mqtt("startup"):
+            self.mqtt_connect()
+        # Connect the SPROG and enable DCC power on startup (if configured).
+        # We do this after creating all the objects so any DCC commands generated
+        # are queued, and we can control the rate of this initial transmission
+        if settings.get_sprog("startup"):
+            sprog_connected = self.sprog_connect()
+            if sprog_connected and settings.get_sprog("power"):
+                self.dcc_power_on()
+        # Start the WiThrottle server if it is configured to start at layout load:
+        if settings.get_control("serverstartup"):
+            debugging = settings.get_control("serverdebugging")
+            allow_list = settings.get_control("serverallowlist")
+            enforce_allow_list = settings.get_control("serverenforceallow")
+            throttle_server.start_throttle_server(debugging, allow_list, enforce_allow_list)
+        # Initialise the schematic
+        schematic.configure_edit_mode(settings.get_general("editmode"))
+        library.configure_edit_mode(settings.get_general("editmode"))
+        run_layout.configure_edit_mode(settings.get_general("editmode"))
+        run_routes.configure_edit_mode(settings.get_general("editmode"))
+        run_layout.configure_automation(settings.get_general("automation"))
+        run_layout.initialise_layout()
+
+    # --------------------------------------------------------------------------------------
+    # Callback function to handle state changes for the throttle server. We only care about
+    # this for shutdown and file load operations so we can change the state deterministically
+    # --------------------------------------------------------------------------------------
+
+    def throttle_server_state_updated(self, server_state:bool, connected_clients:list):
+        self.throttle_server_state = server_state
+
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
     # --------------------------------------------------------------------------------------
+
     def handle_canvas_event(self, event=None):
         # Note that event.keysym returns the character (event.state would be 'Control')
         if event.keysym == 'm':
@@ -410,61 +461,63 @@ class main_menubar:
     #------------------------------------------------------------------------------------------
     # Mode menubar functions
     #------------------------------------------------------------------------------------------
-        
-    def automation_enable(self):
-        new_label = "Automation:On"
+
+    def update_automation_indication(self):
+        if settings.get_general("automation"): new_label = "Automation:On"
+        else: new_label = "Automation:Off"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
-        settings.set_general("automation", True)
-        run_layout.configure_automation(True)
-        run_routes.configure_automation(True)
-        run_layout.initialise_layout()
+
+    def automation_enable(self):
+        if not settings.get_general("automation"):
+            settings.set_general("automation", True)
+            run_layout.configure_automation(True)
+            run_layout.initialise_layout()
+            self.update_automation_indication()
 
     def automation_disable(self):
-        new_label = "Automation:Off"
-        self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
-        self.auto_label = new_label
-        settings.set_general("automation", False)
-        run_layout.configure_automation(False)
-        run_routes.configure_automation(False)
-        run_layout.initialise_layout()
+        if settings.get_general("automation"):
+            settings.set_general("automation", False)
+            run_layout.configure_automation(False)
+            run_layout.initialise_layout()
+            self.update_automation_indication()
+
+    def update_mode_indication(self):
+        if settings.get_general("editmode"):
+            new_label = "Mode:Edit"
+            # Disable the automation menubar selection and set to "off" (automation is always disabled
+            # in Run mode so we just need to update the indication (no need to update 'run_layout')
+            new_label1 = "Automation:N/A"
+            self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
+            self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
+            self.auto_label = new_label1
+        else:
+            new_label = "Mode:Run"
+            # Enable the the automation menubar selection and update to reflect the current setting
+            self.mainmenubar.entryconfigure(self.auto_label, state="normal")
+            self.update_automation_indication()
+        self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
+        self.mode_label = new_label
 
     def edit_mode(self):
-        if self.mode_label != "Mode:Edit":
-            new_label = "Mode:Edit"
-            self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
-            self.mode_label = new_label
+        if not settings.get_general("editmode"):
             settings.set_general("editmode", True)
             schematic.configure_edit_mode(True)
             library.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
             run_routes.configure_edit_mode(True)
             run_layout.initialise_layout()
-        # Disable the automation menubar selection and set to "off" (automation is always disabled
-        # in Run mode so we just need to update the indication (no need to update 'run_layout')
-        new_label1 = "Automation:N/A"
-        self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
-        self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
-        self.auto_label = new_label1
+            self.update_mode_indication()
         
     def run_mode(self):
-        if self.mode_label != "Mode:Run":
-            new_label = "Mode:Run"
-            self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
-            self.mode_label = new_label
+        if settings.get_general("editmode"):
             settings.set_general("editmode", False)
             schematic.configure_edit_mode(False)
             library.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
             run_routes.configure_edit_mode(False)
             run_layout.initialise_layout()
-        # Enable the the automation menubar selection and update to reflect the current setting
-        # (This will be enabled or disabled according to the current setting)
-        if settings.get_general("automation"): new_label1 = "Automation:On"
-        else: new_label1 = "Automation:Off"
-        self.mainmenubar.entryconfigure(self.auto_label, state="normal")
-        self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
-        self.auto_label = new_label1
+            self.update_mode_indication()
 
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
@@ -482,35 +535,27 @@ class main_menubar:
     # SPROG menubar functions
     #------------------------------------------------------------------------------------------
 
-    def update_sprog_menubar_controls(self, desired_state:bool, connected:bool, show_popup:bool):
-        if connected:
+    def update_sprog_menubar_controls(self):
+        if self.sprog_connection_state:
             new_label = "SPROG:Connected"
+            self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
             self.mainmenubar.entryconfigure(self.power_label, state="normal")
-            if show_popup and connected != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="Error disconnecting from Serial Port - try rebooting")
+            self.sprog_label= new_label
         else:
             new_label = "SPROG:Disconnected"
+            self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
             self.mainmenubar.entryconfigure(self.power_label, state="disabled")
-            if show_popup and connected != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="SPROG connection failure - Check SPROG settings")
-        self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
-        self.sprog_label = new_label
+            self.sprog_label= new_label
 
-    def update_power_menubar_controls(self, desired_state:bool, power_on:bool):
-        if power_on:
+    def update_power_menubar_controls(self):
+        if self.sprog_power_state == True:
             new_label = "DCC Power:On"
-            if power_on != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="DCC power off failed - Check SPROG settings")
-        else:
+            self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+            self.power_label = new_label
+        elif self.sprog_power_state == False:
             new_label = "DCC Power:Off"
-            if power_on != desired_state:
-                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="DCC power on failed - Check SPROG settings")
-        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
-        self.power_label = new_label
+            self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+            self.power_label = new_label
 
     def sprog_connect(self, show_popup:bool=True):
         # The connect request returns True if successful
@@ -518,32 +563,43 @@ class main_menubar:
         baud = settings.get_sprog("baud")
         address_mode = settings.get_sprog("addressmode")
         debug = settings.get_sprog("debug")
-        connected = library.sprog_connect(port, baud, address_mode, debug)
-        self.update_sprog_menubar_controls(True, connected, show_popup)
-        return(connected)
+        self.sprog_connection_state = library.sprog_connect(port, baud, address_mode, debug)
+        self.update_sprog_menubar_controls()
+        return(self.sprog_connection_state)
     
-    def sprog_disconnect(self):
+    def sprog_disconnect(self, show_popup:bool=True):
         # The disconnect request returns True if successful
-        connected = not library.sprog_disconnect()
-        self.update_sprog_menubar_controls(False, connected, True)
+        self.sprog_connection_state = not library.sprog_disconnect()
+        self.update_sprog_menubar_controls()
+        if show_popup and self.sprog_connection_state:
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                message="Error disconnecting from Serial Port - try rebooting")
+
+    def dcc_power_off(self, show_popup:bool=True):
+        # The power off request returns True if successful
+        if not library.request_dcc_power_off() and show_popup:
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                message="DCC power off failed - Check SPROG settings")
+        return()
+
+    def dcc_power_on(self, show_popup:bool=True):
+        # The power on request returns True if successful
+        if not library.request_dcc_power_on() and show_popup:
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                message="DCC power on failed - Check SPROG settings")
+        return()
 
     def sprog_update(self):
         # Only update the configuration if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
-        if self.sprog_label == "SPROG:Connected": self.sprog_connect()
+        if self.sprog_connection_state: self.sprog_connect()
 
-    def dcc_power_off(self):
-        # The power off request returns True if successful
-        power_on = not library.request_dcc_power_off()
-        self.update_power_menubar_controls(False, power_on)
-
-    def dcc_power_on(self):
-        # The power on request returns True if successful
-        power_on = library.request_dcc_power_on()
-        self.update_power_menubar_controls(True, power_on)
+    def dcc_power_state_updated(self, dcc_power:bool):
+        self.sprog_power_state = dcc_power
+        self.update_power_menubar_controls()
 
     def dcc_programming_enabled(self):
-        return (self.power_label=="DCC Power:On" and self.sprog_label=="SPROG:Connected")
+        return (self.sprog_power_state and self.sprog_connection_state)
 
     #------------------------------------------------------------------------------------------
     # MQTT menubar functions - The MQTT library module now calls back into the 'update mqtt
@@ -551,13 +607,16 @@ class main_menubar:
     # the connect/disconnect functions to return (with the status)
     #------------------------------------------------------------------------------------------
 
-    def update_mqtt_menubar_controls(self, connected:bool):
-        if connected:
+    def update_mqtt_menubar_controls(self, broker_connection_state):
+        self.broker_connection_state = broker_connection_state
+        if self.broker_connection_state:
             new_label = "MQTT:Connected"
+            self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+            self.mqtt_label = new_label
         else:
             new_label = "MQTT:Disconnected"
-        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
-        self.mqtt_label = new_label
+            self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+            self.mqtt_label = new_label
 
     def mqtt_connect(self):
         url = settings.get_mqtt("url")
@@ -566,7 +625,6 @@ class main_menubar:
         password = settings.get_mqtt("password")
         library.mqtt_broker_connect(url, port, broker_username=username, broker_password=password,
                                         status_callback=self.update_mqtt_menubar_controls)
-        return()
 
     def mqtt_disconnect(self):
         library.mqtt_broker_disconnect()
@@ -579,7 +637,7 @@ class main_menubar:
         # Only reset the broker connection if we are already connected or if the
         # user has clicked the "apply and connect" button in the UI - otherwise
         # do nothing (wait until the next time the user attempts to connect)
-        if apply_and_connect or self.mqtt_label == "MQTT:Connected" : self.mqtt_connect()
+        if apply_and_connect or self.broker_connection_state : self.mqtt_connect()
         # Reconfigure all publish and subscribe settings
         self.apply_new_mqtt_pub_sub_configuration()
         
@@ -593,22 +651,27 @@ class main_menubar:
                         shutdown_callback = lambda:self.quit_schematic(ask_for_confirm=False))
         
     def reset_mqtt_pub_sub_configuration(self):
-        library.reset_dcc_mqtt_configuration()
+        library.reset_dcc_accessory_mqtt_configuration()
+        library.reset_dcc_locomotive_mqtt_configuration()
         library.reset_gpio_mqtt_configuration()
         library.reset_signals_mqtt_configuration()
         library.reset_sections_mqtt_configuration()
         library.reset_instruments_mqtt_configuration()
         
     def apply_new_mqtt_pub_sub_configuration(self):
-        library.set_node_to_publish_dcc_commands(settings.get_mqtt("pubdcc"))
-        library.subscribe_to_dcc_command_feed(*settings.get_mqtt("subdccnodes"))
+        # Publish Configuration
+        library.set_node_to_publish_dcc_accessory_commands(settings.get_mqtt("pubdcc"))
+        library.set_node_to_publish_dcc_locomotive_commands(settings.get_mqtt("publoco"), settings.get_mqtt("publoconode"))
         library.set_gpio_sensors_to_publish_state(*settings.get_mqtt("pubsensors"))
-        library.subscribe_to_remote_gpio_sensors(*settings.get_mqtt("subsensors"))
         library.set_signals_to_publish_state(*settings.get_mqtt("pubsignals"))
-        library.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_mqtt("subsignals"))
         library.set_sections_to_publish_state(*settings.get_mqtt("pubsections"))
-        library.subscribe_to_remote_sections(*settings.get_mqtt("subsections"))
         library.set_instruments_to_publish_state(*settings.get_mqtt("pubinstruments"))
+        # Subscribe Configuration
+        library.subscribe_to_dcc_accessory_command_feed(*settings.get_mqtt("subdccnodes"))
+        library.subscribe_to_dcc_locomotive_command_feed(*settings.get_mqtt("subloconodes"))
+        library.subscribe_to_remote_gpio_sensors(*settings.get_mqtt("subsensors"))
+        library.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_mqtt("subsignals"))
+        library.subscribe_to_remote_sections(*settings.get_mqtt("subsections"))
         library.subscribe_to_remote_instruments(*settings.get_mqtt("subinstruments"))
         objects.configure_remote_gpio_sensor_event_mappings()
 
@@ -712,8 +775,11 @@ class main_menubar:
             # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
             # power and disconnect from the serial port, Revert all GPIO ports to their default states
             # and then wait until all scheduled Tkinter tasks have completed before destroying root)
+            # Also stop the Throttle Server (as its the right thing to do)
             schematic.shutdown()
             library.orderly_shutdown()
+            if self.throttle_server_state:
+                throttle_server.stop_throttle_server()
         return()
                 
     def new_schematic(self, ask_for_confirm:bool=True):
@@ -730,7 +796,8 @@ class main_menubar:
             # Delete all existing objects, restore the default settings and re-initialise the editor
             schematic.delete_all_objects()
             settings.restore_defaults()
-            self.initialise_editor()
+            self.initialise_editor1()
+            self.initialise_editor2()
             # Save the current state (for undo/redo) - deleting all previous history
             objects.save_schematic_state(reset_pointer=True)
             # Set the file saved flag back to false (to force a "save as" on next save)
@@ -820,10 +887,13 @@ class main_menubar:
                     # Set the filename to reflect that actual name of the loaded file
                     settings.set_general("filename", file_loaded)
                     # Re-initialise the editor for the new settings to take effect
-                    self.initialise_editor()
+                    self.initialise_editor1()
                     # Create the loaded layout objects then purge the loaded state information
                     logging.info("CREATING-NEW-OBJECTS*****************************************************************************")
                     objects.set_all(layout_state["objects"])
+                    logging.info("Initialising SPROG and MQTT**********************************************************************")
+                    # Re-initialise the editor for the new settings to take effect
+                    self.initialise_editor2()
                     # Purge the loaded state (to stope it being erroneously inherited when items are deleted/created with the same IDs)
                     library.purge_loaded_state_information()
                     # Set the flag so we don't enforce a "save as" on next save
@@ -877,6 +947,8 @@ class main_menubar:
                             self.gpio_update()
                             logging.info("CREATING-NEW-OBJECTS*****************************************************************************")
                             objects.extend(layout_state["objects"], xoffset=xoffset, yoffset=yoffset)
+                            # Re-initialise the editor for the new settings to take effect
+                            self.initialise_editor2()
             else:
                 logging.error("LOAD LAYOUT - File does not contain all required elements")
                 Tk.messagebox.showerror(parent=self.root, title="Load Error", 
@@ -889,7 +961,37 @@ class main_menubar:
 
 def run_editor():
     print("Starting Model Railway Signalling application")
+    #---------------------------------------------------------------------------------
+    # Set up the logging (we use queues to avoind locking problems betweeen threads)
+    #---------------------------------------------------------------------------------
+    # Get the root logger
+    current_logger = logging.getLogger()
+    # REMOVE any existing handlers to prevent duplicates
+    while current_logger.handlers: current_logger.removeHandler(current_logger.handlers[0])
+    # Create a queue for log records
+    log_queue = queue.Queue(-1) # Infinite size
+    # Set a formatter for the logs
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+    # Setup the Terminal Handler (StreamHandler) and file handler
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    file_log_handler = logging.FileHandler("model_railway_signalling.log", mode='w')
+    file_log_handler.setFormatter(formatter)
+    # Create the Listener that runs in the background, pull logs from the queue and send them to the handlers
+    log_listener = QueueListener(log_queue, console_handler, file_log_handler)
+    log_listener.start()
+    # Configure the root logger to use the QueueHandler
+    root_logger = logging.getLogger()
+    root_logger.addHandler(QueueHandler(log_queue))
+    # Add a header into the file:
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    file_log_handler.stream.write(f"{timestamp} - Starting Model Railway Signals application\n")
+    file_log_handler.flush()
+    try: os.fsync(file_log_handler.stream.fileno())
+    except (AttributeError, ValueError): pass
+    #---------------------------------------------------------------------------------
     # Create the Main Root Window
+    #---------------------------------------------------------------------------------
     root = Tk.Tk()
     # Configure Tkinter to not show hidden files in the file open/save dialogs
     # Full credit to Stack Overflow for the solution to this problem
@@ -912,7 +1014,9 @@ def run_editor():
     main_window_menubar = main_menubar(root)
     # Bind the close window event to the editor quit function to perform an orderly shutdown
     root.protocol("WM_DELETE_WINDOW", main_window_menubar.quit_schematic)
+    #---------------------------------------------------------------------------------
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
+    #---------------------------------------------------------------------------------
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
@@ -920,8 +1024,11 @@ def run_editor():
         # perform an instant shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
         # power and disconnect from the serial port, Revert all GPIO ports to their default states
         # and then wait until all scheduled Tkinter tasks have completed before destroying root
+        # Also stop the Throttle Server (as its the right thing to do)
         schematic.shutdown()
         library.instant_shutdown()
+        if main_window_menubar.throttle_server_state:
+            throttle_server.stop_throttle_server()
     print("Exiting Model Railway Signalling application")
 
 ####################################################################################

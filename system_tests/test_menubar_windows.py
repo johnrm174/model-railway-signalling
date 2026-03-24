@@ -84,10 +84,10 @@ def callback_function():
     print("Received callback that settings have been updated")
 
 def mqtt_callback_function(apply_and_connect:bool=False):
-    print("Received callback that mqtt settings have been updated - apply_and_connect = ", apply_and_connect)
+    print("Received callback that mqtt settings have been updated - apply_and_connect = "+str(apply_and_connect))
 
 def sprog_connect_function(show_popup):
-    print("Received Connect callback - Show Popup = ",show_popup)
+    print("Received Connect callback - Show Popup = "+str(show_popup))
 
 def test_menubar_settings_windows():
     # ------------------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ def test_menubar_settings_windows():
     # we need to check the config remains unchanged
     initial_settings = copy.deepcopy(settings.settings["control"]["dccsoundmappings"])
     # Open the window (we then sleep twice the delay as it tests open and re-open)
-    system_test_harness.run_function(lambda:open_window(menubar.edit_sounds_settings), timeout=5.0)
+    system_test_harness.run_function(lambda:open_window(menubar.edit_sounds_settings, callback_function), timeout=5.0)
     # Apply
     system_test_harness.run_function(lambda:close_window(apply=True), timeout=5.0)
     # Revert
@@ -217,8 +217,7 @@ def test_menubar_utilities_windows():
     print("Testing Menubar utilities windows - DCC PROGRAMMING")
     # All we can do is open the window (we then sleep twice the delay as it tests open and re-open)
     # At a later stage I might develop further tests for the DCC Programming functions
-    system_test_harness.run_function(lambda:open_window(menubar.dcc_programming,
-                            dummy_function, dummy_function, dummy_function), timeout=5.0)
+    system_test_harness.run_function(lambda:open_window(menubar.dcc_programming), timeout=5.0)
     # OK (Close Window)
     system_test_harness.run_function(lambda:close_window(cancel=True), timeout=5.0)
     print("Testing Menubar utilities windows - DCC MAPPINGS")
@@ -387,7 +386,7 @@ def test_menubar_styles_windows():
 ######################################################################################################
 
 def run_all_menubar_window_tests():
-    system_test_harness.report_results()
+    system_test_harness.reset_log_counters()
     # Load a layout file with plenty of 'active' config for these tests
     system_test_harness.initialise_test_harness(filename="./test_mqtt_networking.sig")
     test_menubar_help_windows()
@@ -396,6 +395,9 @@ def run_all_menubar_window_tests():
     # Load a layout to test the style changes
     system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/absolute_block_example.sig")
     test_menubar_styles_windows()
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     system_test_harness.report_results()
     
 if __name__ == "__main__":

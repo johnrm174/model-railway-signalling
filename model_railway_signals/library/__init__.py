@@ -49,7 +49,7 @@ from .signals import subsidary_clear
 from .signals import signal_state
 from .signals import subsidary_state
 from .signals import trigger_timed_signal
-from .signals import update_colour_light_signal
+from .signals import update_signal_aspect
 from .signals import reset_signals_mqtt_configuration
 from .signals import subscribe_to_remote_signals
 from .signals import set_signals_to_publish_state
@@ -159,9 +159,22 @@ from .dcc_control import map_dcc_switch
 from .dcc_control import delete_point_mapping
 from .dcc_control import delete_signal_mapping
 from .dcc_control import delete_switch_mapping
-from .dcc_control import reset_dcc_mqtt_configuration
-from .dcc_control import set_node_to_publish_dcc_commands
-from .dcc_control import subscribe_to_dcc_command_feed
+from .dcc_control import reset_dcc_accessory_mqtt_configuration
+from .dcc_control import set_node_to_publish_dcc_accessory_commands
+from .dcc_control import subscribe_to_dcc_accessory_command_feed
+
+from .loco_control import request_track_power_on
+from .loco_control import request_track_power_off
+from .loco_control import subscribe_to_dcc_power_updates
+from .loco_control import unsubscribe_from_dcc_power_updates
+from .loco_control import request_loco_session
+from .loco_control import release_loco_session
+from .loco_control import send_emergency_stop
+from .loco_control import set_loco_speed_and_direction
+from .loco_control import set_loco_function
+from .loco_control import reset_dcc_locomotive_mqtt_configuration
+from .loco_control import set_node_to_publish_dcc_locomotive_commands
+from .loco_control import subscribe_to_dcc_locomotive_command_feed
 
 from .gpio_sensors import gpio_sensor_triggered
 from .gpio_sensors import gpio_sensor_released
@@ -194,10 +207,13 @@ from .pi_sprog_interface import sprog_disconnect
 from .pi_sprog_interface import service_mode_read_cv
 from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import send_accessory_short_event
+from .pi_sprog_interface import subscribe_to_local_dcc_power_updates
+from .pi_sprog_interface import unsubscribe_from_local_dcc_power_updates
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
 from .pi_sprog_interface import enable_status_reporting
 from .pi_sprog_interface import disable_status_reporting
+
 from .pi_sprog_interface import add_dcc_sound_mapping
 from .pi_sprog_interface import reset_dcc_sound_mappings
 from .pi_sprog_interface import play_dcc_sound_file
@@ -297,7 +313,7 @@ __all__ = [
         'signal_state',
         'subsidary_state',
         'trigger_timed_signal',
-        'update_colour_light_signal',
+        'update_signal_aspect',
         'reset_signals_mqtt_configuration',
         'subscribe_to_remote_signals',
         'set_signals_to_publish_state',
@@ -342,6 +358,8 @@ __all__ = [
         'service_mode_read_cv',
         'service_mode_write_cv',
         'send_accessory_short_event',
+        'subscribe_to_local_dcc_power_updates',
+        'unsubscribe_from_local_dcc_power_updates',
         'request_dcc_power_on',
         'request_dcc_power_off',
         'enable_status_reporting',
@@ -349,7 +367,20 @@ __all__ = [
         'add_dcc_sound_mapping',
         'reset_dcc_sound_mappings',
         'play_dcc_sound_file',
-      # Public DCC control functions
+      # Public DCC Loco Control Functions
+        'request_loco_session',
+        'release_loco_session',
+        'set_loco_speed_and_direction',
+        'set_loco_function',
+        'send_emergency_stop',
+        'reset_dcc_locomotive_mqtt_configuration',
+        'subscribe_to_dcc_locomotive_command_feed',
+        'set_node_to_publish_dcc_locomotive_commands',
+        'subscribe_to_dcc_power_updates',
+        'unsubscribe_from_dcc_power_updates',
+        'request_track_power_on',
+        'request_track_power_off',
+      # Public DCC Accessory control functions
         'get_dcc_address_mappings',
         'dcc_address_mapping',
         'map_dcc_signal',
@@ -359,9 +390,9 @@ __all__ = [
         'delete_point_mapping',
         'delete_signal_mapping',
         'delete_switch_mapping',
-        'reset_dcc_mqtt_configuration',
-        'subscribe_to_dcc_command_feed',
-        'set_node_to_publish_dcc_commands',
+        'reset_dcc_accessory_mqtt_configuration',
+        'subscribe_to_dcc_accessory_command_feed',
+        'set_node_to_publish_dcc_accessory_commands',
       # Public MQTTnetworking functions
         'configure_mqtt_client',
         'mqtt_broker_connect',

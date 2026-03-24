@@ -162,6 +162,137 @@ import tkinter
 import time
 import copy
 import threading
+from logging.handlers import QueueHandler, QueueListener
+import queue
+import sys
+from collections import Counter
+
+# ------------------------------------------------------------------------------
+# Sort out the logging
+# ------------------------------------------------------------------------------
+
+import logging
+import queue
+import sys
+from logging.handlers import QueueHandler, QueueListener
+
+
+import logging
+from collections import Counter
+
+# ------------------------------------------------------------------------------
+# Custom Log Message count handler - so we can assert the number of messages raised
+# ------------------------------------------------------------------------------
+
+class LogCounterHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        # Initialize counts for standard levels + your custom HARNESS_PRINT
+        self.counts = Counter({'DEBUG': 0, 'INFO': 0, 'WARNING': 0, 'ERROR': 0, 'CRITICAL': 0,'HARNESS': 0})
+    def emit(self, record):
+        # Update by level name (handles custom levels if they are registered)
+        self.counts[record.levelname] += 1
+    def get_report(self):
+        return dict(self.counts)
+    def reset(self):
+        self.counts.clear()
+
+# Initialize the counter
+log_counter = LogCounterHandler()
+
+# API Functions for querying the Log counts
+
+def reset_log_counters():
+    log_counter.reset()
+    
+def assert_warning_logs_generated(expected:int):
+    actual = log_counter.get_report().get('WARNING', 0)
+    if expected != actual:
+        raise_test_error (f"assert_warning_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_error_logs_generated(expected:int):
+    actual = log_counter.get_report().get('ERROR', 0)
+    if expected != actual:
+        raise_test_error (f"assert_error_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_debug_logs_generated(expected:int):
+    actual = log_counter.get_report().get('DEBUG', 0)
+    if expected != actual:
+        raise_test_error (f"assert_debug_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_info_logs_generated(expected:int):
+    actual = log_counter.get_report().get('INFO', 0)
+    if expected != actual:
+        raise_test_error (f"assert_info_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+def assert_test_harness_logs_generated(expected:int):
+    actual = log_counter.get_report().get('HARNESS', 0)
+    if expected != actual:
+        raise_test_error (f"assert_test_harness_logs_generated - Expected: {expected}, Actual: {actual} - Test Fail")
+    increment_tests_executed()
+
+# ------------------------------------------------------------------------------
+# Custom Logger
+# ------------------------------------------------------------------------------
+
+# Custom Formatter to handle the formatting logic
+class HarnessFormatter(logging.Formatter):
+    def format(self, record):
+        # ANSI Codes
+        GREEN = '\033[32m'
+        ORANGE = '\033[33m'
+        RED = '\033[31m'
+        RESET = '\033[0m'
+        # Determine Color strictly by levelno
+        color = ""
+        if record.levelno == 25: color = GREEN
+        elif record.levelno == logging.WARNING: color = ORANGE
+        elif record.levelno >= logging.ERROR: color = RED
+        # Apply Logic
+        if record.levelno == 25: return f"{color}{self.formatTime(record)} - ############### {record.getMessage()}{RESET}"
+        elif color: return f"{color}{super().format(record)}{RESET}"
+        return super().format(record)
+
+# Setup the Root Logger
+current_logger = logging.getLogger()
+while current_logger.handlers: current_logger.removeHandler(current_logger.handlers[0])
+#Setup Logging Queue
+log_queue = queue.Queue(-1)
+# Define a custom level to log Test Script Print Statements (Level 25)
+HARNESS_PRINT = 25
+logging.addLevelName(HARNESS_PRINT, "HARNESS")
+#Setup Terminal Handler
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(HarnessFormatter('%(asctime)s - %(levelname)s: %(message)s'))
+#Start Listener
+log_listener = QueueListener(log_queue, console_handler)
+log_listener.start()
+# Add QueueHandler to root
+root_logger = logging.getLogger()
+root_logger.addHandler(log_counter)
+root_logger.addHandler(logging.handlers.QueueHandler(log_queue))
+
+# QueueWriter: Now explicitly using the HARNESS_PRINT level
+class QueueWriter:
+    def __init__(self, queue, level=HARNESS_PRINT):
+        self.queue = queue
+        self.level = level
+    def write(self, message):
+        msg = message.strip()
+        if msg:
+            # Create record with our custom level
+            record = logging.makeLogRecord({'msg': msg, 'levelno': self.level, 'levelname': 'HARNESS'})
+            self.queue.put(record)
+    def flush(self):
+        pass
+
+# Redirect
+sys.stdout = QueueWriter(log_queue, HARNESS_PRINT)
+sys.stderr = QueueWriter(log_queue, logging.ERROR)
 
 # ------------------------------------------------------------------------------
 # The following enables this module to correctly import the model_railway_signals
@@ -295,7 +426,7 @@ def initialise_test_harness(filename=None):
         run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),timeout=2.0)
     else:
         # Ensure any queued tkinter events have completed
-        print ("System Tests: Load Scematic: '",filename,"'")
+        print ("System Tests: Load Scematic: '"+str(filename)+"'")
         run_function(lambda:main_menubar.load_schematic(filename),timeout=5.0)
 
 # ------------------------------------------------------------------------------
@@ -306,8 +437,8 @@ def initialise_test_harness(filename=None):
 def report_results():
     print ("")
     print ("##################################################################################################################")
-    print ("Tests Run:", tests_executed, "  Tests Passed:",
-              tests_executed-test_failures, "  Test failures" ,test_failures ,"  Test Warnings",test_warnings)
+    print ("Tests Run: "+str(tests_executed)+ "  Tests Passed: "+str(tests_executed-test_failures)+
+           "  Test failures: "+str(test_failures)+"  Test Warnings: "+str(test_warnings))
     print ("##################################################################################################################")
     print ("")
     
@@ -346,6 +477,13 @@ def set_signals_on(*sigids):
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" does not exist")
         elif not signals.signal_clear(sigid):
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" is already ON")
+        elif ( ("releaseonred" in signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonred"]) or
+                 ("releaseonyel" in  signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonyel"]) ):
+            # From Release 6.2, we allow approach control to be manually released by clicking the signal button
+            # Therefore for this test function, we need to test if the signal is in an  signal approach control
+            # state and click the signal button twice (once to release the signal, once to set it to ON
+            run_function(lambda:signals.signal_button_event(sigid))
+            run_function(lambda:signals.signal_button_event(sigid))
         else:
             run_function(lambda:signals.signal_button_event(sigid))
 
@@ -524,28 +662,31 @@ def click_telegraph_key(*instrumentids):
             run_function(lambda:block_instruments.telegraph_key_button(instid))
 
 def simulate_gpio_triggered(*gpioids):
+    def dummy_function(): pass
     for gpioid in gpioids:
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
-            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
-            # Wait 0.2 seconds (default GPIO sensor timeout = 0.1s)
-            time.sleep(0.2)
+            run_function(lambda:gpio_sensors.gpio_triggered_callback(gpioid))
+            # Wait 30ms (default GPIO sensor debounce delay = 20ms
+            time.sleep(0.030)
+            run_function(lambda:gpio_sensors.gpio_released_callback(gpioid))
+            # Wait for the event loop to come round again, so we are sure any secondary events have finished
+            run_function(lambda:dummy_function())
 
 def simulate_gpio_on(*gpioids):
     for gpioid in gpioids:
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+            run_function(lambda:gpio_sensors.gpio_triggered_callback(gpioid))
 
 def simulate_gpio_off(*gpioids):
     for gpioid in gpioids:
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+            run_function(lambda:gpio_sensors.gpio_released_callback(gpioid))
 
 def simulate_buttons_clicked(*buttonids):
     for buttonid in buttonids:

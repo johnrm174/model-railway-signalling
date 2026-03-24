@@ -340,6 +340,32 @@ class route_configuration_tab():
         self.route_type_updated_callback()
 
 #####################################################################################
+# Class for a subsidiary signal entry box - builds on the common.int_item_id_entry_box
+# Additional validation performed to ensure the signal has an associated subsidiary
+#####################################################################################
+
+class subsidiary_entry_box(common.int_item_id_entry_box):
+    def __init__(self, *args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+    def validate(self):
+        # Perform the normal validation (is an int, signal exists)
+        valid = super().validate()
+        # Validate that the signal has a subsidiary
+        if valid and self.get_value() > 0:
+            signal_object = objects.schematic_objects[objects.signal(self.get_value())]
+            valid = ( signal_object["subsidary"][0] or
+                      signal_object["sigarms"][0][1][0] or
+                      signal_object["sigarms"][1][1][0] or
+                      signal_object["sigarms"][2][1][0] or
+                      signal_object["sigarms"][3][1][0] or
+                      signal_object["sigarms"][4][1][0] )
+            if not valid:
+                self.TT.text = ("Signal must be a main Semaphore or Colour Light type with an associated subsidiary aspect")
+        self.set_validation_status(valid)
+        return(valid)
+
+#####################################################################################
 # Top level Class for a route definition tab
 #####################################################################################
 
@@ -359,15 +385,16 @@ class route_definition_tab(Tk.Frame):
         self.exitbutton = common.int_item_id_entry_box(self.frame1subframe1, tool_tip="Enter the ID of the exit "+
                "button (or entry / exit button) associated with this route", exists_function=objects.route_exists)
         self.exitbutton.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.frame1Label2 = Tk.Label(self.frame1subframe1, text="     ")
-        self.frame1Label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.addbutton = Tk.Button(self.frame1subframe1, text="+", command=lambda:add_route_callback(tab_id))
+        self.addbutton = Tk.Button(self.frame1subframe1, text="+", command=lambda:add_route_callback(tab_id, copy=False))
         self.addbutton.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.addbutton, text="Select to add a new NX route definition tab")
         self.deletebutton = Tk.Button(self.frame1subframe1, text="-", command=lambda:delete_route_callback(tab_id))
         self.deletebutton.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = common.CreateToolTip(self.deletebutton, text="Select to delete the current NX route definition tab")
         if tab_id == 0: self.deletebutton.config(state="disabled")
+        self.copybutton = Tk.Button(self.frame1subframe1, text="C", command=lambda:add_route_callback(tab_id, copy=True))
+        self.copybutton.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT3 = common.CreateToolTip(self.copybutton, text="Select to create a copy of this NX route definition tab")
         #----------------------------------------------------------------------------------
         # Create a Label Frame for the Route Colour chooser (Frame 3)
         #----------------------------------------------------------------------------------
@@ -397,12 +424,12 @@ class route_definition_tab(Tk.Frame):
         self.frame7 = Tk.LabelFrame(self, text="Main signals to clear")
         self.frame7.pack(padx=2, pady=2, fill='x')
         self.signals = common.grid_of_generic_entry_boxes(self.frame7, base_class=common.int_item_id_entry_box,
-                        columns=12, width=3, exists_function = library.signal_exists, tool_tip=
-                        "Specify the main signals that need "+ "to be cleared for the route")
+                    columns=12, width=3, exists_function = library.signal_exists, tool_tip="Specify the signals "+
+                    "(colour light, semaphore, ground position or ground disc) that need to be cleared for the route")
         self.signals.pack(padx=2, pady=2, fill='x')
         self.frame8 = Tk.LabelFrame(self, text="Subsidiary signals to clear")
         self.frame8.pack(padx=2, pady=2, fill='x')
-        self.subsidaries = common.grid_of_generic_entry_boxes(self.frame8, base_class=common.int_item_id_entry_box,
+        self.subsidaries = common.grid_of_generic_entry_boxes(self.frame8, base_class=subsidiary_entry_box,
                         columns=12, width=3, exists_function = library.signal_exists, tool_tip="Specify the "+
                         "subsidiary signals (associated with a main signal) that need to be cleared for the route")
         self.subsidaries.pack(padx=2, pady=2, fill='x')
@@ -565,10 +592,10 @@ class route_definition_tabs():
             self.list_of_routes.append(route_definition_tab(self.notebook_object, index, self.add_route, self.delete_route))
             self.list_of_routes[-1].set_values(route_definition)
 
-    def add_route(self, after_tab:int):
-        self.list_of_routes.append(route_definition_tab(self.notebook_object, len(self.list_of_routes),
-                                                         self.add_route, self.delete_route))
-        self.list_of_routes[-1].reset_values(colour=self.list_of_routes[0].routecolour.get_value())
+    def add_route(self, after_tab:int, copy:bool):
+        self.list_of_routes.append(route_definition_tab(self.notebook_object, len(self.list_of_routes), self.add_route, self.delete_route))
+        if copy: self.list_of_routes[-1].set_values(self.list_of_routes[after_tab].get_values())
+        else: self.list_of_routes[-1].reset_values(colour=self.list_of_routes[0].routecolour.get_value())
         if self.entry_button or self.exit_button: self.list_of_routes[-1].enable()
         else: self.list_of_routes[-1].disable()
         self.notebook_object.select(self.list_of_routes[-1])

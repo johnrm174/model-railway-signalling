@@ -272,14 +272,16 @@ def deselect_all_objects(event=None):
 
 def delete_all_objects():
     global schematic_state
-    # Select and delete all objects from the schematic
-    select_all_objects()
-    objects.delete_objects(schematic_state["selectedobjects"])
-    # Remove the objects from the list of selected objects
-    schematic_state["selectedobjects"]=[]
     # Belt and braces delete of all canvas objects as I've seen issues when running the system tests
     # (probably because I'm not using the mainloop) - Note we re-draw the grid afterwards
+    # Note we do it here to speed things up for the user
     canvas.delete("all")
+    # Select and delete all objects from the schematic. Note that as everything will
+    # have been deleted, we don't need to initialise the schematic
+    select_all_objects()
+    objects.delete_objects(schematic_state["selectedobjects"], initialise_layout=False)
+    # Remove the objects from the list of selected objects
+    schematic_state["selectedobjects"]=[]
     redraw_canvas_grid()
     # Set the select area box to 'None' so it gets created on first use
     schematic_state["selectareabox"] = None

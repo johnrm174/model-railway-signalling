@@ -93,15 +93,13 @@
 # the existing pub/sub configuration, followed by 'set_node_to_publish_dcc_commands' (either True or False)
 # and 'subscribe_to_dcc_command_feed' for each REMOTE DCC Node (DCC Command feed subscribed).
 #
-#   reset_dcc_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
+#   reset_dcc_accessory_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
+#   set_node_to_publish_dcc_accessory_commands(publish_dcc_commands:bool) - Enable publishing of DCC accessory commands
+#           All DCC accessory commands will then be published to the MQTT broker for consumption by other nodes
+#   subscribe_to_dcc_accessory_command_feed(*nodes:str) - Subcribes to DCC accessory commands from other network nodes.
+#           All received DCC accessory commands will then be automatically forwarded to the local Pi-Sprog interface.
 #
-#   set_node_to_publish_dcc_commands(publish_dcc_commands:bool) - Enable publishing of DCC command feed
-#           All DCC commands wil lthen be published to the MQTT broker for consumption by other nodes
-# 
-#   subscribe_to_dcc_command_feed(*nodes:str) - Subcribes to DCC command feeds from other nodes on the network.
-#           All received DCC commands will then be automatically forwarded to the local Pi-Sprog interface.
-#
-# External API - classes and functions (used by the other library modules):
+# Internal API - classes and functions (used by the other library modules):
 #
 #   update_dcc_point(point_id:int,state:bool) - Called on state change of a point
 #
@@ -180,6 +178,7 @@
 import enum
 import logging
 
+from . import common
 from . import signals
 from . import pi_sprog_interface
 from . import mqtt_interface
@@ -203,7 +202,7 @@ dcc_point_mappings:dict = {}
 dcc_switch_mappings:dict = {}
 
 # Define the Flag to control whether DCC Commands are published to the MQTT Broker
-publish_dcc_commands_to_mqtt_broker:bool = False
+publish_dcc_accessory_commands_to_mqtt_broker:bool = False
 
 # List of DCC Mappings - The key is the address, with each element a list of [item_type, item_id]
 # Note that we use the DCC Address as an INTEGER for the key - so we can sort on the key
@@ -218,11 +217,10 @@ dcc_address_mappings:dict = {}
 # received from a remote node via the MQTT network. On 'SPROG-DCC-power-on' these queued commands
 # are then re-sent to the SPROG for onwards transmission. This ensures the layout will be updated
 # to match the state of the local/remote schematic(s) as soon as DCC power is enabled.
-# Similarly, any 'issued' DCC commands arising from the local schematic will published out to the
+# Similarly, the LATEST 'issued' DCC commands arising from the local schematic will published to the
 # MQTT broker (if the node is configured to publish the DCC command feed) on 'MQTT-broker-connect'
 # (as any DCC commands 'published' before this event will have been silently ignored).
-local_dcc_commands:dict = {}
-remote_dcc_commands:dict = {}
+local_dcc_accessory_commands:dict = {}
 
 #----------------------------------------------------------------------------------------------------
 # API function to return a dictionary of all DCC Address mappings (to signals/points/switches)
@@ -283,14 +281,14 @@ def add_dcc_commands_to_dcc_address_mappings(item_type:str, item_id:int, command
 
 def remove_dcc_address_from_dcc_address_mappings(address:int):
     global dcc_address_mappings
-    global local_dcc_commands
+    global local_dcc_accessory_commands
     # Remove the dcc_address from the dictionary of dcc_address_mappings
     if address in dcc_address_mappings.keys():
         del dcc_address_mappings[address]
     # Also remove the dcc_address from the dictionary of 'issued' DCC commands to prevent
     # legacy commands being sent out on subsequent broker connect and/or DCC Power on events
-    if address in local_dcc_commands.keys():
-        del local_dcc_commands[address]
+    if address in local_dcc_accessory_commands.keys():
+        del local_dcc_accessory_commands[address]
     return()
 
 def remove_dcc_commands_from_dcc_address_mappings(commands:[[int,bool],]):
@@ -542,7 +540,7 @@ def update_dcc_point(point_id:int, state:bool):
     if point_mapped(point_id):
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
-        if dcc_mapping["address"] > 0: issue_local_dcc_command(dcc_mapping["address"], state)
+        if dcc_mapping["address"] > 0: issue_local_dcc_accessory_command(dcc_mapping["address"], state)
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -555,7 +553,7 @@ def update_dcc_switch(switch_id:int, state:bool):
         if state: commands = dcc_switch_mappings[str(switch_id)]["oncommands"]
         else: commands = dcc_switch_mappings[str(switch_id)]["offcommands"]
         for entry in commands:
-            if entry[0] > 0: issue_local_dcc_command(entry[0], entry[1])
+            if entry[0] > 0: issue_local_dcc_accessory_command(entry[0], entry[1])
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -570,7 +568,7 @@ def update_dcc_signal_aspects(sig_id:int, sig_state:signals.signal_state_type):
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
         else:
             for entry in dcc_mapping[str(sig_state)]:
-                if entry[0] > 0: issue_local_dcc_command(entry[0], entry[1])
+                if entry[0] > 0: issue_local_dcc_accessory_command(entry[0], entry[1])
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -586,7 +584,7 @@ def update_dcc_signal_subsidary(sig_id:int, state:bool):
         else:
             if dcc_mapping["subsidary"][1]: state = not state
             if dcc_mapping["subsidary"][0] > 0:
-                issue_local_dcc_command(dcc_mapping["subsidary"][0], state)
+                issue_local_dcc_accessory_command(dcc_mapping["subsidary"][0], state)
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -600,7 +598,7 @@ def update_dcc_signal_element(sig_id:int, state:bool, element:str="main_subsidar
         if dcc_mapping["mapping_type"] != mapping_type.SEMAPHORE:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Semaphore signal")
         else:
-            if dcc_mapping[element] > 0: issue_local_dcc_command(dcc_mapping[element], state)
+            if dcc_mapping[element] > 0: issue_local_dcc_accessory_command(dcc_mapping[element], state)
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -631,7 +629,7 @@ def update_dcc_signal_route(sig_id:int, route:signals.route_type,
                  (not dcc_mapping["auto_route_inhibit"] and signal_change) or
                  (not sig_at_danger and not signal_change) ):
                 for entry in dcc_mapping[str(route)]:
-                    if entry[0] > 0: issue_local_dcc_command(entry[0],entry[1])
+                    if entry[0] > 0: issue_local_dcc_accessory_command(entry[0],entry[1])
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -662,7 +660,7 @@ def update_dcc_signal_theatre(sig_id:int, character_to_display:str,
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
                     for command in entry[1]:
-                        if command[0] > 0: issue_local_dcc_command(command[0], command[1])
+                        if command[0] > 0: issue_local_dcc_accessory_command(command[0], command[1])
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -759,9 +757,9 @@ def delete_signal_mapping(sig_id:int):
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Callback for decoding DCC commands received from a remote signalling node (via the MQTT broker)
-# and sending the them out to the Pi-SPROG to change the state of signals/points/accessories on
-# the layout. We maintain a dictionary representing the latest 'state' of all received DCC commands
+# Callback for handling DCC accessory commands received from a remote signalling node and sending
+# them out to the Pi-SPROG to change the state of signals/points/accessories on the layout.
+# We maintain a dictionary representing the latest 'state' of all received DCC accessory commands
 # to support the use case of connecting to the broker (and receiving DCC commands) BEFORE connecting
 # to the Pi-SPROG and enabling DCC power. The latest layout state can then sent out to the SPROG by
 # the 'mqtt_send_all_dcc_command_states_on_sprog_connect' function (called on DCC Power on).
@@ -769,7 +767,7 @@ def delete_signal_mapping(sig_id:int):
 #----------------------------------------------------------------------------------------------------
 
 def handle_mqtt_dcc_accessory_short_event(message):
-    global remote_dcc_commands
+    global local_dcc_accessory_commands
     if "sourceidentifier" not in message.keys() or "dccaddress" not in message.keys() or "dccstate" not in message.keys():
         logging.error ("DCC Control: Unhandled MQTT Message - "+str(message))
     else:
@@ -784,10 +782,10 @@ def handle_mqtt_dcc_accessory_short_event(message):
                                    source_node+"' for DCC address: "+str(dcc_address))
         # Send the DCC command to the SPROG (will only be transmitted if connected and DCC Power is On)
         # Note that we don't send 'remote' DCC commands back out to the broker (if application misconfigured)
-        issue_dcc_command_to_sprog(dcc_address, dcc_state)
+        issue_dcc_accessory_command_to_sprog(dcc_address, dcc_state)
         # Build/update the dictionary of 'remote' DCC commands that have been sent to the SPROG.
         # Note we use integers for the key for consistency with the DCC Address mappings dictionary
-        remote_dcc_commands[int(dcc_address)] = dcc_state
+        local_dcc_accessory_commands[int(dcc_address)] = dcc_state
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -800,31 +798,36 @@ def handle_mqtt_dcc_accessory_short_event(message):
 # (called on Broker Connect). This ensures the layout always reflects the state of the schematic.
 #----------------------------------------------------------------------------------------------------
 
-def issue_local_dcc_command(address:int, state:bool):
-    global local_dcc_commands
-    # Send the DCC command out to the Pi-SPROG and MQTT Broker.
-    issue_dcc_command_to_sprog(address,state)
-    issue_dcc_command_to_broker(address, state)
+def issue_local_dcc_accessory_command(address:int, state:bool):
+    global local_dcc_accessory_commands
+    # Send the DCC command out to the Pi-SPROG and MQTT Broker (see functions below).
+    issue_dcc_accessory_command_to_broker(address, state)
+    issue_dcc_accessory_command_to_sprog(address,state)
     # Build/update the dictionary of 'local' DCC commands that have been sent to the SPROG/Broker.
     # Note we use integers for the key for consistency with the DCC Address mappings dictionary
-    local_dcc_commands[int(address)] = state
+    local_dcc_accessory_commands[int(address)] = state
     return()
 
 #----------------------------------------------------------------------------------------------------
-# Internal functions for sending DCC commands to the Pi-SPROG and MQTT Broker
+# Internal functions for sending DCC ACCESSORY commands to the Pi-SPROG and MQTT Broker
 #----------------------------------------------------------------------------------------------------
 
-def issue_dcc_command_to_sprog(address:int, state:bool):
-    # Send the DCC command out to the Pi-SPROG. Note that commands will only be transmitted out to
-    # the layout if the Pi-SPROG is connected and DCC power is on (otherwise silently discarded).
-    pi_sprog_interface.send_accessory_short_event(address,state)
+def issue_dcc_accessory_command_to_sprog(address:int, state:bool):
+    # Send the DCC command to the local SPROG. Note that commands will only be sent to the SPROG
+    # if we ARE NOT configured to publish commands out to the MQTT broker (the assumption being
+    # that we use the local SPROG interface OR the SPROG interface running on a remote machine).
+    # Note also that DCC commands are only sent out to the layout ny the SPROG interface if the
+    # SPROG is connected and DCC power has been turned on (otherwise they will be silently discarded).
+    if not publish_dcc_accessory_commands_to_mqtt_broker:
+        pi_sprog_interface.send_accessory_short_event(address,state)
     return()
 
-def issue_dcc_command_to_broker(address:int, state:bool):
+def issue_dcc_accessory_command_to_broker(address:int, state:bool):
     # Publish the DCC command to remote signalling nodes via the MQTT broker if the application is
-    # configured to publish the DCC command feed. Note that commands will only be published if
-    # we are successfully connected to the broker (otherwise silently discarded).
-    if publish_dcc_commands_to_mqtt_broker:
+    # configured to publish the DCC command feed (the assumption being that we use the local SPROG
+    # interface OR the SPROG interface running on a remote machine). Note also that commands will
+    # only be published if we are connected to the broker (otherwise they will be silently discarded).
+    if publish_dcc_accessory_commands_to_mqtt_broker:
         data = {}
         data["dccaddress"] = address
         data["dccstate"] = state
@@ -837,27 +840,26 @@ def issue_dcc_command_to_broker(address:int, state:bool):
 
 #---------------------------------------------------------------------------------------------------
 # Internal function for publishing the current 'state' of all issued DCC commands to the MQTT
-# network on Broker Connect (to synchronise the layout with the local schematic). Note we only
-# publish DCC commands associated with the LOCAL schematic - not any DCC commands we may have
-# received from a remote node. This is to guard against possible user misconfiguration where
-# they have set the application to publish the DCC command feed and also subscribed to it.
+# network on Broker Connect (to synchronise the remote node with the local schematic).
 #---------------------------------------------------------------------------------------------------
 
 def mqtt_send_all_dcc_command_states_on_broker_connect():
-    for address, state in local_dcc_commands.items():
-        issue_dcc_command_to_broker(address, state)
+    delay, total_delay = 250, 0
+    for address, state in local_dcc_accessory_commands.items():
+        common.root_window.after(total_delay, lambda a=address, s=state: issue_dcc_accessory_command_to_broker(a, s))
+        total_delay = total_delay + delay
     return()
 
 #---------------------------------------------------------------------------------------------------
 # Internal Library function for transmitting the current 'state' of all issued DCC Commands on
-# SPROG DCC Power On (to synchronise (to synchronise the layout with the local/remote schematic)
+# SPROG DCC Power On (to synchronise the layout with the local - and all remote - schematics).
 #---------------------------------------------------------------------------------------------------
 
 def sprog_send_all_dcc_command_states_on_sprog_connect():
-    for address, state in local_dcc_commands.items():
-        issue_dcc_command_to_sprog(address, state)
-    for address, state in remote_dcc_commands.items():
-        issue_dcc_command_to_sprog(address, state)
+    delay, total_delay = 250, 0
+    for address, state in local_dcc_accessory_commands.items():
+        common.root_window.after(total_delay, lambda a=address, s=state: issue_dcc_accessory_command_to_sprog(a, s))
+        total_delay = total_delay + delay
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -866,45 +868,40 @@ def sprog_send_all_dcc_command_states_on_sprog_connect():
 # via the 'subscribe_to_dcc_command_feed' & 'set_node_to_publish_dcc_commands' functions.
 #----------------------------------------------------------------------------------------------------
 
-def reset_dcc_mqtt_configuration():
-    global publish_dcc_commands_to_mqtt_broker
-    global remote_dcc_commands
+def reset_dcc_accessory_mqtt_configuration():
+    global publish_dcc_accessory_commands_to_mqtt_broker
+    global local_dcc_accessory_commands
     logging.debug("DCC Control: Resetting MQTT publish and subscribe configuration")
-    publish_dcc_commands_to_mqtt_broker = False
+    publish_dcc_accessory_commands_to_mqtt_broker = False
     mqtt_interface.unsubscribe_from_message_type("dcc_accessory_short_events")
-    # Purge all retained 'remote' DCC commands. The dict will be re-populated on
-    # re-subscribe if/when we receive the latest retained messages from the broker
-    remote_dcc_commands = {}
     return()
 
 #----------------------------------------------------------------------------------------------------
-# API Function to set this Signalling node to publish all DCC commands to remote MQTT
+# API Function to set this Signalling node to publish all DCC ACCESSORY commands to remote MQTT
 # nodes. This function is called by the editor on 'Apply' of the MQTT pub/sub configuration.
 #----------------------------------------------------------------------------------------------------
 
-def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
-    global publish_dcc_commands_to_mqtt_broker
-    if not isinstance(publish_dcc_commands, bool):
-        logging.error("DCC Control: set_node_to_publish_dcc_commands - invalid publish_dcc_commands flag")
-    else:
-        if publish_dcc_commands: logging.debug("DCC Control: Configuring Application to publish DCC Commands to MQTT broker")
-        publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
+def set_node_to_publish_dcc_accessory_commands(publish_dcc_commands:bool=False):
+    global publish_dcc_accessory_commands_to_mqtt_broker
+    if publish_dcc_commands:
+        logging.debug("DCC Control: Configuring Application to publish DCC Accessory Commands to MQTT broker")
+    publish_dcc_accessory_commands_to_mqtt_broker = publish_dcc_commands
     return()
 
 #----------------------------------------------------------------------------------------------------
-# API Function to "subscribe" to the published DCC command feed from other remote MQTT nodes
+# API Function to "subscribe" to the published DCC ACCESSORY command feed from other remote MQTT nodes
 # This function is called by the editor on "Apply' of the MQTT pub/sub configuration.
 #----------------------------------------------------------------------------------------------------
 
-def subscribe_to_dcc_command_feed (*nodes:str):
+def subscribe_to_dcc_accessory_command_feed(*nodes:str):
     for node in nodes:
         if not isinstance(node, str):
             logging.error("DCC Control: subscribe_to_dcc_command_feed - invalid node "+str(node))
         else:
             # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
-            # as each DCC address will appear on a different topic from the remote MQTT node 
-            mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events",node,0,
-                                        handle_mqtt_dcc_accessory_short_event,subtopics=True)
+            # as each DCC address will appear on a different topic from the remote MQTT node.
+            mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events", node, 0,
+                                    handle_mqtt_dcc_accessory_short_event,subtopics=True)
     return() 
 
 #####################################################################################################

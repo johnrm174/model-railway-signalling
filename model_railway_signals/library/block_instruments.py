@@ -67,10 +67,8 @@
 #   mqtt_send_all_instrument_states_on_broker_connect() - transmit the state of all instruments set to publish
 #
 # ------------------------------------------------------------------------------------------
-# To use Block Instruments with full sound enabled (bell rings and telegraph key sounds) then
-# the 'simpleaudio' package will need to be installed. Note that for Windows it has a dependency 
-# on Microsoft Visual C++ 14.0 or greater (so Visual Studio 2015 should be installed first)
-# If 'simpleaudio' is not installed then the software will function without sound.
+# Note that I have moved away from using the 'simpleaudio' package as it seemed to be causing
+# occasional segmentation errors - allegedly, pygame is much more robust - time will tell
 # ------------------------------------------------------------------------------------------
 
 import enum
@@ -83,20 +81,6 @@ from typing import Union
 from . import common
 from . import mqtt_interface
 from . import file_interface
-
-# -------------------------------------------------------------------------
-# We can only use audio for the block instruments if 'simpleaudio' is installed
-# Although this package is supported across different platforms, for Windows
-# it has a dependency on Visual C++ 14.0. As this is quite a faff to install I
-# haven't made audio a hard and fast dependency for the 'model_railway_signals'
-# package as a whole - its up to the user to install if required
-# -------------------------------------------------------------------------
-
-try:
-    import simpleaudio
-    audio_enabled = True
-except Exception:
-    audio_enabled = False
 
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling create_instrument
@@ -117,6 +101,21 @@ instruments = {}
 # --------------------------------------------------------------------------------
 
 list_of_instruments_to_publish = []
+
+# --------------------------------------------------------------------------------
+# Function to play sounds - to minimise risk of segmentation errors
+# --------------------------------------------------------------------------------
+
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+import pygame
+pygame.mixer.init()
+
+def play_audio_object(audio_object):
+    if audio_object:
+        try:
+            audio_object.play()
+        except Exception as exception:
+            logging.error(f"Block Instruments - Audio playback error: {exception}")
 
 # --------------------------------------------------------------------------------
 # Internal Function to Open a window containing a list of common signal box bell
@@ -219,12 +218,10 @@ def telegraph_key_button(inst_id:int):
     logging.debug("Instrument "+str(inst_id)+": Telegraph key operated *******************************************")
     # Provide a visual indication of the key being pressed (and schedule the button reset)
     instruments[str(inst_id)]["bellbutton"].config(relief="sunken")
-    common.root_window.after(10,lambda:reset_telegraph_button(inst_id))
-    # Sound the "clack" of the telegraph key - We put exception handling around this as the function can raise
-    # exceptions if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
+    common.root_window.after(200,lambda:reset_telegraph_button(inst_id))
+    # Sound the "clack" of the telegraph key
     if instruments[str(inst_id)]["telegraphsound"] is not None:
-        try: instruments[str(inst_id)]["telegraphsound"].play()
-        except: pass
+        play_audio_object(instruments[str(inst_id)]["telegraphsound"])
     # If linked to another instrument then call the function to ring the bell on the other instrument or
     # Publish the "bell ring event" to the broker (for other nodes to consume). Note that events will only
     # be published if the MQTT interface has been configured and we are connected to the broker
@@ -248,8 +245,7 @@ def ring_section_bell(inst_id:int):
     # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
     # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
     if instruments[str(inst_id)]["bellsound"] is not None:
-        try: instruments[str(inst_id)]["bellsound"].play()
-        except: pass
+        play_audio_object(instruments[str(inst_id)]["bellsound"])
     return()
 
 def reset_telegraph_button(inst_id:int):
@@ -533,26 +529,20 @@ def create_block_indicator(canvas:int, x:int, y:int, canvas_tag):
 # If the filename isn't fully qualified then it assume a file in the resources folder
 # --------------------------------------------------------------------------------
 
-def load_audio_file(audio_filename):
+def get_audio_object(audio_filename):
     audio_object = None
     if os.path.split(audio_filename)[1] == audio_filename:
         current_folder = pathlib.Path(__file__).parent
         fully_qualified_file_name = current_folder / 'resources' / audio_filename
+    else:
+        fully_qualified_file_name = pathlib.Path(audio_filename)
+    if fully_qualified_file_name.exists():
         try:
-            audio_object = simpleaudio.WaveObject.from_wave_file(str(fully_qualified_file_name))
+            audio_object = pygame.mixer.Sound(str(fully_qualified_file_name))
         except Exception as exception:
-            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
-                            message="Error loading audio resource file '"+str(audio_filename)+"'")
-            logging.error("Block Instruments: Error loading audio resource file '"+str(audio_filename)+"'"+
-                           " \nReported Exception: "+str(exception))       
-    else:        
-        try:
-            audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
-        except Exception as exception:
-            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
-                            message="Error loading audio file '"+str(audio_filename)+"'")
-            logging.error("Block Instruments: Error loading audio file '"+str(audio_filename)+"'"+
-                           " \nReported Exception: "+str(exception))       
+            logging.error(f"Block Instruments: Exception loading audio file {fully_qualified_file_name}: {exception}")
+    else:
+        logging.error(f"Block Instruments: Audio file not found: {fully_qualified_file_name}")
     return(audio_object)
 
 # --------------------------------------------------------------------------------
@@ -617,15 +607,10 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
             rep_ind_block, rep_ind_clear, rep_ind_occup = my_ind_block, my_ind_clear, my_ind_occup
         else:
             rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator(canvas, x, y-55, canvas_tag)
-        # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
-        # if these fail to load for any reason then no sounds will be produced on these events
-        if audio_enabled:
-            bell_audio = load_audio_file(bell_sound_file)
-            telegraph_audio = load_audio_file(telegraph_sound_file)
-        else:
-            logging.warning ("Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
-            bell_audio = None
-            telegraph_audio = None
+        # Try to find the specified audio files for the bell rings and telegraph key
+        # if these cannot be found then no sounds will be produced on these events
+        bell_audio = get_audio_object(bell_sound_file)
+        telegraph_audio = get_audio_object(telegraph_sound_file)
         # Create the dictionary of elements that we need to track
         instruments[str(inst_id)] = {}
         instruments[str(inst_id)]["canvas"] = canvas                         # Tkinter drawing canvas
@@ -645,8 +630,8 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         instruments[str(inst_id)]["repeatindicatorclear"] = rep_ind_clear    # Tkinter Drawing object
         instruments[str(inst_id)]["repeatindicatoroccup"] = rep_ind_occup    # Tkinter Drawing object
         instruments[str(inst_id)]["repeatindicatorblock"] = rep_ind_block    # Tkinter Drawing object
-        instruments[str(inst_id)]["telegraphsound"] = telegraph_audio        # Sound file for the telegraph "clack"
-        instruments[str(inst_id)]["bellsound"] = bell_audio                  # Sound file for the bell "Ting"
+        instruments[str(inst_id)]["telegraphsound"] = telegraph_audio        # Sound Object for the telegraph "clack"
+        instruments[str(inst_id)]["bellsound"] = bell_audio                  # Sound Object for the bell "Ting"
         instruments[str(inst_id)]["tags"] = canvas_tag                       # Canvas Tags for all drawing objects
         # Get the initial state for the instrument (if layout state has been loaded)
         # if nothing has been loaded then the default state (of LINE BLOCKED) will be applied

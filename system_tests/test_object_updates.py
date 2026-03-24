@@ -1340,6 +1340,7 @@ def run_reset_objects_tests():
 ######################################################################################################
 
 def run_all_object_editing_tests():
+    reset_log_counters()
     initialise_test_harness()
     set_edit_mode()
     run_instrument_linking_tests()
@@ -1354,6 +1355,9 @@ def run_all_object_editing_tests():
     run_section_config_update_on_change_of_id_tests()
     run_point_config_update_on_change_of_id_tests()
     run_reset_objects_tests()
+    # Check the total number of Log Messages generated
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(6)
     report_results()
     
 if __name__ == "__main__":

@@ -343,6 +343,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 2,
@@ -726,6 +727,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 9,
@@ -738,7 +740,7 @@
             "overridesubsidary": false,
             "passedsensor": [
                 true,
-                "Box1-7"
+                "Box1-9"
             ],
             "pointinterlock": [
                 [
@@ -1146,6 +1148,7 @@
             "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 16,
@@ -1479,6 +1482,7 @@
             "flipped": false,
             "fullyautomatic": true,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 6,
@@ -1822,6 +1826,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 8,
@@ -2155,6 +2160,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 1,
@@ -2530,6 +2536,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 14,
@@ -2873,6 +2880,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 7,
@@ -3363,6 +3371,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 12,
@@ -3706,6 +3715,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 5,
@@ -4059,6 +4069,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 3,
@@ -4392,6 +4403,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": true,
             "item": "signal",
             "itemid": 4,
@@ -4737,6 +4749,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 13,
@@ -5114,6 +5127,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 11,
@@ -5462,7 +5476,7 @@
     },
     "sections": {
         "1": {
-            "labeltext": "381",
+            "labeltext": "2",
             "occupied": false
         },
         "10": {
@@ -5470,35 +5484,35 @@
             "occupied": true
         },
         "2": {
-            "labeltext": "378",
+            "labeltext": "4",
             "occupied": false
         },
         "3": {
-            "labeltext": "381",
+            "labeltext": "2",
             "occupied": false
         },
         "4": {
-            "labeltext": "378",
+            "labeltext": "4",
             "occupied": false
         },
         "5": {
-            "labeltext": "1",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "6": {
-            "labeltext": "1",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "7": {
-            "labeltext": "1",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "8": {
-            "labeltext": "1",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "9": {
-            "labeltext": "1",
+            "labeltext": "XXXXX",
             "occupied": false
         },
         "Box1-1": {
@@ -5522,7 +5536,12 @@
             "width": 1000
         },
         "control": {
-            "dccsoundmappings": []
+            "dccsoundmappings": [],
+            "locomotiveroster": {},
+            "serverallowlist": [],
+            "serverdebugging": false,
+            "serverenforceallow": false,
+            "serverstartup": false
         },
         "general": {
             "automation": true,
@@ -5535,7 +5554,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.1.0"
+            "version": "Version 6.2.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -5559,6 +5578,10 @@
                 [
                     8,
                     8
+                ],
+                [
+                    9,
+                    9
                 ]
             ],
             "timeoutperiod": 0.1,
@@ -5578,6 +5601,8 @@
                 1,
                 2
             ],
+            "publoco": false,
+            "publoconode": "",
             "pubsections": [
                 1,
                 2
@@ -5587,7 +5612,8 @@
                 5,
                 6,
                 7,
-                8
+                8,
+                9
             ],
             "pubshutdown": false,
             "pubsignals": [
@@ -5605,6 +5631,7 @@
                 "Box1-1",
                 "Box1-2"
             ],
+            "subloconodes": [],
             "subsections": [
                 "Box1-1",
                 "Box1-2"
@@ -5614,7 +5641,8 @@
                 "Box1-5",
                 "Box1-6",
                 "Box1-7",
-                "Box1-8"
+                "Box1-8",
+                "Box1-9"
             ],
             "subshutdown": false,
             "subsignals": [

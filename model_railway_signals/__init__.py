@@ -34,10 +34,28 @@ from .scripting import set_instrument_blocked
 from .scripting import set_instrument_occupied
 from .scripting import set_instrument_clear
 from .scripting import click_telegraph_key
+from .scripting import send_telegraph_code
 from .scripting import simulate_gpio_triggered
 from .scripting import simulate_gpio_on
 from .scripting import simulate_gpio_off
 from .scripting import simulate_button_clicked
+
+from .scripting import get_button_state
+from .scripting import get_gpio_port_state
+
+from .scripting import request_loco_session
+from .scripting import release_loco_session
+from .scripting import set_loco_speed_and_direction
+from .scripting import send_emergency_stop
+from .scripting import set_loco_function
+
+from .scripting import create_throttle
+from .scripting import set_throttle_loco
+from .scripting import set_throttle_direction
+from .scripting import set_throttle_speed
+from .scripting import set_throttle_stop
+from .scripting import set_throttle_function
+from .scripting import destroy_throttle
 
 __all__ = [ 'run_editor',
             'initialise_application',
@@ -66,7 +84,22 @@ __all__ = [ 'run_editor',
             'set_instrument_occupied',
             'set_instrument_clear',
             'click_telegraph_key',
+            'send_telegraph_code',
             'simulate_gpio_triggered',
             'simulate_gpio_on',
             'simulate_gpio_off',
-            'simulate_button_clicked' ]
+            'simulate_button_clicked',
+            'request_loco_session',
+            'release_loco_session',
+            'set_loco_speed_and_direction',
+            'send_emergency_stop',
+            'set_loco_function',
+            'get_button_state',
+            'get_gpio_port_state',
+            'create_throttle',
+            'set_throttle_loco',
+            'set_throttle_direction',
+            'set_throttle_speed',
+            'set_throttle_stop',
+            'set_throttle_function',
+            'destroy_throttle' ]

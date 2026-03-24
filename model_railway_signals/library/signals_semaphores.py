@@ -775,9 +775,13 @@ class timed_sequence():
                 # 'passed'event triggering a timed sequence for another signal. In this case we
                 # generate a 'passed' callback for signal rather than an 'updated' callback.
                 if self.start_delay > 0:                 
+                    # Note that we only update the signal AFTER the signal passed callback as we
+                    # need to let the 'run layout' processing handle the event in terms of any
+                    # track occupancy changes before updating the signal to its overridden aspect.
+                    # If we updated prior to the callback we would get a spurious SPAD
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
-                    update_semaphore_signal(self.sig_id)
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
+                    update_semaphore_signal(self.sig_id)
                 else:
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
                     update_semaphore_signal(self.sig_id)
@@ -810,8 +814,12 @@ def trigger_timed_semaphore_signal(sig_id:int, start_delay:int, time_delay:int):
     # Create a new instance of the time signal class - this should have the effect of "destroying"
     # the old instance when it goes out of scope, leaving us with the newly created instance
     signals.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
-    # Schedule the start of the sequence (i.e. signal to danger)
-    common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    # Schedule the start of the sequence (i.e. signal to danger). Note that if a start delay of zero is
+    # specified, we start the sequence straight away (before any temporary overrides get set)
+    if start_delay > 0:
+        common.root_window.after(start_delay*1000,lambda:signals.signals[str(sig_id)]["timedsequence"][route.value].start())
+    else:
+        signals.signals[str(sig_id)]["timedsequence"][route.value].start()
     return()
 
 ###############################################################################

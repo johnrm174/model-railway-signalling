@@ -4550,7 +4550,12 @@
             "width": 1400
         },
         "control": {
-            "dccsoundmappings": []
+            "dccsoundmappings": [],
+            "locomotiveroster": {},
+            "serverallowlist": [],
+            "serverdebugging": false,
+            "serverenforceallow": false,
+            "serverstartup": false
         },
         "general": {
             "automation": true,
@@ -4563,7 +4568,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.1.0"
+            "version": "Version 6.2.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -4582,6 +4587,8 @@
             "port": 1883,
             "pubdcc": false,
             "pubinstruments": [],
+            "publoco": false,
+            "publoconode": "",
             "pubsections": [],
             "pubsensors": [],
             "pubshutdown": false,
@@ -4589,6 +4596,7 @@
             "startup": false,
             "subdccnodes": [],
             "subinstruments": [],
+            "subloconodes": [],
             "subsections": [],
             "subsensors": [],
             "subshutdown": false,

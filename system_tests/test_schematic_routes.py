@@ -216,6 +216,8 @@ def run_change_of_item_id_tests():
                           "routecolour":"Red"}
     update_object_configuration(rb1, {"routedefinitions": [route_definition1,], "setupsensor": 43 })
     select_single_object(rb1)
+    ##### Note that copying Routes now brings across the entire route configuration
+    ##### So the the new route definition will be the same as route_definition3
     [rb3] = copy_selected_objects(0,50)
     route_definition3 = { "signalsonroute": [],
                           "subsidariesonroute": [],
@@ -228,7 +230,7 @@ def run_change_of_item_id_tests():
                           "exitbutton":0,
                           "routenotes":"Notes related to the route",
                           "routecolour":"white"}
-    assert_object_configuration(rb3,{"routedefinitions":[route_definition3,], "setupsensor":0 } )
+    assert_object_configuration(rb3,{"routedefinitions":[route_definition1,], "setupsensor":0 } )
     # Finally test the deletion of an exit button
     select_single_object(rb2)
     delete_selected_objects()
@@ -781,7 +783,7 @@ def run_schematic_routes_example_tests():
     assert_points_normal(11,14,9)
     assert_buttons_deselected(21)
     assert_buttons_enabled(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22)
-    # Test Signal Change invalidating a route that HAS already been set up
+    # Test Signal Change invalidating a route that HAS already been set up - Warning will be generated
     # For this test we use Route 3 (Platform 1 to down Main)
     assert_signals_DANGER(8,9)
     simulate_buttons_clicked(3)
@@ -800,7 +802,7 @@ def run_schematic_routes_example_tests():
     assert_buttons_disabled(20)
     set_signals_on(15)
     assert_buttons_enabled(20)
-    # Test Signal Change invalidating a route IN THE PROCESS of being set up
+    # Test Signal Change invalidating a route IN THE PROCESS of being set up - Warning will be generated
     # For this test we use Route 20 (Up to Goods) and signal 15
     simulate_buttons_clicked(20)
     sleep(1)
@@ -1051,6 +1053,7 @@ def test_nx_routes3():
 ######################################################################################################
 
 def run_all_schematic_routes_tests():
+    reset_log_counters()
     # Run the standalone tests for Schematic routes
     print("Route configuration update tests (change/delete of item IDs)")
     initialise_test_harness()
@@ -1084,17 +1087,20 @@ def run_all_schematic_routes_tests():
     test_configuration_windows.test_all_object_edit_windows()
     # Run the Tests for the example layout
     initialise_test_harness(filename="../model_railway_signals/examples/one_touch_routes_example.sig")
-    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
     reset_layout()
     set_run_mode()
     set_automation_off()
+    print("Schematic Route Example Layout Tests - Run Mode, Automation Off - 2 warnings will be generated")
     run_schematic_routes_example_tests()
-    print("Schematic Route Example Layout Tests - Run Mode, Automation On")
+    print("Schematic Route Example Layout Tests - Run Mode, Automation On - 2 warnings will be generated")
     set_automation_on()
     run_schematic_routes_example_tests()
+    # Check the total number of Log Messages generated
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(28)
     report_results()
     
 if __name__ == "__main__":

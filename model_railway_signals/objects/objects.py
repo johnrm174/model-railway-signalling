@@ -118,55 +118,74 @@ from .. import run_layout
 from .. import library
 
 #------------------------------------------------------------------------------------
-# Internal function to bring all track sections, route buttons and switches to the
-# front. This ensures they are not obscured by any lines drawn on the canvas
+# Internal function to apply a layering tag to an object (for bring to front)
 #------------------------------------------------------------------------------------
 
-def bring_track_sections_to_the_front():
-    for object_id in objects_common.schematic_objects:
-        if ( objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.section or
-             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.route or
-             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.switch or
-             objects_common.schematic_objects[object_id]["item"] == objects_common.object_type.textbox):
-            objects_common.canvas.tag_raise(objects_common.schematic_objects[object_id]["tags"])
-        # Now bring all Item ID labels to the front
-        library.bring_item_ids_to_front()
+FRONT_ITEM_TYPES = {
+    objects_common.object_type.section,
+    objects_common.object_type.route,
+    objects_common.object_type.switch,
+    objects_common.object_type.textbox, }
+
+def apply_layering_tag(object_id):
+    obj = objects_common.schematic_objects.get(object_id)
+    if obj["item"] in FRONT_ITEM_TYPES:
+        objects_common.canvas.addtag_withtag("front_layer", obj["tags"])
     return()
 
 #------------------------------------------------------------------------------------
-# Internal Function to redraw (re-create) all objects on the schematic with a new
-# boundary box. Called following a file load or undo/redo. Note that in both cases
-# all existing schematic objects will have been deleted prior to the re-draw
+# Internal function to bring all track sections, route buttons, switches and
+# textboxes to the front. This ensures they are not obscured by any lines drawn
+# on the canvas. Note this function has been optimised for performance
 #------------------------------------------------------------------------------------
 
+FRONT_ITEM_TYPES = {
+    objects_common.object_type.section,
+    objects_common.object_type.route,
+    objects_common.object_type.switch,
+    objects_common.object_type.textbox, }
+
+def bring_track_sections_to_the_front():
+    objects_common.canvas.tag_raise("front_layer")
+    # Bring Item ID labels to the front
+    library.bring_item_ids_to_front()
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal Functions to redraw (re-create) objects on the schematic with a new
+# boundary box. Called following a file load or undo/redo. Note that in both cases
+# the existing schematic objects will have been deleted prior to the re-draw
+# This function has been optimised for performance (file load case)
+#------------------------------------------------------------------------------------
+
+REDRAW_FUNCTIONS = {
+    objects_common.object_type.line: objects_lines.redraw_line_object,
+    objects_common.object_type.textbox: objects_textboxes.redraw_textbox_object,
+    objects_common.object_type.signal: objects_signals.redraw_signal_object,
+    objects_common.object_type.point: objects_points.redraw_point_object,
+    objects_common.object_type.section: objects_sections.redraw_section_object,
+    objects_common.object_type.instrument: objects_instruments.redraw_instrument_object,
+    objects_common.object_type.track_sensor: objects_sensors.redraw_track_sensor_object,
+    objects_common.object_type.route: objects_routes.redraw_route_object,
+    objects_common.object_type.switch: objects_switches.redraw_switch_object,
+    objects_common.object_type.lever: objects_levers.redraw_lever_object, }
+
 def redraw_object(object_id):
+    # Localize references to avoid repeated global/attribute lookups
+    obj = objects_common.schematic_objects[object_id]
     # Set the bbox reference to 'None' so it will be created on redraw
-    objects_common.schematic_objects[object_id]["bbox"] = None
-    this_object_type = objects_common.schematic_objects[object_id]["item"]
-    if this_object_type == objects_common.object_type.line:
-        objects_lines.redraw_line_object(object_id)
-    elif this_object_type == objects_common.object_type.textbox:
-        objects_textboxes.redraw_textbox_object(object_id)
-    elif this_object_type == objects_common.object_type.signal:
-        objects_signals.redraw_signal_object(object_id)
-    elif this_object_type == objects_common.object_type.point:
-        objects_points.redraw_point_object(object_id)
-    elif this_object_type == objects_common.object_type.section:
-        objects_sections.redraw_section_object(object_id)
-    elif this_object_type == objects_common.object_type.instrument:
-        objects_instruments.redraw_instrument_object(object_id)
-    elif this_object_type == objects_common.object_type.track_sensor:
-        objects_sensors.redraw_track_sensor_object(object_id)
-    elif this_object_type == objects_common.object_type.route:
-        objects_routes.redraw_route_object(object_id)
-    elif this_object_type == objects_common.object_type.switch:
-        objects_switches.redraw_switch_object(object_id)
-    elif this_object_type == objects_common.object_type.lever:
-        objects_levers.redraw_lever_object(object_id)
+    obj["bbox"] = None
+    this_object_type = obj["item"]
+    redraw_function = REDRAW_FUNCTIONS.get(this_object_type)
+    if redraw_function:
+        redraw_function(object_id)
+        apply_layering_tag(object_id)
     return()
 
 def redraw_all_objects():
-    for object_id in objects_common.schematic_objects:
+    # Localize reference to avoid repeated global/attribute lookups
+    schematic_objects = objects_common.schematic_objects
+    for object_id in schematic_objects:
         redraw_object(object_id)
     return()
 
@@ -214,27 +233,26 @@ def reset_all_schematic_indexes():
 # It is also an API function, called from the Schematic module after 'place object' and
 # 'snap to grid' operations (which may have involved several interim object moves).
 # 'restore_schematic_state' is the internal function used by 'undo' and 'redo'
+# Note that these functions have been optimised for performance
 #------------------------------------------------------------------------------------
 
-undo_buffer = [{}]
-undo_pointer = 0
+undo_buffer = [] # Start empty
+undo_pointer = -1
 
 def save_schematic_state(reset_pointer:bool=False):
-    global undo_buffer
-    global undo_pointer
-    # The undo buffer is reset following 'layout load' or 'new layout'
-    if reset_pointer: undo_pointer = 0
-    else:undo_pointer = undo_pointer + 1
-    # If the undo pointer isn't at the end of the undo buffer when a change is made
-    # then we need to clear everything from the undo buffer forward of this point
-    if len(undo_buffer) > undo_pointer:
+    global undo_buffer, undo_pointer
+    # Handle Reset of undo/redo buffer
+    if reset_pointer:
+        undo_buffer.clear()
+        undo_pointer = -1
+    # Increment Pointer for the new snapshot
+    undo_pointer += 1
+    # Truncate Redo History beyond the current pointer
+    if undo_pointer < len(undo_buffer):
         undo_buffer = undo_buffer[:undo_pointer]
-    undo_buffer.append({})
-    # Save a snapshot of all schematic objects - I had a few issues with copy and
-    # deepcopy not working as I was expecting but copying one object at a time works
-    snapshot_objects = objects_common.schematic_objects
-    for object_id in snapshot_objects:
-        undo_buffer[undo_pointer][object_id] = copy.deepcopy(snapshot_objects[object_id])
+    # Use deepcopy as it preserves Enums, Tuples, and UUIDs.
+    snapshot = copy.deepcopy(objects_common.schematic_objects)
+    undo_buffer.append(snapshot)
     return()
 
 def undo():
@@ -253,59 +271,59 @@ def redo():
 
 def restore_schematic_state():
     global undo_pointer
-    # Delete all current objects gracefully. We create a list of objects to delete rather than
-    # just iterating through the main dictionary otherwise the dict would disappear from underneath
-    objects_to_delete = []
-    for object_id in objects_common.schematic_objects:
-        objects_to_delete.append(object_id)
-    for object_id in objects_to_delete:
+    # Unpack the canvas whilst we delete and redraw everything (increased performance)
+    objects_common.canvas.pack_forget()
+    # Delete all schematic objects prior ro restoring the undo/redo state
+    # We use the master dict keys to ensure we are looking at the 'real' data
+    ids_to_delete = list(objects_common.schematic_objects.keys())
+    for object_id in ids_to_delete:
         delete_object(object_id)
-    # Restore the main schematic object dictionary from the snapshot - I had a few issues with
-    # copy and deepcopy not working as I was expecting but copying one object at a time works
-    snapshot_objects = undo_buffer[undo_pointer]
-    for object_id in snapshot_objects:
-        objects_common.schematic_objects[object_id] = copy.deepcopy(snapshot_objects[object_id])
-    # Set the seperate schematic dictionary indexes from the restored schematic objects dict
+    # Restore the required snapshot by Clearing and Updating the master dictionary
+    snapshot_data = undo_buffer[undo_pointer]
+    objects_common.schematic_objects.clear()
+    objects_common.schematic_objects.update(copy.deepcopy(snapshot_data))
+    # Rebuild The schematic indexes
     reset_all_schematic_indexes()
-    # Re-draw all objects on the schematic.
+    # Redraw all items from the now-populated master dict
     redraw_all_objects()
-    # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
-    # Initialise the layout (interlocking changes, signal aspects etc)
+    # Repack the canvas now we have finished drawing everything
+    objects_common.canvas.pack(fill="both", expand=True)
     run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Create a new schematic object and draw it on the canvas
 # Called from the Schematic Module when an "add object" button is clicked
+# Note that this function has been optimised for performance
 #------------------------------------------------------------------------------------
 
+CREATE_FUNCTIONS = {
+    objects_common.object_type.line: objects_lines.create_line,
+    objects_common.object_type.textbox: objects_textboxes.create_textbox,
+    objects_common.object_type.signal: objects_signals.create_signal,
+    objects_common.object_type.point: objects_points.create_point,
+    objects_common.object_type.section: objects_sections.create_section,
+    objects_common.object_type.instrument: objects_instruments.create_instrument,
+    objects_common.object_type.track_sensor: objects_sensors.create_track_sensor,
+    objects_common.object_type.route: objects_routes.create_route,
+    objects_common.object_type.switch: objects_switches.create_switch,
+    objects_common.object_type.lever: objects_levers.create_lever, }
+
 def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subtype=None):
-    if new_object_type == objects_common.object_type.line:
-        object_id = objects_lines.create_line(xpos, ypos)
-    elif new_object_type == objects_common.object_type.textbox:
-        object_id = objects_textboxes.create_textbox(xpos, ypos)
-    elif new_object_type == objects_common.object_type.signal:
-        object_id = objects_signals.create_signal(xpos, ypos, item_type, item_subtype)
-    elif new_object_type == objects_common.object_type.point:
-         object_id = objects_points.create_point(xpos, ypos, item_type, item_subtype)
-    elif new_object_type == objects_common.object_type.section:
-        object_id = objects_sections.create_section(xpos, ypos)
-    elif new_object_type == objects_common.object_type.instrument:
-        object_id = objects_instruments.create_instrument(xpos, ypos, item_type)
-    elif new_object_type == objects_common.object_type.track_sensor:
-        object_id = objects_sensors.create_track_sensor(xpos, ypos)
-    elif new_object_type == objects_common.object_type.route:
-        object_id = objects_routes.create_route(xpos, ypos)
-    elif new_object_type == objects_common.object_type.switch:
-        object_id = objects_switches.create_switch(xpos, ypos)
-    elif new_object_type == objects_common.object_type.lever:
-        object_id = objects_levers.create_lever(xpos, ypos, item_type)
-    else:
-        object_id = None
+    create_function = CREATE_FUNCTIONS.get(new_object_type)
+    if create_function:
+        # Handle varying signatures based on type
+        if new_object_type in {objects_common.object_type.signal, objects_common.object_type.point}:
+            object_id = create_function(xpos, ypos, item_type, item_subtype)
+        elif new_object_type in {objects_common.object_type.instrument, objects_common.object_type.lever}:
+            object_id = create_function(xpos, ypos, item_type)
+        else:
+            object_id = create_function(xpos, ypos)
+        apply_layering_tag(object_id)
     # Note that we do not save the schematic state after the 'create' as, although the item now
     # exists, it has yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
-    # Also - as we are just creating a 'new' object, we don't need to process layout changes
+    # Also - as we are just creating a 'new' object, we don't need to process any layout changes
     return(object_id)
 
 #------------------------------------------------------------------------------------
@@ -320,6 +338,7 @@ def finalise_object_updates():
     # Ensure all track sections are brought forward on the schematic (in front of any
     # lines), save the current state (for undo/redo) and Process any layout changes
     bring_track_sections_to_the_front()
+    objects_common.root.update_idletasks()
     save_schematic_state()
     run_layout.initialise_layout()
     return()
@@ -335,30 +354,30 @@ def finalise_object_updates():
 # Note that line objects have their own 'selected' indication (selection circles at
 # each end of the line) and for individual changes we create the line as 'selected'.
 # For the 'bulk update' use cases we suppress this (and leave the lines unselected).
+# Note that this function has been optimised for performance.
 #------------------------------------------------------------------------------------
+
+UPDATE_FUNCTIONS = {
+    objects_common.object_type.line: objects_lines.update_line,
+    objects_common.object_type.textbox: objects_textboxes.update_textbox,
+    objects_common.object_type.signal: objects_signals.update_signal,
+    objects_common.object_type.point: objects_points.update_point,
+    objects_common.object_type.section: objects_sections.update_section,
+    objects_common.object_type.instrument: objects_instruments.update_instrument,
+    objects_common.object_type.track_sensor: objects_sensors.update_track_sensor,
+    objects_common.object_type.route: objects_routes.update_route,
+    objects_common.object_type.switch: objects_switches.update_switch,
+    objects_common.object_type.lever: objects_levers.update_lever, }
 
 def update_object(object_id, new_object, update_schematic_state:bool=True, create_selected:bool=True):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
-    if type_of_object == objects_common.object_type.line:
-        objects_lines.update_line(object_id, new_object, create_selected=create_selected)
-    elif type_of_object == objects_common.object_type.textbox:
-        objects_textboxes.update_textbox(object_id, new_object)
-    elif type_of_object == objects_common.object_type.signal:
-        objects_signals.update_signal(object_id, new_object)
-    elif type_of_object == objects_common.object_type.point:
-        objects_points.update_point(object_id, new_object)
-    elif type_of_object == objects_common.object_type.section:
-        objects_sections.update_section(object_id, new_object)
-    elif type_of_object == objects_common.object_type.instrument:
-        objects_instruments.update_instrument(object_id, new_object)
-    elif type_of_object == objects_common.object_type.track_sensor:
-        objects_sensors.update_track_sensor(object_id, new_object)
-    elif type_of_object == objects_common.object_type.route:
-        objects_routes.update_route(object_id, new_object)
-    elif type_of_object == objects_common.object_type.switch:
-        objects_switches.update_switch(object_id, new_object)
-    elif type_of_object == objects_common.object_type.lever:
-        objects_levers.update_lever(object_id, new_object)
+    update_function = UPDATE_FUNCTIONS.get(type_of_object)
+    if update_function:
+        if type_of_object == objects_common.object_type.line:
+            update_function(object_id, new_object, create_selected=create_selected)
+        else:
+            update_function(object_id, new_object)
+        apply_layering_tag(object_id)
     # We normally process layout changes after each object update but for the bulk renumbering
     # use case we postpone this processing until all the renumbering has been completed
     if update_schematic_state: finalise_object_updates()
@@ -368,157 +387,181 @@ def update_object(object_id, new_object, update_schematic_state:bool=True, creat
 # Common Internal Function to hard Delete an object. This function deletes the library
 # object from the schematic and also permanently deletes the object from the dictionary
 # of schematic objects - Called from the delete_objects and also the undo/redo functions
+# Note that this function has been optimised for performance.
 #------------------------------------------------------------------------------------
+
+DELETE_FUNCTIONS = {
+    objects_common.object_type.line: objects_lines.delete_line,
+    objects_common.object_type.textbox: objects_textboxes.delete_textbox,
+    objects_common.object_type.signal: objects_signals.delete_signal,
+    objects_common.object_type.point: objects_points.delete_point,
+    objects_common.object_type.section: objects_sections.delete_section,
+    objects_common.object_type.instrument: objects_instruments.delete_instrument,
+    objects_common.object_type.track_sensor: objects_sensors.delete_track_sensor,
+    objects_common.object_type.route: objects_routes.delete_route,
+    objects_common.object_type.switch: objects_switches.delete_switch,
+    objects_common.object_type.lever: objects_levers.delete_lever, }
 
 def delete_object(object_id):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
-    if type_of_object == objects_common.object_type.line:
-        objects_lines.delete_line(object_id) 
-    elif type_of_object == objects_common.object_type.textbox:
-        objects_textboxes.delete_textbox(object_id) 
-    elif type_of_object == objects_common.object_type.signal:
-        objects_signals.delete_signal(object_id)
-    elif type_of_object == objects_common.object_type.point:
-         objects_points.delete_point(object_id)
-    elif type_of_object == objects_common.object_type.section:
-        objects_sections.delete_section(object_id)
-    elif type_of_object == objects_common.object_type.instrument:
-        objects_instruments.delete_instrument(object_id)
-    elif type_of_object == objects_common.object_type.track_sensor:
-        objects_sensors.delete_track_sensor(object_id)
-    elif type_of_object == objects_common.object_type.route:
-        objects_routes.delete_route(object_id)
-    elif type_of_object == objects_common.object_type.switch:
-        objects_switches.delete_switch(object_id)
-    elif type_of_object == objects_common.object_type.lever:
-        objects_levers.delete_lever(object_id)
+    delete_function = DELETE_FUNCTIONS.get(type_of_object)
+    if delete_function: delete_function(object_id)
     return()
 
-#------------------------------------------------------------------------------------
-# Function to permanently Delete one or more objects from the schematic. Called from
-# the Schematic Module when selected objects are deleted or when all objects are deleted
-#------------------------------------------------------------------------------------
-
-def delete_objects(list_of_object_ids:list):
+def delete_objects(list_of_object_ids:list, initialise_layout:bool=True):
     for object_id in list_of_object_ids:
         delete_object(object_id)
+    # Force a display refresh at this point (user experience)
+    objects_common.root.update_idletasks()
     # Save the schematic state (for undo/redo) and initialise the layout
     save_schematic_state()
-    run_layout.initialise_layout()
+    # Don't initialise the layout after a delete all (on file new or part of file load)
+    if initialise_layout: run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Rotate one or more objects on the schematic
 # Called from the Schematic Module when selected objects are rotated
 # Only Points and Signals can be rotated - all other objects are unchanged
+# Note that this function has been optimised for performance.
 #------------------------------------------------------------------------------------
 
-def rotate_objects(list_of_object_ids:list):
+def rotate_objects(list_of_object_ids: list):
     # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
     # processing a load of intermixed deletes/creates when it returns to the main loop
+    schematic_objects = objects_common.schematic_objects
+    active_updates = []
+    # Only delete objects that can be rotated (Points and signals)
     for object_id in list_of_object_ids:
-        type_of_object = objects_common.schematic_objects[object_id]["item"]            
-        # Delete the drawing objects from the canvas
-        if type_of_object == objects_common.object_type.signal: objects_signals.delete_signal_object(object_id)
-        elif type_of_object == objects_common.object_type.point: objects_points.delete_point_object(object_id)
-    # Re-draw the drawing objects on the canvas in their new position
-    for object_id in list_of_object_ids:
-        type_of_object = objects_common.schematic_objects[object_id]["item"]            
-        if type_of_object in (objects_common.object_type.signal,objects_common.object_type.point):
-            # Work out the orientation change based on the current orientation
-            orientation = objects_common.schematic_objects[object_id]["orientation"]
-            if orientation == 0: objects_common.schematic_objects[object_id]["orientation"] = 180
-            else: objects_common.schematic_objects[object_id]["orientation"] = 0
-            if type_of_object == objects_common.object_type.signal: objects_signals.redraw_signal_object(object_id)
-            elif type_of_object == objects_common.object_type.point: objects_points.redraw_point_object(object_id)    
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are deleting/re-creating objects we still need to process layout changes as the
-    # signals may need to be locked depending on the state of the points and vice versa
-    run_layout.initialise_layout()
+        obj = schematic_objects[object_id]
+        obj_type = obj["item"]
+        if obj_type == objects_common.object_type.signal:
+            objects_signals.delete_signal_object(object_id)
+            active_updates.append((object_id, obj, obj_type))
+        elif obj_type == objects_common.object_type.point:
+            objects_points.delete_point_object(object_id)
+            active_updates.append((object_id, obj, obj_type))
+    # Only proceed if there are objects that need to be rotated (already deleted)
+    if active_updates:
+        for object_id, obj, obj_type in active_updates:
+            # Toggle orientation between 0 and 180
+            obj["orientation"] = 180 if obj["orientation"] == 0 else 0
+            # Re-draw based on type
+            if obj_type == objects_common.object_type.signal:
+                objects_signals.redraw_signal_object(object_id)
+            elif obj_type == objects_common.object_type.point:
+                objects_points.redraw_point_object(object_id)
+        # Force a display refresh at this point (user experience)
+        objects_common.root.update_idletasks()
+        # save the current state (for undo/redo)
+        save_schematic_state()
+        # As we are deleting/re-creating objects we still need to process layout changes as the
+        # signals may need to be locked depending on the state of the points and vice versa
+        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Hide/unhide one or more objects on the schematic.
+# Note that this function has been optimised for performance
 #------------------------------------------------------------------------------------
 
-def hide_objects(list_of_object_ids:list, hide:bool=True):
+def hide_objects(list_of_object_ids: list, hide: bool = True):
     # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
     # processing a load of intermixed deletes/creates when it returns to the main loop
+    schematic_objects = objects_common.schematic_objects
+    active_updates = []
+    # Only delete objects whose current state is DIFFERENT from target
     for object_id in list_of_object_ids:
-        if ("hidden" in objects_common.schematic_objects[object_id].keys() and
-                    objects_common.schematic_objects[object_id]["hidden"] != hide):
-            # Call the appropriate functions to delete the object according to type
-            type_of_object = objects_common.schematic_objects[object_id]["item"]
-            if type_of_object == objects_common.object_type.section:
-                objects_sections.delete_section_object(object_id)
-            elif type_of_object == objects_common.object_type.textbox:
-                objects_textboxes.delete_textbox_object(object_id)
-            elif type_of_object == objects_common.object_type.switch:
-                objects_switches.delete_switch_object(object_id)
-            elif type_of_object == objects_common.object_type.track_sensor:
-                objects_sensors.delete_track_sensor_object(object_id)
-    # Update idletasks to provide a 'flash' - giving the user an indication of the change
-    objects_common.root.update_idletasks()
-    # Re-draw the drawing objects on the canvas in their new state
-    for object_id in list_of_object_ids:
-        if ("hidden" in objects_common.schematic_objects[object_id].keys() and
-                    objects_common.schematic_objects[object_id]["hidden"] != hide):
-            objects_common.schematic_objects[object_id]["hidden"] = hide
-            # Call the appropriate functions to delete the object according to type
-            type_of_object = objects_common.schematic_objects[object_id]["item"]
-            if type_of_object == objects_common.object_type.section:
-                objects_sections.redraw_section_object(object_id)
-            elif type_of_object == objects_common.object_type.textbox:
-                objects_textboxes.redraw_textbox_object(object_id)
-            elif type_of_object == objects_common.object_type.switch:
-                objects_switches.redraw_switch_object(object_id)
-            elif type_of_object == objects_common.object_type.track_sensor:
-                objects_sensors.redraw_track_sensor_object(object_id)
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are deleting/re-creating objects we still need to process layout changes as the
-    # points may need need to be un locked depending on the state of the sections
-    run_layout.initialise_layout()
+        obj = schematic_objects[object_id]
+        obj_type = obj["item"]
+        # Check for standard "hidden" property types
+        if obj_type in (objects_common.object_type.section,
+                        objects_common.object_type.textbox,
+                        objects_common.object_type.switch,
+                        objects_common.object_type.track_sensor):
+            if obj.get("hidden") != hide:
+                # Call specific deletion functions
+                if obj_type == objects_common.object_type.section: objects_sections.delete_section_object(object_id)
+                elif obj_type == objects_common.object_type.textbox: objects_textboxes.delete_textbox_object(object_id)
+                elif obj_type == objects_common.object_type.switch: objects_switches.delete_switch_object(object_id)
+                elif obj_type == objects_common.object_type.track_sensor: objects_sensors.delete_track_sensor_object(object_id)
+                active_updates.append((object_id, obj, obj_type, "hidden"))
+        # Check for "hidebuttons" property types
+        elif obj_type in (objects_common.object_type.signal,
+                          objects_common.object_type.point,
+                          objects_common.object_type.lever):
+            if obj.get("hidebuttons") != hide:
+                if obj_type == objects_common.object_type.signal: objects_signals.delete_signal_object(object_id)
+                elif obj_type == objects_common.object_type.point: objects_points.delete_point_object(object_id)
+                elif obj_type == objects_common.object_type.lever: objects_levers.delete_lever_object(object_id)
+                active_updates.append((object_id, obj, obj_type, "hidebuttons"))
+    # Only proceed if there are objects that need to be toggled
+    if active_updates:
+        # Update idletasks to provide a 'flash' - giving the user an indication of the change
+        objects_common.root.update_idletasks()
+        for object_id, obj, obj_type, prop_key in active_updates:
+            # Update the dictionary property and Re-draw based on type
+            obj[prop_key] = hide
+            if obj_type == objects_common.object_type.section: objects_sections.redraw_section_object(object_id)
+            elif obj_type == objects_common.object_type.textbox: objects_textboxes.redraw_textbox_object(object_id)
+            elif obj_type == objects_common.object_type.switch: objects_switches.redraw_switch_object(object_id)
+            elif obj_type == objects_common.object_type.track_sensor: objects_sensors.redraw_track_sensor_object(object_id)
+            elif obj_type == objects_common.object_type.signal: objects_signals.redraw_signal_object(object_id)
+            elif obj_type == objects_common.object_type.point: objects_points.redraw_point_object(object_id)
+            elif obj_type == objects_common.object_type.lever: objects_levers.redraw_lever_object(object_id)
+        # Force a display refresh at this point (user experience)
+        objects_common.root.update_idletasks()
+        # save the current state (for undo/redo)
+        save_schematic_state()
+        # As we are deleting/re-creating objects we still need to process layout changes as the
+        # points may need to be un-locked depending on the state of the sections
+        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Flip one or more objects on the schematic. For signals this
 # will flip the position to the other side of the track. For points, this will
 # change them from LH to RH or vice versa (Y points remain unchanged)
+# Note that this function has been optimised for performance.
 #------------------------------------------------------------------------------------
 
 def flip_objects(list_of_object_ids:list):
     # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
     # processing a load of intermixed deletes/creates when it returns to the main loop
+    schematic_objects = objects_common.schematic_objects
+    active_updates = []
+    # Only delete objects that can be flipped (LH/RH Points and signals)
     for object_id in list_of_object_ids:
-        type_of_object = objects_common.schematic_objects[object_id]["item"]
-        # Delete the drawing objects from the canvas
-        if type_of_object == objects_common.object_type.signal: objects_signals.delete_signal_object(object_id)
-        elif type_of_object == objects_common.object_type.point:
-            current_point_type = objects_common.schematic_objects[object_id]["itemtype"]
-            if current_point_type in(library.point_type.LH.value, library.point_type.RH.value):
+        obj = schematic_objects[object_id]
+        obj_type = obj["item"]
+        if obj_type == objects_common.object_type.signal:
+            objects_signals.delete_signal_object(object_id)
+            active_updates.append((object_id, obj, obj_type))
+        elif obj_type == objects_common.object_type.point:
+            if obj["itemtype"] in (library.point_type.LH.value, library.point_type.RH.value):
                 objects_points.delete_point_object(object_id)
-    # Re-draw the drawing objects on the canvas in their new position
-    for object_id in list_of_object_ids:
-        type_of_object = objects_common.schematic_objects[object_id]["item"]
-        if type_of_object == objects_common.object_type.signal:
-            current_flipped_state = objects_common.schematic_objects[object_id]["flipped"]
-            objects_common.schematic_objects[object_id]["flipped"] = not current_flipped_state
-            objects_signals.redraw_signal_object(object_id)
-        elif type_of_object == objects_common.object_type.point:
-            current_point_type = objects_common.schematic_objects[object_id]["itemtype"]
-            if current_point_type == library.point_type.LH.value:
-                objects_common.schematic_objects[object_id]["itemtype"] = library.point_type.RH.value
+                active_updates.append((object_id, obj, obj_type))
+    # Only proceed if there are objects that need to be flipped (already deleted)
+    if active_updates:
+        for object_id, obj, obj_type in active_updates:
+            if obj_type == objects_common.object_type.signal:
+                obj["flipped"] = not obj["flipped"]
+                objects_signals.redraw_signal_object(object_id)
+            elif obj_type == objects_common.object_type.point:
+                # Toggle between LH and RH types
+                if obj["itemtype"] == library.point_type.LH.value:
+                    obj["itemtype"] = library.point_type.RH.value
+                else:
+                    obj["itemtype"] = library.point_type.LH.value
                 objects_points.redraw_point_object(object_id)
-            elif current_point_type == library.point_type.RH.value:
-                objects_common.schematic_objects[object_id]["itemtype"] = library.point_type.LH.value
-                objects_points.redraw_point_object(object_id)
-    # save the current state (for undo/redo)
-    save_schematic_state()
-    # As we are deleting/re-creating objects we still need to process layout changes as the
-    # signals may need to be locked depending on the state of the points and vice versa
-    run_layout.initialise_layout()
+        # Force a display refresh at this point (user experience)
+        objects_common.root.update_idletasks()
+        # save the current state (for undo/redo)
+        save_schematic_state()
+        # As we are deleting/re-creating objects we still need to process layout changes as the
+        # signals may need to be locked depending on the state of the points and vice versa
+        # And the re-draw will have returned the point to 'unswitched'
+        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -566,39 +609,32 @@ def move_objects(list_of_object_ids:list, xdiff1:int=None, ydiff1:int=None,
 # Called from the Schematic Module when selected objects are copied.
 #------------------------------------------------------------------------------------
 
-def copy_objects(list_of_object_ids:list, deltax:int, deltay:int):
-    # New objects are "pasted" at a slightly offset position on the canvas so
-    # its clear that new objects have been created (to move/place on the canvas)
-    # We need to return a list of new object IDs
+PASTE_FUNCTIONS = {
+    objects_common.object_type.line:         objects_lines.paste_line,
+    objects_common.object_type.textbox:      objects_textboxes.paste_textbox,
+    objects_common.object_type.signal:       objects_signals.paste_signal,
+    objects_common.object_type.point:        objects_points.paste_point,
+    objects_common.object_type.section:      objects_sections.paste_section,
+    objects_common.object_type.instrument:   objects_instruments.paste_instrument,
+    objects_common.object_type.track_sensor: objects_sensors.paste_track_sensor,
+    objects_common.object_type.route:        objects_routes.paste_route,
+    objects_common.object_type.switch:       objects_switches.paste_switch,
+    objects_common.object_type.lever:        objects_levers.paste_lever, }
+
+def copy_objects(list_of_object_ids: list, deltax: int, deltay: int):
+    # Localize for speed
+    schematic_objects = objects_common.schematic_objects
     list_of_new_object_ids = []
-    # Create a copy of each object in the clipboard (depending on type)
     for object_id in list_of_object_ids:
-        object_to_copy = objects_common.schematic_objects[object_id]
-        type_of_object = objects_common.schematic_objects[object_id]["item"]
-        if type_of_object == objects_common.object_type.line:
-            new_object_id = objects_lines.paste_line(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.textbox:
-            new_object_id = objects_textboxes.paste_textbox(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.signal:
-            new_object_id = objects_signals.paste_signal(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.point:
-            new_object_id = objects_points.paste_point(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.section:
-            new_object_id = objects_sections.paste_section(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.instrument:
-            new_object_id = objects_instruments.paste_instrument(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.track_sensor:
-            new_object_id = objects_sensors.paste_track_sensor(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.route:
-            new_object_id = objects_routes.paste_route(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.switch:
-            new_object_id = objects_switches.paste_switch(object_to_copy, deltax, deltay)
-        elif type_of_object == objects_common.object_type.lever:
-            new_object_id = objects_levers.paste_lever(object_to_copy, deltax, deltay)
-        # Add the new object to the list of clipboard objects
-        # in case the user wants to paste the same objects again
-        list_of_new_object_ids.append(new_object_id)
-    # Ensure all track sections are in front of any lines
+        object_to_copy = schematic_objects[object_id]
+        type_of_object = object_to_copy["item"]
+        # Look up the appropriate paste function
+        paste_func = PASTE_FUNCTIONS.get(type_of_object)
+        if paste_func:
+            # Execute the specific module's paste function
+            new_object_id = paste_func(object_to_copy, deltax, deltay)
+            list_of_new_object_ids.append(new_object_id)
+            apply_layering_tag(new_object_id)
     bring_track_sections_to_the_front()
     # Note that we do not save the schematic state after the 'copy' as, although the copied items now
     # exist, they have yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
@@ -609,31 +645,27 @@ def copy_objects(list_of_object_ids:list, deltax:int, deltay:int):
 # Function to update the styles of one or more objects on the schematic
 #------------------------------------------------------------------------------------
 
-def update_styles(list_of_object_ids:list, dict_of_new_styles:dict):
+STYLE_FUNCTIONS = {
+    objects_common.object_type.line:    objects_lines.update_line_styles,
+    objects_common.object_type.signal:  objects_signals.update_signal_styles,
+    objects_common.object_type.point:   objects_points.update_point_styles,
+    objects_common.object_type.section: objects_sections.update_section_styles,
+    objects_common.object_type.route:   objects_routes.update_route_styles,
+    objects_common.object_type.switch:  objects_switches.update_switch_styles,
+    objects_common.object_type.textbox: objects_textboxes.update_textbox_styles,
+    objects_common.object_type.lever:   objects_levers.update_lever_styles, }
+
+def update_styles(list_of_object_ids: list, dict_of_new_styles: dict):
+    # Localize schematic for fast access
+    schematic_objects = objects_common.schematic_objects
+    # We only care about objects that actually have an update function defined
     for object_id in list_of_object_ids:
-        # Call the object-specific function to perform the update
-        type_of_object = objects_common.schematic_objects[object_id]["item"]
-        if type_of_object == objects_common.object_type.line:
-            objects_lines.update_line_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.signal:
-            objects_signals.update_signal_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.point:
-            objects_points.update_point_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.section:
-            objects_sections.update_section_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.route:
-            objects_routes.update_route_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.switch:
-            objects_switches.update_switch_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.textbox:
-            objects_textboxes.update_textbox_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.lever:
-            objects_levers.update_lever_styles(object_id, dict_of_new_styles)
-        elif type_of_object == objects_common.object_type.instrument:
-            pass
-        elif type_of_object == objects_common.object_type.track_sensor:
-            pass
-    # save the current state (for undo/redo)
+        obj_type = schematic_objects[object_id]["item"]
+        # Dispatch the call if the type is in our mapping
+        update_func = STYLE_FUNCTIONS.get(obj_type)
+        if update_func: update_func(object_id, dict_of_new_styles)
+    # save the current state (for undo/redo). We don't need to process any layout changes
+    # as we are not deleting/recreating the objects when we apply the style changes
     save_schematic_state()
     return()
 
@@ -713,13 +745,13 @@ def extend(new_objects:dict, xoffset:int=0, yoffset:int=0):
         redraw_object(new_object_id)
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
+    # Force a display refresh at this point (user experience)
+    objects_common.root.update_idletasks()
+    # save the current state (for undo/redo) - retaining all previous history
+    save_schematic_state(reset_pointer=False)
     # Recalculate point interlocking tables as a 'belt and braces' measure (they should
     # have been loaded with the rest of the configuration but we do this just in case)
     objects_points.reset_point_interlocking_tables()
-    # Initialise the layout (interlocking changes, signal aspects etc)
-    run_layout.initialise_layout()
-    # save the current state (for undo/redo) - retaining all previous history
-    save_schematic_state(reset_pointer=False)
     return()
 
 #------------------------------------------------------------------------------------
@@ -811,15 +843,19 @@ def set_all(new_objects:dict):
                             +element+"' - Asigning default values: "+str(default_value))
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
-    # Redraw (re-create) all items on the schematic with a new bbox
+    # Disable the canvas whilst we populate it (increased performance)
+    objects_common.canvas.pack_forget()
+    # Re-draw all objects on the schematic and bring track sections etc to the front (so they
+    # are in front of any route lines). We also update idletasks to display the layout before
+    # going on to initialise it ro improve the overall user experience
     redraw_all_objects()
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
+    # Repack the canvas now we have finished drawing everything
+    objects_common.canvas.pack(fill="both", expand=True)
     # Recalculate point interlocking tables as a 'belt and braces' measure (they should
     # have been loaded with the rest of the configuration but we do this just in case)
     objects_points.reset_point_interlocking_tables()
-    # Initialise the layout (interlocking changes, signal aspects etc)
-    run_layout.initialise_layout()
     # save the current state (for undo/redo) - deleting all previous history
     save_schematic_state(reset_pointer=True)
     return()

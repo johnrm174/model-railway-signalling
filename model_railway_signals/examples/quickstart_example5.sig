@@ -182,6 +182,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 2,
@@ -694,6 +695,7 @@
             "flipped": false,
             "fullyautomatic": false,
             "hidebuttons": false,
+            "inhibitflashing": false,
             "interlockahead": false,
             "item": "signal",
             "itemid": 1,
@@ -1340,7 +1342,12 @@
             "width": 1000
         },
         "control": {
-            "dccsoundmappings": []
+            "dccsoundmappings": [],
+            "locomotiveroster": {},
+            "serverallowlist": [],
+            "serverdebugging": false,
+            "serverenforceallow": false,
+            "serverstartup": false
         },
         "general": {
             "automation": true,
@@ -1353,7 +1360,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.1.0"
+            "version": "Version 6.2.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -1372,6 +1379,8 @@
             "port": 1883,
             "pubdcc": false,
             "pubinstruments": [],
+            "publoco": false,
+            "publoconode": "",
             "pubsections": [],
             "pubsensors": [],
             "pubshutdown": false,
@@ -1379,6 +1388,7 @@
             "startup": false,
             "subdccnodes": [],
             "subinstruments": [],
+            "subloconodes": [],
             "subsections": [],
             "subsensors": [],
             "subshutdown": false,

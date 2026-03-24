@@ -13,6 +13,9 @@
 #    edit_canvas_settings(root, canvas_update_callback)
 #    edit_gpio_settings(root, gpio_update_callback)
 #    edit_sounds_settings(root, sounds_update_callback)
+#    edit_server_settings(root)
+#    edit_roster(root)
+#
 #    edit_section_styles(root)
 #    edit_route_styles(root)
 #    edit_switch_styles(root)
@@ -21,12 +24,15 @@
 #    edit_signal_styles(root)
 #    edit_lever_styles(root)
 #    edit_textbox_styles(root)
+#
 #    dcc_programming(root, dcc_prog_enabled_function, dcc_power_on_function, dcc_power_off_function)
 #    dcc_mappings(root)
 #    bulk_renumbering(root)
 #    application_upgrade(root)
 #    import_layout(root, import_schematic_callback)
 #    exercise_points(root, reset_layout_callback)
+#    mqtt_subscriptions(root)
+#    loco_control(root)
 #
 #------------------------------------------------------------------------------------
 
@@ -42,6 +48,7 @@ from .menubar_settings import edit_logging_settings
 from .menubar_settings import edit_canvas_settings
 from .menubar_settings import edit_gpio_settings
 from .menubar_settings import edit_sounds_settings
+from .menubar_settings import edit_server_settings
 
 from .menubar_styles import edit_section_styles
 from .menubar_styles import edit_route_styles
@@ -61,6 +68,9 @@ from .menubar_utilities import exercise_points
 
 from .menubar_subscriptions import mqtt_subscriptions
 
+from .menubar_loco_control import loco_control
+from .menubar_loco_control import edit_roster
+
 __all__ = [
     'display_help',
     'display_about',
@@ -73,6 +83,7 @@ __all__ = [
     'edit_logging_settings',
     'edit_canvas_settings',
     'edit_gpio_settings',
+    'edit_server_settings',
     'edit_section_styles',
     'edit_route_styles',
     'edit_switch_styles',
@@ -87,6 +98,8 @@ __all__ = [
     'application_upgrade',
     'import_layout',
     'exercise_points',
-    'mqtt_subscriptions']
+    'mqtt_subscriptions',
+    'loco_control',
+    'edit_roster']
 
 ##############################################################################################################

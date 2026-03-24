@@ -19,7 +19,7 @@ def test_end_to_end_layout(delay=0.0):
     # As we are using networking, we need to introduce an additional delay for messages
     # to be sent to and received from the MQTT message broker - as we are using a
     # local broker, a short delay of 100ms should suffice
-    network_delay = 0.1 
+    network_delay = 0.2
     sleep(delay)
     reset_layout()
     # Set up a couple of trains to test with
@@ -177,7 +177,7 @@ def test_circular_layout(delay=0.0):
     # We also need to introduce a delay for triggering of the remote GPIO sensors
     # as these are configured with a timeout period of 0.1 seconds (this means that
     # any additional triggers received within the 0.1 seconds will be ignored
-    network_delay = 0.1
+    network_delay = 0.2
     gpio_trigger_delay = 0.2
     sleep(delay)
     reset_layout()
@@ -185,7 +185,6 @@ def test_circular_layout(delay=0.0):
     set_signals_off(21,22,31,32)
     sleep(delay)
     set_sections_occupied(22)
-    sleep(delay)
     for repeat in range(5):
         sleep(delay+network_delay+gpio_trigger_delay)
         assert_sections_occupied(22)
@@ -236,18 +235,22 @@ def test_circular_layout(delay=0.0):
     set_signals_on(21,22,31,32)
     sleep(delay)
     return()
-    
 
 ######################################################################################################
 
 def run_all_mqtt_networking_example_tests(delay:float=0.0):
+    reset_log_counters()
     initialise_test_harness(filename="../model_railway_signals/examples/mqtt_networked_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_configuration_windows.test_all_object_edit_windows()
     set_run_mode()
+    time.sleep(5) ####################### Need to put in a sleep if commenting out the above ################
     test_circular_layout(delay)
     test_end_to_end_layout(delay)
+    # Check the total number of Log Messages generated
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
 
 if __name__ == "__main__":

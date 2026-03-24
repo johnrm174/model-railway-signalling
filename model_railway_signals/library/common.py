@@ -45,6 +45,11 @@ import math
 import logging
 import queue
 import tkinter as Tk
+import time
+import threading
+import sys
+import traceback
+import os
 
 from datetime import datetime
 
@@ -56,6 +61,7 @@ from . import track_sections
 from . import text_boxes
 from . import block_instruments
 from . import dcc_control
+from . import loco_control
 from . import buttons
 from . import points
 from . import levers
@@ -68,14 +74,15 @@ from . import signals
 
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
-# Global flag to indicate that the application is closing
-shutdown_initiated = False
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
 # Global flag to track the mode (set via the configure_edit_mode function)
 editing_enabled = False
 # Global Flag to enable or disable the processing of keypress events
 keypresses_enabled = True
+
+# A thread-safe flag to indicate shutdown has been initiated
+shutdown_event = threading.Event()
 
 #---------------------------------------------------------------------------------------------
 # Popup window for displaying Run Layout Warnings. Used by the Levers library module to
@@ -204,6 +211,7 @@ def mqtt_transmit_all_now_things_should_have_stabilised():
     track_sections.mqtt_send_all_section_states_on_broker_connect()
     signals.mqtt_send_all_signal_states_on_broker_connect()
     dcc_control.mqtt_send_all_dcc_command_states_on_broker_connect()
+    loco_control.send_local_dcc_power_state_on_broker_connect()
     return()
 
 #-------------------------------------------------------------------------
@@ -253,10 +261,9 @@ def set_root_window(root):
 #-------------------------------------------------------------------------
 
 def instant_shutdown():
-    global shutdown_initiated
-    if not shutdown_initiated:
+    if not shutdown_event.is_set():
         logging.info ("Initiating Instant Application Shutdown")
-        shutdown_initiated = True
+        shutdown_event.set()
         mqtt_interface.mqtt_publish_shutdown_message()
         mqtt_interface.mqtt_broker_disconnect()
         pi_sprog_interface.request_dcc_power_off()
@@ -264,10 +271,9 @@ def instant_shutdown():
         root_window.destroy()
 
 def orderly_shutdown():
-    global shutdown_initiated
-    if not shutdown_initiated:
+    if not shutdown_event.is_set():
         logging.info ("Initiating Orderly Application Shutdown")
-        shutdown_initiated = True
+        shutdown_event.set()
         root_window.after(0, lambda:shutdown_step1())
         return()
 
@@ -278,7 +284,7 @@ def shutdown_step1():
     return()
 
 def shutdown_step2():
-    # Clear out any retained messages and disconnect from broker
+    # Disconnect from the broker and shutdown the MQTT publishing thread
     mqtt_interface.mqtt_broker_disconnect()
     root_window.after(100, lambda:shutdown_step3())
     return()
@@ -388,21 +394,98 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
 #-------------------------------------------------------------------------
 
 def process_external_events():
-    # Check how many items are waiting
-    backlog = event_queue.qsize()
-    # Process only what is currently in the queue (max 10 events at a time)
-    # This ensures a flood of event data doesn't starve the GUI thread.
-    for item in range(min(backlog, 20)):
-        callback = event_queue.get_nowait()
-        try: callback()
-        except: pass
-    # Schedule next check. 10ms seems to give good performance
-    root_window.after(10, process_external_events)
+    while not event_queue.empty():
+        try:
+            callback = event_queue.get_nowait()
+            callback()
+        except Exception as exception:
+            logging.error(f"Exception processing event in Tkinter Thread: {exception}")
+    root_window.after(50, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
     return()
+
+##################################################################################################
+# Probe function to detect main thread freezes and write them out to file
+##################################################################################################
+
+# A thread-safe flag to track if the GUI is responsive
+gui_responsive = threading.Event()
+gui_responsive.set()
+
+# Set up a dedicated freeze log
+handler = logging.FileHandler("freeze_diagnostics.log", mode='w')
+freeze_logger = logging.getLogger("FreezeDetector")
+freeze_logger.propagate = False
+freeze_logger.addHandler(handler)
+
+def probe_callback():
+    # This function runs in the main tkinter thread
+    gui_responsive.set()
+
+def flush_to_disk():
+    handler.flush()
+    try: os.fsync(handler.stream.fileno())
+    except (AttributeError, ValueError): pass
+
+def watchdog_monitor():
+    heartbeat_count = 0
+    freeze_logger.error(f"Watchdog Started at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    while True:
+        try:
+            # Start a new line with a timestamp if we are at the beginning
+            if heartbeat_count == 0:
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                handler.stream.write(f"{timestamp} - HEARTBEAT: ")
+                flush_to_disk()
+            # Clear the shutdown event and execute the probe function in the main thread
+            gui_responsive.clear()
+            execute_function_in_tkinter_thread(probe_callback)
+            # Wait 15 seconds OR until shutdown_event.set() is called.
+            if shutdown_event.wait(timeout=15): break
+            # If the probe_callback hasn't finished then we know the tkinter main_loop has hung
+            if not gui_responsive.is_set():
+                print("Application Freeze Detected - Capturing diagnostic snapshot")
+                handler.stream.write(" [FREEZE DETECTED]\n")
+                flush_to_disk()
+                capture_diagnostic_snapshot()
+                break
+            # Heartbeat Logic (Write one dot every 30s cycle)
+            handler.stream.write(".")
+            heartbeat_count += 1
+            flush_to_disk()
+            if heartbeat_count >= 100:
+                handler.stream.write("\n")
+                flush_to_disk()
+                heartbeat_count = 0
+        except Exception as exception:
+            freeze_logger.error(f"Watchdog Monitor - Exception processing heartbeat: {exception}")
+            time.sleep (1.0)
+    return()
+
+def capture_diagnostic_snapshot():
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    # Capture the queue depth at the moment of the freeze
+    try: current_queue_size = event_queue.qsize()
+    except: current_queue_size = "Unknown/Error"
+    header = (f"\n{'='*30}\nFREEZE SNAPSHOT: {timestamp}\nQueue Backlog: {current_queue_size} items\n{'='*30}\n")
+    output = [header]
+    # sys._current_frames() returns {thread_id: stack_frame}
+    for thread_id, frame in sys._current_frames().items():
+        # Identify which thread is which
+        thread_name = "Unknown"
+        for t in threading.enumerate():
+            if t.ident == thread_id:
+                thread_name = t.name
+                break
+        output.append(f"\nTHREAD: {thread_name} (ID: {thread_id})")
+        output.append("".join(traceback.format_stack(frame)))
+    freeze_logger.error("".join(output))
+    print("Application Freeze Detected - Diagnodstic snapshot written to 'freeze_diagnostics.log'")
+
+threading.Thread(target=watchdog_monitor, daemon=True).start()
 
 ##################################################################################################
 

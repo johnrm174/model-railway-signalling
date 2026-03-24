@@ -1225,6 +1225,7 @@ def run_shunting_tests(delay=0):
 #-----------------------------------------------------------------------------------
 
 def run_all_automation_example_tests(delay:float=0.0):
+    reset_log_counters()
     initialise_test_harness(filename="../model_railway_signals/examples/automation_colour_light_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -1260,6 +1261,9 @@ def run_all_automation_example_tests(delay:float=0.0):
     run_shunting_tests(delay)
     run_main_line_approach_control_tests(delay)
     run_loop_line_approach_control_tests(delay)
+    # Check the total number of Log Messages generated
+    assert_error_logs_generated(0)
+    assert_warning_logs_generated(0)
     report_results()
     
 if __name__ == "__main__":

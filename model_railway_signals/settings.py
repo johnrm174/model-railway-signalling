@@ -32,7 +32,7 @@ default_settings = {}
 
 default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
-default_settings["general"]["version"] = "Version 6.1.0"
+default_settings["general"]["version"] = "Version 6.2.0"
 default_settings["general"]["info"] = "Document your layout here"
 default_settings["general"]["menubarfontsize"] = 10
 default_settings["general"]["baseitemid"] = 1
@@ -76,11 +76,14 @@ default_settings["mqtt"]["startup"] = False
 default_settings["mqtt"]["pubshutdown"] = False
 default_settings["mqtt"]["subshutdown"] = False
 default_settings["mqtt"]["subdccnodes"] = []
+default_settings["mqtt"]["subloconodes"] = []
 default_settings["mqtt"]["subsignals"] = []
 default_settings["mqtt"]["subsections"] = []
 default_settings["mqtt"]["subinstruments"] = []
 default_settings["mqtt"]["subsensors"] = []
 default_settings["mqtt"]["pubdcc"] = False
+default_settings["mqtt"]["publoco"] = False
+default_settings["mqtt"]["publoconode"] = ""
 default_settings["mqtt"]["pubsignals"] = []
 default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
@@ -88,6 +91,11 @@ default_settings["mqtt"]["pubsensors"] = []
 
 default_settings["control"] = {}
 default_settings["control"]["dccsoundmappings"] = []
+default_settings["control"]["locomotiveroster"] = {}
+default_settings["control"]["serverstartup"] = False
+default_settings["control"]["serverdebugging"] = False
+default_settings["control"]["serverallowlist"] = []
+default_settings["control"]["serverenforceallow"] = False
 
 default_settings["gpio"] = {}
 default_settings["gpio"]["triggerdelay"] = 0.020

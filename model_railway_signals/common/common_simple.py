@@ -936,7 +936,7 @@ class validated_keycode_entry_box(integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
-    def __init__(self, parent_frame, item_type:str, tool_tip:str, callback=None):
+    def __init__(self, parent_frame, item_type:str, tool_tip:str, callback=None, event_type:str=""):
         # We need to know the current item ID for validation, but we want to hold it
         # locally rather than pass into the parent class (which already has a local
         # 'current_item_id' parameter used for local validation so we can't use that
@@ -944,7 +944,8 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
         # The Item Type ("Sensor" or "Signal" is supplied at initialisation time.
         # The item ID is supplied via the 'set_value' or 'set_item_id' functions.
         self.local_item_id = 0
-        self.current_item_type = item_type
+        self.item_type = item_type
+        self.event_type = event_type
         super().__init__(parent_frame, tool_tip=tool_tip, exists_function=library.gpio_sensor_exists, callback=callback)
 
     def validate(self, update_validation_status:bool=True):
@@ -956,16 +957,16 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
             event_mappings = library.get_gpio_sensor_callback(gpio_sensor_id)
             # The returned list is [signal_passed, signal_approach, sensor_passed, track_section]
             # Where each element of the list is the ID of the mapped item (0 if no mapping)
-            if self.current_item_type == "Signal" and event_mappings[0] > 0 and event_mappings[0] != self.local_item_id:
-                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
+            if self.item_type == "Signal" and self.event_type == "Passed" and event_mappings[0] > 0 and event_mappings[0] != self.local_item_id:
+                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to 'Passed' event for Signal "+str(event_mappings[0]))
                 valid = False
-            elif self.current_item_type == "Signal" and event_mappings[1] > 0 and event_mappings[1] != self.local_item_id:
-                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
+            elif self.item_type == "Signal" and self.event_type == "Approach" and event_mappings[1] > 0 and event_mappings[1] != self.local_item_id:
+                self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to 'Approach event for Signal "+str(event_mappings[1]))
                 valid = False
-            elif self.current_item_type == "Sensor" and event_mappings[2] > 0 and event_mappings[2] != self.local_item_id:
+            elif self.item_type == "Sensor" and event_mappings[2] > 0 and event_mappings[2] != self.local_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
-            elif self.current_item_type == "Section" and event_mappings[3] > 0 and event_mappings[3] != self.local_item_id:
+            elif self.item_type == "Section" and event_mappings[3] > 0 and event_mappings[3] != self.local_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Section "+str(event_mappings[3]))
                 valid = False
         if update_validation_status: self.set_validation_status(valid)

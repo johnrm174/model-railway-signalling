@@ -3,8 +3,11 @@
 A DCC model railway signalling application written in Python, enabling automated and interlocked layout 
 signalling schemes to be designed and configured via the UI without the need to write any code. The
 application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
-without some of the Raspberry-Pi specific interfacing functions). 
+without some of the Raspberry-Pi specific interfacing functions).
 
+* Provides a full DCC Command station for your model railway layout:
+    * Control your locos via on-screen throttles or via your smartphone.
+    * Control all your DCC accessories intuitively via the on-screen schematic.
 * Enables signalling schematics to be easily created with route lines, points and signals:
     * Supports most types of UK colour light signals, semaphore signals, and ground signals.
     * Supports complex trackwork formations such as crossovers, slips and 3-way points.
@@ -52,46 +55,36 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 6.0.0:
+## What's new for Release 6.2.0:
 
 > [!IMPORTANT]
-> Release 6.1.0 will only support the loading of layout files created by Release 6.0.0 or later.
+> Release 6.2.0 will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.1.0.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.2.0.
 > You have been warned!
 
-* Minor improvements/bugfixes to Route setup functionality:
-    * Ignore state of monentary switches on completion of route setup.
-    * Ensure flashing of route buttons is canceled on load of new schematic.
-* More flexibility in the automatic cleardown of routes (one-touch and NX routes):
-    * Multiple track sensors can be specified (useful when routes are 'laddered').
-    * Multiple signals can be specified (to clear down route on signal passed events).
-* New scripting API to enable control of signalling application from python programs:
-    * Enables full signalbox simulations to be developed (with simulated train movements).
-    * Enables simple automation to be achieved (e.g. train shuttles) via DCC relays.
-* Allow GPIO Sensors to be mapped to more than one object type to give more flexibility:
-    * e.g. A GPIO sensor can be mapped to a Signal Passed event and a Track Sensor event.
-* Added new test functionality into the GPIO Settings window to aid layout configuration:
-    * Test buttons for each GPIO input can be pressed/release to simulate events.
-    * Allows end-to end test of functionality whilst not connected to the layout.
-* Added new Subscriptions utility to monitor the state of subscribed objects:
-    * Initial release displays the state of Subscribed GPIO Sensors:
-    * Test buttons for subscribed sensor can be pressed/release to simulate events.
-    * Allows end-to end test of functionality whilst not connected to other nodes.
-* New SPROG Status Monitoring Feature (SPROG Settings Window):
-    * Provides display of SPROG Status, DCC Bus Voltage and DCC Bus current
-* Alternative labels can now be specified for Signalbox Lever control buttons:
-    * Provides greater flexibility for associating Levers towith Signals and Points.
-* Added ability to override ground signals (to ON) based on track occupancy ahead
-* Added ability to override subsidiary signals (to ON) based on track occupancy ahead
-* Semaphore signals can now be specified (and displayed) with lower quadrant arms.
-* Accept optional OS arguments (to enable application start when sig file is clicked)
-* Colour Scheme changes to make popup warnings (SPAD and Lever warnings) more obvious.
-* Clearance delay (track occupancy changes) can now be specified up to 60 seconds.
-* Bugfix to enable schematics with block instrument sounds to run on Windows platforms.
-* Bugfix for hiding/unhiding Switches and Track Sensors in Run Mode ('h' and 'u' keys).
-* Bugfix to validation of 'Signal passed' and 'signal approached' GPIO Sensor ID entries.
-* Bugfix to interlocking of subsidiary signals (now locked correctly if no route ahead)
+* DCC Loco control - Now the DCC Signalling system can be used as a full DCC Command Station:
+    * Ideal for smaller layouts if you don't want the to use a seperate command station.
+    * Add your DCC locos to the Roster, defining DCC address and DCC functions.
+    * Control your Locos via on-screen throttles (fully compatible with touchscreens).
+    * Start the built-in Throttle server and control your locos from your smartphone.
+    * Tested and fully supported for Android (third party 'Engine Driver' App).
+* Scripting interface improved and extended to include locomotive control:
+    * Entire layouts can now be fully automated via python scripting.
+* Extended Hide/Unhide ('h' and 'u' keys) to Signal, point and lever buttons).
+* Improved initial synchronisation of layout state following DCC connect.
+* Added ability to inhibit flashing aspects for signal approach control.
+* Added ability to click on signals subject to approach control to 'release' them.
+* Added ability to specify the same GPIO sensor for signal passed and signal approach events.
+* New functionality to allow copying of route definitions and route buttons:
+    * NX route definitions can now be copied within the Route Button configuration.
+    * Copying of Route Buttons will now bring across all individual route definitions.
+    * Makes it easier to define laddered routes with minor differences between them.
+* Performance improvements when editing or initialising very large schematics.
+* Improved logging - logs are now also written to disk to aid subsequent diagnostics:
+    * If you encounter problems you can now easily email us the logs for diagnosis.
+* Minor Improvements to the DCC Programming utility.
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
@@ -154,18 +147,6 @@ these packages can be installed seperately (prior to installing the model-railwa
 $ pip install paho-mqtt
 $ pip install pyserial
 </pre>
-If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
-then you will also need to install the 'simpleaudio' package. If 'simpleaudio' is not installed then 
-the application will still function correctly (just without sound).
-<pre>
-$ pip install simpleaudio
-</pre>
-If you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
-<pre>
-$ sudo apt-get install libasound2-dev
-</pre>
-Note that for Windows, the 'simpleaudio' it has a dependency  on Microsoft Visual C++ 14.0 or greater 
-(so you will need to ensure Visual Studio 2015 is installed first).
 
 ## Running the application
 

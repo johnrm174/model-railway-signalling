@@ -14,26 +14,10 @@
 #------------------------------------------------------------------------------------
 
 import os
-import logging
 import tkinter as Tk
 
 from . import common_simple
-from . import common_compound
 from .. import library
-
-#------------------------------------------------------------------------------------
-# We can only use audio if 'simpleaudio' is installed. Although this package is
-# supported across different platforms, for Windows it has a dependency on Visual C++
-# As this is quite a faff to install I haven't made audio a hard and fast dependency
-# its up to the user to install if required. If not, we just won't use audio
-# Only enable the audio file selections if simpleaudio is installed
-#------------------------------------------------------------------------------------
-
-try:
-    import simpleaudio
-    audio_enabled = True
-except Exception:
-    audio_enabled = False
 
 #------------------------------------------------------------------------------------
 # Class for the Sound file selection element (builds on the entry_box class)
@@ -48,24 +32,18 @@ class sound_file_entry(Tk.Frame):
     def __init__(self, parent_frame, label:str, tool_tip:str, base_folder:str):
         super().__init__(parent_frame)
         self.base_folder = base_folder
-        self.full_filename = None
+        self.full_filename = ""
         # Flag to test if a load file or error dialog is open or not
         self.child_windows_open = False
-        if audio_enabled:
-            button_tool_tip = "Browse to select audio file"
-            control_state = "normal"
-        else:
-            button_tool_tip = "Upload disabled - The simpleaudio package is not installed"
-            control_state = "disabled"
         # Create the various UI elements
         self.label = Tk.Label(self, text=label)
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
         self.EB = common_simple.entry_box(self, width=30, callback=None, tool_tip=tool_tip)
         self.EB.configure(state="disabled", disabledforeground="Black")
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.B1 = Tk.Button(self, text="Browse",command=self.load, state=control_state)
+        self.B1 = Tk.Button(self, text="Browse",command=self.load, state="normal")
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = common_simple.CreateToolTip(self.B1, button_tool_tip)
+        self.TT1 = common_simple.CreateToolTip(self.B1, "Browse to select audio file")
 
     def load(self):
         self.child_windows_open = True
@@ -73,18 +51,10 @@ class sound_file_entry(Tk.Frame):
         # But the user can navigate away and use another sound file from somewhere else
         filename = Tk.filedialog.askopenfilename(title='Select Audio File', initialdir = self.base_folder,
                         filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self)
-        # Try loading/playing the selected file - with an error popup if it fails
+        # Set the filename if the user has selected a file (and not cancelled)
         if filename != () and filename != "":
-            try:
-                simpleaudio.WaveObject.from_wave_file(filename)
-            except Exception as exception:
-                logging.error("Error loading file '"+str(filename)+"'")
-                logging.error("Reported Exception: "+str(exception))
-                Tk.messagebox.showerror(parent=self, title="Load Error",
-                            message="Error loading audio file '"+str(filename)+"'")
-            else:
-                self.full_filename = filename
-                self.EB.set_value(os.path.split(filename)[1])
+            self.full_filename = filename
+            self.EB.set_value(os.path.split(filename)[1])
         self.child_windows_open = False
 
     def is_open(self):
@@ -97,7 +67,7 @@ class sound_file_entry(Tk.Frame):
         self.EB.set_value(file_name)
 
     def get_value(self):
-        return(self.full_filename)
+        return(str(self.full_filename))
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a validated_dcc_command_entry [address:int, state:bool].
@@ -322,7 +292,7 @@ class signal_route_selections(Tk.Frame):
         self.EB.pack(side=Tk.LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value)
         if self.read_only: self.EB.configure(state="disabled")
-        self.routes = common_compound.route_selections(self, tool_tip, read_only)
+        self.routes = route_selections(self, tool_tip, read_only)
         self.routes.pack(side=Tk.LEFT)
         # Add a spacer to improve the UI appearnace when used in a grid
         self.label2 = Tk.Label(self, width=1)
