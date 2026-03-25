@@ -1360,7 +1360,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.0"
+            "version": "Version 6.2.1"
         },
         "gpio": {
             "maxevents": 100,
