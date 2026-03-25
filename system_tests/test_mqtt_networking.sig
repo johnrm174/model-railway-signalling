@@ -5481,7 +5481,7 @@
         },
         "10": {
             "labeltext": "XXXXX",
-            "occupied": true
+            "occupied": false
         },
         "2": {
             "labeltext": "4",
@@ -5554,7 +5554,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.0"
+            "version": "Version 6.2.1"
         },
         "gpio": {
             "maxevents": 100,
