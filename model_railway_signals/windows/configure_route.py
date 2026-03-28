@@ -490,6 +490,7 @@ class route_definition_tab(Tk.Frame):
         self.points.enable()
         self.switches.enable()
         self.addbutton.config(state="normal")
+        self.copybutton.config(state="normal")
         self.exitbuttonlabel.config(state="normal")
 
     def disable(self):
@@ -503,6 +504,7 @@ class route_definition_tab(Tk.Frame):
         self.points.disable()
         self.switches.disable()
         self.addbutton.config(state="disabled")
+        self.copybutton.config(state="disabled")
         self.exitbuttonlabel.config(state="disabled")
 
     def reset_values(self, colour:str="Black"):
@@ -642,6 +644,7 @@ class route_definition_tabs():
             if not exit_button and not entry_button:
                 self.list_of_routes[0].exitbutton.disable()
                 self.list_of_routes[0].addbutton.config(state="disabled")
+                self.list_of_routes[0].copybutton.config(state="disabled")
                 self.list_of_routes[0].exitbuttonlabel.config(state="disabled")
         # All other tabs are fully disabled for 'X-only'  and 'one-click' route buttons
         for route in self.list_of_routes[1:]:
