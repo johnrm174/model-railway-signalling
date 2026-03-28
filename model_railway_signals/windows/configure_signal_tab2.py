@@ -22,6 +22,7 @@ import tkinter as Tk
 
 from .. import common
 from .. import library
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # Class for the 'signal ahead' entry box. This builds on the common.str_int_item_id_entry_box
@@ -79,7 +80,10 @@ class interlocking_route_group:
         self.routetypeTT = common.CreateToolTip(self.routetype, text="Indicates if the route is directly controlled by the "+
                     "signal and/or subsidary (otherwise it could be an 'incoming route' to support NX track occupancy)")
         tool_tip = "Specify the points that need to be set and locked for the route"
-        self.points = common.row_of_point_settings(self.frame, columns=8, tool_tip=tool_tip)
+        # Retrieve the number of columns from the settings (this allows the user
+        # to customise the UI "under the hood" to meet a specific use case
+        number_of_points = settings.get_user_interface("signals", "pointsahead")
+        self.points = common.row_of_point_settings(self.frame, columns=number_of_points, tool_tip=tool_tip)
         self.points.pack(side = Tk.LEFT)
         # Create the signal ahead and instrument ahead elements (always packed)
         self.label1 = Tk.Label(self.frame, text=" Sig:")

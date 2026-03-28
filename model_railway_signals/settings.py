@@ -147,6 +147,12 @@ default_settings["styles"]["textboxes"]["textfonttuple"] = ("Courier", 10, "")
 default_settings["styles"]["textboxes"]["justification"] = 2   # 1=Left, 2=Center, 3=right
 default_settings["styles"]["textboxes"]["borderwidth"] = 0     # border width
 
+default_settings["userinterface"] = {}
+default_settings["userinterface"]["signals"] = {}
+default_settings["userinterface"]["signals"]["pointsahead"] = 8
+default_settings["userinterface"]["tracksensors"] = {}
+default_settings["userinterface"]["tracksensors"]["pointsahead"] = 8
+
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
 #------------------------------------------------------------------------------------
@@ -291,6 +297,14 @@ def set_style(object_type:str, parameter:str, value):
     return()
 
 #------------------------------------------------------------------------------------
+# Functions to get the user interface settings
+# This allows users to customise their interface to meet their specific use cases
+#------------------------------------------------------------------------------------
+
+def get_user_interface(user_interface:str, parameter:str):
+    return(settings["userinterface"][user_interface][parameter])
+
+#------------------------------------------------------------------------------------
 # Functions to set/get the general settings
 #------------------------------------------------------------------------------------
 
@@ -300,6 +314,7 @@ def get_general(parameter:str):
 def set_general(parameter:str, value):
     settings["general"][parameter] = value
     return()
+
 
 #------------------------------------------------------------------------------------
 # Functions to set/get the canvas settings
