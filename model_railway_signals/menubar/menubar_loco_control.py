@@ -511,7 +511,7 @@ class loco_control(Tk.Toplevel):
         self.speed_var = Tk.IntVar(value=0)
         self.throttle = Tk.Scale(self.subframe1, from_=127, to=0, orient="vertical", showvalue=0, width=60,
                     length=230, sliderlength=40, variable=self.speed_var, command=self.speed_updated)
-        self.throttle.pack(padx=5, pady=5)
+        self.throttle.pack(padx=5, pady=0)
         # Create the function buttons (F0-F28) - Note that we don't pack them here
         # They are packed/unpacked dynamically on locomotive selection
         self.function_buttons = []
@@ -523,15 +523,15 @@ class loco_control(Tk.Toplevel):
         # Create a frame for the Forward and reverse buttons (frame3)
         self.frame3 = Tk.LabelFrame(self, text="Direction")
         self.frame3.pack(padx=5,pady=2, fill="x")
-        self.reverse = Tk.Button(self.frame3, width=3, text="Rev", command=lambda:self.direction_updated(False))
-        self.reverse.pack(side=Tk.LEFT, padx=5, pady=5)
+        self.reverse = Tk.Button(self.frame3, width=3, text="Rev", command=lambda:self.direction_updated(False), padx=3)
+        self.reverse.pack(side=Tk.LEFT, padx=5, pady=4)
         self.reverse.configure(font=button_font)
         self.emergencystop = Tk.Button(self.frame3, text="Stop", bg="pink2", activebackground="pink1",
-                                        width=4, command=self.emergency_stop)
-        self.emergencystop.pack(side=Tk.LEFT, padx=5, pady=5, fill="x", expand=True)
+                                        width=4, command=self.emergency_stop, padx=3)
+        self.emergencystop.pack(side=Tk.LEFT, padx=0, pady=4, fill="x", expand=True)
         self.emergencystop.configure(font=button_font)
-        self.forward = Tk.Button(self.frame3, width=3, text="Fwd", command=lambda:self.direction_updated(True))
-        self.forward.pack(side=Tk.RIGHT, padx=5, pady=5)
+        self.forward = Tk.Button(self.frame3, width=3, text="Fwd", command=lambda:self.direction_updated(True), padx=3)
+        self.forward.pack(side=Tk.RIGHT, padx=5, pady=4)
         self.forward.configure(font=button_font)
         # Create a frame For the Roster and OK buttons
         self.frame5 = Tk.Frame(self)
