@@ -448,7 +448,7 @@ class selected_locomotive(Tk.LabelFrame):
 #------------------------------------------------------------------------------------
 
 class loco_control(Tk.Toplevel):
-    def __init__(self, root_window):
+    def __init__(self, root_window, selected_loco:str=None):
         super().__init__(root_window)
         # Variables we need to track
         self.selected_locos = {}
@@ -551,6 +551,9 @@ class loco_control(Tk.Toplevel):
         registered_callbacks.append(self.roster_updated)
         # Register for DCC power updates (from the local or remote SPROG interface)
         library.subscribe_to_dcc_power_updates(self.dcc_power_status_updated)
+        # Select the requested loco (if specified) - This is the use case of
+        # double clicking on a Track Section to select the loco
+        if selected_loco is not None: self.loco_selected(selected_loco)
 
     #--------------------------------------------------------------------
     # Callback Function to toggle the state of the Track Power by calling
