@@ -38,6 +38,7 @@ import re
 import threading
 import asyncio
 import socket
+import subprocess
 import logging
 from zeroconf.asyncio import AsyncZeroconf, AsyncServiceInfo
 
@@ -512,16 +513,28 @@ def broadcast_to_all(message):
 #-----------------------------------------------------------------------------------------------
 
 def find_local_ip_address():
+    # Try the standard routing trick (works when connected to internet/router)
     test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
+        # This doesn't actually send data, just checks routing
         test_socket.connect(('10.255.255.255', 1))
         ip_address = test_socket.getsockname()[0]
-    except:
-        logging.error("Throttle Server: Could not retrieve local IP address")
-        ip_address = None
-    finally:
         test_socket.close()
-    return(ip_address)
+        return(ip_address)
+    except Exception:
+        test_socket.close()
+    # Fallback: Specifically look for the Hotspot interface (wlan0)
+    # This is much more reliable for a standalone DCC Signal Box
+    try:
+        # We use check_output to ask the system for the wlan0 address directly
+        cmd = "hostname -I"
+        addresses = subprocess.check_output(cmd.split()).decode().split()
+        if addresses:
+            # Return the first address found (usually wlan0 in hotspot mode)
+            return(addresses[0])
+    except Exception:
+        pass
+    return(None)
 
 #-----------------------------------------------------------------------------------------------
 # The actual WiThrottle Server runs in a seperate thread to the main Tkinter thread
@@ -534,7 +547,7 @@ async def throttle_server_thread(ready_event, ip_str, ip_bytes):
     aiozc = None
     try:
         logging.info(f"Throttle Server: Starting Throttle Server on {ip_str}:{server_port_number}")
-        aiozc = AsyncZeroconf()
+        aiozc = AsyncZeroconf(interfaces=[ip_str])
         # Start the server and configure the service entry (for discovery)
         server = await asyncio.start_server(handle_client, "0.0.0.0", server_port_number)
         info = AsyncServiceInfo(
