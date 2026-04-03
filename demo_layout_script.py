@@ -166,7 +166,7 @@ def my_script2():
     print("Starting script 2 (Colour Light Example)")
     # Create a Throttle for the semaphore layout
     throttle1 = create_throttle()
-    set_throttle_loco(throttle1, "6752 (37)")
+    set_throttle_loco(throttle1, "37238")
     set_throttle_function(throttle1, 1, True)
     # Set up the loco start position on the layout
     set_section_occupied(1, "6752", delay=0.0)

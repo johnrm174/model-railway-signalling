@@ -98,7 +98,7 @@
             "switched": true
         },
         "4": {
-            "locked": true,
+            "locked": false,
             "switched": false
         },
         "5": {
@@ -123,8 +123,8 @@
             "linkedpoint": 4,
             "linkedsignal": 0,
             "lockcolourtype": 1,
-            "offkeycode": 0,
-            "onkeycode": 0,
+            "offkeycode": 42,
+            "onkeycode": 45,
             "posx": 175.0,
             "posy": 125.0,
             "signalroutes": [
@@ -336,8 +336,8 @@
             "linkedpoint": 0,
             "linkedsignal": 2,
             "lockcolourtype": 1,
-            "offkeycode": 0,
-            "onkeycode": 0,
+            "offkeycode": 55,
+            "onkeycode": 29,
             "posx": 125.0,
             "posy": 125.0,
             "signalroutes": [
@@ -804,8 +804,8 @@
             "linkedpoint": 0,
             "linkedsignal": 5,
             "lockcolourtype": 1,
-            "offkeycode": 0,
-            "onkeycode": 0,
+            "offkeycode": 41,
+            "onkeycode": 31,
             "posx": 200.0,
             "posy": 125.0,
             "signalroutes": [
@@ -1261,8 +1261,8 @@
             "linkedpoint": 4,
             "linkedsignal": 0,
             "lockcolourtype": 1,
-            "offkeycode": 0,
-            "onkeycode": 0,
+            "offkeycode": 30,
+            "onkeycode": 53,
             "posx": 150.0,
             "posy": 125.0,
             "signalroutes": [
@@ -3038,8 +3038,8 @@
             "linkedpoint": 0,
             "linkedsignal": 1,
             "lockcolourtype": 1,
-            "offkeycode": 0,
-            "onkeycode": 0,
+            "offkeycode": 25,
+            "onkeycode": 52,
             "posx": 100.0,
             "posy": 125.0,
             "signalroutes": [
@@ -5585,8 +5585,8 @@
             "linkedpoint": 0,
             "linkedsignal": 6,
             "lockcolourtype": 1,
-            "offkeycode": 0,
-            "onkeycode": 0,
+            "offkeycode": 26,
+            "onkeycode": 44,
             "posx": 225.0,
             "posy": 125.0,
             "signalroutes": [
@@ -5733,8 +5733,8 @@
     },
     "sections": {
         "1": {
-            "labeltext": "XXXXX",
-            "occupied": false
+            "labeltext": "6752",
+            "occupied": true
         },
         "10": {
             "labeltext": "XXXXX",
@@ -5745,23 +5745,23 @@
             "occupied": false
         },
         "12": {
-            "labeltext": "XXXXX",
-            "occupied": false
+            "labeltext": "25083",
+            "occupied": true
         },
         "2": {
-            "labeltext": "XXXXX",
+            "labeltext": "6752",
             "occupied": false
         },
         "3": {
-            "labeltext": "XXXXX",
+            "labeltext": "6752",
             "occupied": false
         },
         "4": {
-            "labeltext": "XXXXX",
+            "labeltext": "6752",
             "occupied": false
         },
         "5": {
-            "labeltext": "XXXXX",
+            "labeltext": "6752",
             "occupied": false
         },
         "6": {
@@ -7378,14 +7378,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/demo_layout.sig",
+            "filename": "demo_layout.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": true,
-            "version": "Version 6.2.0"
+            "version": "Version 6.2.1"
         },
         "gpio": {
             "maxevents": 100,
