@@ -491,60 +491,63 @@ def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
     else:
         new_state=None
     # Update the displayed aspect if there has been a change
-    if new_state != old_state and new_state == signals.signal_state_type.DANGER:
-        update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
-        update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
-        update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
-        update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
-        update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
-    elif new_state != old_state and new_state == signals.signal_state_type.PROCEED:
-        # If the route has been set to signals.route_type.NONE then we assume MAIN and change the MAIN arm
-        # We also change the MAIN subsidary arm for Home signals without any diverging route arms (main signal or 
-        # subsidary signal) to cover the case of a single subsidary signal arm controlling multiple routes
-        if ( signals.signals[str(sig_id)]["routeset"] == signals.route_type.MAIN or
-             signals.signals[str(sig_id)]["routeset"] == signals.route_type.NONE or
-             not has_diverging_route_arms(sig_id)):
-            update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", True, log_message)
-            update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
-            update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
-            update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
-            update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
-        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH1:
-            if signals.signals[str(sig_id)]["lh1_subsidary"] is None:
-                logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route LH1")
-            update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
-            update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", True, log_message)
-            update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
-            update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
-            update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
-        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH2:
-            if signals.signals[str(sig_id)]["lh2_subsidary"] is None:
-                logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route LH2")
-            update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
-            update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
-            update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", True, log_message)
-            update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
-            update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
-        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH1:
-            if signals.signals[str(sig_id)]["rh1_subsidary"] is None:
-                logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route RH1")
-            update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
-            update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
-            update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
-            update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", True, log_message)
-            update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
-        elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH2:
-            if signals.signals[str(sig_id)]["rh2_subsidary"] is None:
-                logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route RH2")
+    if new_state != old_state:
+        if new_state == signals.signal_state_type.DANGER:
             update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
             update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
             update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
             update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
-            update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", True, log_message)
-    # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
-    if new_state != old_state and signals.signals[str(sig_id)]["subsidarytheatre"]:
-        signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
-    signals.signals[str(sig_id)]["substate"] = new_state
+            update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+            sig_at_danger = True
+        elif new_state == signals.signal_state_type.PROCEED:
+            # If the route has been set to signals.route_type.NONE then we assume MAIN and change the MAIN arm
+            # We also change the MAIN subsidary arm for Home signals without any diverging route arms (main signal or 
+            # subsidary signal) to cover the case of a single subsidary signal arm controlling multiple routes
+            if ( signals.signals[str(sig_id)]["routeset"] == signals.route_type.MAIN or
+                 signals.signals[str(sig_id)]["routeset"] == signals.route_type.NONE or
+                 not has_diverging_route_arms(sig_id)):
+                update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", True, log_message)
+                update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
+                update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
+                update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
+                update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+            elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH1:
+                if signals.signals[str(sig_id)]["lh1_subsidary"] is None:
+                    logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route LH1")
+                update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
+                update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", True, log_message)
+                update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
+                update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
+                update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+            elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.LH2:
+                if signals.signals[str(sig_id)]["lh2_subsidary"] is None:
+                    logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route LH2")
+                update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
+                update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
+                update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", True, log_message)
+                update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
+                update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+            elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH1:
+                if signals.signals[str(sig_id)]["rh1_subsidary"] is None:
+                    logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route RH1")
+                update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
+                update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
+                update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
+                update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", True, log_message)
+                update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
+            elif signals.signals[str(sig_id)]["routeset"] == signals.route_type.RH2:
+                if signals.signals[str(sig_id)]["rh2_subsidary"] is None:
+                    logging.info("Signal "+str(sig_id)+": No subsidary arm exists for route RH2")
+                update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
+                update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
+                update_signal_arm(sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
+                update_signal_arm(sig_id, "rh1_subsidary", "rh1suboff", "rh1subon", False, log_message)
+                update_signal_arm(sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", True, log_message)
+            sig_at_danger = False
+        # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
+        if signals.signals[str(sig_id)]["subsidarytheatre"]:
+            signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=sig_at_danger)
+        signals.signals[str(sig_id)]["substate"] = new_state
     return ()
 
 # -------------------------------------------------------------------------
