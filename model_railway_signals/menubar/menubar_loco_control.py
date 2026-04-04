@@ -448,9 +448,32 @@ class selected_locomotive(Tk.LabelFrame):
 #------------------------------------------------------------------------------------
 
 class loco_control(Tk.Toplevel):
+    # Callback function to establish the initial DCC power state
+    def set_initial_power_state(self, power_state):
+        self.dcc_power_state = power_state
+
     def __init__(self, root_window, selected_loco:str=None):
+        # Register for DCC power updates (from the local or remote SPROG interface)
+        # This will make an immediate callback to set self.dcc_power_state. If we have
+        # been given a loco identifier (user double clicking on an occupied Track section)
+        # but power is not on then we exit rather than opening the throttle window
+        self.dcc_power_state = None
+        library.subscribe_to_dcc_power_updates(self.set_initial_power_state)
+        library.unsubscribe_from_dcc_power_updates(self.set_initial_power_state)
+        if selected_loco is not None and not self.dcc_power_state: return(None)
+        # If we have been given a loco identifier (user double clicking on
+        # an occupied track section) then check the loco is in the roster
+        # before opening the throttle window - otherwise just exit
+        roster = settings.get_control("locomotiveroster")
+        if selected_loco is not None and selected_loco not in roster.keys(): return(None)
+        # If we have been given a loco identifier (user double clicking on an occupied
+        # track section) then check the loco is in the roster before opening the window.
+        roster = settings.get_control("locomotiveroster")
+        if selected_loco is not None and selected_loco not in roster.keys(): return(None)
+        # Create the Throttle Window
         super().__init__(root_window)
-        # Variables we need to track
+        self.focus()
+        # Other variables we need to track
         self.selected_locos = {}
         self.speed_update_in_progress = False
         self.next_event = None
@@ -479,6 +502,7 @@ class loco_control(Tk.Toplevel):
         self.locomotiveTT = common.CreateToolTip(self.locomotive, text= "Select a locomotive from the roster")
         self.locoframe = Tk.Frame(self.frame1)
         self.locoframe.pack(padx=2, pady=2)
+        self.error_message = None
         # Create a frame to hold the Speed buttons, function buttons and slider (frame2)
         self.frame2 = Tk.LabelFrame(self, text="Speed")
         self.frame2.pack(padx=5,pady=2, fill="x")
@@ -549,7 +573,7 @@ class loco_control(Tk.Toplevel):
         self.roster_updated()
         # Register the callback for future roster updates
         registered_callbacks.append(self.roster_updated)
-        # Register for DCC power updates (from the local or remote SPROG interface)
+        # Register for subsequent DCC power updates (from the local or remote SPROG interface)
         library.subscribe_to_dcc_power_updates(self.dcc_power_status_updated)
         # Select the requested loco (if specified) - This is the use case of
         # double clicking on a Track Section to select the loco
@@ -727,10 +751,10 @@ class loco_control(Tk.Toplevel):
                 selected_loco_name = loco_name
                 selected_loco_functions = loco_data[1]
                 break
+        # Pack the frame that is going to display the selected locos
+        self.locoframe.pack()
         # Only add the loco to the consist if the session was created
         if loco_name is not None and loco_data is not None and session_id > 0:
-            # Pack the frame that is going to display the selected locos
-            self.locoframe.pack()
             # If this is the 'first' loco then we use the function key
             # definitions forthat loco and assume that subsequent locos
             # added to the consist also support the same functions.
@@ -763,10 +787,15 @@ class loco_control(Tk.Toplevel):
             self.selected_locos[session_id] = selected_locomotive(self.locoframe, loco_name=selected_loco_name,
                                                session_id=session_id, release_callback=self.release_loco)
             self.selected_locos[session_id].pack(padx=2, pady=2)
+            # Get rid of any legacy error messages
+            if self.error_message is not None: self.error_message.destroy()
+            self.error_message = None
         else:
-            Tk.messagebox.showerror(parent=self, title="Error",
-                message=f"Could not create\ncontrol session for\n{selected_loco_name}")
-        
+            # Display a new error message
+            error_message = f"Could not create session for\n{selected_loco_name}"
+            self.error_message = Tk.Label(self.locoframe, text=error_message, fg="red")
+            self.error_message.pack()
+
     #-------------------------------------------------------------------------------------------
     # User selection callback for Locomotive released
     #-------------------------------------------------------------------------------------------
