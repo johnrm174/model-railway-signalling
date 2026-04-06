@@ -352,7 +352,8 @@ def set_button_flashing(button_id:int):
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": set_button_flashing - Button ID does not exist")
     else:
-        flash_button1(button_id)
+        flash_event = buttons[str(button_id)]["flashevent"]
+        if flash_event is None: flash_button1(button_id)
     return()
 
 def reset_button_flashing(button_id:int):

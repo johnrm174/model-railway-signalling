@@ -187,7 +187,7 @@ def thread_to_send_buffered_data():
                 if debug: logging.debug("Pi-SPROG: Tx thread - Not sending CBUS Message: "+command_string+" - port is closed")
         except queue.Empty:
             continue
-        except Exception as exception:
+        except Exception:
             time.sleep(0.5)
 
 tx_thread = threading.Thread(target=thread_to_send_buffered_data, daemon=True)
@@ -214,7 +214,7 @@ def thread_to_read_received_data():
             else:
                 # Port is closed, just sleep and wait for it to be re-opened
                 time.sleep(0.1)
-        except Exception as exception:
+        except Exception:
             time.sleep(0.5)
 
 rx_thread = threading.Thread(target=thread_to_read_received_data, daemon=True)

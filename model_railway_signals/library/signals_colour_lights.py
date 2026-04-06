@@ -298,15 +298,17 @@ def update_colour_light_subsidary(sig_id:int):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="grey")
             logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to UNLIT")
             dcc_control.update_dcc_signal_subsidary(sig_id, False)
+            sig_at_danger = True
         else:
             logging.info("Signal "+str(sig_id)+": Changing subsidary aspect to PROCEED")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos1"],fill="white")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="white")
             dcc_control.update_dcc_signal_subsidary(sig_id, True)
+            sig_at_danger = False
         # Update the Theatre display (if enabled for the subsidary signal) - this is a prototypical use case
         if signals.signals[str(sig_id)]["subsidarytheatre"]:
-            signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=(not signals.signals[str(sig_id)]["subclear"]))
-    signals.signals[str(sig_id)]["substate"] = new_state
+            signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=sig_at_danger)
+        signals.signals[str(sig_id)]["substate"] = new_state
     return ()
 
 #-------------------------------------------------------------------------

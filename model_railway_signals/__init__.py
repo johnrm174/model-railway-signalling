@@ -55,6 +55,7 @@ from .scripting import set_throttle_direction
 from .scripting import set_throttle_speed
 from .scripting import set_throttle_stop
 from .scripting import set_throttle_function
+from .scripting import release_throttle
 from .scripting import destroy_throttle
 
 __all__ = [ 'run_editor',
@@ -102,4 +103,5 @@ __all__ = [ 'run_editor',
             'set_throttle_speed',
             'set_throttle_stop',
             'set_throttle_function',
+            'release_throttle',
             'destroy_throttle' ]

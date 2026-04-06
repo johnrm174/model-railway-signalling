@@ -83,6 +83,8 @@ from typing import Union
 from . import mqtt_interface
 from . import file_interface
 from . import common
+
+from .. import menubar
     
 #---------------------------------------------------------------------------------------------
 # Track sections are to be added to a global dictionary when created
@@ -214,6 +216,24 @@ def section_exists(section_id:Union[int,str]):
     else:
         section_exists = str(section_id) in sections.keys()
     return(section_exists)
+
+#---------------------------------------------------------------------------------------------
+# Internal Function to handle the double-left-click of a (local) Track Section
+# This will open a throttle window and try to select the locomotive from the roster
+# if a loco name in the roster matches the train identifier in the track section
+# The double click will only be processed if the track section is occupied
+#---------------------------------------------------------------------------------------------
+
+def open_throttle_window(section_id:int):
+    # This function will be called whenever a Track Section is double clicked, but the first
+    # click will already have been processed to toggle the state. The first thing we need to
+    # do is therefore to toggle the state back to what it was before the double click
+    section_state_toggled(section_id)
+    # We only open the throttle window if the section is showing occupied by a loco
+    if sections[str(section_id)]["occupied"]:
+        train_id = sections[str(section_id)]["labeltext"]
+        menubar.loco_control(common.root_window,train_id)
+    return()
 
 #---------------------------------------------------------------------------------------------
 # Internal callbacks for processing Button presses (toggling and cut/paste of Track Sections)
@@ -489,6 +509,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
             section_button.bind('<Button-1>', lambda event:section_button_pressed_event(section_id))
             section_button.bind('<ButtonRelease-1>', lambda event:section_button_released_event(section_id))
             section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
+            section_button.bind('<Double-Button-1>', lambda event:open_throttle_window(section_id))
         else:
             section_button.config(state="disabled")
         # Create the window for the section button (Run Mode operation). Note the Window

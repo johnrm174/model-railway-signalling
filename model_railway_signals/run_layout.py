@@ -587,10 +587,14 @@ def update_track_occupancy_for_signal(item_id:int):
         signal_clear = False
     # Validate the track occupancy change arising from the signal 'passed' event, raising any
     # warnings as required. If there is a change to process, then schedule this for later
+    override_sig = objects.schematic_objects[objects.signal(item_id)]["overridesignal"]
+    override_sub = objects.schematic_objects[objects.signal(item_id)]["overridesubsidary"]
     if route is not None and not is_secondary_event:
         if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
-            library.set_signal_override(item_id, temp_override=True)
-            if has_subsidary(item_id): library.set_subsidary_override(item_id, temp_override=True)
+            if override_sig:
+                library.set_signal_override(item_id, temp_override=True)
+            if override_sub and has_subsidary(item_id):
+                library.set_subsidary_override(item_id, temp_override=True)
             clearance_delay = schematic_object["clearancedelay"]*1000
             root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, item_id))
     return()

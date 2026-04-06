@@ -6,7 +6,7 @@
     "objects": {
         "11572d7d-c95f-47e0-a3fa-400d86e6f3f0": {
             "background": "grey85",
-            "bbox": 2021,
+            "bbox": 5560,
             "borderwidth": 2,
             "hidden": false,
             "item": "textbox",
@@ -49,14 +49,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": true,
-            "filename": "model_railway_signals/examples/sensor_node.sig",
+            "filename": "../model_railway_signals/examples/sensor_node.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.1"
+            "version": "Version 6.2.3"
         },
         "gpio": {
             "maxevents": 100,
@@ -279,6 +279,14 @@
                     9,
                     "bold"
                 ]
+            }
+        },
+        "userinterface": {
+            "signals": {
+                "pointsahead": 8
+            },
+            "tracksensors": {
+                "pointsahead": 8
             }
         }
     },

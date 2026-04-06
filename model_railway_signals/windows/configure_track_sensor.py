@@ -32,6 +32,7 @@ import tkinter as Tk
 from .. import common
 from .. import objects
 from .. import library
+from .. import settings
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID
@@ -60,7 +61,10 @@ class track_sensor_route_group():
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify the points that need to be configured for the route"
-        self.points = common.row_of_point_settings(self.frame, columns=8, tool_tip=tool_tip)
+        # Retrieve the number of columns from the settings (this allows the user
+        # to customise the UI "under the hood" to meet a specific use case
+        number_of_points = settings.get_user_interface("tracksensors", "pointsahead")
+        self.points = common.row_of_point_settings(self.frame, columns=number_of_points, tool_tip=tool_tip)
         self.points.pack (side=Tk.LEFT)
         # Create the Track Section element (always packed)
         self.label = Tk.Label(self.frame, text="  Section:")
