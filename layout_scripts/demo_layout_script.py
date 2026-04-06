@@ -176,9 +176,9 @@ def my_script1():
 #------------------------------------------------------------------------------------------
 
 def my_script2():
-    print("Starting script 2 (Colour Light Example)")
     # Wait for the sig file to load (loaded by script1)
     delay(5.0)
+    print("Starting script 2 (Colour Light Example)")
     # Create a Throttle for the semaphore layout
     throttle1 = create_throttle()
     # Set up the loco start position on the layout
