@@ -55,16 +55,16 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 6.2.0:
+## What's new for Release 6.2.3:
 
 > [!IMPORTANT]
-> Release 6.x.x will only support the loading of layout files created by Release 6.0.0 or later.
+> Release 6.2.3 will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.2.3.
 > You have been warned!
 
 * You can now click on an occupied track section to bring up a throttle window for that loco
-
+* Bugfix to overriding of signals between the passed event and the subsequent track occupancy change
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
