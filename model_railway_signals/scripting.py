@@ -56,6 +56,7 @@
 #    set_throttle_direction(throttle_id, forward, delay)
 #    set_throttle_function(throttle_id, function_id, state, delay)
 #    set_throttle_stop(throttle_id, delay)
+#    release_throttle(throttle_id, delay)
 #    destroy_throttle(throttle_id)
 #
 #------------------------------------------------------------------------------
@@ -552,6 +553,9 @@ def set_throttle_stop(throttle_instance, delay:float=default_delay_time):
 def set_throttle_function(throttle_instance, function_id:int, state:bool, delay:float=default_delay_time):
     # To call a method, we wrap the instance method call
     run_function(lambda:throttle_instance.set_function(function_id, state), delay)
+
+def release_throttle(throttle_instance, delay:float=default_delay_time):
+    run_function(lambda:throttle_instance.release_throttle(), delay)
 
 def destroy_throttle(throttle_instance, delay:float=default_delay_time):
     run_function(lambda:throttle_instance.destroy(), delay)

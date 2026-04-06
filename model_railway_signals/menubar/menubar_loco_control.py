@@ -797,6 +797,14 @@ class loco_control(Tk.Toplevel):
             self.error_message.pack()
 
     #-------------------------------------------------------------------------------------------
+    # Scripting engine API function to release all locos controlled by the throttle
+    #-------------------------------------------------------------------------------------------
+
+    def release_throttle(self):
+        for loco_object in list(self.selected_locos.values()):
+            self.release_loco(loco_object)
+
+    #-------------------------------------------------------------------------------------------
     # User selection callback for Locomotive released
     #-------------------------------------------------------------------------------------------
 
