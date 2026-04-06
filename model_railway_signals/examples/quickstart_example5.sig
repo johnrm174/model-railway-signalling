@@ -5,7 +5,7 @@
     "levers": {},
     "objects": {
         "0069c0e5-ea44-4868-9287-276ad65c1407": {
-            "bbox": 9624,
+            "bbox": 13163,
             "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
@@ -76,7 +76,7 @@
             "tags": "sensor2"
         },
         "0bfb0559-02cb-4e91-85a7-dd78aeba631a": {
-            "bbox": 9628,
+            "bbox": 13167,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -113,7 +113,7 @@
                 false,
                 ""
             ],
-            "bbox": 9648,
+            "bbox": 13187,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -434,7 +434,7 @@
             "ybuttonoffset": 0
         },
         "25899818-cd4d-4f23-8b7b-3163bc7c2482": {
-            "bbox": 9652,
+            "bbox": 13191,
             "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
@@ -525,7 +525,7 @@
             "tags": "sensor3"
         },
         "3caae2e0-a491-4353-a526-5e93054a51e5": {
-            "bbox": 9656,
+            "bbox": 13195,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -555,7 +555,7 @@
                 0,
                 0
             ],
-            "bbox": 9664,
+            "bbox": 13203,
             "colour": "Black",
             "endx": 475.0,
             "endy": 175.0,
@@ -575,7 +575,7 @@
                 0,
                 0
             ],
-            "bbox": 9672,
+            "bbox": 13211,
             "colour": "Black",
             "endx": 625.0,
             "endy": 150.0,
@@ -589,7 +589,7 @@
             "tags": "line5"
         },
         "67ed5620-8f45-46b5-ae65-cd152d4926c7": {
-            "bbox": 9676,
+            "bbox": 13215,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -626,7 +626,7 @@
                 false,
                 ""
             ],
-            "bbox": 9696,
+            "bbox": 13235,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -955,7 +955,7 @@
                 0,
                 0
             ],
-            "bbox": 9704,
+            "bbox": 13243,
             "colour": "Black",
             "endx": 375.0,
             "endy": 200.0,
@@ -969,7 +969,7 @@
             "tags": "line4"
         },
         "a5f95aa9-b869-4dff-933a-d1d83c7fb44b": {
-            "bbox": 9708,
+            "bbox": 13247,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -993,7 +993,7 @@
             ]
         },
         "a732c9a1-625a-4875-a802-706c56273db8": {
-            "bbox": 9712,
+            "bbox": 13251,
             "clearancedelay": 0,
             "hidden": false,
             "item": "tracksensor",
@@ -1064,7 +1064,7 @@
             "tags": "sensor1"
         },
         "a9b08221-b11c-4b63-a7ad-124f585c44fb": {
-            "bbox": 9716,
+            "bbox": 13255,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1090,7 +1090,7 @@
         "b4981c47-bf98-478a-8356-77710753c1fd": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9725,
+            "bbox": 13264,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -1120,7 +1120,7 @@
             "ybuttonoffset": 0
         },
         "be998d8b-50f1-40a4-b663-ec5bf1e8ba5c": {
-            "bbox": 9729,
+            "bbox": 13268,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1144,7 +1144,7 @@
             ]
         },
         "ced7bc00-e0aa-4bc2-bef3-9fa7da7f92c5": {
-            "bbox": 9733,
+            "bbox": 13272,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1168,7 +1168,7 @@
             ]
         },
         "d2f6f51a-0bbf-452b-bd1c-b3b3839329b8": {
-            "bbox": 9737,
+            "bbox": 13276,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1198,7 +1198,7 @@
                 0,
                 0
             ],
-            "bbox": 9745,
+            "bbox": 13284,
             "colour": "Black",
             "endx": 725.0,
             "endy": 75.0,
@@ -1218,7 +1218,7 @@
                 0,
                 0
             ],
-            "bbox": 9753,
+            "bbox": 13292,
             "colour": "Black",
             "endx": 375.0,
             "endy": 150.0,
@@ -1234,7 +1234,7 @@
         "fb9e5b3a-1a61-4b99-866d-03878bed3c10": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9762,
+            "bbox": 13301,
             "buttoncolour": "Grey85",
             "colour": "Black",
             "dccaddress": 0,
@@ -1270,7 +1270,7 @@
                 0,
                 0
             ],
-            "bbox": 9770,
+            "bbox": 13309,
             "colour": "Black",
             "endx": 625.0,
             "endy": 200.0,
@@ -1353,14 +1353,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": false,
-            "filename": "model_railway_signals/examples/quickstart_example5.sig",
+            "filename": "../model_railway_signals/examples/quickstart_example5.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.1"
+            "version": "Version 6.2.3"
         },
         "gpio": {
             "maxevents": 100,
@@ -1481,6 +1481,14 @@
                     9,
                     "bold"
                 ]
+            }
+        },
+        "userinterface": {
+            "signals": {
+                "pointsahead": 8
+            },
+            "tracksensors": {
+                "pointsahead": 8
             }
         }
     },

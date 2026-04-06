@@ -20,7 +20,7 @@
                 20,
                 5
             ],
-            "bbox": 21324,
+            "bbox": 24863,
             "colour": "black",
             "endx": 600.0,
             "endy": 125.0,
@@ -40,7 +40,7 @@
                 20,
                 5
             ],
-            "bbox": 21332,
+            "bbox": 24871,
             "colour": "black",
             "endx": 125.0,
             "endy": 125.0,
@@ -67,7 +67,7 @@
                 false,
                 ""
             ],
-            "bbox": 21358,
+            "bbox": 24897,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -401,7 +401,7 @@
             "ybuttonoffset": 0
         },
         "5119d487-7752-469d-addb-5aa3be1bedb6": {
-            "bbox": 21362,
+            "bbox": 24901,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -438,7 +438,7 @@
                 false,
                 ""
             ],
-            "bbox": 21388,
+            "bbox": 24927,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -785,7 +785,7 @@
         },
         "6408cbee-f763-41ad-8fca-3130f53d2519": {
             "background": "grey85",
-            "bbox": 21391,
+            "bbox": 24930,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -816,7 +816,7 @@
                 false,
                 ""
             ],
-            "bbox": 21411,
+            "bbox": 24950,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1143,7 +1143,7 @@
                 20,
                 5
             ],
-            "bbox": 21419,
+            "bbox": 24958,
             "colour": "black",
             "endx": 475.0,
             "endy": 300.0,
@@ -1157,7 +1157,7 @@
             "tags": "line3"
         },
         "70194f30-ef69-484a-b947-66951acf8a72": {
-            "bbox": 21423,
+            "bbox": 24962,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1194,7 +1194,7 @@
                 false,
                 ""
             ],
-            "bbox": 21443,
+            "bbox": 24982,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1515,7 +1515,7 @@
             "ybuttonoffset": 0
         },
         "73be5b7a-289a-4a48-959b-0f06dc39c0e9": {
-            "bbox": 21447,
+            "bbox": 24986,
             "buttoncolour": "Black",
             "buttonwidth": 5,
             "defaultlabel": "XXXXX",
@@ -1540,7 +1540,7 @@
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
-            "bbox": 21450,
+            "bbox": 24989,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1559,7 +1559,7 @@
         },
         "9a8b2db4-dadb-4a28-bf0f-5ce1baaa363f": {
             "background": "grey85",
-            "bbox": 21453,
+            "bbox": 24992,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1577,7 +1577,7 @@
             ]
         },
         "a271c006-6796-436a-b85f-c805554d8237": {
-            "bbox": 21468,
+            "bbox": 25007,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1590,7 +1590,7 @@
         },
         "aad6451e-e1e2-4a4d-8f93-064d331acafd": {
             "background": "grey85",
-            "bbox": 21471,
+            "bbox": 25010,
             "borderwidth": 0,
             "hidden": false,
             "item": "textbox",
@@ -1621,7 +1621,7 @@
                 false,
                 ""
             ],
-            "bbox": 21497,
+            "bbox": 25036,
             "buttoncolour": "Grey85",
             "clearancedelay": 0,
             "dccaspects": [
@@ -1997,14 +1997,14 @@
             "automation": true,
             "baseitemid": 1,
             "editmode": false,
-            "filename": "model_railway_signals/examples/networking1-node1.sig",
+            "filename": "../model_railway_signals/examples/networking1-node1.sig",
             "info": "Document your layout here",
             "leverinterlocking": false,
             "leverpopupwarnings": false,
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.1"
+            "version": "Version 6.2.3"
         },
         "gpio": {
             "maxevents": 100,
@@ -2157,6 +2157,14 @@
                     9,
                     "bold"
                 ]
+            }
+        },
+        "userinterface": {
+            "signals": {
+                "pointsahead": 8
+            },
+            "tracksensors": {
+                "pointsahead": 8
             }
         }
     },
