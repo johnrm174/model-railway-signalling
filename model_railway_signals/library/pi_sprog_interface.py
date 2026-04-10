@@ -125,7 +125,7 @@ session_id = 1
 
 # The global output buffer for messages sent from the main thread to the SPROG Tx Thread
 # We use a seperate thread so we can throttle the Tx rate without blocking the main thread
-output_buffer = queue.Queue()
+output_buffer = queue.PriorityQueue()
 
 # Global variable to hold the DCC Addressing Mode - address offset applied when sending out
 # short accessory commands (1 = No Offset, 2 = Plus 4 Offset, 3 = minus 4 Offset)
@@ -176,11 +176,11 @@ def thread_to_send_buffered_data():
     while True:
         try:
             # Block until data is available, with a timeout
-            command_string = output_buffer.get(timeout=0.1)
+            priority, command_string = output_buffer.get(timeout=0.1)
             if serial_port.is_open:
                 serial_port.write(bytes(command_string, "Ascii"))
                 # Print the Transmitted message (if the appropriate debug level is set)
-                if debug: logging.debug("Pi-SPROG: Tx thread - Sent CBUS Message: "+command_string)
+                if debug: logging.debug("Pi-SPROG: Tx thread - Sent CBUS Message: "+command_string+"  Priority "+str(priority))
                 # Throttle The transmission (some decoders need this)
                 time.sleep(transmit_delay)
             else:
@@ -541,16 +541,30 @@ def process_error_message(byte_string):
 #
 # Example - can_id=99 , mj_pri=2, min_pri=2, op_code=9 (RTON - request track on)
 # encodes into a CBUS Command 'SAC60N09;'
+#
+# Priorities are used as follows:
+#    mj_pri=0, min_pri=0 - TON and the initial RSTAT to check SPROG connectivity
+#    mj_pri=1, min_pri=0 - LOCO session control and emergency stop
+#    mj_pri=1, min_pri=1 - LOCO speed/direction commands
+#    mj_pri=1, min_pri=2 - LOCO Function commands
+#    mj_pri=2, min_pri=0 - ASON/ASOF short accessory commands
+#    mj_pri=3, min_pri=0 - CV Read/Write commands
+#    mj_pri=3, min_pri=1 - Status reporting (RSTAT, and Muliimeter on/off)
+#    mj_pri=3, min_pri=2 - TOF (Track power off) - low priority to ensure it gets
+#                      sent AFTER any loco stop, functions off and release commands
+#
 #------------------------------------------------------------------------------
 
 def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
-    if (mj_pri < 0 or mj_pri > 2):
+    if (mj_pri < 0 or mj_pri > 3):
         logging.error("Pi-SPROG: CBUS Command - Invalid Major Priority "+str(mj_pri))
     elif (min_pri < 0 or min_pri > 3):
         logging.error("Pi-SPROG: CBUS Command - Invalid Minor Priority "+str(min_pri))
     elif (op_code < 0 or op_code > 255):
         logging.error("Pi-SPROG: CBUS Command - Op Code out of range "+str(op_code))
     else:
+        # Combine mj_pri and min_pri to give a single integer (0-15) for the queue priority
+        queue_priority = (mj_pri << 2) | min_pri
         # Encode the CAN Header (11-bit Identifier)
         # Pri1 (bits 10-9), Pri2 (bits 8-7), CAN ID (bits 6-0)
         header_val = (mj_pri << 9) | (min_pri << 7) | can_bus_id
@@ -563,7 +577,7 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
         # Finally - add the command string termination character
         command_string = command_string + ";"
         # Add the command to the output buffer (to be picked up by the Tx thread)
-        output_buffer.put(command_string)
+        output_buffer.put((queue_priority,command_string))
         if debug: logging.debug("Pi-SPROG: Tx thread - Queued CBUS Command: " + command_string)
         return()
 
@@ -760,8 +774,12 @@ def request_dcc_power_off():
                 release_loco_session(session_id)
         # Send the command to switch on the Track Supply (to the DCC Bus)
         logging.debug("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
-        # For RSTAT(0C), TON(09)and TOF(08) the Priority must be set to high
-        send_cbus_command(mj_pri=0, min_pri=0, op_code=0x08)
+        # I'd ideally like this to be high priority so power can be turned off
+        # immediately as an emergency stop all, but at the moment, when we turn
+        # track power off, all locos are stopped, all loco functions are switched
+        # off and the loco gets released (i.e. a clean shutdown). We therefore
+        # set this to a low priority to ensure all the above gets sent first/
+        send_cbus_command(mj_pri=3, min_pri=2, op_code=0x08)
         # Wait for the response (with a 5 second timeout as the power off
         # command may be queued behind all the loco release messages)
         ######################################################################################
@@ -786,7 +804,8 @@ def request_dcc_power_off():
 def request_status_report():
     if sprog_status_callback is not None and serial_port.is_open:
         if debug: logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
-        send_cbus_command(mj_pri=0, min_pri=0, op_code=0x0C)
+        # Set a low priority for the RSTAT message
+        send_cbus_command(mj_pri=3, min_pri=1, op_code=0x0C)
         # Schedule the next poll in 2000ms (2 seconds)
         common.root_window.after(2000, request_status_report)
     return()
@@ -799,9 +818,9 @@ def enable_status_reporting(callback):
         # Logic: mj_pri=0, min_pri=2, op_code=0x96, Data: NN_high, NN_low, NV_index, NV_value
         logging.debug("Pi-SPROG: Enabling SPROG Telemetry Reporting (NVSET Command)")
         # Early Firmware versions (Node 258)
-        send_cbus_command(0, 2, 0x96, 0x01, 0x02, 10, 1)
+        send_cbus_command(3, 1, 0x96, 0x01, 0x02, 10, 1)
         # Later Firmware Versions (Global/Alias)
-        send_cbus_command(0, 2, 0x96, 0xFF, 0xFE, 10, 1)
+        send_cbus_command(3, 1, 0x96, 0xFF, 0xFE, 10, 1)
         # Kick off the first regular poll after 1000ms
         common.root_window.after(1000, request_status_report)
         return()
@@ -813,9 +832,9 @@ def disable_status_reporting():
         logging.debug("Pi-SPROG: Disabling SPROG Telemetry Reporting (NVSET Command)")
         # NVSET (OpCode 0x96) - Write 0 to Node Variable 10 to disable telemetry
         # Early Firmware versions
-        send_cbus_command(0, 2, 0x96, 0x01, 0x02, 10, 0)
+        send_cbus_command(3, 1, 0x96, 0x01, 0x02, 10, 0)
         # Later Firmware Versions
-        send_cbus_command(0, 2, 0x96, 0xFF, 0xFE, 10, 0)
+        send_cbus_command(3, 1, 0x96, 0xFF, 0xFE, 10, 0)
     return()
 
 #------------------------------------------------------------------------------
@@ -849,13 +868,13 @@ def send_accessory_short_event(address:int, active:bool):
             node_lo = pi_cbus_node & 0xFF
             addr_hi = (address_to_send >> 8) & 0xFF
             addr_lo = address_to_send & 0xFF
-            # Send ASON (0x98) or ASOF (0x99)- mj_pri=2, min_pri=3 (standard for accessory events)
+            # Send ASON (0x98) or ASOF (0x99)- mj_pri=2, min_pri=0
             if active:
                 logging.debug(f"Pi-SPROG: Sending ASON (Accessory Short ON) to DCC address: {address}{offset_text}")
-                send_cbus_command(2, 3, 0x98, node_hi, node_lo, addr_hi, addr_lo)
+                send_cbus_command(2, 0, 0x98, node_hi, node_lo, addr_hi, addr_lo)
             else:
                 logging.debug(f"Pi-SPROG: Sending ASOF (Accessory Short OFF) to DCC address: {address}{offset_text}")
-                send_cbus_command(2, 3, 0x99, node_hi, node_lo, addr_hi, addr_lo)
+                send_cbus_command(2, 0, 0x99, node_hi, node_lo, addr_hi, addr_lo)
         elif debug:
             # Note we only log the discard messages in enhanced debugging mode (to reduce the spam in the logs)
             # Note we log the address we have been given - not the one with offsets applied
@@ -891,7 +910,7 @@ def service_mode_read_cv(cv:int):
         byte4 = 1                      # Mode (1 = Direct Byte)
         logging.debug(f"Pi-SPROG: Sending QCVS (Read CV in Service Mode) - Session:{byte1}, CV:{cv}")
         # Command 0x84 (132 Decimal) - Read CV in Service Mode (QCVS)
-        send_cbus_command(2, 2, 0x84, byte1, byte2, byte3, byte4)
+        send_cbus_command(3, 0, 0x84, byte1, byte2, byte3, byte4)
         # Wait for the response (5 second timeout as service mode reads involve physical DCC pulses)
         ######################################################################################
         # We BLOCK whilst awaiting the response on the basis that if the user has initiated
@@ -947,7 +966,7 @@ def service_mode_write_cv(cv:int, value:int):
         byte5 = value                  # Value to write
         logging.debug(f"Pi-SPROG: Sending WCVS (Write CV in Service Mode) - Session:{byte1}, CV:{cv}, Value:{value}")
         # Command 0xA2 (162 Decimal) - Write CV in Service mode (WCVS)
-        send_cbus_command(2, 2, 0xA2, byte1, byte2, byte3, byte4, byte5)
+        send_cbus_command(3, 0, 0xA2, byte1, byte2, byte3, byte4, byte5)
         # Wait for the response (5 second timeout for programming acknowledgment)
         ######################################################################################
         # We BLOCK whilst awaiting the response on the basis that if the user has initiated
@@ -1035,7 +1054,7 @@ def request_loco_session(dcc_address:int):
                 addr_hi = (dcc_address >> 8) | 0xC0
                 addr_lo = dcc_address & 0xFF
             # Request the session and wait for a response
-            send_cbus_command(2, 2, 0x40, addr_hi, addr_lo)
+            send_cbus_command(1, 0, 0x40, addr_hi, addr_lo)
             ######################################################################################
             # We currently BLOCK whilst awaiting the response but this is certainly a candidate
             # to re-factor at some stage as this this is very much part of normal operations
@@ -1070,7 +1089,7 @@ def send_loco_keep_alive(session_id:int):
     # If DCC address > 0 The session is still in our dict of active sessions
     dcc_address = find_dcc_address_for_session(session_id)
     if dcc_address > 0:
-        send_cbus_command(2, 2, 0x23, session_id)
+        send_cbus_command(1, 0, 0x23, session_id)
         new_heartbeat = common.root_window.after(5000, lambda:send_loco_keep_alive(session_id))
         locomotive_sessions[str(dcc_address)]["heartbeat"] = new_heartbeat
     return()
@@ -1099,7 +1118,7 @@ def release_loco_session(session_id:int):
             locomotive_sessions[str(dcc_address)]["heartbeat"] = None
             locomotive_sessions[str(dcc_address)]["sessionid"] = None
             # Finally - send the release locomotive command
-            send_cbus_command(2, 2, 0x21, session_id)
+            send_cbus_command(1, 0, 0x21, session_id)
             # Delete the Session entry from the list of active sessions
             del(locomotive_sessions[str(dcc_address)])
         else:
@@ -1173,7 +1192,9 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool):
             # DCC Speed 1 is usually Emergency Stop, so we map 0-127
             speed_byte = (speed & 0x7F) | dir_val
             logging.debug(f"Pi-SPROG: Locomotive Session {session_id} Speed {speed} Forward {forward}")
-            send_cbus_command(2, 2, 0x47, session_id, speed_byte)
+            # Use a higher priority for the Loco emergency stop
+            if speed == 1: send_cbus_command(1, 0, 0x47, session_id, speed_byte)
+            else: send_cbus_command(1, 1, 0x47, session_id, speed_byte)
         else:
             logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Session {session_id} not found")
     return()
@@ -1203,7 +1224,7 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
                        (4  if locomotive["functions"].get("3") else 0) | \
                        (2  if locomotive["functions"].get("2") else 0) | \
                        (1  if locomotive["functions"].get("1") else 0)
-                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+                send_cbus_command(1, 2, 0x60, session_id, range_id, mask)
             # Range 2: F5, F6, F7, F8
             elif 5 <= function_id <= 8:
                 range_id = 2
@@ -1211,7 +1232,7 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
                        (4 if locomotive["functions"].get("7") else 0) | \
                        (2 if locomotive["functions"].get("6") else 0) | \
                        (1 if locomotive["functions"].get("5") else 0)
-                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+                send_cbus_command(1, 2, 0x60, session_id, range_id, mask)
             # Range 3: F9, F10, F11, F12
             elif 9 <= function_id <= 12:
                 range_id = 3
@@ -1219,7 +1240,7 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
                        (4 if locomotive["functions"].get("11") else 0) | \
                        (2 if locomotive["functions"].get("10") else 0) | \
                        (1 if locomotive["functions"].get("9") else 0)
-                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+                send_cbus_command(1, 2, 0x60, session_id, range_id, mask)
             # Range 4: F13, F14, F15, F16, F17, F18, F19, F20
             elif 13 <= function_id <= 20:
                 range_id = 4
@@ -1231,7 +1252,7 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
                        (4   if locomotive["functions"].get("15") else 0) | \
                        (2   if locomotive["functions"].get("14") else 0) | \
                        (1   if locomotive["functions"].get("13") else 0)
-                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+                send_cbus_command(1, 2, 0x60, session_id, range_id, mask)
             # Range 5: F21, F22, F23, F24, F25, F26, F27, F28
             elif 21 <= function_id <= 28:
                 range_id = 5
@@ -1243,7 +1264,7 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
                        (4   if locomotive["functions"].get("23") else 0) | \
                        (2   if locomotive["functions"].get("22") else 0) | \
                        (1   if locomotive["functions"].get("21") else 0)
-                send_cbus_command(2, 2, 0x60, session_id, range_id, mask)
+                send_cbus_command(1, 2, 0x60, session_id, range_id, mask)
             if not suppress_logging:
                 logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
         else:
