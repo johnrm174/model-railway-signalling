@@ -106,7 +106,7 @@ serial_port = serial.Serial()
 # Global constants used when transmitting CBUS messages
 can_bus_id = 1                       # The arbitary CANBUS ID we will use for the Pi
 pi_cbus_node = 258                   # The CBUS Node ID Of the Pi-Sprog (This is updated with that reported in the STAT)
-transmit_delay = 0.02                # The delay between sending CBUS Messages (in seconds)
+transmit_delay = 0.02                # The delay between sending CBUS Accessory Command Messages (in seconds)
 
 # Global Flag to enable enhanced debug logging for the Pi-SPROG interface
 debug = False                       # Enhanced Debug logging - set by the sprog_connect call
@@ -166,10 +166,12 @@ def wait_for_response(timeout:float,test_for_response_function):
     return(response_received)
 
 #------------------------------------------------------------------------------
-# Internal thread to write queued CBUS messages to the Serial Port with a
-# short delay in between each message. We do this because some decoders don't
-# seem to process all messages if sent to them in quick succession - and if the
-# decoder "misses" an event the signal/point may end up in an erronous state.
+# Internal thread to write queued CBUS messages to the Serial Port. Note that
+# we 'throttle' the output of DCC accessory commands as we have seen some decoders
+# (e.g. the signallist SC1) don't seem to process all messages in a sequence if
+# these messages are sent one after the other in quick succession (e.g. when using
+# 8 individual addresses to control 8 individual LED outputs). This is definatly a
+# decoder issue as the NCE Bus analyser proves the commands are being transmitted.
 #------------------------------------------------------------------------------
 
 def thread_to_send_buffered_data():
@@ -178,11 +180,13 @@ def thread_to_send_buffered_data():
             # Block until data is available, with a timeout
             priority, command_string = output_buffer.get(timeout=0.1)
             if serial_port.is_open:
+                # Throttle The transmission for DCC Accessory commands only
+                # DCC Accessory commands are given an overall priority of 8
+                if priority == 8: time.sleep(transmit_delay)
+                # Send out the CBUS command
                 serial_port.write(bytes(command_string, "Ascii"))
                 # Print the Transmitted message (if the appropriate debug level is set)
                 if debug: logging.debug("Pi-SPROG: Tx thread - Sent CBUS Message: "+command_string+"  Priority "+str(priority))
-                # Throttle The transmission (some decoders need this)
-                time.sleep(transmit_delay)
             else:
                 if debug: logging.debug("Pi-SPROG: Tx thread - Not sending CBUS Message: "+command_string+" - port is closed")
         except queue.Empty:
@@ -543,14 +547,14 @@ def process_error_message(byte_string):
 # encodes into a CBUS Command 'SAC60N09;'
 #
 # Priorities are used as follows:
-#    mj_pri=0, min_pri=0 - TON and the initial RSTAT to check SPROG connectivity
-#    mj_pri=1, min_pri=0 - LOCO session control and emergency stop
-#    mj_pri=1, min_pri=1 - LOCO speed/direction commands
-#    mj_pri=1, min_pri=2 - LOCO Function commands
-#    mj_pri=2, min_pri=0 - ASON/ASOF short accessory commands
-#    mj_pri=3, min_pri=0 - CV Read/Write commands
-#    mj_pri=3, min_pri=1 - Status reporting (RSTAT, and Muliimeter on/off)
-#    mj_pri=3, min_pri=2 - TOF (Track power off) - low priority to ensure it gets
+#    mj_pri=0, min_pri=0 - queue_priority 0- TON and the initial RSTAT to check SPROG connectivity
+#    mj_pri=1, min_pri=0 - queue_priority 4 - LOCO session control and emergency stop
+#    mj_pri=1, min_pri=1 - queue_priority 5 - LOCO speed/direction commands
+#    mj_pri=1, min_pri=2 - queue_priority 6 - LOCO Function commands
+#    mj_pri=2, min_pri=0 - queue_priority 8 - ASON/ASOF short accessory commands
+#    mj_pri=3, min_pri=0 - queue_priority 12- CV Read/Write commands
+#    mj_pri=3, min_pri=1 - queue_priority 13 - Status reporting (RSTAT, and Muliimeter on/off)
+#    mj_pri=3, min_pri=2 - queue_priority 12 - TOF (Track power off) - low priority to ensure it gets
 #                      sent AFTER any loco stop, functions off and release commands
 #
 #------------------------------------------------------------------------------
