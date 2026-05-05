@@ -641,7 +641,7 @@ def run_pi_sprog_interface_tests(baud_rate):
     assert not pi_sprog_interface.request_dcc_power_off()
     print("Library Tests - Edge case testing - send CBUS command - 6 Errors will be generated")
     pi_sprog_interface.send_cbus_command (mj_pri=-1, min_pri=2, op_code=8)     # Invalid mj_pri
-    pi_sprog_interface.send_cbus_command (mj_pri=3, min_pri=3, op_code=8)      # Invalid mj_pri
+    pi_sprog_interface.send_cbus_command (mj_pri=3, min_pri=4, op_code=8)      # Invalid mj_pri
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=-1, op_code=8)     # Invalid min_pri
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=4, op_code=8)      # Invalid min_pri
     pi_sprog_interface.send_cbus_command (mj_pri=2, min_pri=2, op_code=-1)     # Invalid op_code
