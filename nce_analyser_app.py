@@ -169,9 +169,9 @@ class NCEApp(tk.Tk):
         
     # Function to handle messages received from the NCE Interface
     def poll_rx(self):
-            # Retrieve each message from the Rx Queue. If we get a Queue
-            # Empty exception then we just wait for 20ms and try again
-            while not self.nce.rx_queue.empty():
+        # Retrieve each message from the Rx Queue. If we get a Queue
+        # Empty exception then we just wait for 20ms and try again
+        while not self.nce.rx_queue.empty():
             message = self.nce.rx_queue.get_nowait()
             # Handle DCC Short Accessory commands
             if message.startswith("A"):
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     # If we cant find a port then we just exit the application
     nce_port = find_nce_port()
     if nce_port:
-        nce_interface = NCEInterface(port)
+        nce_interface = NCEInterface(nce_port)
         nce_interface.start()
         nce_application = NCEApp(nce_interface)
         nce_application.mainloop()
