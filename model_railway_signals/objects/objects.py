@@ -444,8 +444,11 @@ def rotate_objects(list_of_object_ids: list):
     # Only proceed if there are objects that need to be rotated (already deleted)
     if active_updates:
         for object_id, obj, obj_type in active_updates:
-            # Toggle orientation between 0 and 180
-            obj["orientation"] = 180 if obj["orientation"] == 0 else 0
+            # Toggle orientation in 90 degree steps
+            if obj["orientation"] == 0: obj["orientation"] = 90
+            elif obj["orientation"] == 90: obj["orientation"] = 180
+            elif obj["orientation"] == 180: obj["orientation"] = 270
+            else: obj["orientation"] = 0
             # Re-draw based on type
             if obj_type == objects_common.object_type.signal:
                 objects_signals.redraw_signal_object(object_id)

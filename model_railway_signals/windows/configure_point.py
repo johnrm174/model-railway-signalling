@@ -29,6 +29,7 @@
 #    common.signal_route_frame
 #    common.colour_selection
 #    common.window_controls
+#    common.rotation_button
 #
 #------------------------------------------------------------------------------------
 
@@ -71,9 +72,8 @@ class general_settings(Tk.LabelFrame):
         # Create a subframe to center the buttons
         self.subframe = Tk.Frame(self)
         self.subframe.pack()
-        self.CB1 = common.check_box(self.subframe, label="Rotated",width=9,
-                        tool_tip="Select to rotate point by 180 degrees")
-        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.orientation = common.rotation_button(self.subframe, tool_tip="Click to rotate point by 90 degrees")
+        self.orientation.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB2 = common.check_box(self.subframe, label="Facing point lock", width=14,
                 tool_tip="Select to include a Facing Point Lock (manually switched points only)")
         self.CB2.pack(side=Tk.LEFT, padx=2, pady=2)
@@ -81,13 +81,13 @@ class general_settings(Tk.LabelFrame):
                         tool_tip="Select to reverse the point blades")
         self.CB3.pack(side=Tk.LEFT, padx=2, pady=2)    
     
-    def set_values(self, rot:bool, fpl:bool, rev:bool):
-        self.CB1.set_value(rot)
+    def set_values(self, orientation:int, fpl:bool, rev:bool):
+        self.orientation.set_value(orientation)
         self.CB2.set_value(fpl)
         self.CB3.set_value(rev)
         
     def get_values(self):
-        return(self.CB1.get_value(), self.CB2.get_value(), self.CB3.get_value())
+        return(self.orientation.get_value(), self.CB2.get_value(), self.CB3.get_value())
 
 #------------------------------------------------------------------------------------
 # Class for the Automation UI Element (based on a Tk.LabelFrame)
@@ -399,10 +399,10 @@ class edit_point():
             yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
             self.config.buttonoffsets.set_values(hide_buttons, xoffset, yoffset)
             # These are the general settings for the point
-            rot = objects.schematic_objects[self.object_id]["orientation"] == 180
+            orientation = objects.schematic_objects[self.object_id]["orientation"]
             fpl = objects.schematic_objects[self.object_id]["hasfpl"]
             rev = objects.schematic_objects[self.object_id]["reverse"]
-            self.config.settings.set_values(rot, fpl, rev)
+            self.config.settings.set_values(orientation, fpl, rev)
             # These are the automation settings (Note the current point ID is needed for validation)
             switch_point = objects.schematic_objects[self.object_id]["alsoswitch"]
             switched_with = objects.schematic_objects[self.object_id]["automatic"]
@@ -449,11 +449,10 @@ class edit_point():
             new_object_configuration["xbuttonoffset"] = xoffset
             new_object_configuration["ybuttonoffset"] = yoffset
             # These are the general settings
-            rot, fpl, rev = self.config.settings.get_values()
+            orientation, fpl, rev = self.config.settings.get_values()
             new_object_configuration["reverse"] = rev
             new_object_configuration["hasfpl"] = fpl
-            if rot: new_object_configuration["orientation"] = 180
-            else: new_object_configuration["orientation"] = 0
+            new_object_configuration["orientation"] = orientation
             # These are the automation settings
             switch_point, switched_with = self.config.automation.get_values()
             new_object_configuration["alsoswitch"] = switch_point

@@ -18,6 +18,7 @@
 #    validated_dcc_entry_box(dcc_entry_box)
 #    validated_keycode_entry_box(integer_entry_box)
 #    validated_gpio_sensor_entry_box(str_int_item_id_entry_box)
+#    rotation_button(Tk.Frame)
 #
 # Provides the following 'compound' UI elements for the application
 #    validated_keypress_entry(Tk.Frame) - validated character or unicode entry
@@ -71,6 +72,7 @@ from .common_simple import scrollable_text_frame
 from .common_simple import validated_dcc_entry_box
 from .common_simple import validated_keycode_entry_box
 from .common_simple import validated_gpio_sensor_entry_box
+from .common_simple import rotation_button
 
 from .common_compound import validated_dcc_command_entry
 from .common_compound import point_settings_entry

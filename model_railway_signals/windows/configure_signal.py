@@ -969,9 +969,7 @@ class edit_signal:
             self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
             self.config.slotwith.set_value(objects.schematic_objects[self.object_id]["slotwith"], item_id)
             # These are the general settings for the signal
-            if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
-            else:rot = False
-            self.config.settings.rotated.set_value(rot)
+            self.config.settings.rotated.set_value(objects.schematic_objects[self.object_id]["orientation"])
             self.config.settings.flipped.set_value(objects.schematic_objects[self.object_id]["flipped"])
             # These are the signal button position offsets and styles:
             hide_buttons = objects.schematic_objects[self.object_id]["hidebuttons"]
@@ -1078,9 +1076,7 @@ class edit_signal:
                 new_object_configuration["subroutes"] = get_sub_routes(self)
                 new_object_configuration["slotwith"] = self.config.slotwith.get_value()
                 # These are the general settings for the signal
-                rot = self.config.settings.rotated.get_value()
-                if rot: new_object_configuration["orientation"] = 180
-                else: new_object_configuration["orientation"] = 0
+                new_object_configuration["orientation"] = self.config.settings.rotated.get_value()
                 new_object_configuration["flipped"] = self.config.settings.flipped.get_value()
                 # These are the point button position offsets and styles:
                 hidden, xoffset, yoffset = self.config.buttonoffsets.get_values()

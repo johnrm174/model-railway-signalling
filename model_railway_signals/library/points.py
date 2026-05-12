@@ -343,20 +343,32 @@ def toggle_point(point_id:int, switched_by_another_point:bool=False):
 # Used for all points apart from 'Y' Points.
 # -------------------------------------------------------------------------
 
-def create_button_windows(canvas, button_coords, fpl, switched_with:int, canvas_tag:str,
-                           point_button:bool, fpl_button:bool, buttons_above:bool):
-    # Create the control button windows in the correct position (taking into account the orientation
-    if fpl and not buttons_above:
+def create_button_windows(canvas, button_coords, fpl, switched_with:int, canvas_tag:str, point_button:bool,
+                fpl_button:bool, buttons_above:bool, buttons_below:bool, buttons_left:bool, buttons_right:bool):
+    # Create the control button windows in the correct position (taking into account the orientation)
+    if fpl and buttons_below:
         point_button_window = canvas.create_window(button_coords, anchor=Tk.NW, window=point_button, tags=canvas_tag)
         fpl_button_window = canvas.create_window(button_coords, anchor=Tk.NE, window=fpl_button, tags=canvas_tag)
     elif fpl and buttons_above:
         point_button_window = canvas.create_window(button_coords, anchor=Tk.SW, window=point_button, tags=canvas_tag)
         fpl_button_window = canvas.create_window(button_coords, anchor=Tk.SE, window=fpl_button, tags=canvas_tag)
-    elif not switched_with and not buttons_above:
+    elif fpl and buttons_right:
+        point_button_window = canvas.create_window(button_coords, anchor=Tk.NW, window=point_button, tags=canvas_tag)
+        fpl_button_window = canvas.create_window(button_coords, anchor=Tk.SW, window=fpl_button, tags=canvas_tag)
+    elif fpl and buttons_left:
+        point_button_window = canvas.create_window(button_coords, anchor=Tk.NE, window=point_button, tags=canvas_tag)
+        fpl_button_window = canvas.create_window(button_coords, anchor=Tk.SE, window=fpl_button, tags=canvas_tag)
+    elif not switched_with and buttons_below:
         point_button_window = canvas.create_window(button_coords, anchor=Tk.N, window=point_button, tags=canvas_tag)
         fpl_button_window = None
     elif not switched_with and buttons_above:
         point_button_window = canvas.create_window(button_coords, anchor=Tk.S, window=point_button, tags=canvas_tag)
+        fpl_button_window = None
+    elif not switched_with and buttons_left:
+        point_button_window = canvas.create_window(button_coords, anchor=Tk.E, window=point_button, tags=canvas_tag)
+        fpl_button_window = None
+    elif not switched_with and buttons_right:
+        point_button_window = canvas.create_window(button_coords, anchor=Tk.W, window=point_button, tags=canvas_tag)
         fpl_button_window = None
     else:
         point_button_window = None
@@ -452,9 +464,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,-13,+18,-7,+12, orientation)
                 canvas.create_line(line_coords, tags=(canvas_tag, route2))     ## 'Switched' end stop (Trap Only)
             # Work out the offsets of the buttons and create them (in windows)
+            if orientation == 0: buttons_above, buttons_below, buttons_left, buttons_right = True, False, False, False
+            elif orientation == 90: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, True
+            elif orientation == 180: buttons_above, buttons_below, buttons_left, buttons_right = False, True, False, False
+            elif orientation == 270: buttons_above, buttons_below, buttons_left, buttons_right = False, False, True, False
+            else: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, False
             point_coords = common.rotate_point (x, y, button_xoffset - 10, button_yoffset - 5, orientation)
-            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
-                    switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation != 180))
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl, switched_with,
+                    canvas_tag, point_button, fpl_button, buttons_above, buttons_below, buttons_left, buttons_right)
         # Normal Point or Trap Point or Scissors Crossover Point - Left Hand
         elif pointtype == point_type.LH and pointsubtype in (point_subtype.normal, point_subtype.trap, point_subtype.xcross):
             # Create the line objects to represent the point blades
@@ -477,9 +494,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,-13,-18,-7,-12, orientation)
                 canvas.create_line(line_coords, tags=(canvas_tag, route2))     ## 'Switched' end stop (Trap only)
             # Work out the offsets of the buttons and create them (in windows)
+            if orientation == 0: buttons_above, buttons_below, buttons_left, buttons_right = False, True, False, False
+            elif orientation == 90: buttons_above, buttons_below, buttons_left, buttons_right = False, False, True, False
+            elif orientation == 180: buttons_above, buttons_below, buttons_left, buttons_right = True, False, False, False
+            elif orientation == 270: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, True
+            else: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, False
             point_coords = common.rotate_point (x, y, button_xoffset - 10, button_yoffset + 5, orientation)
-            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
-                    switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation == 180))
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl, switched_with,
+                    canvas_tag, point_button, fpl_button, buttons_above, buttons_below, buttons_left, buttons_right)
         # Y Point (the point subtype is ignored)
         elif pointtype==point_type.Y:
             # Create the line objects to represent the point
@@ -495,9 +517,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             line_coords = common.rotate_line(x,y,+10,+10,+25,+25,orientation)
             canvas.create_line(line_coords, tags=(canvas_tag, route2))  ## 'Switched' route line
             # Work out the offsets of the buttons and create them (in windows)
+            if orientation == 0: buttons_above, buttons_below, buttons_left, buttons_right = True, False, False, False
+            elif orientation == 90: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, True
+            elif orientation == 180: buttons_above, buttons_below, buttons_left, buttons_right = False, True, False, False
+            elif orientation == 270: buttons_above, buttons_below, buttons_left, buttons_right = False, False, True, False
+            else: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, False
             point_coords = common.rotate_point (x, y, button_xoffset - 20, button_yoffset - 5, orientation)
-            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
-                    switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation != 180))
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,switched_with,
+                    canvas_tag, point_button, fpl_button, buttons_above, buttons_below, buttons_left, buttons_right)
         # Parts 1 and 2 of a Single Slip or Double Slip - Left Hand
         elif pointtype == point_type.LH and pointsubtype in (point_subtype.sslip1, point_subtype.dslip1, point_subtype.sslip2, point_subtype.dslip2):
             # Note that we use the 'route0' tag for the parts of the point applicable to either route - at the moment
@@ -507,7 +534,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             # This is more sensible for the default (unswitched) configuration of the double slip)
             if pointsubtype == point_subtype.sslip2: blade1, blade2 = blade2, blade1
             # If its the second half of a double slip or single slip we rotate the point elements by 180 degrees
-            if pointsubtype in (point_subtype.sslip2, point_subtype.dslip2): orientation = orientation + 180
+            if pointsubtype in (point_subtype.sslip2, point_subtype.dslip2):
+                orientation = orientation + 180
+                if orientation >= 360: orientation = orientation - 360
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,0,0,+7,0,orientation)
             canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 1 (straight)
@@ -534,9 +563,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,+12,+13,+28,-3,orientation)
                 canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 2 (crossing)
             # Work out the offsets of the buttons and create them (in windows)
+            if orientation == 0: buttons_above, buttons_below, buttons_left, buttons_right = True, False, False, False
+            elif orientation == 90: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, True
+            elif orientation == 180: buttons_above, buttons_below, buttons_left, buttons_right = False, True, False, False
+            elif orientation == 270: buttons_above, buttons_below, buttons_left, buttons_right = False, False, True, False
+            else: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, False
             point_coords = common.rotate_point (x, y, button_xoffset - 10, button_yoffset - 5, orientation)
-            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
-                    switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation != 180))
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl, switched_with,
+                    canvas_tag, point_button, fpl_button, buttons_above, buttons_below, buttons_left, buttons_right)
         # Parts 1 and 2 of a Single Slip or Double Slip - Right Hand
         elif pointtype == point_type.RH and pointsubtype in (point_subtype.sslip1, point_subtype.dslip1, point_subtype.sslip2, point_subtype.dslip2):
             # Note that we use the 'route0' tag for the parts of the point applicable to either route - at the moment
@@ -546,7 +580,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
             # This is more sensible for the default (unswitched) configuration of the double slip)
             if pointsubtype == point_subtype.sslip2: blade1, blade2 = blade2, blade1
             # If its the second half of a double slip or single slip we rotate the point elements by 180 degrees
-            if pointsubtype in (point_subtype.sslip2, point_subtype.dslip2): orientation = orientation + 180
+            if pointsubtype in (point_subtype.sslip2, point_subtype.dslip2):
+                orientation = orientation + 180
+                if orientation >= 360: orientation = orientation - 360
             # If its the second half of a double slip or single slip we rotate the point elements by 180 degrees
             line_coords = common.rotate_line(x,y,0,0,+7,0,orientation)
             canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 1 (straight)
@@ -573,9 +609,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,+12,-13,+28,+3,orientation)
                 canvas.create_line(line_coords, tags=(canvas_tag, route0_tag))  ## Main Route line 2 (crossing)
             # Work out the offsets of the buttons and create them (in windows)
+            if orientation == 0: buttons_above, buttons_below, buttons_left, buttons_right = False, True, False, False
+            elif orientation == 90: buttons_above, buttons_below, buttons_left, buttons_right = False, False, True, False
+            elif orientation == 180: buttons_above, buttons_below, buttons_left, buttons_right = True, False, False, False
+            elif orientation == 270: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, True
+            else: buttons_above, buttons_below, buttons_left, buttons_right = False, False, False, False
             point_coords = common.rotate_point (x, y, button_xoffset - 10, button_yoffset + 5, orientation)
-            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl,
-                    switched_with, canvas_tag, point_button, fpl_button, buttons_above = (orientation == 180))
+            point_button_window, fpl_button_window = create_button_windows(canvas, point_coords, fpl, switched_with,
+                    canvas_tag, point_button, fpl_button, buttons_above, buttons_below, buttons_left, buttons_right)
         # hide the buttons if we are in Run Mode and the "hide_buttons" flag is set
         if not editing_enabled and hide_buttons:
             if point_button_window is not None: canvas.itemconfig(point_button_window, state="hidden")

@@ -17,6 +17,7 @@
 #    common.int_item_id_entry_box
 #    common.selection_buttons
 #    common.button_configuration
+#    common.rotation_button
 #
 #------------------------------------------------------------------------------------
 
@@ -39,8 +40,8 @@ class general_settings(Tk.LabelFrame):
         self.subframe=Tk.Frame(self)
         self.subframe.pack()
         # Create the "rotated" and 'flipped' checkbutton and tool Tip
-        self.rotated = common.check_box(self.subframe, label="Rotated", tool_tip = "Select to rotate signal by 180 degrees")
-        self.rotated.pack(side=Tk.LEFT)
+        self.rotated = common.rotation_button(self.subframe, tool_tip = "Click to rotate signal by 90 degrees")
+        self.rotated.pack(side=Tk.LEFT, padx=2, pady=2)
         self.flipped = common.check_box(self.subframe, label="Flipped", tool_tip = "Select to position the signal on the other side of the track")
         self.flipped.pack(side=Tk.LEFT)
 
@@ -1108,7 +1109,7 @@ class signal_configuration_tab:
         self.routetype = common.selection_buttons(self.frame2, label="Route Indications",
                     tool_tip="Select the route indications for the main signal", callback=route_type_updated,
                     button_labels=("None", "Feathers", "Theatre", "Route arms") )
-        self.routetype.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.routetype.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create the labelframe for the signal style configuration elements
         self.frame3 = Tk.Frame(parent_tab)
         self.frame3.pack(padx=2, pady=2, fill='x')

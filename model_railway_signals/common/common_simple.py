@@ -16,6 +16,7 @@
 #    validated_dcc_entry_box(dcc_entry_box)
 #    validated_keycode_entry_box(integer_entry_box)
 #    validated_gpio_sensor_entry_box(str_int_item_id_entry_box)
+#    rotation_button(Tk.Frame)
 #
 # Makes the following external API calls to the library package
 #    library.dcc_address_mapping(dcc_address)
@@ -978,5 +979,42 @@ class validated_gpio_sensor_entry_box(str_int_item_id_entry_box):
 
     def set_item_id(self, item_id:int):
         self.local_item_id = item_id
+
+#------------------------------------------------------------------------------------
+# Class for a 'Rotated' UI element - a button that toggles in 90 degree steps
+#
+# Main class methods used by the editor are:
+#    "set_value" - will set the current value (integer)
+#    "get_value" - will return the last "valid" value (integer)
+#    "pack"  for packing the compound UI element
+#------------------------------------------------------------------------------------
+
+class rotation_button(Tk.Frame):
+    def __init__(self, parent_frame, tool_tip:str):
+        # Define the rotation sequence
+        self.values = [0, 90, 180, 270]
+        self.current_index = 0
+        # Create a frame to hold the label and button:
+        super().__init__(parent_frame)
+        self.label = Tk.Label(self, text="Orientation:")
+        self.label.pack(side=Tk.LEFT)
+        self.orientation = Tk.Button(self, width=3, command=self.toggle_rotation)
+        self.orientation.pack(side=Tk.LEFT)
+        self.TT = CreateToolTip(self.orientation, tool_tip)
+
+    def toggle_rotation(self):
+        self.current_index = (self.current_index + 1) % len(self.values)
+        self.update_value()
+
+    def update_value(self):
+        self.orientation.config(text=f"{self.values[self.current_index]}°")
+
+    def get_value(self) -> int:
+        return self.values[self.current_index]
+
+    def set_value(self, value: int):
+        if value in self.values: self.current_index = self.values.index(value)
+        else: self.current_index = 0
+        self.update_value()
 
 ###########################################################################################
