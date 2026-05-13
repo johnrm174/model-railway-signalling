@@ -71,6 +71,7 @@ default_section_object["defaultlabel"] = settings.get_style("tracksections", "de
 # Other object-specific parameters:
 default_section_object["editable"] = True
 default_section_object["hidden"] = False
+default_section_object["vertical"] = False
 default_section_object["mirror"] = ""
 default_section_object["highlightcolour"] = "Red"
 default_section_object["gpiosensor"] = ""
@@ -214,6 +215,7 @@ def redraw_section_object(object_id):
                 default_label = objects_common.schematic_objects[object_id]["defaultlabel"],
                 editable = objects_common.schematic_objects[object_id]["editable"],
                 hidden = objects_common.schematic_objects[object_id]["hidden"],
+                vertical = objects_common.schematic_objects[object_id]["vertical"],
                 section_width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 mirror_id = objects_common.schematic_objects[object_id]["mirror"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],

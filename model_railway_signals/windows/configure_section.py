@@ -204,6 +204,9 @@ class section_configuration_tab():
         self.hidden = common.check_box(self.frame1subframe2, label="Hidden",
                      tool_tip= "Select to hide the Track Section in Run Mode")
         self.hidden.pack(padx=2, side=Tk.LEFT, fill="y")
+        self.vertical = common.check_box(self.frame1subframe2, label="Rotated",
+                     tool_tip= "Select to orient vertically ")
+        self.vertical.pack(padx=2, side=Tk.LEFT, fill="y")
         #----------------------------------------------------------------------------------
         # Create a Label Frame to hold the Default label selection (Frame1a)
         #----------------------------------------------------------------------------------
@@ -261,13 +264,17 @@ class section_configuration_tab():
         #----------------------------------------------------------------------------------
         self.frame4 = Tk.LabelFrame(parent_tab, text="Route lines to highlight (when occupied)")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.highlightlines = common.grid_of_generic_entry_boxes(self.frame4, base_class=common.int_item_id_entry_box,
+        self.frame4a = Tk.Frame(self.frame4)
+        self.frame4a.pack()
+        self.highlightlines = common.grid_of_generic_entry_boxes(self.frame4a, base_class=common.int_item_id_entry_box,
                     columns=8, width=3, exists_function = library.line_exists, tool_tip="Specify the route lines "+
                                         "to highlight when the Track Section is occupied")
         self.highlightlines.pack(padx=2, pady=2, fill='x')
         self.frame5 = Tk.LabelFrame(parent_tab, text="Points to highlight (when occupied)")
         self.frame5.pack(padx=2, pady=2, fill='x')
-        self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame5, base_class=common.int_item_id_entry_box,
+        self.frame5a = Tk.Frame(self.frame5)
+        self.frame5a.pack()
+        self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame5a, base_class=common.int_item_id_entry_box,
                     columns=8, width=3, exists_function = library.point_exists, tool_tip="Specify the points (manual "+
                     "or automatic) to be highlighted when the Track Section is occupied")
         self.highlightpoints.pack(padx=2, pady=2, fill='x')
@@ -393,6 +400,7 @@ class edit_section():
             self.config.sectionid.set_value(item_id)
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
             self.config.hidden.set_value(objects.schematic_objects[self.object_id]["hidden"])
+            self.config.vertical.set_value(objects.schematic_objects[self.object_id]["vertical"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.interlocking.points.set_values(interlocked_points(self.object_id))            
@@ -430,6 +438,7 @@ class edit_section():
             new_object_configuration["itemid"] = self.config.sectionid.get_value()
             new_object_configuration["editable"] = not self.config.readonly.get_value()
             new_object_configuration["hidden"] = self.config.hidden.get_value()
+            new_object_configuration["vertical"] = self.config.vertical.get_value()
             new_object_configuration["mirror"] = self.config.mirror.get_value()
             new_object_configuration["linestohighlight"] = self.config.highlightlines.get_values()
             new_object_configuration["pointstohighlight"] = self.config.highlightpoints.get_values()

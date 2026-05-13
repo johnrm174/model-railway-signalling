@@ -441,19 +441,28 @@ def rotate_objects(list_of_object_ids: list):
         elif obj_type == objects_common.object_type.point:
             objects_points.delete_point_object(object_id)
             active_updates.append((object_id, obj, obj_type))
+        elif obj_type == objects_common.object_type.section:
+            objects_sections.delete_section_object(object_id)
+            active_updates.append((object_id, obj, obj_type))
     # Only proceed if there are objects that need to be rotated (already deleted)
     if active_updates:
         for object_id, obj, obj_type in active_updates:
-            # Toggle orientation in 90 degree steps
-            if obj["orientation"] == 0: obj["orientation"] = 90
-            elif obj["orientation"] == 90: obj["orientation"] = 180
-            elif obj["orientation"] == 180: obj["orientation"] = 270
-            else: obj["orientation"] = 0
+            if "orientation" in obj.keys():
+                # Toggle orientation in 90 degree steps (Signals and Points)
+                if obj["orientation"] == 0: obj["orientation"] = 90
+                elif obj["orientation"] == 90: obj["orientation"] = 180
+                elif obj["orientation"] == 180: obj["orientation"] = 270
+                else: obj["orientation"] = 0
+            elif "vertical" in obj.keys():
+                # Toggle between horizontal and vertical (Track Sections)
+                obj["vertical"] = not obj["vertical"]
             # Re-draw based on type
             if obj_type == objects_common.object_type.signal:
                 objects_signals.redraw_signal_object(object_id)
             elif obj_type == objects_common.object_type.point:
                 objects_points.redraw_point_object(object_id)
+            elif obj_type == objects_common.object_type.section:
+                objects_sections.redraw_section_object(object_id)
         # Force a display refresh at this point (user experience)
         objects_common.root.update_idletasks()
         # save the current state (for undo/redo)
