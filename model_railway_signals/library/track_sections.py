@@ -193,7 +193,7 @@ def configure_edit_mode(edit_mode:bool):
                 # configuration (placeholder1 is the text object and placeholder2 is the rectangle object)
                 track_section["canvas"].itemconfig(track_section["buttonwindow"], state='hidden')
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='normal')
-                track_section["canvas"].itemconfig(track_section["placeholder2"], fill=track_section["selectedbgcolour"])
+                track_section["canvas"].itemconfig(track_section["placeholder2"], fill=track_section["deselectedbgcolour"])
             else:
                 # In Run Mode - If the object is configured as 'hidden' then we hide the text object but set
                 # the rectangle object to transparent - effectively hiding it whilst maintaining its 'presence'
@@ -478,8 +478,9 @@ def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
 #---------------------------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int, section_callback, default_label:str="XXXXX",
-                    section_width:int=5, editable:bool=True, hidden=False, mirror_id:str="", vertical:bool=False,
-                    button_colour:str="Black", text_colour:str="White", font=("TkFixedFont",8,"")):
+            section_width:int=5, editable:bool=True, hidden=False, mirror_id:str="", vertical:bool=False,
+            button_colour:str="Black", text_colour:str="White", highlight_colour:str="Red",
+            highlight_section:bool=False, font=("TkFixedFont",8,"")):
     global sections
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "section"+str(section_id)
@@ -503,6 +504,10 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         deselected_fg_colour = button_colour
         selected_bg_colour = button_colour
         deselected_bg_colour = button_colour
+        # If the track section is configured to highlight when occupied, we use the
+        # highlight_colour for the background in place of the default selected_bg_colour
+        if highlight_section: selected_bg_colour = highlight_colour
+        else: selected_bg_colour = button_colour
         # Work out the default button width and height (chars) depending on the orientation
         if vertical:
             font = (font[0], font[1] - 1, font[2])
@@ -548,7 +553,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
                                             fill=selected_fg_colour, tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
-                                            tags=canvas_tag, fill=selected_bg_colour, width=0)
+                                            tags=canvas_tag, fill=deselected_bg_colour, width=0)
         # Raise the text item to be in front of the rectangle item
         canvas.tag_raise(placeholder1, placeholder2)
         # Now we have created the textbox at the right width and height , update it with the 'proper'
@@ -580,6 +585,8 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         sections[str(section_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
         sections[str(section_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         sections[str(section_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
+        sections[str(section_id)]["highlightsection"] = highlight_section       # Flag to highlight section when OCCUPIED
+        sections[str(section_id)]["highlightcolour"] = highlight_colour         # Highlighting colour when section OCCUPIED
         sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour      # Section colour in its selected state
         sections[str(section_id)]["selectedfgcolour"] = selected_fg_colour      # Section colour in its selected state
         sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour  # Section colour in its normal/unselected state
@@ -638,8 +645,12 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
         # Specify the various parameters we need for the button/placeholder styles
         selected_fg_colour = text_colour
         deselected_fg_colour = button_colour
-        selected_bg_colour = button_colour
         deselected_bg_colour = button_colour
+        # If section highlighting is enabled, we use the highlight colour for the selected background
+        if sections[str(section_id)]["highlightsection"]:
+            selected_bg_colour = sections[str(section_id)]["highlightcolour"]
+        else:
+            selected_bg_colour = button_colour
         # Update the Button Styles depending on the state of the button
         if section["occupied"]:
             section["button"].config(background=selected_bg_colour)
@@ -671,17 +682,17 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
         # Finally we can change the placeholder text to the appropriate string
         section["canvas"].itemconfigure(section["placeholder1"], text=button_id_text)
         # Only update the background colour if we are in edit mode (to make it visible)
-        if editing_enabled: section["canvas"].itemconfig(section["placeholder2"], fill=selected_bg_colour)
+        if editing_enabled: section["canvas"].itemconfig(section["placeholder2"], fill=deselected_bg_colour)
         # Update the label text if it is still set to the original default label text
         if section["labeltext"] == section["defaultlabel"]: update_label(section_id, button_label)
         # Store the parameters we need to track
         sections[str(section_id)]["textfont"] = font
         sections[str(section_id)]["defaultlabel"] = default_label
         sections[str(section_id)]["sectionwidth"] = section_width
-        sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour
         sections[str(section_id)]["selectedfgcolour"] = selected_fg_colour
         sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour
         sections[str(section_id)]["deselectedbgcolour"] = deselected_bg_colour
+        sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour
     return()
 
 #---------------------------------------------------------------------------------------------

@@ -262,22 +262,25 @@ class section_configuration_tab():
         #----------------------------------------------------------------------------------
         # Create the point and line to highlight lists (frame 4,5)
         #----------------------------------------------------------------------------------
-        self.frame4 = Tk.LabelFrame(parent_tab, text="Route lines to highlight (when occupied)")
+        self.frame4 = Tk.LabelFrame(parent_tab, text="Route highlighting (when occupied)")
         self.frame4.pack(padx=2, pady=2, fill='x')
-        self.frame4a = Tk.Frame(self.frame4)
-        self.frame4a.pack()
-        self.highlightlines = common.grid_of_generic_entry_boxes(self.frame4a, base_class=common.int_item_id_entry_box,
+        self.frame4b = Tk.Frame(self.frame4)
+        self.frame4b.pack()
+        self.label4b1 = Tk.Label(self.frame4b, text="Route Lines to highlight:", anchor="w")
+        self.label4b1.pack(padx=2,pady=2, fill="x")
+        self.highlightlines = common.grid_of_generic_entry_boxes(self.frame4b, base_class=common.int_item_id_entry_box,
                     columns=8, width=3, exists_function = library.line_exists, tool_tip="Specify the route lines "+
                                         "to highlight when the Track Section is occupied")
-        self.highlightlines.pack(padx=2, pady=2, fill='x')
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Points to highlight (when occupied)")
-        self.frame5.pack(padx=2, pady=2, fill='x')
-        self.frame5a = Tk.Frame(self.frame5)
-        self.frame5a.pack()
-        self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame5a, base_class=common.int_item_id_entry_box,
+        self.highlightlines.pack(padx=2, pady=2)
+        self.label4b2 = Tk.Label(self.frame4b, text="Points to highlight:", anchor="w")
+        self.label4b2.pack(padx=2,pady=2, fill="x")
+        self.highlightpoints = common.grid_of_generic_entry_boxes(self.frame4b, base_class=common.int_item_id_entry_box,
                     columns=8, width=3, exists_function = library.point_exists, tool_tip="Specify the points (manual "+
                     "or automatic) to be highlighted when the Track Section is occupied")
-        self.highlightpoints.pack(padx=2, pady=2, fill='x')
+        self.highlightpoints.pack(padx=2, pady=2)
+        self.highlightsection = common.check_box(self.frame4b, label="Highlight Track Section when occupied",
+                        tool_tip="Select to highlight the Track Section when occupied")
+        self.highlightsection.pack (padx=2, pady=2)
 
 #####################################################################################
 # Class for the Track Section Interlocking Tab
@@ -414,6 +417,7 @@ class edit_section():
             self.config.highlightlines.set_values(objects.schematic_objects[self.object_id]["linestohighlight"])
             self.config.highlightpoints.set_values(objects.schematic_objects[self.object_id]["pointstohighlight"])
             self.config.highlightcolour.set_value(objects.schematic_objects[self.object_id]["highlightcolour"])
+            self.config.highlightsection.set_value(objects.schematic_objects[self.object_id]["highlightsection"])
             self.config.gpiosensor.set_value(objects.schematic_objects[self.object_id]["gpiosensor"], item_id)
             self.config.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.config.defaultlabel.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
@@ -443,6 +447,7 @@ class edit_section():
             new_object_configuration["linestohighlight"] = self.config.highlightlines.get_values()
             new_object_configuration["pointstohighlight"] = self.config.highlightpoints.get_values()
             new_object_configuration["highlightcolour"] = self.config.highlightcolour.get_value()
+            new_object_configuration["highlightsection"] = self.config.highlightsection.get_value()
             new_object_configuration["gpiosensor"] = self.config.gpiosensor.get_value()
             new_object_configuration["buttonwidth"] = self.config.buttonwidth.get_value()
             new_object_configuration["defaultlabel"] = self.config.defaultlabel.get_value()

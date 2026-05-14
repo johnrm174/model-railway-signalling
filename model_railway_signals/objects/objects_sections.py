@@ -73,9 +73,11 @@ default_section_object["editable"] = True
 default_section_object["hidden"] = False
 default_section_object["vertical"] = False
 default_section_object["mirror"] = ""
-default_section_object["highlightcolour"] = "Red"
 default_section_object["gpiosensor"] = ""
+# These are the selections for route highlighting when the section is occupied
 # lines and points to highlight comprise variable length lists of Item IDs
+default_section_object["highlightcolour"] = "Red"
+default_section_object["highlightsection"] = False
 default_section_object["linestohighlight"] = []
 default_section_object["pointstohighlight"] = []
 
@@ -219,6 +221,8 @@ def redraw_section_object(object_id):
                 section_width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 mirror_id = objects_common.schematic_objects[object_id]["mirror"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],
+                highlight_colour = objects_common.schematic_objects[object_id]["highlightcolour"],
+                highlight_section = objects_common.schematic_objects[object_id]["highlightsection"],
                 button_colour = button_colour,
                 text_colour = text_colour)
     # Create/update the canvas "tags" and selection rectangle for the Track Section
