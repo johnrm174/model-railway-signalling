@@ -66,6 +66,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Points and signals can now be rotated in 90 degree steps (orientations of 0, 90, 180, 270 degrees)
 * Track sections can now be rotated (i.e. oriented either vertically or horizontally)
 * Track sections can now be highlighted to show they are occupied (background colour)
+* Timed signal delays (between aspect changes) can now be specified up to 240 seconds
+* Bugfix to colour light timed sequences to ensure that a DANGER aspect takes precidence
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
