@@ -416,10 +416,21 @@ gui_responsive = threading.Event()
 gui_responsive.set()
 
 # Set up a dedicated freeze log
-handler = logging.FileHandler("freeze_diagnostics.log", mode='w')
 freeze_logger = logging.getLogger("FreezeDetector")
 freeze_logger.propagate = False
-freeze_logger.addHandler(handler)
+
+try:
+    # Try to create the file handler
+    handler = logging.FileHandler("freeze_diagnostics.log", mode='w')
+    freeze_logger.addHandler(handler)
+except OSError as e:
+    # If it fails, write out a log message to stdout
+    handler = None
+    fallback_handler = logging.StreamHandler(sys.stderr)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fallback_handler.setFormatter(formatter)
+    freeze_logger.addHandler(fallback_handler)
+    freeze_logger.warning(f"Watchdog Logging is disabled: {e}")
 
 def probe_callback():
     # This function runs in the main tkinter thread
@@ -485,7 +496,9 @@ def capture_diagnostic_snapshot():
     freeze_logger.error("".join(output))
     print("Application Freeze Detected - Diagnodstic snapshot written to 'freeze_diagnostics.log'")
 
-threading.Thread(target=watchdog_monitor, daemon=True).start()
+# Only start the watchdog/freeze logging thread if the handler was successfully
+# created (ie if the current folder/file is writable by the application)
+if handler: threading.Thread(target=watchdog_monitor, daemon=True).start()
 
 ##################################################################################################
 
