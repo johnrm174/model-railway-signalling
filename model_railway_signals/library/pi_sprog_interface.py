@@ -106,7 +106,7 @@ serial_port = serial.Serial()
 # Global constants used when transmitting CBUS messages
 can_bus_id = 1                       # The arbitary CANBUS ID we will use for the Pi
 pi_cbus_node = 258                   # The CBUS Node ID Of the Pi-Sprog (This is updated with that reported in the STAT)
-transmit_delay = 0.02                # The delay between sending CBUS Accessory Command Messages (in seconds)
+transmit_delay = 0.03                # The delay between sending CBUS Accessory Command Messages (in seconds)
 
 # Global Flag to enable enhanced debug logging for the Pi-SPROG interface
 debug = False                       # Enhanced Debug logging - set by the sprog_connect call
@@ -167,11 +167,21 @@ def wait_for_response(timeout:float,test_for_response_function):
 
 #------------------------------------------------------------------------------
 # Internal thread to write queued CBUS messages to the Serial Port. Note that
-# we 'throttle' the output of DCC accessory commands as we have seen some decoders
-# (e.g. the signallist SC1) don't seem to process all messages in a sequence if
-# these messages are sent one after the other in quick succession (e.g. when using
-# 8 individual addresses to control 8 individual LED outputs). This is definatly a
-# decoder issue as the NCE Bus analyser proves the commands are being transmitted.
+# we 'throttle' the output of DCC accessory commands and CV Read/Write commands as
+# some decoders (such as the signallist SC1) can 'miss' messages if these are
+# sent one after the other in quick succession. This is definatly a decoder issue
+# as the NCE Bus analyser proves the commands are being output to the DCC bus.
+#
+# Priorities are used as follows:
+#    mj_pri=0, min_pri=0 - queue_priority 0- TON and initial RSTAT to check SPROG connectivity
+#    mj_pri=1, min_pri=0 - queue_priority 4 - LOCO session control and emergency stop
+#    mj_pri=1, min_pri=1 - queue_priority 5 - LOCO speed/direction commands
+#    mj_pri=1, min_pri=2 - queue_priority 6 - LOCO Function commands
+#    mj_pri=2, min_pri=0 - queue_priority 8 - ASON/ASOF short accessory commands
+#    mj_pri=3, min_pri=0 - queue_priority 12- CV Read/Write commands
+#    mj_pri=3, min_pri=1 - queue_priority 13 - Status reporting (RSTAT, and Muliimeter on/off)
+#    mj_pri=3, min_pri=2 - queue_priority 12 - TOF (Track power off) - low priority to ensure 
+#                      it gets sent AFTER any loco stop, function off and release commands
 #------------------------------------------------------------------------------
 
 def thread_to_send_buffered_data():
@@ -180,9 +190,9 @@ def thread_to_send_buffered_data():
             # Block until data is available, with a timeout
             priority, command_string = output_buffer.get(timeout=0.1)
             if serial_port.is_open:
-                # Throttle The transmission for DCC Accessory commands only
-                # DCC Accessory commands are given an overall priority of 8
-                if priority == 8: time.sleep(transmit_delay)
+                # Throttle The transmission for DCC Accessory and CV read/write commands
+                # i.e commands with a priority of 8 (ASON/ASOF) or 12 (CV read/write)
+                if priority == 8 or priority == 12: time.sleep(transmit_delay)
                 # Send out the CBUS command
                 serial_port.write(bytes(command_string, "Ascii"))
                 # Print the Transmitted message (if the appropriate debug level is set)
@@ -276,8 +286,6 @@ def process_received_data(byte_string):
             elif op_code == 0xD0: process_accessory_data(byte_string)
             # Engine Report / Response to DLOC (0xE1 = 225 decimal)
             elif op_code == 0xE1: process_ploc_message(byte_string)
-            # Error Code (from request session) ERR (0x63)
-            elif op_code == 0x63: process_error_message(byte_string)
             # Error Code (from request session) ERR (0x63)
             elif op_code == 0x63: process_error_message(byte_string)
     except:
@@ -806,6 +814,7 @@ def request_dcc_power_off():
 #------------------------------------------------------------------------------
 
 def request_status_report():
+    # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if sprog_status_callback is not None and serial_port.is_open:
         if debug: logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
         # Set a low priority for the RSTAT message
@@ -817,6 +826,7 @@ def request_status_report():
 def enable_status_reporting(callback):
     global sprog_status_callback
     sprog_status_callback = callback
+    # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
         # NVSET (OpCode 0x96) - Write to Node Variable 10 to enable telemetry
         # Logic: mj_pri=0, min_pri=2, op_code=0x96, Data: NN_high, NN_low, NV_index, NV_value
@@ -832,6 +842,7 @@ def enable_status_reporting(callback):
 def disable_status_reporting():
     global sprog_status_callback
     sprog_status_callback = None
+    # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
         logging.debug("Pi-SPROG: Disabling SPROG Telemetry Reporting (NVSET Command)")
         # NVSET (OpCode 0x96) - Write 0 to Node Variable 10 to disable telemetry
@@ -864,7 +875,7 @@ def send_accessory_short_event(address:int, active:bool):
         # Validate the modified address - Log the address we have been given - not the one with offsets applied
         if (address_to_send < 1 or address_to_send > 2047):
             logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address)+offset_text)
-        # Only bother sending commands to the Pi Sprog if the serial port has been opened
+        # Only bother sending commands to the Pi Sprog if the serial port has been opened and DCC power is on
         elif serial_port.is_open and dcc_power_is_on:
             # Split Node ID and Address into High/Low bytes
             # pi_cbus_node is usually the fixed node ID of the command station
@@ -886,7 +897,7 @@ def send_accessory_short_event(address:int, active:bool):
             logging.debug(f"Pi-SPROG: Discarding {state_label} command to DCC address: {address}{offset_text} - SPROG disconnected")
         # Play any sound files that are triggered by the DCC command
         play_dcc_sound_file(address, active)
-    return ()
+    return()
 
 #------------------------------------------------------------------------------
 # Externally Called Function to read a single CV (used for testing)
@@ -905,8 +916,8 @@ def service_mode_read_cv(cv:int):
         logging.error("Pi-SPROG: service_mode_read_cv - CV to read must be specified as an integer")
     elif (cv < 0 or cv > 1023):
         logging.error(f"Pi-SPROG: service_mode_read_cv - Invalid CV specified: {cv}")
-    # Only bother sending commands to the Pi SPROG if the serial port has been opened
-    elif serial_port.is_open:
+    # Only bother sending commands to the Pi SPROG if the serial port has been opened and DCC power is on
+    elif serial_port.is_open and dcc_power_is_on:
         # Encode the message into the required bytes
         byte1 = session_id             # Session ID
         byte2 = (cv >> 8) & 0xFF       # High CV Byte
@@ -960,8 +971,8 @@ def service_mode_write_cv(cv:int, value:int):
         logging.error(f"Pi-SPROG: service_mode_write_cv - Invalid CV specified: {cv}")
     elif (value < 0 or value > 255):
         logging.error(f"Pi-SPROG: service_mode_write_cv - CV {cv} - Invalid value specified: {value}")
-    # Only try to send the command if the PI-SPROG-3 is connected
-    elif serial_port.is_open:
+    # Only try to send the command if the PI-SPROG-3 is connected and DCC power is on
+    elif serial_port.is_open and dcc_power_is_on:
         # Encode the message into the required bytes
         byte1 = session_id             # Session ID
         byte2 = (cv >> 8) & 0xFF       # High CV Byte
@@ -1035,7 +1046,9 @@ def request_loco_session(dcc_address:int):
     session_id_to_return = 0
     if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 10239:
         logging.error(f"Pi-SPROG: request_loco_session - Invalid DCC Address {dcc_address} - must be an int (1-10239)")
-    else:
+    # Only try to send the command if the PI-SPROG-3 is connected and DCC power is on
+    # (as all locos get released when DCC power is turned off ensure a known state)
+    elif serial_port.is_open and dcc_power_is_on:
         logging.debug(f"Pi-SPROG: Requesting Loco Session for DCC address {dcc_address}")
         # Check if the DCC address is already in use - if so there is an active session so we error
         if not str(dcc_address) in locomotive_sessions.keys():
@@ -1081,6 +1094,8 @@ def request_loco_session(dcc_address:int):
         else:
             # Return Session ID of zero (could not create session)
             logging.error(f"Pi-SPROG: request_loco_session - DCC Address {dcc_address} is already allocated to a loco session")
+    else:
+        logging.warning(f"Pi-SPROG: Failed to Request Session for DCC address {dcc_address} - SPROG is disconnected / DCC Power is Off")
     return(session_id_to_return)
 
 #------------------------------------------------------------------------------
@@ -1107,7 +1122,8 @@ def release_loco_session(session_id:int):
     global locomotive_sessions
     if not isinstance(session_id, int):
         logging.error(f"Pi-SPROG: release_loco_session - Invalid Session ID {session_id} - must be an int")
-    else:
+    # Only try to send the command if the PI-SPROG-3 is connected
+    elif serial_port.is_open:
         logging.debug(f"Pi-SPROG: Releasing Loco Session {session_id}")
         # Check that the session is still active (in our list of active sessions)
         dcc_address = find_dcc_address_for_session(session_id)
@@ -1127,6 +1143,8 @@ def release_loco_session(session_id:int):
             del(locomotive_sessions[str(dcc_address)])
         else:
             logging.error(f"Pi-SPROG: release_loco_session - Session ID {session_id} not found")
+    else:
+        logging.warning(f"Pi-SPROG: Failed to Release Loco Session {session_id} - SPROG is disconnected")
     return()
 
 #------------------------------------------------------------------------------
@@ -1187,7 +1205,8 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool):
         logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid Session ID {session_id} - must be an int")
     elif not isinstance(speed, int) or speed < 0 or speed > 127:
         logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Invalid speed for session {session_id} - must be an int (0-127)")
-    else:
+    # Only try to send the command if the PI-SPROG-3 is connected
+    elif serial_port.is_open:
         # Direction bit: 1 for Forward, 0 for Reverse
         # Speed is in the range 0-127 where 0 is normal Stop and 1 is Emergency Stop
         dcc_address = find_dcc_address_for_session(session_id)
@@ -1201,6 +1220,8 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool):
             else: send_cbus_command(1, 1, 0x47, session_id, speed_byte)
         else:
             logging.error(f"Pi-SPROG: set_loco_speed_and_direction - Session {session_id} not found")
+    else:
+        logging.warning(f"Pi-SPROG: Failed to set speed and direction for Session {session_id} - SPROG is disconnected")
     return()
 
 #------------------------------------------------------------------------------
@@ -1213,7 +1234,8 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
         logging.error(f"Pi-SPROG: set_loco_function - Invalid Session ID {session_id} - must be an int")
     elif not isinstance(function_id, int) or function_id < 0 or function_id > 28:
         logging.error(f"Pi-SPROG: set_loco_function - Invalid function ID {function_id} for session {session_id} - must be 0-28")
-    else:
+    # Only try to send the command if the PI-SPROG-3 is connected
+    elif serial_port.is_open:
         # Check if the session is valid before sending
         dcc_address = find_dcc_address_for_session(session_id)
         if dcc_address > 0:
@@ -1273,6 +1295,8 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
                 logging.debug(f"Pi-SPROG: Locomotive Session {session_id} (Addr {dcc_address}) Function F{function_id} set to {'ON' if state else 'OFF'}")
         else:
             logging.error(f"Pi-SPROG: set_loco_function - Session {session_id} not found")
+    else:
+        logging.warning(f"Pi-SPROG: Failed to set loco function for Session {session_id} - SPROG is disconnected")
     return()
 
 #------------------------------------------------------------------------------
@@ -1281,7 +1305,11 @@ def set_loco_function(session_id:int, function_id:int, state:bool, suppress_logg
 #------------------------------------------------------------------------------
 
 def send_emergency_stop_all():
-    send_cbus_command(0, 0, 0x06)
+    # Only try to send the command if the PI-SPROG-3 is connected
+    if serial_port.is_open:
+        send_cbus_command(0, 0, 0x06)
+    else:
+        logging.warning("Pi-SPROG: Failed to send Emergency Stop message - SPROG is disconnected")
     return()
 
 #------------------------------------------------------------------------------
@@ -1462,7 +1490,8 @@ dcc_sound_mappings = {}
 # API function to add a new DCC sound file mapping
 def add_dcc_sound_mapping(address:int, state:bool, fully_qualified_sound_filename:str):
     global dcc_sound_mappings
-    dcc_sound_mappings[address] = [state, fully_qualified_sound_filename]
+    key = str(address)+"-"+str(state)
+    dcc_sound_mappings[key] = fully_qualified_sound_filename
     return()
 
 # API function to delete all DCC sound file mappings
@@ -1473,10 +1502,12 @@ def reset_dcc_sound_mappings():
 
 # Internal function to play a sound file if a mapping exists for the DCC command
 def play_dcc_sound_file(address:int, active:bool):
-    if address in dcc_sound_mappings.keys() and active == dcc_sound_mappings[address][0]:
-        dcc_sound_file_to_load_and_play = dcc_sound_mappings[address][1]
+    key = str(address)+"-"+str(active)
+    if key in dcc_sound_mappings.keys():
+        dcc_sound_file_to_load_and_play = dcc_sound_mappings[key]
         logging.debug("Pi-SPROG: Triggering sound file: "+dcc_sound_file_to_load_and_play)
         try:
+            print(dcc_sound_file_to_load_and_play)
             audio_object = pygame.mixer.Sound(str(dcc_sound_file_to_load_and_play))
             audio_object.play()
         except Exception as exception:
