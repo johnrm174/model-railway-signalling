@@ -100,7 +100,9 @@ def mqtt_messaging_tests():
     assert mqtt_connected
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_2", "node1", 1, message_callback, subtopics=True)
     assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 2
-    print("Library Tests - resubscribe on disconnect/reconnect - 3 Info and 7 Debug messages will be generated")
+    print("Library Tests - resubscribe on disconnect/reconnect - 1 Info and 7 Debug messages will be generated")
+    mqtt_interface.mqtt_broker_disconnect()
+    time.sleep(2.0)
     logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, mqtt_status_callback, "user1", "password1") # success
     time.sleep(2.0)
@@ -142,8 +144,8 @@ def mqtt_messaging_tests():
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(0)
     system_test_harness.assert_warning_logs_generated(0)
-    system_test_harness.assert_debug_logs_generated(32)
-    system_test_harness.assert_info_logs_generated(3)
+    system_test_harness.assert_debug_logs_generated(30)
+    system_test_harness.assert_info_logs_generated(2)
 
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests

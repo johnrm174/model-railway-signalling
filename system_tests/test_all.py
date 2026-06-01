@@ -4,7 +4,10 @@
 
 import system_test_harness
 
-import basic_library_tests1
+import library_tests_dcc_control
+import library_tests_gpio_interface
+import library_tests_mqtt_interface
+import library_tests_sprog_interface
 import basic_library_tests2
 import basic_library_tests3
 
@@ -25,9 +28,11 @@ import test_mqtt_networking_example
 import test_load_layout_failures
 
 def run_all_tests():
-    print("*** Running tests from 'basic_library_tests1.py' ***")
-    basic_library_tests1.run_all_basic_library_tests()
-    system_test_harness.report_results()
+    print("*** Running Library Tests ***")
+    library_tests_dcc_control.run_all_tests()
+    library_tests_gpio_interface.run_all_tests()
+    library_tests_mqtt_interface.run_all_tests()
+    library_tests_sprog_interface.run_all_tests()
     
     if system_test_harness.test_failures == 0:
         print("*** Running tests from 'basic_library_tests2.py' ***")
