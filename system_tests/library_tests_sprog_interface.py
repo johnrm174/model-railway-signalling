@@ -116,7 +116,8 @@ def sprog_short_accessory_tests(baud_rate):
     system_test_harness.reset_log_counters()
     assert pi_sprog_interface.sprog_connect("/dev/serial0", baud_rate, 1, False)
     assert pi_sprog_interface.request_dcc_power_on()
-    print("Library Tests - send_accessory_short_event - 3 Errors should be generated")
+    print("Library Tests - send_accessory_short_event - 3 Errors and 15 Debug messages should be generated")
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     pi_sprog_interface.send_accessory_short_event("1", True)    # Fail - address not int
     pi_sprog_interface.send_accessory_short_event(2048, True)   # Fail - address invalid
     pi_sprog_interface.send_accessory_short_event(1, "True")    # Fail - state invalid
@@ -135,28 +136,38 @@ def sprog_short_accessory_tests(baud_rate):
     pi_sprog_interface.send_accessory_short_event(6, False)
     pi_sprog_interface.send_accessory_short_event(7, False)
     pi_sprog_interface.send_accessory_short_event(8, False)
-    print("Library Tests - send_accessory_short_event - Test different addressing modes")
-    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 2, True)
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
+    print("Library Tests - send_accessory_short_event - Test different addressing modes - 4 Debug messages should be generated")
+    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 2, False)
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     pi_sprog_interface.send_accessory_short_event(5, True)
     pi_sprog_interface.send_accessory_short_event(5, False)
-    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 3, True)
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
+    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 3, False)
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     pi_sprog_interface.send_accessory_short_event(5, True)
     pi_sprog_interface.send_accessory_short_event(5, False)
-    print("Library Tests - negative tests - sending commands when DCC power is off - No Warnings")
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
+    print("Library Tests - negative tests - sending commands when DCC power is off - 2 Debug messages should be generated")
     assert pi_sprog_interface.request_dcc_power_off()
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     pi_sprog_interface.send_accessory_short_event(8, True)
     pi_sprog_interface.send_accessory_short_event(8, False)
-    print("Library Tests - negative tests - sending commands when SPROG disconnected - No Warnings")
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
+    print("Library Tests - negative tests - sending commands when SPROG disconnected - 2 Debug messages should be generated")
     assert pi_sprog_interface.sprog_disconnect()
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     pi_sprog_interface.send_accessory_short_event(8, True)
     pi_sprog_interface.send_accessory_short_event(8, False)
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(3)
     system_test_harness.assert_warning_logs_generated(0)
+    system_test_harness.assert_debug_logs_generated(19)
 
 def sprog_loco_control_tests(baud_rate):
     system_test_harness.reset_log_counters()
-    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 1, True)
+    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, 1, False)
     assert pi_sprog_interface.request_dcc_power_on()
     print("Library Tests - request_loco_session - 4 Errors should be generated")
     assert pi_sprog_interface.request_loco_session("100") == 0              # Error (address not an int)
@@ -167,7 +178,8 @@ def sprog_loco_control_tests(baud_rate):
     assert pi_sprog_interface.request_loco_session(100) == 0                # Error (session already exists)
     session_id2 = pi_sprog_interface.request_loco_session(1000)             # Success
     assert session_id2 > 0
-    print("Library Tests - set_loco_speed_and_direction - 4 Errors should be generated")
+    print("Library Tests - set_loco_speed_and_direction - 4 Errors and 4 Debug messages should be generated")
+    logging.getLogger().setLevel(logging.DEBUG) #################################################################################
     pi_sprog_interface.set_loco_speed_and_direction("100", 0, True)           # Error (session not an int)
     pi_sprog_interface.set_loco_speed_and_direction(100, 100, True)           # Error (session does not exist)
     pi_sprog_interface.set_loco_speed_and_direction(session_id1, -1, True)    # Error (speed out of range)
@@ -176,7 +188,7 @@ def sprog_loco_control_tests(baud_rate):
     pi_sprog_interface.set_loco_speed_and_direction(session_id2, 50, True)    # success
     pi_sprog_interface.set_loco_speed_and_direction(session_id1, 1, True)     # success (loco emergency stop)
     pi_sprog_interface.set_loco_speed_and_direction(session_id2, 1, True)     # success (loco emergency stop)
-    print("Library Tests - set_loco_function - 5 Errors should be generated")
+    print("Library Tests - set_loco_function - 5 Errors and 10 Debug messages should be generated")
     pi_sprog_interface.set_loco_function("100", 0, True)           # Error (session not an int)
     pi_sprog_interface.set_loco_function(100, 0, True)             # Error (session does not exist)
     pi_sprog_interface.set_loco_function(session_id1, "0", True)   # Error (Func ID not an int)
@@ -193,20 +205,22 @@ def sprog_loco_control_tests(baud_rate):
     pi_sprog_interface.set_loco_function(session_id1, 10, False)    # Success
     pi_sprog_interface.set_loco_function(session_id1, 14, False)    # Success
     pi_sprog_interface.set_loco_function(session_id1, 22, False)    # Success
-    # Excersise the keep alive code
+    print("Library Tests - Exercise the Keep Alive code - no errors or warnings")
     time.sleep(10.0)
     print("Library Tests - send_emergency_stop_all - no errors or warnings")
     pi_sprog_interface.send_emergency_stop_all()
-    print("Library Tests - release_loco_session - 2 Errors should be generated")
+    print("Library Tests - release_loco_session - 2 Errors and 3 Debug messages should be generated")
     pi_sprog_interface.release_loco_session("100")              # Error (Session ID not an int)
     pi_sprog_interface.release_loco_session(100)                # Error (Session ID does not exist)
     pi_sprog_interface.release_loco_session(session_id2)        # Success
-    print("Library Tests - negative tests - Sending commands when DCC power is off - 1 Warning and 3 Errors should be generated")
+    print("Library Tests - Release locos on DCC Power off - 2 Errors, 1 Info and 5 Debug messages should be generated")
     assert pi_sprog_interface.request_dcc_power_off()
+    print("Library Tests - negative tests - Sending commands when DCC power is off - 1 Warning and 3 Errors should be generated")
     session_id3 = pi_sprog_interface.request_loco_session(1000)            # Warning - DCC Power is Off
     pi_sprog_interface.set_loco_function(session_id3, 2, True)             # Error - session does not exist
     pi_sprog_interface.set_loco_speed_and_direction(session_id3, 50, True) # Error - session does not exist
     pi_sprog_interface.release_loco_session(session_id3)                   # Error - session does not exist
+    logging.getLogger().setLevel(logging.WARNING) #################################################################################
     print("Library Tests - negative tests - sending commands when SPROG disconnected - 5 Warnings should be generated")
     assert pi_sprog_interface.sprog_disconnect()
     session_id3 = pi_sprog_interface.request_loco_session(1000)              # Error
@@ -217,6 +231,8 @@ def sprog_loco_control_tests(baud_rate):
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(18)
     system_test_harness.assert_warning_logs_generated(6)
+    system_test_harness.assert_info_logs_generated(1)
+    system_test_harness.assert_debug_logs_generated(22)
 
 def sound_file_playback_tests():
     system_test_harness.reset_log_counters()
