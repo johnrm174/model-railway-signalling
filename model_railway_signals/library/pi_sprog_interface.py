@@ -1124,14 +1124,15 @@ def release_loco_session(session_id:int):
         logging.error(f"Pi-SPROG: release_loco_session - Invalid Session ID {session_id} - must be an int")
     # Only try to send the command if the PI-SPROG-3 is connected
     elif serial_port.is_open:
-        logging.debug(f"Pi-SPROG: Releasing Loco Session {session_id}")
         # Check that the session is still active (in our list of active sessions)
         dcc_address = find_dcc_address_for_session(session_id)
         if dcc_address > 0:
             # Set speed and direction to zero (to force a known state)
             set_loco_speed_and_direction(session_id, 0, False)
             # Turn all the functions off (to force a known state)
+            logging.debug(f"Pi-SPROG: Locomotive Session {session_id}: Turning off all functions")
             for function in range(29): set_loco_function(session_id, function, False, suppress_logging=True)
+            logging.debug(f"Pi-SPROG: Releasing Locomotive Session {session_id}")
             # Kill the heartbeat thread 
             heartbeat = locomotive_sessions[str(dcc_address)]["heartbeat"]
             common.root_window.after_cancel(heartbeat)
@@ -1214,7 +1215,7 @@ def set_loco_speed_and_direction(session_id:int, speed:int, forward:bool):
             dir_val = 128 if forward else 0
             # DCC Speed 1 is usually Emergency Stop, so we map 0-127
             speed_byte = (speed & 0x7F) | dir_val
-            logging.debug(f"Pi-SPROG: Locomotive Session {session_id} Speed {speed} Forward {forward}")
+            logging.debug(f"Pi-SPROG: Locomotive Session {session_id}: Speed {speed} Forward {forward}")
             # Use a higher priority for the Loco emergency stop
             if speed == 1: send_cbus_command(1, 0, 0x47, session_id, speed_byte)
             else: send_cbus_command(1, 1, 0x47, session_id, speed_byte)
@@ -1507,7 +1508,6 @@ def play_dcc_sound_file(address:int, active:bool):
         dcc_sound_file_to_load_and_play = dcc_sound_mappings[key]
         logging.debug("Pi-SPROG: Triggering sound file: "+dcc_sound_file_to_load_and_play)
         try:
-            print(dcc_sound_file_to_load_and_play)
             audio_object = pygame.mixer.Sound(str(dcc_sound_file_to_load_and_play))
             audio_object.play()
         except Exception as exception:
