@@ -259,6 +259,8 @@ def create_colour_light_signal (canvas, sig_id:int,
         if loaded_state["releaseonyel"]: signals.set_approach_control(sig_id,release_on_yellow=True)
         if loaded_state["theatretext"]: signals.set_route(sig_id, theatre_text=loaded_state["theatretext"])
         if loaded_state["override"]: signals.set_signal_override(sig_id)
+        if loaded_state["overridesub"]: signals.set_subsidary_override(sig_id)
+        if loaded_state["overcaution"]: signals.set_signal_override_caution(sig_id)
         # If no state was loaded, but the signal is 'automatic' then toggle the signal to 'OFF'
         if loaded_state["sigclear"] or fully_automatic: signals.toggle_signal(sig_id)
         # finally Lock the signal if required

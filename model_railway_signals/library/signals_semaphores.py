@@ -366,6 +366,8 @@ def create_semaphore_signal(canvas, sig_id:int,
         if loaded_state["releaseonyel"]: signals.set_approach_control(sig_id,release_on_yellow=True)
         if loaded_state["theatretext"]: signals.set_route(sig_id, theatre_text=loaded_state["theatretext"])
         if loaded_state["override"]: signals.set_signal_override(sig_id)
+        if loaded_state["overridesub"]: signals.set_subsidary_override(sig_id)
+        if loaded_state["overcaution"]: signals.set_signal_override_caution(sig_id)
         # If no state was loaded, but the signal is 'automatic' then we need to set the appropriate signal
         # arm to 'OFF'. Note that we Set the signal arm to the "wrong" initial state so that when we
         # toggle the signal this ensures the appropriate DCC commands and MQTT Messages are sent out.
