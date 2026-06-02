@@ -203,10 +203,10 @@ def update_lever_styles_tests():
     system_test_harness.assert_warning_logs_generated(0)
 
 def editor_mode_change_tests():
-    print("Library Tests - hide/unhide levers in Run Mode - No errors or warnings")
     system_test_harness.reset_log_counters()
     assert len(levers.levers) == 0    
     canvas = schematic.canvas
+    print("Library Tests - hide/unhide levers in Run Mode - No errors or warnings")
     # Select Edit mode and then create a 'hidden' lever in Edit Mode
     common.configure_edit_mode(edit_mode=True)
     levers.create_lever(canvas, 1, levers.lever_type.spare, 200, 100, lever_callback, hide_buttons=True)
@@ -254,6 +254,7 @@ def editor_mode_change_tests():
     levers.delete_lever(2)
     levers.delete_lever(5)
     assert len(levers.levers) == 0
+    levers.configure_edit_mode(edit_mode=False)
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(0)
     system_test_harness.assert_warning_logs_generated(0)

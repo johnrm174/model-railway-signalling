@@ -9,8 +9,10 @@ import library_tests_buttons
 import library_tests_dcc_control
 import library_tests_gpio_interface
 import library_tests_levers
+import library_tests_lines
 import library_tests_mqtt_interface
 import library_tests_sprog_interface
+import library_tests_text_boxes
 ###import basic_library_tests2
 import basic_library_tests3
 
@@ -34,12 +36,19 @@ def run_all_tests():
     print("*** Running Library Tests ***")
     library_tests_block_instruments.run_all_tests()
     library_tests_buttons.run_all_tests()
+    # Common ???????
     library_tests_dcc_control.run_all_tests()
+    # File Interface
     library_tests_gpio_interface.run_all_tests()
     library_tests_levers.run_all_tests()
-    
+    library_tests_lines.run_all_tests()
+    # loco_control
     library_tests_mqtt_interface.run_all_tests()
+    # Points
     library_tests_sprog_interface.run_all_tests()
+    library_tests_text_boxes.run_all_tests()
+    # Track Sections
+    # Track Sensors
     
     if system_test_harness.test_failures == 0:
         print("*** Running tests from 'basic_library_tests2.py' ***")

@@ -14,33 +14,36 @@ from model_railway_signals.editor import schematic
 # Test Text Box Library objects
 #---------------------------------------------------------------------------------------------------------
     
-def run_text_box_library_tests():
+def textbox_create_and_delete_tests():
     system_test_harness.reset_log_counters()
-    # Test all functions - including negative tests for parameter validation
-    print("Library Tests - Text Box Objects")
+    assert len(text_boxes.text_boxes) == 0    
     canvas = schematic.canvas
-    # create_track_sensor
     print("Library Tests - create_text_box - will generate 3 errors:")
-    assert len(track_sensors.track_sensors) == 0    
+    assert len(text_boxes.text_boxes) == 0    
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # success
     text_boxes.create_text_box(canvas, "2", 200, 100, text="Textbox 1")    # Fail - not an int
     text_boxes.create_text_box(canvas, 0, 200, 100, text="Textbox 1")      # Fail - out of range
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # Fail - duplicate
     assert len(text_boxes.text_boxes) == 1
-    # track_sensor_exists
     print("Library Tests - text_box_exists - will generate 1 error:")
-    assert text_boxes.text_box_exists(1)         # True (exists)
+    assert text_boxes.text_box_exists(1)            # True (exists)
     assert not text_boxes.text_box_exists("1")      # False - with error message (not int)
     assert not text_boxes.text_box_exists(0)        # False - no error message
     assert not text_boxes.text_box_exists(100)      # False - no error message
-    # delete_track_sensor - reset_sensor_button function should not generate any exceptions
     print("Library Tests - delete_text_box - will generate 2 errors:")
     text_boxes.delete_text_box("1")        # Fail - not an int
     text_boxes.delete_text_box(100)        # Fail - does not exist
     text_boxes.delete_text_box(1)          # success
+    assert not text_boxes.text_box_exists(1)
     assert len(text_boxes.text_boxes) == 0
-    assert not text_boxes.text_box_exists(1)       
-    # configure_edit_mode - this is an internal library function
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(6)
+    system_test_harness.assert_warning_logs_generated(0)
+    
+def editor_mode_change_tests():
+    system_test_harness.reset_log_counters()
+    assert len(text_boxes.text_boxes) == 0
+    canvas = schematic.canvas    
     print("Library Tests - configure_edit_mode - No Errors or Warnings")
     text_boxes.configure_edit_mode(edit_mode=False)
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")
@@ -61,6 +64,23 @@ def run_text_box_library_tests():
     assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"state") == "hidden"
     assert canvas.itemcget(text_boxes.text_boxes[str(3)]["textwidget"],"state") == "normal"
     assert canvas.itemcget(text_boxes.text_boxes[str(4)]["textwidget"],"state") == "hidden"
+    # Cleanup
+    text_boxes.delete_text_box(1)
+    text_boxes.delete_text_box(2)
+    text_boxes.delete_text_box(3)
+    text_boxes.delete_text_box(4)
+    assert len(text_boxes.text_boxes) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
+    
+def update_textbox_styles_tests():
+    system_test_harness.reset_log_counters()
+    assert len(text_boxes.text_boxes) == 0
+    canvas = schematic.canvas    
+    text_boxes.configure_edit_mode(edit_mode=False)
+    text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")
+    text_boxes.create_text_box(canvas, 2, 200, 100, text="Textbox 2", hidden=True)
     print("Library Tests - update_text_box_styles - Run Mode / Not Hidden - will generate 2 errors:")
     text_boxes.update_text_box_styles("1", colour="Red", background="Blue", borderwidth=2)    # Not an int
     text_boxes.update_text_box_styles(99, colour="Red", background="Blue", borderwidth=2)     # Does not exist
@@ -84,26 +104,26 @@ def run_text_box_library_tests():
     assert canvas.itemcget(text_boxes.text_boxes[str(2)]["textwidget"],"fill") == "Blue"
     assert canvas.itemcget(text_boxes.text_boxes[str(2)]["rectangle"],"fill") == "Black"
     assert canvas.itemcget(text_boxes.text_boxes[str(2)]["rectangle"],"width") == "2.0"
-    # Clean up
-    text_boxes.delete_text_box(1) 
+    # Cleanup
+    text_boxes.delete_text_box(1)
     text_boxes.delete_text_box(2)
-    text_boxes.delete_text_box(3) 
-    text_boxes.delete_text_box(4)
-    # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(text_boxes.text_boxes) == 0
+    text_boxes.configure_edit_mode(edit_mode=False)
     # Check the total number of Log Messages generated
-    system_test_harness.assert_error_logs_generated(8)
+    system_test_harness.assert_error_logs_generated(2)
     system_test_harness.assert_warning_logs_generated(0)
     
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
-def run_all_tests()
+def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Textbox Object Tests")
     print("----------------------------------------------------------------------------------------")
-    run_text_box_library_tests()
+    textbox_create_and_delete_tests()
+    editor_mode_change_tests()
+    update_textbox_styles_tests()
     system_test_harness.report_results()
     print("")
 
