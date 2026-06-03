@@ -20,18 +20,16 @@ def track_sensor_callback(sensor_id):
     
 def run_track_sensor_library_tests():
     system_test_harness.reset_log_counters()
-    # Test all functions - including negative tests for parameter validation
-    print("Library Tests - Track Sensor Objects")
     canvas = schematic.canvas
-    # create_track_sensor
-    print("Library Tests - create_track_sensor - will generate 3 errors:")
     assert len(track_sensors.track_sensors) == 0    
+    print("Library Tests - create_track_sensor - will generate 3 errors:")
+    # Create objects in Run Mode (should already be set but just to make sure)
+    track_sensors.configure_edit_mode(False)
     track_sensors.create_track_sensor(canvas, sensor_id=10, x=100, y=100, callback=track_sensor_callback)    # success
     track_sensors.create_track_sensor(canvas, sensor_id=0, x=100, y=100, callback=track_sensor_callback)     # Fail (<1)
     track_sensors.create_track_sensor(canvas, sensor_id="10", x=100, y=100, callback=track_sensor_callback)  # Fail (not int)
     track_sensors.create_track_sensor(canvas, sensor_id=10, x=100, y=100, callback=track_sensor_callback)    # fail (duplicate)
     assert len(track_sensors.track_sensors) == 1
-    # track_sensor_exists
     print("Library Tests - track_sensor_exists - will generate 1 error:")
     assert track_sensors.track_sensor_exists(10)        # True (exists)
     assert not track_sensors.track_sensor_exists("10")  # False - with error message (not int)
@@ -77,7 +75,7 @@ def run_track_sensor_library_tests():
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
-def run_all_tests()
+def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Track Sensor Object Tests")
     print("----------------------------------------------------------------------------------------")

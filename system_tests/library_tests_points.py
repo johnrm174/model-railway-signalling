@@ -28,6 +28,8 @@ def point_create_and_delete_tests():
     assert len(points.points) == 0
     # Point ID and point_type combinations
     print("Library Tests - create_point - will generate 9 errors:")
+    # Create objects in Run Mode (should already be set but just to make sure)
+    points.configure_edit_mode(False)
     points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 50, 100, point_callback, fpl_callback, fpl=True, orientation=0)  # Valid
     points.create_point(canvas, 11, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, fpl=True, orientation=90)  # Valid
     points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 150, 100, point_callback, fpl_callback, fpl=True, orientation=180)  # Valid

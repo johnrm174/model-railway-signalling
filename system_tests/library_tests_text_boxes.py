@@ -19,7 +19,8 @@ def textbox_create_and_delete_tests():
     assert len(text_boxes.text_boxes) == 0    
     canvas = schematic.canvas
     print("Library Tests - create_text_box - will generate 3 errors:")
-    assert len(text_boxes.text_boxes) == 0    
+    # Create objects in Run Mode (should already be set but just to make sure)
+    text_boxes.configure_edit_mode(False)
     text_boxes.create_text_box(canvas, 1, 100, 100, text="Textbox 1")      # success
     text_boxes.create_text_box(canvas, "2", 200, 100, text="Textbox 1")    # Fail - not an int
     text_boxes.create_text_box(canvas, 0, 200, 100, text="Textbox 1")      # Fail - out of range

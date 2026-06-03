@@ -29,6 +29,8 @@ def lever_create_and_delete_tests():
     assert len(levers.levers) == 0    
     canvas = schematic.canvas
     print("Library Tests - create_lever - will generate 4 errors:")
+    # Create objects in Run Mode (should already be set but just to make sure)
+    levers.configure_edit_mode(False)
     assert len(levers.levers) == 0    
     levers.create_lever(canvas, 1, levers.lever_type.spare, 100, 100, lever_callback)         # success
     levers.create_lever(canvas, 2, levers.lever_type.stopsignal, 125, 100, lever_callback)    # success

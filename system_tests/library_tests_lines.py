@@ -19,6 +19,8 @@ def line_create_and_delete_tests():
     assert len(lines.lines) == 0    
     canvas = schematic.canvas
     print("Library Tests - create_line - will generate 3 errors:")
+    # Create objects in Run Mode (should already be set but just to make sure)
+    lines.configure_edit_mode(False)
     lines.create_line(canvas, 10, 100, 100, 200, 100, arrow_type=[20,20,5], arrow_ends=0, colour="red")   # success
     lines.create_line(canvas, 11, 100, 150, 200, 150, arrow_type=[20,20,5], arrow_ends=1)                 # success
     lines.create_line(canvas, 12, 100, 200, 200, 200, arrow_type=[20,20,5], arrow_ends=2)                 # success
