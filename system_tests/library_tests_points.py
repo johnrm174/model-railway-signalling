@@ -22,50 +22,95 @@ def fpl_callback(point_id):
     logging_string="FPL Callback from Point "+str(point_id)
     logging.info(logging_string)
     
-def run_point_library_tests():
+def point_create_and_delete_tests():
     system_test_harness.reset_log_counters()
-    # Test all functions - including negative tests for parameter validation
-    print("Library Tests - Point Objects")
     canvas = schematic.canvas
-    # create_point
     assert len(points.points) == 0
     # Point ID and point_type combinations
     print("Library Tests - create_point - will generate 9 errors:")
-    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red") #  Valid
-    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True)  # Valid
-    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)  # Valid
-    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)  # Valid
-    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
-    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)  # Valid
-    points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)  # Valid
-    points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)   # Error (<1)
-    points.create_point(canvas, "15", points.point_type.RH, points.point_subtype.normal,100, 100, point_callback, fpl_callback)  # Error (not int)
-    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error (duplicate)
-    points.create_point(canvas, 17, "random-type", points.point_subtype.normal, 100, 100, point_callback, fpl_callback)  # Error - invalid type
-    points.create_point(canvas, 18, points.point_type.RH,"random-subtype", 100, 100, point_callback, fpl_callback)  # Error - invalid subtype
-    points.create_point(canvas, 19, points.point_type.Y, points.point_subtype.trap, 100, 100, point_callback, fpl_callback)  # Error - Not normal Subtype
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 50, 100, point_callback, fpl_callback, fpl=True, orientation=0)  # Valid
+    points.create_point(canvas, 11, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, fpl=True, orientation=90)  # Valid
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 150, 100, point_callback, fpl_callback, fpl=True, orientation=180)  # Valid
+    points.create_point(canvas, 13, points.point_type.RH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, fpl=True, orientation=270)  # Valid
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 250, 100, point_callback, fpl_callback, fpl=True, orientation=0)  # Valid
+    points.create_point(canvas, 15, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, fpl=True, orientation=90)  # Valid
+    points.create_point(canvas, 16, points.point_type.LH, points.point_subtype.normal, 350, 100, point_callback, fpl_callback, fpl=True, orientation=180)  # Valid
+    points.create_point(canvas, 17, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, fpl=True, orientation=270)  # Valid
+    #
+    points.create_point(canvas, 18, points.point_type.RH, points.point_subtype.normal, 50, 150, point_callback, fpl_callback, orientation=0)  # Valid
+    points.create_point(canvas, 19, points.point_type.RH, points.point_subtype.normal, 100, 150, point_callback, fpl_callback, orientation=90)  # Valid
+    points.create_point(canvas, 20, points.point_type.RH, points.point_subtype.normal, 150, 150, point_callback, fpl_callback, orientation=180)  # Valid
+    points.create_point(canvas, 21, points.point_type.RH, points.point_subtype.normal, 200, 150, point_callback, fpl_callback, orientation=270)  # Valid
+    points.create_point(canvas, 22, points.point_type.LH, points.point_subtype.normal, 250, 150, point_callback, fpl_callback, orientation=0)  # Valid
+    points.create_point(canvas, 23, points.point_type.LH, points.point_subtype.normal, 300, 150, point_callback, fpl_callback, orientation=90)  # Valid
+    points.create_point(canvas, 24, points.point_type.LH, points.point_subtype.normal, 350, 150, point_callback, fpl_callback, orientation=180)  # Valid
+    points.create_point(canvas, 25, points.point_type.LH, points.point_subtype.normal, 400, 150, point_callback, fpl_callback, orientation=270)  # Valid
+    #
+    points.create_point(canvas, 26, points.point_type.Y, points.point_subtype.normal, 50, 200, point_callback, fpl_callback, orientation=0)  # Valid
+    points.create_point(canvas, 27, points.point_type.Y, points.point_subtype.normal, 100, 200, point_callback, fpl_callback, orientation=90)  # Valid
+    points.create_point(canvas, 28, points.point_type.Y, points.point_subtype.normal, 150, 200, point_callback, fpl_callback, orientation=180)  # Valid
+    points.create_point(canvas, 29, points.point_type.Y, points.point_subtype.normal, 200, 200, point_callback, fpl_callback, orientation=270)  # Valid
+    #
+    points.create_point(canvas, 30, points.point_type.RH, points.point_subtype.dslip1, 50, 300, point_callback, fpl_callback, orientation=0)  # Valid
+    points.create_point(canvas, 31, points.point_type.RH, points.point_subtype.dslip1, 100, 300, point_callback, fpl_callback, orientation=90)  # Valid
+    points.create_point(canvas, 32, points.point_type.RH, points.point_subtype.dslip1, 150, 300, point_callback, fpl_callback, orientation=180)  # Valid
+    points.create_point(canvas, 33, points.point_type.RH, points.point_subtype.dslip1, 200, 300, point_callback, fpl_callback, orientation=270)  # Valid
+    points.create_point(canvas, 34, points.point_type.LH, points.point_subtype.dslip1, 250, 300, point_callback, fpl_callback, orientation=0)  # Valid
+    points.create_point(canvas, 35, points.point_type.LH, points.point_subtype.dslip1, 300, 300, point_callback, fpl_callback, orientation=90)  # Valid
+    points.create_point(canvas, 36, points.point_type.LH, points.point_subtype.dslip1, 350, 300, point_callback, fpl_callback, orientation=180)  # Valid
+    points.create_point(canvas, 37, points.point_type.LH, points.point_subtype.dslip1, 400, 300, point_callback, fpl_callback, orientation=270)  # Valid
+    #
+    points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback)   # Error (<1)
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback)  # Error (duplicate)
+    points.create_point(canvas, 100, "random-type", points.point_subtype.normal, 100, 200, point_callback, fpl_callback)  # Error - invalid type
+    points.create_point(canvas, 101, points.point_type.RH,"random-subtype", 100, 200, point_callback, fpl_callback)  # Error - invalid subtype
+    points.create_point(canvas, 102, points.point_type.Y, points.point_subtype.trap, 100, 200, point_callback, fpl_callback)  # Error - Not normal Subtype
+    points.create_point(canvas, "103", points.point_type.RH, points.point_subtype.normal,100, 200, point_callback, fpl_callback)  # Error (not int)
     # Alsoswitch combinations
-    points.create_point(canvas, 18, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch="10") # Error (not an int)
-    points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=19) # Error (switch itself)
+    points.create_point(canvas, 104, points.point_type.LH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback, also_switch="10") # Error (not an int)
+    points.create_point(canvas, 105, points.point_type.LH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback, also_switch=105) # Error (switch itself)
     # Automatic and FPL combinations
-    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, switched_with=True, fpl=True) # Error
-    assert len(points.points) == 7
-    # point_exists
+    points.create_point(canvas, 106, points.point_type.LH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback, switched_with=True, fpl=True) # Error
+    print(len(points.points))
+    assert len(points.points) == 28
     print("Library Tests - point_exists - will generate 1 error:")
     assert points.point_exists(10)
-    assert points.point_exists(11)
-    assert points.point_exists(12)
-    assert points.point_exists(13)
-    assert points.point_exists(14)
-    assert points.point_exists(15)
-    assert points.point_exists(16)
-    assert not points.point_exists(17)
-    assert not points.point_exists(18)
-    assert not points.point_exists(19)
-    assert not points.point_exists(20)
-    assert not points.point_exists("10") # Invalid (not int)
-    # toggle_point and point/fpl state
+    assert points.point_exists(18)
+    assert points.point_exists(26)
+    assert points.point_exists(30)
+    assert not points.point_exists(100)
+    assert not points.point_exists(101)
+    assert not points.point_exists(102)
+    assert not points.point_exists(103)
+    assert not points.point_exists(104)
+    assert not points.point_exists(105)
+    assert not points.point_exists(106)
+    assert not points.point_exists("106")  # Error - not int
+    print("Library Tests - delete_point - will generate 2 errors:")
+    points.delete_point("10") # Error - Not Int
+    points.delete_point(20)   # Error - does not exist
+    points.delete_point(10)
+    assert not points.point_exists(10)
+    assert points.point_exists(18)
+    assert points.point_exists(26)
+    assert points.point_exists(30)
+    for point_id in range (11,38):
+        points.delete_point(point_id)
+    assert len(points.points) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(12)
+    system_test_harness.assert_warning_logs_generated(0)
+    
+def point_switching_tests():
+    system_test_harness.reset_log_counters()
+    assert len(points.points) == 0
+    canvas = schematic.canvas
     print("Library Tests - point_switched - will generate 2 errors:")
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red")
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True)
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)
     assert not points.point_switched(10)
     assert not points.point_switched(11)
     assert not points.point_switched(12)
@@ -105,7 +150,6 @@ def run_point_library_tests():
     assert not points.point_switched(12)
     assert not points.point_switched(13)
     assert not points.point_switched(14)
-    # FPL specific tests
     print("Library Tests - toggle_fpl - will generate 3 errors and 2 warnings:")
     points.toggle_fpl("10") # Invalid
     points.toggle_fpl(10)   # No FPL
@@ -122,7 +166,7 @@ def run_point_library_tests():
     assert not points.fpl_active(14)
     points.unlock_point(14)
     # Test the button callback functions
-    print("Library Tests - Point button callback functions:")
+    print("Library Tests - Point/FPL button callback functions - no errors or warnings:")
     assert not points.fpl_active(14)
     points.change_button_event(14) # Has FPL - switch point
     assert points.point_switched(14)
@@ -130,17 +174,37 @@ def run_point_library_tests():
     assert not points.point_switched(14)
     points.fpl_button_event(14)   # Has FPL - toggle on FPL
     assert points.fpl_active(14)
-    # Note we leave the FPL off for the next tests to generate warnings
     points.fpl_button_event(14)   # Has FPL - toggle off FPL
-    # Lock Point
+    # Clean up
+    points.delete_point(10)
+    points.delete_point(11)
+    points.delete_point(12)
+    points.delete_point(13)
+    points.delete_point(14)
+    assert len(points.points) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(11)
+    system_test_harness.assert_warning_logs_generated(4)
+
+def point_locking_tests():
+    system_test_harness.reset_log_counters()
+    canvas = schematic.canvas
+    assert len(points.points) == 0
     print("Library Tests - lock_point / point_locked - will generate 2 errors and 1 warning:")
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red")
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True)
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)
     assert not points.point_locked(10)
     assert not points.point_locked(14)
+    # Toggle FPL Off for Point 14 (to generate a warning (see below)
+    points.toggle_fpl(14)
     points.lock_point("10") # Invalid
     points.lock_point(20)   # Does not exist
     points.lock_point(10)
-    points.lock_point(14)   # Warning as FPL is not active (see above)
-    points.lock_point(14)   # No warning as FPL got activated the first time we locked it
+    points.lock_point(14)   # Warning as FPL for Point 14 is not active (see above)
+    points.lock_point(14)   # No warning as FPL got activated by the first lock_point call
     assert points.point_locked(10)
     assert points.point_locked(14)
     print("Library Tests - unlock_point / point_locked- will generate 2 errors:")
@@ -154,8 +218,27 @@ def run_point_library_tests():
     print("Library Tests - point_locked - negative tests - will generate 2 errors:")
     assert not points.point_locked("10") # Invalid
     assert not points.point_locked(20)   # Does not exist
-    # Update autoswitch
+    # Clean up
+    points.delete_point(10)
+    points.delete_point(11)
+    points.delete_point(12)
+    points.delete_point(13)
+    points.delete_point(14)
+    assert len(points.points) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(6)
+    system_test_harness.assert_warning_logs_generated(1)
+     
+def point_autoswitch_tests():
+    system_test_harness.reset_log_counters()
+    canvas = schematic.canvas
+    assert len(points.points) == 0
     print("Library Tests - update_autoswitch - will generate 4 errors:")
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red")
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True)
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, switched_with=True)
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)
     points.update_autoswitch("10", 13) # Error - not an int
     points.update_autoswitch(20, 13)   # Error - Point does not exist
     points.update_autoswitch(12, "19") # Error - alsoswitch not an int
@@ -182,7 +265,39 @@ def run_point_library_tests():
     points.toggle_point(12)
     assert points.point_switched(12)
     assert not points.point_switched(10)
+    print("Library Tests - autoswitch a deleted point - will generate 1 error:")
+    points.delete_point(10)
+    points.toggle_point(12)
+    print("Library Tests - create autoswitched point - will generate 1 warning:")
+    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=21) # Valid
+    points.toggle_point_state(20)
+    points.create_point(canvas, 21, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True) # Valid
+    assert points.point_switched(20)
+    assert points.point_switched(21)
+    points.create_point(canvas, 22, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=21) # Valid
+    assert points.point_switched(20)
+    assert not points.point_switched(21)
+    assert not points.point_switched(21)
+    # Clean up (Note that point 10 has already been deleted above)
+    points.delete_point(11)
+    points.delete_point(12)
+    points.delete_point(13)
+    points.delete_point(14)
+    points.delete_point(20)
+    points.delete_point(21)
+    points.delete_point(22)
+    assert len(points.points) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(7)
+    system_test_harness.assert_warning_logs_generated(1)
+    
+def point_highlighting_tests():
+    system_test_harness.reset_log_counters()
+    canvas = schematic.canvas
+    assert len(points.points) == 0
     print("Library Tests - set_point_colour part1- will generate 2 errors:")
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red")
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl_callback, fpl=True)
     assert not points.point_switched(10)
     assert not points.point_switched(14)
     assert points.fpl_active(14)          # FPL should be active
@@ -286,43 +401,19 @@ def run_point_library_tests():
     assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
     assert canvas.itemcget(points.points[str(14)]["route1"],"fill") == "black"
     assert canvas.itemcget(points.points[str(14)]["route2"],"fill") == "black"
-    print("Library Tests - delete_point - will generate 2 errors:")
-    assert len(points.points) == 7
-    points.delete_point("10")
-    points.delete_point(20)   # does not exist
+    # Clean up
     points.delete_point(10)
-    points.delete_point(11)
-    points.delete_point(13)
     points.delete_point(14)
-    points.delete_point(15)
-    points.delete_point(16)
-    assert not points.point_exists(10)
-    assert not points.point_exists(11)
-    assert not points.point_exists(13)
-    assert not points.point_exists(14)
-    assert len(points.points) == 1
-    print("Library Tests - autoswitch a deleted point - will generate 1 error:")
-    points.toggle_point(12)
-    points.delete_point(12)
-    assert not points.point_exists(12)
     assert len(points.points) == 0
-    print("Library Tests - create autoswitched point - will generate 1 warning:")
-    points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, also_switch=11) # Valid
-    points.toggle_point_state(10)
-    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, switched_with=True) # Valid
-    assert len(points.points) == 2
-    assert points.point_switched(10)
-    assert points.point_switched(11)
-    points.create_point(canvas, 12, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11) # Valid
-    assert points.point_switched(10)
-    assert not points.point_switched(11)
-    assert not points.point_switched(11)
-    print("Library Tests - clean up by deleting all points")
-    points.delete_point(10)
-    points.delete_point(11)
-    points.delete_point(12)
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(8)
+    system_test_harness.assert_warning_logs_generated(0)
+
+def editor_mode_change_tests():
+    system_test_harness.reset_log_counters()
+    canvas = schematic.canvas
     assert len(points.points) == 0
-    print("Library Tests - Run Mode change tests (hidden buttons)")
+    print("Library Tests - Run Mode change tests (hidden buttons) - no errors or warnings")
     # Create points in Run Mode (This is the default mode and we haven't changed it in any other tests)
     points.configure_edit_mode(edit_mode=False)
     points.create_point(canvas, 1, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, fpl=True)
@@ -358,8 +449,47 @@ def run_point_library_tests():
     assert points.points[str(3)]["canvas"].itemcget(points.points[str(3)]["window2"], 'state') == "normal"
     assert points.points[str(4)]["canvas"].itemcget(points.points[str(4)]["window1"], 'state') == "hidden"
     assert points.points[str(4)]["canvas"].itemcget(points.points[str(4)]["window2"], 'state') == "hidden"
+    print("Library Tests - hide/unhide Point IDs in Edit Mode - No errors or warnings")
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="hidden"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="hidden"
+    # Select Edit mode, enable display of IDs  and then create a new Point
+    points.configure_edit_mode(True)
+    points.show_point_ids()
+    points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback)
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="normal"
+    assert canvas.itemcget(points.points["10"]["label1"],"state") =="normal"
+    assert canvas.itemcget(points.points["10"]["label2"],"state") =="normal"
+    # Toggle between modes to test
+    points.hide_point_ids()
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="hidden"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="hidden"
+    assert canvas.itemcget(points.points["10"]["label1"],"state") =="hidden"
+    assert canvas.itemcget(points.points["10"]["label2"],"state") =="hidden"
+    points.show_point_ids()
+    assert canvas.itemcget(points.points["1"]["label1"],"state") =="normal"
+    assert canvas.itemcget(points.points["1"]["label2"],"state") =="normal"
+    assert canvas.itemcget(points.points["10"]["label1"],"state") =="normal"
+    assert canvas.itemcget(points.points["10"]["label2"],"state") =="normal"
+    # Clean up
+    points.delete_point(1)
+    points.delete_point(2)
+    points.delete_point(3)
+    points.delete_point(4)
+    points.delete_point(10)
+    assert len(points.points) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
+    
+def style_update_tests():
+    system_test_harness.reset_log_counters()
+    canvas = schematic.canvas
+    assert len(points.points) == 0
     print("Library Tests - update_point_button_styles - will generate 2 Errors")
-    # Update the styles in Run Mode
+    points.create_point(canvas, 1, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, fpl=True)
+    points.create_point(canvas, 2, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, fpl=True, hide_buttons=True)
+    points.configure_edit_mode(edit_mode=False)
     points.update_point_button_styles("1", button_colour="Green4", active_colour="Green3", selected_colour="Green2",
                                         text_colour="White", font=("TkFixedFont", 10, "bold"))  # Not an Int
     points.update_point_button_styles(99, button_colour="Green4", active_colour="Green3", selected_colour="Green2",
@@ -414,7 +544,6 @@ def run_point_library_tests():
     assert points.points[str(1)]["lockbutton"].cget('foreground') == "Red"
     assert points.points[str(1)]["lockbutton"].cget('background') == "Blue2"
     assert points.points[str(1)]["lockbutton"].cget('activebackground') == "Blue3"
-    
     print("Library Tests - update_point_styles - will generate 2 Errors")
     # Update the styles in Run Mode
     points.update_point_styles("1", colour="Green", line_width=5)  # Not an Int
@@ -437,45 +566,33 @@ def run_point_library_tests():
     assert points.points[str(2)]["canvas"].itemcget(points.points[str(2)]["route1"], 'fill') == "Green"
     assert points.points[str(2)]["canvas"].itemcget(points.points[str(2)]["route2"], 'fill') == "Green"
     # Clean up
+    points.configure_edit_mode(edit_mode=False)
     points.delete_point(1)
     points.delete_point(2)
-    points.delete_point(3)
-    points.delete_point(4)
-    print("Library Tests - hide/unhide Point IDs in Edit Mode - No errors or warnings")
-    # Select Edit mode, enable display of IDs  and then create a new Point
-    points.configure_edit_mode(True)
-    points.show_point_ids()
-    points.create_point(canvas, 1, points.point_type.LH, points.point_subtype.normal, 100, 200, point_callback, fpl_callback)
-    assert canvas.itemcget(points.points["1"]["label1"],"state") =="normal"
-    assert canvas.itemcget(points.points["1"]["label2"],"state") =="normal"
-    # Toggle between modes to test
-    points.hide_point_ids()
-    assert canvas.itemcget(points.points["1"]["label1"],"state") =="hidden"
-    assert canvas.itemcget(points.points["1"]["label2"],"state") =="hidden"
-    points.show_point_ids()
-    assert canvas.itemcget(points.points["1"]["label1"],"state") =="normal"
-    assert canvas.itemcget(points.points["1"]["label2"],"state") =="normal"
-    # Clean up
-    points.delete_point(1)
-    # Double check we have cleaned everything up so as not to impact subsequent tests
     assert len(points.points) == 0
-    # Check the creation of all supported point types
-    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/complex_trackwork.sig")
-    # Now clear down the layout for the next series of tests
-    system_test_harness.initialise_test_harness()
     # Check the total number of Log Messages generated
-    system_test_harness.assert_error_logs_generated(48)
-    system_test_harness.assert_warning_logs_generated(6)
+    system_test_harness.assert_error_logs_generated(4)
+    system_test_harness.assert_warning_logs_generated(0)
 
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
-def run_all_tests()
+def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Point Object Tests")
     print("----------------------------------------------------------------------------------------")
-    run_point_library_tests()
+    point_create_and_delete_tests()
+    point_switching_tests()
+    point_locking_tests()
+    point_autoswitch_tests()
+    point_highlighting_tests()
+    editor_mode_change_tests()
+    style_update_tests()
+    # Check the creation of all supported point types by loading a sig file with all point types
+    system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/complex_trackwork.sig")
+    # Cleanup by creating a 'new' schematic (ready for the next series of tests)
+    system_test_harness.initialise_test_harness()
     system_test_harness.report_results()
     print("")
 
