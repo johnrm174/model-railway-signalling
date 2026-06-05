@@ -231,6 +231,12 @@ def make_vertical(text: str):
 # The double click will only be processed if the track section is occupied
 #---------------------------------------------------------------------------------------------
 
+###############################################################################
+#######  TECH DEBT - consider refactoring to pass in the ######################
+####### 'menubar.loco_control' function as a callback to ######################
+#######  keep the library module dependencies 'clean' #########################
+###############################################################################
+
 def open_throttle_window(section_id:int):
     # This function will be called whenever a Track Section is double clicked, but the first
     # click will already have been processed to toggle the state. The first thing we need to
@@ -637,11 +643,15 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
             button_id_text = make_vertical(format(section_id,'02d'))
             button_height = section_width
             button_width = 1
+            button_pady = 0
+            button_padx = 5
         else:
             button_label = default_label
             button_id_text = format(section_id,'02d')
             button_width = section_width
             button_height = 1
+            button_pady = 1
+            button_padx = 3
         # Specify the various parameters we need for the button/placeholder styles
         selected_fg_colour = text_colour
         deselected_fg_colour = button_colour
@@ -651,7 +661,7 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
             selected_bg_colour = sections[str(section_id)]["highlightcolour"]
         else:
             selected_bg_colour = button_colour
-        # Update the Button Styles depending on the state of the button
+        # Update the Button Colours depending on the state of the button
         if section["occupied"]:
             section["button"].config(background=selected_bg_colour)
             section["button"].config(foreground=selected_fg_colour)
@@ -664,18 +674,27 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
             section["button"].config(activebackground=deselected_bg_colour)
             section["button"].config(activeforeground=deselected_fg_colour)
             section["button"].config(disabledforeground=deselected_fg_colour)
+        # Configure the button geometry (this takes into account its orientation
         section["button"].config(width=button_width)
         section["button"].config(height=button_height)
-        section["button"].config(font=font)
+        section["button"].config(padx=button_padx)
+        section["button"].config(pady=button_pady)
+        # If the existing button_text is still set to the default button text then we
+        # update it to the new default button text. Otherwise we leave it unchanged
+        if section["labeltext"] == section["defaultlabel"]: section["button"].config(text=button_label)
         # Update the Placeholder Styles. This is relatively complex operation as we first
-        # need to ensure the text isn't "hidden" otherwise we will not be able to use the
+        # need to ensure the text box isn't "hidden" otherwise we will not be able to use the
         # 'bbox' method to get the new boundary coordinates (after we have updated the font).
         if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='normal')
+        # Create a dummy label to 'fill' the specified section 'width/height (depending on orientation)
+        if section["vertical"]: edit_label = make_vertical("".zfill(section_width))
+        else: edit_label = "".zfill(section_width)
+        # Update the textbox placeholder (this sets the correct size)
         section["canvas"].itemconfigure(section["placeholder1"], font=font)
         section["canvas"].itemconfigure(section["placeholder1"], fill=selected_fg_colour)
-        section["canvas"].itemconfigure(section["placeholder1"], text=button_label)
+        section["canvas"].itemconfigure(section["placeholder1"], text=edit_label)
         bbox = section["canvas"].bbox(section["placeholder1"])
-        # Now we have the boundary coordinates we can re-hide the placeholder if we are in run mode
+        # Now we have the boundary coordinates we can re-hide the text_box if we are in run mode
         if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='hidden')
         # The second placeholder (the background rectangle) can now be updated as required
         section["canvas"].coords(section["placeholder2"], bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1)
@@ -683,8 +702,6 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
         section["canvas"].itemconfigure(section["placeholder1"], text=button_id_text)
         # Only update the background colour if we are in edit mode (to make it visible)
         if editing_enabled: section["canvas"].itemconfig(section["placeholder2"], fill=deselected_bg_colour)
-        # Update the label text if it is still set to the original default label text
-        if section["labeltext"] == section["defaultlabel"]: update_label(section_id, button_label)
         # Store the parameters we need to track
         sections[str(section_id)]["textfont"] = font
         sections[str(section_id)]["defaultlabel"] = default_label
