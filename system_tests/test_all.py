@@ -15,6 +15,7 @@ import library_tests_mqtt_interface
 import library_tests_points
 import library_tests_sprog_interface
 import library_tests_text_boxes
+import library_tests_track_sections
 import library_tests_track_sensors
 ###import basic_library_tests2
 import basic_library_tests3
@@ -40,18 +41,18 @@ def run_all_tests():
     # Note we immediately abort if any library tests fail
     if system_test_harness.test_failures == 0: library_tests_block_instruments.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_buttons.run_all_tests()
-    # Common ???????
+    # Common #########################################
     if system_test_harness.test_failures == 0: library_tests_dcc_control.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_file_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_gpio_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_levers.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_lines.run_all_tests()
-    # loco_control
+    # loco_control #################################
     if system_test_harness.test_failures == 0: library_tests_mqtt_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_points.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_sprog_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_text_boxes.run_all_tests()
-    # Track Sections
+    if system_test_harness.test_failures == 0: library_tests_track_sectionss.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_track_sensors.run_all_tests()
     
     if system_test_harness.test_failures == 0:

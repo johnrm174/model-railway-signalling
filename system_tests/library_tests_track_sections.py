@@ -25,15 +25,6 @@ def raise_events_to_toggle_section_state(section_id):
 def track_section_callback(section_id):
     logging_string="Track Section Callback from Section "+str(section_id)
     logging.info(logging_string)
-    
-
-#     track_sections.create_section(canvas,1,100,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="box1-50")    # Success
-#     track_sections.create_section(canvas,2,200,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="box1-51")    # Success
-#     track_sections.create_section(canvas,3,300,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="4", hidden=True)  # Success
-#     track_sections.create_section(canvas,4,400,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="3", hidden=True)  # Success
-#     track_sections.create_section(canvas,5,500,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
-#     track_sections.create_section(canvas,6,600,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
-
 
 def create_and_delete_sensors():
     system_test_harness.reset_log_counters()
@@ -42,12 +33,12 @@ def create_and_delete_sensors():
     print("Library Tests - create_section - will generate 8 errors:")
     # Create objects in Run Mode (should already be set but just to make sure)
     track_sections.configure_edit_mode(False)
-    track_sections.create_section(canvas,1,100,100, track_section_callback, "OCCUPIED", editable=True)    # Success
-    track_sections.create_section(canvas,2,200,100, track_section_callback, "OCCUPIED", editable=True)    # Success
-    track_sections.create_section(canvas,3,300,100, track_section_callback, "OCCUPIED", editable=True)    # Success
-    track_sections.create_section(canvas,4,400,100, track_section_callback, "OCCUPIED", editable=True)    # Success
-    track_sections.create_section(canvas,5,500,100, track_section_callback, "OCCUPIED", editable=False)   # Success
-    track_sections.create_section(canvas,6,600,100, track_section_callback, "OCCUPIED", editable=False)   # Success
+    track_sections.create_section(canvas,1,100,100, track_section_callback, "OCCUPIED", editable=True)                         # Success
+    track_sections.create_section(canvas,2,200,100, track_section_callback, "OCCUPIED", editable=True)                         # Success
+    track_sections.create_section(canvas,3,300,100, track_section_callback, "OCCUPIED", editable=True)                         # Success
+    track_sections.create_section(canvas,4,400,100, track_section_callback, "OCCUPIED", editable=True)                         # Success
+    track_sections.create_section(canvas,5,500,100, track_section_callback, "OCCUPIED", editable=False, vertical=True)         # Success
+    track_sections.create_section(canvas,6,600,100, track_section_callback, "OCCUPIED", editable=False, vertical=True)         # Success
     track_sections.create_section(canvas,0,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID out of range
     track_sections.create_section(canvas,6,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID already exists
     track_sections.create_section(canvas,"7",100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")       # Fail - ID not an int
@@ -263,11 +254,11 @@ def mqtt_integration_tests():
     # Set the sections to mirror each other over the network
     track_sections.update_mirrored_section(1,"box1-2") 
     track_sections.update_mirrored_section(2,"box1-1")
-    print ("Library Tests - Test Publishing of Section states on Broker connect - no errors or warnings - 9 Info and 5 Debug messages")
+    print ("Library Tests - Test Publishing of Section states on Broker connect - no errors or warnings - 3 Info and 3 Debug messages")
     logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
     mqtt_interface.mqtt_broker_connect("127.0.0.1",1883)
     time.sleep(5.0)
-    print("Library Tests - Test publishing of events on section creation - no errors or warnings - 1 info and 4 Debug messages")
+    print("Library Tests - Test publishing of events on section creation - no errors or warnings - 2 Debug messages")
     # Create a Section already set to publish state on creation
     track_sections.create_section(canvas,20,300,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="")
     logging.getLogger().setLevel(logging.WARNING) ##############################################################################################    
@@ -287,6 +278,11 @@ def mqtt_integration_tests():
     track_sections.clear_section_occupied(2)
     time.sleep(1.0)
     assert not track_sections.section_occupied(1)
+    print("Library Tests - handle_mqtt_section_updated_event - Negative Testing - 4 warnings will be generated")
+    track_sections.handle_mqtt_section_updated_event(message={"source_identifier":1, "occupied":True})                     # Error
+    track_sections.handle_mqtt_section_updated_event(message={"source_identifier":1, "labeltext":"ABC"})                   # Error
+    track_sections.handle_mqtt_section_updated_event(message={"occupied":True, "labeltext":"ABC"})                         # Error
+    track_sections.handle_mqtt_section_updated_event(message={"source_identifier":8, "occupied":True, "labeltext":"ABC"})  # Error
     print("Library Tests - Reset of MQTT Configuration (no errors or warnings)")
     assert len(track_sections.list_of_sections_to_publish) == 3
     assert len(track_sections.sections) == 5
@@ -300,7 +296,7 @@ def mqtt_integration_tests():
     assert len(track_sections.sections) == 0
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(6)
-    system_test_harness.assert_warning_logs_generated(4)
+    system_test_harness.assert_warning_logs_generated(8)
     system_test_harness.assert_info_logs_generated(3)
     system_test_harness.assert_debug_logs_generated(5)
 
@@ -311,8 +307,8 @@ def update_section_style_tests():
     print("Library Tests - update_section_styles - will generate 2 Errors")
     # Create track sections for the test in Run Mode (This should be the mode we're left in but re-set to make sure)
     track_sections.configure_edit_mode(edit_mode=False)
-    track_sections.create_section(canvas, 1, 100, 100, track_section_callback)
-    track_sections.create_section(canvas, 2, 300, 100, track_section_callback)
+    track_sections.create_section(canvas, 1, 100, 100, track_section_callback,highlight_section=True)
+    track_sections.create_section(canvas, 2, 300, 100, track_section_callback, vertical=True)
     raise_events_to_toggle_section_state(2)
     # Update the styles and check they have been applied
     track_sections.update_section_styles("1", section_width=10, default_label="12345", button_colour="Blue", text_colour="White")  # Not an Int
@@ -323,10 +319,12 @@ def update_section_style_tests():
     assert track_sections.sections[str(1)]["button"].cget('background') == "Blue"
     assert track_sections.sections[str(1)]["button"].cget('text') == "12345"
     assert track_sections.sections[str(1)]["button"].cget('width') == 10
+    assert track_sections.sections[str(1)]["button"].cget('height') == 1
     assert track_sections.sections[str(2)]["button"].cget('foreground') == "White"
     assert track_sections.sections[str(2)]["button"].cget('background') == "Blue"
-    assert track_sections.sections[str(2)]["button"].cget('text') == "12345"
-    assert track_sections.sections[str(2)]["button"].cget('width') == 10
+    assert track_sections.sections[str(2)]["button"].cget('text') == "1\n2\n3\n4\n5"
+    assert track_sections.sections[str(2)]["button"].cget('width') == 1
+    assert track_sections.sections[str(2)]["button"].cget('height') == 10
     # Create track sections for the test in Edit Mode
     track_sections.configure_edit_mode(edit_mode=True)
     track_sections.create_section(canvas, 3, 100, 100, track_section_callback)
@@ -347,16 +345,19 @@ def update_section_style_tests():
     assert track_sections.sections[str(1)]["button"].cget('width') == 10
     assert track_sections.sections[str(2)]["button"].cget('foreground') == "White"
     assert track_sections.sections[str(2)]["button"].cget('background') == "Blue"
-    assert track_sections.sections[str(2)]["button"].cget('text') == "12345"
-    assert track_sections.sections[str(2)]["button"].cget('width') == 10
+    assert track_sections.sections[str(2)]["button"].cget('text') == "1\n2\n3\n4\n5"
+    assert track_sections.sections[str(2)]["button"].cget('width') == 1
+    assert track_sections.sections[str(2)]["button"].cget('height') == 10
     assert track_sections.sections[str(3)]["button"].cget('foreground') == "Yellow"
     assert track_sections.sections[str(3)]["button"].cget('background') == "Yellow"
     assert track_sections.sections[str(3)]["button"].cget('text') == "67890"
+    assert track_sections.sections[str(3)]["button"].cget('height') == 1
     assert track_sections.sections[str(3)]["button"].cget('width') == 10
     assert track_sections.sections[str(4)]["button"].cget('foreground') == "Red"
     assert track_sections.sections[str(4)]["button"].cget('background') == "Yellow"
     assert track_sections.sections[str(4)]["button"].cget('text') == "67890"
     assert track_sections.sections[str(4)]["button"].cget('width') == 10
+    assert track_sections.sections[str(4)]["button"].cget('height') == 1
     # Clean up
     track_sections.delete_section(1)
     track_sections.delete_section(2)
@@ -366,7 +367,6 @@ def update_section_style_tests():
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(2)
     system_test_harness.assert_warning_logs_generated(0)
-    
 
 def drag_and_drop_tests():
     system_test_harness.reset_log_counters()
@@ -398,6 +398,48 @@ def drag_and_drop_tests():
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(0)
     system_test_harness.assert_warning_logs_generated(0)
+
+def edit_section_window_tests():
+    system_test_harness.reset_log_counters()
+    canvas = schematic.canvas
+    assert len(track_sections.sections) == 0
+    print("Library Tests - Test Entry Box Window - No errors or warnings")
+    # Sequence of events: S1_entered => S1_pressed, S1_left1, S1_released => S1_left2 => S2_entered => S2_left 
+    # Note that we get two seperate S1_Left events that we have to handle in the sequence 
+    track_sections.create_section(canvas, 1, 100, 100, track_section_callback, default_label="ABC")
+    track_sections.create_section(canvas, 2, 100, 100, track_section_callback, default_label="DEF")
+    # Section is created unoccupied - if we edit it and cancel then it should remain unoccupied
+    assert track_sections.section_label(1) == "ABC"
+    track_sections.open_entry_box(1)
+    track_sections.close_entry_box(1)
+    assert not track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "ABC"
+    # If unoccupied then the section will open with a blank label, but will be changed to unoccupied and the existing label retained on Apply
+    track_sections.open_entry_box(1)
+    track_sections.accept_entered_value(1)
+    assert not track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "ABC"
+    # If occupied then the section will open with the current label, and the entered label will be applied on Apply
+    track_sections.set_section_occupied(1,"GHJ")
+    track_sections.open_entry_box(1)
+    track_sections.accept_entered_value(1)
+    assert track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "GHJ"
+    # Now test opening an edit window when one is already opened
+    track_sections.open_entry_box(1)
+    track_sections.open_entry_box(2)
+    track_sections.accept_entered_value(2)
+    assert track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "GHJ"
+    assert not track_sections.section_occupied(2)
+    assert track_sections.section_label(2) == "DEF"
+    # Clean up
+    track_sections.delete_section(1)
+    track_sections.delete_section(2)
+    assert len(track_sections.sections) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
     
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
@@ -413,6 +455,7 @@ def run_all_tests():
     update_section_style_tests()
     drag_and_drop_tests()
     mqtt_integration_tests()
+    edit_section_window_tests()
     system_test_harness.report_results()
     print("")
 
