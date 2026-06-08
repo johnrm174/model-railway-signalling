@@ -68,6 +68,9 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Track sections can now be highlighted to show they are occupied (background colour)
 * Timed signal delays (between aspect changes) can now be specified up to 240 seconds
 * Bugfix to colour light timed sequences to ensure that a DANGER aspect takes precidence
+* Bugfix to Throttles to set speed to zero and inhibit selections when DCC power is off
+* Enhancement to occupancy processing to allow track sensors to be used 'back to back' with signals
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
