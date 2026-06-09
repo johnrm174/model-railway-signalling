@@ -450,7 +450,7 @@ class sprog_config_frame(Tk.Frame):
             button_labels=("No Offset", "Plus 4 Offset", "Minus 4 Offset"))
         self.addressmode.pack(padx=2, pady=2)
         self.B2 = Tk.Button (self.frame2, text="Extended help for this setting",
-                             command=lambda:sprog_addressing_information(self.window))
+                             command=lambda:sprog_addressing_information(parent_window))
         self.B2.pack(padx=2, pady=2)
         self.TT2 = common.CreateToolTip(self.B2, "Click for more information on DCC Addressing Modes")
         #----------------------------------------------------------------------------
