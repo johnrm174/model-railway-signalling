@@ -48,6 +48,8 @@ from .scripting import simulate_button_clicked
 
 from .scripting import get_button_state
 from .scripting import get_gpio_port_state
+from .scripting import wait_for_button
+from .scripting import wait_for_gpio_port
 
 from .scripting import request_loco_session
 from .scripting import release_loco_session
@@ -103,6 +105,8 @@ __all__ = [ 'run_editor',
             'set_loco_function',
             'get_button_state',
             'get_gpio_port_state',
+            'wait_for_gpio_port',
+            'wait_for_button',
             'create_throttle',
             'set_throttle_loco',
             'set_throttle_direction',
