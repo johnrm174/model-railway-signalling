@@ -651,14 +651,14 @@ def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callb
 def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=None,retain:bool=False,subtopic=None):
     global mqtt_client
     global node_config
+    item_identifier = create_remote_item_identifier(item_id,node_config["node_identifier"])
+    # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
+    topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
+    if subtopic is not None: topic = topic+"/"+subtopic
+    data["sourceidentifier"] = item_identifier
+    payload = json.dumps(data)
     # Only publish the broker if we are connected
     if node_config["connected_to_broker"]:
-        item_identifier = create_remote_item_identifier(item_id,node_config["node_identifier"])
-        # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
-        topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
-        if subtopic is not None: topic = topic+"/"+subtopic
-        data["sourceidentifier"] = item_identifier
-        payload = json.dumps(data)
         if log_message is not None: logging.debug(log_message)
         if node_config["enhanced_debugging"]:
             logging.debug("MQTT-Client: Publishing to Topic: "+str(topic)+", Message: "+str(payload))
@@ -668,6 +668,8 @@ def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=No
         # the MQTT broker by publishing empty messages on shutdown
         if topic not in node_config["list_of_published_topics"]:
             node_config["list_of_published_topics"].append(topic)
+    elif node_config["enhanced_debugging"]:
+        logging.debug("MQTT-Client: Broker Disconnected - Discarding message: "+str(payload))
     return()
 
 #-----------------------------------------------------------------------------------------------
