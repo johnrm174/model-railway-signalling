@@ -63,13 +63,16 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.3.0.
 > You have been warned!
 
-* Points and signals can now be rotated in 90 degree steps (orientations of 0, 90, 180, 270 degrees)
-* Track sections can now be rotated (i.e. oriented either vertically or horizontally)
-* Track sections can now be highlighted to show they are occupied (background colour)
-* Timed signal delays (between aspect changes) can now be specified up to 240 seconds
-* Bugfix to colour light timed sequences to ensure that a DANGER aspect takes precidence
-* Bugfix to Throttles to set speed to zero and inhibit selections when DCC power is off
-* Enhancement to occupancy processing to allow track sensors to be used 'back to back' with signals
+* Points and signals can now be rotated in 90 degree steps (0/90/180/270 degrees).
+* Track sections can now be rotated (i.e. oriented either vertically or horizontally).
+* Track sections can now be highlighted to show they are occupied (background colour).
+* Timed signal delays (between aspect changes) can now be specified up to 240 seconds.
+* Bugfix to colour light timed sequences - ensure that DANGER aspects take precidence.
+* Bugfix to Throttles - set speed to zero and inhibit selections when DCC power is off.
+* Bugfix to NX Routes - exit buttons disabled during route selection if not viable.
+* Bugfix to NX Routes - Ensure all route buttons are cleared down on layout reset.
+* Bugfix to Lever Interlocking - To take account of lever type (FPL, Point, FPL+Point).
+* Enhancement to occupancy - track sensors can now be used 'back to back' with signals.
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
