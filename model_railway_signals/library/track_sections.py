@@ -679,6 +679,7 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
         section["button"].config(height=button_height)
         section["button"].config(padx=button_padx)
         section["button"].config(pady=button_pady)
+        section["button"].config(font=font)
         # If the existing button_text is still set to the default button text then we
         # update it to the new default button text. Otherwise we leave it unchanged
         if section["labeltext"] == section["defaultlabel"]: section["button"].config(text=button_label)
