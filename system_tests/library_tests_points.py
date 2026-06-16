@@ -3,7 +3,6 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
@@ -584,13 +583,13 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Point Object Tests")
     print("----------------------------------------------------------------------------------------")
-    point_create_and_delete_tests()
-    point_switching_tests()
-    point_locking_tests()
-    point_autoswitch_tests()
-    point_highlighting_tests()
-    editor_mode_change_tests()
-    style_update_tests()
+    system_test_harness.run_function(point_create_and_delete_tests, timeout=20)
+    system_test_harness.run_function(point_switching_tests, timeout=20)
+    system_test_harness.run_function(point_locking_tests, timeout=20)
+    system_test_harness.run_function(point_autoswitch_tests, timeout=20)
+    system_test_harness.run_function(point_highlighting_tests, timeout=20)
+    system_test_harness.run_function(editor_mode_change_tests, timeout=20)
+    system_test_harness.run_function(style_update_tests, timeout=20)
     # Check the creation of all supported point types by loading a sig file with all point types
     system_test_harness.initialise_test_harness(filename="../model_railway_signals/examples/complex_trackwork.sig")
     # Cleanup by creating a 'new' schematic (ready for the next series of tests)

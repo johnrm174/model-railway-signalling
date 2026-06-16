@@ -3,7 +3,6 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
@@ -122,9 +121,9 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Textbox Object Tests")
     print("----------------------------------------------------------------------------------------")
-    textbox_create_and_delete_tests()
-    editor_mode_change_tests()
-    update_textbox_styles_tests()
+    system_test_harness.run_function(textbox_create_and_delete_tests, timeout=20)
+    system_test_harness.run_function(editor_mode_change_tests, timeout=20)
+    system_test_harness.run_function(update_textbox_styles_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 

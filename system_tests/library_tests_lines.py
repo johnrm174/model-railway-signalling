@@ -3,7 +3,6 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
@@ -184,7 +183,7 @@ def editor_mode_change_tests():
     assert len(lines.lines) == 0    
     canvas = schematic.canvas    
     print("Library Tests - hide/unhide Line IDs in Edit Mode - No errors or warnings")
-    text_boxes.configure_edit_mode(edit_mode=False)
+    lines.configure_edit_mode(edit_mode=False)
     lines.create_line(canvas, 1, 100, 100, 200, 100)
     # Select Edit mode, enable display of IDs  and then create a new Line
     lines.configure_edit_mode(True)
@@ -225,11 +224,11 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Line Object Tests")
     print("----------------------------------------------------------------------------------------")
-    line_create_and_delete_tests()
-    move_line_end_tests()
-    update_line_colour_tests()
-    update_line_styles_tests()
-    editor_mode_change_tests()
+    system_test_harness.run_function(line_create_and_delete_tests, timeout=20)
+    system_test_harness.run_function(move_line_end_tests, timeout=20)
+    system_test_harness.run_function(update_line_colour_tests, timeout=20)
+    system_test_harness.run_function(update_line_styles_tests, timeout=20)
+    system_test_harness.run_function(editor_mode_change_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 

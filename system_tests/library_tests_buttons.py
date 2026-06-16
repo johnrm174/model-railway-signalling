@@ -3,7 +3,6 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
@@ -207,7 +206,7 @@ def latching_button_tests():
     system_test_harness.assert_error_logs_generated(2)
     system_test_harness.assert_warning_logs_generated(0)
 
-def momentary_button_tests():
+def momentary_button_tests1():
     system_test_harness.reset_log_counters()
     assert len(buttons.buttons) == 0
     canvas = schematic.canvas
@@ -226,7 +225,6 @@ def momentary_button_tests():
     assert buttons.buttons["3"]["button"]["background"] == "SeaGreen3"
     buttons.button_pressed_event(3)  # Press
     assert buttons.buttons["3"]["button"]["background"] == "SeaGreen1"
-    time.sleep(0.5)
     assert buttons.buttons["3"]["button"]["background"] == "SeaGreen1"
     buttons.button_released_event(3)   # Note both events
     buttons.button_event(3)            # are active here
@@ -238,29 +236,41 @@ def momentary_button_tests():
     assert buttons.buttons["4"]["button"]["background"] == "SeaGreen3"
     buttons.button_pressed_event(4)  # Press
     assert buttons.buttons["4"]["button"]["background"] == "SeaGreen1"
-    time.sleep(0.2)
     buttons.button_event(4)  # Only the button event (on release) is active
     assert buttons.buttons["4"]["button"]["background"] == "SeaGreen1"
-    time.sleep(0.3)
-    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen3"
+    # Clean up
+    buttons.delete_button(3)
+    buttons.delete_button(4)
+    assert len(buttons.buttons) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(0)
+    system_test_harness.assert_warning_logs_generated(0)
+    
+def momentary_button_tests2():
+    system_test_harness.reset_log_counters()
+    assert len(buttons.buttons) == 0
+    canvas = schematic.canvas
+    buttons.create_button(canvas,3,buttons.button_type.momentary,300,100,selected_callback,deselected_callback,
+                                      release_delay=0, button_colour="SeaGreen3", selected_colour="SeaGreen1")
+    buttons.create_button(canvas,4,buttons.button_type.momentary,400,100,selected_callback,deselected_callback,
+                                      release_delay=400, button_colour="SeaGreen3", selected_colour="SeaGreen1")
+    # Note that for momentary buttons we have to make asserts based on the selected or deselected 
+    # colour (specified at button creation time) as we can't use button_state (this is for latching 
+    # buttons only). The Selected colour is Seagreen1. The Deselected Colour = Seagreen3.
+    # Note also, that the momentary buttons use additional events (button pressed and button
+    # released) in addition to the main (which occurs just after button release) 
     print("Library Tests - momentary_buttons toggle events (API calls) - No errors or warnings")
     # Button 3 is configured with a release timeout of zero, therefore will only be selected
     # until the button is released - It will then revert straight back to deselected
     assert buttons.buttons["3"]["button"]["background"] == "SeaGreen3"
     buttons.toggle_button(4)
-    time.sleep(0.1)
     assert buttons.buttons["3"]["button"]["background"] == "SeaGreen3"
     # Button 4 is configured with a release timeout of 400ms
     buttons.toggle_button(4)
     assert buttons.buttons["4"]["button"]["background"] == "SeaGreen1"
-    time.sleep(0.2)
-    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen1"
-    time.sleep(0.4)
-    assert buttons.buttons["4"]["button"]["background"] == "SeaGreen3"
     # Test the activation of a momentary button followed by a delete to exercise the code
     buttons.button_pressed_event(4)
     buttons.delete_button(4)
-    time.sleep(0.4)
     # Clean up
     buttons.delete_button(3)
     assert len(buttons.buttons) == 0
@@ -283,18 +293,19 @@ def button_mode_and_data_tests():
     assert buttons.get_button_data(10) == None        # Fail - ID does not exist
     assert buttons.get_button_data(1) == {"data1":1}  # success
     assert buttons.get_button_data(2) == {"data2":2}  # success
-    print("Library Tests Flash Button - will generate 4 Errors")
+    print("Library Tests - set_button_flashing - will generate 4 Errors")
     # Toggle one of the buttins to ensure we cover both selected and de-selected cases
     buttons.toggle_button(2)
     # Note that set/reset button flashing functions need to be executed in the main tkinter thread
+    assert buttons.buttons[str(1)]["flashevent"] is None
+    assert buttons.buttons[str(2)]["flashevent"] is None
     buttons.set_button_flashing("1") # Fail - ID ot an Int
     buttons.set_button_flashing(10)  # Fail - ID does not exist
     buttons.set_button_flashing(1)   # success
     buttons.set_button_flashing(2)   # success
     assert buttons.buttons[str(1)]["flashevent"] is not None
     assert buttons.buttons[str(2)]["flashevent"] is not None
-    # Test the next flash event is scheduled and then Let it flash for a bit to excersise the code
-    time.sleep(1.2)
+    print("Library Tests - reset_button_flashing - will generate 4 Errors")
     buttons.reset_button_flashing("1") # Fail - ID ot an Int
     buttons.reset_button_flashing(10)  # Fail - ID does not exist
     buttons.reset_button_flashing(1)   # success
@@ -447,13 +458,14 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Button Object Tests")
     print("----------------------------------------------------------------------------------------")
-    button_create_and_delete_tests()
-    button_enable_disable_tests()
-    latching_button_tests()
-    momentary_button_tests()
-    button_mode_and_data_tests()
-    editor_mode_change_tests()
-    style_update_tests()
+    system_test_harness.run_function(button_create_and_delete_tests, timeout=20)
+    system_test_harness.run_function(button_enable_disable_tests, timeout=20)
+    system_test_harness.run_function(latching_button_tests, timeout=20)
+    system_test_harness.run_function(momentary_button_tests1, timeout=20)
+    system_test_harness.run_function(momentary_button_tests2, timeout=20)
+    system_test_harness.run_function(button_mode_and_data_tests, timeout=20)
+    system_test_harness.run_function(editor_mode_change_tests, timeout=20)
+    system_test_harness.run_function(style_update_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 

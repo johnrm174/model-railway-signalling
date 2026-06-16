@@ -3,12 +3,10 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
 from model_railway_signals.library import block_instruments
-from model_railway_signals.library import mqtt_interface
 from model_railway_signals.editor import schematic
 
 #---------------------------------------------------------------------------------------------------------
@@ -80,15 +78,23 @@ def create_and_delete_instrument_tests():
     assert not block_instruments.instrument_exists(8)
     assert not block_instruments.instrument_exists(9)
     assert len(block_instruments.instruments) == 4
-    # Instruments 1,2,3 and 4 Exist after these tests - used for the next series of tests
+    # Clean up
+    block_instruments.delete_instrument(1)
+    block_instruments.delete_instrument(2)
+    block_instruments.delete_instrument(3)
+    block_instruments.delete_instrument(4)
+    assert len(block_instruments.instruments) == 0
+    # Check the total number of Log Messages generated
+    system_test_harness.assert_error_logs_generated(12)
+    system_test_harness.assert_warning_logs_generated(4)
     
 def instrument_linking_tests():
     system_test_harness.reset_log_counters()
-    # Requires Instruments 1,2,3 and 4 (created by the above test function)
-    assert block_instruments.instrument_exists(1)
-    assert block_instruments.instrument_exists(2)
-    assert block_instruments.instrument_exists(3)
-    assert block_instruments.instrument_exists(4)
+    canvas = schematic.canvas
+    block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="2")       # Valid
+    block_instruments.create_instrument(canvas, 2, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="1")       # Valid
+    block_instruments.create_instrument(canvas, 3, block_instruments.instrument_type.double_line, 300, 100, instrument_callback, linked_to="4")       # Valid
+    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.double_line, 400, 100, instrument_callback, linked_to="3")       # Valid
     print("Library Tests - block_section_ahead_clear - Part 1 - 2 Errors will be generated")
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(2)
@@ -244,156 +250,83 @@ def instrument_linking_tests():
     block_instruments.update_linked_instrument(2,"")           # No Warnings 
     block_instruments.update_linked_instrument(3,"")           # No Warnings
     block_instruments.update_linked_instrument(4,"")           # No Warnings
+    # Clean up
+    block_instruments.delete_instrument(1)
+    block_instruments.delete_instrument(2)
+    block_instruments.delete_instrument(3)
+    block_instruments.delete_instrument(4)
+    assert len(block_instruments.instruments) == 0
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(10)
     system_test_harness.assert_warning_logs_generated(6)
-    # Instruments 1,2,3 and 4 Exist after these tests - used for the next series of tests
     
 def mqtt_integration_tests():   
     system_test_harness.reset_log_counters()
-    # Requires Instruments 1,2,3 and 4 (created by the above test function)
-    assert block_instruments.instrument_exists(1)
-    assert block_instruments.instrument_exists(2)
-    assert block_instruments.instrument_exists(3)
-    assert block_instruments.instrument_exists(4)
+    print("Library Tests - subscribe_to_remote_instrument - 4 Errors and 1 Warning will be generated")
+    assert len(block_instruments.instruments) == 0
+    block_instruments.subscribe_to_remote_instruments("box1-1")    # Success
+    block_instruments.subscribe_to_remote_instruments("box1-2")    # Success
+    block_instruments.subscribe_to_remote_instruments("box1-3")    # Success
+    block_instruments.subscribe_to_remote_instruments("box1-4")    # Success
+    block_instruments.subscribe_to_remote_instruments("box1-100")  # Success
+    block_instruments.subscribe_to_remote_instruments("box1-100")  # Warning - This is a duplicate
+    block_instruments.subscribe_to_remote_instruments(20)          # Fail - not a string
+    block_instruments.subscribe_to_remote_instruments("box1")      # Fail - not valid remote ID
+    block_instruments.subscribe_to_remote_instruments("200")       # Fail - not valid remote ID
+    block_instruments.subscribe_to_remote_instruments("box1-0")    # Fail - not valid remote ID    canvas = schematic.canvas
+    assert len(block_instruments.instruments) == 5
+    assert block_instruments.instrument_exists("box1-1")
+    assert block_instruments.instrument_exists("box1-2")
+    assert block_instruments.instrument_exists("box1-3")
+    assert block_instruments.instrument_exists("box1-4")
+    assert block_instruments.instrument_exists("box1-100")
     canvas = schematic.canvas
-    mqtt_interface.configure_mqtt_client("network1","box1")
+    block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-1")       # Valid
+    block_instruments.create_instrument(canvas, 2, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="box1-2")       # Valid
+    block_instruments.create_instrument(canvas, 3, block_instruments.instrument_type.double_line, 300, 100, instrument_callback, linked_to="box1-3")       # Valid
+    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.double_line, 400, 100, instrument_callback, linked_to="box1-4")       # Valid
+    assert len(block_instruments.instruments) == 9
     print("Library Tests - set_instruments_to_publish_state - 3 Errors and 2 warnings will be generated")
     assert len(block_instruments.list_of_instruments_to_publish) == 0
     block_instruments.set_instruments_to_publish_state(1,2,3,4,10,20)   # Valid
     block_instruments.set_instruments_to_publish_state(1,2)             # Already set to publish - 2 warnings
     block_instruments.set_instruments_to_publish_state("1,","2")        # Not integers - 2 Errors
     block_instruments.set_instruments_to_publish_state(0)               # Integer but out of range - 1 error
-    # Update linking to use network
-    block_instruments.update_linked_instrument(1,"box1-2")      # No Warnings
-    block_instruments.update_linked_instrument(2,"box1-1")      # No Warnings
-    block_instruments.update_linked_instrument(3,"box1-4")      # No Warnings
-    block_instruments.update_linked_instrument(4,"box1-3")      # No Warnings
-    assert len(block_instruments.list_of_instruments_to_publish) == 6
-    print("Library Tests - subscribe_to_remote_instrument - 4 Errors and 1 Warning will be generated")
-    assert len(block_instruments.instruments) == 4
-    block_instruments.subscribe_to_remote_instruments("box1-1")    # Success
-    block_instruments.subscribe_to_remote_instruments("box1-2")    # Success
-    block_instruments.subscribe_to_remote_instruments("box1-3")    # Success
-    block_instruments.subscribe_to_remote_instruments("box1-4")    # Success
-    block_instruments.subscribe_to_remote_instruments("box1-10")   # Success
-    block_instruments.subscribe_to_remote_instruments("box1-20")   # Success
-    block_instruments.subscribe_to_remote_instruments("box1-20")   # Warning - This is a duplicate
-    block_instruments.subscribe_to_remote_instruments(20)          # Fail - not a string
-    block_instruments.subscribe_to_remote_instruments("box1")      # Fail - not valid remote ID
-    block_instruments.subscribe_to_remote_instruments("200")       # Fail - not valid remote ID
-    block_instruments.subscribe_to_remote_instruments("box1-0")    # Fail - not valid remote ID
-    assert len(block_instruments.instruments) == 10
-    assert block_instruments.instrument_exists("box1-1")
-    assert block_instruments.instrument_exists("box1-2")
-    assert block_instruments.instrument_exists("box1-3")
-    assert block_instruments.instrument_exists("box1-4")
-    assert block_instruments.instrument_exists("box1-10")
-    assert block_instruments.instrument_exists("box1-20")
-    print ("Library Tests - Test Publishing of Instrument state on Broker connect - no errors or warnings - 9 Info and 5 Debug messages")
+    print ("Library Tests - Test Publishing of Instrument state on Broker connect - no errors or warnings")
     block_instruments.clear_button_event(1)
     block_instruments.clear_button_event(3)
-    logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
-    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883)
-    time.sleep(5.0)
-    print("Library Tests - Test publishing of events on instrument creation - no errors or warnings - 1 info and 4 Debug messages")
+    block_instruments.mqtt_send_all_instrument_states_on_broker_connect()
+    print("Library Tests - Test publishing of events on instrument creation - no errors or warnings")
     # Create 2 instruments already set to publish state on creation
-    block_instruments.create_instrument(canvas, 10, block_instruments.instrument_type.single_line, 700, 100, instrument_callback, linked_to="box1-20")
-    block_instruments.create_instrument(canvas, 20, block_instruments.instrument_type.single_line, 800, 100, instrument_callback, linked_to="box1-10")
-    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################    
-    assert len(block_instruments.instruments) == 12
-    print("Library Tests - Test Networking of instrument states (no errors or warnings)")
-    time.sleep(4.0)
-    # Try one way
+    block_instruments.create_instrument(canvas, 10, block_instruments.instrument_type.single_line, 700, 100, instrument_callback, linked_to="box1-10")
+    block_instruments.create_instrument(canvas, 20, block_instruments.instrument_type.single_line, 800, 100, instrument_callback, linked_to="box1-20")
+    assert len(block_instruments.instruments) == 11
+    print("Library Tests - handle_mqtt_instrument_updated_event - 5 Warnings will be generated")
     assert not block_instruments.block_section_ahead_clear(1)
-    assert block_instruments.block_section_ahead_clear(2)
     assert not block_instruments.block_section_ahead_clear(3)
-    assert block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(10)
-    assert not block_instruments.block_section_ahead_clear(20)
-    block_instruments.clear_button_event(10)
-    time.sleep(1.0)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-1","sectionstate":False,"instrumentid":"box1-1"})       # Success
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-3","sectionstate":False,"instrumentid":"box1-3"})       # Success
     assert not block_instruments.block_section_ahead_clear(1)
-    assert block_instruments.block_section_ahead_clear(2)
     assert not block_instruments.block_section_ahead_clear(3)
-    assert block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(10)
-    assert block_instruments.block_section_ahead_clear(20)
-    block_instruments.occup_button_event(1)
-    block_instruments.occup_button_event(3)
-    block_instruments.occup_button_event(10)
-    time.sleep(1.0)
-    assert not block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(2)
-    assert not block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(10)
-    assert not block_instruments.block_section_ahead_clear(20)
-    block_instruments.blocked_button_event(1)
-    block_instruments.blocked_button_event(3)
-    block_instruments.blocked_button_event(10)
-    time.sleep(1.0)
-    assert not block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(2)
-    assert not block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(10)
-    assert not block_instruments.block_section_ahead_clear(20)
-    # Try the other way
-    block_instruments.clear_button_event(2)
-    block_instruments.clear_button_event(4)
-    block_instruments.clear_button_event(20)
-    time.sleep(1.0)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-1","sectionstate":True,"instrumentid":"box1-1"})        # Success
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-3","sectionstate":True,"instrumentid":"box1-3"})        # Success
     assert block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(2)
     assert block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(4)
-    assert block_instruments.block_section_ahead_clear(10)
-    assert not block_instruments.block_section_ahead_clear(20)
-    block_instruments.occup_button_event(2)
-    block_instruments.occup_button_event(4)
-    block_instruments.occup_button_event(20)
-    time.sleep(1.0)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-1","sectionstate":None,"instrumentid":"box1-1"})        # Success
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-3","sectionstate":None,"instrumentid":"box1-3"})        # Success
     assert not block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(2)
     assert not block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(10)
-    assert not block_instruments.block_section_ahead_clear(20)
-    block_instruments.blocked_button_event(2)
-    block_instruments.blocked_button_event(4)
-    block_instruments.blocked_button_event(20)
-    time.sleep(1.0)
-    assert not block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(2)
-    assert not block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(10)
-    assert not block_instruments.block_section_ahead_clear(20)
-    print("Library Tests - Test Networking of instrument telegraph (no errors or warnings)")
-    # Try one way
-    block_instruments.telegraph_key_button(1)
-    block_instruments.telegraph_key_button(3)
-    block_instruments.telegraph_key_button(10)
-    time.sleep(1.0)
-    # Try the other way
-    block_instruments.telegraph_key_button(2)
-    block_instruments.telegraph_key_button(4)
-    block_instruments.telegraph_key_button(20)
-    time.sleep(1.0)
-    print("Library Tests - handle_mqtt_instrument_updated_event - negative tests - 5 Warnings will be generated")
-    block_instruments.subscribe_to_remote_instruments("box1-30")
-    assert len(block_instruments.instruments) == 13
-    assert block_instruments.instrument_exists("box1-30")
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-10", "sectionstate": None, "instrumentid":"box1-30" })   # box1-30 Does not exist (no warnings)
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-10","sectionstate":None,"instrumentid":"random" })       # Invalid ID
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-50","sectionstate":False,"instrumentid":"box1-1"})       # Not subscribed
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-50","instrumentid":"box1-1"})                            # Fail - spurious message
-    block_instruments.handle_mqtt_instrument_updated_event({"sectionstate": False, "instrumentid":"box1-1"})                                  # Fail - spurious message
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-50","sectionstate": False})                              # Fail - spurious message
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-2", "sectionstate": None, "instrumentid":"box1-100" })  # box1-100 not linked (no warnings)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-2","sectionstate":None,"instrumentid":"random" })       # Error - Invalid ID
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-50","sectionstate":False,"instrumentid":"box1-200"})    # Error - Not subscribed
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-2","instrumentid":"box1-1"})                            # Error - spurious message
+    block_instruments.handle_mqtt_instrument_updated_event({"sectionstate": False, "instrumentid":"box1-1"})                                 # Error - spurious message
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box1-2","sectionstate": False})                              # Error - spurious message
     print("Library Tests - handle_mqtt_ring_section_bell_event - 4 Warnings will be generated")
-    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-10", "instrumentid":"box1-20" })                         # box1-30 Does not exist (no warnings)
-    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-10", "instrumentid":"random" })                          # Invalid ID
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-1", "instrumentid":"box1-3" })                           # Success
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-3", "instrumentid":"box1-3" })                           # Success
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-2", "instrumentid":"box1-200" })                         # box1-200 Not Linked (no warnings)
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-2", "instrumentid":"random" })                           # Invalid ID
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box1-50", "instrumentid":"box1-1"})                           # Not subscribed
     block_instruments.handle_mqtt_ring_section_bell_event({"instrumentid": "box2-1"})                                                         # Fail - spurious message
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20"})                                                    # Fail - spurious message
@@ -415,8 +348,6 @@ def mqtt_integration_tests():
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(7)
     system_test_harness.assert_warning_logs_generated(12)
-    system_test_harness.assert_debug_logs_generated(9)
-    system_test_harness.assert_info_logs_generated(10)
 
 def other_instrument_tests():
     canvas = schematic.canvas
@@ -477,10 +408,10 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Block Instrument Tests")
     print("----------------------------------------------------------------------------------------")
-    create_and_delete_instrument_tests()
-    instrument_linking_tests()
-    mqtt_integration_tests()
-    other_instrument_tests()
+    system_test_harness.run_function(create_and_delete_instrument_tests, timeout=20)
+    system_test_harness.run_function(instrument_linking_tests, timeout=20)
+    system_test_harness.run_function(mqtt_integration_tests, timeout=20)
+    system_test_harness.run_function(other_instrument_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 

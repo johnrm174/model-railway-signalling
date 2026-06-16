@@ -3,7 +3,6 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
@@ -41,7 +40,6 @@ def run_track_sensor_library_tests():
     track_sensors.track_sensor_triggered(100)  # Fail - does not exist
     print("Library Tests - track_sensor_triggered - Triggering 2 track sensor passed events:")
     track_sensors.track_sensor_triggered(10)   # success
-    time.sleep(1.5)
     # track_sensor_triggered (pulse the button and generate callback)
     track_sensors.track_sensor_triggered(10)   # Success
     # delete_track_sensor - reset_sensor_button function should not generate any exceptions
@@ -79,7 +77,7 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Track Sensor Object Tests")
     print("----------------------------------------------------------------------------------------")
-    run_track_sensor_library_tests()
+    system_test_harness.run_function(run_track_sensor_library_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 
