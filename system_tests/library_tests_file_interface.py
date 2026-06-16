@@ -3,7 +3,6 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
 
 import system_test_harness
@@ -299,19 +298,19 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - File Interface Tests")
     print("----------------------------------------------------------------------------------------")
-    create_objects()
-    set_object_states()
-    assert_object_states()
+    system_test_harness.run_function(create_objects, timeout=20)
+    system_test_harness.run_function(set_object_states, timeout=20)
+    system_test_harness.run_function(assert_object_states, timeout=20)
     print("File Interface Tests - Saving Schematic - No errors or warnings")
-    file_interface.save_schematic({"settings":None}, {"objects":None}, "file_interface_test.sig")
-    delete_objects()
+    system_test_harness.run_function(lambda:file_interface.save_schematic({"settings":None}, {"objects":None}, "file_interface_test.sig"), timeout=20)
+    system_test_harness.run_function(delete_objects, timeout=20)
     print("File Interface Tests - Loading Schematic - No errors or warnings")
-    file_interface.load_schematic("file_interface_test.sig")
-    create_objects()
-    assert_object_states()
-    delete_objects()
+    system_test_harness.run_function(lambda:file_interface.load_schematic("file_interface_test.sig"), timeout=20)
+    system_test_harness.run_function(create_objects, timeout=20)
+    system_test_harness.run_function(assert_object_states, timeout=20)
+    system_test_harness.run_function(delete_objects, timeout=20)
     print("File Interface Tests - Purging State Information - No errors or warnings")
-    file_interface.purge_loaded_state_information()
+    system_test_harness.run_function(file_interface.purge_loaded_state_information, timeout=20)
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(0)
     system_test_harness.assert_warning_logs_generated(0)

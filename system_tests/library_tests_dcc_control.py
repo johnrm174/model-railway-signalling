@@ -3,8 +3,8 @@
 # Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
-import time
 import logging
+import time
 
 import system_test_harness
 from model_railway_signals.library import signals
@@ -199,22 +199,20 @@ def dcc_mapping_deletion_tests():
     system_test_harness.assert_error_logs_generated(6)
     system_test_harness.assert_warning_logs_generated(0)
 
-def dcc_output_tests(baud_rate):
+def dcc_output_tests():
     # Note - this should only be run if all the above mapping tests are enabled
     system_test_harness.reset_log_counters()
-    print("Library Tests - DCC control Tests - connecting to SPROG first")
-    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate)
-    assert pi_sprog_interface.request_dcc_power_on()
-    time.sleep(2.0)
+    # Force enhanced debugging mode (to generate the debug messages)
+    pi_sprog_interface.debug = True #############################################################################################
     logging.getLogger().setLevel(logging.DEBUG) #################################################################################
-    print("Library Tests - update_dcc_point - no errors or warnings - 4 DCC commands should be sent out")
+    print("Library Tests - update_dcc_point - no errors or warnings - 4 DCC commands should be discarded")
     dcc_control.update_dcc_point(1, True)     # Ok (1 command)
     dcc_control.update_dcc_point(1, False)    # Ok (1 command)
     dcc_control.update_dcc_point(2, True)     # Ok (1 command)
     dcc_control.update_dcc_point(2, False)    # Ok (1 command)
     dcc_control.update_dcc_point(3, True)     # Silently ignored (no mapping)
     dcc_control.update_dcc_point(3, False)    # Silently ignored (no mapping)
-    print("Library Tests - update_dcc_signal_aspects - 2 errors (wrong signal types) - 18 DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_aspects - 2 errors (wrong signal types) - 18 DCC commands should be discarded")
     dcc_control.update_dcc_signal_aspects(2, signals.signal_state_type.DANGER)                # Error - wrong type
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.DANGER)                # Ok (3 commands)
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.PROCEED)               # Ok (3 commands)
@@ -224,12 +222,12 @@ def dcc_output_tests(baud_rate):
     dcc_control.update_dcc_signal_aspects(1, signals.signal_state_type.FLASH_PRELIM_CAUTION)  # Ok (3 commands)
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")                  # Error - wrong type
     dcc_control.update_dcc_signal_aspects(3, signals.signal_state_type.DANGER)                # Silently ignored (no mapping)
-    print("Library Tests - update_dcc_signal_subsidary - 1 Error (wrong signal type) - 1 DCC command should be sent out")
+    print("Library Tests - update_dcc_signal_subsidary - 1 Error (wrong signal type) - 1 DCC command should be discarded")
     dcc_control.update_dcc_signal_subsidary(5, True)      # OK (but no mapping so no command)
     dcc_control.update_dcc_signal_subsidary(1, True)      # OK (1 command)
     dcc_control.update_dcc_signal_subsidary(2, True)      # Error - wrong type
     dcc_control.update_dcc_signal_subsidary(10, True)     # Silently ignored (no mapping)
-    print("Library Tests - update_dcc_signal_element - 2 Errors (wrong signal type) - 10 DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_element - 2 Errors (wrong signal type) - 10 DCC commands should be discarded")
     dcc_control.update_dcc_signal_element(1, True, element="main_signal")       # Error - wrong type
     dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")    # Error - wrong type
     dcc_control.update_dcc_signal_element(2, True, element="main_signal")       # Ok (1 command)
@@ -243,7 +241,7 @@ def dcc_output_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, True, element="rh2_signal")        # Ok (1 command)
     dcc_control.update_dcc_signal_element(2, True, element="rh2_subsidary")     # Ok (1 command)
     dcc_control.update_dcc_signal_element(3, True, element="main_subsidary")    # Silently ignored (no mapping)
-    print("Library Tests - update_dcc_signal_route - 1 Error (wrong signal type) - 21 DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_route - 1 Error (wrong signal type) - 21 DCC commands should be discarded")
     dcc_control.update_dcc_signal_route(2,signals.route_type.MAIN, True, False)    # Error - wrong type
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals.route_type.LH1, True, False)
@@ -254,7 +252,7 @@ def dcc_output_tests(baud_rate):
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, False, True)
     dcc_control.update_dcc_signal_route(1,signals.route_type.MAIN, False, False)
     dcc_control.update_dcc_signal_route(3,signals.route_type.MAIN, False, False)    # Silently ignored (no mapping)
-    print("Library Tests - update_dcc_signal_theatre - no errors or warnings - 24 DCC commands should be sent out")
+    print("Library Tests - update_dcc_signal_theatre - no errors or warnings - 24 DCC commands should be discarded")
     dcc_control.update_dcc_signal_theatre(1,"#", True, False)
     dcc_control.update_dcc_signal_theatre(1,"1", True, False)
     dcc_control.update_dcc_signal_theatre(1,"2", True, False)
@@ -265,24 +263,21 @@ def dcc_output_tests(baud_rate):
     dcc_control.update_dcc_signal_theatre(1,"1", False, True)
     dcc_control.update_dcc_signal_theatre(1,"1", False, False)
     dcc_control.update_dcc_signal_theatre(3,"1", False, False)    # Silently ignored (no mapping)
-    print("Library Tests - update_dcc_switch - no errors or warnings - 8 DCC commands should be sent out")
+    print("Library Tests - update_dcc_switch - no errors or warnings - 8 DCC commands should be discarded")
     dcc_control.update_dcc_switch(1, True)
     dcc_control.update_dcc_switch(1, False)
     dcc_control.update_dcc_switch(2, True)
     dcc_control.update_dcc_switch(2, False)
     dcc_control.update_dcc_switch(3, True)     # Silently ignored (no mapping)
     dcc_control.update_dcc_switch(3, False)    # Silently ignored (no mapping)
-    logging.getLogger().setLevel(logging.WARNING) #################################################################################
-    # Turn power off and disconnect from the sprog
-    time.sleep(2.0)
-    assert pi_sprog_interface.request_dcc_power_off()
-    assert pi_sprog_interface.sprog_disconnect ()
+    logging.getLogger().setLevel(logging.WARNING) ################################################################################
+    pi_sprog_interface.debug = False #############################################################################################
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(6)
     system_test_harness.assert_warning_logs_generated(0)
     system_test_harness.assert_debug_logs_generated(86)
     
-def mqtt_integration_tests(baud_rate):
+def mqtt_integration_tests1():
     # Note - this should only be run if all the above mapping tests are enabled
     system_test_harness.reset_log_counters()
     # Clear out any 'retained' commands from previous tests
@@ -303,7 +298,9 @@ def mqtt_integration_tests(baud_rate):
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": True}) # Valid
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-0", "dccaddress": 1000, "dccstate": False}) # Valid
     logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
-    print("Library Tests - DCC control Tests - sending of commands before Sprog connected/power on and MQTT Connect")
+    
+def mqtt_integration_tests2():
+    print("Library Tests - DCC control Tests - Queuing of commands before Sprog connected/power on and MQTT Connect")
     # Queue up some 'remote' DCC commands
     dcc_control.reset_dcc_accessory_mqtt_configuration()
     dcc_control.set_node_to_publish_dcc_accessory_commands(False) 
@@ -321,36 +318,34 @@ def mqtt_integration_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, False, element="main_signal")          # 1 DCC Command (this 'overwrites' the one above)
     dcc_control.update_dcc_signal_element(2, True, element="main_subsidary")        # 1 DCC Command (this won't get sent)
     dcc_control.update_dcc_signal_element(2, False, element="main_subsidary")       # 1 DCC Command (this 'overwrites' the one above)
-    print("Library Tests - DCC control Tests - Sprog connected/power on - 8 DCC commands should be transmitted (10 Debug and 1 Info message) ")
-    assert pi_sprog_interface.sprog_connect()
+    print("Library Tests - DCC control Tests - Sprog connected - 8 DCC commands should be discarded (8 Debug messages) ")
+    pi_sprog_interface.debug = True ##########################################################################################################
+    mqtt_interface.node_config["enhanced_debugging"] = True ##################################################################################
     logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
-    assert pi_sprog_interface.request_dcc_power_on()
-    # DCC commands are transmitted after 1 second (and then at 250ms intervals) - we wait for this to complete
-    time.sleep (5.0)    
-    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
-    print("Library Tests - DCC control Tests - MQTT Broker Connect - 8 DCC commands should be published (9 Debug and 1 Info log message)")
-    mqtt_interface.configure_mqtt_client("network1","node1")
+    dcc_control.sprog_send_all_dcc_command_states_on_sprog_connect()
+    # DCC commands are sent to the SPROG after 1 second (and then at 250ms intervals) - we wait for this to complete
+    
+def mqtt_integration_tests3():
+    print("Library Tests - DCC control Tests - MQTT Broker Connect - 8 DCC messages should be discarded (9 Debug messages)")
     dcc_control.set_node_to_publish_dcc_accessory_commands(True)
-    logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
-    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883)
-    time.sleep(5.0)
-    print("Library Tests - DCC control Tests - Inhibit SPROG when node set to publish - 2 DCC commands should be published")
+    dcc_control.mqtt_send_all_dcc_command_states_on_broker_connect()
+    # DCC commands are sent to the broker after 1 second (and then at 250ms intervals) - we wait for this to complete
+    
+def mqtt_integration_tests4():
+    print("Library Tests - DCC control Tests - Inhibit SPROG when node set to publish - 2 DCC commands should be published but not sent to broker")
     dcc_control.update_dcc_signal_subsidary(1, True)
     dcc_control.update_dcc_signal_subsidary(1, False)
-    time.sleep(1.0)
-    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
+    logging.getLogger().setLevel(logging.WARNING) #############################################################################################
+    pi_sprog_interface.debug = False ##########################################################################################################    
+    mqtt_interface.node_config["enhanced_debugging"] = False ##################################################################################
     # Clean up
     dcc_control.local_dcc_accessory_commands = {}
     dcc_control.reset_dcc_accessory_mqtt_configuration()
-    assert pi_sprog_interface.request_dcc_power_off()
-    assert pi_sprog_interface.sprog_disconnect()
-    mqtt_interface.mqtt_broker_disconnect()
-    time.sleep(1.0)
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(4)
     system_test_harness.assert_warning_logs_generated(0)
-    system_test_harness.assert_info_logs_generated(2)
-    system_test_harness.assert_debug_logs_generated(23)
+    system_test_harness.assert_info_logs_generated(0)
+    system_test_harness.assert_debug_logs_generated(21)
 
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
@@ -359,15 +354,22 @@ def mqtt_integration_tests(baud_rate):
 def run_all_tests():
     baud_rate = 115200    # Set to 115200 for Pi-Sprog-3 V1 or 460800 for Pi-SPROG-3 V2
     print("----------------------------------------------------------------------------------------")
-    print("Library Tests - SPROG Interface Tests")
+    print("Library Tests - DCC Interface Tests")
     print("----------------------------------------------------------------------------------------")
-    dcc_signal_mapping_tests()
-    dcc_switch_mapping_tests()
-    dcc_point_mapping_tests()
-    dcc_mapping_retrieval_tests()
-    mqtt_integration_tests(baud_rate)
-    dcc_output_tests(baud_rate)
-    dcc_mapping_deletion_tests()
+    system_test_harness.run_function(dcc_signal_mapping_tests, timeout=20)
+    system_test_harness.run_function(dcc_switch_mapping_tests, timeout=20)
+    system_test_harness.run_function(dcc_point_mapping_tests, timeout=20)
+    system_test_harness.run_function(dcc_mapping_retrieval_tests, timeout=20)
+    # The MQTT Integration Tests need to be split to wait for other threads to do their thing
+    system_test_harness.run_function(mqtt_integration_tests1, timeout=20)
+    system_test_harness.run_function(mqtt_integration_tests2, timeout=20)
+    time.sleep(4.0)
+    system_test_harness.run_function(mqtt_integration_tests3, timeout=20)
+    time.sleep(4.0)
+    system_test_harness.run_function(mqtt_integration_tests4, timeout=20)
+    # End of MQTT Integration Tests
+    system_test_harness.run_function(dcc_output_tests, timeout=20)
+    system_test_harness.run_function(dcc_mapping_deletion_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 
