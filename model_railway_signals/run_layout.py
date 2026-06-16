@@ -940,12 +940,14 @@ def process_all_point_interlocking():
         # Lock or unlock the Point as required
         if point_locked: library.lock_point(int_point_id, point_tooltip)
         else: library.unlock_point(int_point_id)
-        # Lock any Signalbox levers that are linked to the Point
+        # Lock any Signalbox levers that are linked to the Point.
         for str_lever_id in objects.lever_index:
             lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-            if lever_object["linkedpoint"] == int_point_id :
-                if point_locked: library.lock_lever(int(str_lever_id), point_tooltip)
-                else: library.unlock_lever(int(str_lever_id))
+            if lever_object["linkedpoint"] == int_point_id:
+                if (lever_object["switchfpl"] or lever_object["switchpointandfpl"] or
+                     (lever_object["switchpoint"] and not point_object["hasfpl"])):
+                    if point_locked: library.lock_lever(int(str_lever_id), point_tooltip)
+                    else: library.unlock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------
