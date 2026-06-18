@@ -140,7 +140,6 @@ def configure_gpio_callback_tests():
     
 def mqtt_integration_tests():    
     system_test_harness.reset_log_counters()
-    mqtt_interface.configure_mqtt_client("network1","node1")
     # subscribe_to_remote_gpio_sensors
     print ("GPIO Sensors - subscribe_to_remote_gpio_sensors - Will generate 1 warning and 5 Errors")
     assert len(gpio_sensors.gpio_port_mappings) == 5
@@ -201,10 +200,10 @@ def mqtt_integration_tests():
     gpio_sensors.set_gpio_sensors_to_publish_state(10, 11)         # sensors already set to publish - will generate warnings
     gpio_sensors.set_gpio_sensors_to_publish_state("12", "13")     # Fail - not an int
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 4
-    print ("GPIO Sensors - Test Publishing of Sensors on Broker connect - no errors or warnings - 1 Info and 3 Debug messages")
+    print ("GPIO Sensors - Test Publishing of Sensors on Broker connect - no errors or warnings - 2 Debug messages")
     logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
-    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883)
-    time.sleep(3.0)
+    mqtt_interface.node_config["enhanced_debugging"] = True ##################################################################################
+    gpio_sensors.mqtt_send_all_gpio_sensor_states_on_broker_connect()
     print ("GPIO Sensors - Test Publishing of Sensors while broker connected - no errors or warnings - 4 Info and 4 Debug messages")
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
@@ -223,8 +222,8 @@ def mqtt_integration_tests():
     assert gpio_sensors.gpio_port_mappings["4"]["sensor_state"] == False
     assert gpio_sensors.gpio_port_mappings["5"]["sensor_state"] == False
     time.sleep(2.0)
-    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################
-    mqtt_interface.mqtt_broker_disconnect()
+    logging.getLogger().setLevel(logging.WARNING) ############################################################################################
+    mqtt_interface.node_config["enhanced_debugging"] = False #################################################################################
     # reset_mqtt_configuration (all remote sensors will be deleted)
     print ("GPIO Sensors - reset_mqtt_configuration - no errors or warnings")
     gpio_sensors.reset_gpio_mqtt_configuration()
@@ -264,8 +263,8 @@ def mqtt_integration_tests():
     # Check the total number of Log Messages Generated
     system_test_harness.assert_error_logs_generated(23)
     system_test_harness.assert_warning_logs_generated(10)
-    system_test_harness.assert_info_logs_generated(5)
-    system_test_harness.assert_debug_logs_generated(7)
+    system_test_harness.assert_info_logs_generated(4)
+    system_test_harness.assert_debug_logs_generated(6)
 
 def gpio_triggering_tests():
     system_test_harness.reset_log_counters()
@@ -561,6 +560,8 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - GPIO Interface Tests")
     print("----------------------------------------------------------------------------------------")
+    # Note that the functions we are testing do not make any tkinter calls and so we
+    # Should be safe running all these tests in the Test harness thread
     create_gpio_sensor_tests()
     configure_gpio_callback_tests()
     mqtt_integration_tests()
