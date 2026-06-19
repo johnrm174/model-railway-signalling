@@ -367,7 +367,7 @@ def handle_mqtt_section_updated_event(message):
         logging.warning("Sections: handle_mqtt_section_updated_event - Message received from Remote Section "+
                         message["sourceidentifier"]+" but this Section has not been subscribed to")
     else:
-        # Extract the Data we need from the message.
+        # A typical message would be: {'sourceidentifier': 'box1-1', 'occupied': True, 'labeltext': 'ABC'}
         remote_sec_id = message["sourceidentifier"]
         remote_sec_state = message["occupied"]
         remote_sec_label = message["labeltext"]
@@ -399,6 +399,8 @@ def send_mqtt_section_updated_event(section_id:int):
         log_message = "Section "+str(section_id)+": Publishing section state to MQTT Broker"
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("section_updated_event",section_id,data=data,log_message=log_message,retain=True)
+        # The MQTT interface turns the section ID into the source identifier for inclusion in the message
+        # A transmitted message would be: {'sourceidentifier': 'box1-1', 'occupied': True, 'labeltext': 'ABC'}
     return()
 
 #---------------------------------------------------------------------------------------------------
