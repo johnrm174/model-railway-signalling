@@ -268,6 +268,7 @@ def handle_mqtt_instrument_updated_event(message):
         # Extract the Data we need from the message. The local_inst_id is the 'target' for the state update (i.e. the
         # LOCAL instrument the REMOTE instrument is linked to), which is the second parameter of the Tuple returned from
         # the 'split_remote_item_identifier' function (we don't need on the 'node_id' as this will always be our node)
+        # A typical message would be: {"sourceidentifier":"box1-1","sectionstate":False,"instrumentid":"box2-1"}
         remote_inst_id = message["sourceidentifier"]
         remote_inst_state = message["sectionstate"]
         local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])[1]
@@ -306,6 +307,7 @@ def handle_mqtt_ring_section_bell_event(message):
         # Extract the Data we need from the message. The local_inst_id is the 'target' for the bell event (i.e. the
         # LOCAL instrument the REMOTE instrument is linked to), which is the second parameter of the Tuple returned from
         # the 'split_remote_item_identifier' function (we don't need on the 'node_id' as this will always be our node)
+        # A typical message would be: {"sourceidentifier": "box1-1", "instrumentid":"box2-1" }
         local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])[1]
         # Only ring the bell on the the LOCAL instrument if it exists on the schematic (we might have subscribed to
         # the REMOTE instrument and the REMOTE instrument may be linked to an LOCAL instrument on our schematic (which
