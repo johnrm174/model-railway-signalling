@@ -278,6 +278,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 7,
             "linestohighlight": [],
@@ -291,7 +292,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "02365e11-198e-43ba-8cea-eaf0babbfd8b": {
             "arrowends": 0,
@@ -587,6 +589,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 1,
             "linestohighlight": [],
@@ -600,7 +603,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "08f74d1a-8743-408a-a0b5-4da47ddb8317": {
             "approachcontrol": [
@@ -2822,6 +2826,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 8,
             "linestohighlight": [],
@@ -2835,7 +2840,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "23d1f525-9fc8-4f92-acbb-9b86c3c0e7bf": {
             "bbox": 455,
@@ -3319,6 +3325,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 6,
             "linestohighlight": [],
@@ -3332,7 +3339,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "29f85e73-35b2-4fa3-83bc-8d9db311ae3f": {
             "bbox": 503,
@@ -3940,6 +3948,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 5,
             "linestohighlight": [],
@@ -3953,7 +3962,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "37fbb878-e6fd-4629-96f8-5912ec2ab8d3": {
             "alsoswitch": 0,
@@ -4529,6 +4539,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 17,
             "linestohighlight": [],
@@ -4542,7 +4553,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "3e21b1c6-4357-460f-bb55-19b5aef1ecbe": {
             "alsoswitch": 0,
@@ -5107,6 +5119,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 2,
             "linestohighlight": [],
@@ -5120,7 +5133,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "44ba7fde-6643-4a13-8016-12dce8062d68": {
             "alsoswitch": 0,
@@ -7364,6 +7378,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 4,
             "linestohighlight": [],
@@ -7377,7 +7392,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "72d9a7ab-03e3-4862-9edc-e4b1b0669d8a": {
             "bbox": 979,
@@ -7388,6 +7404,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 19,
             "linestohighlight": [],
@@ -7401,7 +7418,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "7359abc4-4fcd-4dae-83df-0617d02eaf43": {
             "arrowends": 0,
@@ -7504,6 +7522,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 11,
             "linestohighlight": [],
@@ -7517,7 +7536,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "7aa34fb1-3039-4be1-b71a-9d85fa38f112": {
             "background": "",
@@ -11168,6 +11188,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 3,
             "linestohighlight": [],
@@ -11181,7 +11202,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "ca9a0626-6d24-4239-ab94-524319645b85": {
             "bbox": 1460,
@@ -11496,6 +11518,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 10,
             "linestohighlight": [],
@@ -11509,7 +11532,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "d50f5e30-09c8-4e0d-a222-c91f7a749fab": {
             "bbox": 1533,
@@ -11799,6 +11823,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 21,
             "linestohighlight": [],
@@ -11812,7 +11837,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "e36ddda7-ba76-4409-a1b5-f24db2cf4aab": {
             "bbox": 1604,
@@ -15376,7 +15402,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.4"
+            "version": "Version 6.3.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -15572,6 +15598,7 @@
     },
     "signals": {
         "1": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15584,6 +15611,7 @@
             "theatretext": ""
         },
         "10": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15596,6 +15624,7 @@
             "theatretext": ""
         },
         "11": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15608,6 +15637,7 @@
             "theatretext": ""
         },
         "12": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15620,6 +15650,7 @@
             "theatretext": ""
         },
         "13": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15632,6 +15663,7 @@
             "theatretext": ""
         },
         "14": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -15644,6 +15676,7 @@
             "theatretext": null
         },
         "15": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -15656,6 +15689,7 @@
             "theatretext": null
         },
         "16": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -15668,6 +15702,7 @@
             "theatretext": null
         },
         "17": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15680,6 +15715,7 @@
             "theatretext": ""
         },
         "19": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -15692,6 +15728,7 @@
             "theatretext": null
         },
         "2": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15704,6 +15741,7 @@
             "theatretext": ""
         },
         "3": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15716,6 +15754,7 @@
             "theatretext": ""
         },
         "4": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15728,6 +15767,7 @@
             "theatretext": ""
         },
         "5": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15740,6 +15780,7 @@
             "theatretext": ""
         },
         "6": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15752,6 +15793,7 @@
             "theatretext": ""
         },
         "7": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15764,6 +15806,7 @@
             "theatretext": ""
         },
         "8": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -15776,6 +15819,7 @@
             "theatretext": ""
         },
         "9": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,

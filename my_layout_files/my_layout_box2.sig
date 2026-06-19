@@ -284,6 +284,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 23,
             "linestohighlight": [],
@@ -297,7 +298,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "13512e82-4e67-42dd-94d3-9f37fba91a9e": {
             "alsoswitch": 0,
@@ -684,6 +686,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 12,
             "linestohighlight": [],
@@ -697,7 +700,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "22bcdf4f-4167-4f05-9ce1-2dcebca363df": {
             "arrowends": 0,
@@ -728,6 +732,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 16,
             "linestohighlight": [],
@@ -741,7 +746,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "2570ccb3-3de1-44c7-beed-a47ea9ba10ed": {
             "bbox": 2014,
@@ -1188,6 +1194,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 2,
             "linestohighlight": [],
@@ -1201,7 +1208,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "354e6e3c-1f40-4f12-be23-630a39e460c9": {
             "bbox": 2041,
@@ -1509,6 +1517,7 @@
             "gpiosensor": "",
             "hidden": true,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 29,
             "linestohighlight": [],
@@ -1522,7 +1531,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "5387148a-d462-49ca-b3d4-fad82caeef68": {
             "arrowends": 0,
@@ -1593,6 +1603,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 15,
             "linestohighlight": [],
@@ -1606,7 +1617,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "5a37a546-0400-4859-87ed-1187f46bf3a6": {
             "arrowends": 0,
@@ -3233,6 +3245,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 27,
             "linestohighlight": [],
@@ -3246,7 +3259,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "79860921-3763-460a-86f8-ae5a6831fdf4": {
             "alsoswitch": 0,
@@ -3413,6 +3427,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 26,
             "linestohighlight": [],
@@ -3426,7 +3441,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "84382d9a-164b-49d0-9409-28d21f989f04": {
             "arrowends": 0,
@@ -3745,6 +3761,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 25,
             "linestohighlight": [],
@@ -3758,7 +3775,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "b049f6c2-1c1f-420f-b761-7b2437a1591c": {
             "bbox": 2371,
@@ -3769,6 +3787,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 24,
             "linestohighlight": [],
@@ -3782,7 +3801,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "b32d513f-95e9-4120-a416-a4308a8c253f": {
             "arrowends": 0,
@@ -4218,6 +4238,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 22,
             "linestohighlight": [],
@@ -4231,7 +4252,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "cd254939-c215-44b2-b98c-290b808fcddf": {
             "arrowends": 0,
@@ -5123,6 +5145,7 @@
             "gpiosensor": "",
             "hidden": true,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 28,
             "linestohighlight": [],
@@ -5136,7 +5159,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "de5ecec8-8419-4e56-ba05-7d1a26a4f465": {
             "arrowends": 0,
@@ -5647,6 +5671,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 9,
             "linestohighlight": [],
@@ -5660,7 +5685,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "e8fc21e4-18a8-406e-9292-020931b6142a": {
             "arrowends": 0,
@@ -5781,6 +5807,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 18,
             "linestohighlight": [],
@@ -5794,7 +5821,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "ea11a94c-abba-44d8-a657-f62c8644bf04": {
             "arrowends": 2,
@@ -5825,6 +5853,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 20,
             "linestohighlight": [],
@@ -5838,7 +5867,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "f00c90e6-e985-44b7-8582-eb62eb88eb67": {
             "alsoswitch": 0,
@@ -5881,6 +5911,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 14,
             "linestohighlight": [],
@@ -5894,7 +5925,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "f344723f-98fe-4cd5-a727-29e2b7983642": {
             "arrowends": 0,
@@ -6063,6 +6095,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 13,
             "linestohighlight": [],
@@ -6076,7 +6109,8 @@
                 "TkFixedFont",
                 9,
                 "bold "
-            ]
+            ],
+            "vertical": false
         },
         "fb278a5c-6ed9-4f14-bb06-8d7bc7e98f82": {
             "arrowends": 0,
@@ -7966,7 +8000,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.4"
+            "version": "Version 6.3.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -8191,6 +8225,7 @@
     },
     "signals": {
         "14": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -8203,6 +8238,7 @@
             "theatretext": ""
         },
         "18": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -8215,6 +8251,7 @@
             "theatretext": ""
         },
         "20": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -8227,6 +8264,7 @@
             "theatretext": ""
         },
         "21": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,

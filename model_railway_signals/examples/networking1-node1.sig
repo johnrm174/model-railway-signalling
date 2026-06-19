@@ -409,6 +409,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 1,
             "linestohighlight": [],
@@ -422,7 +423,8 @@
                 "Courier",
                 9,
                 "bold"
-            ]
+            ],
+            "vertical": false
         },
         "56eeb076-0e5f-4da9-a0bb-980c28494739": {
             "approachcontrol": [
@@ -1165,6 +1167,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 2,
             "linestohighlight": [],
@@ -1178,7 +1181,8 @@
                 "Courier",
                 9,
                 "bold"
-            ]
+            ],
+            "vertical": false
         },
         "705f5d8f-465e-4ccc-a399-f1c7c2cf048a": {
             "approachcontrol": [
@@ -1523,6 +1527,7 @@
             "gpiosensor": "",
             "hidden": false,
             "highlightcolour": "Red",
+            "highlightsection": false,
             "item": "section",
             "itemid": 3,
             "linestohighlight": [],
@@ -1536,7 +1541,8 @@
                 "Courier",
                 9,
                 "bold"
-            ]
+            ],
+            "vertical": false
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
@@ -2004,7 +2010,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.4"
+            "version": "Version 6.3.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -2170,6 +2176,7 @@
     },
     "signals": {
         "1": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -2182,6 +2189,7 @@
             "theatretext": ""
         },
         "10": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -2194,6 +2202,7 @@
             "theatretext": ""
         },
         "11": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -2206,6 +2215,7 @@
             "theatretext": ""
         },
         "12": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -2218,6 +2228,7 @@
             "theatretext": ""
         },
         "2": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -2230,6 +2241,7 @@
             "theatretext": ""
         },
         "Node2-3": {
+            "overcaution": null,
             "override": null,
             "overridesub": null,
             "releaseonred": null,
