@@ -366,7 +366,7 @@ def start_application(callback_function):
         schematic.shutdown()
         common.instant_shutdown()
 
-def run_function(test_function, timeout=10.0):
+def run_function(test_function, timeout=2.0):
     # Create an Event (to signal back into this thread when the function has completed)
     done_event1 = threading.Event()
     done_event2 = threading.Event()
