@@ -155,6 +155,9 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - MQTT Interface Tests")
     print("----------------------------------------------------------------------------------------")
+    # The only function calls that result in a Tkinter function call are 'mqtt_broker_connect'
+    # and 'mqtt_broker_disconnect' (where it updates the MQTT Connection state indicator in the menubar)
+    # We therefore 'take the risk' and run everything in the main Test Harness Thread
     mqtt_configuration_tests()
     mqtt_messaging_tests()
     system_test_harness.report_results()

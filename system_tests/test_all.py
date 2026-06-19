@@ -11,6 +11,7 @@ import library_tests_file_interface
 import library_tests_gpio_interface
 import library_tests_levers
 import library_tests_lines
+import library_tests_loco_control
 import library_tests_mqtt_interface
 import library_tests_points
 import library_tests_sprog_interface
@@ -47,24 +48,22 @@ def run_all_tests():
     if system_test_harness.test_failures == 0: library_tests_gpio_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_levers.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_lines.run_all_tests()
-    # loco_control #################################
+    if system_test_harness.test_failures == 0: library_tests_loco_control.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_mqtt_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_points.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_sprog_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_text_boxes.run_all_tests()
-    if system_test_harness.test_failures == 0: library_tests_track_sectionss.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_track_sections.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_track_sensors.run_all_tests()
     
-    if system_test_harness.test_failures == 0:
-        print("*** Running tests from 'basic_library_tests2.py' ***")
-        basic_library_tests2.run_all_basic_library_tests()
-        system_test_harness.report_results()
-        
+    #################################################################################################
+    ## Still to be refactored and consolidated
     if system_test_harness.test_failures == 0:
         print("*** Running tests from 'basic_library_tests3.py' ***")
         basic_library_tests3.run_all_basic_library_tests()
         system_test_harness.report_results()
-    
+    #################################################################################################
+
     if system_test_harness.test_failures == 0:
 
         print("*** Running tests from 'test_menubar_windows.py' ***")
