@@ -560,8 +560,8 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - GPIO Interface Tests")
     print("----------------------------------------------------------------------------------------")
-    # Note that the functions we are testing do not make any tkinter calls and so we
-    # Should be safe running all these tests in the Test harness thread
+    # Note that the functions we are testing do not make any tkinter calls and so we are safe
+    # to run all these tests in the Test harness thread rather than the Tkinter thread
     create_gpio_sensor_tests()
     configure_gpio_callback_tests()
     mqtt_integration_tests()

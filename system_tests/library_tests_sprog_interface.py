@@ -252,10 +252,13 @@ def sound_file_playback_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_tests():
-    baud_rate = 115200    # Set to 115200 for Pi-Sprog-3 V2 or 460800 for Pi-SPROG-3 V1
+    baud_rate = 115200    # Set to 115200 for Pi-Sprog-3 V1 or 460800 for Pi-SPROG-3 V2
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - SPROG Interface Tests")
     print("----------------------------------------------------------------------------------------")
+    # The only function calls that result in a Tkinter function call are 'request_dcc_power_on'
+    # and 'request_dcc_power_off' (where it updates the DCC power state indicator in the menubar)
+    # We therefore 'take the risk' and run everything in the main Test Harness Thread
     sprog_configuration_tests(baud_rate)
     sprog_cv_read_write_tests(baud_rate)
     sprog_short_accessory_tests(baud_rate)
