@@ -229,7 +229,7 @@ def mirrored_section_tests():
     system_test_harness.assert_error_logs_generated(7)
     system_test_harness.assert_warning_logs_generated(0)
 
-def mqtt_integration_tests():    
+def mqtt_integration_tests1():    
     system_test_harness.reset_log_counters()
     canvas = schematic.canvas
     assert len(track_sections.sections) == 0
@@ -254,35 +254,42 @@ def mqtt_integration_tests():
     # Set the sections to mirror each other over the network
     track_sections.update_mirrored_section(1,"box1-2") 
     track_sections.update_mirrored_section(2,"box1-1")
-    print ("Library Tests - Test Publishing of Section states on Broker connect - no errors or warnings - 3 Info and 3 Debug messages")
+    print ("Library Tests - Test Publishing of Section states on Broker connect - no errors or warnings - 2 Debug messages")
     logging.getLogger().setLevel(logging.DEBUG) ##############################################################################################
-    mqtt_interface.mqtt_broker_connect("127.0.0.1",1883)
-    time.sleep(5.0)
+    mqtt_interface.node_config["enhanced_debugging"] = True ##################################################################################
+    track_sections.mqtt_send_all_section_states_on_broker_connect()
+    # We need to wait for the events to be processed
+    
+def mqtt_integration_tests2():    
     print("Library Tests - Test publishing of events on section creation - no errors or warnings - 2 Debug messages")
     # Create a Section already set to publish state on creation
+    canvas = schematic.canvas
     track_sections.create_section(canvas,20,300,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="")
-    logging.getLogger().setLevel(logging.WARNING) ##############################################################################################    
-    assert len(track_sections.sections) == 5
-    print("Library Tests - Test Networking of Mirrored Sections (no errors or warnings)")
-    time.sleep(1.0)
+    # We need to wait for the events to be processed
+    
+def mqtt_integration_tests3():    
+    mqtt_interface.node_config["enhanced_debugging"] = False #################################################################################
+    logging.getLogger().setLevel(logging.WARNING) ############################################################################################    
+    print("Library Tests - handle_mqtt_section_updated_event - 4 warnings will be generated")
+    track_sections.handle_mqtt_section_updated_event(message={"sourceidentifier":"box1-1", "occupied":True})                     # Error
+    track_sections.handle_mqtt_section_updated_event(message={"sourceidentifier":"box1-1", "labeltext":"ABC"})                   # Error
+    track_sections.handle_mqtt_section_updated_event(message={"occupied":True, "labeltext":"ABC"})                               # Error
+    track_sections.handle_mqtt_section_updated_event(message={"sourceidentifier":"box1-10", "occupied":True, "labeltext":"ABC"}) # Error
+    # Test mirroring of remote sections
+    assert not track_sections.section_occupied(1)
+    assert not track_sections.section_occupied(2)
+    assert track_sections.section_label(1) == "Train0"
     assert track_sections.section_label(2) == "Train0"
+    track_sections.handle_mqtt_section_updated_event(message={"sourceidentifier":"box1-1", "occupied":True, "labeltext":"ABC"})
     assert not track_sections.section_occupied(1)
-    track_sections.set_section_occupied(1,"Train10")
-    time.sleep(1.0)
-    assert track_sections.section_label(2) == "Train10"
     assert track_sections.section_occupied(2)
-    track_sections.set_section_occupied(2,"Train11")
-    time.sleep(1.0)
-    assert track_sections.section_label(1) == "Train11"
+    assert track_sections.section_label(1) == "Train0"
+    assert track_sections.section_label(2) == "ABC"
+    track_sections.handle_mqtt_section_updated_event(message={"sourceidentifier":"box1-2", "occupied":True, "labeltext":"DEF"})
     assert track_sections.section_occupied(1)
-    track_sections.clear_section_occupied(2)
-    time.sleep(1.0)
-    assert not track_sections.section_occupied(1)
-    print("Library Tests - handle_mqtt_section_updated_event - Negative Testing - 4 warnings will be generated")
-    track_sections.handle_mqtt_section_updated_event(message={"source_identifier":1, "occupied":True})                     # Error
-    track_sections.handle_mqtt_section_updated_event(message={"source_identifier":1, "labeltext":"ABC"})                   # Error
-    track_sections.handle_mqtt_section_updated_event(message={"occupied":True, "labeltext":"ABC"})                         # Error
-    track_sections.handle_mqtt_section_updated_event(message={"source_identifier":8, "occupied":True, "labeltext":"ABC"})  # Error
+    assert track_sections.section_occupied(2)
+    assert track_sections.section_label(1) == "DEF"
+    assert track_sections.section_label(2) == "ABC"
     print("Library Tests - Reset of MQTT Configuration (no errors or warnings)")
     assert len(track_sections.list_of_sections_to_publish) == 3
     assert len(track_sections.sections) == 5
@@ -297,8 +304,8 @@ def mqtt_integration_tests():
     # Check the total number of Log Messages generated
     system_test_harness.assert_error_logs_generated(6)
     system_test_harness.assert_warning_logs_generated(8)
-    system_test_harness.assert_info_logs_generated(3)
-    system_test_harness.assert_debug_logs_generated(5)
+    system_test_harness.assert_info_logs_generated(0)
+    system_test_harness.assert_debug_logs_generated(4)
 
 def update_section_style_tests():
     system_test_harness.reset_log_counters()
@@ -449,13 +456,17 @@ def run_all_tests():
     print("----------------------------------------------------------------------------------------")
     print("Library Tests - Track Section Object Tests")
     print("----------------------------------------------------------------------------------------")
-    create_and_delete_sensors()
-    section_state_change_tests()
-    mirrored_section_tests()
-    update_section_style_tests()
-    drag_and_drop_tests()
-    mqtt_integration_tests()
-    edit_section_window_tests()
+    system_test_harness.run_function(create_and_delete_sensors, timeout=20)
+    system_test_harness.run_function(section_state_change_tests, timeout=20)
+    system_test_harness.run_function(mirrored_section_tests, timeout=20)
+    system_test_harness.run_function(update_section_style_tests, timeout=20)
+    system_test_harness.run_function(drag_and_drop_tests, timeout=20)
+    system_test_harness.run_function(mqtt_integration_tests1, timeout=20)
+    time.sleep(1.0)
+    system_test_harness.run_function(mqtt_integration_tests2, timeout=20)
+    time.sleep(1.0)
+    system_test_harness.run_function(mqtt_integration_tests3, timeout=20)
+    system_test_harness.run_function(edit_section_window_tests, timeout=20)
     system_test_harness.report_results()
     print("")
 
