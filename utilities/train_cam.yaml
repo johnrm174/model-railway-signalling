@@ -1,0 +1,51 @@
+esphome:
+  name: train-cab-cam
+  friendly_name: Train Cab Cam
+
+esp32:
+  board: seeed_xiao_esp32s3
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+# Change these to your actual home layout Wi-Fi details
+wifi:
+  ssid: "xxx"
+  password: "xxx"
+  power_save_mode: none
+  output_power: 8.5dB
+
+# Enable logging via the USB Serial link
+logger:
+  level: DEBUG
+
+# Activates a direct web page stream
+esp32_camera_web_server:
+  - port: 8080
+    mode: stream
+
+# The exact pinout configuration required for the Sense camera board
+esp32_camera:
+  name: "Cab View"
+  external_clock:
+    pin: GPIO10
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO40
+    scl: GPIO39
+  data_pins: [GPIO15, GPIO17, GPIO18, GPIO16, GPIO14, GPIO12, GPIO11, GPIO48]
+  vsync_pin: GPIO38
+  href_pin: GPIO47
+  pixel_clock_pin: GPIO13
+
+  # Perfect layout frame size balancing clarity and frame rate
+  resolution: 640x480
+  max_framerate: 24 fps
+  jpeg_quality: 16
+  vertical_flip: false
+  horizontal_mirror: false
+  frame_buffer_count: 2
