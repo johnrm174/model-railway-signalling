@@ -100,7 +100,7 @@ def mqtt_messaging_tests():
     assert mqtt_connected
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_2", "node1", 1, message_callback, subtopics=True)
     assert len(mqtt_interface.node_config["list_of_subscribed_topics"]) == 2
-    print("Library Tests - resubscribe on disconnect/reconnect - 1 Info and 7 Debug messages will be generated")
+    print("Library Tests - resubscribe on disconnect/reconnect - 1 Info and 5 Debug messages will be generated")
     mqtt_interface.mqtt_broker_disconnect()
     time.sleep(2.0)
     logging.getLogger().setLevel(logging.DEBUG) #################################################################################
@@ -123,7 +123,7 @@ def mqtt_messaging_tests():
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":34, "data2":"def"}, log_message="LOG MESSAGE 2")
     mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":56, "data2":"ghi"}, log_message="LOG MESSAGE 3", subtopic="sub1")
     mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":78, "data2":"jkl"}, log_message="LOG MESSAGE 4", subtopic="sub2")
-    time.sleep(1.0)
+    time.sleep(2.0)
     logging.getLogger().setLevel(logging.WARNING) #################################################################################
     print("Library Tests - mqtt_publish_shutdown_message - 3 Debug and 1 Info message will be generated")
     mqtt_interface.configure_mqtt_client("network1","node1", True, True, True, shutdown_callback) # Shutdown processed
