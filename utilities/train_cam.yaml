@@ -14,8 +14,8 @@ psram:
 
 # Change these to your actual home layout Wi-Fi details
 wifi:
-  ssid: "xxx"
-  password: "xxx"
+  ssid: "BT-FMAKT2"
+  password: "xxxxxxxxxx"
   power_save_mode: none
   output_power: 8.5dB
 
@@ -46,6 +46,6 @@ esp32_camera:
   resolution: 640x480
   max_framerate: 24 fps
   jpeg_quality: 16
-  vertical_flip: false
+  vertical_flip: true
   horizontal_mirror: false
   frame_buffer_count: 2
