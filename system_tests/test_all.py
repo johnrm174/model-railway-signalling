@@ -2,6 +2,8 @@
 # Test script to run all system tests
 #-----------------------------------------------------------------------------------
 
+import os
+
 import system_test_harness
 
 import library_tests_block_instruments
@@ -38,8 +40,11 @@ import test_mqtt_networking_example
 import test_load_layout_failures
 
 def run_all_tests():
+    #  Purge any retained messages prior to start of the script
+    os.system("mosquitto_sub -t '#' --remove-retained --retained-only -W 1")
     print("*** Running Library Tests ***")
     # Note we immediately abort if any library tests fail
+    if system_test_harness.test_failures == 0: library_tests_mqtt_interface.run_all_tests()   ## This needs to run first
     if system_test_harness.test_failures == 0: library_tests_block_instruments.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_buttons.run_all_tests()
     # Common #########################################
@@ -49,7 +54,6 @@ def run_all_tests():
     if system_test_harness.test_failures == 0: library_tests_levers.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_lines.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_loco_control.run_all_tests()
-    if system_test_harness.test_failures == 0: library_tests_mqtt_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_points.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_sprog_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_text_boxes.run_all_tests()
