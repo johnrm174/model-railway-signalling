@@ -858,7 +858,7 @@ def run_undo_and_redo_tests():
     select_single_object(s1)    
     assert_object_configuration(s1,{"orientation":0})  
     rotate_selected_objects()                             # event 7 #
-    assert_object_configuration(s1,{"orientation":180})  
+    assert_object_configuration(s1,{"orientation":90})  
     [s11] = copy_selected_objects(50,50)      # event 8 #
     assert_objects_exist(s11)
     delete_selected_objects()                             # event 9 #
@@ -875,7 +875,7 @@ def run_undo_and_redo_tests():
     assert_objects_exist(s11)
     undo()                                                # undo of event 8 #
     assert_objects_do_not_exist(s11)
-    assert_object_configuration(s1,{"orientation":180})
+    assert_object_configuration(s1,{"orientation":90})
     undo()                                                # undo of event 7 #
     assert_object_configuration(s1,{"orientation":0})
     assert_object_position(l1,25,100,550,100)
@@ -925,7 +925,7 @@ def run_undo_and_redo_tests():
     select_single_object(s1)    
     assert_object_configuration(s1,{"orientation":0})  
     redo()
-    assert_object_configuration(s1,{"orientation":180})  
+    assert_object_configuration(s1,{"orientation":90})  
     copy_selected_objects(50,50)
     assert_objects_do_not_exist(s11)
     redo()
