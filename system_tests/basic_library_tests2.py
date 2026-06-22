@@ -10,7 +10,6 @@ import system_test_harness
 from model_railway_signals.library import common
 from model_railway_signals.editor import schematic
 
-
 #---------------------------------------------------------------------------------------------------------
 # Library Common tests
 #---------------------------------------------------------------------------------------------------------
@@ -39,9 +38,6 @@ def run_library_common_tests():
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
-
-##### TODO - File_interface ######
-##### TODO - Loco_control ######
 
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
