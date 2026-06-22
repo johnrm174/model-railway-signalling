@@ -67,12 +67,14 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Track sections can now be rotated (i.e. oriented either vertically or horizontally).
 * Track sections can now be highlighted to show they are occupied (background colour).
 * Timed signal delays (between aspect changes) can now be specified up to 240 seconds.
+* Enhancement to occupancy - track sensors can now be used 'back to back' with signals.
+* Scripting interface improvements - can now "wait for" button and gpio events
 * Bugfix to colour light timed sequences - ensure that DANGER aspects take precidence.
 * Bugfix to Throttles - set speed to zero and inhibit selections when DCC power is off.
 * Bugfix to NX Routes - exit buttons disabled during route selection if not viable.
 * Bugfix to NX Routes - Ensure all route buttons are cleared down on layout reset.
 * Bugfix to Lever Interlocking - To take account of lever type (FPL, Point, FPL+Point).
-* Enhancement to occupancy - track sensors can now be used 'back to back' with signals.
+
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
