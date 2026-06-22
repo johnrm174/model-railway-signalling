@@ -41,8 +41,8 @@
 # Scripting API functions to query layout state:
 #    get_button_state(button_id)
 #    get_gpio_port_state(gpio_port_id)
-#    wait_for_gpio_port(gpio_port_id, required_state, timeout=None)
-#    wait_for_button(button_id, required_state, timeout=None)
+#    wait_for_gpio_port(gpio_port_id, required_state, delay=0, timeout=None)
+#    wait_for_button(button_id, required_state, delay=0, timeout=None)
 #
 # Scripting API functions for loco control (direct via pi-sprog interface):
 #    request_loco_session(dcc_address, delay)
@@ -513,7 +513,7 @@ def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
         time.sleep(delay)
     return(gpio_state)
 
-def wait_for_gpio_port(gpio_port_id:int, state:bool, timeout:float=None):
+def wait_for_gpio_port(gpio_port_id:int, state:bool, delay:float=default_delay_time, timeout:float=None):
     if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings.keys():
         raise_test_warning("Scripting: wait_for_gpio_port - GPIO: "+str(gpio_port_id)+" has not been mapped")
     else:
@@ -523,7 +523,9 @@ def wait_for_gpio_port(gpio_port_id:int, state:bool, timeout:float=None):
         released_evt = gpio_sensors.gpio_port_mappings[str(gpio_port_id)]["released_event"]
         # Check if it's already in the Active state
         current_state = gpio_sensors.get_gpio_port_state(gpio_port_id)
-        if current_state == state: return(True)
+        if current_state == state:
+            time.sleep(delay)
+            return(True)
         elif state: target_event = triggered_evt
         else: target_event = released_evt
         # Deterministic Wait Loop We loop using a small timeout window so we can safely check
@@ -535,7 +537,9 @@ def wait_for_gpio_port(gpio_port_id:int, state:bool, timeout:float=None):
                 raise ThreadStopException("Scripting: Application closing. Stopping wait.")
             # Wait on the hardware event for up to 250ms (completely handles CPU sleep)
             event_fired = target_event.wait(timeout=0.25)
-            if event_fired: return(True)
+            if event_fired:
+                time.sleep(delay)
+                return(True)
             # Handle custom user timeouts if specified
             if timeout is not None:
                 if (time.time() - start_time) >= timeout:
@@ -543,7 +547,7 @@ def wait_for_gpio_port(gpio_port_id:int, state:bool, timeout:float=None):
                     break
     return(False)
 
-def wait_for_button(button_id:int, state:bool, timeout:float=None):
+def wait_for_button(button_id:int, state:bool, delay:float=default_delay_time, timeout:float=None):
     # Ensure button exists in the mapping configuration
     if str(button_id) not in buttons.buttons.keys():
         raise_test_warning(f"Scripting: wait_for_button - Button: {button_id} does not exist")
@@ -554,7 +558,9 @@ def wait_for_button(button_id:int, state:bool, timeout:float=None):
     released_evt = buttons.buttons[str(button_id)]["released_event"]
     # Check if the button is already sitting in the desired target state
     current_state = buttons.button_state(button_id)
-    if current_state == state: return(True)
+    if current_state == state:
+        time.sleep(delay)
+        return(True)
     elif state: target_event = triggered_evt
     else: target_event = released_evt
     # Deterministic Wait Loop. We loop using a small timeout window so we can safely check
@@ -566,7 +572,9 @@ def wait_for_button(button_id:int, state:bool, timeout:float=None):
             raise ThreadStopException("Scripting: Application closing. Stopping wait.")
         # Wait on the thread synchronization primitive for up to 250ms (0 CPU usage sleep)
         event_fired = target_event.wait(timeout=0.25)
-        if event_fired: return(True)
+        if event_fired:
+            time.sleep(delay)
+            return(True)
         # Handle user-defined timing ceiling restraints if passed explicitly
         if timeout is not None:
             if (time.time() - start_time) >= timeout:
