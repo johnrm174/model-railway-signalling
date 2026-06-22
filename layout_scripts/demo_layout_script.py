@@ -1,12 +1,12 @@
 import faulthandler
 faulthandler.enable()
+
 #------------------------------------------------------------------------------------------
 # Scripts for running demo layout
 #------------------------------------------------------------------------------------------
 
 # Import the scripting API functions from the signalling appliaction
 from model_railway_signals import *
-
 
 #------------------------------------------------------------------------------------------
 # Loco designations to use on the demo layout
