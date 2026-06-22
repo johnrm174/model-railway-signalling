@@ -1,13 +1,17 @@
-import sounddevice  ############################### This is a new import
-from PIL import Image, ImageTk  # Handles OpenCV to Tkinter conversion ###################
-import cv2 # Open Source Computer Vision Library ##########################
+complex_throttle_enabled = False
+try:
+    import cv2  # New Import - Open Source Computer Vision Library ####################################################
+    import sounddevice  # New Import ##################################################################################
+    from PIL import Image, ImageTk  # New Import- Handles OpenCV to Tkinter conversion (APT install ###################
+    complex_throttle_enabled = True
+except:
+    pass
 
 import tkinter as Tk
 import threading
 import logging
 import numpy
 import math
-import sounddevice
 import subprocess
 import os
 
@@ -410,9 +414,10 @@ class complex_throttle(Tk.Toplevel):
 # The axel offsets are only used to generate the clackity-clack sounds
 
 def test_complex_throttle(root):
-    heavy_freight = complex_throttle(root_window=root, name="Class 66", mass=129, max_speed=75, max_te=93000,
-                    traction_responsiveness=0.01, brake_responsiveness=0.03, dcc_address=3,
-                    axle_offsets=[0.0, 8.5, 42.0, 50.5], stream_url="http://192.168.1.149:8080")
+    if complex_throttle_enabled:
+        heavy_freight = complex_throttle(root_window=root, name="Class 66", mass=129, max_speed=75, max_te=93000,
+                        traction_responsiveness=0.01, brake_responsiveness=0.03, dcc_address=3,
+                        axle_offsets=[0.0, 8.5, 42.0, 50.5], stream_url="http://192.168.1.149:8080")
 
 # other = complex_throttle(root_window=root, name="Class 66", mass=129, max_speed=75, max_te=93000,
 #                 traction_responsiveness=0.01, brake_responsiveness=0.03)
