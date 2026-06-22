@@ -40276,7 +40276,7 @@
             "menubarfontsize": 10,
             "resetdelay": 0,
             "spadpopups": false,
-            "version": "Version 6.2.4"
+            "version": "Version 6.3.0"
         },
         "gpio": {
             "maxevents": 100,
@@ -40410,6 +40410,7 @@
     },
     "signals": {
         "1": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40422,6 +40423,7 @@
             "theatretext": ""
         },
         "10": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40434,6 +40436,7 @@
             "theatretext": ""
         },
         "100": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40446,6 +40449,7 @@
             "theatretext": ""
         },
         "101": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40458,6 +40462,7 @@
             "theatretext": ""
         },
         "102": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40470,6 +40475,7 @@
             "theatretext": ""
         },
         "103": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40482,6 +40488,7 @@
             "theatretext": ""
         },
         "104": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40494,6 +40501,7 @@
             "theatretext": ""
         },
         "105": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40506,6 +40514,7 @@
             "theatretext": ""
         },
         "106": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40518,6 +40527,7 @@
             "theatretext": ""
         },
         "107": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40530,6 +40540,7 @@
             "theatretext": ""
         },
         "108": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40542,6 +40553,7 @@
             "theatretext": ""
         },
         "109": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40554,6 +40566,7 @@
             "theatretext": ""
         },
         "11": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40566,6 +40579,7 @@
             "theatretext": ""
         },
         "110": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40578,6 +40592,7 @@
             "theatretext": ""
         },
         "111": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40590,6 +40605,7 @@
             "theatretext": ""
         },
         "112": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40602,6 +40618,7 @@
             "theatretext": ""
         },
         "113": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40614,6 +40631,7 @@
             "theatretext": null
         },
         "114": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40626,6 +40644,7 @@
             "theatretext": null
         },
         "115": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40638,6 +40657,7 @@
             "theatretext": null
         },
         "116": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40650,6 +40670,7 @@
             "theatretext": null
         },
         "117": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40662,6 +40683,7 @@
             "theatretext": null
         },
         "118": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40674,6 +40696,7 @@
             "theatretext": null
         },
         "119": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40686,6 +40709,7 @@
             "theatretext": null
         },
         "12": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40698,6 +40722,7 @@
             "theatretext": ""
         },
         "120": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40710,6 +40735,7 @@
             "theatretext": null
         },
         "13": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40722,6 +40748,7 @@
             "theatretext": ""
         },
         "14": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40734,6 +40761,7 @@
             "theatretext": null
         },
         "15": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40746,6 +40774,7 @@
             "theatretext": null
         },
         "16": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40758,6 +40787,7 @@
             "theatretext": null
         },
         "17": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40770,6 +40800,7 @@
             "theatretext": null
         },
         "18": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40782,6 +40813,7 @@
             "theatretext": ""
         },
         "19": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40794,6 +40826,7 @@
             "theatretext": ""
         },
         "2": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40806,6 +40839,7 @@
             "theatretext": ""
         },
         "20": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40818,6 +40852,7 @@
             "theatretext": ""
         },
         "21": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40830,6 +40865,7 @@
             "theatretext": ""
         },
         "22": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40842,6 +40878,7 @@
             "theatretext": "M"
         },
         "23": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40854,6 +40891,7 @@
             "theatretext": "M"
         },
         "24": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40866,6 +40904,7 @@
             "theatretext": "M"
         },
         "25": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40878,6 +40917,7 @@
             "theatretext": "M"
         },
         "26": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40890,6 +40930,7 @@
             "theatretext": ""
         },
         "27": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40902,6 +40943,7 @@
             "theatretext": ""
         },
         "28": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40914,6 +40956,7 @@
             "theatretext": ""
         },
         "29": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40926,6 +40969,7 @@
             "theatretext": null
         },
         "3": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40938,6 +40982,7 @@
             "theatretext": ""
         },
         "30": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40950,6 +40995,7 @@
             "theatretext": null
         },
         "31": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40962,6 +41008,7 @@
             "theatretext": null
         },
         "32": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": null,
@@ -40974,6 +41021,7 @@
             "theatretext": null
         },
         "33": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40986,6 +41034,7 @@
             "theatretext": ""
         },
         "34": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -40998,6 +41047,7 @@
             "theatretext": ""
         },
         "35": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41010,6 +41060,7 @@
             "theatretext": "M"
         },
         "36": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41022,6 +41073,7 @@
             "theatretext": ""
         },
         "37": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41034,6 +41086,7 @@
             "theatretext": ""
         },
         "38": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41046,6 +41099,7 @@
             "theatretext": ""
         },
         "39": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41058,6 +41112,7 @@
             "theatretext": ""
         },
         "4": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41070,6 +41125,7 @@
             "theatretext": ""
         },
         "40": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41082,6 +41138,7 @@
             "theatretext": ""
         },
         "41": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41094,6 +41151,7 @@
             "theatretext": ""
         },
         "42": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41106,6 +41164,7 @@
             "theatretext": ""
         },
         "43": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41118,6 +41177,7 @@
             "theatretext": ""
         },
         "44": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41130,6 +41190,7 @@
             "theatretext": ""
         },
         "45": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41142,6 +41203,7 @@
             "theatretext": ""
         },
         "46": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41154,6 +41216,7 @@
             "theatretext": ""
         },
         "47": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41166,6 +41229,7 @@
             "theatretext": ""
         },
         "48": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41178,6 +41242,7 @@
             "theatretext": ""
         },
         "49": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41190,6 +41255,7 @@
             "theatretext": ""
         },
         "5": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41202,6 +41268,7 @@
             "theatretext": ""
         },
         "50": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41214,6 +41281,7 @@
             "theatretext": ""
         },
         "51": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41226,6 +41294,7 @@
             "theatretext": ""
         },
         "52": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41238,6 +41307,7 @@
             "theatretext": ""
         },
         "53": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41250,6 +41320,7 @@
             "theatretext": ""
         },
         "54": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41262,6 +41333,7 @@
             "theatretext": ""
         },
         "55": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41274,6 +41346,7 @@
             "theatretext": ""
         },
         "56": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41286,6 +41359,7 @@
             "theatretext": ""
         },
         "57": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41298,6 +41372,7 @@
             "theatretext": ""
         },
         "58": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41310,6 +41385,7 @@
             "theatretext": ""
         },
         "59": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41322,6 +41398,7 @@
             "theatretext": ""
         },
         "6": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41334,6 +41411,7 @@
             "theatretext": "M"
         },
         "60": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41346,6 +41424,7 @@
             "theatretext": ""
         },
         "61": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41358,6 +41437,7 @@
             "theatretext": ""
         },
         "62": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41370,6 +41450,7 @@
             "theatretext": ""
         },
         "63": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41382,6 +41463,7 @@
             "theatretext": ""
         },
         "64": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41394,6 +41476,7 @@
             "theatretext": ""
         },
         "65": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41406,6 +41489,7 @@
             "theatretext": ""
         },
         "66": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41418,6 +41502,7 @@
             "theatretext": ""
         },
         "67": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41430,6 +41515,7 @@
             "theatretext": ""
         },
         "68": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41442,6 +41528,7 @@
             "theatretext": "M"
         },
         "69": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41454,6 +41541,7 @@
             "theatretext": ""
         },
         "7": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41466,6 +41554,7 @@
             "theatretext": "M"
         },
         "70": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41478,6 +41567,7 @@
             "theatretext": ""
         },
         "71": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41490,6 +41580,7 @@
             "theatretext": ""
         },
         "72": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41502,6 +41593,7 @@
             "theatretext": ""
         },
         "73": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41514,6 +41606,7 @@
             "theatretext": ""
         },
         "74": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41526,6 +41619,7 @@
             "theatretext": ""
         },
         "75": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41538,6 +41632,7 @@
             "theatretext": ""
         },
         "76": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41550,6 +41645,7 @@
             "theatretext": ""
         },
         "77": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41562,6 +41658,7 @@
             "theatretext": ""
         },
         "78": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41574,6 +41671,7 @@
             "theatretext": ""
         },
         "79": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41586,6 +41684,7 @@
             "theatretext": ""
         },
         "8": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41598,6 +41697,7 @@
             "theatretext": "M"
         },
         "80": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41610,6 +41710,7 @@
             "theatretext": ""
         },
         "81": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41622,6 +41723,7 @@
             "theatretext": ""
         },
         "82": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41634,6 +41736,7 @@
             "theatretext": ""
         },
         "83": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41646,6 +41749,7 @@
             "theatretext": ""
         },
         "84": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41658,6 +41762,7 @@
             "theatretext": ""
         },
         "85": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41670,6 +41775,7 @@
             "theatretext": ""
         },
         "86": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41682,6 +41788,7 @@
             "theatretext": ""
         },
         "87": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41694,6 +41801,7 @@
             "theatretext": ""
         },
         "88": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41706,6 +41814,7 @@
             "theatretext": ""
         },
         "89": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41718,6 +41827,7 @@
             "theatretext": ""
         },
         "9": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41730,6 +41840,7 @@
             "theatretext": ""
         },
         "90": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41742,6 +41853,7 @@
             "theatretext": ""
         },
         "91": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41754,6 +41866,7 @@
             "theatretext": ""
         },
         "92": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41766,6 +41879,7 @@
             "theatretext": ""
         },
         "93": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41778,6 +41892,7 @@
             "theatretext": ""
         },
         "94": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41790,6 +41905,7 @@
             "theatretext": ""
         },
         "95": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41802,6 +41918,7 @@
             "theatretext": ""
         },
         "96": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41814,6 +41931,7 @@
             "theatretext": ""
         },
         "97": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41826,6 +41944,7 @@
             "theatretext": ""
         },
         "98": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,
@@ -41838,6 +41957,7 @@
             "theatretext": ""
         },
         "99": {
+            "overcaution": false,
             "override": false,
             "overridesub": false,
             "releaseonred": false,

@@ -506,7 +506,8 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
 # a signal (and getting passed from one Track Section to another) and then immediately passing an
 # opposing signal on the route ahead (where we don't want to erroneously pass the train back)
 # To enable this, all train movements (from one track section to the next) are stored in the
-# global list_of_movements and then deleted once a secondary 'signal passed' event occurs
+# global list_of_movements and then deleted once a secondary 'signal passed' event occurs.
+# We also ignore secondary 'passed' events for signals / track sections
 #------------------------------------------------------------------------------------
 
 list_of_movements = []
@@ -568,7 +569,7 @@ def update_track_occupancy_for_signal(item_id:int):
             logging.warning("RUN LAYOUT: "+log_text)
             if spad_popups: library.display_warning(canvas, log_text)
     # Establish if this is a primary event or a secondary event (to a previous train movement). This is the
-    # case of a train passing a signal and then immediately passing an opposing signal on the route ahead
+    # case of a train passing a signal/sensor and then immediately passing an opposing signal/sensor ahead.
     # The second event should be ignored as we don't want to pass the train back to the previous section.
     is_secondary_event = False
     if section_ahead > 0 and section_behind > 0:
@@ -589,7 +590,9 @@ def update_track_occupancy_for_signal(item_id:int):
     # warnings as required. If there is a change to process, then schedule this for later
     override_sig = objects.schematic_objects[objects.signal(item_id)]["overridesignal"]
     override_sub = objects.schematic_objects[objects.signal(item_id)]["overridesubsidary"]
-    if route is not None and not is_secondary_event:
+    # If the route is none we don't process any changes. As long as the route is not none
+    # then we can still process the changes (section ahead/behind = 0 is a valid case)
+    if not is_secondary_event and route is not None:
         if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
             if override_sig:
                 library.set_signal_override(item_id, temp_override=True)
@@ -609,6 +612,7 @@ def update_track_occupancy_for_track_sensor(item_id:int):
     # the returned routes are None we can't really assume anything so don't process any changes.
     route_ahead = find_valid_route(object_id, "routeahead")
     if route_ahead is None:
+        section_ahead = 0
         log_text = item_text+" 'passed' - unable to determine movement (no valid route 'ahead of' Sensor)"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: library.display_warning(canvas, log_text)
@@ -616,14 +620,27 @@ def update_track_occupancy_for_track_sensor(item_id:int):
         section_ahead = schematic_object["routeahead"][route_ahead.value-1][1]
     route_behind = find_valid_route(object_id, "routebehind")
     if route_behind is None:
+        section_behind = 0
         log_text=item_text+" 'passed' - unable to determine movement (no valid route 'behind' Sensor)"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: library.display_warning(canvas, log_text)
     else:
         section_behind = schematic_object["routebehind"][route_behind.value-1][1]
-    # Validate the track occupancy change arising from the signal 'passed' event, raising any
+    # Establish if this is a primary event or a secondary event (to a previous train movement). This is the
+    # case of a train passing a signal/sensor and then immediately passing an opposing signal/sensor ahead.
+    # The second event should be ignored as we don't want to pass the train back to the previous section.
+    is_secondary_event = False
+    if section_ahead > 0 and section_behind > 0:
+        if [section_ahead, section_behind] in list_of_movements:
+            list_of_movements.remove([section_ahead, section_behind])
+            is_secondary_event = True
+        elif [section_behind, section_ahead] not in list_of_movements:
+            list_of_movements.append([section_behind, section_ahead])
+    # Validate the track occupancy change arising from the sensor 'passed' event, raising any
     # warnings as required. If there is a change to process, then schedule this for later
-    if route_ahead is not None and route_behind is not None:
+    # If the route is none we don't process any changes. As long as the route is not none
+    # then we can still process the changes (section ahead/behind = 0 is a valid case)
+    if not is_secondary_event and route_ahead is not None and route_behind is not None:
         if validate_occupancy_changes(section_ahead, section_behind, item_text):
             clearance_delay = schematic_object["clearancedelay"]*1000
             root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind))
@@ -923,12 +940,14 @@ def process_all_point_interlocking():
         # Lock or unlock the Point as required
         if point_locked: library.lock_point(int_point_id, point_tooltip)
         else: library.unlock_point(int_point_id)
-        # Lock any Signalbox levers that are linked to the Point
+        # Lock any Signalbox levers that are linked to the Point.
         for str_lever_id in objects.lever_index:
             lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-            if lever_object["linkedpoint"] == int_point_id :
-                if point_locked: library.lock_lever(int(str_lever_id), point_tooltip)
-                else: library.unlock_lever(int(str_lever_id))
+            if lever_object["linkedpoint"] == int_point_id:
+                if (lever_object["switchfpl"] or lever_object["switchpointandfpl"] or
+                     (lever_object["switchpoint"] and not point_object["hasfpl"])):
+                    if point_locked: library.lock_lever(int(str_lever_id), point_tooltip)
+                    else: library.unlock_lever(int(str_lever_id))
     return()
 
 #------------------------------------------------------------------------------------

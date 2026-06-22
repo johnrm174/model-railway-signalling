@@ -71,6 +71,7 @@
 import logging
 import enum
 import tkinter as Tk
+import threading
 
 from ..common import CreateToolTip
 
@@ -91,7 +92,13 @@ class button_type(enum.Enum):
 #---------------------------------------------------------------------------------------------
 
 buttons: dict = {}
-                                                            
+
+#---------------------------------------------------------------------------------------------------
+# Threading Lock To ensure data update of the gpio data is absolutely threadsafe
+#---------------------------------------------------------------------------------------------------
+
+button_data_lock = threading.Lock()
+
 #---------------------------------------------------------------------------------------------
 # Library function to set/clear Edit Mode (called by the editor on mode change)
 # The appearance of Button objects will change between Edit and run Modes
@@ -174,6 +181,9 @@ def button_pressed_event(button_id:int):
     # This event is called for Momentary Switches only - on user 'press' of the button
     logging.info("Button "+str(button_id)+": Momentary Button has been pressed *****************************************")
     buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+    with button_data_lock:
+        buttons[str(button_id)]["triggered_event"].set()
+        buttons[str(button_id)]["released_event"].clear()
     dcc_control.update_dcc_switch(button_id, True)
     if buttons[str(button_id)]["releasedelay"] > 0:
         common.root_window.after(buttons[str(button_id)]["releasedelay"], lambda:button_released_event(button_id))
@@ -187,6 +197,9 @@ def button_released_event(button_id:int):
     if button_exists(button_id):
         logging.info("Button "+str(button_id)+": Momentary Button has been released ****************************************")
         buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["deselectedcolour"])
+        with button_data_lock:
+            buttons[str(button_id)]["triggered_event"].clear()
+            buttons[str(button_id)]["released_event"].set()
         dcc_control.update_dcc_switch(button_id, False)
     return()
 
@@ -225,17 +238,26 @@ def toggle_button(button_id:int):
     elif buttons[str(button_id)]["buttontype"] == button_type.momentary:
         logging.info("Button "+str(button_id)+": Momentary Button has been activated ***************************************")
         buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+        with button_data_lock:
+            buttons[str(button_id)]["triggered_event"].set()
+            buttons[str(button_id)]["released_event"].clear()
         dcc_control.update_dcc_switch(button_id, True)
         common.root_window.after(buttons[str(button_id)]["releasedelay"], lambda:button_released_event(button_id))
     elif buttons[str(button_id)]["selected"]:
         logging.info("Button "+str(button_id)+": Button has been de-selected ***********************************************")
         buttons[str(button_id)]["button"].config(relief="raised",bg=buttons[str(button_id)]["deselectedcolour"])
-        buttons[str(button_id)]["selected"] = False
+        with button_data_lock:
+            buttons[str(button_id)]["triggered_event"].clear()
+            buttons[str(button_id)]["released_event"].set()
+            buttons[str(button_id)]["selected"] = False
         dcc_control.update_dcc_switch(button_id, False)
     else:
         logging.info("Button "+str(button_id)+": Button has been selected **************************************************")
         buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
-        buttons[str(button_id)]["selected"] = True
+        with button_data_lock:
+            buttons[str(button_id)]["selected"] = True
+            buttons[str(button_id)]["triggered_event"].set()
+            buttons[str(button_id)]["released_event"].clear()
         dcc_control.update_dcc_switch(button_id, True)
     return()
 
@@ -382,13 +404,19 @@ def button_state(button_id:int):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(button_id, int) :
         logging.error("Button "+str(button_id)+": button_state - Button ID must be an int")
-        button_state = False
+        button_state_val = False
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": button_state - Button ID does not exist")
-        button_state = False
+        button_state_val = False
     else:
-        button_state = buttons[str(button_id)]["selected"]
-    return(button_state)
+        with button_data_lock:
+            if buttons[str(button_id)]["buttontype"] == button_type.momentary:
+                # Momentary buttons evaluate their real-time transition status flag
+                button_state_val = buttons[str(button_id)]["triggered_event"].is_set()
+            else:
+                # Switched buttons evaluate their toggle state attribute
+                button_state_val = buttons[str(button_id)]["selected"]
+    return(button_state_val)
 
 #---------------------------------------------------------------------------------------------
 # Public API function to create a Button object (drawing objects plus internal state)
@@ -488,14 +516,21 @@ def create_button (canvas, button_id:int, buttontype:button_type, x:int, y:int, 
         buttons[str(button_id)]["deselectedcolour"] = button_colour           # button colour in its normal/unselected state
         buttons[str(button_id)]["selectedcolour"] = selected_colour           # button colour in its selected state
         buttons[str(button_id)]["tags"] = canvas_tag                          # Canvas Tag for ALL drawing objects
+        buttons[str(button_id)]["triggered_event"] = threading.Event()
+        buttons[str(button_id)]["released_event"] = threading.Event()
         # Get the initial state for the button (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("buttons",button_id)
         # Toggle the button to 'Selected' if required
         if loaded_state["selected"]:
             buttons[str(button_id)]["selected"] = True
             buttons[str(button_id)]["button"].config(relief="sunken",bg=buttons[str(button_id)]["selectedcolour"])
+            buttons[str(button_id)]["triggered_event"].set()
+            buttons[str(button_id)]["released_event"].clear()
+        else:
+            buttons[str(button_id)]["triggered_event"].clear()
+            buttons[str(button_id)]["released_event"].set()
         if loaded_state["buttondata"]:
-             buttons[str(button_id)]["buttondata"] = loaded_state["buttondata"]
+            buttons[str(button_id)]["buttondata"] = loaded_state["buttondata"]
         # Send out any DCC commands associated with the initial state of the button
         # Note that commands will only be sent out if a mapping exists
         dcc_control.update_dcc_switch(button_id, buttons[str(button_id)]["selected"])

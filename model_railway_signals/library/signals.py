@@ -460,10 +460,10 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',3,"normal"),
                         highlightthickness=0, command=lambda:sig_passed_button_event(sig_id))
     # Set the anchor point for the buttons according to the position of the signal
-    if orientation != 180 and post_offset < 0:
+    if orientation == 0 and post_offset < 0:
         sig_button_anchor=Tk.SE
         sub_button_anchor=Tk.SW
-    elif orientation != 180 and post_offset >= 0:
+    elif orientation == 0 and post_offset >= 0:
         sig_button_anchor=Tk.NE
         sub_button_anchor=Tk.NW
     elif orientation == 180 and post_offset < 0:
@@ -472,6 +472,18 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     elif orientation == 180 and post_offset >= 0:
         sig_button_anchor=Tk.SW
         sub_button_anchor=Tk.SE
+    elif orientation == 90 and post_offset < 0:
+        sig_button_anchor=Tk.SW
+        sub_button_anchor=Tk.NW
+    elif orientation == 90 and post_offset >= 0:
+        sig_button_anchor=Tk.SW
+        sub_button_anchor=Tk.NW
+    elif orientation == 270 and post_offset < 0:
+        sig_button_anchor=Tk.NE
+        sub_button_anchor=Tk.SE
+    elif orientation == 270 and post_offset >= 0:
+        sig_button_anchor=Tk.NW
+        sub_button_anchor=Tk.SW
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button window is only
     # created if the signal has a subsidary. The Button positions are adjusted so they always
     # remain in the "right" position relative to the signal. Note we also have to cater for the

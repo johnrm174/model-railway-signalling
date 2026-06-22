@@ -370,10 +370,19 @@ def run_function(test_function, timeout=2.0):
     # Create an Event (to signal back into this thread when the function has completed)
     done_event1 = threading.Event()
     done_event2 = threading.Event()
+    # Use a mutable dict to pass any exception back to the test harness thread
+    exception_holder = {}
     # Create a function Wrapper that will always set the event when the function has completed)
     def function_wrapper1():
-        try: test_function()
-        finally: done_event1.set()
+        try: 
+            test_function()
+        except Exception as exception:
+            # Capture the exception before the global handler logs it
+            exception_holder['exception'] = exception
+            # Re-raise it so process_external_events still catches and logs it as normal
+            raise 
+        finally: 
+            done_event1.set()
     # Send the Wrapper to the Event Queue (to be executed in the main tkinter thread)
     common.execute_function_in_tkinter_thread(function_wrapper1)
     # Wait for the event to complete before returning
@@ -381,6 +390,9 @@ def run_function(test_function, timeout=2.0):
     successfully_completed = done_event1.wait(timeout=timeout)
     if not successfully_completed:
         raise_test_error(f"Test function timed out after {timeout} seconds")
+    # If the Tkinter thread caught an exception, raise it in the test thread
+    if 'exception' in exception_holder:
+        raise_test_error("Function raised an exception whilst running in the main tkinter thread")
     # Some application functions schedule events via the root.after() method to
     # complete all required actions (e.g. reset_layout, signal_passed events etc.
     # We therefore ensure any 'immediate' events that have been added to the queue

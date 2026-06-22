@@ -193,7 +193,7 @@ def configure_edit_mode(edit_mode:bool):
                 # configuration (placeholder1 is the text object and placeholder2 is the rectangle object)
                 track_section["canvas"].itemconfig(track_section["buttonwindow"], state='hidden')
                 track_section["canvas"].itemconfig(track_section["placeholder1"], state='normal')
-                track_section["canvas"].itemconfig(track_section["placeholder2"], fill=track_section["selectedbgcolour"])
+                track_section["canvas"].itemconfig(track_section["placeholder2"], fill=track_section["deselectedbgcolour"])
             else:
                 # In Run Mode - If the object is configured as 'hidden' then we hide the text object but set
                 # the rectangle object to transparent - effectively hiding it whilst maintaining its 'presence'
@@ -218,11 +218,24 @@ def section_exists(section_id:Union[int,str]):
     return(section_exists)
 
 #---------------------------------------------------------------------------------------------
+# Internal Helper Function to Change a test string to a vertical text string
+#---------------------------------------------------------------------------------------------
+
+def make_vertical(text: str):
+    return ("\n".join(list(str(text))))
+
+#---------------------------------------------------------------------------------------------
 # Internal Function to handle the double-left-click of a (local) Track Section
 # This will open a throttle window and try to select the locomotive from the roster
 # if a loco name in the roster matches the train identifier in the track section
 # The double click will only be processed if the track section is occupied
 #---------------------------------------------------------------------------------------------
+
+###############################################################################
+#######  TECH DEBT - consider refactoring to pass in the ######################
+####### 'menubar.loco_control' function as a callback to ######################
+#######  keep the library module dependencies 'clean' #########################
+###############################################################################
 
 def open_throttle_window(section_id:int):
     # This function will be called whenever a Track Section is double clicked, but the first
@@ -354,7 +367,7 @@ def handle_mqtt_section_updated_event(message):
         logging.warning("Sections: handle_mqtt_section_updated_event - Message received from Remote Section "+
                         message["sourceidentifier"]+" but this Section has not been subscribed to")
     else:
-        # Extract the Data we need from the message.
+        # A typical message would be: {'sourceidentifier': 'box1-1', 'occupied': True, 'labeltext': 'ABC'}
         remote_sec_id = message["sourceidentifier"]
         remote_sec_state = message["occupied"]
         remote_sec_label = message["labeltext"]
@@ -386,6 +399,8 @@ def send_mqtt_section_updated_event(section_id:int):
         log_message = "Section "+str(section_id)+": Publishing section state to MQTT Broker"
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("section_updated_event",section_id,data=data,log_message=log_message,retain=True)
+        # The MQTT interface turns the section ID into the source identifier for inclusion in the message
+        # A transmitted message would be: {'sourceidentifier': 'box1-1', 'occupied': True, 'labeltext': 'ABC'}
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -432,6 +447,7 @@ def update_label(section_id:int, new_label:str):
     global sections
     logging.info ("Section "+str(section_id)+": Updating Label to '"+new_label+"'")
     sections[str(section_id)]["labeltext"] = new_label
+    if sections[str(section_id)]["vertical"]: new_label = make_vertical(new_label)
     sections[str(section_id)]["button"].config(text=new_label)
     return()
 
@@ -470,8 +486,9 @@ def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
 #---------------------------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int, section_callback, default_label:str="XXXXX",
-                    section_width:int=5, editable:bool=True, hidden=False, mirror_id:str="",
-                    button_colour:str="Black", text_colour:str="White", font=("TkFixedFont",8,"")):
+            section_width:int=5, editable:bool=True, hidden=False, mirror_id:str="", vertical:bool=False,
+            button_colour:str="Black", text_colour:str="White", highlight_colour:str="Red",
+            highlight_section:bool=False, font=("TkFixedFont",8,"")):
     global sections
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "section"+str(section_id)
@@ -495,10 +512,30 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         deselected_fg_colour = button_colour
         selected_bg_colour = button_colour
         deselected_bg_colour = button_colour
-        # Create the Track Section Button
-        section_button = Tk.Button(canvas, text=default_label, width=section_width, highlightthickness=0,
-                        state="normal", relief="raised", padx=3, pady=1, font=font, borderwidth=0,
-                        activebackground=deselected_bg_colour, activeforeground=deselected_fg_colour,
+        # If the track section is configured to highlight when occupied, we use the
+        # highlight_colour for the background in place of the default selected_bg_colour
+        if highlight_section: selected_bg_colour = highlight_colour
+        else: selected_bg_colour = button_colour
+        # Work out the default button width and height (chars) depending on the orientation
+        if vertical:
+            font = (font[0], font[1] - 1, font[2])
+            button_label = make_vertical(default_label)
+            button_id_text = make_vertical(format(section_id,'02d'))
+            button_height = section_width
+            button_width = 1
+            button_pady = 0
+            button_padx = 5
+        else:
+            button_label = default_label
+            button_id_text = format(section_id,'02d')
+            button_width = section_width
+            button_height = 1
+            button_pady = 1
+            button_padx = 3
+        # Create the Track Section Button (using the button width and height defined above)
+        section_button = Tk.Button(canvas, text=button_label, width=button_width, height=button_height, font=font,
+                        highlightthickness=0, state="normal", relief="raised", padx=button_padx, pady=button_pady,
+                        borderwidth=0, activebackground=deselected_bg_colour, activeforeground=deselected_fg_colour,
                         background=deselected_bg_colour, foreground=deselected_fg_colour,
                         disabledforeground=deselected_fg_colour)
         # Bind the mouse button events to the Track Section Button- only if the Section is editable
@@ -516,20 +553,20 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         # is initially 'hidden', assuming edit mode - but changed later if we are in Run Mode
         button_window = canvas.create_window(x, y, window=section_button, tags=canvas_tag, state='hidden')
         # Create the 'placeholder' for the Track Section to display in Edit Mode (so it an be selected/moved).
-        # Note that the 'width' parameter for the canvas.create_text function is the maximum width in pixels
-        # before the text starts to wrap so we can't use this to set the minimum width of the placeholded object.
-        # Instead, we need to specify an initial 'text' value that contains the required number of characters
-        # (using zfill) and change this later.
-        placeholder1 = canvas.create_text(x, y, text="".zfill(section_width), font=font,
+        # To set the default width/height of the placeholder (to match the size of the button), we need to
+        # specify an initial 'text' value that will correctly size the placeholder
+        if vertical: edit_label = make_vertical("".zfill(section_width))
+        else: edit_label = "".zfill(section_width)
+        placeholder1 = canvas.create_text(x, y, text=edit_label, font=font,
                                             fill=selected_fg_colour, tags=canvas_tag)
         bbox = canvas.bbox(placeholder1)
         placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
-                                            tags=canvas_tag, fill=selected_bg_colour, width=0)
+                                            tags=canvas_tag, fill=deselected_bg_colour, width=0)
         # Raise the text item to be in front of the rectangle item
         canvas.tag_raise(placeholder1, placeholder2)
-        # Now we have created the textbox at the right width, update it to display the 'proper' label
-        # which is always the Track Section ID so it can easily be identified on the edit canvas
-        canvas.itemconfigure(placeholder1, text=format(section_id,'02d'))
+        # Now we have created the textbox at the right width and height , update it with the 'proper'
+        # label which is the Track Section ID so it can easily be identified on the edit canvas.
+        canvas.itemconfigure(placeholder1, text=button_id_text)
         # Hide the placeholder objects if we are in Run Mode. Note we can't just make the rectangle
         # 'hidden' as the canvas.bbox function (used by the editor to get the selection area) would
         # just return zero values when subsequently queried (after the return from this function) and
@@ -547,6 +584,7 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         sections[str(section_id)]["extcallback"] = section_callback             # External callback to make
         sections[str(section_id)]["mirror"] = mirror_id                         # Other Local or Remote section to mirror
         sections[str(section_id)]["hidden"] = hidden                            # Display/hide the Track Sensor in Run Mode
+        sections[str(section_id)]["vertical"] = vertical                        # Flag to indicate if the section is vertical
         sections[str(section_id)]["sectionwidth"] = section_width               # The fixed width for the train designator
         sections[str(section_id)]["occupied"] = False                           # Current state (occupied/clear)
         sections[str(section_id)]["labeltext"] = default_label                  # Current state (train designator)
@@ -555,6 +593,8 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback, defa
         sections[str(section_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
         sections[str(section_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         sections[str(section_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
+        sections[str(section_id)]["highlightsection"] = highlight_section       # Flag to highlight section when OCCUPIED
+        sections[str(section_id)]["highlightcolour"] = highlight_colour         # Highlighting colour when section OCCUPIED
         sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour      # Section colour in its selected state
         sections[str(section_id)]["selectedfgcolour"] = selected_fg_colour      # Section colour in its selected state
         sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour  # Section colour in its normal/unselected state
@@ -598,12 +638,32 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
     else:
         logging.debug("Section "+str(section_id)+": Updating Track Section Styles")
         section = sections[str(section_id)]
+        # Take into account the orientation of the track section
+        if section["vertical"]:
+            font = (font[0], font[1] - 1, font[2])
+            button_label = make_vertical(default_label)
+            button_id_text = make_vertical(format(section_id,'02d'))
+            button_height = section_width
+            button_width = 1
+            button_pady = 0
+            button_padx = 5
+        else:
+            button_label = default_label
+            button_id_text = format(section_id,'02d')
+            button_width = section_width
+            button_height = 1
+            button_pady = 1
+            button_padx = 3
         # Specify the various parameters we need for the button/placeholder styles
         selected_fg_colour = text_colour
         deselected_fg_colour = button_colour
-        selected_bg_colour = button_colour
         deselected_bg_colour = button_colour
-        # Update the Button Styles depending on the state of the button
+        # If section highlighting is enabled, we use the highlight colour for the selected background
+        if sections[str(section_id)]["highlightsection"]:
+            selected_bg_colour = sections[str(section_id)]["highlightcolour"]
+        else:
+            selected_bg_colour = button_colour
+        # Update the Button Colours depending on the state of the button
         if section["occupied"]:
             section["button"].config(background=selected_bg_colour)
             section["button"].config(foreground=selected_fg_colour)
@@ -616,34 +676,43 @@ def update_section_styles(section_id:int, default_label:str="XXXXX", section_wid
             section["button"].config(activebackground=deselected_bg_colour)
             section["button"].config(activeforeground=deselected_fg_colour)
             section["button"].config(disabledforeground=deselected_fg_colour)
-        section["button"].config(width=section_width)
+        # Configure the button geometry (this takes into account its orientation
+        section["button"].config(width=button_width)
+        section["button"].config(height=button_height)
+        section["button"].config(padx=button_padx)
+        section["button"].config(pady=button_pady)
         section["button"].config(font=font)
+        # If the existing button_text is still set to the default button text then we
+        # update it to the new default button text. Otherwise we leave it unchanged
+        if section["labeltext"] == section["defaultlabel"]: section["button"].config(text=button_label)
         # Update the Placeholder Styles. This is relatively complex operation as we first
-        # need to ensure the text isn't "hidden" otherwise we will not be able to use the
+        # need to ensure the text box isn't "hidden" otherwise we will not be able to use the
         # 'bbox' method to get the new boundary coordinates (after we have updated the font).
         if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='normal')
+        # Create a dummy label to 'fill' the specified section 'width/height (depending on orientation)
+        if section["vertical"]: edit_label = make_vertical("".zfill(section_width))
+        else: edit_label = "".zfill(section_width)
+        # Update the textbox placeholder (this sets the correct size)
         section["canvas"].itemconfigure(section["placeholder1"], font=font)
         section["canvas"].itemconfigure(section["placeholder1"], fill=selected_fg_colour)
-        section["canvas"].itemconfigure(section["placeholder1"], text="".zfill(section_width))
+        section["canvas"].itemconfigure(section["placeholder1"], text=edit_label)
         bbox = section["canvas"].bbox(section["placeholder1"])
-        # Now we have the boundary coordinates we can re-hide the placeholder if we are in run mode
+        # Now we have the boundary coordinates we can re-hide the text_box if we are in run mode
         if not editing_enabled: section["canvas"].itemconfig(section["placeholder1"], state='hidden')
         # The second placeholder (the background rectangle) can now be updated as required
         section["canvas"].coords(section["placeholder2"], bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1)
         # Finally we can change the placeholder text to the appropriate string
-        section["canvas"].itemconfigure(section["placeholder1"], text=format(section_id,'02d'))
+        section["canvas"].itemconfigure(section["placeholder1"], text=button_id_text)
         # Only update the background colour if we are in edit mode (to make it visible)
-        if editing_enabled: section["canvas"].itemconfig(section["placeholder2"], fill=selected_bg_colour)
-        # Update the label text if it is still set to the original default label text
-        if section["labeltext"] == section["defaultlabel"]: update_label(section_id, default_label)
+        if editing_enabled: section["canvas"].itemconfig(section["placeholder2"], fill=deselected_bg_colour)
         # Store the parameters we need to track
         sections[str(section_id)]["textfont"] = font
         sections[str(section_id)]["defaultlabel"] = default_label
         sections[str(section_id)]["sectionwidth"] = section_width
-        sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour
         sections[str(section_id)]["selectedfgcolour"] = selected_fg_colour
         sections[str(section_id)]["deselectedfgcolour"] = deselected_fg_colour
         sections[str(section_id)]["deselectedbgcolour"] = deselected_bg_colour
+        sections[str(section_id)]["selectedbgcolour"] = selected_bg_colour
     return()
 
 #---------------------------------------------------------------------------------------------

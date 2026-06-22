@@ -960,7 +960,6 @@ class main_menubar:
 #------------------------------------------------------------------------------------
 
 def run_editor():
-    print("Starting Model Railway Signalling application")
     #---------------------------------------------------------------------------------
     # Set up the logging (we use queues to avoind locking problems betweeen threads)
     #---------------------------------------------------------------------------------
@@ -975,20 +974,33 @@ def run_editor():
     # Setup the Terminal Handler (StreamHandler) and file handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
-    file_log_handler = logging.FileHandler("model_railway_signalling.log", mode='w')
-    file_log_handler.setFormatter(formatter)
+    # Track handlers dynamically
+    listener_handlers = [console_handler]
+    file_log_handler = None
+    file_error_msg = None
+    try:
+        # Try to create the file log handler
+        file_log_handler = logging.FileHandler("model_railway_signalling.log", mode='w')
+        file_log_handler.setFormatter(formatter)
+        listener_handlers.append(file_log_handler)
+    except OSError as e:
+        # If it fails, we revert to just using the console handler
+        file_error_msg = f"Logging to file disabled: {e}"
     # Create the Listener that runs in the background, pull logs from the queue and send them to the handlers
-    log_listener = QueueListener(log_queue, console_handler, file_log_handler)
+    log_listener = QueueListener(log_queue, *listener_handlers)
     log_listener.start()
     # Configure the root logger to use the QueueHandler
     root_logger = logging.getLogger()
     root_logger.addHandler(QueueHandler(log_queue))
-    # Add a header into the file:
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    file_log_handler.stream.write(f"{timestamp} - Starting Model Railway Signals application\n")
-    file_log_handler.flush()
-    try: os.fsync(file_log_handler.stream.fileno())
-    except (AttributeError, ValueError): pass
+    # Add a header into the file or Put out a warning message if we failed to create it
+    if file_log_handler:
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        file_log_handler.stream.write(f"{timestamp} - Starting Model Railway Signals application\n")
+        file_log_handler.flush()
+        try: os.fsync(file_log_handler.stream.fileno())
+        except (AttributeError, ValueError): pass
+    else:
+        logging.warning(file_error_msg)
     #---------------------------------------------------------------------------------
     # Create the Main Root Window
     #---------------------------------------------------------------------------------

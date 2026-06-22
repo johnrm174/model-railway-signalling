@@ -125,6 +125,12 @@ def is_running_on_raspberry_pi():
 running_on_raspberry_pi = is_running_on_raspberry_pi()
 
 #---------------------------------------------------------------------------------------------------
+# Threading Lock To ensure data update of the gpio data is absolutely threadsafe
+#---------------------------------------------------------------------------------------------------
+
+gpio_data_lock = threading.Lock()
+
+#---------------------------------------------------------------------------------------------------
 # API Function for external modules to test if GPIO inputs are supported by the platform
 #---------------------------------------------------------------------------------------------------
 
@@ -248,7 +254,8 @@ def get_gpio_port_state(gpio_port_id:int):
         logging.error("GPIO Port "+str(gpio_port_id)+": get_gpio_port_state - GPIO Port does not exist")
         gpio_port_state = False
     else:
-        gpio_port_state = gpio_port_mappings[str(gpio_port_id)]["sensor_state"]
+        with gpio_data_lock:
+            gpio_port_state = gpio_port_mappings[str(gpio_port_id)]["sensor_state"]
     return(gpio_port_state)
 
 #---------------------------------------------------------------------------------------------------
@@ -381,18 +388,26 @@ def gpio_sensor_triggered(gpio_port:int):
             sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
             # Only process the event if we are not in the timeout period from a previous trigger
             # If we are in the timeout period then 'our' sensor state will still be active
-            if not gpio_port_mappings[str(gpio_port)]["sensor_state"]:
-                logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
-                gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
-                # Transmit the updated state via MQTT networking and make the mapped callback
+            valid_triggered_event = False
+            with gpio_data_lock:
+                sensor_state = gpio_port_mappings[str(gpio_port)]["sensor_state"]
+                if not sensor_state:
+                    logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
+                    gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
+                    gpio_port_mappings[str(gpio_port)]["triggered_event"].set()
+                    gpio_port_mappings[str(gpio_port)]["released_event"].clear()
+                    valid_triggered_event = True
+                else:
+                    logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
+                # Reset the timeout period (whether we have acted on it or not)
+                gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
+            # Transmit the updated state via MQTT networking and make the mapped callback
+            # and Report the sensor status to any subscribed modules (the status page) only
+            # if we have detected a transition from True to False (i.e. sensor_state=False)
+            if valid_triggered_event:
                 send_mqtt_gpio_sensor_updated_event(sensor_id)
                 make_gpio_sensor_triggered_callback(sensor_id)
-                # Report the sensor status to any subscribed modules (the status page)
                 report_gpio_port_status(gpio_port, status=2) # Active
-            else:
-                logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
-            # Reset the timeout period (whether we have acted on it or not)
-            gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -412,27 +427,35 @@ def gpio_sensor_released(gpio_port:int):
             timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
             timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
             sensor_object = gpio_port_mappings[str(gpio_port)]["sensor_device"]
+            sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
             # Only process the event if the GPIO input is released and 'our' sensor state is still
             # active. This is to cope with the case where we might have had multiple additional
             # trigger/release events during the timeout period which have extended 'our' sensor
             # active time and resulted in additional re-scheduled release events. This is to ensure
             # we only make a single callback for the release event after the timeout period
-            if not sensor_object.is_active and gpio_port_mappings[str(gpio_port)]["sensor_state"]:
-                # Only process the release event if the trigger timeout period has expired
-                # Otherwise re-schedule the event for when the trigger timeout period expires
-                if time.time() > timeout_start + timeout_value:
-                    gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
-                    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-                    logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
-                    # Transmit the updated state via MQTT networking and make the mapped callback
-                    send_mqtt_gpio_sensor_updated_event(sensor_id)
-                    make_gpio_sensor_released_callback(sensor_id)
-                    # Report the sensor status to any subscribed modules (the status page)
-                    report_gpio_port_status(gpio_port, status=3)  # Inactive
-                else:
-                    # Reschedule the event to be processed after the timeout has expired
-                    remaining_timeout_ms = int((timeout_start + timeout_value - time.time())*1000)
-                    common.root_window.after(remaining_timeout_ms, lambda:gpio_sensor_released(gpio_port))
+            valid_released_event = False
+            with gpio_data_lock:
+                sensor_state = gpio_port_mappings[str(gpio_port)]["sensor_state"]
+                if not sensor_object.is_active and sensor_state:
+                    # Only process the release event if the trigger timeout period has expired
+                    # Otherwise re-schedule the event for when the trigger timeout period expires
+                    if time.time() > timeout_start + timeout_value:
+                        gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
+                        gpio_port_mappings[str(gpio_port)]["triggered_event"].clear()
+                        gpio_port_mappings[str(gpio_port)]["released_event"].set()
+                        logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
+                        valid_released_event = True
+                    else:
+                        # Reschedule the event to be processed after the timeout has expired
+                        remaining_timeout_ms = int((timeout_start + timeout_value - time.time())*1000)
+                        common.root_window.after(remaining_timeout_ms, lambda:gpio_sensor_released(gpio_port))
+            # Transmit the updated state via MQTT networking and make the mapped callback
+            # and report the sensor status to any subscribed modules (the status page) only
+            # if we have detected a transition from False to True (i.e. sensor_state=True)
+            if valid_released_event:
+                send_mqtt_gpio_sensor_updated_event(sensor_id)
+                make_gpio_sensor_released_callback(sensor_id)
+                report_gpio_port_status(gpio_port, status=3)  # Inactive
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -611,6 +634,8 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
         gpio_port_mappings[str(gpio_channel)]["event_timestamps"] = deque(maxlen=max_events_per_second+5)
         gpio_port_mappings[str(gpio_channel)]["breaker_threshold"] = max_events_per_second
         gpio_port_mappings[str(gpio_channel)]["breaker_tripped"] = False
+        gpio_port_mappings[str(gpio_channel)]["triggered_event"] = threading.Event()
+        gpio_port_mappings[str(gpio_channel)]["released_event"] = threading.Event()
         # We report the initial GPIO port status at the end of this funcion (0=unmapped)
         gpio_port_status_to_report = 0
         # We only create /update the gpiozero button object if we are running on a raspberry pi

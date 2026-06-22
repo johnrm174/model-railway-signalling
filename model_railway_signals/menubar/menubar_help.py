@@ -21,6 +21,7 @@ import pathlib
 import tkinter as Tk
 import webbrowser
 import logging
+import threading
 
 from .. import common
 from .. import settings
@@ -131,9 +132,6 @@ class display_help():
             # Pack the OK button First - so it remains visible on re-sizing
             self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
             self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
-        
-    def callback(self,event):
-        webbrowser.open_new_tab(self.hyperlink)
 
     def close_window(self):
         global help_window
@@ -192,7 +190,8 @@ class display_about():
         self.window.destroy()
 
     def callback(self,event):
-        webbrowser.open_new_tab(self.hyperlink)
+        # Fire off the browser request in a background thread
+        threading.Thread(target=lambda: webbrowser.open_new_tab(self.hyperlink), daemon=True).start()
 
 
 #------------------------------------------------------------------------------------
@@ -240,7 +239,12 @@ class display_docs():
             self.close.pack(padx=2, pady=2)
             self.TT1 = common.CreateToolTip(self.close, "Close window")
 
-    def open_doc(self,file_name:str):
+    def open_doc(self, file_name: str):
+        # Create a thread that calls the 'actual' opening logic
+        thread = threading.Thread(target=self.threaded_open_doc, args=(file_name,), daemon=True)
+        thread.start()
+
+    def threaded_open_doc(self,file_name:str):
         current_folder = pathlib.Path(__file__). parent
         fully_qualified_file_name = current_folder.parent / 'docs' / file_name
         try:

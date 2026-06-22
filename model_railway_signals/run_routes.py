@@ -867,7 +867,6 @@ def route_button_selected_callback(route_button_id:int):
         if highlight_possible_routes(route_button_id):
             logging.debug("RUN ROUTES - Initiating a new NX route setup sequence from Button "+str(route_button_id))
             activated_entry_button_id = route_button_id
-            enable_disable_schematic_routes()
         # Deselect the button (only if not part of an active route)
         elif library.button_state(route_button_id) and entry_button_data["entrybutton"] == 0 and entry_button_data["exitbutton"] == 0:
             ########################################################################################################
@@ -893,13 +892,19 @@ def highlight_possible_routes(route_button_id:int):
     route_object = objects.schematic_objects[objects.route(route_button_id)]
     for route_definition in route_object["routedefinitions"]:
         route_tooltip, route_viable = check_route_viable(route_definition)
+        exit_button_id = route_definition["exitbutton"]
         # If the route is viable and there is an exit button, then set it flashing
+        # else disable the exit button whilst the route selection is in progress
         if route_viable and route_definition["exitbutton"] > 0:
-            exit_button_id = route_definition["exitbutton"]
             # But only if it is not already the exit button of an active route
             if library.get_button_data(exit_button_id)["entrybutton"] == 0:
                 library.set_button_flashing(route_definition["exitbutton"])
+                library.enable_button(exit_button_id)
                 one_or_more_possible_routes = True
+            else:
+                library.disable_button(exit_button_id, "Route not viable")
+        else:
+            library.disable_button(exit_button_id, "Route not viable")
     if one_or_more_possible_routes:
         library.set_button_flashing(route_button_id)
     return(one_or_more_possible_routes)
@@ -1151,6 +1156,7 @@ def schedule_tasks_to_clear_down_schematic_route(route_button_id:int, route_defi
 
 def reset_remaining_routes():
     for route_button_id in objects.route_index.keys():
+        library.unlock_button(int(route_button_id))
         library.reset_button_flashing(int(route_button_id))
         library.set_button_data(int(route_button_id), {"route": None, "entrybutton": 0, "exitbutton": 0})
         reset_route_highlighting(int(route_button_id))

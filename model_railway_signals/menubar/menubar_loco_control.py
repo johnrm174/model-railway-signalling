@@ -695,7 +695,8 @@ class loco_control(Tk.Toplevel):
         self.subframe4.pack_forget()
         # Unpack the frame used to display the currently selected locos
         self.locoframe.pack_forget()
-        # Speed must be zero for the user to be able to select/deselect a loco
+        # Set speed to zero
+        self.throttle.set(0)
         # So we only need to deselect FWD and REV buttons
         self.forward.config(relief="raised")
         self.reverse.config(relief="raised")
@@ -928,7 +929,6 @@ class loco_control(Tk.Toplevel):
             if increase == False and current_speed_value > 0: current_speed_value -= 1
             # Set the Throttle Slider to the new Value
             self.throttle.set(current_speed_value)
-            self.speed_updated(current_speed_value)
             # Schedule the next speed command transmititon (in 25 ms)
             self.next_event = self.after(25, lambda:self.inc_dec_speed(increase, stop))
 
@@ -939,7 +939,7 @@ class loco_control(Tk.Toplevel):
         if int(speed) > 0:
             self.disable_forward_and_reverse()
             self.disable_loco_selection()
-        else:
+        elif self.dcc_power_state:
             self.enable_forward_and_reverse()
             self.enable_loco_selection()
         if not self.speed_update_in_progress:

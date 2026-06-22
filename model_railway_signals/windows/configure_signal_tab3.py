@@ -387,15 +387,15 @@ class timed_signal_route_element(Tk.Frame):
         self.sig.pack(side=Tk.LEFT)
         self.label3 = Tk.Label(self, text="  Start delay:")
         self.label3.pack(side=Tk.LEFT)
-        self.start = common.integer_entry_box(self, width=3, min_value=0, max_value=60,
-                            allow_empty=False, tool_tip="Specify the time delay (in seconds) "+
+        self.start = common.integer_entry_box(self, width=3, min_value=0, max_value=240,
+                            allow_empty=False, tool_tip="Specify the time delay (0-240 seconds) "+
                             "before triggering the timed sequence (if triggering the same " +
-                            "signal then this will be zero)")
+                            "signal then this will default to zero)")
         self.start.pack(side=Tk.LEFT)
         self.label4 = Tk.Label(self, text="  Time delay:")
         self.label4.pack(side=Tk.LEFT)
-        self.delay = common.integer_entry_box(self, width=3, min_value=1, max_value=60,
-                            allow_empty=False, tool_tip="Specify the time period (in seconds) "+
+        self.delay = common.integer_entry_box(self, width=3, min_value=1, max_value=240,
+                            allow_empty=False, tool_tip="Specify the time period (0-240 seconds) "+
                                                         "between signal aspect changes")
         self.delay.pack(side=Tk.LEFT)
 

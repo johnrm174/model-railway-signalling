@@ -71,7 +71,7 @@ layout_state ={}
 def get_sig_file_config(get_sig_file_data:bool = False):
     
     signal_elements = ( ("sigclear","bool"),("subclear","bool"),("override","bool"), ("overridesub","bool"),
-                        ("siglocked","bool") ,("sublocked","bool"),("routeset","enum"),
+                        ("siglocked","bool") ,("sublocked","bool"),("routeset","enum"), ("overcaution","bool"),
                         ("releaseonred","bool"),("releaseonyel","bool"),("theatretext","str") )
     point_elements = ( ("switched","bool"),("fpllock","bool"),("locked","bool") )
     section_elements = ( ("occupied","bool"),("labeltext","str") )
@@ -207,8 +207,6 @@ def save_schematic(settings:dict, objects:dict, requested_filename:str, save_as:
                     initialfile=name, initialdir=path)
         # If dialogue is cancelled then Filename will remain as 'None' as nothing will be saved
         if filename_to_save == () or filename_to_save == "": filename_to_save = None
-    elif not os.path.isfile(requested_filename):
-        filename_to_save = None
     else:
         filename_to_save = requested_filename
     # We should now have a valid filename (and the file exists) unless the user has cancelled

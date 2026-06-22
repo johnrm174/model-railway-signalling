@@ -55,18 +55,27 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 6.2.4:
+## What's new for Release 6.3.0:
 
 > [!IMPORTANT]
-> Release 6.2.4 will only support the loading of layout files created by Release 6.0.0 or later.
+> Release 6.3.0 will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.2.4.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.3.0.
 > You have been warned!
 
-* You can now click on an occupied track section to bring up a throttle window for that loco
-* Bugfix to overriding of signals between the passed event and the subsequent track occupancy change
-* Bugfix to ensure all flashing NX route buttons are cleaed down when selection process is cancelled
-* Improvements for Loco control - DCC loco commands are prioritised over DCC accessory commands
+* Points and signals can now be rotated in 90 degree steps (0/90/180/270 degrees).
+* Track sections can now be rotated (i.e. oriented either vertically or horizontally).
+* Track sections can now be highlighted to show they are occupied (background colour).
+* Timed signal delays (between aspect changes) can now be specified up to 240 seconds.
+* Enhancement to occupancy - track sensors can now be used 'back to back' with signals.
+* Scripting interface improvements - can now "wait for" button and gpio events
+* Bugfix to colour light timed sequences - ensure that DANGER aspects take precidence.
+* Bugfix to Throttles - set speed to zero and inhibit selections when DCC power is off.
+* Bugfix to NX Routes - exit buttons disabled during route selection if not viable.
+* Bugfix to NX Routes - Ensure all route buttons are cleared down on layout reset.
+* Bugfix to Lever Interlocking - To take account of lever type (FPL, Point, FPL+Point).
+
+
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 

@@ -286,9 +286,11 @@ def handle_mqtt_dcc_locomotive_control_command(message):
             pi_sprog_interface.set_loco_function(session_id, function_id, func_state)
         # Handle a DCC power On Request - No acknowledgement required (made via a seperate callback)
         elif request_dcc_power is not None and request_dcc_power:
+            logging.debug (f"Loco Control: Received Request DCC Power ON message from {source_node}")
             pi_sprog_interface.request_dcc_power_on()
         # Handle a DCC power Off Request  - No acknowledgement required (made via a seperate callback)
         elif request_dcc_power is not None and not request_dcc_power:
+            logging.debug (f"Loco Control: Received Request DCC Power OFF message from {source_node}")
             pi_sprog_interface.request_dcc_power_off()
         # Handle loco session request from a remote throttle
         elif dcc_address is not None and dcc_address > 0 and session_id is not None and session_id == 0:

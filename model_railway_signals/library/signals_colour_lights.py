@@ -259,6 +259,8 @@ def create_colour_light_signal (canvas, sig_id:int,
         if loaded_state["releaseonyel"]: signals.set_approach_control(sig_id,release_on_yellow=True)
         if loaded_state["theatretext"]: signals.set_route(sig_id, theatre_text=loaded_state["theatretext"])
         if loaded_state["override"]: signals.set_signal_override(sig_id)
+        if loaded_state["overridesub"]: signals.set_subsidary_override(sig_id)
+        if loaded_state["overcaution"]: signals.set_signal_override_caution(sig_id)
         # If no state was loaded, but the signal is 'automatic' then toggle the signal to 'OFF'
         if loaded_state["sigclear"] or fully_automatic: signals.toggle_signal(sig_id)
         # finally Lock the signal if required
@@ -325,13 +327,15 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
     route = signals.signals[str(sig_id)]["routeset"]
     #---------------------------------------------------------------------------------
     # First deal with the cases that would force the signal to a specific aspect
-    # These will apply to all colour light signal types (2, 3 or 4 aspect):
+    # These will apply to all colour light signal types (2, 3 or 4 aspect).
+    # The cases are ordered to ensure the most restrictive aspect is set.
     #   Signal ON => DANGER (2 aspect DISTANT signals will display CAUTION)
     #   OVERRIDE => DANGER (2 aspect DISTANT signals will display CAUTION)
+    #   TIMED SEQUENCE (DANGER) => DANGER (does not apply to 2 aspect DISTANT signals)
+    #   RELEASE ON RED => DANGER (does not apply to 2 aspect DISTANT signals)
     #   OVERRIDE CAUTION => CAUTION (does not apply to 2 aspect HOME signals)
-    #   RELEEASE ON RED => DANGER (does not apply to 2 aspect DISTANT signals)
     #   RELEASE ON YELLOW => CAUTION (does not apply to 2 aspect HOME signals)
-    #   TIMED SEQUENCE => Signal will display the aspect for its timed sequence
+    #   TIMED SEQUENCE (Other Aspect) => display the aspect for its timed sequence
     #---------------------------------------------------------------------------------
     # If signal is "ON" then its DANGER (or CAUTION for 2 aspect DISTANT signals)
     if not signals.signals[str(sig_id)]["sigclear"]:
@@ -341,21 +345,25 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         else:
             new_aspect = signals.signal_state_type.DANGER
             log_message = " (signal is ON)"
-    # If signal is Overriden the set the signal to its overriden aspect.
-    # This will be DANGER (or CAUTION for 2 aspect DISTANT signals).
+    # If signal is Overriden its DANGER (or CAUTION for 2 aspect DISTANT signals).
     elif signals.signals[str(sig_id)]["override"] or signals.signals[str(sig_id)]["override2"]:
         new_aspect = signals.signals[str(sig_id)]["overriddenaspect"]
         log_message = " (signal is OVERRIDEN)"
-    # If signal is Overriden to CAUTION set the signal to display CAUTION
-    # Note this will only apply to signals OTHER THAN 2 aspect home signals.
-    elif signals.signals[str(sig_id)]["overcaution"]:
-        new_aspect = signals.signal_state_type.CAUTION
-        log_message = " (signal is OVERRIDDEN to CAUTION)"
+    # If signal is on a timed sequence and at DANGER then its DANGER
+    elif ( signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress and
+           signals.signals[str(sig_id)]["timedsequence"][route.value].aspect == signals.signal_state_type.DANGER):
+        new_aspect = signals.signal_state_type.DANGER
+        log_message = " (signal is on a timed sequence at DANGER)"
     # Set to DANGER if the signal is subject to "Release on Red" approach control
     # Note this will only apply to signals OTHER THAN 2 aspect distant signals.
     elif signals.signals[str(sig_id)]["releaseonred"]:
         new_aspect = signals.signal_state_type.DANGER
         log_message = " (signal is OFF - but subject to 'release on red' approach control)"
+    # If signal is Overriden to CAUTION set the signal to display CAUTION
+    # Note this will only apply to signals OTHER THAN 2 aspect home signals.
+    elif signals.signals[str(sig_id)]["overcaution"]:
+        new_aspect = signals.signal_state_type.CAUTION
+        log_message = " (signal is OVERRIDDEN to CAUTION)"
     # Set to CAUTION_APPROACH_CONTROL if the signal is subject to "Release on YELLOW"
     # Note this will only apply to signals OTHER THAN 2 aspect home signals.
     elif signals.signals[str(sig_id)]["releaseonyel"]:
@@ -365,7 +373,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         else:
             new_aspect = signals.signal_state_type.CAUTION_APP_CNTL
             log_message = " (signal is OFF - 'release on yellow' approach control is active "
-    # If signal is currently on a timed sequence then set to the sequence aspect
+    # If signal is on a timed sequence (not at DANGER then set it to the sequence aspect
     elif signals.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
         new_aspect = signals.signals[str(sig_id)]["timedsequence"][route.value].aspect
         log_message = " (signal is on a timed sequence)"

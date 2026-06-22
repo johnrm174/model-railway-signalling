@@ -2,10 +2,25 @@
 # Test script to run all system tests
 #-----------------------------------------------------------------------------------
 
+import os
+
 import system_test_harness
 
-import basic_library_tests1
-import basic_library_tests2
+import library_tests_block_instruments
+import library_tests_buttons
+import library_tests_dcc_control
+import library_tests_file_interface
+import library_tests_gpio_interface
+import library_tests_levers
+import library_tests_lines
+import library_tests_loco_control
+import library_tests_mqtt_interface
+import library_tests_points
+import library_tests_sprog_interface
+import library_tests_text_boxes
+import library_tests_track_sections
+import library_tests_track_sensors
+###import basic_library_tests2
 import basic_library_tests3
 
 import test_schematic_editor
@@ -25,20 +40,34 @@ import test_mqtt_networking_example
 import test_load_layout_failures
 
 def run_all_tests():
-    print("*** Running tests from 'basic_library_tests1.py' ***")
-    basic_library_tests1.run_all_basic_library_tests()
-    system_test_harness.report_results()
+    #  Purge any retained messages prior to start of the script
+    os.system("mosquitto_sub -t '#' --remove-retained --retained-only -W 1")
+    print("*** Running Library Tests ***")
+    # Note we immediately abort if any library tests fail
+    if system_test_harness.test_failures == 0: library_tests_mqtt_interface.run_all_tests()   ## This needs to run first
+    if system_test_harness.test_failures == 0: library_tests_block_instruments.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_buttons.run_all_tests()
+    # Common #########################################
+    if system_test_harness.test_failures == 0: library_tests_dcc_control.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_file_interface.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_gpio_interface.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_levers.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_lines.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_loco_control.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_points.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_sprog_interface.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_text_boxes.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_track_sections.run_all_tests()
+    if system_test_harness.test_failures == 0: library_tests_track_sensors.run_all_tests()
     
-    if system_test_harness.test_failures == 0:
-        print("*** Running tests from 'basic_library_tests2.py' ***")
-        basic_library_tests2.run_all_basic_library_tests()
-        system_test_harness.report_results()
-        
+    #################################################################################################
+    ## Still to be refactored and consolidated
     if system_test_harness.test_failures == 0:
         print("*** Running tests from 'basic_library_tests3.py' ***")
         basic_library_tests3.run_all_basic_library_tests()
         system_test_harness.report_results()
-    
+    #################################################################################################
+
     if system_test_harness.test_failures == 0:
 
         print("*** Running tests from 'test_menubar_windows.py' ***")
