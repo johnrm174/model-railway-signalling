@@ -853,7 +853,7 @@ class application_upgrade():
     def null_function(self):
         pass
 
-    def upgrade(self):
+def upgrade(self):
         # Inhibit the Buttons and window close function until the upgrade is complete
         self.B1.config(state="disabled")
         self.B2.config(state="disabled")
@@ -874,7 +874,7 @@ class application_upgrade():
                 # Assume raspberry Pi - Upgrade with sudo as a system package, suppressing errors/warnings
                 # Note that stdout and stderr are directed to the application's stdout and stderr
                 return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action",
-                                                        "ignore", "--break-system-packages", "pip"])
+                                                "ignore", "--break-system-packages", "pip"])
                 # Earlier versions of Pip don't support the --root-user-action or --break-system-packages flags so the
                 # above will error. We'll therefore try to upgrade pip to the latest version without these flags
                 # This is an assumption - pip might fail for other reasons (but unlikely in the big scheme of things)
@@ -888,7 +888,7 @@ class application_upgrade():
                 # Assume Windows platform - Install as a user package
                 result = subprocess.run(["pip", "install", "--upgrade", "pip"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
-                result= subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
+                result = subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
                 print(result.stdout.decode('utf-8'))
                 return_code = 999
         except Exception as exception:

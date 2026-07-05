@@ -76,7 +76,6 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 * Bugfix to Lever Interlocking - To take account of lever type (FPL, Point, FPL+Point).
 
 
-
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
 Bug reports and feedback is welcome and appreciated:
@@ -88,72 +87,47 @@ Bug reports and feedback is welcome and appreciated:
 email: enquiries@model-railway-signalling.co.uk
 (if reporting bugs then please attach the sig file, application logs and any relevant screenshots)
 
-## Installing the application
+## Installing the application (Raspberry Pi or Linux)
 
 For a first time installation use:
 <pre>
-$ pip install model-railway-signals             <== This should work for most python installations
-or
-$ python -m pip install model-railway-signals   <== If the command line version of pip is not installed/enabled
-or
-$ python3 -m pip install model-railway-signals  <== If you have multiple major versions of python installed
+$ python3 -m pip install model-railway-signals
 </pre>
 When installing the application on later versions of python you may get the following error:
 <pre>
 error: externally-managed-environment
 </pre>
-To overcome this, add the '--break-system-packages' argument to the command - e.g.
+To overcome this, add the '--break-system-packages' argument to the command - i.e.
 <pre>
-$ pip install --break-system-packages model-railway-signals 
+$ python3 -m pip install --break-system-packages model-railway-signals 
 </pre>
 To upgrade to the latest version use:
 <pre>
-$ pip install --upgrade model-railway-signals            <== This should work for most python installations
-or
-$ python -m pip install --upgrade model-railway-signals  <== If the command line version of pip is not installed/enabled
-or
-$ python3 -m pip install --upgrade model-railway-signals <== If you have multiple major versions of python installed
+$ python3 -m pip install --upgrade model-railway-signals
 </pre>
 To remove the application:
 <pre>
-$ pip uninstall model-railway-signals                    <== This should work for most python installations
-or
-$ python -m pip uninstall model-railway-signals          <== If the command line version of pip is not installed/enabled
-or
-$ python3 -m pip uninstall model-railway-signals         <== If you have multiple major versions of python installed
+$ python3 -m pip uninstall model-railway-signals
 </pre>
 To install a specific version of the application the application:
 <pre>
-$ pip install model-railway-signals==4.5.0               <== This should work for most python installations
-or
-$ python -m pip install model-railway-signals==4.5.0     <== If the command line version of pip is not installed/enabled
-or
-$ python3 -m pip install model-railway-signals==4.5.0    <== If you have multiple major versions of python installed
+$ python3 -m pip install model-railway-signals==4.5.0
 </pre>
-The application has minimum external dependencies (over and above the 'standard' python installation),
-'pyserial' and 'paho-mqtt', both of which should automatically get installed with the application.
-If for some reason this doesn't happen (I've been made aware of one instance on a Windows platform) then
-these packages can be installed seperately (prior to installing the model-railway-signals package):
-<pre>
-$ pip install paho-mqtt
-$ pip install pyserial
-</pre>
+
 
 ## Running the application
 
 The python package should be run as a module (note underscores):
 <pre>
-$ python -m model_railway_signals  <== This should work for most python installations
-or
-$ python3 -m model_railway_signals <== If you have multiple major versions of python installed
+$ python3 -m model_railway_signals
 </pre>
 If required, a layout schematic can be loaded at startup:
 <pre>
-$ python -m model_railway_signals -f layout_file.sig
+$ python3 -m model_railway_signals -f layout_file.sig
 </pre>
 If required, the logging level can be specified at startup (ERROR, WARNING, INFO or DEBUG)
 <pre>
-$ python -m model_railway_signals -f layout_file.sig -l DEBUG
+$ python3 -m model_railway_signals -f layout_file.sig -l DEBUG
 </pre>
 
 Full documentation is packaged with the application (access by selecting Help => Docs from the main menubar).
