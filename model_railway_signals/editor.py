@@ -103,6 +103,8 @@
 #
 #------------------------------------------------------------------------------------
 
+
+from PIL import ImageGrab
 import os
 import sys
 import tkinter as Tk
@@ -166,6 +168,8 @@ class main_menubar:
         self.file_menu.add_command(label=" Save as...", command=lambda:self.save_schematic(True))
         self.file_menu.add_separator()
         self.file_menu.add_command(label=" Examples...", command=lambda:self.load_schematic(examples=True))
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label=" Export as image...",command=lambda:self.export_to_image())
         self.file_menu.add_separator()
         self.file_menu.add_command(label=" Quit",command=lambda:self.quit_schematic())
         self.mainmenubar.add_cascade(label="File", menu=self.file_menu)
@@ -765,6 +769,37 @@ class main_menubar:
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
     #------------------------------------------------------------------------------------------
+
+    def export_to_image(self):
+        img_path = Tk.filedialog.asksaveasfilename(title="Export application as image", defaultextension=".png",
+            filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg;*.jpeg"), ("BMP files", "*.bmp")], initialdir=os.getcwd())
+        if not img_path: return()
+        def capture():
+            try:
+                win = self.root.winfo_toplevel()
+                win.update_idletasks()
+                win.update()
+                # Optional border/menu padding (tune per platform if needed)
+                pad_left, pad_top, pad_right, pad_bottom = 1, 35, 1, 1
+                x1 = win.winfo_rootx() - pad_left
+                y1 = win.winfo_rooty() - pad_top
+                x2 = win.winfo_rootx() + win.winfo_width() + pad_right
+                y2 = win.winfo_rooty() + win.winfo_height() + pad_bottom
+                img = ImageGrab.grab(bbox=(x1, y1, x2, y2)).convert("RGB")
+                ext = os.path.splitext(img_path)[1].lower()
+                if ext in [".jpg", ".jpeg"]:
+                    img.save(img_path, "JPEG", quality=95, subsampling=0)
+                elif ext == ".bmp":
+                    img.save(img_path, "BMP")
+                else:
+                    # default PNG
+                    if ext != ".png": img_path_png = img_path + ".png"
+                    else: img_path_png = img_path
+                    img.save(img_path_png, "PNG")
+            except Exception as e:
+                Tk.messagebox.showerror("Export failed", f"Could not export image:\n{e}")
+        self.root.after(200, capture)
+        return()
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
