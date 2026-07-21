@@ -853,7 +853,7 @@ class application_upgrade():
     def null_function(self):
         pass
 
-def upgrade(self):
+    def upgrade(self):
         # Inhibit the Buttons and window close function until the upgrade is complete
         self.B1.config(state="disabled")
         self.B2.config(state="disabled")
