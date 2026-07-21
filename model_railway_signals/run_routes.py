@@ -90,7 +90,7 @@ def set_setup_in_progress_flag(route_button_id:int, flag:bool):
     dict_of_route_setup_flags[str(route_button_id)] = flag
 
 def is_setup_in_progress(route_button_id:int):
-    return(str(route_button_id) in dict_of_route_setup_flags.keys() and dict_of_route_setup_flags[str(route_button_id)])
+    return(dict_of_route_setup_flags.get(str(route_button_id), False))
 
 #------------------------------------------------------------------------------------
 # The initialise function is called at application startup (on canvas creation)
@@ -605,7 +605,7 @@ def set_point_state(route_button_id:int, point_id:int, state:bool):
     return()
 
 def complete_route_setup(route_button_id:int, dont_enable_disable_schematic_routes:bool=False):
-    # Signify that the route setup is now progress
+    # Signify that the route setup has now completed
     set_setup_in_progress_flag(route_button_id, False)
     # Find the applicable route definition and exit button ID (stored as the route button data)
     # Stored route data is {"route": index, "entrybutton": 0, "exitbutton": route_button_id}
@@ -675,7 +675,7 @@ def complete_route_cleardown(route_button_id:int, dont_enable_disable_schematic_
         # Remove the route definition from the Exit Button
         exit_button_data = library.get_button_data(route_button_data["exitbutton"])
         exit_button_data["entrybutton"] = 0
-        library.set_button_data(route_button_id, exit_button_data)
+        library.set_button_data(route_button_data["exitbutton"], exit_button_data)
         # Unlock the exit button:
         library.unlock_button(route_button_data["exitbutton"])
     # Remove the route definition from the one-click Button / Entry Button
