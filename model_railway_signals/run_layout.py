@@ -214,7 +214,8 @@ def is_distant_signal(int_signal_id:int):
 # passed in as a variable length dictionary comprising {point_id: point_state,}.
 #------------------------------------------------------------------------------------
 
-def find_route(object_id, dict_key:str, theoretical_settings:dict={}):
+def find_route(object_id, dict_key:str, theoretical_settings:dict=None):
+    if theoretical_settings is None: theoretical_settings = {}
     route_to_return = None
     # Iterate through each route in the specified table 
     for index, route_entry in enumerate(objects.schematic_objects[object_id][dict_key]):
@@ -579,7 +580,7 @@ def update_track_occupancy_for_signal(item_id:int):
         elif [section_behind, section_ahead] not in list_of_movements:
             list_of_movements.append([section_behind, section_ahead])
     # Establish the state of the signal - if the subsidary aspect is clear or the main aspect not showing
-    # DANGER then we can assume any movement from the sectiion_behind to the section_ahead is valid.
+    # DANGER then we can assume any movement from the section_behind to the section_ahead is valid.
     # Otherwise we may need to raise a Signal Passed at Danger warning later on in the code
     if ( (library.signal_state(item_id) != library.signal_state_type.DANGER) or
          (has_subsidary(item_id) and library.subsidary_state(item_id) != library.signal_state_type.DANGER) ):
@@ -933,7 +934,7 @@ def process_all_point_interlocking():
         # The interlocked Sections table is a variable length list of Track Section IDs
         # The point will be locked if any of these Sections are OCCUPIED
         for interlocked_section in point_object["sectioninterlock"]:
-            if library.track_sections.section_occupied(interlocked_section):
+            if library.section_occupied(interlocked_section):
                 message = "\nTrack Section "+str(interlocked_section)+" is Occupied"
                 point_tooltip = point_tooltip + message
                 point_locked = True
