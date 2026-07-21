@@ -444,17 +444,18 @@ class main_menubar:
     # --------------------------------------------------------------------------------------
 
     def handle_canvas_event(self, event=None):
-        # Note that event.keysym returns the character (event.state would be 'Control')
-        if event.keysym == 'm':
+        # Note that event.keysym returns the character (event.state would be 'Control' etc)
+        key = event.keysym.lower()
+        if key == 'm':
             if settings.get_general("editmode"): self.run_mode()
             else: self.edit_mode()
-        elif event.keysym == 's':
+        elif key == 's':
             # the Snap to Grid flag is the fourth parameter returned
             if settings.get_canvas("snaptogrid"): settings.set_canvas("snaptogrid", False)
             else: settings.set_canvas("snaptogrid", True)
             # Apply the new canvas settings
             self.canvas_update()
-        elif event.keysym == 'a':
+        elif key == 'a':
             if settings.get_general("automation"): self.automation_disable()
             else: self.automation_enable()
             

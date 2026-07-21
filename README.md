@@ -1,41 +1,34 @@
 # model-railway-signalling
 
-A DCC model railway signalling application written in Python, enabling automated and interlocked layout 
-signalling schemes to be designed and configured via the UI without the need to write any code. The
-application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
-without some of the Raspberry-Pi specific interfacing functions).
+A fully featured DCC Command Station, with a focus on enabling prototypical operation of your model
+railway in terms of route setting, signal interlocking and signalling automation. Layout schematics
+can be be designed and configured via the UI without the need for any code or bespoke electronics.
+The application is primarily intended for the Raspberry Pi, but will also run on other platforms
+(albeit without some of the Raspberry-Pi specific interfacing functions).
 
 * Provides a full DCC Command station for your model railway layout:
-    * Control your locos via on-screen throttles or via your smartphone.
+    * Control your locos via on-screen throttles or via your tablet/smartphone.
     * Control all your DCC accessories intuitively via the on-screen schematic.
+    * Includes a DCC programming utility for both 'one touch' and CV Programming.
 * Enables signalling schematics to be easily created with route lines, points and signals:
     * Supports most types of UK colour light signals, semaphore signals, and ground signals.
     * Supports complex trackwork formations such as crossovers, slips and 3-way points.
     * Get the schematic looking how you want by changing the styles of objects as required.
-* Interfaces with the Pi-SPROG DCC command station to drive all of your DCC Accessories:
-    * Uses a DCC Accessory bus (seperate from the track bus) to control your layout.
-    * Supports all standard DCC signals, point motors and other DCC accessory decoders.
-    * Signals and points are simply operated via their control buttons on the schematic.
-    * Add virtual 'DCC Switches' to the schematic to control other DCC accessories.
-    * Includes a DCC programming utility for both 'one touch' and CV Programming.
+* Enables intuitive and prototypical control of your DCC Accessories via the schematic:
+    * Supports all standard DCC signals, points and other DCC accessory decoders.
+    * Provides full interlocking of the signals and points on your layout.
+    * Simply click the schematic to change the signals and points on your layout.
 * Enables full signalbox simulations to be realised for your layout:
     * Add virtual 'Signal box Levers' to the schematic to control your signals/points.
-    * Supports integration with external switches (Such as the DCC Concepts Cobalt S Levers).
     * Add virtual 'Block Instruments' for communication and coordination between signal boxes.
+    * Supports integration with physical levers (such as the Cobalt-S Levers)
 * Uses the RPi GPIO inputs (connected to external track sensors) to detect train movements:
     * Add 'Track Sections' to the schematic to provide a mimic diagram of train location.
-    * Train designators then 'move' through the schematic based on 'signal passed' events.
+    * Watch the trains 'move' through the schematic based on 'signal passed' events.
     * Alternatively, use 'track circuits' for an absolute indication of block occupancy
-    * Track occupancy can then be used to support signal automation (see below).
-* Provides full prototypical operation of your layout - just like the real thing.
-    * Signals can be interlocked with points, other signals and Track Sections ahead.
-    * Points are interlocked with the signals that control movements across them.
-    * Points can also be interlocked with Track Sections representing 'track circuits'.
-    * Multiple aspect signals will always reflect the state of the signal ahead.
-    * Signals can be automated based on the 'occupancy' of Track Sections ahead.
-* Provides "one click" set-up and clear-down routes through your layout:
+* Provides "one click" or 'NX' (Entry/Exit) set-up and clear-down routes:
     * Interlocking is preserved - Routes are disabled if conflicting movements are set.
-    * Routes are highlighted on the schematic to show they have been successfully set.
+    * Routes can be highlighted on the schematic to show they have been successfully set.
     * Supports automated set-up and clear-down of routes based on GPIO sensor events.
 * Incorporates MQTT networking to allow multiple signalling applications to be linked.
     * Allows multiple signalling areas or signal boxes to be created for larger layouts
@@ -55,25 +48,15 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 6.3.0:
+## What's new for Release 6.x.x:
 
 > [!IMPORTANT]
-> Release 6.3.0 will only support the loading of layout files created by Release 6.0.0 or later.
+> Release 6.x.x will only support the loading of layout files created by Release 6.0.0 or later.
 > If you have layout files created by an earlier version of the application then you should first
-> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.3.0.
+> upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
 > You have been warned!
 
-* Points and signals can now be rotated in 90 degree steps (0/90/180/270 degrees).
-* Track sections can now be rotated (i.e. oriented either vertically or horizontally).
-* Track sections can now be highlighted to show they are occupied (background colour).
-* Timed signal delays (between aspect changes) can now be specified up to 240 seconds.
-* Enhancement to occupancy - track sensors can now be used 'back to back' with signals.
-* Scripting interface improvements - can now "wait for" button and gpio events
-* Bugfix to colour light timed sequences - ensure that DANGER aspects take precidence.
-* Bugfix to Throttles - set speed to zero and inhibit selections when DCC power is off.
-* Bugfix to NX Routes - exit buttons disabled during route selection if not viable.
-* Bugfix to NX Routes - Ensure all route buttons are cleared down on layout reset.
-* Bugfix to Lever Interlocking - To take account of lever type (FPL, Point, FPL+Point).
+* Keyboard shortcuts (see help=>help) will work for both upper case or lower case key presses)
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
@@ -132,19 +115,16 @@ $ python3 -m model_railway_signals -f layout_file.sig -l DEBUG
 
 Full documentation is packaged with the application (access by selecting Help => Docs from the main menubar).
 
-A number of example layout configuration files are also packaged with the application (access by selecting File => Examples from the main menubar)
+A number of example layout files are also packaged with the application (access by selecting File => Examples from the main menubar)
 
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-And finally, a top tip for running the application on the latest Debian Bookworm release which uses Wayland as the GUI backend
-rather than X11 (which was the backend for previous Debian releases). I found that with Wayland, the Tkinter GUI performance
-was terrible for some reason (not just my application - python/Tkinter performance in general) - and that was running on a
-Raspberry Pi 5 which I would have expected to improve overall performance. Anyway, I found that the fix is to switch the GUI
-backend of the Raspberry Pi back to X11 - performance of the user interface is now lightning quick!
+Note that I have seen problems running the application on some of the more recent Debian releases (such as Bookworm) that use
+Wayland as the backend compositor rather than X11 - specifically significant degredation in GUI performance (especially when
+editing a schematic), button rendering issues (not fully rendered until the cursor hovers over them) and window management
+issues (e.g. windows not being bought to the front when un-minimised). I also saw these issues with other applications/
 
-To change the backend - Run "sudo raspi-config", select 'Advanced Options' then 'Wayland' and select X11.
+The fix was to switch the GUI Compositor back to X11 - Run "sudo raspi-config", select 'Advanced Options' then 'Wayland' and select X11.
 
-An additional benifit was that some of the other applications I use (such as the kazam video capture software)
-will now work as normal on the Raspberry Pi 5.
 

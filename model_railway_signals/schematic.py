@@ -909,7 +909,9 @@ def enable_events_after_completion_of_move():
     if edit_mode_active: enable_edit_mode_event_bindings()
     enable_arrow_keypress_events()
     canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
+    canvas.bind('<Control-Key-M>', canvas_event_callback)        # Toggle Mode (Edit/Run)
     canvas.bind('<Control-Key-r>', reset_window_size)            # Revert Canvas Size
+    canvas.bind('<Control-Key-R>', reset_window_size)            # Revert Canvas Size
     return()
 
 def disable_events_during_move():
@@ -917,7 +919,9 @@ def disable_events_during_move():
     disable_arrow_keypress_events()
     # Unbind the  Toggle mode and revert canvas size buttons (or this will screw up the move)
     canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
+    canvas.unbind('<Control-Key-M>')                             # Toggle Mode (Edit/Run)
     canvas.unbind('<Control-Key-r>')                             # Revert Canvas Size
+    canvas.unbind('<Control-Key-R>')                             # Revert Canvas Size
     return()
 
 #------------------------------------------------------------------------------------
@@ -954,15 +958,25 @@ def enable_edit_mode_event_bindings():
     canvas.bind('<Delete>', delete_selected_objects)
     canvas.bind('<Escape>', deselect_all_objects)
     canvas.bind('<Control-Key-c>', copy_selected_objects)
+    canvas.bind('<Control-Key-C>', copy_selected_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
+    canvas.bind('<Control-Key-Z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
+    canvas.bind('<Control-Key-Y>', schematic_redo)
     canvas.bind('<Control-Key-i>', toggle_item_ids)
+    canvas.bind('<Control-Key-I>', toggle_item_ids)
     canvas.bind('<Control-Key-s>', canvas_event_callback)
+    canvas.bind('<Control-Key-S>', canvas_event_callback)
     canvas.bind('h', hide_selected_objects)
+    canvas.bind('H', hide_selected_objects)
     canvas.bind('u', unhide_selected_objects)
+    canvas.bind('U', unhide_selected_objects)
     canvas.bind('r', rotate_selected_objects)
+    canvas.bind('R', rotate_selected_objects)
     canvas.bind('f', flip_selected_objects)
-    canvas.bind('s', snap_selected_objects_to_grid)      
+    canvas.bind('F', flip_selected_objects)
+    canvas.bind('s', snap_selected_objects_to_grid)
+    canvas.bind('S', snap_selected_objects_to_grid)
     # Edit-mode-specific cursor event bindings
     canvas.bind('<Button-2>', right_button_click)
     canvas.bind('<Button-3>', right_button_click)
@@ -970,6 +984,7 @@ def enable_edit_mode_event_bindings():
     canvas.bind('<Double-Button-1>', left_double_click)
     # Layout Automation toggle is disabled in Edit Mode (only enabled in Run Mode)
     canvas.unbind('<Control-Key-a>')
+    canvas.unbind('<Control-Key-A>')
     return()
 
 def disable_edit_mode_event_bindings():
@@ -978,15 +993,25 @@ def disable_edit_mode_event_bindings():
     canvas.unbind('<Delete>')
     canvas.unbind('<Escape>')
     canvas.unbind('<Control-Key-c>')
+    canvas.unbind('<Control-Key-C>')
     canvas.unbind('<Control-Key-z>')
+    canvas.unbind('<Control-Key-Z>')
     canvas.unbind('<Control-Key-y>')
+    canvas.unbind('<Control-Key-Y>')
     canvas.unbind('<Control-Key-i>')
+    canvas.unbind('<Control-Key-I>')
     canvas.unbind('<Control-Key-s>')
+    canvas.unbind('<Control-Key-S>')
     canvas.unbind('h')
+    canvas.unbind('H')
     canvas.unbind('u')
+    canvas.unbind('U')
     canvas.unbind('r')
+    canvas.unbind('R')
     canvas.unbind('f')
+    canvas.unbind('F')
     canvas.unbind('s')
+    canvas.unbind('S')
     # Edit-mode-specific cursor event bindings
     canvas.unbind('<Button-2>')
     canvas.unbind('<Button-3>')
@@ -994,6 +1019,7 @@ def disable_edit_mode_event_bindings():
     canvas.unbind('<Double-Button-1>')
     # Layout Automation toggle is only enabled in Run Mode (disabled in Edit Mode)
     canvas.bind('<Control-Key-a>', canvas_event_callback)        
+    canvas.bind('<Control-Key-A>', canvas_event_callback)
     return()
 
 #------------------------------------------------------------------------------------
@@ -1005,7 +1031,9 @@ def create_common_event_bindings():
     # are only disabled during object moves, line edits, area selections (edit mode)
     # and canvas scroll operations (Run Mode)
     canvas.bind('<Control-Key-r>', reset_window_size)
+    canvas.bind('<Control-Key-R>', reset_window_size)
     canvas.bind('<Control-Key-m>', canvas_event_callback)
+    canvas.bind('<Control-Key-M>', canvas_event_callback)
     # Cursor Events enabled in all modes at all times
     canvas.bind("<Motion>", track_cursor)
     canvas.bind('<Button-1>', left_button_click)
