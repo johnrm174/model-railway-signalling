@@ -56,7 +56,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
 > You have been warned!
 
-* Keyboard shortcuts (see help=>help) will work for both upper case or lower case key presses)
+* Keyboard shortcuts (see help=>help) will now work for both upper case or lower case keypresses)
+* Minot editor performance improvements - when moving large numbers of selected objects
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)

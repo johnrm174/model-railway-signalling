@@ -85,6 +85,10 @@ schematic_state["selectarea"] = False        # Schematic is in Select Area mode
 schematic_state["movewindow"] = False        # Schematic is in Scroll canvas mode(Run Mode only)
 schematic_state["selectareabox"] = None      # Tkinter drawing object
 schematic_state["selectedobjects"] = []      # List of currently selected Object IDs
+schematic_state["move_pending"] = False
+schematic_state["pending_xdiff"] = 0
+schematic_state["pending_ydiff"] = 0
+
 # The Root reference is used when calling a "configure object" module (to open a popup window)
 # The Canvas reference is used for configuring and moving canvas widgets for schematic editing
 # canvas_width / canvas_height / canvas_grid are used for positioning of objects.
@@ -220,13 +224,20 @@ def cancel_copy_object_in_progress(event=None):
 
 def select_object(object_id):
     global schematic_state
-    # Add the specified object to the list of selected objects
-    schematic_state["selectedobjects"].append(object_id)
+    selection_move_tag = "SELECTED"
+    # Add the specified object to the list of selected objects (avoid duplicates)
+    if object_id not in schematic_state["selectedobjects"]:
+        schematic_state["selectedobjects"].append(object_id)
     # Highlight the item to show it has been selected
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
         canvas.itemconfigure(objects.schematic_objects[object_id]["selection"],state="normal")
     else:
         canvas.itemconfigure(objects.schematic_objects[object_id]["bbox"],state="normal")
+    # Add all drawable items for this object to the shared move tag
+    canvas.addtag_withtag(selection_move_tag, objects.schematic_objects[object_id]["tags"])
+    canvas.addtag_withtag(selection_move_tag, objects.schematic_objects[object_id]["bbox"])
+    if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+        canvas.addtag_withtag(selection_move_tag, objects.schematic_objects[object_id]["selection"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -235,13 +246,20 @@ def select_object(object_id):
 
 def deselect_object(object_id):
     global schematic_state
+    selection_move_tag = "SELECTED"
     # remove the specified object from the list of selected objects
-    schematic_state["selectedobjects"].remove(object_id)
+    if object_id in schematic_state["selectedobjects"]:
+        schematic_state["selectedobjects"].remove(object_id)
     # Remove the highlighting to show it has been de-selected
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
         canvas.itemconfigure(objects.schematic_objects[object_id]["selection"],state="hidden")
     else:
         canvas.itemconfigure(objects.schematic_objects[object_id]["bbox"],state="hidden")
+    # Remove shared move tag from this object's drawable items
+    canvas.dtag(objects.schematic_objects[object_id]["tags"], selection_move_tag)
+    canvas.dtag(objects.schematic_objects[object_id]["bbox"], selection_move_tag)
+    if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+        canvas.dtag(objects.schematic_objects[object_id]["selection"], selection_move_tag)
     return()
 
 #------------------------------------------------------------------------------------
@@ -251,6 +269,7 @@ def deselect_object(object_id):
 def select_all_objects(event=None):
     global schematic_state
     # Clear out the list of selected objects first
+    canvas.dtag("all", "SELECTED")
     schematic_state["selectedobjects"] = []
     for object_id in objects.schematic_objects:
         select_object(object_id)
@@ -391,10 +410,7 @@ def nudge_selected_objects(event=None):
 #------------------------------------------------------------------------------------
         
 def move_selected_objects(xdiff:int,ydiff:int):
-    for object_id in schematic_state["selectedobjects"]:
-        # All drawing objects should be "tagged" apart from the bbox
-        canvas.move(objects.schematic_objects[object_id]["tags"],xdiff,ydiff)
-        canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff,ydiff)
+    canvas.move("SELECTED", xdiff, ydiff)
     return()
 
 #------------------------------------------------------------------------------------
@@ -432,10 +448,6 @@ def hide_selected_objects(event=None):
 def unhide_selected_objects(event=None):
     objects.hide_objects(schematic_state["selectedobjects"], hide=False)
     return()
-
-#------------------------------------------------------------------------------------
-# Internal functions to Rotate / flip all selected Objects ('r' key and popup menu)
-#------------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------------
 # Internal function to return the ID of the Object the cursor is "highlighting"
@@ -539,6 +551,7 @@ def right_button_click(event):
 
 def left_button_click(event):
     global schematic_state
+    flush_pending_move_if_any()
     # Get the canvas coordinates (to take into account any scroll bar offsets) 
     canvas_x, canvas_y = canvas_coordinates(event)
     # The function to perform will depend on the Editor Mode
@@ -661,6 +674,19 @@ def left_double_click(event):
 # The event will only be bound to the canvas in "Edit" Mode
 #------------------------------------------------------------------------------------
 
+def flush_pending_move_if_any():
+    if schematic_state["move_pending"]:
+        apply_pending_move()
+        
+def apply_pending_move():
+    # Apply the accumulated movement
+    dx = schematic_state.get("pending_xdiff", 0)
+    dy = schematic_state.get("pending_ydiff", 0)
+    schematic_state["pending_xdiff"] = 0
+    schematic_state["pending_ydiff"] = 0
+    schematic_state["move_pending"] = False
+    if dx != 0 or dy != 0: move_selected_objects(dx, dy)
+
 def track_cursor(event):
     global schematic_state
     # Get the canvas coordinates (to take into account any scroll bar offsets) 
@@ -688,11 +714,16 @@ def track_cursor(event):
         # Work out the delta movement since the last re-draw
         xdiff = canvas_x - schematic_state["lastx"]
         ydiff = canvas_y - schematic_state["lasty"]
-        # Move all the objects that are selected
-        move_selected_objects(xdiff,ydiff)
-        # Set the 'last' position for the next move event
+        # Skip motion events that won't result in a move
+        if xdiff == 0 and ydiff == 0: return()
+        # Coalesce high-frequency motion events into one UI update
+        schematic_state["pending_xdiff"] += xdiff
+        schematic_state["pending_ydiff"] += ydiff
         schematic_state["lastx"] = canvas_x
         schematic_state["lasty"] = canvas_y
+        if not schematic_state["move_pending"]:
+            schematic_state["move_pending"] = True
+            canvas.after_idle(apply_pending_move)
     # If we are in "Line Edit" Mode them we want the selected line end to move
     # across the schematic with the cusrsor (leaving the other line end in place)
     elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
@@ -790,6 +821,7 @@ def left_button_release(event):
 
 def cancel_move_in_progress(event=None):
     global schematic_state
+    flush_pending_move_if_any()
     if schematic_state["moveobjects"]:
         # Undo the move by returning all objects to their start position
         xdiff = schematic_state["startx"] - schematic_state["lastx"]
