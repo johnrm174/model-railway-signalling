@@ -1,5 +1,5 @@
 {
-   "filename": "/home/john/model-railway-signalling/roster.rst",
+   "filename": "/home/john/model-railway-signalling/my_layout_files/roster.rst",
    "fileinfo": "DCC Signallisng system Roster File",
    "roster": {
       "20046": [
@@ -1476,6 +1476,127 @@
             [
                "/Inertia",
                true
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
+            ]
+         ]
+      ],
+      "9F-92185": [
+         13,
+         [
+            [
+               "",
+               false
+            ],
+            [
+               "Shunt",
+               true
+            ],
+            [
+               "/Inertia",
+               false
+            ],
+            [
+               "",
+               false
+            ],
+            [
+               "",
+               false
             ],
             [
                "",
