@@ -503,8 +503,8 @@ def get_button_state(button_id:int, delay:float=default_delay_time):
     return(button_state)
 
 def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
-    if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
-        raise_test_warning("Scripting: get_gpio_port_state - GPIO: "+str(gpioid)+" has not been mapped")
+    if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings.keys():
+        raise_test_warning("Scripting: get_gpio_port_state - GPIO: "+str(gpio_port_id)+" has not been mapped")
         gpio_state = False
     else:
         # Note that as we are just querying the state of the button we don't
