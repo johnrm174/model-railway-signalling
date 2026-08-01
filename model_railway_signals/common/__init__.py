@@ -117,6 +117,7 @@ __all__ = [
     'validated_dcc_entry_box',
     'validated_keycode_entry_box',
     'validated_gpio_sensor_entry_box',
+    'rotation_button',
     # Compound UI Elements
     'validated_dcc_command_entry',
     'point_settings_entry',
