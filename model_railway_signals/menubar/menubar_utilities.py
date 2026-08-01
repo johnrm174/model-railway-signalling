@@ -923,12 +923,7 @@ class application_upgrade():
                     print(f"Imported module version ({module_name}): {mod_ver}")
                 else:
                     print(f"Imported module ({module_name}) successfully (no __version__ attribute).")
-                user_site = ""
-                try:
-                    user_site = site.getusersitepackages()
-                except Exception:
-                    pass
-                # Accept user site OR source checkout path (development/manual run case).
+                # Accept source checkout path (development/manual run case).
                 # Only fail if import resolves to a known system/root location.
                 if mod_path != "":
                     system_prefixes = ("/usr/lib", "/usr/local/lib", "/opt")
@@ -958,7 +953,6 @@ class application_upgrade():
         print("----------------------------------------------------------------------------------------------------------------")
         return_code = 1
         import_check_failed = False
-        root_module_path = ""
         try:
             # Log interpreter/environment details to aid support diagnostics.
             # This helps identify path/interpreter mismatches on customer systems.
@@ -995,7 +989,6 @@ class application_upgrade():
                     ok, mod_path, mod_ver, fail_reason = validate_import(dist_ver)
                     if not ok:
                         import_check_failed = True
-                        root_module_path = mod_path
                         print(f"WARNING: Upgrade completed successfully but import validation failed: {fail_reason}")
                 # If import validation failed due to legacy root install, and we're on an allowed Debian
                 # version, attempt automatic root uninstall and then re-validate.
@@ -1023,12 +1016,10 @@ class application_upgrade():
                             ok2, mod_path2, mod_ver2, fail_reason2 = validate_import(dist_ver)
                             if ok2:
                                 import_check_failed = False
-                                root_module_path = ""
                                 return_code = 0
                                 print("Automatic cleanup/repair successful.")
                             else:
                                 import_check_failed = True
-                                root_module_path = mod_path2
                                 print(f"Automatic cleanup attempted but validation still failed: {fail_reason2}")
                         else:
                             print("Automatic cleanup attempt failed or was incomplete; manual recovery required.")
@@ -1079,13 +1070,11 @@ class application_upgrade():
             print("    python3 -m pip install --user --upgrade model-railway-signals")
             print("----------------------------------------------------------------------------------------------------------------")
         # Re-enable the close button and window close now the upgrade process is complete
-        self.B1.update()
-        self.B2.update()
         self.B1.config(state="normal")
         self.B2.config(state="normal")
         self.window.protocol("WM_DELETE_WINDOW", self.close_window)
-        self.label.update()
-
+        self.window.update_idletasks()
+        
     def close_window(self):
         global upgrade_utility_window
         upgrade_utility_window = None
