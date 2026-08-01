@@ -59,10 +59,15 @@ import os
 import pathlib
 import subprocess
 import time
+import sys
+import site
+import importlib.metadata
 
 from .. import common
 from .. import library
 from .. import objects
+
+
 
 #------------------------------------------------------------------------------------
 # Class for a CV Programming entry element
@@ -817,6 +822,19 @@ class bulk_renumbering():
 
 #---------------------------------------------------------------------------------------
 # Class for the "Application Upgrade" utility window (uses the classes above)
+# Historically this utility used "sudo pip install --upgrade ..." to update a system-level
+# installation. That worked for older Debian/Raspberry Pi OS releases (e.g. Bullseye),
+# but later releases are increasingly locked down for system Python package management.
+#
+# To provide a consistent upgrade experience across Bullseye/Bookworm/Trixie without
+# interactive sudo prompts (which break the GUI/log-window workflow), we now:
+#   1) Upgrade/install the package in the CURRENT USER context (--user)
+#   2) Use the same Python interpreter that launched this app (sys.executable)
+#   3) Avoid sudo entirely in this GUI flow
+#
+# This keeps backward compatibility with existing launcher methods using:
+#   Exec=python3 -m model_railway_signals
+# because the module import is resolved by that interpreter at runtime.
 #---------------------------------------------------------------------------------------
 
 upgrade_utility_window = None
@@ -854,66 +872,211 @@ class application_upgrade():
         pass
 
     def upgrade(self):
+        package_name = "model-railway-signals"      # pip/distribution name
+        module_name = "model_railway_signals"       # python import/module name
+        #------------------------------------------------------------------------------
+        # Helper function to capture stdout/stderr, print both to the application's
+        # terminal window and return the process return code.
+        #------------------------------------------------------------------------------
+        def run_cmd(cmd):
+            print(f"$ {' '.join(cmd)}")
+            proc = subprocess.run(cmd,text=True,capture_output=True,shell=False)
+            if proc.stdout: print(proc.stdout.rstrip())
+            if proc.stderr: print(proc.stderr.rstrip())
+            return(proc.returncode)
+        #------------------------------------------------------------------------------
+        # Helper function: detect Debian major version from /etc/os-release.
+        # Returns integer major version (e.g. 11,12,13) or None if unknown/non-Linux.
+        #------------------------------------------------------------------------------
+        def get_debian_major():
+            try:
+                if os.name != "posix":
+                    return None
+                if not os.path.exists("/etc/os-release"):
+                    return None
+                data = {}
+                with open("/etc/os-release", "r", encoding="utf-8") as f:
+                    for line in f:
+                        if "=" in line:
+                            k, v = line.strip().split("=", 1)
+                            data[k] = v.strip().strip('"')
+                # VERSION_ID is typically "11", "12", "13"
+                ver = data.get("VERSION_ID", "")
+                if ver == "":
+                    return None
+                return int(ver.split(".")[0])
+            except Exception:
+                return None
+        #------------------------------------------------------------------------------
+        # Helper function: validate current import resolution.
+        # Returns (ok, mod_path, mod_ver, fail_reason)
+        #------------------------------------------------------------------------------
+        def validate_import(dist_ver):
+            try:
+                if module_name in sys.modules:
+                    del sys.modules[module_name]
+                mod = __import__(module_name)
+                mod_ver = getattr(mod, "__version__", None)
+                mod_path = getattr(mod, "__file__", "")
+                print(f"Imported module path ({module_name}): {mod_path}")
+                if mod_ver:
+                    print(f"Imported module version ({module_name}): {mod_ver}")
+                else:
+                    print(f"Imported module ({module_name}) successfully (no __version__ attribute).")
+                user_site = ""
+                try:
+                    user_site = site.getusersitepackages()
+                except Exception:
+                    pass
+                # Accept user site OR source checkout path (development/manual run case).
+                # Only fail if import resolves to a known system/root location.
+                if mod_path != "":
+                    system_prefixes = ("/usr/lib", "/usr/local/lib", "/opt")
+                    if mod_path.startswith(system_prefixes):
+                        return (False, mod_path, mod_ver, "Imported module path is in system/root location")
+                # If module exposes __version__ and it differs from installed distribution, fail.
+                if dist_ver is not None and mod_ver is not None and mod_ver != dist_ver:
+                    return (False, mod_path, mod_ver, "Imported module version differs from installed distribution")
+                return (True, mod_path, mod_ver, "")
+            except Exception as ex:
+                return (False, "", None, f"Import test failed: {ex}")
+        #------------------------------------------------------------------------------
+        # Main Function Starts Here
+        #------------------------------------------------------------------------------
         # Inhibit the Buttons and window close function until the upgrade is complete
         self.B1.config(state="disabled")
         self.B2.config(state="disabled")
         self.window.protocol("WM_DELETE_WINDOW", self.null_function)
         self.label.config(text="Application upgrade in progress - please wait\n"+
-                            "Do not close application until upgrade is complete",fg="black")
+                            "Do not close application until upgrade is complete", fg="black")
         self.B1.update()
         self.B2.update()
         self.label.update()
         # Perform the upgrade (with output to the main terminal window).
-        # We use the library.gpio_interface_enabled function as a quick and dirty method of
-        # establishing if we are running on a raspberry Pi - otherwise we assume Windows
         print("----------------------------------------------------------------------------------------------------------------")
         print("Updating the Model Railway Signalling Application - Do not close the application until the upgrade is complete")
         print("----------------------------------------------------------------------------------------------------------------")
+        return_code = 1
+        import_check_failed = False
+        root_module_path = ""
         try:
-            if library.gpio_interface_enabled():
-                # Assume raspberry Pi - Upgrade with sudo as a system package, suppressing errors/warnings
-                # Note that stdout and stderr are directed to the application's stdout and stderr
-                return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action",
-                                                "ignore", "--break-system-packages", "pip"])
-                # Earlier versions of Pip don't support the --root-user-action or --break-system-packages flags so the
-                # above will error. We'll therefore try to upgrade pip to the latest version without these flags
-                # This is an assumption - pip might fail for other reasons (but unlikely in the big scheme of things)
-                if return_code != 0:
-                    return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "pip"])
-                # We'll only go ahead and try to install the application if we know Pip has been updated
-                if return_code == 0:
-                    return_code = subprocess.call(["sudo", "pip", "install", "--upgrade", "--root-user-action", "ignore",
-                                                        "--break-system-packages", "model-railway-signals"])
-            else:
-                # Assume Windows platform - Install as a user package
-                result = subprocess.run(["pip", "install", "--upgrade", "pip"], shell=True, capture_output=True)
-                print(result.stdout.decode('utf-8'))
-                result = subprocess.run(["pip", "install", "--upgrade", "model-railway-signals"], shell=True, capture_output=True)
-                print(result.stdout.decode('utf-8'))
-                return_code = 999
+            # Log interpreter/environment details to aid support diagnostics.
+            # This helps identify path/interpreter mismatches on customer systems.
+            print(f"Python executable : {sys.executable}")
+            print(f"Python version    : {sys.version.split()[0]}")
+            try:
+                print(f"User site-packages: {site.getusersitepackages()}")
+            except Exception:
+                pass
+            try:
+                print(f"User base         : {site.getuserbase()}")
+            except Exception:
+                pass
+            # Upgrade pip for this interpreter - We do not fail hard if this step fails but
+            # still go on to attempt the application upgrade. This is because some systems
+            # may restrict pip self-upgrade behavior, but package upgrade can still succeed.
+            return_code = run_cmd([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+            if return_code != 0:
+                print("WARNING: pip upgrade failed; continuing with application upgrade attempt.")
+            # Upgrade/install the application as a USER package.
+            return_code = run_cmd([sys.executable, "-m", "pip", "install", "--user", "--upgrade", package_name])
+            #-------------------------------------------------------------------------
+            # Install has succeeded but we need to perform strict verification
+            #-------------------------------------------------------------------------
+            if return_code == 0:
+                dist_ver = None
+                try:
+                    dist_ver = importlib.metadata.version(package_name)
+                    print(f"Installed distribution version ({package_name}): {dist_ver}")
+                except Exception as ex:
+                    import_check_failed = True
+                    print(f"WARNING: Could not read installed distribution version: {ex}")
+                if not import_check_failed:
+                    ok, mod_path, mod_ver, fail_reason = validate_import(dist_ver)
+                    if not ok:
+                        import_check_failed = True
+                        root_module_path = mod_path
+                        print(f"WARNING: Upgrade completed successfully but import validation failed: {fail_reason}")
+                # If import validation failed due to legacy root install, and we're on an allowed Debian
+                # version, attempt automatic root uninstall and then re-validate.
+                if import_check_failed:
+                    debian_major = get_debian_major()
+                    auto_fix_versions = {11}  # Use {11,12} if you also want Bookworm auto-fix
+                    if debian_major in auto_fix_versions:
+                        print("----------------------------------------------------------------------------------------------------------------")
+                        print(f"Attempting automatic legacy root-install cleanup for Debian {debian_major}")
+                        print("----------------------------------------------------------------------------------------------------------------")
+                        # Remove legacy root/system install (non-interactive).
+                        # On newer Debian releases this may require --break-system-packages.
+                        rc_uninstall = run_cmd([ "sudo", "python3", "-m", "pip", "uninstall", "--break-system-packages", "-y", package_name])
+                        if rc_uninstall != 0:
+                            # Fallback for older pip versions that do not support the flag.
+                            rc_uninstall = run_cmd([ "sudo", "python3", "-m", "pip", "uninstall", "-y", package_name])
+                        # Reinstall/refresh user install after cleanup attempt
+                        rc_reinstall = run_cmd([sys.executable, "-m", "pip", "install", "--user", "--upgrade", package_name])
+                        if rc_uninstall == 0 and rc_reinstall == 0:
+                            try:
+                                dist_ver = importlib.metadata.version(package_name)
+                                print(f"Installed distribution version after cleanup ({package_name}): {dist_ver}")
+                            except Exception:
+                                pass
+                            ok2, mod_path2, mod_ver2, fail_reason2 = validate_import(dist_ver)
+                            if ok2:
+                                import_check_failed = False
+                                root_module_path = ""
+                                return_code = 0
+                                print("Automatic cleanup/repair successful.")
+                            else:
+                                import_check_failed = True
+                                root_module_path = mod_path2
+                                print(f"Automatic cleanup attempted but validation still failed: {fail_reason2}")
+                        else:
+                            print("Automatic cleanup attempt failed or was incomplete; manual recovery required.")
+                # If we still have an import mismatch/path mismatch this is considered an upgrade failure.
+                if import_check_failed:
+                    return_code = 3
+        #------------------------------------------------------------------------------------
+        # Install has hit an exception - this is definately an upgrade process failure
+        #------------------------------------------------------------------------------------
         except Exception as exception:
             return_code = 2
             print("----------------------------------------------------------------------------------------------------------------")
             print("Upgrade Error - An unhandled exception occured during the application upgrade process:")
             print(str(exception))
             print("----------------------------------------------------------------------------------------------------------------")
+        #------------------------------------------------------------------------------------------------
+        # Report the success/failure of the upgrade process back to the user:
+        #   0 = Success - User install/upgrade completed & Import validation passed
+        #   1 = Generic failure / non-zero command failure - pip install/upgrade command fails
+        #   2 = Unhandled exception - Python exception occurred in upgrade() try block
+        #   3 = Validation failure after install - pip succeeded, but runtime import validation failed
+        #------------------------------------------------------------------------------------------------
         if return_code == 0:
             self.label.config(text="Upgrade process has completed successfully\n"+
-                    "Exit and re-open the application to use the new version", fg="green4")
+                            "Exit and re-open the application to use the new version", fg="green4")
             print("----------------------------------------------------------------------------------------------------------------")
             print("Application Upgrade process completed successfully - Exit and re-open the application to use the new version")
             print("----------------------------------------------------------------------------------------------------------------")
-        elif return_code == 999:
-            self.label.config(text="Upgrade process has completed - check logs for status\n"+
-                    "Exit and re-open the application to use the new version", fg="black")
+        elif return_code == 3:
+            self.label.config(text="Upgrade failed due to legacy root installation\n"+
+                                "Refer to the system logs for recovery instructions" , fg="red")
             print("----------------------------------------------------------------------------------------------------------------")
-            print("Application Upgrade process is now complete - check logs for success/fail status")
+            print("Upgrade failed - legacy root/system version is taking precedence over the user install")
+            print("1) Leave the current Signalling System application window open")
+            print("2) Raspberry Pi - Open a terminal window and run the following command")
+            print("      sudo python3 -m pip uninstall model-railway-signals")
+            print("          (enter the system password if prompted)")
+            print("3) Windows - Open a Command Prompt window and run the following command")
+            print("      py -m pip uninstall model-railway-signals")
+            print("4) Re-attempt the application upgrade")
             print("----------------------------------------------------------------------------------------------------------------")
         else:
             self.label.config(text="Upgrade failed with one or more errors\nSee logs for details\n"+
-                                          "Try manually upgrading from the Terminal Window", fg="red")
+                                  "Try manually upgrading from the Terminal Window", fg="red")
             print("----------------------------------------------------------------------------------------------------------------")
             print("Upgrade Error - One or more errors occured during the upgrade process")
+            print("Manual fallback command:")
+            print("    python3 -m pip install --user --upgrade model-railway-signals")
             print("----------------------------------------------------------------------------------------------------------------")
         # Re-enable the close button and window close now the upgrade process is complete
         self.B1.update()
