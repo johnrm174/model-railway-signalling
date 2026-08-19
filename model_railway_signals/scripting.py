@@ -14,7 +14,7 @@
 #    set_lever_on(leverid, delay)
 #    set_lever_off(leverid, delay)
 #    set_signal_on(sigid, delay)
-#    set_signal_off(sigid, delay)
+#    set_signal_off(sigid, delay)t
 #    set_subsidiary_on(sigid, delay)
 #    set_subsidiary_off(sigid, delay)
 #    set_secondary_dist_on(sigid, delay) - Semaphore only
@@ -379,7 +379,7 @@ def set_point_switched(pointid:int, delay:float=default_delay_time):
     elif points.point_switched(pointid):
         raise_test_warning("Scripting: set_point_switched - Point: "+str(pointid)+" is already switched")
     else:
-        run_function(lambda:points.change_button_event(pointid))
+        run_function(lambda:points.change_button_event(pointid), delay)
                                                
 def set_point_unswitched(pointid:int, delay:float=default_delay_time):
     if str(pointid) not in points.points.keys():
@@ -465,9 +465,9 @@ def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
         raise_test_warning("Scripting: simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
     else:
         run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
-        time.delay(0.3)
+        time.sleep(0.3)
         run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
-        time.delay(0.2)
+        time.sleep(0.2)
 
 def simulate_gpio_on(gpioid:int, delay:float=default_delay_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():

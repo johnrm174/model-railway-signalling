@@ -943,7 +943,7 @@ def clear_signal_override(sig_id:int, temp_override:bool=False):
         elif not temp_override and signals[str(sig_id)]["override"]:
             logging.info("Signal "+str(sig_id)+": Clearing signal override")
             signals[str(sig_id)]["override"] = False
-        if not signals[str(sig_id)]["override"] or not signals[str(sig_id)]["override2"]:
+        if not signals[str(sig_id)]["override"] and not signals[str(sig_id)]["override2"]:
             text_colour = signals[str(sig_id)]["textcolour"]
             signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
@@ -988,7 +988,7 @@ def clear_subsidary_override(sig_id:int, temp_override:bool=False):
             logging.info("Signal "+str(sig_id)+": Clearing subsidiary override")
             signals[str(sig_id)]["overridesub"] = False
             update_subsidary_aspect(sig_id)
-        if not signals[str(sig_id)]["overridesub"] or not signals[str(sig_id)]["overridesub2"]:
+        if not signals[str(sig_id)]["overridesub"] and not signals[str(sig_id)]["overridesub2"]:
             text_colour = signals[str(sig_id)]["textcolour"]
             signals[str(sig_id)]["subbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
