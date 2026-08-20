@@ -506,7 +506,7 @@ def broadcast_to_all(message):
                 # schedule a drain task on the server event loop
                 server_loop.call_soon_threadsafe(lambda w=writer: server_loop.create_task(w.drain()))
         except Exception:
-            logging.exception("Throttle Server: failed to broadcast message to client")
+            logging.error("Throttle Server: failed to broadcast message to client")
             
 #-----------------------------------------------------------------------------------------------
 # Find the local IP address of the machine we are running on
@@ -514,15 +514,14 @@ def broadcast_to_all(message):
 
 def find_local_ip_address():
     # Try the standard routing trick (works when connected to internet/router)
-    test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # This doesn't actually send data, just checks routing
-        test_socket.connect(('10.255.255.255', 1))
-        ip_address = test_socket.getsockname()[0]
-        test_socket.close()
-        return(ip_address)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as test_socket:
+            # This doesn't actually send data, just checks routing
+            test_socket.connect(('10.255.255.255', 1))
+            ip_address = test_socket.getsockname()[0]
+            return(ip_address)
     except Exception:
-        test_socket.close()
+        pass
     # Fallback: Specifically look for the Hotspot interface (wlan0)
     # This is much more reliable for a standalone DCC Signal Box
     try:
@@ -589,10 +588,13 @@ def start_throttle_server(debugging:bool, allow_list:list, use_allow_list:bool):
     if server_loop: stop_throttle_server()
     # Retrieve the local IP address and Validate
     ip_str = find_local_ip_address()
+    if ip_str is None:
+        logging.error("Throttle Server: Could not retrieve local IP address")
+        return()
     try:
         ip_bytes = socket.inet_aton(ip_str)
     except:
-        logging.exception(f"Throttle Server: Invalid local IP address '{ip_str}'")
+        logging.error(f"Throttle Server: Invalid local IP address '{ip_str}'")
     else:
         # Set the global variables
         enforce_allow_list = use_allow_list
@@ -677,7 +679,7 @@ def dcc_power_status_updated(dcc_power:bool):
             server_loop.call_soon_threadsafe(broadcast_to_all, message1)
             server_loop.call_soon_threadsafe(broadcast_to_all, message2)
     except Exception as e:
-        logging.exception(f"Throttle Server: Exception scheduling DCC power broadcast: {e}")
+        logging.error(f"Throttle Server: Exception scheduling DCC power broadcast: {e}")
     # Notify all WiThrottle clients to drop their current sessions
     if not dcc_power:
         try:
