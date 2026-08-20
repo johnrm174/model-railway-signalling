@@ -93,6 +93,17 @@ shutdown_event = threading.Event()
 
 interlocking_warning_window = None
 list_of_warning_labels = []
+warning_window_min_width = 0   # tracks widest width ever seen
+
+def remember_warning_window_width():
+    global warning_window_min_width
+    if interlocking_warning_window is None:
+        return()
+    interlocking_warning_window.update_idletasks()
+    width = interlocking_warning_window.winfo_width()
+    if width > warning_window_min_width:
+        warning_window_min_width = width
+        interlocking_warning_window.minsize(warning_window_min_width, 1)
 
 def close_warning_window():
     global interlocking_warning_window
@@ -101,9 +112,13 @@ def close_warning_window():
 
 def clear_warning_window():
     global list_of_warning_labels
-    # Clear out everything but the last entry (to maintain the width of the window)
-    for warning_label in list_of_warning_labels[:-1]: warning_label.destroy()
-    list_of_warning_labels = [list_of_warning_labels[-1]]
+    for warning_label in list_of_warning_labels:
+        warning_label.destroy()
+    list_of_warning_labels = []
+    # Re-apply min width so clear does not shrink the window
+    if interlocking_warning_window is not None:
+        interlocking_warning_window.update_idletasks()
+        interlocking_warning_window.minsize(warning_window_min_width, 1)
 
 def focus_back_on_canvas(event, canvas):
     # Update Idletasks to update the warning window and schedule an immediate event to return
@@ -136,12 +151,14 @@ def display_warning(canvas, message:str):
         buttonframe.pack(side=Tk.BOTTOM)
         button1 = Tk.Button(buttonframe, text="OK/Close", command=close_warning_window)
         button1.pack(padx=2, pady=2, side=Tk.LEFT)
-        button2 = Tk.Button(buttonframe, text="Clear all but last message", command=clear_warning_window)
+        button2 = Tk.Button(buttonframe, text="Clear List", command=clear_warning_window)
         button2.pack(padx=2, pady=2, side=Tk.LEFT)
     # Add the latest warning message
     current_time = datetime.now().strftime('%H:%M:%S')
     list_of_warning_labels.append(Tk.Label(interlocking_warning_window, text=current_time+" - "+message, anchor="w", bg=background))
     list_of_warning_labels[-1].pack(padx=10, pady=2, fill='x', expand=True)
+    # Capture the maximum window width
+    remember_warning_window_width()
     # We don't want to take focus from the main application window (otherwise subsequent
     # keypress events won't be processed by the main application window). I've tried
     # setting the 'takefocus' parameter to zero but this didn't work, so the workaround
