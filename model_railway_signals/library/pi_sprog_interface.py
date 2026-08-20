@@ -341,8 +341,6 @@ def process_accessory_data(byte_string):
 
 def process_stat_message(byte_string):
     global rstat_response, pi_cbus_node
-    # Respond to the trigger function (waiting in the main thread for a response)
-    rstat_response = True
     logging.debug ("Pi-SPROG: Rx thread - Received STAT (Command Station Status) message")
     # Process the message (with exception handling just in case)
     try:
@@ -358,6 +356,8 @@ def process_stat_message(byte_string):
         # Extract values using dynamic offsets from d_start
         # Node ID (2 bytes / 4 hex chars)
         pi_cbus_node = int(msg_str[d_start : d_start+4], 16)
+        # Respond to the trigger function (waiting in the main thread for a response)
+        rstat_response = True
         # Command Station ID (1 byte / 2 hex chars)
         command_station_id = int(msg_str[d_start+4 : d_start+6], 16)
         # Flags (1 byte / 2 hex chars)
