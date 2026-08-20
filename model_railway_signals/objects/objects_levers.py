@@ -85,7 +85,7 @@ def check_for_key_code_conflicts(object_to_check):
     conflicts_detected = False
     keycodes = [object_to_check["onkeycode"], object_to_check["offkeycode"]]
     for keycode in keycodes:
-        keycode_mapping = library.get_keyboard_mapping(object_to_check["onkeycode"])
+        keycode_mapping = library.get_keyboard_mapping(keycode)
         if keycode_mapping is not None:
             conflicts_detected = True
             logging.error("Import Schematic - Lever "+str(object_to_check["itemid"])+" Keycode "+
