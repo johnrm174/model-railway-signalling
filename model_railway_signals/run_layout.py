@@ -728,7 +728,7 @@ def process_occupancy_changes(section_ahead:int, section_behind:int, sig_id:int=
         library.set_section_occupied(section_ahead)
     elif section_behind > 0 and section_ahead == 0 and not library.section_occupied(section_behind):
         # Section BEHIND = CLEAR - section AHEAD doesn't exist - set section behind to OCCUPIED
-       library.set_section_occupied(section_behind)
+        library.set_section_occupied(section_behind)
     elif section_ahead > 0 and section_behind == 0 and library.section_occupied(section_ahead):
         #  Section AHEAD = OCCUPIED - section BEHIND doesn't exist - set section ahead to CLEAR
         library.clear_section_occupied(section_ahead)
