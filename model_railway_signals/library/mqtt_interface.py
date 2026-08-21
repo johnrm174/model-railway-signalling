@@ -91,6 +91,7 @@ import socket
 import tkinter as Tk
 import queue
 import threading
+import subprocess
 
 from . import common
 
@@ -650,7 +651,7 @@ def mqtt_disconnect_stage1():
 
 def mqtt_disconnect_stage2():
     global mqtt_client
-     if mqtt_client is not None: mqtt_client.loop_stop()
+    if mqtt_client is not None: mqtt_client.loop_stop()
     common.root_window.after(100, lambda:mqtt_disconnect_stage3())
 
 def mqtt_disconnect_stage3():
