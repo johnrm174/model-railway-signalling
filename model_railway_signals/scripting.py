@@ -514,38 +514,38 @@ def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
     return(gpio_state)
 
 def wait_for_gpio_port(gpio_port_id:int, state:bool, delay:float=default_delay_time, timeout:float=None):
+    global gpio_sensors
+    # Validate mapping exists
     if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings.keys():
-        raise_test_warning("Scripting: wait_for_gpio_port - GPIO: "+str(gpio_port_id)+" has not been mapped")
-    else:
-        current_thread = threading.current_thread()
-        # Grab the synchronization events for this specific port
-        triggered_evt = gpio_sensors.gpio_port_mappings[str(gpio_port_id)]["triggered_event"]
-        released_evt = gpio_sensors.gpio_port_mappings[str(gpio_port_id)]["released_event"]
-        # Check if it's already in the Active state
-        current_state = gpio_sensors.get_gpio_port_state(gpio_port_id)
-        if current_state == state:
+        raise_test_warning("Scripting: wait_for_gpio_port - GPIO: " + str(gpio_port_id) + " has not been mapped")
+        return(False)
+    current_thread = threading.current_thread()
+    gpio_port_configuration = gpio_sensors.gpio_port_mappings[str(gpio_port_id)]
+    # Wait for the logical sensor_state to become the requested state
+    start_time = time.time()
+    while True:
+        # Stop cleanly if the application is shutting down
+        if hasattr(current_thread, 'stop_event') and current_thread.stop_event.is_set():
+            raise ThreadStopException("Scripting: Application closing. Stopping wait.")
+        # Snapshot the current logical state under the configuration lock
+        with gpio_port_configuration["configuration_lock"]:
+            logical_state = gpio_port_configuration["sensor_state"]
+            triggered_event = gpio_port_configuration["triggered_event"]
+            released_event = gpio_port_configuration["released_event"]
+        # If we're already in the requested logical state, return immediately
+        if logical_state == state:
             time.sleep(delay)
             return(True)
-        elif state: target_event = triggered_evt
-        else: target_event = released_evt
-        # Deterministic Wait Loop We loop using a small timeout window so we can safely check
-        # if the user closed the application while the script was waiting for a train.
-        start_time = time.time()
-        while True:
-            # Check if the main thread told this script thread to stop
-            if hasattr(current_thread, 'stop_event') and current_thread.stop_event.is_set():
-                raise ThreadStopException("Scripting: Application closing. Stopping wait.")
-            # Wait on the hardware event for up to 250ms (completely handles CPU sleep)
-            event_fired = target_event.wait(timeout=0.25)
-            if event_fired:
-                time.sleep(delay)
-                return(True)
-            # Handle custom user timeouts if specified
-            if timeout is not None:
-                if (time.time() - start_time) >= timeout:
-                    logging.warning(f"Scripting: Timeout waiting for GPIO {gpio_port_id} to go {state}")
-                    break
-    return(False)
+        # Otherwise wait on the corresponding logical event
+        target_event = triggered_event if state else released_event
+        event_fired = target_event.wait(timeout=0.25)
+        if event_fired:
+            time.sleep(delay)
+            return(True)
+        # Handle timeout if specified
+        if timeout is not None and (time.time() - start_time) >= timeout:
+            logging.warning(f"Scripting: Timeout waiting for GPIO {gpio_port_id} to go {state}")
+            return(False)
 
 def wait_for_button(button_id:int, state:bool, delay:float=default_delay_time, timeout:float=None):
     # Ensure button exists in the mapping configuration

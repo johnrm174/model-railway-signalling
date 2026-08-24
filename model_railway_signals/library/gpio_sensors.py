@@ -125,12 +125,6 @@ def is_running_on_raspberry_pi():
 running_on_raspberry_pi = is_running_on_raspberry_pi()
 
 #---------------------------------------------------------------------------------------------------
-# Threading Lock To ensure data update of the gpio data is absolutely threadsafe
-#---------------------------------------------------------------------------------------------------
-
-gpio_data_lock = threading.Lock()
-
-#---------------------------------------------------------------------------------------------------
 # API Function for external modules to test if GPIO inputs are supported by the platform
 #---------------------------------------------------------------------------------------------------
 
@@ -149,18 +143,24 @@ def get_list_of_available_gpio_ports():
 #---------------------------------------------------------------------------------------------------
 # GPIO port mappings are stored in a global dictionary when created - key is the GPIO port ID 
 # Each Entry is a dictionary specific to the GPIO port that has been mapped with the following Keys:
-# "sensor_id"         : Unique ID for the sensor - int (for local sensors) or str (for remote sensors)
-# "timeout_value"     : Time period (in seconds) during which subsequent trigger events will be ignored
-# "timeout_start"     : Absolute time the sensor was first triggered (after any 'debounce' period)
-# "signal_approach"   : A signal ID (to raise a 'signal approached' event when triggered)
-# "signal_passed"     : A signal ID (to raise a 'signal passed' event for when triggered)
-# "sensor_passed"     : A Sensor ID (to raise a 'sensor passed' event when triggered)
-# "track_section"     : A Section ID (to raise a occupied/clear event when triggered/released)
-# "sensor_state"      : The current state of the GPIO input (True=active, False=inactive)
-# "event_timestamps"  : A list of trigger/release event timestamps over a rolling 1 second window
-# "breaker_threshold" : The maximum number of events allowed within the one second time period
-# "breaker_tripped"   : A flag to indicate if the sircuit breaker has tripped or not
-# "sensor_device"     : The reference to the gpiozero button object mapped to the GPIO port
+# "sensor_id"          : Unique ID for the sensor - int (for local sensors) or str (for remote sensors)
+# "timeout_value"      : Time period (in seconds) during which subsequent trigger events will be ignored
+# "trigger_period"     : Time period (in seconds) for a trigger to be treated as a valid trigger event
+# "signal_approach"    : A signal ID (to raise a 'signal approached' event when triggered)
+# "signal_passed"      : A signal ID (to raise a 'signal passed' event for when triggered)
+# "sensor_passed"      : A Sensor ID (to raise a 'sensor passed' event when triggered)
+# "track_section"      : A Section ID (to raise a occupied/clear event when triggered/released)
+# "sensor_state"       : The current state of the GPIO input (True=active, False=inactive)
+# "physical_state"     : The current state of the GPIO input (True=active, False=inactive)
+# "event_timestamps"   : A list of trigger/release event timestamps over a rolling 1 second window
+# "breaker_threshold"  : The maximum number of events allowed within the one second time period
+# "breaker_tripped"    : A flag to indicate if the sircuit breaker has tripped or not
+# "triggered_event"    : Threading event used to coordinate with the scripting engine
+# "released_event"     : Threading event used to coordinate with the scripting engine
+# "trigger_timer"      : Holds the reference to the trigger validation timer
+# "timeout_timer"      : Holds the reference to the sensor timeout timer
+# "configuration_lock" : The threading lock to protect configuration updates
+# "sensor_device"      : The reference to the gpiozero button object mapped to the GPIO port
 #---------------------------------------------------------------------------------------------------
 
 gpio_port_mappings: dict = {}
@@ -254,8 +254,7 @@ def get_gpio_port_state(gpio_port_id:int):
         logging.error("GPIO Port "+str(gpio_port_id)+": get_gpio_port_state - GPIO Port does not exist")
         gpio_port_state = False
     else:
-        with gpio_data_lock:
-            gpio_port_state = gpio_port_mappings[str(gpio_port_id)]["sensor_state"]
+        gpio_port_state = gpio_port_mappings[str(gpio_port_id)]["sensor_state"]
     return(gpio_port_state)
 
 #---------------------------------------------------------------------------------------------------
@@ -312,150 +311,157 @@ circuit_breaker_thread.setDaemon(True)
 circuit_breaker_thread.start()
 
 #---------------------------------------------------------------------------------------------------
-# The 'gpio_triggered_callback' function is called whenever a "Pressed" event is detected for
-# an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
-# Note that the GPIO port entry is never deleted once created - the sensor ID gets unmapped instead
-# so we don't have to check the gpio_port_mapping entry still exists before querying it.
+# Callback functions to handle the physical and logical GPIO Port trigger/release Events
+# Note that these will run in their respective threads (not the main Tkinter thread).
+# These functions implement a trigger validation period (to 'debounce' the physical
+# gpio input) and a sensor_timeout (during which subsequent triggers are ignored).
 #---------------------------------------------------------------------------------------------------
 
-# Use a dictionary to keep track of active trigger timer objects
-pending_triggers_lock = threading.Lock()
-pending_triggers = {}
-
-def gpio_triggered_callback(gpio_port:int):
+def gpio_physical_trigger_callback(gpio_port:int):
     global gpio_port_mappings
-    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-        with pending_triggers_lock:
-            # Cancel any previous trigger timers if a rapid fire of triggers occurs
-            if gpio_port in pending_triggers:pending_triggers[gpio_port].cancel()
-            # Start a new timer for the trigger period (this will call the validate_trigger function)
-            trigger_period = gpio_port_mappings[str(gpio_port)]["trigger_period"]
-            timer_thread = threading.Timer(trigger_period, validate_trigger, args=[gpio_port])
-            pending_triggers[gpio_port] = timer_thread
-            timer_thread.start()
-        # Register the event to the event queue for the circuit breaker thread
-        event_queue.put(gpio_port)
+    # Get the GPIO Port configuration (will return None if there is no Mapping)
+    gpio_port_configuration = gpio_port_mappings.get(str(gpio_port))
+    # Return immediately if there is no mapping
+    if gpio_port_configuration is None: return()
+    # Use a threading lock to Protect against trigger/release and timer races
+    with gpio_port_configuration["configuration_lock"]:
+        # Return Immediately if the circuit breaker for the port has tripped
+        if gpio_port_configuration["breaker_tripped"]: return()
+        # Record the physical edge
+        gpio_port_configuration["physical_state"] = True
+        # If there is already a pending trigger validation timer, cancel it
+        existing_trigger_timer = gpio_port_configuration.get("trigger_timer")
+        if existing_trigger_timer is not None:
+            try:
+                existing_trigger_timer.cancel()
+            except Exception:
+                pass
+        # Start a new trigger validation timer
+        trigger_period = gpio_port_configuration["trigger_period"]
+        timer = threading.Timer(trigger_period, gpio_validate_logical_trigger, args=[gpio_port])
+        timer.daemon = True
+        gpio_port_configuration["trigger_timer"] = timer
+        timer.start()
+    # Register the event to the event queue for the circuit breaker thread
+    event_queue.put(gpio_port)
     return()
 
-def validate_trigger(gpio_port: int):
-    with pending_triggers_lock:
-        if gpio_port in pending_triggers:
-            del pending_triggers[gpio_port]
-    # This runs in a background thread exactly when the timer expires
-    common.execute_function_in_tkinter_thread(lambda: gpio_sensor_triggered(gpio_port))
-    return()
-
-#---------------------------------------------------------------------------------------------------
-# The 'gpio_released_callback' function is called whenever a "Relesed" event is detected for
-# an external GPIO port. The function immediately passes execution back into the main Tkinter thread.
-# Note that the GPIO port entry is never deleted once created - the sensor ID gets unmapped instead
-# so we don't have to check the gpio_port_mapping entry still exists before querying it.
-#---------------------------------------------------------------------------------------------------
-
-def gpio_released_callback(gpio_port:int):
+def gpio_validate_logical_trigger(gpio_port: int):
     global gpio_port_mappings
-    if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-        was_pending = False
-        with pending_triggers_lock:
-            # Cancel any ongoing trigger timer for the port
-            if gpio_port in pending_triggers:
-                pending_triggers[gpio_port].cancel()
-                del pending_triggers[gpio_port]
-                was_pending = True
-        # Register the event to the event queue for the circuit breaker thread
-        event_queue.put(gpio_port)
-        if not was_pending:
-            common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
+    # Get the GPIO Port configuration (will return None if there is no Mapping)
+    gpio_port_configuration = gpio_port_mappings.get(str(gpio_port))
+    # Return immediately if there is no mapping
+    if gpio_port_configuration is None: return()
+    # Flag to determine whether we need to raise a logical sensor triggered event
+    process_gpio_trigger_event = False
+    extending_sensor_timeout = False
+    # Use a threading lock to Protect against trigger/release and timer races
+    with gpio_port_configuration["configuration_lock"]:
+        sensor_id = gpio_port_configuration["sensor_id"]
+        # This trigger validation timer has now fired, so clear the reference to it
+        gpio_port_configuration["trigger_timer"] = None
+        # If we are in a sensor timeout period then we DO NOT Process the Event.
+        # We just extend the timeout by cancelling it and starting a new one
+        existing_timeout_timer = gpio_port_configuration.get("timeout_timer")
+        if existing_timeout_timer is not None:
+            extending_sensor_timeout = True
+            try:
+                existing_timeout_timer.cancel()
+            except Exception:
+                pass
+        # If we are not in a Sensor timeout period then we still only process the trigger
+        # if the sensor is still physically active and we are not already logically active
+        elif gpio_port_configuration["physical_state"] and not gpio_port_configuration["sensor_state"]:
+            gpio_port_configuration["sensor_state"] = True
+            gpio_port_configuration["triggered_event"].set()
+            gpio_port_configuration["released_event"].clear()
+            process_gpio_trigger_event = True
+        # Schedule a sensor timeout (during which no further triggers should be processed)
+        # This is the case for a 'new' trigger or just extending the timeout on an existing trigger
+        timeout_value = gpio_port_configuration["timeout_value"]
+        timeout_timer = threading.Timer(timeout_value, gpio_logical_sensor_timeout, args=[gpio_port])
+        timeout_timer.daemon = True
+        gpio_port_configuration["timeout_timer"] = timeout_timer
+        timeout_timer.start()
+    # Pass the sensor triggered event in the Tkinter thread for processing
+    if process_gpio_trigger_event:
+        logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
+        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_triggered(gpio_port))
+    if extending_sensor_timeout:
+        logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
+    return()
+
+def gpio_physical_release_callback(gpio_port:int):
+    global gpio_port_mappings
+    # Get the GPIO Port configuration (will return None if there is no Mapping)
+    gpio_port_configuration = gpio_port_mappings.get(str(gpio_port))
+    # Return immediately if there is no mapping
+    if gpio_port_configuration is None: return()
+    # Flag to determine whether we need to raise a logical sensor released event
+    process_gpio_release_event = False
+    # Use a threading lock to Protect against trigger/release and timer races
+    with gpio_port_configuration["configuration_lock"]:
+        sensor_id = gpio_port_configuration["sensor_id"]
+        # Return Immediately if the circuit breaker for the port has tripped
+        if gpio_port_configuration["breaker_tripped"]: return()
+        # Record the physical edge
+        gpio_port_configuration["physical_state"] = False
+        # Only only process the release if we are logically active
+        if gpio_port_configuration["sensor_state"]:
+            gpio_port_configuration["sensor_state"] = False
+            gpio_port_configuration["triggered_event"].clear()
+            gpio_port_configuration["released_event"].set()
+            process_gpio_release_event = True
+    # Pass the sensor released event in the Tkinter thread for processing
+    if process_gpio_release_event:
+        logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
+        common.execute_function_in_tkinter_thread(lambda:gpio_sensor_released(gpio_port))
+    # Register the event to the event queue for the circuit breaker thread
+    event_queue.put(gpio_port)
+    return()
+
+def gpio_logical_sensor_timeout(gpio_port: int):
+    global gpio_port_mappings
+    # Get the GPIO Port configuration (will return None if there is no Mapping)
+    gpio_port_configuration = gpio_port_mappings.get(str(gpio_port))
+    # Return immediately if there is no mapping
+    if gpio_port_configuration is None: return()
+    # Use a threading lock to Protect against trigger/release and timer races
+    with gpio_port_configuration["configuration_lock"]:
+        # Timeout has fired, so clear the reference
+        gpio_port_configuration["timeout_timer"] = None
     return()
 
 #---------------------------------------------------------------------------------------------------
-# API function executed in the main Tkinter thread whenever a "Button Held" event is detected
-# for the external GPIO port. A timeout is applied to ignore further triggers during the timeout period.
-# If the sensor is re-triggered within the timeout period then the timeout period is extended. This is
-# to handle optical sensors which might Fall and Rise as each carriage/waggon passes the sensor.
+# Functions to process the validated logical trigger/release events
+# Also API Functions to simulate validated trigger/release events
+# Note that these functions will be running in the main Tkinter Loop
 #---------------------------------------------------------------------------------------------------
 
 def gpio_sensor_triggered(gpio_port:int):
-    global gpio_port_mappings
     if not isinstance(gpio_port, int):
         logging.error("GPIO Port "+str(gpio_port)+": gpio_sensor_triggered - GPIO Port must be an int")
-    elif str(gpio_port) in gpio_port_mappings.keys():
-        # Check the breaker hasn't tripped in the time between when the event was raised in the
-        # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
-        # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
-        # so we don't have to check the gpio_port_mapping entry still exists before querying it.
-        if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-            sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-            # Only process the event if we are not in the timeout period from a previous trigger
-            # If we are in the timeout period then 'our' sensor state will still be active
-            valid_triggered_event = False
-            with gpio_data_lock:
-                sensor_state = gpio_port_mappings[str(gpio_port)]["sensor_state"]
-                if not sensor_state:
-                    logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
-                    gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
-                    gpio_port_mappings[str(gpio_port)]["triggered_event"].set()
-                    gpio_port_mappings[str(gpio_port)]["released_event"].clear()
-                    valid_triggered_event = True
-                else:
-                    logging.debug("GPIO Sensor "+str(sensor_id)+": Extending Timeout ****************************************")
-                # Reset the timeout period (whether we have acted on it or not)
-                gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-            # Transmit the updated state via MQTT networking and make the mapped callback
-            # and Report the sensor status to any subscribed modules (the status page) only
-            # if we have detected a transition from True to False (i.e. sensor_state=False)
-            if valid_triggered_event:
-                send_mqtt_gpio_sensor_updated_event(sensor_id)
-                make_gpio_sensor_triggered_callback(sensor_id)
-                report_gpio_port_status(gpio_port, status=2) # Active
+    # Get the GPIO Port configuration (will return None if there is no Mapping)
+    gpio_port_configuration = gpio_port_mappings.get(str(gpio_port))
+    # Return immediately if there is no mapping
+    if gpio_port_configuration is None: return()
+    sensor_id = gpio_port_configuration["sensor_id"]
+    send_mqtt_gpio_sensor_updated_event(sensor_id)
+    make_gpio_sensor_triggered_callback(sensor_id)
+    report_gpio_port_status(gpio_port, status=2)
     return()
 
-#---------------------------------------------------------------------------------------------------
-# API function executed in the main Tkinter thread whenever a "Button Released" event is detected.
-#---------------------------------------------------------------------------------------------------
-
 def gpio_sensor_released(gpio_port:int):
-    global gpio_port_mappings
     if not isinstance(gpio_port, int):
         logging.error("GPIO Port "+str(gpio_port)+": gpio_sensor_released - GPIO Port must be an int")
-    elif str(gpio_port) in gpio_port_mappings.keys():
-        # Check the breaker hasn't tripped in the time between when the event was raised in the
-        # GPIO ZERO thread and the time this event is being processed in the tkinter thread.
-        # Note that the GPIO port entry is never deleted once created (the sensor ID gets unmapped)
-        # so we don't have to check the gpio_port_mapping entry still exists before querying it.
-        if not gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
-            timeout_start = gpio_port_mappings[str(gpio_port)]["timeout_start"]
-            timeout_value = gpio_port_mappings[str(gpio_port)]["timeout_value"]
-            sensor_object = gpio_port_mappings[str(gpio_port)]["sensor_device"]
-            sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-            # Only process the event if the GPIO input is released and 'our' sensor state is still
-            # active. This is to cope with the case where we might have had multiple additional
-            # trigger/release events during the timeout period which have extended 'our' sensor
-            # active time and resulted in additional re-scheduled release events. This is to ensure
-            # we only make a single callback for the release event after the timeout period
-            valid_released_event = False
-            with gpio_data_lock:
-                sensor_state = gpio_port_mappings[str(gpio_port)]["sensor_state"]
-                if not sensor_object.is_active and sensor_state:
-                    # Only process the release event if the trigger timeout period has expired
-                    # Otherwise re-schedule the event for when the trigger timeout period expires
-                    if time.time() > timeout_start + timeout_value:
-                        gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
-                        gpio_port_mappings[str(gpio_port)]["triggered_event"].clear()
-                        gpio_port_mappings[str(gpio_port)]["released_event"].set()
-                        logging.info("GPIO Sensor "+str(sensor_id)+": Released Event ********************************************")
-                        valid_released_event = True
-                    else:
-                        # Reschedule the event to be processed after the timeout has expired
-                        remaining_timeout_ms = int((timeout_start + timeout_value - time.time())*1000)
-                        common.root_window.after(remaining_timeout_ms, lambda:gpio_sensor_released(gpio_port))
-            # Transmit the updated state via MQTT networking and make the mapped callback
-            # and report the sensor status to any subscribed modules (the status page) only
-            # if we have detected a transition from False to True (i.e. sensor_state=True)
-            if valid_released_event:
-                send_mqtt_gpio_sensor_updated_event(sensor_id)
-                make_gpio_sensor_released_callback(sensor_id)
-                report_gpio_port_status(gpio_port, status=3)  # Inactive
+    # Get the GPIO Port configuration (will return None if there is no Mapping)
+    gpio_port_configuration = gpio_port_mappings.get(str(gpio_port))
+    # Return immediately if there is no mapping
+    if gpio_port_configuration is None: return()
+    sensor_id = gpio_port_configuration["sensor_id"]
+    send_mqtt_gpio_sensor_updated_event(sensor_id)
+    make_gpio_sensor_released_callback(sensor_id)
+    report_gpio_port_status(gpio_port, status=3)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -616,26 +622,51 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
         logging.debug("GPIO Sensor "+str(sensor_id)+": Mapping sensor to GPIO Port "+str(gpio_channel))
         # If the GPIO Port has not yet been mapped then create a new entry dictionary of gpio_port_mappings
         # The sensor device itself (gpiozero Button Object) is creted later (if running on a RPi)
+        # We also create the thread coordination elements and event timers from scratch
         if str(gpio_channel) not in gpio_port_mappings.keys():
             gpio_port_mappings[str(gpio_channel)] = {}
             gpio_port_mappings[str(gpio_channel)]["sensor_device"] = None
-        gpio_port_mappings[str(gpio_channel)]["sensor_state"] = False
-        gpio_port_mappings[str(gpio_channel)]["sensor_id"] = sensor_id
+            gpio_port_mappings[str(gpio_channel)]["trigger_timer"] = None
+            gpio_port_mappings[str(gpio_channel)]["timeout_timer"] = None
+            gpio_port_mappings[str(gpio_channel)]["configuration_lock"] = threading.Lock()
+            gpio_port_mappings[str(gpio_channel)]["triggered_event"] = threading.Event()
+            gpio_port_mappings[str(gpio_channel)]["released_event"] = threading.Event()
+        else:
+            # If the Mapping already exists then we 'clean u' all threading events/timers
+            with gpio_port_mappings[str(gpio_channel)]["configuration_lock"]:
+                existing_trigger_timer = gpio_port_mappings[str(gpio_channel)].get("trigger_timer")
+                if existing_trigger_timer is not None:
+                    try:
+                        existing_trigger_timer.cancel()
+                    except Exception:
+                        pass
+                gpio_port_mappings[str(gpio_channel)]["trigger_timer"] = None
+                existing_timeout_timer = gpio_port_mappings[str(gpio_channel)].get("timeout_timer")
+                if existing_timeout_timer is not None:
+                    try:
+                        existing_timeout_timer.cancel()
+                    except Exception:
+                        pass
+                gpio_port_mappings[str(gpio_channel)]["timeout_timer"] = None
+                gpio_port_mappings[str(gpio_channel)]["triggered_event"].clear()
+                gpio_port_mappings[str(gpio_channel)]["released_event"].clear()     
         # Create/update the rest of the GPIO Port Mapping entry in the dictionary of gpio_port_mappings
+        gpio_port_mappings[str(gpio_channel)]["sensor_id"] = sensor_id
         gpio_port_mappings[str(gpio_channel)]["timeout_value"] = sensor_timeout
         gpio_port_mappings[str(gpio_channel)]["trigger_period"] = trigger_period
-        gpio_port_mappings[str(gpio_channel)]["timeout_start"] = 0.0
         # These are the mapped callbacks (zero for no mapped callback)
         gpio_port_mappings[str(gpio_channel)]["signal_approach"] = 0
         gpio_port_mappings[str(gpio_channel)]["signal_passed"] = 0
         gpio_port_mappings[str(gpio_channel)]["sensor_passed"] = 0
         gpio_port_mappings[str(gpio_channel)]["track_section"] = 0
-        # Parameters required for circuit breakerCircuit breaker
+        # Parameters required for circuit breaker
         gpio_port_mappings[str(gpio_channel)]["event_timestamps"] = deque(maxlen=max_events_per_second+5)
         gpio_port_mappings[str(gpio_channel)]["breaker_threshold"] = max_events_per_second
         gpio_port_mappings[str(gpio_channel)]["breaker_tripped"] = False
-        gpio_port_mappings[str(gpio_channel)]["triggered_event"] = threading.Event()
-        gpio_port_mappings[str(gpio_channel)]["released_event"] = threading.Event()
+        # These are the events and locks used to coordinate between threads
+        # Sensor States and threading timers used to validate the trigger/release events
+        gpio_port_mappings[str(gpio_channel)]["sensor_state"] = False
+        gpio_port_mappings[str(gpio_channel)]["physical_state"] = False
         # We report the initial GPIO port status at the end of this funcion (0=unmapped)
         gpio_port_status_to_report = 0
         # We only create /update the gpiozero button object if we are running on a raspberry pi
@@ -647,12 +678,11 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
                 try:
                     # Use the DigitalInputDevice pin and the when_changed attribute to report events
                     device = gpiozero.DigitalInputDevice(pin=gpio_channel, pull_up=True)
-                    device.when_activated = lambda: gpio_triggered_callback(gpio_channel)
-                    device.when_deactivated = lambda: gpio_released_callback(gpio_channel)
+                    device.when_activated = lambda: gpio_physical_trigger_callback(gpio_channel)
+                    device.when_deactivated = lambda: gpio_physical_release_callback(gpio_channel)
                     gpio_port_mappings[str(gpio_channel)]["sensor_device"] = device
                 except Exception as exception:
-                    logging.error(f"GPIO Sensor {sensor_id}: create_track_sensor - GPIO port {gpio_channel}"+
-                                  f" cannot be mapped: {exception}")
+                    logging.error(f"GPIO Sensor {sensor_id}: create_track_sensor - GPIO port {gpio_channel}"+f" cannot be mapped: {exception}")
                     gpio_port_mappings[str(gpio_channel)]["sensor_device"] = None
             # Update/assign the gpiozero Button Object with the new value for the trigger period.
             # We also capture the initial state of the Button Object so we can make a callback
@@ -662,6 +692,7 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
             # (creation will error if the port is being used by another software application)
             if gpio_port_mappings[str(gpio_channel)]["sensor_device"] is not None:
                 initial_state = gpio_port_mappings[str(gpio_channel)]["sensor_device"].is_active
+                gpio_port_mappings[str(gpio_channel)]["physical_state"] = initial_state
                 gpio_port_mappings[str(gpio_channel)]["sensor_state"] = initial_state
                 if initial_state: gpio_port_status_to_report = 2    # Active
                 else: gpio_port_status_to_report = 3                # Inactive
