@@ -649,7 +649,7 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
                         pass
                 gpio_port_mappings[str(gpio_channel)]["timeout_timer"] = None
                 gpio_port_mappings[str(gpio_channel)]["triggered_event"].clear()
-                gpio_port_mappings[str(gpio_channel)]["released_event"].clear()     
+                gpio_port_mappings[str(gpio_channel)]["released_event"].clear()
         # Create/update the rest of the GPIO Port Mapping entry in the dictionary of gpio_port_mappings
         gpio_port_mappings[str(gpio_channel)]["sensor_id"] = sensor_id
         gpio_port_mappings[str(gpio_channel)]["timeout_value"] = sensor_timeout
