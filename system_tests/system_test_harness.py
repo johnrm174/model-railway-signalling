@@ -679,10 +679,10 @@ def simulate_gpio_triggered(*gpioids):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_triggered_callback(gpioid))
+            run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid))
             # Wait 30ms (default GPIO sensor debounce delay = 20ms
             time.sleep(0.030)
-            run_function(lambda:gpio_sensors.gpio_released_callback(gpioid))
+            run_function(lambda:gpio_sensors.gpio_physical_release_callback(gpioid))
             # Wait for the event loop to come round again, so we are sure any secondary events have finished
             run_function(lambda:dummy_function())
 
@@ -691,14 +691,14 @@ def simulate_gpio_on(*gpioids):
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_triggered_callback(gpioid))
+            run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid))
 
 def simulate_gpio_off(*gpioids):
     for gpioid in gpioids:
         if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_released_callback(gpioid))
+            run_function(lambda:gpio_sensors.gpio_physical_release_callback(gpioid))
 
 def simulate_buttons_clicked(*buttonids):
     for buttonid in buttonids:

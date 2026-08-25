@@ -464,22 +464,22 @@ def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
         raise_test_warning("Scripting: simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
     else:
-        run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid))
+        run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid))
         time.sleep(0.3)
-        run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid))
+        run_function(lambda:gpio_sensors.gpio_physical_release_callback(gpioid))
         time.sleep(0.2)
 
 def simulate_gpio_on(gpioid:int, delay:float=default_delay_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
         raise_test_warning("Scripting: simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
     else:
-        run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid), delay)
+        run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid), delay)
 
 def simulate_gpio_off(gpioid:int, delay:float=default_delay_time):
     if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
         raise_test_warning("Scripting: simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
     else:
-        run_function(lambda:gpio_sensors.gpio_sensor_released(gpioid), delay)
+        run_function(lambda:gpio_sensors.gpio_physical_release_callback(gpioid), delay)
 
 def simulate_button_clicked(buttonid:int, delay:float=default_delay_time):
     if str(buttonid) not in buttons.buttons.keys():
@@ -507,8 +507,7 @@ def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
         raise_test_warning("Scripting: get_gpio_port_state - GPIO: "+str(gpio_port_id)+" has not been mapped")
         gpio_state = False
     else:
-        # Note that as we are just querying the state of the button we don't
-        # need to hand this off to the main tkinter thread
+        # As we are just querying the state of the GPIO Port we don't need to hand this off to the main tkinter thread
         gpio_state = gpio_sensors.get_gpio_port_state(gpio_port_id)
         time.sleep(delay)
     return(gpio_state)
