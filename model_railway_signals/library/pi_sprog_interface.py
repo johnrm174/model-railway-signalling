@@ -96,6 +96,7 @@ import serial
 import time
 import logging
 import queue
+import copy
 import os
 
 from . import common
@@ -386,7 +387,8 @@ def process_stat_message(byte_string):
             "bus_active_flag"  : str(bus_active_flag),
             "sprog_error"      : str(sprog_error_flag),
             "emergency_stop"   : str(emergency_stop_flag) }
-        common.execute_function_in_tkinter_thread(lambda: report_status(status))
+        status_snapshot = status.copy()   # shallow copy
+        common.execute_function_in_tkinter_thread(lambda s=status_snapshot: report_status(s))
         # Log out the status report
         if debug:
             logging.debug("    CBUS Node Id       :"+str(pi_cbus_node))
@@ -677,7 +679,10 @@ def sprog_disconnect():
     return(pi_sprog_disconnected)
 
 #------------------------------------------------------------------------------
-# Function to send a RSTAT (Request command Station Status) command (response logged)
+# INTERNAL Function to send a RSTAT (Request command Station Status) command.
+# As this function is ONLY used on SPROG Connect (to confirm connectivity)
+# we are happy to wait for the response (can't go any further unless connected)
+#------------------------------------------------------------------------------
 # Returns True if successful and False if no response is received (timeout)
 # Results in a character string of ':SA020N0C' being sent out to the Pi-SPROG
 # The only bit we really care about is the bit after the 'N', which is the op code
@@ -815,6 +820,8 @@ def request_dcc_power_off():
 
 def request_status_report():
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
+    # Note that we don't use the 'query_command_station_status' function here as we don't
+    # want to block whilst waiting for a response (we get that via the registered callback)
     if sprog_status_callback is not None and serial_port.is_open:
         if debug: logging.debug("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
         # Set a low priority for the RSTAT message
