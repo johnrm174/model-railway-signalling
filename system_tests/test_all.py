@@ -22,7 +22,6 @@ import library_tests_track_sections
 import library_tests_track_sensors
 ###import basic_library_tests2
 import basic_library_tests3
-
 import test_schematic_editor
 import test_object_updates
 import test_run_layout
@@ -45,6 +44,7 @@ def run_all_tests():
     print("*** Running Library Tests ***")
     # Note we immediately abort if any library tests fail
     if system_test_harness.test_failures == 0: library_tests_mqtt_interface.run_all_tests()   ## This needs to run first
+    if system_test_harness.test_failures == 0: library_tests_sprog_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_block_instruments.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_buttons.run_all_tests()
     # Common #########################################
@@ -55,7 +55,6 @@ def run_all_tests():
     if system_test_harness.test_failures == 0: library_tests_lines.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_loco_control.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_points.run_all_tests()
-    if system_test_harness.test_failures == 0: library_tests_sprog_interface.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_text_boxes.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_track_sections.run_all_tests()
     if system_test_harness.test_failures == 0: library_tests_track_sensors.run_all_tests()
