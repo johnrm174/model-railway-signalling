@@ -481,7 +481,6 @@ def gpio_circuit_breaker_tests():
     gpio_sensors.gpio_physical_release_callback(10)
     time.sleep(0.500)
     print ("GPIO Sensors - Disable status reporting - Will generate 1 Error")
-    assert len
     gpio_sensors.unsubscribe_from_gpio_port_status(4.0) # Error (not an int or str)
     gpio_sensors.unsubscribe_from_gpio_port_status(10) # Port is Mapped, port will be unmapped successfully
     gpio_sensors.unsubscribe_from_gpio_port_status(20) # Port isnt mapped but No Error will be generated
