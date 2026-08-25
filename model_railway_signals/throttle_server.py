@@ -53,7 +53,8 @@ from . import settings
 server_thread_handle = None
 
 # Keep track of active writers (connections) and the server loop
-connected_clients = set()
+set_of_connected_clients_lock = threading.Lock()
+set_of_connected_clients = set()
 server_loop = None
 stop_event = None
 
@@ -68,6 +69,7 @@ dcc_power_state = None
 maximum_no_of_functions = 13
 server_status_callbacks = []
 list_of_connected_clients = []
+list_of_connected_clients_lock = threading.Lock()
 
 # Connection Security - simple whitelist
 enforce_allow_list = True
@@ -164,7 +166,8 @@ async def handle_client(reader, writer):
     peer_port_number = peer[1]
     client_name = "unknown"
     # Add this connection to the list of writers
-    connected_clients.add(writer)
+    with set_of_connected_clients_lock:
+        set_of_connected_clients.add(writer)
     logging.info(f"Throttle Server: Starting session from {peer_ip_address}:{peer_port_number}")    
     # Send the WiThrottle Protocol version to the client
     protocol_version = "VN2.0\n" 
@@ -197,20 +200,21 @@ async def handle_client(reader, writer):
                 #------------------------------------------------------------
                 if message.startswith("N") or message.startswith("HU"):
                     if message.startswith("N"):
-                        client_name = message[1:]
-                        # Apply connection security (whitelist)
-                        if enforce_allow_list and client_name not in list_of_allowed_clients:
-                            logging.warning(f"Throttle Server: REJECTED unauthorized client: '{client_name}'")
-                            # WiThrottle doesn't have a standard "Access Denied" message, 
-                            # but sending a screen message helps the user understand why it failed.
-                            writer.write("HMUnauthorized Device. Closing Connection.\n".encode())
-                            await writer.drain()
-                            break # Exits the while loop and triggers the 'finally' cleanup
-                        elif client_name not in list_of_connected_clients:
-                            # Connection is allowed - but ignore 'heartbeat messages if already connected
-                            logging.info(f"Throttle Server: Connected WiThrottle Client is '{client_name}'")
-                            list_of_connected_clients.append(client_name)
-                            make_server_status_updated_callbacks()
+                        with list_of_connected_clients_lock:
+                            client_name = message[1:]
+                            # Apply connection security (whitelist)
+                            if enforce_allow_list and client_name not in list_of_allowed_clients:
+                                logging.warning(f"Throttle Server: REJECTED unauthorized client: '{client_name}'")
+                                # WiThrottle doesn't have a standard "Access Denied" message, 
+                                # but sending a screen message helps the user understand why it failed.
+                                writer.write("HMUnauthorized Device. Closing Connection.\n".encode())
+                                await writer.drain()
+                                break # Exits the while loop and triggers the 'finally' cleanup
+                            elif client_name not in list_of_connected_clients:
+                                # Connection is allowed - but ignore 'heartbeat messages if already connected
+                                logging.info(f"Throttle Server: Connected WiThrottle Client is '{client_name}'")
+                                list_of_connected_clients.append(client_name)
+                                make_server_status_updated_callbacks()
                     if message.startswith("HU") and server_debug: logging.debug("Throttle Server: Handling Hardware Update Message")
                     # Send Hardware info and server name
                     hardware_type_response = f"HT{server_name}\n"
@@ -479,7 +483,8 @@ async def handle_client(reader, writer):
             # Remove the throttle key after its consist is cleared
             del wi_sessions[t_key]                
         # Close the socket properly
-        connected_clients.discard(writer)
+        with set_of_connected_clients_lock:
+            set_of_connected_clients.discard(writer)
         try:
             writer.close()
             await writer.wait_closed()
@@ -487,19 +492,22 @@ async def handle_client(reader, writer):
         except Exception as e:
             logging.error(f"Throttle Server: Error closing socket: {e}")
         # Remove the client from the list of active connections
-        if client_name in list_of_connected_clients:
-            list_of_connected_clients.remove(client_name)
+        with list_of_connected_clients_lock:
+            if client_name in list_of_connected_clients:
+                list_of_connected_clients.remove(client_name)
         make_server_status_updated_callbacks()
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Internal Function To broadcast messages to al lconnected clients
+# Internal Function To broadcast messages to all connected clients
 #-----------------------------------------------------------------------------------------------
 
 def broadcast_to_all(message):
     if not message.endswith('\n'):
         message += '\n'
-    for writer in list(connected_clients):  # iterate a snapshot copy
+    with set_of_connected_clients_lock:
+         set_of_connected_clients_snapshot = list(set_of_connected_clients)
+    for writer in  set_of_connected_clients_snapshot:  # iterate the snapshot copy
         try:
             writer.write(message.encode("utf-8"))
             if server_loop and server_loop.is_running():
@@ -661,8 +669,10 @@ def make_server_status_updated_callbacks():
     # Report Server Startup to the registered callbacks (registered when calling server_start)
     # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
     server_running = bool(server_loop and server_loop.is_running())
+    with list_of_connected_clients_lock:
+        list_of_connected_clients_snapshot = list_of_connected_clients.copy():
     for server_status_callback in server_status_callbacks:
-        library.execute_function_in_tkinter_thread(lambda:server_status_callback(server_running, list_of_connected_clients))
+        library.execute_function_in_tkinter_thread(lambda:server_status_callback(server_running, list_of_connected_clients_snapshot))
 
 #-----------------------------------------------------------------------------------------------
 # This is the callback function to handle DCC power updates (triggered by anything)
@@ -684,7 +694,9 @@ def dcc_power_status_updated(dcc_power:bool):
     if not dcc_power:
         try:
             # We iterate through the writers for each client
-            for writer in list(connected_clients):
+            with set_of_connected_clients_lock:
+                set_of_connected_clients_snapshot = list(set_of_connected_clients)
+            for writer in set_of_connected_clients_snapshot:
                 # Retrieve the sessions we attached to this writer
                 sessions = getattr(writer, 'wi_sessions', {})
                 # WiThrottle clients can have multiple throttles (usually T and S)
