@@ -205,7 +205,7 @@ async def handle_client(reader, writer):
                             # Apply connection security (whitelist)
                             if enforce_allow_list and client_name not in list_of_allowed_clients:
                                 logging.warning(f"Throttle Server: REJECTED unauthorized client: '{client_name}'")
-                                # WiThrottle doesn't have a standard "Access Denied" message, 
+                                # WiThrottle doesn't have a standard "Access Denied" message,
                                 # but sending a screen message helps the user understand why it failed.
                                 writer.write("HMUnauthorized Device. Closing Connection.\n".encode())
                                 await writer.drain()
