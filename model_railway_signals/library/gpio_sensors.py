@@ -287,13 +287,14 @@ def circuit_breaker_thread():
                     max_events = port_data["breaker_threshold"]
                     if len(port_data["event_timestamps"]) > max_events:
                         port_data["breaker_tripped"] = True
-                        sensor_id = "GPIO Sensor "+str(gpio_port_mappings[str(gpio_port)]["sensor_id"])
+                        sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+                        sensor_id_txt = "GPIO Sensor "+str(gpio_port_mappings[str(gpio_port)]["sensor_id"])
                         logging.error("**********************************************************************************************")
-                        logging.error(sensor_id+" - Circuit breaker function for GPIO Port "+ str(gpio_port)+" has tripped due to over "+str(max_events))
-                        logging.error(sensor_id+" - trigger/release events being received within the last 1.0 seconds.")
-                        logging.error(sensor_id+" - All subsequent trigger / release events will be ignored by the application.")
-                        logging.error(sensor_id+" - Try increasing the the 'max events per second' in the GPIO settings.")
-                        logging.error(sensor_id+" - Otherwise the probable cause is a faulty external sensor or GPIO input.")
+                        logging.error(sensor_id_txt+" - Circuit breaker function for GPIO Port "+ str(gpio_port)+" has tripped due to over "+str(max_events))
+                        logging.error(sensor_id_txt+" - trigger/release events being received within the last 1.0 seconds.")
+                        logging.error(sensor_id_txt+" - All subsequent trigger / release events will be ignored by the application.")
+                        logging.error(sensor_id_txt+" - Try increasing the the 'max events per second' in the GPIO settings.")
+                        logging.error(sensor_id_txt+" - Otherwise the probable cause is a faulty external sensor or GPIO input.")
                         logging.error("**********************************************************************************************")
                         # Report the 'breaker tripped' sensor status (status=1) to any subscribed modules
                         common.execute_function_in_tkinter_thread(lambda:report_gpio_port_status(gpio_port, status=1))
