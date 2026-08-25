@@ -168,19 +168,6 @@ import sys
 from collections import Counter
 
 # ------------------------------------------------------------------------------
-# Sort out the logging
-# ------------------------------------------------------------------------------
-
-import logging
-import queue
-import sys
-from logging.handlers import QueueHandler, QueueListener
-
-
-import logging
-from collections import Counter
-
-# ------------------------------------------------------------------------------
 # Custom Log Message count handler - so we can assert the number of messages raised
 # ------------------------------------------------------------------------------
 
@@ -300,7 +287,6 @@ sys.stderr = QueueWriter(log_queue, logging.ERROR)
 # be to look for 'pip installed' model_railway_signals package - so be careful
 # ------------------------------------------------------------------------------
 
-import sys
 sys.path.append("..")
 from model_railway_signals import editor
 from model_railway_signals import schematic
