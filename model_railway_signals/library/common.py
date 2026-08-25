@@ -417,7 +417,7 @@ def process_external_events():
             callback()
         except Exception as exception:
             logging.error(f"Exception processing event in Tkinter Thread: {exception}")
-    root_window.after(50, process_external_events)
+    root_window.after(10, process_external_events)
     return()
 
 def execute_function_in_tkinter_thread(callback_function):
