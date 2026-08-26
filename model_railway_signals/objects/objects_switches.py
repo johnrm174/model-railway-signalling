@@ -219,7 +219,7 @@ def paste_switch(object_to_paste, deltax:int, deltay:int):
 
 def update_switch_styles(object_id, dict_of_new_styles:dict):
     # Update the appropriate elements in the object configuration
-    for element_to_change in dict_of_new_styles.keys():
+    for element_to_change in dict_of_new_styles:
         objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]

@@ -89,7 +89,7 @@ def text_box_exists(textbox_id:int):
         logging.error("Text Box "+str(textbox_id)+": textbox_exists - textbox_id ID must be an int")
         textbox_exists = False
     else:
-        textbox_exists = str(textbox_id) in text_boxes.keys() 
+        textbox_exists = str(textbox_id) in text_boxes 
     return(textbox_exists)
 
 #---------------------------------------------------------------------------------------------------

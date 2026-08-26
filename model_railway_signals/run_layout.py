@@ -226,7 +226,7 @@ def find_route(object_id, dict_key:str, theoretical_settings:dict=None):
                 route_has_points = True
                 # This code is for testing a theoretical point setting (if one has been specified)
                 # As it is a theoretical point setting, we have to assume the FPL would be active.
-                if str(point_entry[0]) in theoretical_settings.keys():
+                if str(point_entry[0]) in theoretical_settings:
                     if theoretical_settings[str(point_entry[0])] != point_entry[1]:
                         valid_route = False
                 # If a theoretical point setting has not been specified, we use the real point settings

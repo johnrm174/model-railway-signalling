@@ -177,7 +177,7 @@ list_of_track_sensors_to_publish = []
 #---------------------------------------------------------------------------------------------------
 
 def mapped_gpio_port(sensor_id:Union[int,str]):
-    for gpio_port in gpio_port_mappings.keys():
+    for gpio_port in gpio_port_mappings:
         if str(gpio_port_mappings[gpio_port]["sensor_id"]) == str(sensor_id):
             return(gpio_port)
     return("None")
@@ -211,7 +211,7 @@ def subscribe_to_gpio_port_status(gpio_port:Union[int,str], callback):
         logging.error("GPIO Port "+str(gpio_port)+": subscribe_to_gpio_port_status - Remote ID is an invalid format")
     else:
         gpio_port_subscriptions[str(gpio_port)] = callback
-        if str(gpio_port) not in gpio_port_mappings.keys(): status = 0
+        if str(gpio_port) not in gpio_port_mappings: status = 0
         elif gpio_port_mappings[str(gpio_port)]["sensor_state"] is None: status = 0
         elif gpio_port_mappings[str(gpio_port)]["breaker_tripped"]: status = 1
         elif gpio_port_mappings[str(gpio_port)]["sensor_state"]: status = 2
@@ -223,7 +223,7 @@ def unsubscribe_from_gpio_port_status(gpio_port:Union[int,str]):
     global gpio_port_subscriptions
     if not isinstance(gpio_port, int) and not isinstance(gpio_port, str):
         logging.error("GPIO Port "+str(gpio_port)+": unsubscribe_from_gpio_port_status - GPIO Port must be an int or str")
-    elif str(gpio_port) in gpio_port_subscriptions.keys():
+    elif str(gpio_port) in gpio_port_subscriptions:
         del gpio_port_subscriptions[str(gpio_port)]
     return()
 
@@ -232,11 +232,11 @@ def unsubscribe_from_all_gpio_port_status():
     gpio_port_subscriptions = {}
     
 def report_gpio_port_status(gpio_port:Union[int,str], status:int):
-    if str(gpio_port) in gpio_port_subscriptions.keys():
+    if str(gpio_port) in gpio_port_subscriptions:
         # We test the 'tripped' flag AND the status code that we are given to cope with event timing edge cases
         # where a set/reset event is processed in the main tkinter thread AFTER the circuit breaker has tripped.
         # Note we need to test the mapping exists here (it might have been subscribed to but not yet mapped).
-        if str(gpio_port) in gpio_port_mappings.keys() and gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
+        if str(gpio_port) in gpio_port_mappings and gpio_port_mappings[str(gpio_port)]["breaker_tripped"]:
             status = 1
         gpio_port_subscriptions[str(gpio_port)] (status)
     return()
@@ -250,7 +250,7 @@ def get_gpio_port_state(gpio_port_id:int):
     if not isinstance(gpio_port_id, int) :
         logging.error("GPIO Port "+str(gpio_port_id)+": get_gpio_port_state - GPIO Port ID must be an int")
         gpio_port_state = False
-    elif not str(gpio_port_id) in gpio_port_mappings.keys():
+    elif not str(gpio_port_id) in gpio_port_mappings:
         logging.error("GPIO Port "+str(gpio_port_id)+": get_gpio_port_state - GPIO Port does not exist")
         gpio_port_state = False
     else:
@@ -511,7 +511,7 @@ warning_issued = False
 
 def handle_mqtt_gpio_sensor_event(message):
     global warning_issued
-    if "sourceidentifier" not in message.keys():
+    if "sourceidentifier" not in message:
         logging.warning("GPIO Interface: handle_mqtt_gpio_sensor_triggered_event - Unhandled MQTT message - "+str(message))
     elif not gpio_sensor_exists(message["sourceidentifier"]):
         logging.warning("GPIO Interface: handle_mqtt_gpio_sensor_triggered_event - Message received from Remote Sensor "+
@@ -519,7 +519,7 @@ def handle_mqtt_gpio_sensor_event(message):
     ###################################################################################################################
     #### CODE BEGINS TO HANDLE MESSAGES RECEIVED FROM VERSION 5.0.0 OR BEFORE (NO ADDITIONAL PARAMETERS) ##############
     ###################################################################################################################
-    elif "connectionevent" not in message.keys() or "state" not in message.keys() or "tripped" not in message.keys():
+    elif "connectionevent" not in message or "state" not in message or "tripped" not in message:
         # Remote node is running an old version of the software so this is a triggered event
         logging.info("GPIO Sensor "+message["sourceidentifier"]+": Remote GPIO sensor has been triggered *********************")
         gpio_port_mappings[message["sourceidentifier"]]["sensor_state"] = True
@@ -617,14 +617,14 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int, sensor_timeout:float, t
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port must be int")
     elif gpio_channel not in get_list_of_available_gpio_ports():
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Invalid GPIO Port "+str(gpio_channel))
-    elif str(gpio_channel) in gpio_port_mappings.keys() and gpio_port_mappings[str(gpio_channel)]["sensor_id"] > 0:
+    elif str(gpio_channel) in gpio_port_mappings and gpio_port_mappings[str(gpio_channel)]["sensor_id"] > 0:
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+str(gpio_channel)+" is already mapped")
     else:
         logging.debug("GPIO Sensor "+str(sensor_id)+": Mapping sensor to GPIO Port "+str(gpio_channel))
         # If the GPIO Port has not yet been mapped then create a new entry dictionary of gpio_port_mappings
         # The sensor device itself (gpiozero Button Object) is creted later (if running on a RPi)
         # We also create the thread coordination elements and event timers from scratch
-        if str(gpio_channel) not in gpio_port_mappings.keys():
+        if str(gpio_channel) not in gpio_port_mappings:
             gpio_port_mappings[str(gpio_channel)] = {}
             gpio_port_mappings[str(gpio_channel)]["sensor_device"] = None
             gpio_port_mappings[str(gpio_channel)]["trigger_timer"] = None

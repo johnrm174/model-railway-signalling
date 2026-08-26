@@ -191,11 +191,11 @@ def add_keyboard_event(keycode:int, item:str, item_id:int, function):
 
 def delete_keyboard_event(keycode:int):
     global keyboard_mappings
-    if str(keycode) in keyboard_mappings.keys(): del(keyboard_mappings[str(keycode)])
+    if str(keycode) in keyboard_mappings: del(keyboard_mappings[str(keycode)])
     return()
 
 def get_keyboard_mapping(keycode:int):
-    if isinstance(keycode, int) and str(keycode) in keyboard_mappings.keys():
+    if isinstance(keycode, int) and str(keycode) in keyboard_mappings:
         keyboard_mapping = (keyboard_mappings[str(keycode)][0], keyboard_mappings[str(keycode)][1])
     else:
         keyboard_mapping = None

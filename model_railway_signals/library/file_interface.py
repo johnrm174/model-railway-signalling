@@ -242,7 +242,7 @@ def save_schematic(settings:dict, objects:dict, requested_filename:str, save_as:
                 # Iterate through the ITEM ELEMENTS to save for the specific ITEM
                 for item_element in item_elements_to_save:
                     # Value [0] is the element name, Value [1] is the element type
-                    if item_element[0] not in source_data_dictionary[item].keys():
+                    if item_element[0] not in source_data_dictionary[item]:
                         # if the element isn't present in the source dict then we save a NULL value
                        dictionary_to_save[layout_element][item][item_element[0]] = None
                     elif item_element[1]=="enum":
@@ -279,7 +279,7 @@ def get_initial_item_state(layout_element:str,item_id:int):
     # Retrieve the DEFINITION of all the data items that are available
     sig_file_config = get_sig_file_config()
     # Check if the requested LAYOUT ELEMENT is a supported
-    if layout_element not in sig_file_config.keys():
+    if layout_element not in sig_file_config:
         logging.error("File Interface - Item type not supported : "+layout_element)
         state_to_return = None
     else:
@@ -292,11 +292,11 @@ def get_initial_item_state(layout_element:str,item_id:int):
             item_element_name = item_element[0]
             state_to_return[item_element_name] = None
         # See if the specified LAYOUT ELEMENT exists in the loaded file 
-        if not layout_element in layout_state.keys():
+        if not layout_element in layout_state:
             # This could be a valid condition if no file has been loaded - fail silently
             pass
         # See if the specified ITEM (for the LAYOUT ELEMENT) exists in the loaded file
-        elif str(item_id) not in layout_state[layout_element].keys():
+        elif str(item_id) not in layout_state[layout_element]:
             # We know a file is loaded - therefore this is a valid error to report
             logging.debug("File Interface - Data missing for '"+layout_element+"-"
                                                 +str(item_id)+"' - Default values will be set")

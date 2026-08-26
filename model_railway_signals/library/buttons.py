@@ -168,7 +168,7 @@ def button_exists(button_id:int):
         logging.error("Button "+str(button_id)+": button_exists - Button ID must be an int")
         button_exists = False
     else:
-        button_exists = str(button_id) in buttons.keys()
+        button_exists = str(button_id) in buttons
     return(button_exists)
 
 #---------------------------------------------------------------------------------------------

@@ -83,7 +83,7 @@ def track_sensor_exists(sensor_id:int):
         logging.error("Track Sensor "+str(sensor_id)+": track_sensor_exists - Sensor ID must be an int")
         sensor_exists = False
     else:
-        sensor_exists = str(sensor_id) in track_sensors.keys() 
+        sensor_exists = str(sensor_id) in track_sensors 
     return (sensor_exists)
 
 #---------------------------------------------------------------------------------------------------

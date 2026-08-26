@@ -277,7 +277,7 @@ def save_layout(delay:float=default_delay_time):
 #------------------------------------------------------------------------------
     
 def set_lever_on(leverid:int, delay:float=default_delay_time):
-    if str(leverid) not in levers.levers.keys():
+    if str(leverid) not in levers.levers:
         raise_test_warning("Scripting: set_lever_on - Lever: "+str(leverid)+" does not exist")
     elif not levers.lever_switched(leverid):
         raise_test_warning("Scripting: set_lever_on - Lever: "+str(leverid)+" is already ON")
@@ -285,7 +285,7 @@ def set_lever_on(leverid:int, delay:float=default_delay_time):
         run_function(lambda:levers.change_button_event(leverid), delay)
 
 def set_lever_off(leverid:int, delay:float=default_delay_time):
-    if str(leverid) not in levers.levers.keys():
+    if str(leverid) not in levers.levers:
         raise_test_warning("Scripting: set_lever_off - Lever: "+str(leverid)+" does not exist")
     elif levers.lever_switched(leverid):
         raise_test_warning("Scripting: set_lever_off - Lever: "+str(leverid)+" is already OFF")
@@ -293,12 +293,12 @@ def set_lever_off(leverid:int, delay:float=default_delay_time):
         run_function(lambda:levers.change_button_event(leverid), delay)
             
 def set_signal_on(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signal_clear(sigid):
         raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" is already ON")
-    elif ( ("releaseonred" in signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonred"]) or
-             ("releaseonyel" in  signals.signals[str(sigid)].keys() and  signals.signals[str(sigid)]["releaseonyel"]) ):
+    elif ( ("releaseonred" in signals.signals[str(sigid)] and  signals.signals[str(sigid)]["releaseonred"]) or
+             ("releaseonyel" in  signals.signals[str(sigid)] and  signals.signals[str(sigid)]["releaseonyel"]) ):
         # From Release 6.2, we allow approach control to be manually released by clicking the signal button
         # Therefore for this test function, we need to test if the signal is in an  signal approach control
         # state and click the signal button twice (once to release the signal, once to set it to ON
@@ -308,7 +308,7 @@ def set_signal_on(sigid:int, delay:float=default_delay_time):
         run_function(lambda:signals.signal_button_event(sigid))
 
 def set_signal_off(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
     elif signals.signal_clear(sigid):
         raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" is already OFF")
@@ -316,7 +316,7 @@ def set_signal_off(sigid:int, delay:float=default_delay_time):
         run_function(lambda:signals.signal_button_event(sigid), delay)
 
 def set_subsidiary_on(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not exist")
     elif not signals.signals[str(sigid)]["hassubsidary"]:
         raise_test_warning("Scripting: set_subsidiary_on - Signal: "+str(sigid)+" does not have a subsidiary")
@@ -326,7 +326,7 @@ def set_subsidiary_on(sigid:int, delay:float=default_delay_time):
         run_function(lambda:signals.subsidary_button_event(sigid), delay)
 
 def set_subsidiary_off(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" does not exist")
     elif not signals.signals[str(sigid)]["hassubsidary"]:
         raise_test_warning("Scripting: set_subsidiary_off - Signal: "+str(sigid)+" does not have a subsidiary")
@@ -336,9 +336,9 @@ def set_subsidiary_off(sigid:int, delay:float=default_delay_time):
         run_function(lambda:signals.subsidary_button_event(sigid), delay)
 
 def set_secondary_dist_on(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: set_secondary_dist_on - Signal: "+str(sigid)+" does not exist")
-    elif str(sigid+100) not in signals.signals.keys():
+    elif str(sigid+100) not in signals.signals:
         raise_test_warning("Scripting: set_secondary_dist_on - Signal: "+str(sigid)+" does not have a secondary distant")
     elif not signals.signal_clear(sigid+100):
         raise_test_warning("Scripting: set_secondary_dist_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
@@ -346,9 +346,9 @@ def set_secondary_dist_on(sigid:int, delay:float=default_delay_time):
         run_function(lambda:signals.signal_button_event(sigid+100), delay)
 
 def set_secondary_dist_off(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: set_secondary_dist_off - Signal: "+str(sigid)+" does not exist")
-    elif str(sigid+100) not in signals.signals.keys():
+    elif str(sigid+100) not in signals.signals:
         raise_test_warning("Scripting: set_secondary_dist_off - Signal: "+str(sigid)+" does not have a secondary distant")
     elif signals.signal_clear(sigid+100):
         raise_test_warning("Scripting: set_secondary_dist_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
@@ -356,25 +356,25 @@ def set_secondary_dist_off(sigid:int, delay:float=default_delay_time):
         run_function(lambda:signals.signal_button_event(sigid+100), delay)
 
 def trigger_signal_passed(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: trigger_signal_passed - Signal: "+str(sigid)+" does not exist")
     else:
         run_function(lambda:signals.sig_passed_button_event(sigid), delay)
                                                
 def trigger_signal_released(sigid:int, delay:float=default_delay_time):
-    if str(sigid) not in signals.signals.keys():
+    if str(sigid) not in signals.signals:
         raise_test_warning("Scripting: trigger_signal_released - Signal: "+str(sigid)+" does not exist")
     else:
         run_function(lambda:signals.approach_release_button_event(sigid), delay)
 
 def trigger_sensor_passed(sensorid:int, delay:float=default_delay_time):
-    if str(sensorid) not in track_sensors.track_sensors.keys():
+    if str(sensorid) not in track_sensors.track_sensors:
         raise_test_warning("Scripting: trigger_sensor_passed - Track Sensor: "+str(sensorid)+" does not exist")
     else:
         run_function(lambda:track_sensors.track_sensor_triggered(sensorid), delay)
 
 def set_point_switched(pointid:int, delay:float=default_delay_time):
-    if str(pointid) not in points.points.keys():
+    if str(pointid) not in points.points:
         raise_test_warning("Scripting: set_point_switched - Point: "+str(pointid)+" does not exist")
     elif points.point_switched(pointid):
         raise_test_warning("Scripting: set_point_switched - Point: "+str(pointid)+" is already switched")
@@ -382,7 +382,7 @@ def set_point_switched(pointid:int, delay:float=default_delay_time):
         run_function(lambda:points.change_button_event(pointid), delay)
                                                
 def set_point_unswitched(pointid:int, delay:float=default_delay_time):
-    if str(pointid) not in points.points.keys():
+    if str(pointid) not in points.points:
         raise_test_warning("Scripting: set_point_normal - Point: "+str(pointid)+" does not exist")
     elif not points.point_switched(pointid):
         raise_test_warning("Scripting: set_point_normal - Point: "+str(pointid)+" is already normal")
@@ -390,7 +390,7 @@ def set_point_unswitched(pointid:int, delay:float=default_delay_time):
         run_function(lambda:points.change_button_event(pointid), delay)
 
 def set_fpl_on(pointid:int, delay:float=default_delay_time):
-    if str(pointid) not in points.points.keys():
+    if str(pointid) not in points.points:
         raise_test_warning("Scripting: set_fpl_on - Point: "+str(pointid)+" does not exist")
     elif not points.points[str(pointid)]["hasfpl"]:
         raise_test_warning("Scripting: set_fpl_on - Point: "+str(pointid)+" does not have a FPL")
@@ -400,7 +400,7 @@ def set_fpl_on(pointid:int, delay:float=default_delay_time):
         run_function(lambda:points.fpl_button_event(pointid), delay)
 
 def set_fpl_off(pointid:int, delay:float=default_delay_time):
-    if str(pointid) not in points.points.keys():
+    if str(pointid) not in points.points:
         raise_test_warning("Scripting: set_fpl_off - Point: "+str(pointid)+" - does not exist on the schematic")
     elif not points.points[str(pointid)]["hasfpl"]:
         raise_test_warning("Scripting: set_fpl_off - Point: "+str(pointid)+" does not have a FPL")
@@ -410,7 +410,7 @@ def set_fpl_off(pointid:int, delay:float=default_delay_time):
         run_function(lambda:points.fpl_button_event(pointid), delay)
 
 def set_section_occupied(secid:int, identifier:str="OCCUPIED", delay:float=default_delay_time):
-    if str(secid) not in track_sections.sections.keys():
+    if str(secid) not in track_sections.sections:
         raise_test_warning ("Scripting: set_section_occupied - Section: "+str(secid)+" does not exist")
     elif track_sections.section_occupied(secid):
         raise_test_warning("Scripting: set_section_occupied - Section: "+str(secid)+" is already OCCUPIED")
@@ -421,7 +421,7 @@ def set_section_occupied(secid:int, identifier:str="OCCUPIED", delay:float=defau
         run_function(lambda:track_sections.section_state_toggled(secid), delay)
 
 def set_section_clear(secid:int, delay:float=default_delay_time):
-    if str(secid) not in track_sections.sections.keys():
+    if str(secid) not in track_sections.sections:
         raise_test_warning("Scripting: set_section_clear - Section: "+str(secid)+" does not exist")
     else:
         if not track_sections.section_occupied(secid):
@@ -430,25 +430,25 @@ def set_section_clear(secid:int, delay:float=default_delay_time):
             run_function(lambda:track_sections.section_state_toggled(secid), delay)
     
 def set_instrument_blocked(instid:int, delay:float=default_delay_time):
-    if str(instid) not in block_instruments.instruments.keys():
+    if str(instid) not in block_instruments.instruments:
         raise_test_warning("Scripting: set_instrument_blocked - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.blocked_button_event(instid), delay)
     
 def set_instrument_occupied(instid:int, delay:float=default_delay_time):
-    if str(instid) not in block_instruments.instruments.keys():
+    if str(instid) not in block_instruments.instruments:
         raise_test_warning("Scripting: set_instrument_occupied - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.occup_button_event(instid), delay)
     
 def set_instrument_clear(instid:int, delay:float=default_delay_time):
-    if str(instid) not in block_instruments.instruments.keys():
+    if str(instid) not in block_instruments.instruments:
         raise_test_warning("Scripting: set_instrument_clear - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.clear_button_event(instid), delay)
 
 def click_telegraph_key(instid:int, delay:float=default_delay_time):
-    if str(instid) not in block_instruments.instruments.keys():
+    if str(instid) not in block_instruments.instruments:
         raise_test_warning("Scripting: click_telegraph_key - Instrument: "+str(instid)+" does not exist")
     else:
         run_function(lambda:block_instruments.telegraph_key_button(instid), delay)
@@ -461,7 +461,7 @@ def send_telegraph_code(instid:int, signal_box_code:list, delay:float=default_de
     time.sleep(delay)
 
 def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
-    if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
+    if str(gpioid) not in gpio_sensors.gpio_port_mappings:
         raise_test_warning("Scripting: simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
     else:
         run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid))
@@ -470,19 +470,19 @@ def simulate_gpio_triggered(gpioid:int, delay:float=default_delay_time):
         time.sleep(0.2)
 
 def simulate_gpio_on(gpioid:int, delay:float=default_delay_time):
-    if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
+    if str(gpioid) not in gpio_sensors.gpio_port_mappings:
         raise_test_warning("Scripting: simulate_gpio_on - GPIO: "+str(gpioid)+" has not been mapped")
     else:
         run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid), delay)
 
 def simulate_gpio_off(gpioid:int, delay:float=default_delay_time):
-    if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
+    if str(gpioid) not in gpio_sensors.gpio_port_mappings:
         raise_test_warning("Scripting: simulate_gpio_off - GPIO: "+str(gpioid)+" has not been mapped")
     else:
         run_function(lambda:gpio_sensors.gpio_physical_release_callback(gpioid), delay)
 
 def simulate_button_clicked(buttonid:int, delay:float=default_delay_time):
-    if str(buttonid) not in buttons.buttons.keys():
+    if str(buttonid) not in buttons.buttons:
         raise_test_warning("Scripting: simulate_button_clicked - Button: "+str(buttonid)+" does not exist")
     else:
         run_function(lambda:buttons.button_event(buttonid), delay)
@@ -492,7 +492,7 @@ def simulate_button_clicked(buttonid:int, delay:float=default_delay_time):
 #------------------------------------------------------------------------------
 
 def get_button_state(button_id:int, delay:float=default_delay_time):
-    if str(button_id) not in buttons.buttons.keys():
+    if str(button_id) not in buttons.buttons:
         button_state = False
         raise_test_warning("Scripting: get_button_state - Button: "+str(button_id)+" does not exist")
     else:
@@ -503,7 +503,7 @@ def get_button_state(button_id:int, delay:float=default_delay_time):
     return(button_state)
 
 def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
-    if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings.keys():
+    if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings:
         raise_test_warning("Scripting: get_gpio_port_state - GPIO: "+str(gpio_port_id)+" has not been mapped")
         gpio_state = False
     else:
@@ -515,7 +515,7 @@ def get_gpio_port_state(gpio_port_id:int, delay:float=default_delay_time):
 def wait_for_gpio_port(gpio_port_id:int, state:bool, delay:float=default_delay_time, timeout:float=None):
     global gpio_sensors
     # Validate mapping exists
-    if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings.keys():
+    if str(gpio_port_id) not in gpio_sensors.gpio_port_mappings:
         raise_test_warning("Scripting: wait_for_gpio_port - GPIO: " + str(gpio_port_id) + " has not been mapped")
         return(False)
     current_thread = threading.current_thread()
@@ -548,7 +548,7 @@ def wait_for_gpio_port(gpio_port_id:int, state:bool, delay:float=default_delay_t
 
 def wait_for_button(button_id:int, state:bool, delay:float=default_delay_time, timeout:float=None):
     # Ensure button exists in the mapping configuration
-    if str(button_id) not in buttons.buttons.keys():
+    if str(button_id) not in buttons.buttons:
         raise_test_warning(f"Scripting: wait_for_button - Button: {button_id} does not exist")
         return(False)
     current_thread = threading.current_thread()

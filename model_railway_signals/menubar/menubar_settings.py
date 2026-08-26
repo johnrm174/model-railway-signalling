@@ -872,7 +872,7 @@ class mqtt_status_tab():
         self.frame2 = Tk.Frame(self.frame1)
         self.frame2.pack()
         # Populate the list of all nodes seen since application start
-        for node_id in node_status.keys():
+        for node_id in node_status:
             subframe1 = Tk.Frame(self.frame2)
             subframe1.pack(padx=2, pady=2, fill='x', expand=True)
             subframe2 = Tk.Frame(subframe1)

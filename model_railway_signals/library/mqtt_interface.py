@@ -431,7 +431,7 @@ def process_message(topic, payload):
             ### Handle case of receiving a heartbeat message from an older version of the application #####
             ### (version 5.2.2 or before, which didn't include the hostname element #######################
             ###############################################################################################
-            if "host" not in unpacked_json.keys(): unpacked_json["host"] = "unknown"
+            if "host" not in unpacked_json: unpacked_json["host"] = "unknown"
             ###############################################################################################
             heartbeats[unpacked_json["node"]] = [unpacked_json["host"], unpacked_json["ip"], int(time.time())]
         # If it is a shutdown message we only act on it if configured to do so

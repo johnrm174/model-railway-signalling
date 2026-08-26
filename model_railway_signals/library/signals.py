@@ -324,7 +324,7 @@ def signal_exists(sig_id:Union[int,str]):
         logging.error("Signal "+str(sig_id)+": signal_exists - Signal ID must be an int or str")
         signal_exists = False
     else:
-        signal_exists = str(sig_id) in signals.keys()
+        signal_exists = str(sig_id) in signals
     return(signal_exists)
 
 # -------------------------------------------------------------------------
@@ -333,8 +333,8 @@ def signal_exists(sig_id:Union[int,str]):
 
 def signal_button_event(sig_id:int):
     logging.info("Signal "+str(sig_id)+": Signal Change Button Event *************************************************")
-    if ( ("releaseonred" in signals[str(sig_id)].keys() and signals[str(sig_id)]["releaseonred"]) or
-         ("releaseonyel" in signals[str(sig_id)].keys() and signals[str(sig_id)]["releaseonyel"]) ):
+    if ( ("releaseonred" in signals[str(sig_id)] and signals[str(sig_id)]["releaseonred"]) or
+         ("releaseonyel" in signals[str(sig_id)] and signals[str(sig_id)]["releaseonyel"]) ):
         # Deal with the case of "releasing" a signal stuck in approach control mode
         # We want the button click to "release" the signal rather than toggle it
         signals[str(sig_id)]["released"] = True
@@ -372,7 +372,7 @@ def sig_passed_button_event(sig_id:int):
         common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
         # Reset the approach control 'released' state (if the signal supports approach control).
         # We don't reset the approach control mode  - this needs to be reset from the calling application.
-        if "released" in signals[str(sig_id)].keys(): signals[str(sig_id)]["released"] = False
+        if "released" in signals[str(sig_id)]: signals[str(sig_id)]["released"] = False
         # Make the external callback
         signals[str(sig_id)]['sigpassedcallback'] (sig_id)
     return ()
@@ -409,7 +409,7 @@ def reset_sig_passed_button(sig_id:int):
     if signal_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg="grey85")
 
 def reset_sig_released_button(sig_id:int):
-    if signal_exists(sig_id) and "releasebutton" in signals[str(sig_id)].keys():
+    if signal_exists(sig_id) and "releasebutton" in signals[str(sig_id)]:
         signals[str(sig_id)]["releasebutton"].config(bg="grey85")
 
 # -------------------------------------------------------------------------
@@ -1355,7 +1355,7 @@ def delete_signal(sig_id:int):
 
 def handle_mqtt_signal_updated_event(message:dict):
     global signals
-    if "sourceidentifier" not in message.keys() or "sigstate" not in message.keys():
+    if "sourceidentifier" not in message or "sigstate" not in message:
         logging.warning("Signals: handle_mqtt_signal_updated_event - Unhandled MQTT message - "+str(message))
     elif not signal_exists(message["sourceidentifier"]):
         logging.warning("Signals: handle_mqtt_signal_updated_event - Message received from Remote Signal "+

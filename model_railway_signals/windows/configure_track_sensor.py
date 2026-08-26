@@ -159,7 +159,7 @@ class edit_track_sensor():
     def __init__(self, root, object_id):
         global open_windows
         # If there is already a window open for this object then re-focus and exit
-        if object_id in open_windows.keys() and open_windows[object_id].winfo_exists():
+        if object_id in open_windows and open_windows[object_id].winfo_exists():
             open_windows[object_id].lift()
             open_windows[object_id].state('normal')
             open_windows[object_id].focus_force()
@@ -230,7 +230,7 @@ class edit_track_sensor():
     def load_state(self):
         # Check the object we are editing still exists (hasn't been deleted from the schematic)
         # If it no longer exists then we just destroy the window and exit without saving
-        if self.object_id not in objects.schematic_objects.keys():
+        if self.object_id not in objects.schematic_objects:
             self.close_window()
         else:
             item_id = objects.schematic_objects[self.object_id]["itemid"]
@@ -250,7 +250,7 @@ class edit_track_sensor():
     def save_state(self, close_window:bool):
         # Check the object we are editing still exists (hasn't been deleted from the schematic)
         # If it no longer exists then we just destroy the window and exit without saving
-        if self.object_id not in objects.schematic_objects.keys():
+        if self.object_id not in objects.schematic_objects:
             self.close_window()
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then

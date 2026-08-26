@@ -458,7 +458,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
         signals.send_mqtt_signal_updated_event(sig_id)
         # Update any slotted ground signals (if the main sig is clear the ground signal needs to show clear)
         for other_sig_id in signals.signals:
-            if "slotwith" in signals.signals[other_sig_id].keys():
+            if "slotwith" in signals.signals[other_sig_id]:
                 if signals.signals[other_sig_id]["slotwith"] == sig_id:
                     signals.update_signal_aspect(int(other_sig_id))
     return ()

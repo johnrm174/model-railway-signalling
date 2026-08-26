@@ -214,7 +214,7 @@ def section_exists(section_id:Union[int,str]):
         logging.error("Section "+str(section_id)+": section_exists - Section ID must be an int or str")
         section_exists = False
     else:
-        section_exists = str(section_id) in sections.keys()
+        section_exists = str(section_id) in sections
     return(section_exists)
 
 #---------------------------------------------------------------------------------------------
@@ -361,7 +361,7 @@ def section_state_toggled(section_id:int, required_state:bool=None, make_callbac
 
 def handle_mqtt_section_updated_event(message):
     global sections
-    if "sourceidentifier" not in message.keys() or "occupied" not in message.keys() or "labeltext" not in message.keys():
+    if "sourceidentifier" not in message or "occupied" not in message or "labeltext" not in message:
         logging.warning("Sections: handle_mqtt_section_updated_event - Unhandled MQTT message - "+str(message))
     elif not section_exists(message["sourceidentifier"]):
         logging.warning("Sections: handle_mqtt_section_updated_event - Message received from Remote Section "+

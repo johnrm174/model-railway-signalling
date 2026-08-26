@@ -275,7 +275,7 @@ def restore_schematic_state():
     objects_common.canvas.pack_forget()
     # Delete all schematic objects prior ro restoring the undo/redo state
     # We use the master dict keys to ensure we are looking at the 'real' data
-    ids_to_delete = list(objects_common.schematic_objects.keys())
+    ids_to_delete = list(objects_common.schematic_objects)
     for object_id in ids_to_delete:
         delete_object(object_id)
     # Restore the required snapshot by Clearing and Updating the master dictionary
@@ -447,13 +447,13 @@ def rotate_objects(list_of_object_ids: list):
     # Only proceed if there are objects that need to be rotated (already deleted)
     if active_updates:
         for object_id, obj, obj_type in active_updates:
-            if "orientation" in obj.keys():
+            if "orientation" in obj:
                 # Toggle orientation in 90 degree steps (Signals and Points)
                 if obj["orientation"] == 0: obj["orientation"] = 90
                 elif obj["orientation"] == 90: obj["orientation"] = 180
                 elif obj["orientation"] == 180: obj["orientation"] = 270
                 else: obj["orientation"] = 0
-            elif "vertical" in obj.keys():
+            elif "vertical" in obj:
                 # Toggle between horizontal and vertical (Track Sections)
                 obj["vertical"] = not obj["vertical"]
             # Re-draw based on type
@@ -696,17 +696,17 @@ def check_for_import_conflicts(new_objects:dict):
     for object_id in new_objects:
         new_object_type = new_objects[object_id]["item"]
         new_item_id = str(new_objects[object_id]["itemid"])
-        if ( new_object_type == objects_common.object_type.line and new_item_id in objects_common.line_index.keys() or
-             new_object_type == objects_common.object_type.signal and new_item_id in objects_common.signal_index.keys() or
-             new_object_type == objects_common.object_type.point and new_item_id in objects_common.point_index.keys() or
-             new_object_type == objects_common.object_type.section and new_item_id in objects_common.section_index.keys() or
-             new_object_type == objects_common.object_type.instrument and new_item_id in objects_common.instrument_index.keys() or
-             new_object_type == objects_common.object_type.track_sensor and new_item_id in objects_common.track_sensor_index.keys() or
-             new_object_type == objects_common.object_type.route and new_item_id in objects_common.route_index.keys() or
-             new_object_type == objects_common.object_type.route and new_item_id in objects_common.switch_index.keys() or
-             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.route_index.keys() or
-             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.switch_index.keys() or
-             new_object_type == objects_common.object_type.lever and new_item_id in objects_common.lever_index.keys() ):
+        if ( new_object_type == objects_common.object_type.line and new_item_id in objects_common.line_index or
+             new_object_type == objects_common.object_type.signal and new_item_id in objects_common.signal_index or
+             new_object_type == objects_common.object_type.point and new_item_id in objects_common.point_index or
+             new_object_type == objects_common.object_type.section and new_item_id in objects_common.section_index or
+             new_object_type == objects_common.object_type.instrument and new_item_id in objects_common.instrument_index or
+             new_object_type == objects_common.object_type.track_sensor and new_item_id in objects_common.track_sensor_index or
+             new_object_type == objects_common.object_type.route and new_item_id in objects_common.route_index or
+             new_object_type == objects_common.object_type.route and new_item_id in objects_common.switch_index or
+             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.route_index or
+             new_object_type == objects_common.object_type.switch and new_item_id in objects_common.switch_index or
+             new_object_type == objects_common.object_type.lever and new_item_id in objects_common.lever_index ):
             logging.error("Import Schematic - Duplicate Item ID detected for "+str(new_object_type.rpartition('.')[-1])+" "+new_item_id)
             conflicts_detected=True
     if not conflicts_detected:
@@ -813,7 +813,7 @@ def set_all(new_objects:dict):
         if default_object != {}:
             objects_common.schematic_objects[object_id] = copy.deepcopy(default_object)
             for element in new_objects[object_id]:
-                if element not in default_object.keys():
+                if element not in default_object:
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 else:
@@ -829,7 +829,7 @@ def set_all(new_objects:dict):
                     if new_object_type == objects_common.object_type.route and element == "routedefinitions":
                         for index, route_definition in enumerate(new_objects[object_id]["routedefinitions"]):
                             # Turn the 'old' single 'exitsensor' entry to a list of 'exitsensors'
-                            if "exitsensor" in route_definition.keys():
+                            if "exitsensor" in route_definition:
                                 sensor_id = new_objects[object_id]["routedefinitions"][index]["exitsensor"]
                                 if sensor_id == 0: list_of_sensors = []
                                 else: list_of_sensors = [sensor_id]
@@ -840,7 +840,7 @@ def set_all(new_objects:dict):
                             if list_of_sensors == [0]:
                                 new_objects[object_id]["routedefinitions"][index]["exitsensors"] = []
                             # Create an empty list of 'exitsignals' if the route definition doesn't contain one
-                            if "exitsignals" not in route_definition.keys():
+                            if "exitsignals" not in route_definition:
                                 new_objects[object_id]["routedefinitions"][index]["exitsignals"] = []
                     ######################################################################################################
                     ## End of Code to handle Breaking Changes ############################################################
@@ -849,7 +849,7 @@ def set_all(new_objects:dict):
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
-                if element not in new_objects[object_id].keys():
+                if element not in new_objects[object_id]:
                     default_value = objects_common.schematic_objects[object_id][element]
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: '"
                             +element+"' - Asigning default values: "+str(default_value))

@@ -188,7 +188,7 @@ def point_exists(point_id:int):
         logging.error("Point "+str(point_id)+": point_exists - Point ID must be an int")
         point_exists = False
     else:
-        point_exists = str(point_id) in points.keys()
+        point_exists = str(point_id) in points
     return(point_exists)
 
 # -------------------------------------------------------------------------

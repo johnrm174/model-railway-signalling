@@ -192,7 +192,7 @@ def instrument_exists(inst_id:Union[int,str]):
         logging.error("Instrument "+str(inst_id)+": instrument_exists - Instrument ID must be an int or str")
         instrument_exists = False
     else:
-        instrument_exists = str(inst_id) in instruments.keys()
+        instrument_exists = str(inst_id) in instruments
     return(instrument_exists)
 
 # --------------------------------------------------------------------------------
@@ -258,7 +258,7 @@ def reset_telegraph_button(inst_id:int):
 # --------------------------------------------------------------------------------
 
 def handle_mqtt_instrument_updated_event(message):
-    if ("sourceidentifier" not in message.keys() or "sectionstate" not in message.keys() or "instrumentid" not in message.keys()
+    if ("sourceidentifier" not in message or "sectionstate" not in message or "instrumentid" not in message
               or mqtt_interface.split_remote_item_identifier(message["instrumentid"]) is None):
         logging.warning("Instruments: handle_mqtt_instrument_updated_event - Unhandled MQTT message - "+str(message))
     elif not instrument_exists(message["sourceidentifier"]):
@@ -295,7 +295,7 @@ def handle_mqtt_instrument_updated_event(message):
 # --------------------------------------------------------------------------------
 
 def handle_mqtt_ring_section_bell_event(message):
-    if ("sourceidentifier" not in message.keys() or "instrumentid" not in message.keys()
+    if ("sourceidentifier" not in message or "instrumentid" not in message
             or mqtt_interface.split_remote_item_identifier(message["instrumentid"]) is None):
         logging.warning("Instruments: handle_mqtt_ring_section_bell_event - Unhandled MQTT message - "+str(message))
     elif not instrument_exists(message["sourceidentifier"]):

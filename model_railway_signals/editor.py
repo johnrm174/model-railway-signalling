@@ -943,7 +943,7 @@ class main_menubar:
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need
-            if "settings" in layout_state.keys() and "objects" in layout_state.keys():
+            if "settings" in layout_state and "objects" in layout_state:
                 # Compare the version of the application to the version the file was saved under
                 sig_file_version = layout_state["settings"]["general"]["version"]
                 application_version = settings.get_general("version")
@@ -1014,7 +1014,7 @@ class main_menubar:
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need
-            if "settings" in layout_state.keys() and "objects" in layout_state.keys():
+            if "settings" in layout_state and "objects" in layout_state:
                 # Compare the version of the application to the version the file was saved under
                 sig_file_version = layout_state["settings"]["general"]["version"]
                 application_version = settings.get_general("version")

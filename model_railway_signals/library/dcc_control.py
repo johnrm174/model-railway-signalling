@@ -237,7 +237,7 @@ def dcc_address_mapping(dcc_address:int):
     if not isinstance(dcc_address, int) or dcc_address < 0 or dcc_address > 2047:
         logging.error("DCC Control: dcc_address_mapping - Invalid DCC Address "+str(dcc_address))
         dcc_address_mapping = None
-    elif dcc_address not in dcc_address_mappings.keys():
+    elif dcc_address not in dcc_address_mappings:
         dcc_address_mapping = None
     else:
         dcc_address_mapping = dcc_address_mappings[dcc_address]
@@ -248,13 +248,13 @@ def dcc_address_mapping(dcc_address:int):
 #----------------------------------------------------------------------------------------------------
 
 def sig_mapped(sig_id:int):
-    return (str(sig_id) in dcc_signal_mappings.keys())
+    return (str(sig_id) in dcc_signal_mappings)
 
 def point_mapped(point_id:int):
-    return (str(point_id) in dcc_point_mappings.keys())
+    return (str(point_id) in dcc_point_mappings)
 
 def switch_mapped(switch_id:int):
-    return (str(switch_id) in dcc_switch_mappings.keys())
+    return (str(switch_id) in dcc_switch_mappings)
 
 #----------------------------------------------------------------------------------------------------
 # Internal functions to add/remove DCC addresses/commands to the dcc_address_mappings dictionary
@@ -265,7 +265,7 @@ def switch_mapped(switch_id:int):
 
 def add_dcc_address_to_dcc_address_mappings(item_type:str, item_id:int, address:int):
     global dcc_address_mappings
-    if address > 0 and address not in dcc_address_mappings.keys():
+    if address > 0 and address not in dcc_address_mappings:
         dcc_address_mappings[int(address)] = [item_type, item_id]
     return()
 
@@ -283,11 +283,11 @@ def remove_dcc_address_from_dcc_address_mappings(address:int):
     global dcc_address_mappings
     global local_dcc_accessory_commands
     # Remove the dcc_address from the dictionary of dcc_address_mappings
-    if address in dcc_address_mappings.keys():
+    if address in dcc_address_mappings:
         del dcc_address_mappings[address]
     # Also remove the dcc_address from the dictionary of 'issued' DCC commands to prevent
     # legacy commands being sent out on subsequent broker connect and/or DCC Power on events
-    if address in local_dcc_accessory_commands.keys():
+    if address in local_dcc_accessory_commands:
         del local_dcc_accessory_commands[address]
     return()
 
@@ -768,7 +768,7 @@ def delete_signal_mapping(sig_id:int):
 
 def handle_mqtt_dcc_accessory_short_event(message):
     global local_dcc_accessory_commands
-    if "sourceidentifier" not in message.keys() or "dccaddress" not in message.keys() or "dccstate" not in message.keys():
+    if "sourceidentifier" not in message or "dccaddress" not in message or "dccstate" not in message:
         logging.error ("DCC Control: Unhandled MQTT Message - "+str(message))
     else:
         source_node = message["sourceidentifier"]

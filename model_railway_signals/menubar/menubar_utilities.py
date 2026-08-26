@@ -789,7 +789,7 @@ class bulk_renumbering():
             # We update idletasks to process each individual change as tkinter doesn't seem to
             # handle large numbers of delete and create operations outside of the main loop
             for value in list_of_all_values:
-                if value[0] in objects.schematic_objects.keys() and value[1] != value[2]:
+                if value[0] in objects.schematic_objects and value[1] != value[2]:
                     new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
                     new_object_configuration["itemid"] = value[1]+1000
                     objects.update_object(value[0], new_object_configuration,
@@ -801,7 +801,7 @@ class bulk_renumbering():
             # We update idletasks to process each individual change as tkinter doesn't seem to
             # handle large numbers of delete and create operations outside of the main loop
             for value in list_of_all_values:
-                if value[0] in objects.schematic_objects.keys() and value[1] != value[2]:
+                if value[0] in objects.schematic_objects and value[1] != value[2]:
                     new_object_configuration = copy.deepcopy(objects.schematic_objects[value[0]])
                     new_object_configuration["itemid"] = value[2]
                     objects.update_object(value[0], new_object_configuration,
@@ -1244,11 +1244,11 @@ class exercise_points():
     def start(self):
         # Cycle through all the points to switch the FPLs OFF if required.
         # This is so we don't get any warnings whilst we are toggling the points.
-        for point_id in objects.point_index.keys():
+        for point_id in objects.point_index:
             has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
             if has_fpl and library.fpl_active(int(point_id)): library.toggle_fpl(int(point_id))
         # Take a copy of the point index (so it can't change underneath us)
-        self.list_of_point_ids = list(objects.point_index.keys())
+        self.list_of_point_ids = list(objects.point_index)
         self.point_list_index = 0
         # Schedule the first event as long as there are points to switch
         self.start_time = time.time()
@@ -1265,7 +1265,7 @@ class exercise_points():
             # Only toggle the point if the point still exists on the schematic. Note that
             # we don't toggle points that are configured to be switched with another point.
             point_id = self.list_of_point_ids[self.point_list_index]
-            if point_id in objects.point_index.keys():
+            if point_id in objects.point_index:
                 auto_point = objects.schematic_objects[objects.point(point_id)]["automatic"]
                 if not auto_point: library.toggle_point(int(point_id))
             # Schedule the event to toggle the next point
@@ -1279,7 +1279,7 @@ class exercise_points():
         self.next_event_scheduled = None
         if next_event_scheduled: self.window.after_cancel(next_event_scheduled)
          # Cycle through all the points to switch the FPL to ON if required
-        for point_id in objects.point_index.keys():
+        for point_id in objects.point_index:
             has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
             if has_fpl and not library.fpl_active(int(point_id)): library.toggle_fpl(int(point_id))
         # Re-enable the START/CLOSE buttons and disable the STOP button

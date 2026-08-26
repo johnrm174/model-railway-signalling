@@ -168,7 +168,7 @@ def lever_exists(lever_id:int):
         logging.error("Lever "+str(lever_id)+": lever_exists - Lever ID must be an int")
         lever_exists = False
     else:
-        lever_exists = str(lever_id) in levers.keys()
+        lever_exists = str(lever_id) in levers
     return(lever_exists)
 
 #-------------------------------------------------------------------------

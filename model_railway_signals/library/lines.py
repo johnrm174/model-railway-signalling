@@ -112,7 +112,7 @@ def line_exists(line_id:int):
         logging.error("Line "+str(line_id)+": line_exists - Line ID must be an int")
         line_exists = False
     else:
-        line_exists = str(line_id) in lines.keys()
+        line_exists = str(line_id) in lines
     return(line_exists)
 
 #---------------------------------------------------------------------------------------------

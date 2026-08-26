@@ -367,11 +367,11 @@ def paste_point(object_to_paste, deltax:int, deltay:int):
 
 def update_point_styles(object_id, dict_of_new_styles:dict):
     # Update the appropriate elements in the object configuration
-    for element_to_change in dict_of_new_styles.keys():
+    for element_to_change in dict_of_new_styles:
         objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
     # This function will either get called when applying changes to the route lines (in which case the
     # "colour" element will be present) or for changes to the point button styles ("colour" not present)
-    if "colour" in dict_of_new_styles.keys():
+    if "colour" in dict_of_new_styles:
         library.update_point_styles(
                 point_id = objects_common.schematic_objects[object_id]["itemid"],
                 colour = objects_common.schematic_objects[object_id]["colour"],

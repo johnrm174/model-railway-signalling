@@ -294,7 +294,7 @@ def paste_section(object_to_paste, deltax:int, deltay:int):
 
 def update_section_styles(object_id, dict_of_new_styles:dict):
     # Update the appropriate elements in the object configuration
-    for element_to_change in dict_of_new_styles.keys():
+    for element_to_change in dict_of_new_styles:
         objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
     # The text_colour is set according to the text colour type and background colour
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]

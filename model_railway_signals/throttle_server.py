@@ -391,7 +391,7 @@ async def handle_client(reader, writer):
                     # 1. Parse the target: Is it a wildcard '*' or a specific address (e.g., 'S8')?
                     target_match = re.search(r"A([^<;>]+)", message)
                     msg_target = target_match.group(1) if target_match else "*"
-                    target_keys = [throttle_index] if throttle_index != "*" else list(wi_sessions.keys())
+                    target_keys = [throttle_index] if throttle_index != "*" else list(wi_sessions)
                     for t_key in target_keys:
                         if t_key in wi_sessions:
                             for session in wi_sessions[t_key][:]:
@@ -463,7 +463,7 @@ async def handle_client(reader, writer):
         # This code runs no matter HOW the loop exits (Quit command, crash, or disconnect)
         if server_debug: logging.debug(f"Throttle Server: Cleaning up all consists for {peer_ip_address}:{peer_port_number} ('{client_name}')")
         # Iterate through every throttle key (e.g., '0', '1', 'T1')
-        for t_key in list(wi_sessions.keys()):
+        for t_key in list(wi_sessions):
             # Iterate through every locomotive in that throttle's consist
             for session in wi_sessions[t_key]:
                 try:
@@ -701,7 +701,7 @@ def dcc_power_status_updated(dcc_power:bool):
                 sessions = getattr(writer, 'wi_sessions', {})
                 # WiThrottle clients can have multiple throttles (usually T and S)
                 # active_locos should be a dict like {'T': 'L4401', 'S': 'S3'}
-                for t_key in list(sessions.keys()):
+                for t_key in list(sessions):
                     for session in sessions[t_key]:
                         address_str = session["addr_str"]
                         # Notify the WiThrottle Client to release the UI

@@ -107,10 +107,10 @@ def lever(ID:int): return (lever_index[str(ID)])
 #------------------------------------------------------------------------------------
 
 def switch_exists(ID:int):
-    return (str(ID) in switch_index.keys())
+    return (str(ID) in switch_index)
 
 def route_exists(ID:int):
-    return (str(ID) in route_index.keys())
+    return (str(ID) in route_index)
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)

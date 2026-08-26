@@ -47,7 +47,7 @@ class edit_textbox():
     def __init__(self, root, object_id):
         global open_windows
         # If there is already a  window open then we just make it jump to the top and exit
-        if object_id in open_windows.keys() and open_windows[object_id].winfo_exists():
+        if object_id in open_windows and open_windows[object_id].winfo_exists():
             open_windows[object_id].lift()
             open_windows[object_id].state('normal')
             open_windows[object_id].focus_force()
@@ -159,7 +159,7 @@ class edit_textbox():
     def load_state(self):
         # Check the object we are editing still exists (hasn't been deleted from the schematic)
         # If it no longer exists then we just destroy the window and exit without saving
-        if self.object_id not in objects.schematic_objects.keys():
+        if self.object_id not in objects.schematic_objects:
             self.close_window()
         else:
             # Label the edit window
@@ -185,7 +185,7 @@ class edit_textbox():
     def save_state(self, close_window:bool):
         # Check the object we are editing still exists (hasn't been deleted from the schematic)
         # If it no longer exists then we just destroy the window and exit without saving
-        if self.object_id not in objects.schematic_objects.keys():
+        if self.object_id not in objects.schematic_objects:
             self.close_window()
         elif self.fontsize.validate() and self.borderwidth.validate():
             # Copy the original object Configuration (elements get overwritten as required)

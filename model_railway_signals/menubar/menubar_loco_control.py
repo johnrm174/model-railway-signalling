@@ -356,7 +356,7 @@ class edit_roster():
                 except Exception as exception:
                     Tk.messagebox.showerror(parent=self.window, title="File Parse Error", message=str(exception))
                 else:
-                    if "roster" not in loaded_data.keys():
+                    if "roster" not in loaded_data:
                         Tk.messagebox.showerror(parent=self.window, title="File Load Error", message="Not a roster file")
                     elif not isinstance(loaded_data["roster"], dict):
                         Tk.messagebox.showerror(parent=self.window, title="File Load Error", message="Roster file corrupted")
@@ -465,11 +465,11 @@ class loco_control(Tk.Toplevel):
         # an occupied track section) then check the loco is in the roster
         # before opening the throttle window - otherwise just exit
         roster = settings.get_control("locomotiveroster")
-        if selected_loco is not None and selected_loco not in roster.keys(): return(None)
+        if selected_loco is not None and selected_loco not in roster: return(None)
         # If we have been given a loco identifier (user double clicking on an occupied
         # track section) then check the loco is in the roster before opening the window.
         roster = settings.get_control("locomotiveroster")
-        if selected_loco is not None and selected_loco not in roster.keys(): return(None)
+        if selected_loco is not None and selected_loco not in roster: return(None)
         # Create the Throttle Window
         super().__init__(root_window)
         self.focus()
@@ -721,7 +721,7 @@ class loco_control(Tk.Toplevel):
                loco_already_selected = True
                break
         # Only add the loco if a valid roster selection and not already selected
-        if selection in roster.keys() and not loco_already_selected:
+        if selection in roster and not loco_already_selected:
             # We need to get the DCC Address for the locomotive from the roster entry
             # Key is the loco name - data comprises [dcc_address:int, loco_functions:list]
             # Each loco function entry comprises [label:str, latching:bool]

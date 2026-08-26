@@ -1058,7 +1058,7 @@ def request_loco_session(dcc_address:int):
     elif serial_port.is_open and dcc_power_is_on:
         logging.debug(f"Pi-SPROG: Requesting Loco Session for DCC address {dcc_address}")
         # Check if the DCC address is already in use - if so there is an active session so we error
-        if not str(dcc_address) in locomotive_sessions.keys():
+        if not str(dcc_address) in locomotive_sessions:
             locomotive_sessions[str(dcc_address)] = {}
             locomotive_sessions[str(dcc_address)]["sessionid"] = 0
             locomotive_sessions[str(dcc_address)]["heartbeat"] = None
@@ -1196,7 +1196,7 @@ def process_ploc_message(byte_string):
             logging.debug(f"    Session:{session_handle}, Address:{dcc_address} ({address_type})")
             logging.debug(f"    Speed:{speed}, Direction:{direction}, Function-Map1:0x{function_group1:02X}")
         # Store the session address
-        if str(dcc_address) in locomotive_sessions.keys():
+        if str(dcc_address) in locomotive_sessions:
             locomotive_sessions[str(dcc_address)]["sessionid"] = session_handle
     except Exception as exception:
         logging.error("Pi-SPROG: Error parsing Engine Report (PLOC) Message")
@@ -1511,7 +1511,7 @@ def reset_dcc_sound_mappings():
 # Internal function to play a sound file if a mapping exists for the DCC command
 def play_dcc_sound_file(address:int, active:bool):
     key = str(address)+"-"+str(active)
-    if key in dcc_sound_mappings.keys():
+    if key in dcc_sound_mappings:
         dcc_sound_file_to_load_and_play = dcc_sound_mappings[key]
         logging.debug("Pi-SPROG: Triggering sound file: "+dcc_sound_file_to_load_and_play)
         try:

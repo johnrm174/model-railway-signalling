@@ -241,11 +241,11 @@ def set_all(new_settings):
     restore_defaults()
     # Populate an element at a time - and report any elements we don't recognise
     for group in new_settings:
-        if group not in settings.keys():
+        if group not in settings:
             logging.debug("LOAD LAYOUT - Unexpected settings group '"+group+"' - DISCARDED")
         else:
             for element in new_settings[group]:
-                if element not in settings[group].keys():
+                if element not in settings[group]:
                     logging.debug("LOAD LAYOUT - Unexpected settings element '"+group+":"+element+"' - DISCARDED")
                 else:
                     # Following the introduction of 'styles' we now have sub elements that need
@@ -258,21 +258,21 @@ def set_all(new_settings):
     # Now report any elements missing from the new configuration - intended to provide a
     # level of backward capability (able to load old config files into an extended config
     for group in settings:
-        if group not in new_settings.keys():
+        if group not in new_settings:
             logging.debug("LOAD LAYOUT - Missing settings group: '"+group+"' - Asigning default values:")
             for element in default_settings[group]:
                 logging.debug("LOAD LAYOUT - Missing settings element '"+group+":"+element+
                         "' - Asigning default value '"+ str(default_settings[group][element])+"'")
         else:
             for element in settings[group]:
-                if element not in new_settings[group].keys():
+                if element not in new_settings[group]:
                     logging.debug("LOAD LAYOUT - Missing settings element '"+group+":"+element+
                             "' - Assigning Default Value '"+ str(default_settings[group][element])+"'")
                 # Following the introduction of 'styles' we now have sub elements that need
                 # pulling across - if we just copy the element then we'll lose settinga
                 elif type(settings[group][element]) == dict:
                     for sub_element in settings[group][element]:
-                        if sub_element not in new_settings[group][element].keys():
+                        if sub_element not in new_settings[group][element]:
                             logging.debug("LOAD LAYOUT - Missing settings sub-element '"+group+":"+
                                         element+":"+sub_element+"' - Assigning Default Value '"+
                                           str(default_settings[group][element][sub_element])+"'")

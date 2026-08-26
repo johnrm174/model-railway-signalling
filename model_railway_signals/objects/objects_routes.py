@@ -136,7 +136,7 @@ def remove_references_to_point(point_id:int):
                     new_points_table.append(item_id)
             objects_common.schematic_objects[object_id]["routedefinitions"][index]["pointstohighlight"] = new_points_table
             # Update the "pointsonroute" table in the route definition
-            if str(point_id) in route_definition["pointsonroute"].keys():
+            if str(point_id) in route_definition["pointsonroute"]:
                 del objects_common.schematic_objects[object_id]["routedefinitions"][index]["pointsonroute"][str(point_id)]
     return()
 
@@ -152,7 +152,7 @@ def update_references_to_point(old_point_id:int, new_point_id:int):
                 if item_id == old_point_id:
                     objects_common.schematic_objects[object_id]["routedefinitions"][index1]["pointstohighlight"][index2] = new_point_id
             # Update the "pointsonroute" table in the route definition
-            if str(old_point_id) in route_definition["pointsonroute"].keys():
+            if str(old_point_id) in route_definition["pointsonroute"]:
                 value = objects_common.schematic_objects[object_id]["routedefinitions"][index1]["pointsonroute"].pop(str(old_point_id))
                 objects_common.schematic_objects[object_id]["routedefinitions"][index1]["pointsonroute"][str(new_point_id)] = value
     return()
@@ -293,7 +293,7 @@ def remove_references_to_switch(switch_id:int):
         # Iterate through all the route definitions
         for index, route_definition in enumerate(route_definitions):
             # Update the "switchesonroute" table in the route definition
-            if str(switch_id) in route_definition["switchesonroute"].keys():
+            if str(switch_id) in route_definition["switchesonroute"]:
                 del objects_common.schematic_objects[object_id]["routedefinitions"][index]["switchesonroute"][str(switch_id)]
     return()
 
@@ -304,7 +304,7 @@ def update_references_to_switch(old_switch_id:int, new_switch_id:int):
         # Iterate through all the route definitions
         for index, route_definition in enumerate(route_definitions):
             # Update the "switchesonroute" table in the route definition
-            if str(old_switch_id) in route_definition["switchesonroute"].keys():
+            if str(old_switch_id) in route_definition["switchesonroute"]:
                 value = objects_common.schematic_objects[object_id]["routedefinitions"][index]["switchesonroute"].pop(str(old_switch_id))
                 objects_common.schematic_objects[object_id]["routedefinitions"][index]["switchesonroute"][str(new_switch_id)] = value
     return()
@@ -452,7 +452,7 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
 
 def update_route_styles(object_id, dict_of_new_styles:dict):
     # Update the appropriate elements in the object configuration
-    for element_to_change in dict_of_new_styles.keys():
+    for element_to_change in dict_of_new_styles:
         objects_common.schematic_objects[object_id][element_to_change] = dict_of_new_styles[element_to_change]
     # Work out what the active and selected colours for the button should be
     button_colour = objects_common.schematic_objects[object_id]["buttoncolour"]
