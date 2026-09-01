@@ -48,7 +48,7 @@ import logging
 
 from . import objects_common
 from . import objects_routes
-from .. import run_layout
+from .. import run_common
 from .. import settings
 from .. import library
 
@@ -144,8 +144,8 @@ def redraw_switch_object(object_id):
                 buttontype = button_type,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                selected_callback = run_layout.switch_updated_callback,
-                deselected_callback = run_layout.switch_updated_callback,
+                selected_callback = run_common.switch_updated_callback,
+                deselected_callback = run_common.switch_updated_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["switchname"],
                 tooltip = objects_common.schematic_objects[object_id]["switchdescription"],

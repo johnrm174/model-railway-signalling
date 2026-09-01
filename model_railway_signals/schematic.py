@@ -32,8 +32,7 @@
 #    windows.edit_route(root,object_id) - Open the edit window (on double click)
 #    windows.edit_switch(root,object_id) - Open the edit window (on double click)
 #    windows.edit_lever(root,object_id) - Open the edit window (on double click)
-#    run_layout.initialise(root_window, canvas) - Initialise the run_layout module with the root and canvas
-#    run_routes.initialise(root_window, canvas) - Initialise the run_routes module with the root and canvas 
+#    run_common.initialise(root_window, canvas) - Initialise the run_layout modules with the root and canvas
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -62,8 +61,7 @@ import copy
 from . import library
 from . import objects
 from . import windows
-from . import run_layout
-from . import run_routes
+from . import run_common
 
 #------------------------------------------------------------------------------------
 # Global variables used to track the current selections/state of the Schematic Editor
@@ -295,10 +293,9 @@ def delete_all_objects():
     # (probably because I'm not using the mainloop) - Note we re-draw the grid afterwards
     # Note we do it here to speed things up for the user
     canvas.delete("all")
-    # Select and delete all objects from the schematic. Note that as everything will
-    # have been deleted, we don't need to initialise the schematic
+    # Select and delete all objects from the schematic.
     select_all_objects()
-    objects.delete_objects(schematic_state["selectedobjects"], initialise_layout=False)
+    objects.delete_objects(schematic_state["selectedobjects"])
     # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
     redraw_canvas_grid()
@@ -1203,10 +1200,10 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             # Else fall back to using a text label (filename) for the button
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')
-    # Initialise the Objects and run_layout modules with the canvas details
+    # Initialise the Objects, Library and Run-Layout modules with the Root and Canvas references
     objects.initialise(root_window, canvas)
-    run_layout.initialise(root_window, canvas)
-    run_routes.initialise(root_window, canvas)
+    run_common.initialise(root_window, canvas)
+    library.initialise(root_window, canvas)
     # Create the common tkinter event bindings (applicable to all modes)
     create_common_event_bindings()
     return()

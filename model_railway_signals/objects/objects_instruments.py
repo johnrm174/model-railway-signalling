@@ -18,7 +18,7 @@
 #    objects_signals.remove_references_to_instrument - when the instrument is deleted
 #
 # Accesses the following external editor objects directly:
-#    run_layout.instrument_updated_callback - setting the object callbacks when created/recreated
+#    run_common.instrument_updated_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.instrument_index - The index of Instrument Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
@@ -37,7 +37,7 @@ import copy
 
 from . import objects_common
 from . import objects_signals
-from .. import run_layout 
+from .. import run_common 
 from .. import library
 
 #------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ def redraw_instrument_object(object_id):
                         inst_type = instrument_type,
                         x = objects_common.schematic_objects[object_id]["posx"],
                         y = objects_common.schematic_objects[object_id]["posy"],
-                        callback = run_layout.instrument_updated_callback,
+                        callback = run_common.instrument_updated_callback,
                         bell_sound_file = objects_common.schematic_objects[object_id]["bellsound"],
                         telegraph_sound_file = objects_common.schematic_objects[object_id]["keysound"],
                         linked_to = objects_common.schematic_objects[object_id]["linkedto"])

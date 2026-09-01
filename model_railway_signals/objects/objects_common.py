@@ -11,17 +11,25 @@
 #    get_offset_colour - Get a colour with a specified brightness offset to a specified colour
 #    get_text_colour - Get text colour (black/white) for max contrast with the background colour
 #
-#    signal(item_id:int) - helper function to find the object Id by Item ID
-#    point(item_id:int) - helper function to find the object Id by Item ID
-#    section(item_id:int) - helper function to find the object Id by Item ID
-#    instrument(item_id:int) - helper function to find the object Id by Item ID
-#    line(item_id:int) - helper function to find the object Id by Item ID
-#    track_sensor(item_id:int) - helper function to find the object Id by Item ID
-#    route(item_id:int) - helper function to find the object Id by Item ID
-#    switch(item_id:int) - helper function to find the object Id by Item ID
-#    lever(item_id:int) - helper function to find the object Id by Item ID
+#    signal(item_id:int/str) - helper function to find the object Id by Item ID
+#    point(item_id:int/str) - helper function to find the object Id by Item ID
+#    section(item_id:int/str) - helper function to find the object Id by Item ID
+#    instrument(item_id:int/str) - helper function to find the object Id by Item ID
+#    line(item_id:int/str) - helper function to find the object Id by Item ID
+#    track_sensor(item_id:int/str) - helper function to find the object Id by Item ID
+#    route(item_id:int/str) - helper function to find the object Id by Item ID
+#    switch(item_id:int/str) - helper function to find the object Id by Item ID
+#    lever(item_id:int/str) - helper function to find the object Id by Item ID
 #
-#    switch_exists(item_id:int) - helper function to see if a Switch of a given ID exists
+#    signal_exists(item_id:int/str) - helper function to find if a DCC Switch Object Exists
+#    point_exists(item_id:int/str) - helper function to find if a Route Button Object Exists
+#    instrument_exists(item_id:int/str) - helper function to find if a Signal Object exists
+#    section_exists(item_id:int/str) - helper function to find if a DCC Switch Object Exists
+#    line_exists(item_id:int/str) - helper function to find if a Route Button Object Exists
+#    track_sensor_exists(item_id:int/str) - helper function to find if a Signal Object exists
+#    route_exists(item_id:int/str) - helper function to find if a DCC Switch Object Exists
+#    switch_exists(item_id:int/str) - helper function to find if a Route Button Object Exists
+#    lever_exists(item_id:int/str) - helper function to find if a Signal Object exists
 #
 # Objects intended to be accessed directly by other editor modules:
 #
@@ -44,6 +52,8 @@
 #    lever_index - for iterating through all the signalbox lever objects
 #
 #------------------------------------------------------------------------------------
+
+from typing import Union
 
 #------------------------------------------------------------------------------------
 # Global class used for the object_type - we use normal strings rather than enumeration
@@ -90,27 +100,48 @@ lever_index:dict={}
 # Helper functions to get the main dictionary index (the object_id) from the item_id
 #------------------------------------------------------------------------------------
 
-def signal(ID:int): return (signal_index[str(ID)])
-def point(ID:int): return (point_index[str(ID)])
-def instrument(ID:int): return (instrument_index[str(ID)])
-def section(ID:int): return (section_index[str(ID)])
-def line(ID:int): return (line_index[str(ID)])
-def track_sensor(ID:int): return (track_sensor_index[str(ID)])
-def route(ID:int): return (route_index[str(ID)])
-def switch(ID:int): return (switch_index[str(ID)])
-def lever(ID:int): return (lever_index[str(ID)])
+def signal(ID:Union[int,str]): return (signal_index[str(ID)])
+def point(ID:Union[int,str]): return (point_index[str(ID)])
+def instrument(ID:Union[int,str]): return (instrument_index[str(ID)])
+def section(ID:Union[int,str]): return (section_index[str(ID)])
+def line(ID:Union[int,str]): return (line_index[str(ID)])
+def track_sensor(ID:Union[int,str]): return (track_sensor_index[str(ID)])
+def route(ID:Union[int,str]): return (route_index[str(ID)])
+def switch(ID:Union[int,str]): return (switch_index[str(ID)])
+def lever(ID:Union[int,str]): return (lever_index[str(ID)])
 
 #------------------------------------------------------------------------------------
-# Externally used functions to see if a DCC Switch or route exists. We need to have
-# a specific Function here rather than use the Library function 'button_exists' as
-# both Route Buttons and DCC Switches use the common button library objects
+# Externally used functions to see if a Object of a specified type exists. These will
+# give a definitive indication as to whether the item exists on the local schematic
+# or not - as the library 'exists' functions will return true for remote item IDs
 #------------------------------------------------------------------------------------
 
-def switch_exists(ID:int):
-    return (str(ID) in switch_index)
+def signal_exists(ID:Union[int,str]):
+    return(str(ID) in signal_index)
 
-def route_exists(ID:int):
-    return (str(ID) in route_index)
+def point_exists(ID:Union[int,str]):
+    return(str(ID) in point_index)
+
+def instrument_exists(ID:Union[int,str]):
+    return(str(ID) in instrument_index)
+
+def section_exists(ID:Union[int,str]):
+    return(str(ID) in section_index)
+
+def line_exists(ID:Union[int,str]):
+    return(str(ID) in line_index)
+
+def track_sensor_exists(ID:Union[int,str]):
+    return(str(ID) in track_sensor_index)
+
+def route_exists(ID:Union[int,str]):
+    return(str(ID) in route_index)
+
+def switch_exists(ID:Union[int,str]):
+    return(str(ID) in switch_index)
+
+def lever_exists(ID:Union[int,str]):
+    return(str(ID) in lever_index)
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)

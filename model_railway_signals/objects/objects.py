@@ -22,7 +22,7 @@
 #    finalise_object_updates() - called after bulk updates to process any layout changes
 #
 # Makes the following external API calls to other editor modules:
-#    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
+#    run_common.initialise_layout() - Re-initiallise the state of schematic objects following a change
 #    objects_instruments.create_instrument(type) - Create a default object on the schematic
 #    objects_instruments.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_instruments.update_instrument(obj_id,new_obj) - Update the configuration of an existing instrument object
@@ -114,7 +114,7 @@ from . import objects_routes
 from . import objects_switches
 from . import objects_levers
 
-from .. import run_layout
+from .. import run_common
 from .. import library
 
 #------------------------------------------------------------------------------------
@@ -253,6 +253,7 @@ def save_schematic_state(reset_pointer:bool=False):
     # Use deepcopy as it preserves Enums, Tuples, and UUIDs.
     snapshot = copy.deepcopy(objects_common.schematic_objects)
     undo_buffer.append(snapshot)
+    run_common.initialise_layout()
     return()
 
 def undo():
@@ -289,7 +290,7 @@ def restore_schematic_state():
     bring_track_sections_to_the_front()
     # Repack the canvas now we have finished drawing everything
     objects_common.canvas.pack(fill="both", expand=True)
-    run_layout.initialise_layout()
+    run_common.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -323,7 +324,6 @@ def create_object(xpos:int, ypos:int, new_object_type, item_type=None, item_subt
         apply_layering_tag(object_id)
     # Note that we do not save the schematic state after the 'create' as, although the item now
     # exists, it has yet to be 'placed' on the canvas (schematic state gets saved after the 'place')
-    # Also - as we are just creating a 'new' object, we don't need to process any layout changes
     return(object_id)
 
 #------------------------------------------------------------------------------------
@@ -340,7 +340,6 @@ def finalise_object_updates():
     bring_track_sections_to_the_front()
     objects_common.root.update_idletasks()
     save_schematic_state()
-    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -408,15 +407,13 @@ def delete_object(object_id):
     if delete_function: delete_function(object_id)
     return()
 
-def delete_objects(list_of_object_ids:list, initialise_layout:bool=True):
+def delete_objects(list_of_object_ids:list):
     for object_id in list_of_object_ids:
         delete_object(object_id)
     # Force a display refresh at this point (user experience)
     objects_common.root.update_idletasks()
     # Save the schematic state (for undo/redo) and initialise the layout
     save_schematic_state()
-    # Don't initialise the layout after a delete all (on file new or part of file load)
-    if initialise_layout: run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -467,9 +464,6 @@ def rotate_objects(list_of_object_ids: list):
         objects_common.root.update_idletasks()
         # save the current state (for undo/redo)
         save_schematic_state()
-        # As we are deleting/re-creating objects we still need to process layout changes as the
-        # signals may need to be locked depending on the state of the points and vice versa
-        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -525,9 +519,6 @@ def hide_objects(list_of_object_ids: list, hide: bool = True):
         objects_common.root.update_idletasks()
         # save the current state (for undo/redo)
         save_schematic_state()
-        # As we are deleting/re-creating objects we still need to process layout changes as the
-        # points may need to be un-locked depending on the state of the sections
-        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -570,10 +561,6 @@ def flip_objects(list_of_object_ids:list):
         objects_common.root.update_idletasks()
         # save the current state (for undo/redo)
         save_schematic_state()
-        # As we are deleting/re-creating objects we still need to process layout changes as the
-        # signals may need to be locked depending on the state of the points and vice versa
-        # And the re-draw will have returned the point to 'unswitched'
-        run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------

@@ -42,7 +42,7 @@ import copy
 import logging
 
 from . import objects_common
-from .. import run_layout
+from .. import run_common
 from .. import settings
 from .. import library
 
@@ -181,7 +181,7 @@ def redraw_lever_object(object_id, create_selected:bool=False):
                 levertype = lever_type,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                lever_callback = run_layout.lever_switched_callback,
+                lever_callback = run_common.lever_switched_callback,
                 on_keycode = objects_common.schematic_objects[object_id]["onkeycode"],
                 off_keycode = objects_common.schematic_objects[object_id]["offkeycode"],
                 font = objects_common.schematic_objects[object_id]["textfonttuple"],

@@ -20,12 +20,11 @@
 #    schematic.update_canvas(*canvasargs) - Update the canvas following reload/resizing
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    schematic.scroll_canvas(x:int,y:int) - Scroll the viewable area of the canvas to the given coords
-#    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
-#    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
+#    run_common.configure_automation(automation) - Configure run layout module for automation on/off
+#    run_common.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
-#    run_layout.signal_updated_callback() - When applying the new pub/sub configuration
-#    run_layout.reset_layout() - Reset the schematic back to its default state
-#    run_routes.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
+#    run_common.signal_updated_callback() - When applying the new pub/sub configuration
+#    run_common.reset_layout() - Reset the schematic back to its default state
 #    settings.check_for_import_conflicts() - Check for conflicts with existing settings
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Update settings (following Import)
@@ -118,8 +117,8 @@ from logging.handlers import QueueHandler, QueueListener
 from . import objects
 from . import settings
 from . import schematic
+from . import run_common
 from . import run_layout
-from . import run_routes
 from . import menubar
 from . import library
 from . import throttle_server
@@ -277,7 +276,7 @@ class main_menubar:
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
-        # Initialise the schematic module - this will initialise the objects and run_layout modules
+        # Initialise the schematic module - this will initialise the objects, library and run_layout modules
         schematic.initialise(self.root, self.handle_canvas_event,
                              width=settings.get_canvas("width"),
                              height=settings.get_canvas("height"),
@@ -430,10 +429,9 @@ class main_menubar:
         # Initialise the schematic
         schematic.configure_edit_mode(settings.get_general("editmode"))
         library.configure_edit_mode(settings.get_general("editmode"))
-        run_layout.configure_edit_mode(settings.get_general("editmode"))
-        run_routes.configure_edit_mode(settings.get_general("editmode"))
-        run_layout.configure_automation(settings.get_general("automation"))
-        run_layout.initialise_layout()
+        run_common.configure_edit_mode(settings.get_general("editmode"))
+        run_common.configure_automation(settings.get_general("automation"))
+        run_common.initialise_layout()
 
     # --------------------------------------------------------------------------------------
     # Callback function to handle state changes for the throttle server. We only care about
@@ -476,15 +474,15 @@ class main_menubar:
     def automation_enable(self):
         if not settings.get_general("automation"):
             settings.set_general("automation", True)
-            run_layout.configure_automation(True)
-            run_layout.initialise_layout()
+            run_common.configure_automation(True)
+            run_common.initialise_layout()
             self.update_automation_indication()
 
     def automation_disable(self):
         if settings.get_general("automation"):
             settings.set_general("automation", False)
-            run_layout.configure_automation(False)
-            run_layout.initialise_layout()
+            run_common.configure_automation(False)
+            run_common.initialise_layout()
             self.update_automation_indication()
 
     def update_mode_indication(self):
@@ -509,9 +507,8 @@ class main_menubar:
             settings.set_general("editmode", True)
             schematic.configure_edit_mode(True)
             library.configure_edit_mode(True)
-            run_layout.configure_edit_mode(True)
-            run_routes.configure_edit_mode(True)
-            run_layout.initialise_layout()
+            run_common.configure_edit_mode(True)
+            run_common.initialise_layout()
             self.update_mode_indication()
         
     def run_mode(self):
@@ -519,9 +516,8 @@ class main_menubar:
             settings.set_general("editmode", False)
             schematic.configure_edit_mode(False)
             library.configure_edit_mode(False)
-            run_layout.configure_edit_mode(False)
-            run_routes.configure_edit_mode(False)
-            run_layout.initialise_layout()
+            run_common.configure_edit_mode(False)
+            run_common.initialise_layout()
             self.update_mode_indication()
 
     def reset_layout(self, ask_for_confirm:bool=True):
@@ -529,11 +525,11 @@ class main_menubar:
             if Tk.messagebox.askokcancel(parent=self.root, title="Reset Schematic",
                     message="Are you sure you want to reset all signals, points, switches and "
                     +"instruments back to their default states (Note that track occupancy will be retained)"):
-                delay = run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+                delay = run_common.reset_layout(switch_delay=settings.get_general("resetdelay"))
             else:
                 delay = None
         else:
-            delay = run_layout.reset_layout(switch_delay=settings.get_general("resetdelay"))
+            delay = run_common.reset_layout(switch_delay=settings.get_general("resetdelay"))
         return(delay)
             
     #------------------------------------------------------------------------------------------
@@ -675,7 +671,7 @@ class main_menubar:
         library.subscribe_to_dcc_accessory_command_feed(*settings.get_mqtt("subdccnodes"))
         library.subscribe_to_dcc_locomotive_command_feed(*settings.get_mqtt("subloconodes"))
         library.subscribe_to_remote_gpio_sensors(*settings.get_mqtt("subsensors"))
-        library.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_mqtt("subsignals"))
+        library.subscribe_to_remote_signals(run_common.signal_updated_callback, *settings.get_mqtt("subsignals"))
         library.subscribe_to_remote_sections(*settings.get_mqtt("subsections"))
         library.subscribe_to_remote_instruments(*settings.get_mqtt("subinstruments"))
         objects.configure_remote_gpio_sensor_event_mappings()
@@ -1122,8 +1118,6 @@ def run_editor():
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()-30
     root.maxsize(screen_width,screen_height)
-    # Store the root window reference for use by the library functions
-    library.set_root_window(root)
     # Create the menubar and editor canvas (canvas size will be set on creation)
     main_window_menubar = main_menubar(root)
     # Bind the close window event to the editor quit function to perform an orderly shutdown

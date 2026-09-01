@@ -5,17 +5,25 @@
 # Externalised API functions intended for use by other editor modules:
 #    initialise (root, canvas) - Initialise the objects package
 #    set_base_item_id(item_id) - Set the base value for creating new item IDs
-#    signal(item_id:int) - helper function to find the object Id by Item ID
-#    point(item_id:int) - helper function to find the object Id by Item ID
-#    section(item_id:int) - helper function to find the object Id by Item ID
-#    instrument(item_id:int) - helper function to find the object Id by Item ID
-#    track_sensor(item_id:int) - helper function to find the object Id by Item ID
-#    line(item_id:int) - helper function to find the object Id by Item ID
-#    route(item_id:int) - helper function to find the object Id by Item ID
-#    switch(item_id:int) - helper function to find the object Id by Item ID
-#    lever(item_id:int) - helper function to find the object Id by Item ID
+#    signal(item_id:int/str) - helper function to find the object Id by Item ID
+#    point(item_id:int/str) - helper function to find the object Id by Item ID
+#    section(item_id:int/str) - helper function to find the object Id by Item ID
+#    instrument(item_id:int/str) - helper function to find the object Id by Item ID
+#    track_sensor(item_id:int/str) - helper function to find the object Id by Item ID
+#    line(item_id:int/str) - helper function to find the object Id by Item ID
+#    route(item_id:int/str) - helper function to find the object Id by Item ID
+#    switch(item_id:int/str) - helper function to find the object Id by Item ID
+#    lever(item_id:int/str) - helper function to find the object Id by Item ID
 #
-#    switch_exists(item_id:int) - helper function to find if a DCC Switch Exists
+#    signal_exists(item_id:int/str) - helper function to find if a DCC Switch Object Exists
+#    point_exists(item_id:int/str) - helper function to find if a Route Button Object Exists
+#    instrument_exists(item_id:int/str) - helper function to find if a Signal Object exists
+#    section_exists(item_id:int/str) - helper function to find if a DCC Switch Object Exists
+#    line_exists(item_id:int/str) - helper function to find if a Route Button Object Exists
+#    track_sensor_exists(item_id:int/str) - helper function to find if a Signal Object exists
+#    route_exists(item_id:int/str) - helper function to find if a DCC Switch Object Exists
+#    switch_exists(item_id:int/str) - helper function to find if a Route Button Object Exists
+#    lever_exists(item_id:int/str) - helper function to find if a Signal Object exists
 #
 #    create_gpio_sensors(trigger,timeout,max_events,mappings) - Configure the local GPIO sensor mappings
 #    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
@@ -89,8 +97,15 @@ from .objects_common import route
 from .objects_common import switch
 from .objects_common import lever
 
-from .objects_common import switch_exists
+from .objects_common import signal_exists
+from .objects_common import point_exists
+from .objects_common import instrument_exists
+from .objects_common import section_exists
+from .objects_common import line_exists
+from .objects_common import track_sensor_exists
 from .objects_common import route_exists
+from .objects_common import switch_exists
+from .objects_common import lever_exists
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -144,9 +159,17 @@ __all__ = [
     'route',
     'switch',
     'lever',
-    # Helper functions to See if a DCC switch of a given ID exists
-    'switch_exists',
+    # Helper functions to See if Objects of a particular type exist
+    'signal_exists',
+    'point_exists',
+    'instrument_exists',
+    'section_exists',
+    'line_exists',
+    'track_sensor_exists',
     'route_exists',
+    'switch_exists',
+    'lever_exists',
+
     # Main schematic object dict and the type-specific indexes
     'schematic_objects',
     'signal_index',

@@ -5,10 +5,9 @@
 #
 # External API - classes and functions (used by the Schematic Editor):
 #
-#   set_root_window(root) - initialise the library with the root window reference
+#   initialise(root, canvas) - initialise the library with the root window reference
 #
-#   display_warning(canvas, message) - Display a warning message in the pop-up warnings window
-#             The Canvas reference is needed to schedule a re-focus (for subsequent keypresses to work)
+#   display_warning(message) - Display a warning message in the pop-up warnings window
 #
 #   get_keyboard_mapping(char) - To test if a keyboard character has been mapped to an object event
 #                        If mapped the return will be a tupl containing the mapping_type(str) and the
@@ -74,6 +73,7 @@ from . import signals
 
 # Global Variable to hold a reference to the TkInter Root Window
 root_window = None
+canvas = None
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
 # Global flag to track the mode (set via the configure_edit_mode function)
@@ -84,6 +84,27 @@ keypresses_enabled = True
 # A thread-safe flag to indicate shutdown has been initiated
 shutdown_event = threading.Event()
 
+#-------------------------------------------------------------------------
+# Function to set the root window and canvas references. The canvas reference
+# is used to force focus back on the canvas after a warning window event
+# (to ensure any keypresses will get processed correctly). The root_window
+# reference is used to to feed callbacks functions from other threads into
+# the main tkinter loop and for accessing the window geometry. Also used for
+# scheduling general callbacks in the main tkinter loop. This ensures that
+# all interaction with tkinter is done from within the main tkinter thread.
+#-------------------------------------------------------------------------
+
+def initialise(root, main_canvas):
+    global root_window, canvas
+    root_window = root
+    canvas = main_canvas
+    # Bind a handler for any keypress events used to trigger library events such
+    # as switching signalbox levers or Sensor Triggered events. Note that any
+    # specific canvas event bindings elsewhere in the code will still work.
+    root_window.bind("<Key>", keyboard_handler)
+    # Start the polling loop (for handling events passed in by other threads)
+    root_window.after(100, process_external_events)
+    return()
 #---------------------------------------------------------------------------------------------
 # Popup window for displaying Run Layout Warnings. Used by the Levers library module to
 # display interlocking warnings (when triggered from external keypress events) and also
@@ -126,7 +147,7 @@ def focus_back_on_canvas(event, canvas):
     root_window.update_idletasks()
     root_window.after(0, lambda:canvas.focus_set())
 
-def display_warning(canvas, message:str):
+def display_warning(message:str):
     global interlocking_warning_window
     global list_of_warning_labels
     background = "yellow2"
@@ -238,26 +259,6 @@ def mqtt_transmit_all_now_things_should_have_stabilised():
 
 def sprog_transmit_all():
     dcc_control.sprog_send_all_dcc_command_states_on_sprog_connect()
-    return()
-
-#-------------------------------------------------------------------------
-# Function to set the tkinter "root" window reference as this is used to
-# schedule callback events in the main tkinter event loop using the 'after'
-# method and also for feeding custom callback functions into the main tkinter
-# thread. We do this as all the information out there on the internet concludes
-# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
-# objects should be done from within the main tkinter thread.
-#-------------------------------------------------------------------------
-
-def set_root_window(root):
-    global root_window
-    root_window = root
-    # Bind a handler for any keypress events used to trigger library events such
-    # as switching signalbox levers or Sensor Triggered events. Note that any
-    # specific canvas event bindings elsewhere in the code will still work.
-    root_window.bind("<Key>", keyboard_handler)
-    # Start the polling loop (for handling events passed in by other threads)
-    root_window.after(100, process_external_events)
     return()
 
 #-------------------------------------------------------------------------

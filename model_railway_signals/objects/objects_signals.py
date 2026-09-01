@@ -32,11 +32,11 @@
 #    objects_levers.remove_references_to_signal - called when the signal is deleted
 #
 # Accesses the following external editor objects directly:
-#    run_layout.signal_switched_callback - setting the object callbacks when created/recreated
-#    run_layout.subsidary_switched_callback - setting the object callbacks when created/recreated
-#    run_layout.signal_passed_callback - setting the object callbacks when created/recreated
-#    run_layout.signal_released_callback - setting the object callbacks when created/recreated
-#    run_layout.signal_updated_callback - setting the object callbacks when created/recreated
+#    run_common.signal_switched_callback - setting the object callbacks when created/recreated
+#    run_common.subsidary_switched_callback - setting the object callbacks when created/recreated
+#    run_common.signal_passed_callback - setting the object callbacks when created/recreated
+#    run_common.signal_released_callback - setting the object callbacks when created/recreated
+#    run_common.signal_updated_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.signal_index - The Index of Signal Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
@@ -76,7 +76,7 @@ from . import objects_common
 from . import objects_points
 from . import objects_routes
 from . import objects_levers
-from .. import run_layout
+from .. import run_common
 from .. import settings
 from .. import library
 
@@ -619,11 +619,11 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    sig_switched_callback = run_layout.signal_switched_callback,
-                    sub_switched_callback = run_layout.subsidary_switched_callback,
-                    sig_released_callback = run_layout.signal_released_callback,
-                    sig_passed_callback = run_layout.signal_passed_callback,
-                    sig_updated_callback = run_layout.signal_updated_callback,
+                    sig_switched_callback = run_common.signal_switched_callback,
+                    sub_switched_callback = run_common.subsidary_switched_callback,
+                    sig_released_callback = run_common.signal_released_callback,
+                    sig_passed_callback = run_common.signal_passed_callback,
+                    sig_updated_callback = run_common.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
@@ -664,11 +664,11 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    sig_switched_callback = run_layout.signal_switched_callback,
-                    sub_switched_callback = run_layout.subsidary_switched_callback,
-                    sig_released_callback = run_layout.signal_released_callback,
-                    sig_passed_callback = run_layout.signal_passed_callback,
-                    sig_updated_callback = run_layout.signal_updated_callback,
+                    sig_switched_callback = run_common.signal_switched_callback,
+                    sub_switched_callback = run_common.subsidary_switched_callback,
+                    sig_released_callback = run_common.signal_released_callback,
+                    sig_passed_callback = run_common.signal_passed_callback,
+                    sig_updated_callback = run_common.signal_updated_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
@@ -706,11 +706,11 @@ def redraw_signal_object(object_id):
                     signalsubtype = library.semaphore_subtype.distant,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    sig_switched_callback = run_layout.signal_switched_callback,
-                    sub_switched_callback = run_layout.subsidary_switched_callback,
-                    sig_released_callback = run_layout.signal_released_callback,
-                    sig_passed_callback = run_layout.signal_passed_callback,
-                    sig_updated_callback = run_layout.signal_updated_callback,
+                    sig_switched_callback = run_common.signal_switched_callback,
+                    sub_switched_callback = run_common.subsidary_switched_callback,
+                    sig_released_callback = run_common.signal_released_callback,
+                    sig_passed_callback = run_common.signal_passed_callback,
+                    sig_updated_callback = run_common.signal_updated_callback,
                     associated_home = objects_common.schematic_objects[object_id]["itemid"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
@@ -741,8 +741,8 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    sig_switched_callback = run_layout.signal_switched_callback,
-                    sig_passed_callback = run_layout.signal_passed_callback,
+                    sig_switched_callback = run_common.signal_switched_callback,
+                    sig_passed_callback = run_common.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     slot_with = objects_common.schematic_objects[object_id]["slotwith"],
@@ -766,8 +766,8 @@ def redraw_signal_object(object_id):
                     signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    sig_switched_callback = run_layout.signal_switched_callback,
-                    sig_passed_callback = run_layout.signal_passed_callback,
+                    sig_switched_callback = run_common.signal_switched_callback,
+                    sig_passed_callback = run_common.signal_passed_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     flip_position = objects_common.schematic_objects[object_id]["flipped"],
                     slot_with = objects_common.schematic_objects[object_id]["slotwith"],

@@ -29,7 +29,7 @@
 #    objects_points.remove_references_to_section - called when the Section is deleted
 #    
 # Accesses the following external editor objects directly:
-#    run_layout.section_updated_callback - setting the object callbacks when created/recreated
+#    run_common.section_updated_callback - setting the object callbacks when created/recreated
 #    objects_common.objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.objects_common.section_index - The index of Section Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
@@ -53,7 +53,7 @@ from . import objects_signals
 from . import objects_sensors
 from . import objects_points
 from .. import settings
-from .. import run_layout 
+from .. import run_common
 from .. import library
 
 #------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ def redraw_section_object(object_id):
                 section_id = item_id,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                section_callback = run_layout.section_updated_callback,
+                section_callback = run_common.section_updated_callback,
                 default_label = objects_common.schematic_objects[object_id]["defaultlabel"],
                 editable = objects_common.schematic_objects[object_id]["editable"],
                 hidden = objects_common.schematic_objects[object_id]["hidden"],

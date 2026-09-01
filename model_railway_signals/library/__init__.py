@@ -7,7 +7,7 @@
 # Which is used in the buttons module for creating button tooltips.
 #------------------------------------------------------------------------------------
 
-from .common import set_root_window
+from .common import initialise
 from .common import orderly_shutdown
 from .common import instant_shutdown
 from .common import configure_edit_mode
@@ -220,7 +220,7 @@ from .pi_sprog_interface import play_dcc_sound_file
 
 __all__ = [
       # Public common functions
-        'set_root_window',
+        'initialise',
         'orderly_shutdown',
         'instant_shutdown',
         'configure_edit_mode',
